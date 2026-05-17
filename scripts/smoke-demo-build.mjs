@@ -565,7 +565,7 @@ async function verifyCopyLoadedSource() {
     await waitForPatternRoute({ pattern: 'accordion', panel: 'code', source: 'Accordion.tsx', label: 'Accordion' })
     const copyButton = await waitFor(() => {
       const button = Array.from(document.querySelectorAll('button'))
-        .find((candidate) => candidate.textContent?.trim() === 'copy')
+        .find((candidate) => candidate.getAttribute('aria-label') === 'copy')
       const sourceText = sourcePanelText()
       const ready = button
         && !button.disabled
@@ -580,7 +580,7 @@ async function verifyCopyLoadedSource() {
       return copiedText.includes('export function Accordion')
         && !copiedText.includes('loading')
         && Array.from(document.querySelectorAll('button'))
-          .some((button) => button.textContent?.trim() === 'copied')
+          .some((button) => button.getAttribute('aria-label') === 'copied')
     })
   } catch {
     patternFailures.push(`source copy did not write the loaded Accordion source: writes=${clipboardWrites.length}, text=${rootText().slice(0, 180)}`)
