@@ -290,6 +290,24 @@ describe('demo source wiring', () => {
 
     expect(servedCollisions).toEqual([])
   })
+
+  it('loads every exposed source tab as non-empty source text', async () => {
+    const exposedSourceNames = new Set<string>()
+    const failedSources: string[] = []
+
+    render(<DemoSourceProbe onSourceName={(sourceName) => exposedSourceNames.add(sourceName)} />)
+
+    await Promise.all([...exposedSourceNames].map(async (sourceName) => {
+      try {
+        const source = await sourceLoaders[sourceName]?.()
+        if (!source || source.trim().length === 0) failedSources.push(sourceName)
+      } catch {
+        failedSources.push(sourceName)
+      }
+    }))
+
+    expect(failedSources).toEqual([])
+  })
 })
 
 function DemoSourceProbe({
@@ -297,12 +315,14 @@ function DemoSourceProbe({
   onMissingHookSource = () => undefined,
   onInvalidEntry = () => undefined,
   onCollidingSource = () => undefined,
+  onSourceName = () => undefined,
   collidingSourceNames = new Set(),
 }: {
   onMissingSource?: (sourceName: string) => void
   onMissingHookSource?: (sourceName: string) => void
   onInvalidEntry?: (issue: string) => void
   onCollidingSource?: (sourceName: string) => void
+  onSourceName?: (sourceName: string) => void
   collidingSourceNames?: ReadonlySet<string>
 }) {
   return (
@@ -315,6 +335,7 @@ function DemoSourceProbe({
           onMissingHookSource={onMissingHookSource}
           onInvalidEntry={onInvalidEntry}
           onCollidingSource={onCollidingSource}
+          onSourceName={onSourceName}
           collidingSourceNames={collidingSourceNames}
         />
       ))}
@@ -328,6 +349,7 @@ function DemoSourceProbeItem({
   onMissingHookSource,
   onInvalidEntry,
   onCollidingSource,
+  onSourceName,
   collidingSourceNames,
 }: {
   entry: (typeof patternEntries)[number]
@@ -335,6 +357,7 @@ function DemoSourceProbeItem({
   onMissingHookSource: (sourceName: string) => void
   onInvalidEntry: (issue: string) => void
   onCollidingSource: (sourceName: string) => void
+  onSourceName: (sourceName: string) => void
   collidingSourceNames: ReadonlySet<string>
 }) {
   const demo = entry.useDemoPattern(() => undefined)
@@ -344,6 +367,7 @@ function DemoSourceProbeItem({
   if (duplicates([...demo.sourceNames]).length > 0) onInvalidEntry(`${entry.key}: duplicate source tabs`)
   if (demo.keyboardShortcuts.some((shortcut) => shortcut.trim().length === 0)) onInvalidEntry(`${entry.key}: empty keyboard shortcut`)
   for (const sourceName of demo.sourceNames) {
+    onSourceName(sourceName)
     if (!sourceLoaders[sourceName]) onMissingSource?.(`${entry.key}: ${sourceName}`)
     if (collidingSourceNames.has(sourceName)) onCollidingSource(`${entry.key}: ${sourceName}`)
   }
