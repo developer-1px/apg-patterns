@@ -9,7 +9,7 @@ type Props = HTMLAttributes<HTMLElement>
 const buttonClass =
   'inline-flex h-8 items-center justify-between rounded-lg bg-zinc-100/80 px-3 text-sm font-medium text-zinc-800 shadow-sm shadow-zinc-200/60 outline-none hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.06] dark:text-zinc-200 dark:shadow-black/20 dark:hover:bg-white/[0.1] dark:focus-visible:outline-zinc-500'
 const panelClass =
-  'rounded-xl bg-white/95 p-2 text-sm text-zinc-700 shadow-[0_18px_50px_rgba(24,24,27,0.14)] ring-1 ring-black/[0.03] backdrop-blur dark:bg-zinc-950/95 dark:text-zinc-300 dark:ring-white/[0.05]'
+  'rounded-xl bg-white/96 p-2 text-sm text-zinc-700 shadow-[0_20px_56px_rgba(24,24,27,0.15)] backdrop-blur dark:bg-zinc-950/96 dark:text-zinc-300 dark:shadow-black/35'
 const linkClass =
   'block rounded-lg px-2 py-1 text-sm text-zinc-700 outline-none hover:bg-zinc-100/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:text-zinc-300 dark:hover:bg-white/[0.07] dark:focus-visible:outline-zinc-500'
 

@@ -155,8 +155,15 @@ npm run demo
 ## Verification
 
 ```bash
+npm run check
+```
+
+`check` runs TypeScript validation, the Vitest suite, and the production demo smoke test:
+
+```bash
 npm run typecheck
 npm test
+npm run demo:smoke
 ```
 
 ## Design Notes
