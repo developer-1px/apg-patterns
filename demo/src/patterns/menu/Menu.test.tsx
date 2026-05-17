@@ -157,6 +157,26 @@ describe('Menu — actionMenuButton (rovingTabIndex)', () => {
     expect(items[0]!.getAttribute('tabindex')).toBe('0')
   })
 
+  it('click on trigger opens menu and focuses first item', () => {
+    render(<MenuDemo variant="actionMenuButton" />)
+    const trigger = screen.getByRole('button', { name: /Actions/ })
+
+    fireEvent.click(trigger)
+
+    expect(trigger.getAttribute('aria-expanded')).toBe('true')
+    expect(screen.getByRole('menuitem', { name: 'Action 1' }).getAttribute('tabindex')).toBe('0')
+  })
+
+  it('ArrowDown after trigger click moves from first to next item', () => {
+    render(<MenuDemo variant="actionMenuButton" />)
+    const trigger = screen.getByRole('button', { name: /Actions/ })
+
+    fireEvent.click(trigger)
+    fireEvent.keyDown(screen.getByRole('menu'), { key: 'ArrowDown' })
+
+    expect(screen.getByRole('menuitem', { name: 'Action 2' }).getAttribute('tabindex')).toBe('0')
+  })
+
   it('hovering a menuitem (focus event) updates active item', () => {
     render(<MenuDemo variant="actionMenuButton" />)
     const trigger = screen.getByRole('button', { name: /Actions/ })
@@ -221,5 +241,16 @@ describe('Menu — actionMenuButtonActiveDescendant', () => {
 
     fireEvent.focus(items[2]!)
     expect(menu.getAttribute('aria-activedescendant')).toBe(items[2]!.id)
+  })
+
+  it('click on trigger opens menu and sets aria-activedescendant to first item id', () => {
+    render(<MenuDemo variant="actionMenuButtonActiveDescendant" />)
+    const trigger = screen.getByRole('button', { name: /Actions/ })
+
+    fireEvent.click(trigger)
+
+    const menu = screen.getByRole('menu')
+    const items = screen.getAllByRole('menuitem')
+    expect(menu.getAttribute('aria-activedescendant')).toBe(items[0]!.id)
   })
 })
