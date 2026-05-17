@@ -13,7 +13,7 @@ export const entry: PatternEntry = {
       key: 'toolbar',
       label: 'Toolbar',
       keyboardShortcuts: ['ArrowRight', 'ArrowLeft', 'Home', 'End', 'Enter', 'Space'],
-      sourceNames: ['Toolbar.tsx', 'toolbarData.ts', 'toolbar/definition.ts', ...KERNEL_SOURCES],
+      sourceNames: ['Toolbar.tsx', 'toolbarData.ts', 'toolbar/useToolbarPattern.ts', 'toolbar/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
       preview: <Toolbar data={host.data} onEvent={(event) => {
         onEvent(event)

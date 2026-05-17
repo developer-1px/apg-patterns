@@ -15,7 +15,7 @@ export const entry: PatternEntry = {
       key: 'alertdialog',
       label: 'Alert Dialog',
       keyboardShortcuts: ['Tab', 'Shift+Tab', 'Escape', 'Enter', 'Space'],
-      sourceNames: ['AlertDialog.tsx', 'alertdialogData.ts', 'alertdialog/definition.ts', ...KERNEL_SOURCES],
+      sourceNames: ['AlertDialog.tsx', 'alertdialogData.ts', 'alertdialog/useAlertDialogPattern.ts', 'alertdialog/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
       preview: <AlertDialog data={host.data} onEvent={(event) => {
         onEvent(event)

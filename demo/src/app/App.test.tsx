@@ -45,13 +45,27 @@ describe('demo source wiring', () => {
 
     expect(missingSources).toEqual([])
   })
+
+  it('exposes each collected pattern hook source from its demo source tabs', () => {
+    const missingHookSources: string[] = []
+
+    render(<DemoSourceProbe onMissingHookSource={(sourceName) => missingHookSources.push(sourceName)} />)
+
+    expect(missingHookSources).toEqual([])
+  })
 })
 
-function DemoSourceProbe({ onMissingSource }: { onMissingSource: (sourceName: string) => void }) {
+function DemoSourceProbe({
+  onMissingSource,
+  onMissingHookSource = () => undefined,
+}: {
+  onMissingSource?: (sourceName: string) => void
+  onMissingHookSource?: (sourceName: string) => void
+}) {
   return (
     <>
       {patternEntries.map((entry) => (
-        <DemoSourceProbeItem key={entry.key} entry={entry} onMissingSource={onMissingSource} />
+        <DemoSourceProbeItem key={entry.key} entry={entry} onMissingSource={onMissingSource} onMissingHookSource={onMissingHookSource} />
       ))}
     </>
   )
@@ -60,13 +74,25 @@ function DemoSourceProbe({ onMissingSource }: { onMissingSource: (sourceName: st
 function DemoSourceProbeItem({
   entry,
   onMissingSource,
+  onMissingHookSource,
 }: {
   entry: (typeof patternEntries)[number]
-  onMissingSource: (sourceName: string) => void
+  onMissingSource?: (sourceName: string) => void
+  onMissingHookSource: (sourceName: string) => void
 }) {
   const demo = entry.useDemoPattern(() => undefined)
   for (const sourceName of demo.sourceNames) {
-    if (!sourceLoaders[sourceName]) onMissingSource(`${entry.key}: ${sourceName}`)
+    if (!sourceLoaders[sourceName]) onMissingSource?.(`${entry.key}: ${sourceName}`)
+  }
+  for (const sourceName of expectedHookSources(entry.key)) {
+    if (!demo.sourceNames.includes(sourceName)) onMissingHookSource(`${entry.key}: ${sourceName}`)
   }
   return null
+}
+
+function expectedHookSources(patternKey: string) {
+  return Object.keys(sourceLoaders).filter((sourceName) => (
+    sourceName.startsWith(`${patternKey}/`)
+    && /\/use[A-Z].*Pattern\.ts$/.test(sourceName)
+  ))
 }

@@ -1,6 +1,6 @@
 import type { HTMLAttributes, KeyboardEvent } from 'react'
 import { useRef } from 'react'
-import { createPatternRuntime, disclosureDefinition, type PatternData, type PatternEvent } from '../../../../src'
+import { useDisclosurePattern, type PatternData, type PatternEvent } from '../../../../src'
 import { navMenuContent, navMenuTopLinksContent } from './disclosureData'
 import { Icon } from '../../shared/Icon'
 
@@ -30,7 +30,8 @@ function NavMenuBase({
   onEvent: (event: PatternEvent) => void
   mixed: boolean
 }) {
-  const { rootKeys, expandedKeys, triggerOf, panelOf } = useTriggerRuntime(data, onEvent)
+  const disclosure = useDisclosurePattern(data, onEvent)
+  const expandedKeys = disclosure.state.expandedKeys
   const containerRef = useRef<HTMLDivElement>(null)
   const entries = mixed ? navMenuTopLinksContent : navMenuContent.map((group) => ({ kind: 'group' as const, ...group }))
 
@@ -106,32 +107,13 @@ function NavMenuBase({
       <ul className="flex flex-wrap items-start gap-2">
         {entries.map((entry) => entry.kind === 'link'
           ? <TopLink key={entry.key} entry={entry} />
-          : <TopGroup key={entry.key} entry={entry} expanded={expandedKeys.includes(entry.key)} trigger={triggerOf(entry.key)} panel={panelOf(entry.key) ?? {}} onToggle={() => {
+          : <TopGroup key={entry.key} entry={entry} expanded={expandedKeys.includes(entry.key)} trigger={disclosure.items.find((item) => item.key === entry.key)?.triggerProps ?? {}} panel={disclosure.items.find((item) => item.key === entry.key)?.panelProps ?? {}} onToggle={() => {
             closeOthers(entry.key)
             onEvent({ type: 'expand', key: entry.key, expanded: !expandedKeys.includes(entry.key) })
           }} onButtonKey={onButtonKey(entry.key)} onLinkKey={onLinkKey(entry.key)} />)}
       </ul>
     </nav>
   )
-}
-
-function useTriggerRuntime(data: PatternData, onEvent: (event: PatternEvent) => void) {
-  const runtime = createPatternRuntime({
-    definition: disclosureDefinition,
-    data,
-    options: {},
-    onEvent,
-    keyToElementId: (key) => `disclosure-${String(key).toLowerCase().replace(/[^a-z0-9_-]+/g, '-')}`,
-  })
-  const triggerOf = (key: string) => {
-    const { onKeyDown: _ignore, ...rest } = runtime.getItemProps('trigger', key) as Props
-    return rest
-  }
-  const panelOf = (triggerKey: string) => {
-    const panelKey = data.relations?.controlsByKey?.[triggerKey]?.[0]
-    return panelKey ? runtime.getItemProps('panel', panelKey) as Props : null
-  }
-  return { rootKeys: data.relations?.rootKeys ?? [], expandedKeys: data.state?.expandedKeys ?? [], triggerOf, panelOf }
 }
 
 function TopLink({ entry }: { entry: { key: string; label: string; href: string } }) {

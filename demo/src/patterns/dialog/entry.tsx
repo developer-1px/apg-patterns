@@ -11,7 +11,7 @@ export const entry: PatternEntry = {
       key: 'dialog',
       label: 'Dialog',
       keyboardShortcuts: ['Tab', 'Shift+Tab', 'Escape'],
-      sourceNames: ['Dialog.tsx', 'dialogData.ts', 'dialog/definition.ts', ...KERNEL_SOURCES],
+      sourceNames: ['Dialog.tsx', 'dialogData.ts', 'dialog/useDialogPattern.ts', 'dialog/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(initialDialogData),
       preview: <Dialog />,
     }

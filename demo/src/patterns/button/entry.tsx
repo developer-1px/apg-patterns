@@ -19,7 +19,7 @@ export const entry: PatternEntry = {
       key: 'button',
       label: 'Button',
       keyboardShortcuts: ['Enter', 'Space'],
-      sourceNames: ['Button.tsx', 'buttonData.ts', 'button/definition.ts', ...KERNEL_SOURCES],
+      sourceNames: ['Button.tsx', 'buttonData.ts', 'button/useButtonPattern.ts', 'button/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
       variants: <VariantListbox orientation="horizontal" value={host.variant} items={buttonVariantItems} label="button variants" idPrefix="button-variant" onChange={host.selectVariant} />,
       preview: <Button data={host.data} onEvent={(event) => {

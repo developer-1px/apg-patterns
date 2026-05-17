@@ -13,7 +13,7 @@ export const entry: PatternEntry = {
       key: 'switch',
       label: 'Switch',
       keyboardShortcuts: ['Space', 'Enter'],
-      sourceNames: ['Switch.tsx', 'switchData.ts', 'switch/definition.ts', ...KERNEL_SOURCES],
+      sourceNames: ['Switch.tsx', 'switchData.ts', 'switch/useSwitchPattern.ts', 'switch/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
       preview: <Switch data={host.data} onEvent={(event) => {
         onEvent(event)

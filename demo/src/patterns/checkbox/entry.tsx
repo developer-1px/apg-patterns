@@ -19,7 +19,7 @@ export const entry: PatternEntry = {
       key: 'checkbox',
       label: 'Checkbox',
       keyboardShortcuts: ['Space'],
-      sourceNames: ['Checkbox.tsx', 'checkboxData.ts', 'checkbox/definition.ts', ...KERNEL_SOURCES],
+      sourceNames: ['Checkbox.tsx', 'checkboxData.ts', 'checkbox/useCheckboxPattern.ts', 'checkbox/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
       variants: <VariantListbox orientation="horizontal" value={host.variant} items={checkboxVariantItems} label="checkbox variants" idPrefix="checkbox-variant" onChange={host.selectVariant} />,
       preview: <Checkbox data={host.data} onEvent={(event) => {

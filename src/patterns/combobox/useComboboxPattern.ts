@@ -58,7 +58,7 @@ export function useComboboxPattern(data: PatternData, onEvent: (event: PatternEv
       type: 'text',
       readOnly: !editable,
       value: displayValue,
-      placeholder: editable ? 'Type a fruit (ArrowDown opens)' : 'Pick a fruit (ArrowDown opens)',
+      placeholder: editable ? 'Search fruit' : 'Select fruit',
       'aria-controls': listboxId,
       onChange: (event) => {
         if (editable) onEvent({ type: 'inputValue', key: COMBOBOX_KEY, value: event.currentTarget.value, inline: variant === 'listWithInlineAutocomplete' })
