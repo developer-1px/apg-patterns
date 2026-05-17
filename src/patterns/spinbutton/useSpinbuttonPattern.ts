@@ -1,5 +1,4 @@
 import type { KeyboardEvent } from 'react'
-import type { KeyInput } from '@interactive-os/keyboard'
 import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions, PatternValueStepDirection } from '../../schema'
 import type { ReactPatternProps, ReactRenderItemState } from '../../adapters/reactBaseTypes'
@@ -92,7 +91,7 @@ function createSpinbuttonRenderItem(runtime: PatternRuntime, key: Key): ReactSpi
       'aria-valuemax': max,
       onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
         runtime.emit({ type: 'focus', key })
-        const result = runtime.resolveKeyboardBinding(event as unknown as KeyInput, key)
+        const result = runtime.resolveKeyboardBinding(event, key)
         if (!result) return
         if (result.preventDefault) event.preventDefault()
         for (const next of result.events) runtime.emit(next)
