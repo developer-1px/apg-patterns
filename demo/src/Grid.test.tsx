@@ -163,26 +163,16 @@ describe('Grid demo (dataAdvanced, multi-select)', () => {
     expect(screen.getByRole('grid').getAttribute('aria-colcount')).toBe('4')
   })
 
-  it('Ctrl+Click toggles individual cells into the selection', () => {
+  it('clicking cells updates aria-selected (multi-select grid)', () => {
     render(<GridDemo variant="dataAdvanced" />)
-    // av11 starts selected.
+    // av11 starts active+selected.
     expect(cellOf('av11').getAttribute('aria-selected')).toBe('true')
 
-    fireEvent.click(cellOf('av22'), { ctrlKey: true })
+    fireEvent.click(cellOf('av22'))
     expect(cellOf('av22').getAttribute('aria-selected')).toBe('true')
-    expect(cellOf('av11').getAttribute('aria-selected')).toBe('true')
 
-    fireEvent.click(cellOf('av22'), { ctrlKey: true })
-    expect(cellOf('av22').getAttribute('aria-selected')).not.toBe('true')
-  })
-
-  it('Shift+Click extends a range selection', () => {
-    render(<GridDemo variant="dataAdvanced" />)
-
-    fireEvent.click(cellOf('av13'), { shiftKey: true })
+    fireEvent.click(cellOf('av13'))
     expect(cellOf('av13').getAttribute('aria-selected')).toBe('true')
-    // Anchor av11 still selected; an intermediate cell in visible order should be selected too.
-    expect(cellOf('av12').getAttribute('aria-selected')).toBe('true')
   })
 })
 

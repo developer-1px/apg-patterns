@@ -152,7 +152,8 @@ describe('Menu — actionMenuButton (rovingTabIndex)', () => {
     expect(items[0]!.getAttribute('tabindex')).toBe('0')
 
     fireEvent.keyDown(items[0]!, { key: 'ArrowDown' })
-    expect(items[1]!.getAttribute('tabindex')).toBe('0')
+    const items2 = screen.getAllByRole('menuitem')
+    expect(items2[1]!.getAttribute('tabindex')).toBe('0')
   })
 
   it('Escape closes menu and returns focus to trigger', () => {
