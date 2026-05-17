@@ -1,12 +1,16 @@
-import { useTreeviewPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
+import { useTreeviewPattern, type PatternData, type PatternEvent, type PatternItem, type PatternOptions } from '../../../../src'
 import { Icon } from '../../shared/Icon'
+
+type TreeItem = PatternItem & {
+  href?: string
+}
 
 export function Tree({
   data,
   onEvent,
   options,
 }: {
-  data: PatternData
+  data: PatternData<TreeItem>
   onEvent: (event: PatternEvent) => void
   options?: PatternOptions
 }) {
@@ -15,7 +19,7 @@ export function Tree({
   return (
     <div {...tree.rootProps} className="min-h-56 bg-white py-1 outline-none focus:outline focus:outline-2 focus:outline-zinc-400 dark:bg-zinc-950 dark:focus:outline-zinc-500">
       {tree.renderItems.map((item) => {
-        const href = (data.items[item.key] as { href?: string } | undefined)?.href
+        const href = data.items[item.key]?.href
         const indent = item.level * 18
 
         const indicator = item.kind === 'branch' ? (

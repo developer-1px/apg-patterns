@@ -19,6 +19,8 @@ export const PatternItemSchema = z
   .passthrough()
   .superRefine((value, ctx) => validateJsonExtensionFields(value, ['label', 'labelledBy', 'textValue', 'itemValue', 'kind'], ctx))
 
+export type PatternItem = z.infer<typeof PatternItemSchema>
+
 export const PatternRelationsSchema = z
   .object({
     rootKeys: z.array(KeySchema).readonly().optional(),
@@ -121,4 +123,8 @@ export const PatternDataSchema = z
   .strict()
   .superRefine(validatePatternDataRefs)
 
-export type PatternData = z.infer<typeof PatternDataSchema>
+type PatternDataBase = z.infer<typeof PatternDataSchema>
+
+export type PatternData<TItem extends PatternItem = PatternItem> = Omit<PatternDataBase, 'items'> & {
+  items: Record<Key, TItem>
+}
