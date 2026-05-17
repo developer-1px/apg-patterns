@@ -29,7 +29,6 @@ export const entry: PatternEntry = {
         if (event.type !== 'spawn') onEvent(event)
         dispatch({ type: 'event', event })
       }} />,
-      reset: () => dispatch({ type: 'reset' }),
     }
   },
 }

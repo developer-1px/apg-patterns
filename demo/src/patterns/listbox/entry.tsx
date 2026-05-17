@@ -78,7 +78,6 @@ export const entry: PatternEntry = {
       inspect: renderDataInspect(host.data),
       variants: <VariantListbox orientation="horizontal" value={host.variant} items={listboxVariantItems} label="listbox variants" idPrefix="listbox-variant" onChange={host.selectVariant} />,
       preview,
-      reset: host.reset,
     }
   },
 }

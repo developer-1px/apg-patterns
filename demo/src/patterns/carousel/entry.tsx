@@ -14,7 +14,6 @@ export const entry: PatternEntry = {
       sourceNames: ['Carousel.tsx', 'carouselData.ts', 'carousel/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(initialCarouselData),
       preview: <Carousel />,
-      // stateless — no reset
     }
   },
 }

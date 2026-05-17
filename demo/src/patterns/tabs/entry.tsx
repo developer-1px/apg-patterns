@@ -51,7 +51,6 @@ export const entry: PatternEntry = {
           <Tabs data={host.data} onEvent={handleEvent} />
         </div>
       ),
-      reset: host.reset,
     }
   },
 }

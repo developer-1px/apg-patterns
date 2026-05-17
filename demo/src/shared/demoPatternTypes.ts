@@ -13,7 +13,6 @@ export interface DemoPattern {
   keyboardShortcuts: readonly string[]
   inspect: string
   preview: ReactNode
-  reset?: () => void
   variants?: ReactNode
   inspectControls?: ReactNode
 }

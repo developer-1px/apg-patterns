@@ -14,7 +14,6 @@ export const entry: PatternEntry = {
       sourceNames: ['Tooltip.tsx', 'tooltipData.ts', 'tooltip/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(initialTooltipData),
       preview: <Tooltip />,
-      // stateless — no reset
     }
   },
 }

@@ -23,7 +23,6 @@ export const entry: PatternEntry = {
       inspect: renderDataInspect(host.data),
       variants: <VariantListbox orientation="horizontal" value={host.variant} items={meterVariantItems} label="meter variants" idPrefix="meter-variant" onChange={host.selectVariant} />,
       preview: <Meter data={host.data} onEvent={onEvent} />,
-      reset: () => host.selectVariant('disk'),
     }
   },
 }

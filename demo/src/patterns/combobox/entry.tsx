@@ -36,7 +36,6 @@ export const entry: PatternEntry = {
           }}
         />
       ),
-      reset: host.reset,
     }
   },
 }

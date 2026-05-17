@@ -34,7 +34,6 @@ export const entry: PatternEntry = {
         onEvent(event)
         host.dispatchEvent(event)
       }} />,
-      reset: host.reset,
     }
   },
 }

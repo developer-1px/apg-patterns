@@ -13,7 +13,6 @@ export type DemoPatternHostState = z.infer<typeof DemoPatternHostStateSchema>
 
 type HostAction =
   | { type: 'event'; event: PatternEvent }
-  | { type: 'reset'; data: PatternData }
   | { type: 'selectVariant'; variant: string; data: PatternData }
 
 export function usePatternDataHost(
@@ -21,7 +20,6 @@ export function usePatternDataHost(
   reduce: (data: PatternData, event: PatternEvent) => PatternData,
 ) {
   const [state, dispatch] = useReducer((current: DemoPatternHostState, action: HostAction): DemoPatternHostState => {
-    if (action.type === 'reset') return DemoPatternHostStateSchema.parse({ data: action.data })
     if (action.type === 'selectVariant') return DemoPatternHostStateSchema.parse({ variant: action.variant, data: action.data })
     return DemoPatternHostStateSchema.parse({ ...current, data: reduce(current.data, action.event) })
   }, DemoPatternHostStateSchema.parse({ data: initialData }))
@@ -29,7 +27,6 @@ export function usePatternDataHost(
   return {
     data: state.data,
     dispatchEvent: (event: PatternEvent) => dispatch({ type: 'event', event }),
-    reset: () => dispatch({ type: 'reset', data: initialData }),
   }
 }
 
@@ -40,7 +37,6 @@ export function useVariantPatternDataHost<Variant extends string>(
   reduce: (variant: Variant, data: PatternData, event: PatternEvent) => PatternData,
 ) {
   const [state, dispatch] = useReducer((current: DemoPatternHostState, action: HostAction): DemoPatternHostState => {
-    if (action.type === 'reset') return DemoPatternHostStateSchema.parse({ ...current, data: action.data })
     if (action.type === 'selectVariant') return DemoPatternHostStateSchema.parse({ variant: action.variant, data: action.data })
     return DemoPatternHostStateSchema.parse({
       ...current,
@@ -55,6 +51,5 @@ export function useVariantPatternDataHost<Variant extends string>(
     data: state.data,
     dispatchEvent: (event: PatternEvent) => dispatch({ type: 'event', event }),
     selectVariant: (next: Variant) => dispatch({ type: 'selectVariant', variant: next, data: dataByVariant(next) }),
-    reset: () => dispatch({ type: 'reset', data: dataByVariant(variant) }),
   }
 }

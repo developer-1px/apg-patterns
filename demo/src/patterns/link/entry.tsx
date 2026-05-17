@@ -28,7 +28,6 @@ export const entry: PatternEntry = {
       inspect: renderDataInspect(host.data),
       variants: <VariantListbox orientation="horizontal" value={host.variant} items={items} label="link variants" idPrefix="link-variant" onChange={host.selectVariant} />,
       preview: <Link data={host.data} onEvent={onEvent} />,
-      reset: () => host.selectVariant('anchor'),
     }
   },
 }

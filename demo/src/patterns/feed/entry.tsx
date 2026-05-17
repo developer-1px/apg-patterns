@@ -14,7 +14,6 @@ export const entry: PatternEntry = {
       sourceNames: ['Feed.tsx', 'feedData.ts', 'feed/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(initialFeedData),
       preview: <Feed />,
-      // stateless — no reset
     }
   },
 }

@@ -14,7 +14,6 @@ export const entry: PatternEntry = {
       sourceNames: ['Breadcrumb.tsx', 'breadcrumbData.ts', 'breadcrumb/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(initialBreadcrumbData),
       preview: <Breadcrumb data={initialBreadcrumbData} onEvent={onEvent} />,
-      // stateless — no reset
     }
   },
 }

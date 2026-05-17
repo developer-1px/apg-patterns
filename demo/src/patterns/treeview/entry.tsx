@@ -105,7 +105,6 @@ export const entry: PatternEntry = {
         </div>
       ),
       preview: <Tree data={state.data} onEvent={handleTreeEvent} options={treeOptions} />,
-      reset: () => dispatchTree({ type: 'reset' }),
     }
   },
 }

@@ -14,7 +14,6 @@ export const entry: PatternEntry = {
       sourceNames: ['Dialog.tsx', 'dialogData.ts', 'dialog/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(initialDialogData),
       preview: <Dialog />,
-      // stateless — no reset
     }
   },
 }
