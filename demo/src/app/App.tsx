@@ -1,8 +1,8 @@
-import { useReducer } from 'react'
+import { useEffect, useReducer } from 'react'
 import { z } from 'zod'
 import type { PatternEvent } from '../../../src'
 import { PatternMenu } from './PatternMenu'
-import { type PatternKey, useDemoPatterns } from '../shared/demoPatterns'
+import { patternItems, type PatternKey, useDemoPatterns } from '../shared/demoPatterns'
 import { sources, type SourceName } from '../shared/sources'
 import { SourceTabs, useSourceTabs } from './SourceTabs'
 
@@ -19,6 +19,11 @@ const rightModeLabels: Record<(typeof rightModes)[number], string> = {
   inspect: 'aria',
   log: 'events',
 }
+const rightModesByLabel = {
+  code: 'source',
+  aria: 'inspect',
+  events: 'log',
+} as const satisfies Record<string, AppState['rightMode']>
 
 const AppStateSchema = z.object({
   patternKey: z.string(),
@@ -37,7 +42,7 @@ type AppAction =
   | { type: 'selectRightMode'; rightMode: AppState['rightMode'] }
   | { type: 'toggleRightPanel' }
 
-const initialAppState = AppStateSchema.parse({
+const defaultAppState = AppStateSchema.parse({
   patternKey: 'treeview',
   events: [],
   sourceName: 'Tree.tsx',
@@ -45,8 +50,10 @@ const initialAppState = AppStateSchema.parse({
   rightPanelOpen: true,
 })
 
+const initialAppState = readInitialAppState(defaultAppState)
+
 const reduceAppState = (state: AppState, action: AppAction): AppState => {
-  if (action.type === 'selectPattern') return AppStateSchema.parse({ ...state, patternKey: action.patternKey })
+  if (action.type === 'selectPattern') return AppStateSchema.parse({ ...state, patternKey: action.patternKey, events: [] })
   if (action.type === 'recordEvent') return AppStateSchema.parse({ ...state, events: [action.event, ...state.events].slice(0, 12) })
   if (action.type === 'selectSource') return AppStateSchema.parse({ ...state, sourceName: action.sourceName })
   if (action.type === 'selectRightMode') return AppStateSchema.parse({ ...state, rightMode: action.rightMode, rightPanelOpen: true })
@@ -63,6 +70,15 @@ export function App() {
   const sourceTabs = useSourceTabs({ label: 'source files', tabs: sourceNames, value: activeSourceName, onChange: (sourceName) => dispatch({ type: 'selectSource', sourceName }) })
   const rightModeTabs = useSourceTabs({ label: 'right panel', tabs: rightModes, value: state.rightMode, onChange: (rightMode) => dispatch({ type: 'selectRightMode', rightMode }) })
   const eventLog = state.events.map((event) => JSON.stringify(event)).join('\n') || 'none'
+
+  useEffect(() => {
+    writeAppHash({
+      patternKey: activeDemo.key,
+      sourceName: activeSourceName,
+      rightMode: state.rightMode,
+      rightPanelOpen: state.rightPanelOpen,
+    })
+  }, [activeDemo.key, activeSourceName, state.rightMode, state.rightPanelOpen])
 
   return (
     <main className={`grid h-screen grid-cols-1 ${state.rightPanelOpen ? 'grid-rows-[auto_minmax(0,1fr)_minmax(260px,40vh)]' : 'grid-rows-[auto_minmax(0,1fr)]'} gap-8 bg-white px-6 py-5 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 ${state.rightPanelOpen ? 'lg:grid-cols-[180px_minmax(360px,1fr)_minmax(380px,0.9fr)]' : 'lg:grid-cols-[180px_minmax(360px,1fr)]'} lg:grid-rows-[minmax(0,1fr)]`}>
@@ -140,4 +156,40 @@ export function App() {
       ) : null}
     </main>
   )
+}
+
+function readInitialAppState(fallback: AppState): AppState {
+  if (typeof window === 'undefined') return fallback
+  const params = new URLSearchParams(window.location.hash.replace(/^#/, ''))
+  const patternKey = coercePatternKey(params.get('pattern')) ?? fallback.patternKey
+  const rightMode = coerceRightMode(params.get('panel')) ?? fallback.rightMode
+  const sourceName = params.get('source') || fallback.sourceName
+  const rightPanelOpen = params.get('panel') === 'off' ? false : fallback.rightPanelOpen
+  return AppStateSchema.parse({ ...fallback, patternKey, sourceName, rightMode, rightPanelOpen })
+}
+
+function writeAppHash({
+  patternKey,
+  sourceName,
+  rightMode,
+  rightPanelOpen,
+}: Pick<AppState, 'patternKey' | 'sourceName' | 'rightMode' | 'rightPanelOpen'>) {
+  if (typeof window === 'undefined') return
+  const params = new URLSearchParams()
+  params.set('pattern', patternKey)
+  params.set('panel', rightPanelOpen ? rightModeLabels[rightMode] : 'off')
+  params.set('source', sourceName)
+  const nextHash = `#${params.toString()}`
+  if (window.location.hash !== nextHash) window.history.replaceState(null, '', nextHash)
+}
+
+function coercePatternKey(value: string | null): PatternKey | null {
+  if (!value) return null
+  return patternItems.some((item) => item.key === value) ? value : null
+}
+
+function coerceRightMode(value: string | null): AppState['rightMode'] | null {
+  if (!value || value === 'off') return null
+  if (value in rightModesByLabel) return rightModesByLabel[value as keyof typeof rightModesByLabel]
+  return rightModes.includes(value as AppState['rightMode']) ? value as AppState['rightMode'] : null
 }

@@ -271,6 +271,7 @@ export const ReactItemFieldNameSchema = z.enum([
   'level',
   'parentKey',
   'indexInParent',
+  'panelKey',
   'state',
 ])
 export type ReactItemFieldName = z.infer<typeof ReactItemFieldNameSchema>
@@ -323,10 +324,11 @@ export const ReactRenderValueSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('treeLevel'), base: z.literal(1) }).strict(),
   z.object({ kind: z.literal('treeParentKey'), rootValue: z.literal(null) }).strict(),
   z.object({ kind: z.literal('treeIndexInParent'), base: z.literal(1) }).strict(),
+  z.object({ kind: z.literal('firstControlledKey'), fallback: z.literal(null) }).strict(),
 ])
 export type ReactRenderValue = z.infer<typeof ReactRenderValueSchema>
 
-export const ReactPropOwnerSchema = z.enum(['root', 'item', 'toggle'])
+export const ReactPropOwnerSchema = z.enum(['root', 'item', 'toggle', 'panel'])
 export type ReactPropOwner = z.infer<typeof ReactPropOwnerSchema>
 
 export const ReactItemPropSchema = z
