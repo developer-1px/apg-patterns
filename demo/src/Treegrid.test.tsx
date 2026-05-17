@@ -60,8 +60,8 @@ describe('Treegrid demo', () => {
     const grid = screen.getByRole('treegrid')
 
     // Move to docs name cell (it's collapsed). From src:name, ArrowDown a few times.
-    // src is expanded → next visible row is components, then button.tsx, input.tsx, index.ts, docs, pkg.json.
-    for (let i = 0; i < 5; i += 1) fireEvent.keyDown(grid, { key: 'ArrowDown' })
+    // src is expanded but components is collapsed → visible rows after src: components, index.ts, docs.
+    for (let i = 0; i < 3; i += 1) fireEvent.keyDown(grid, { key: 'ArrowDown' })
     expect(cellOf(treegridFirstCell('docs')).hasAttribute('data-active')).toBe(true)
 
     // ArrowRight on first cell of collapsed docs → expand.

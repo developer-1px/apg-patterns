@@ -4,6 +4,7 @@ import { createPatternRuntime, type Key, type PatternData, type PatternEvent, ty
 import { windowsplitterDefinition } from '../../src/patterns/windowsplitter/definition'
 
 type Props = HTMLAttributes<HTMLElement>
+const keyToElementId = (key: Key) => `windowsplitter-${key}`
 
 export function WindowSplitter({
   data,
@@ -19,7 +20,7 @@ export function WindowSplitter({
     data,
     options,
     onEvent,
-    keyToElementId: (key) => `windowsplitter-${key}`,
+    keyToElementId,
   })
   const rootKeys = data.relations?.rootKeys ?? []
   if (rootKeys.length === 0) return null
@@ -44,7 +45,7 @@ export function WindowSplitter({
   return (
     <div className="flex h-32 w-full overflow-hidden rounded border border-zinc-300 dark:border-zinc-700">
       <div
-        id={runtime.keyToElementId?.(controlled) ?? `windowsplitter-${controlled}`}
+        id={keyToElementId(controlled)}
         className="bg-zinc-100 dark:bg-zinc-900"
         style={{ width: `${position}%` }}
         data-testid="windowsplitter-primary"

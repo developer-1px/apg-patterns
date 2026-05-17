@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo } from 'react'
+import { useLayoutEffect } from 'react'
 import type { HTMLAttributes } from 'react'
 import { createPatternRuntime, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
 import { treegridDefinition, treegridVisibleCells, treegridVisibleRowKeys } from '../../src/patterns/treegrid/definition'
@@ -14,17 +14,26 @@ export function Treegrid({
   onEvent: (event: PatternEvent) => void
   options?: PatternOptions
 }) {
-  const runtime = useMemo(
-    () =>
-      createPatternRuntime({
-        definition: treegridDefinition,
-        data,
-        options: { focusStrategy: 'rovingTabIndex', selectionMode: 'single', ...options },
-        onEvent,
-        keyToElementId: (key) => `treegridcell-${key}`,
-      }),
-    [data, onEvent, options],
-  )
+  const runtime = createPatternRuntime({
+    definition: treegridDefinition,
+    data,
+    options: { focusStrategy: 'rovingTabIndex', selectionMode: 'single', ...options },
+    onEvent: (event) => {
+      if (event.type === 'extension' && event.name === 'treegridToggleActiveRow') {
+        const activeKey = data.state?.activeKey
+        const rowKey = activeKey
+          ? data.relations?.cells?.find((c) => c.cellKey === activeKey)?.rowKey
+          : undefined
+        if (rowKey) {
+          const expanded = Boolean((event.payload as { expanded?: boolean } | undefined)?.expanded)
+          onEvent({ type: 'expand', key: rowKey, expanded })
+        }
+        return
+      }
+      onEvent(event)
+    },
+    keyToElementId: (key) => `treegridcell-${key}`,
+  })
 
   useLayoutEffect(() => {
     const activeKey = data.state?.activeKey

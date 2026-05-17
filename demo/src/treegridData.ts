@@ -132,7 +132,7 @@ export const initialTreegridData = PatternDataSchema.parse({
   relations: {
     rowKeys: built.rowKeys,
     columnKeys: [...COLUMNS],
-    rootKeys: built.rootKeys,
+    rootKeys: ['headerRow', ...built.rootKeys],
     childrenByKey: built.childrenByKey,
     cells: built.cells,
   },
