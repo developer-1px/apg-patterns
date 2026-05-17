@@ -1,7 +1,5 @@
-import type { HTMLAttributes, MouseEvent as ReactMouseEvent, ReactNode } from 'react'
-import type { PatternData, PatternEvent } from '../../../../src'
-
-export type ListboxProps = HTMLAttributes<HTMLElement>
+import type { ReactNode } from 'react'
+import type { PatternData } from '../../../../src'
 
 export interface ListboxGroup {
   groupKey: string
@@ -18,14 +16,3 @@ export interface ListboxLayoutInput extends ListboxOptionRenderer {
   groups: readonly ListboxGroup[]
   visibleKeys: readonly string[]
 }
-
-export interface ListboxSelectionContext {
-  data: PatternData
-  visibleKeys: readonly string[]
-  selectedKeys: readonly string[]
-  anchorKey: string | null
-  isMulti: boolean
-  onEvent: (event: PatternEvent) => void
-}
-
-export type OptionClickHandler = (event: ReactMouseEvent, key: string) => void

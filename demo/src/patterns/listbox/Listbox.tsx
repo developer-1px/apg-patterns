@@ -6,28 +6,28 @@ import type { ListboxGroup } from './listboxTypes'
 export function Listbox({
   data,
   onEvent,
+  options,
 }: {
   data: PatternData
   onEvent: (event: PatternEvent) => void
+  options?: PatternOptions
 }) {
-  const options = (data.state?.options as PatternOptions | undefined) ?? {}
   const groups = (data.state?.groups as readonly ListboxGroup[] | undefined) ?? []
   const scrollable = data.state?.scrollable === true
   const ariaLabelledBy = typeof data.refs?.labelledBy === 'string' ? data.refs.labelledBy : undefined
   const listbox = useListboxPattern(data, onEvent, options)
-  const visibleKeys = data.relations?.rootKeys ?? []
   const selectionMode = options?.selectionMode ?? 'single'
   const isMulti = selectionMode === 'multiple'
   const renderItemsByKey = new Map(listbox.renderItems.map((item) => [item.key, item]))
+  const visibleKeys = listbox.renderItems.map((item) => item.key)
 
   const renderOption = (key: string, posIndex?: number, setSize?: number) => {
     const item = renderItemsByKey.get(key)
+    if (!item) return null
     return (
       <ListboxOption
         key={key}
-        itemKey={key}
-        data={data}
-        optionProps={item?.optionProps}
+        item={item}
         isMulti={isMulti}
         posIndex={posIndex}
         setSize={setSize}

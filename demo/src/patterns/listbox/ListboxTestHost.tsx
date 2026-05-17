@@ -37,7 +37,6 @@ export function ListboxDemo({ variant = 'basic' }: { variant?: ListboxTestVarian
     : { focusStrategy: 'rovingTabIndex', selectionMode: 'single' }
   const state = {
     ...host.data.state,
-    options,
     scrollable: variant === 'scrollable',
   }
   const data: PatternData = {
@@ -46,7 +45,7 @@ export function ListboxDemo({ variant = 'basic' }: { variant?: ListboxTestVarian
   }
   const handleEvent = (event: PatternEvent) => host.dispatchEvent(event)
   if (variant === 'rearrangeable' || variant === 'rearrangeableMulti') {
-    return <RearrangeableListbox data={data} onEvent={handleEvent} />
+    return <RearrangeableListbox data={data} onEvent={handleEvent} options={options} />
   }
-  return <Listbox data={data} onEvent={handleEvent} />
+  return <Listbox data={data} onEvent={handleEvent} options={options} />
 }

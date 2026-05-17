@@ -1,5 +1,5 @@
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
-import { type PatternData, type PatternEvent } from '../../../../src'
+import { type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
 import { Listbox } from './Listbox'
 
 /**
@@ -10,9 +10,11 @@ import { Listbox } from './Listbox'
 export function RearrangeableListbox({
   data,
   onEvent,
+  options,
 }: {
   data: PatternData
   onEvent: (event: PatternEvent) => void
+  options?: PatternOptions
 }) {
   const rootKeys = data.relations?.rootKeys ?? []
   const activeKey = data.state?.activeKey ?? rootKeys[0] ?? null
@@ -75,7 +77,7 @@ export function RearrangeableListbox({
           Remove
         </button>
       </div>
-      <Listbox data={data} onEvent={onEvent} />
+      <Listbox data={data} onEvent={onEvent} options={options} />
     </div>
   )
 }

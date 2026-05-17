@@ -60,7 +60,6 @@ export const entry: PatternEntry = {
     }
     const state = {
       ...host.data.state,
-      options,
       scrollable: host.variant === 'scrollable',
     }
     const data: PatternData = {
@@ -68,14 +67,14 @@ export const entry: PatternEntry = {
       state: host.variant === 'grouped' ? { ...state, groups: groupedListboxStructure } : state,
     }
     const preview = host.variant === 'rearrangeable' || host.variant === 'rearrangeableMulti'
-      ? <RearrangeableListbox data={data} onEvent={handleEvent} />
-      : <Listbox data={data} onEvent={handleEvent} />
+      ? <RearrangeableListbox data={data} onEvent={handleEvent} options={options} />
+      : <Listbox data={data} onEvent={handleEvent} options={options} />
 
     return {
       key: 'listbox',
       label: 'Listbox',
       keyboardShortcuts: ['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Space'],
-      sourceNames: ['Listbox.tsx', 'RearrangeableListbox.tsx', 'listboxData.ts', 'listbox/definition.ts', ...KERNEL_SOURCES],
+      sourceNames: ['Listbox.tsx', 'RearrangeableListbox.tsx', 'listboxData.ts', 'react.ts', 'listbox/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
       variants: <VariantListbox orientation="horizontal" value={host.variant} items={listboxVariantItems} label="listbox variants" idPrefix="listbox-variant" onChange={host.selectVariant} />,
       preview,

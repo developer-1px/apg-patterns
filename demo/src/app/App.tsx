@@ -23,7 +23,7 @@ const rightModesByLabel = {
   code: 'source',
   aria: 'inspect',
   events: 'log',
-} as const satisfies Record<string, AppState['rightMode']>
+} as const satisfies Record<string, (typeof rightModes)[number]>
 
 const AppStateSchema = z.object({
   patternKey: z.string(),
@@ -50,8 +50,6 @@ const defaultAppState = AppStateSchema.parse({
   rightPanelOpen: true,
 })
 
-const initialAppState = readInitialAppState(defaultAppState)
-
 const reduceAppState = (state: AppState, action: AppAction): AppState => {
   if (action.type === 'selectPattern') return AppStateSchema.parse({ ...state, patternKey: action.patternKey, events: [] })
   if (action.type === 'recordEvent') return AppStateSchema.parse({ ...state, events: [action.event, ...state.events].slice(0, 12) })
@@ -61,7 +59,7 @@ const reduceAppState = (state: AppState, action: AppAction): AppState => {
 }
 
 export function App() {
-  const [state, dispatch] = useReducer(reduceAppState, initialAppState)
+  const [state, dispatch] = useReducer(reduceAppState, defaultAppState, readInitialAppState)
   const demos = useDemoPatterns((event) => dispatch({ type: 'recordEvent', event }))
   const activeDemo = demos.find((demo) => demo.key === state.patternKey) ?? demos[0]
   const sourceNames = activeDemo.sourceNames
@@ -136,9 +134,14 @@ export function App() {
           <div className="min-w-0">
             {state.rightMode === 'source' ? (
               <div className="grid gap-1">
-                <SourceTabs tabs={sourceTabs.tabs} getTablistProps={sourceTabs.getTablistProps} getTabProps={sourceTabs.getTabProps} />
-                <div className="truncate px-1 font-mono text-[11px] text-zinc-400 dark:text-zinc-600">
-                  {state.patternKey} / {activeSourceName}
+                <div className="flex min-w-0 items-start gap-2">
+                  <SourceTabs tabs={sourceTabs.tabs} getTablistProps={sourceTabs.getTablistProps} getTabProps={sourceTabs.getTabProps} />
+                  <button type="button" className={`${buttonClass} shrink-0`} onClick={() => copyText(source)}>
+                    copy
+                  </button>
+                </div>
+                <div className="truncate px-1 font-mono text-[11px] text-zinc-400 dark:text-zinc-600" title={activeSourceName}>
+                  {activeSourceName}
                 </div>
               </div>
             ) : null}
@@ -192,4 +195,8 @@ function coerceRightMode(value: string | null): AppState['rightMode'] | null {
   if (!value || value === 'off') return null
   if (value in rightModesByLabel) return rightModesByLabel[value as keyof typeof rightModesByLabel]
   return rightModes.includes(value as AppState['rightMode']) ? value as AppState['rightMode'] : null
+}
+
+function copyText(value: string) {
+  void navigator.clipboard?.writeText(value)
 }
