@@ -642,7 +642,11 @@ function DemoSourceProbeItem({
   onDefaultSource(`${entry.key}: ${demo.sourceNames[0] ?? 'none'}`)
   if (entry.key === defaultPatternKey && !demo.sourceNames.includes(defaultSourceName)) onInvalidEntry(`${entry.key}: missing default source ${defaultSourceName}`)
   if (duplicates([...demo.sourceNames]).length > 0) onInvalidEntry(`${entry.key}: duplicate source tabs`)
+  if (demo.inspect.trim().length === 0) onInvalidEntry(`${entry.key}: empty inspect output`)
   if (demo.keyboardShortcuts.some((shortcut) => shortcut.trim().length === 0)) onInvalidEntry(`${entry.key}: empty keyboard shortcut`)
+  for (const shortcut of demo.keyboardShortcuts) {
+    if (!isValidShortcut(shortcut)) onInvalidEntry(`${entry.key}: invalid keyboard shortcut ${shortcut}`)
+  }
   for (const sourceName of demo.sourceNames) {
     onSourceName(sourceName)
     if (!sourceLoaders[sourceName]) onMissingSource?.(`${entry.key}: ${sourceName}`)
@@ -693,6 +697,36 @@ function expectedHookSources(patternKey: string) {
     sourceName.startsWith(`${patternKey}/`)
     && /\/use[A-Z].*Pattern\.ts$/.test(sourceName)
   ))
+}
+
+const validShortcutModifiers = new Set(['Alt', 'Ctrl', 'Meta', 'Shift'])
+const validShortcutKeys = new Set([
+  'ArrowDown',
+  'ArrowLeft',
+  'ArrowRight',
+  'ArrowUp',
+  'Delete',
+  'End',
+  'Enter',
+  'Escape',
+  'F2',
+  'Home',
+  'PageDown',
+  'PageUp',
+  'Space',
+  'Tab',
+])
+
+function isValidShortcut(shortcut: string) {
+  const parts = shortcut.split('+')
+  const key = parts.at(-1)
+  const modifiers = parts.slice(0, -1)
+
+  if (!key) return false
+
+  return validShortcutKeys.has(key)
+    && modifiers.length === new Set(modifiers).size
+    && modifiers.every((modifier) => validShortcutModifiers.has(modifier))
 }
 
 function duplicates(values: readonly string[]) {
