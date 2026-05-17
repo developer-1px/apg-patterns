@@ -3,6 +3,7 @@ import { z } from 'zod'
 import type { PatternEvent } from '../../../src'
 import { PatternMenu } from './PatternMenu'
 import { patternItems, type PatternKey, useDemoPattern } from '../shared/demoPatterns'
+import { Icon, type IconName } from '../shared/Icon'
 import { sourceLoaders, type SourceName } from '../shared/sources'
 import { SourceTabs, useSourceTabs } from './SourceTabs'
 
@@ -150,8 +151,8 @@ function ActiveDemoWorkspace({
             <div className="mb-1 text-[10px] uppercase tracking-wide text-zinc-400 dark:text-zinc-600">keys</div>
             <div className="flex flex-wrap gap-1">
               {activeDemo.keyboardShortcuts.map((shortcut) => (
-                <kbd key={shortcut} className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[11px] text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400">
-                  {shortcut}
+                <kbd key={shortcut} className="inline-flex items-center gap-1 rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[11px] text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400">
+                  <ShortcutIndicator shortcut={shortcut} />
                 </kbd>
               ))}
             </div>
@@ -204,6 +205,29 @@ function ActiveDemoWorkspace({
         {state.rightMode === 'log' ? <pre className={preClass}>{eventLog}</pre> : null}
       </section>
       ) : null}
+    </>
+  )
+}
+
+const shortcutIconByToken: Partial<Record<string, IconName>> = {
+  ArrowDown: 'arrow-down',
+  ArrowLeft: 'arrow-left',
+  ArrowRight: 'arrow-right',
+  ArrowUp: 'arrow-up',
+}
+
+function ShortcutIndicator({ shortcut }: { shortcut: string }) {
+  return (
+    <>
+      {shortcut.split('+').map((token, index) => {
+        const icon = shortcutIconByToken[token]
+        return (
+          <span key={`${shortcut}-${token}-${index}`} className="inline-flex items-center gap-1">
+            {index > 0 ? <span aria-hidden="true" className="text-zinc-400 dark:text-zinc-600">+</span> : null}
+            {icon ? <Icon name={icon} className="text-xs" /> : <span>{token}</span>}
+          </span>
+        )
+      })}
     </>
   )
 }

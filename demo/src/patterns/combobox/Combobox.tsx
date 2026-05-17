@@ -76,7 +76,7 @@ export function Combobox({
         type="text"
         readOnly={!editable}
         value={displayValue}
-        placeholder={editable ? 'Type a fruit (e.g. Apple) — ↓ opens' : 'Pick a fruit — ↓ opens'}
+        placeholder={editable ? 'Type a fruit (ArrowDown opens)' : 'Pick a fruit (ArrowDown opens)'}
         aria-controls={listboxId}
         onChange={(e) => editable && handleInput(e.currentTarget.value)}
         onKeyDown={handleKeyDown}

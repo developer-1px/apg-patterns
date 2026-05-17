@@ -2,6 +2,7 @@ import type { HTMLAttributes, KeyboardEvent } from 'react'
 import type { KeyInput } from '@interactive-os/keyboard'
 import { createPatternRuntime, type Key, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
 import { windowsplitterDefinition } from '../../../../src/patterns/windowsplitter/definition'
+import { Icon } from '../../shared/Icon'
 
 type Props = HTMLAttributes<HTMLElement>
 const keyToElementId = (key: Key) => `windowsplitter-${key}`
@@ -53,8 +54,10 @@ export function WindowSplitter({
         {...props}
         onKeyDown={handleKeyDown}
         onFocus={() => onEvent({ type: 'focus', key })}
-        className="w-1 cursor-col-resize bg-zinc-400 outline-none focus:bg-zinc-700 dark:bg-zinc-600 dark:focus:bg-zinc-300"
-      />
+        className="grid w-4 cursor-col-resize place-items-center bg-zinc-200 text-xs text-zinc-500 outline-none focus:bg-zinc-300 focus:text-zinc-900 dark:bg-zinc-800 dark:text-zinc-400 dark:focus:bg-zinc-700 dark:focus:text-zinc-100"
+      >
+        <Icon name="grip-vertical" />
+      </div>
       <div className="flex-1 bg-white dark:bg-zinc-950" data-testid="windowsplitter-secondary" />
     </div>
   )
