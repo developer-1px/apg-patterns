@@ -15,6 +15,7 @@ for (const [path, mod] of Object.entries(modules)) {
 }
 
 collected.sort((a, b) => a.key.localeCompare(b.key))
+validatePatternEntries(collected)
 
 export const patternEntries: readonly PatternEntry[] = collected
 
@@ -29,4 +30,28 @@ export function useDemoPattern(patternKey: PatternKey, onEvent: (event: PatternE
 
 function getPatternEntry(patternKey: PatternKey): PatternEntry {
   return patternEntries.find((entry) => entry.key === patternKey) ?? patternEntries[0]
+}
+
+function validatePatternEntries(entries: readonly PatternEntry[]) {
+  if (entries.length === 0) throw new Error('[demoPatterns] no pattern entries were registered')
+
+  const duplicateKeys = duplicates(entries.map((entry) => entry.key))
+  if (duplicateKeys.length > 0) {
+    throw new Error(`[demoPatterns] duplicate pattern keys: ${duplicateKeys.join(', ')}`)
+  }
+
+  const duplicateLabels = duplicates(entries.map((entry) => entry.label))
+  if (duplicateLabels.length > 0) {
+    throw new Error(`[demoPatterns] duplicate pattern labels: ${duplicateLabels.join(', ')}`)
+  }
+}
+
+function duplicates(values: readonly string[]) {
+  const seen = new Set<string>()
+  const duplicateValues = new Set<string>()
+  for (const value of values) {
+    if (seen.has(value)) duplicateValues.add(value)
+    seen.add(value)
+  }
+  return [...duplicateValues]
 }
