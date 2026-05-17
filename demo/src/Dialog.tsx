@@ -1,4 +1,4 @@
-import { useReducer, type KeyboardEvent } from 'react'
+import { useLayoutEffect, useReducer, type KeyboardEvent } from 'react'
 import type { KeyInput } from '@interactive-os/keyboard'
 import { createPatternRuntime, reducePatternData, type Key, type PatternData, type PatternEvent } from '../../src'
 import { dialogDefinition } from '../../src/patterns/dialog/definition'
@@ -31,6 +31,10 @@ export function Dialog({ data: initialData = initialDialogData }: DialogProps = 
   const open = data.state?.expandedKeys?.includes('trigger') ?? false
   const rootKeyDown = runtime.getRootKeyboardHandler()
   usePatternEffects({ definition: dialogDefinition, data, keyToElementId })
+
+  useLayoutEffect(() => {
+    if (open) document.getElementById('dialog-street')?.focus({ preventScroll: true })
+  }, [open])
 
   const onPanelKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     rootKeyDown(event as unknown as KeyInput & { preventDefault?: () => void })

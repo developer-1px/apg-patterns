@@ -60,8 +60,8 @@ export function handlePatternTrapFocus({
   const ctx = { data, activeKey: data.state?.activeKey ?? null, parentByKey: createParentByKey(data), keyToElementId }
   const trap = (definition.effects ?? []).find((effect) => effect.kind === 'trapFocus' && evaluatePredicate(effect.when, ctx))
   if (!trap || trap.kind !== 'trapFocus') return
-  const root = resolveElementTarget(trap.root, data, keyToElementId)
-  const items = root ? Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)) : []
+  const root = resolveElementTarget(trap.root, data, keyToElementId) ?? event.currentTarget
+  const items = Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
   if (items.length === 0) {
     event.preventDefault()
     return
