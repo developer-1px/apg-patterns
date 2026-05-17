@@ -173,6 +173,11 @@ async function runSmoke() {
         })
         const duplicate = Array.from(renderedSourceByName.entries()).find(([, previousSource]) => previousSource === renderedSource)
         if (duplicate) patternFailures.push(`${label}: source tab reused rendered code for ${duplicate[0]} and ${sourceName}`)
+        const missingNeedles = sourceIdentityNeedles(sourceName, key)
+          .filter((needle) => !renderedSource.includes(needle))
+        if (missingNeedles.length > 0) {
+          patternFailures.push(`${label}: source tab ${sourceName} rendered code missing ${missingNeedles.join(', ')}`)
+        }
         renderedSourceByName.set(sourceName, renderedSource)
       } catch {
         patternFailures.push(`${label}: source tab failed: ${sourceName}`)
@@ -610,6 +615,37 @@ function sourcePanelText() {
   return Array.from(document.querySelectorAll('[role="tabpanel"]'))
     .find((panel) => panel.id.startsWith('tab-source-panel-'))
     ?.textContent ?? ''
+}
+
+function sourceIdentityNeedles(sourceName, patternKey) {
+  if (sourceName.endsWith('.tsx')) {
+    const componentName = sourceName.replace(/\.tsx$/, '')
+    return [`export function ${componentName}`]
+  }
+  if (sourceName.endsWith('Data.ts')) {
+    return []
+  }
+
+  const patternSource = sourceName.match(/^([^/]+)\/(.+)\.ts$/)
+  if (patternSource) {
+    const [, sourcePatternKey, fileName] = patternSource
+    if (fileName === 'definition') {
+      if (sourcePatternKey === 'menu') return ["apgPattern: 'menubar'"]
+      return [`apgPattern: '${sourcePatternKey}'`]
+    }
+    if (/^use[A-Z].*Pattern$/.test(fileName)) return [`export function ${fileName}`]
+    if (fileName === 'runtime') return []
+    if (fileName === 'navigation') return []
+  }
+
+  if (sourceName === 'kernel/patternRuntime.ts') return ['createPatternRuntime']
+  if (sourceName === 'kernel/patternReducer.ts') return ['reducePatternData']
+  if (sourceName === 'kernel/patternKernel.ts') return ['defineAriaSource']
+  if (sourceName === 'schema/index.ts') return ["export * from './patternDefinition'"]
+  if (sourceName === 'treeContract.ts') return ['initialData']
+  if (sourceName === 'treeVariants.ts') return ['treeVariants']
+
+  return [patternKey]
 }
 
 function findSourceTab(sourceName) {
