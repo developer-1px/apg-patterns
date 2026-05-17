@@ -22,7 +22,7 @@ export function Menubar({ data, onEvent }: MenuProps) {
 
   return (
     <div className="relative grid gap-2">
-      <div {...rootProps} onKeyDown={(event) => handleMenubarKey(event, rootProps.onKeyDown as ((event: ReactKeyboardEvent) => void) | undefined, typeahead)} className="flex items-center gap-0.5 rounded-xl bg-zinc-100/70 p-1 outline-none shadow-inner shadow-zinc-200/50 dark:bg-white/[0.045] dark:shadow-black/10">
+      <div {...rootProps} onKeyDown={(event) => handleMenubarKey(event, rootProps.onKeyDown as ((event: ReactKeyboardEvent) => void) | undefined, typeahead)} className="flex items-center gap-0.5 rounded-[6px] bg-zinc-100/70 p-1 outline-none shadow-inner shadow-zinc-200/50 dark:bg-white/[0.045] dark:shadow-black/10">
         {rootKeys.map((key) => (
           <RootMenuItem key={key} itemKey={key} data={data} runtime={runtime} expanded={(data.state?.expandedKeys ?? []).includes(key)} onEvent={onEvent} />
         ))}
@@ -60,7 +60,7 @@ function RootMenuItem({ itemKey, data, runtime, expanded, onEvent }: { itemKey: 
         }
         ;(itemProps.onKeyDown as ((event: ReactKeyboardEvent) => void) | undefined)?.(event)
       }}
-      className="h-8 rounded-lg px-2.5 text-sm font-medium text-zinc-800 outline-none transition hover:bg-white/70 aria-disabled:text-zinc-400 aria-expanded:bg-white aria-expanded:text-zinc-950 aria-expanded:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:text-zinc-200 dark:hover:bg-white/[0.06] dark:aria-disabled:text-zinc-600 dark:aria-expanded:bg-zinc-100 dark:aria-expanded:text-zinc-950 dark:focus-visible:outline-zinc-500"
+      className="h-8 rounded-[4px] px-2.5 text-sm font-medium text-zinc-800 outline-none transition hover:bg-white/70 aria-disabled:text-zinc-400 aria-expanded:bg-white aria-expanded:text-zinc-950 aria-expanded:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:text-zinc-200 dark:hover:bg-white/[0.06] dark:aria-disabled:text-zinc-600 dark:aria-expanded:bg-zinc-100 dark:aria-expanded:text-zinc-950 dark:focus-visible:outline-zinc-500"
     >
       {data.items[itemKey]?.label}
       {(data.relations?.childrenByKey?.[itemKey]?.length ?? 0) > 0 ? <Icon name="chevron-right" className={`ml-1 text-xs text-zinc-500 ${expanded ? 'rotate-90' : ''}`} /> : null}
@@ -93,7 +93,7 @@ function Submenu({ data, ownerKey, rootKeys, onEvent }: { data: PatternData; own
   }
   const popupLeft = `${rootKeys.indexOf(ownerKey) * 4.25}rem`
   return (
-    <ul role="menu" aria-labelledby={`menubar-${ownerKey}`} style={{ left: popupLeft }} className="absolute top-10 z-10 grid w-56 gap-0.5 rounded-xl bg-white/95 p-1 text-sm shadow-[0_18px_50px_rgba(24,24,27,0.14)] ring-1 ring-black/[0.03] outline-none backdrop-blur dark:bg-zinc-950/95 dark:shadow-black/30 dark:ring-white/[0.05]" onKeyDown={(event) => {
+    <ul role="menu" aria-labelledby={`menubar-${ownerKey}`} style={{ left: popupLeft }} className="absolute top-10 z-10 grid w-56 gap-0.5 rounded-[6px] bg-white/95 p-1 text-sm shadow-lg ring-1 ring-black/[0.03] outline-none backdrop-blur dark:bg-zinc-950/95 dark:shadow-black/30 dark:ring-white/[0.05]" onKeyDown={(event) => {
       if (event.key === 'Escape') {
         event.preventDefault()
         close()
@@ -153,7 +153,7 @@ function SubmenuItem({ itemKey, data, active, radioGroup, onEvent, onClose }: { 
         event.preventDefault()
         activate()
       }
-    }} className="cursor-default rounded-lg px-2.5 py-1.5 text-zinc-800 outline-none transition hover:bg-zinc-100/80 aria-disabled:text-zinc-400 data-active:bg-zinc-100/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:text-zinc-200 dark:hover:bg-white/[0.06] dark:aria-disabled:text-zinc-600 dark:data-active:bg-white/[0.07] dark:focus-visible:outline-zinc-500">
+    }} className="cursor-default rounded-[4px] px-2.5 py-1.5 text-zinc-800 outline-none transition hover:bg-zinc-100/80 aria-disabled:text-zinc-400 data-active:bg-zinc-100/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:text-zinc-200 dark:hover:bg-white/[0.06] dark:aria-disabled:text-zinc-600 dark:data-active:bg-white/[0.07] dark:focus-visible:outline-zinc-500">
       <span className="mr-2 inline-grid w-4 place-items-center text-xs text-zinc-500">
         {role === 'menuitemcheckbox' ? <Icon name={checked ? 'square-check' : 'square'} /> : null}
         {role === 'menuitemradio' ? <Icon name="circle-dot" className={checked ? '' : 'opacity-0'} /> : null}

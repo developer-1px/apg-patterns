@@ -52,7 +52,7 @@ export function MenuButton({ data, onEvent }: MenuProps) {
           onEvent({ type: 'expand', key: triggerKey, expanded: true, meta: { reason: 'open' } })
           if (menuItemKeys.length > 0) onEvent({ type: 'focus', key: menuItemKeys[menuItemKeys.length - 1]!, meta: { reason: 'open' } })
         }
-      }} className="inline-flex h-8 items-center justify-between rounded-md bg-zinc-100/80 px-3 text-sm font-medium text-zinc-800 shadow-sm outline-none transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.06] dark:text-zinc-200 dark:hover:bg-white/[0.08] dark:focus-visible:outline-zinc-500">
+      }} className="inline-flex h-8 items-center justify-between rounded-[6px] bg-zinc-100/80 px-3 text-sm font-medium text-zinc-800 shadow-sm outline-none transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.06] dark:text-zinc-200 dark:hover:bg-white/[0.08] dark:focus-visible:outline-zinc-500">
         <span>{data.items[triggerKey]?.label ?? 'Menu'}</span>
         <Icon name="chevron-right" className={`ml-3 text-xs text-zinc-500 ${expanded ? 'rotate-90' : ''}`} />
       </button>
@@ -75,7 +75,7 @@ export function MenuButton({ data, onEvent }: MenuProps) {
             return
           }
           rootKeyDown(event as any)
-        }} className="absolute top-10 z-10 grid w-56 gap-0.5 rounded-md bg-white/95 p-1 text-sm shadow-lg ring-1 ring-black/[0.03] outline-none backdrop-blur focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-zinc-950/95 dark:shadow-black/30 dark:ring-white/[0.05] dark:focus-visible:outline-zinc-500">
+        }} className="absolute top-10 z-10 grid w-56 gap-0.5 rounded-[6px] bg-white/95 p-1 text-sm shadow-lg ring-1 ring-black/[0.03] outline-none backdrop-blur focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-zinc-950/95 dark:shadow-black/30 dark:ring-white/[0.05] dark:focus-visible:outline-zinc-500">
           {menuItemKeys.map((key) => {
             const itemProps = runtime.getPartProps('menuitem', key) as Props
             const itemState = runtime.getItemState(key, 'menuitem')
@@ -83,7 +83,7 @@ export function MenuButton({ data, onEvent }: MenuProps) {
               <li key={key} id={`mb-${key}`} {...itemProps} data-active={itemState.active ? '' : undefined} onFocus={() => onEvent({ type: 'focus', key })} onClick={(event) => {
                 ;(itemProps.onClick as ((event: unknown) => void) | undefined)?.(event)
                 closeAndFocusTrigger()
-              }} className="cursor-default rounded px-2.5 py-1.5 text-zinc-800 outline-none transition aria-disabled:text-zinc-400 data-active:bg-zinc-100/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:text-zinc-200 dark:aria-disabled:text-zinc-600 dark:data-active:bg-white/[0.07] dark:focus-visible:outline-zinc-500">
+              }} className="cursor-default rounded-[4px] px-2.5 py-1.5 text-zinc-800 outline-none transition aria-disabled:text-zinc-400 data-active:bg-zinc-100/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:text-zinc-200 dark:aria-disabled:text-zinc-600 dark:data-active:bg-white/[0.07] dark:focus-visible:outline-zinc-500">
                 {data.items[key]?.label ?? key}
               </li>
             )
