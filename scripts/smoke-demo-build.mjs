@@ -598,20 +598,32 @@ function describePreviewTabs(key) {
 }
 
 async function verifyPatternPanelRoutes({ key, label, sourceName }) {
-  await verifyHashRoute(buildHash({ pattern: key, panel: 'state', source: sourceName }), () =>
-    currentHashParam('pattern') === key
-    && currentHashParam('panel') === 'state'
-    && hasActiveDemoHeading(label)
-    && findRightPanelTab('state')?.getAttribute('aria-selected') === 'true',
+  await verifyHashRoute(buildHash({ pattern: key, panel: 'state', source: sourceName }), () => {
+    const inspectText = activePreText()
+    return (
+      currentHashParam('pattern') === key
+      && currentHashParam('panel') === 'state'
+      && hasActiveDemoHeading(label)
+      && findRightPanelTab('state')?.getAttribute('aria-selected') === 'true'
+      && inspectText.trim().length > 0
+      && inspectText !== 'loading'
+      && !inspectText.includes('export function ')
+    )
+  },
     `${label}: state panel route did not render`,
   )
 
-  await verifyHashRoute(buildHash({ pattern: key, panel: 'events', source: sourceName }), (text) =>
-    currentHashParam('pattern') === key
-    && currentHashParam('panel') === 'events'
-    && hasActiveDemoHeading(label)
-    && findRightPanelTab('events')?.getAttribute('aria-selected') === 'true'
-    && text.includes('events'),
+  await verifyHashRoute(buildHash({ pattern: key, panel: 'events', source: sourceName }), (text) => {
+    const logText = activePreText()
+    return (
+      currentHashParam('pattern') === key
+      && currentHashParam('panel') === 'events'
+      && hasActiveDemoHeading(label)
+      && findRightPanelTab('events')?.getAttribute('aria-selected') === 'true'
+      && text.includes('events')
+      && logText.trim() === 'none'
+    )
+  },
     `${label}: events panel route did not render`,
   )
 
@@ -623,12 +635,19 @@ async function verifyPatternPanelRoutes({ key, label, sourceName }) {
     `${label}: closed panel route did not render`,
   )
 
-  await verifyHashRoute(buildHash({ pattern: key, panel: 'code', source: sourceName }), () =>
-    currentHashParam('pattern') === key
-    && currentHashParam('panel') === 'code'
-    && hasActiveDemoHeading(label)
-    && findRightPanelTab('code')?.getAttribute('aria-selected') === 'true'
-    && sourceFilenameIs(sourceName),
+  await verifyHashRoute(buildHash({ pattern: key, panel: 'code', source: sourceName }), () => {
+    const sourceText = sourcePanelText()
+    return (
+      currentHashParam('pattern') === key
+      && currentHashParam('panel') === 'code'
+      && hasActiveDemoHeading(label)
+      && findRightPanelTab('code')?.getAttribute('aria-selected') === 'true'
+      && sourceFilenameIs(sourceName)
+      && sourceText.trim().length > 0
+      && sourceText !== 'loading'
+      && !hasSourceLoadFailure(sourceText)
+    )
+  },
     `${label}: code panel route did not restore after panel route checks`,
   )
 }
@@ -662,6 +681,10 @@ function sourcePanelText() {
   return Array.from(document.querySelectorAll('[role="tabpanel"]'))
     .find((panel) => panel.id.startsWith('tab-source-panel-'))
     ?.textContent ?? ''
+}
+
+function activePreText() {
+  return document.querySelector('pre')?.textContent ?? ''
 }
 
 function hasSourceLoadFailure(text) {
