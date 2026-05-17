@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useState } from 'react'
+import { useEffect, useReducer, useRef, useState } from 'react'
 import { z } from 'zod'
 import type { PatternEvent } from '../../../src'
 import { PatternMenu } from './PatternMenu'
@@ -94,6 +94,7 @@ function ActiveDemoWorkspace({
   const activeSourceName = sourceNames.includes(state.sourceName as SourceName) ? state.sourceName as SourceName : sourceNames[0]
   const [source, setSource] = useState('loading')
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle')
+  const copyRequestId = useRef(0)
   const sourceTabs = useSourceTabs({ label: 'source files', tabs: sourceNames, value: activeSourceName, onChange: (sourceName) => dispatch({ type: 'selectSource', sourceName }) })
   const rightModeTabs = useSourceTabs({ label: 'right panel', tabs: rightModes, value: state.rightMode, onChange: (rightMode) => dispatch({ type: 'selectRightMode', rightMode }) })
   const eventLog = state.events.map(formatEvent).join('\n') || 'none'
@@ -120,12 +121,14 @@ function ActiveDemoWorkspace({
 
   useEffect(() => {
     let cancelled = false
+    copyRequestId.current += 1
     setCopyState('idle')
     setSource('loading')
     loadSourcePreview(activeSourceName).then((nextSource) => {
       if (!cancelled) setSource(nextSource)
     })
     return () => {
+      copyRequestId.current += 1
       cancelled = true
     }
   }, [activeSourceName])
@@ -138,8 +141,10 @@ function ActiveDemoWorkspace({
 
   const copySource = () => {
     if (!canCopySource) return
+    const requestId = copyRequestId.current + 1
+    copyRequestId.current = requestId
     void copyText(source).then((copied) => {
-      if (copied) setCopyState('copied')
+      if (copied && copyRequestId.current === requestId) setCopyState('copied')
     })
   }
 

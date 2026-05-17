@@ -84,6 +84,26 @@ describe('source copy', () => {
     await waitFor(() => expect(copyButton.textContent).toBe('copy'))
     expect(screen.queryByRole('button', { name: 'copied' })).toBeNull()
   })
+
+  it('does not show copied for a stale source after switching source tabs', async () => {
+    let resolveCopy: (() => void) | undefined
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: () => new Promise<void>((resolve) => { resolveCopy = resolve }) },
+    })
+    replaceHash('#pattern=accordion&panel=code&source=Accordion.tsx')
+
+    render(<App />)
+
+    const copyButton = screen.getByRole('button', { name: 'copy' })
+    await waitFor(() => expect(copyButton).toHaveProperty('disabled', false))
+    fireEvent.click(copyButton)
+    fireEvent.click(screen.getByRole('tab', { name: 'accordionData.ts' }))
+    resolveCopy?.()
+
+    await waitFor(() => expect(currentHashParam('source')).toBe('accordionData.ts'))
+    expect(screen.queryByRole('button', { name: 'copied' })).toBeNull()
+  })
 })
 
 describe('App route state', () => {
