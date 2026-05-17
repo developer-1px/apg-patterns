@@ -392,6 +392,19 @@ describe('demo source wiring', () => {
     expect(duplicateCollisionPaths).toEqual([])
   })
 
+  it('keeps source registry diagnostics deterministic', () => {
+    const collisionNames = sourceNameCollisions.map((collision) => collision.name)
+
+    expect(collisionNames).toEqual([...collisionNames].sort((a, b) => a.localeCompare(b)))
+    for (const collision of sourceNameCollisions) {
+      expect(collision.paths).toEqual([...collision.paths].sort((a, b) => a.localeCompare(b)))
+    }
+
+    const sourceNames = Object.keys(sourceLoaders)
+
+    expect(sourceNames).toEqual([...sourceNames].sort((a, b) => a.localeCompare(b)))
+  })
+
   it('loads every exposed source tab as non-empty source text', async () => {
     const exposedSourceNames = new Set<string>()
     const failedSources: string[] = []

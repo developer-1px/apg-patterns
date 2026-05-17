@@ -80,8 +80,11 @@ for (const [path, load] of Object.entries(demoDataModules)) {
 
 export const sourceNameCollisions: readonly SourceCollision[] = Array.from(collectedPaths.entries())
   .filter(([, paths]) => paths.length > 1)
-  .map(([name, paths]) => ({ name, paths }))
+  .map(([name, paths]) => ({ name, paths: [...paths].sort((a, b) => a.localeCompare(b)) }))
+  .sort((a, b) => a.name.localeCompare(b.name))
 for (const { name } of sourceNameCollisions) delete collected[name]
 
-export const sourceLoaders: Readonly<Record<string, SourceLoader>> = collected
+export const sourceLoaders: Readonly<Record<string, SourceLoader>> = Object.fromEntries(
+  Object.entries(collected).sort(([a], [b]) => a.localeCompare(b)),
+)
 export type SourceName = string
