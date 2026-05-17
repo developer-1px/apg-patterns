@@ -255,6 +255,16 @@ describe('Menu — actionMenuButtonActiveDescendant', () => {
     expect(first).toBe(items[0]!.id)
   })
 
+  it('keeps DOM focus on the menu when using aria-activedescendant', () => {
+    render(<MenuDemo variant="actionMenuButtonActiveDescendant" />)
+    const trigger = screen.getByRole('button', { name: /Actions/ })
+
+    fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+
+    const menu = screen.getByRole('menu')
+    expect(document.activeElement).toBe(menu)
+  })
+
   it('focus event on a menuitem updates aria-activedescendant', () => {
     render(<MenuDemo variant="actionMenuButtonActiveDescendant" />)
     const trigger = screen.getByRole('button', { name: /Actions/ })

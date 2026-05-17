@@ -6,6 +6,7 @@ import { SourceTabs, useSourceTabs } from './SourceTabs'
 import { defaultAppState, readInitialAppState, rightModeLabels, rightModes, type AppAction, type AppState, writeAppHash } from './appState'
 import { formatEvent } from './eventLog'
 import { isCopyableSource, loadSourcePreview } from './sourcePreview'
+import { VariantRouteProvider } from '../shared/variantRoute'
 
 const panelClass = 'min-h-0 rounded-xl bg-white/92 p-3 shadow-[0_16px_48px_rgba(24,24,27,0.07)] backdrop-blur dark:bg-zinc-950/90 dark:shadow-[0_18px_54px_rgba(0,0,0,0.34)]'
 export const scrollPanelClass = `${panelClass} overflow-auto`
@@ -101,7 +102,7 @@ export function ActiveDemoWorkspace({
   }
 
   return (
-    <>
+    <VariantRouteProvider patternKey={activeDemo.key}>
       <section className={scrollPanelClass}>
         <header className={headerClass}>
           <div className="min-w-0">
@@ -190,7 +191,7 @@ export function ActiveDemoWorkspace({
           </div>
         </section>
       ) : null}
-    </>
+    </VariantRouteProvider>
   )
 }
 

@@ -315,6 +315,51 @@ describe('App route state', () => {
       expect(button?.textContent).toBe('Mute')
       expect(button?.getAttribute('aria-pressed')).toBe('false')
     })
+
+    const previewButton = document.querySelector('[data-demo-preview="button"] button')
+    if (!previewButton) throw new Error('missing button preview')
+    fireEvent.click(previewButton)
+
+    await waitFor(() => {
+      expect(document.querySelector('[data-demo-preview="button"] button')?.getAttribute('aria-pressed')).toBe('true')
+    })
+  })
+
+  it('opens variant deep links on the requested variant', async () => {
+    replaceHash('#pattern=tabs&panel=code&source=Tabs.tsx&variant=manual')
+
+    render(<App />)
+
+    await waitFor(() => expect(screen.getByRole('option', { name: 'Manual activation', selected: true })).toBeTruthy())
+    expect(currentHashParam('variant')).toBe('manual')
+    expect(screen.getByRole('tab', { name: 'Overview', selected: true })).toBeTruthy()
+  })
+
+  it('keeps the active variant in the route while inspecting source and state', async () => {
+    replaceHash('#pattern=button&panel=code&source=Button.tsx')
+
+    render(<App />)
+
+    const variantListbox = screen.getByRole('listbox', { name: 'button variants' })
+    fireEvent.keyDown(variantListbox, { key: 'ArrowRight', code: 'ArrowRight' })
+
+    await waitFor(() => expect(currentHashParam('variant')).toBe('toggle'))
+    fireEvent.click(screen.getByRole('tab', { name: 'state' }))
+
+    await waitFor(() => expect(currentHashParam('panel')).toBe('state'))
+    expect(currentHashParam('variant')).toBe('toggle')
+  })
+
+  it('drops stale variant route state when switching patterns', async () => {
+    replaceHash('#pattern=button&panel=code&source=Button.tsx&variant=toggle')
+
+    render(<App />)
+
+    await waitFor(() => expect(screen.getByRole('option', { name: 'Toggle (aria-pressed)', selected: true })).toBeTruthy())
+    fireEvent.click(screen.getByRole('option', { name: 'Checkbox' }))
+
+    await waitFor(() => expect(currentHashParam('pattern')).toBe('checkbox'))
+    expect(currentHashParam('variant')).toBeNull()
   })
 })
 

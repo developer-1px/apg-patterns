@@ -70,10 +70,15 @@ export function writeAppHash({
   rightPanelOpen,
 }: Pick<AppState, 'patternKey' | 'sourceName' | 'rightMode' | 'rightPanelOpen'>) {
   if (typeof window === 'undefined') return
+  const currentParams = new URLSearchParams(window.location.hash.replace(/^#/, ''))
   const params = new URLSearchParams()
   params.set('pattern', patternKey)
   params.set('panel', rightPanelOpen ? rightModeLabels[rightMode] : 'off')
   params.set('source', sourceName)
+  if (currentParams.get('pattern') === patternKey) {
+    const variant = currentParams.get('variant')
+    if (variant) params.set('variant', variant)
+  }
   const nextHash = `#${params.toString()}`
   if (window.location.hash !== nextHash) window.history.replaceState(null, '', nextHash)
 }

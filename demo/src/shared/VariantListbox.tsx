@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import type { HTMLAttributes } from 'react'
 import { listboxDefinition, reducePatternData, useListboxPattern, type PatternData } from '../../../src'
+import { useVariantRoutePattern } from './variantRoute'
 
 type Props = HTMLAttributes<HTMLElement>
 
@@ -18,6 +20,15 @@ export function VariantListbox<T extends string>({
   onChange: (value: T) => void
   orientation?: 'horizontal' | 'vertical'
 }) {
+  const routePattern = useVariantRoutePattern()
+
+  useEffect(() => {
+    const variant = currentHashVariant(routePattern)
+    if (!variant || variant === value) return
+    const item = items.find((candidate) => candidate.key === variant)
+    if (item) onChange(item.key)
+  }, [items, onChange, routePattern, value])
+
   const data = createVariantData(value, items, label)
   const listbox = useListboxPattern(
     data,
@@ -79,5 +90,22 @@ function selectVariant<T extends string>(
   onChange: (value: T) => void,
 ) {
   const item = items.find((candidate) => candidate.key === key)
-  if (item) onChange(item.key)
+  if (!item) return
+  writeHashVariant(item.key)
+  onChange(item.key)
+}
+
+function currentHashVariant(routePattern: string | null) {
+  if (typeof window === 'undefined') return null
+  const params = new URLSearchParams(window.location.hash.replace(/^#/, ''))
+  if (routePattern && params.get('pattern') !== routePattern) return null
+  return params.get('variant')
+}
+
+function writeHashVariant(variant: string) {
+  if (typeof window === 'undefined') return
+  const params = new URLSearchParams(window.location.hash.replace(/^#/, ''))
+  params.set('variant', variant)
+  const nextHash = `#${params.toString()}`
+  if (window.location.hash !== nextHash) window.history.replaceState(null, '', nextHash)
 }

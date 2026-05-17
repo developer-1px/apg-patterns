@@ -1,4 +1,4 @@
-import type { KeyboardEvent, MouseEvent } from 'react'
+import { useLayoutEffect, type KeyboardEvent, type MouseEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
@@ -42,6 +42,12 @@ export function useMenuButtonPattern(data: PatternData, onEvent: (event: Pattern
   const itemKeys = menuKey ? data.relations?.childrenByKey?.[menuKey] ?? [] : []
 
   usePatternEffects({ definition: menuButtonDefinition, data: runtime.data, keyToElementId: runtime.keyToElementId })
+  useLayoutEffect(() => {
+    if (focusStrategy !== 'ariaActiveDescendant' || !expanded || !menuKey) return
+    const reason = data.state?.lastEventReason
+    if (reason !== 'open' && reason !== 'keyboard' && reason !== 'typeahead') return
+    document.getElementById(runtime.keyToElementId(menuKey))?.focus({ preventScroll: true })
+  }, [data.state?.activeKey, data.state?.lastEventReason, expanded, focusStrategy, menuKey, runtime])
 
   const closeAndFocusTrigger = () => {
     if (!triggerKey) return
