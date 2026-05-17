@@ -54,7 +54,6 @@ export const entry: PatternEntry = {
   useDemoPattern: (onEvent) => {
     const [state, dispatch] = useReducer(reduceTreeviewDemoState, initialTreeviewDemoState)
     const treeOptions: PatternOptions = { focusStrategy: state.focusStrategy, followFocus: state.followFocus, itemClickAction: state.itemClickAction, indicatorClickAction: 'toggleExpand' }
-    const treeData: PatternData = { ...state.data, state: { ...state.data.state, options: treeOptions } }
     const dispatchTree = (event: PatternEvent | { type: 'reset' }) => {
       if (event.type === 'reset') return dispatch({ type: 'reset' })
       dispatch({ type: 'patternEvent', event })
@@ -105,7 +104,7 @@ export const entry: PatternEntry = {
           </label>
         </div>
       ),
-      preview: <Tree data={treeData} onEvent={handleTreeEvent} />,
+      preview: <Tree data={state.data} onEvent={handleTreeEvent} options={treeOptions} />,
       reset: () => dispatchTree({ type: 'reset' }),
     }
   },
