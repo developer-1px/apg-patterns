@@ -28,7 +28,6 @@ export const entry: PatternEntry = {
         ? closeTabInData(data, event.key)
         : reduceTabsData(data, event),
     )
-    const active = tabsVariants[host.variant]
     const handleEvent = (event: PatternEvent) => {
       onEvent(event)
       host.dispatchEvent(event)
@@ -46,8 +45,6 @@ export const entry: PatternEntry = {
       ),
       preview: (
         <div className="grid gap-3">
-          <div className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-500">{active.label}</div>
-          {active.hint ? <p className="text-xs text-zinc-500 dark:text-zinc-500">{active.hint}</p> : null}
           <Tabs data={host.data} onEvent={handleEvent} />
         </div>
       ),

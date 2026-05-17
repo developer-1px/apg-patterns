@@ -1,4 +1,4 @@
-import type { KeyboardEvent } from 'react'
+import type { KeyboardEvent, MouseEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
@@ -126,7 +126,7 @@ export function useMenuButtonPattern(data: PatternData, onEvent: (event: Pattern
             ...itemProps,
             id: runtime.keyToElementId(key),
             onFocus: () => onEvent({ type: 'focus', key }),
-            onClick: (event) => {
+            onClick: (event: MouseEvent<HTMLElement>) => {
               itemProps.onClick?.(event)
               closeAndFocusTrigger()
             },

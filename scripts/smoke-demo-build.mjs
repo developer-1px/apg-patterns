@@ -62,6 +62,31 @@ for (const option of patternListbox.querySelectorAll('[role="option"]')) {
   }
 
   if (rootText().includes('missing source:')) patternFailures.push(`${label}: missing source marker rendered`)
+
+  const sourceTablist = document.querySelector('[role="tablist"][aria-label="source files"]')
+  if (!sourceTablist) {
+    patternFailures.push(`${label}: missing source tablist`)
+    continue
+  }
+
+  for (const tab of Array.from(sourceTablist.querySelectorAll('[role="tab"]'))) {
+    const sourceName = tab.textContent?.trim()
+    if (!sourceName) continue
+    tab.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
+
+    try {
+      await waitFor(() => {
+        const sourceText = document.querySelector('pre')?.textContent ?? ''
+        return tab.getAttribute('aria-selected') === 'true'
+          && currentHashParam('source') === sourceName
+          && sourceText !== 'loading'
+          && sourceText.length > 0
+          && !sourceText.startsWith('missing source:')
+      })
+    } catch {
+      patternFailures.push(`${label}: source tab failed: ${sourceName}`)
+    }
+  }
 }
 
 await verifyHashRoute('#pattern=accordion&panel=aria&source=Accordion.tsx', (text) =>
@@ -115,4 +140,8 @@ async function verifyHashRoute(hash, predicate, failure) {
   } catch {
     patternFailures.push(failure)
   }
+}
+
+function currentHashParam(name) {
+  return new URLSearchParams(window.location.hash.replace(/^#/, '')).get(name)
 }
