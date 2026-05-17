@@ -1,6 +1,8 @@
 import { PatternDefinitionSchema } from '../../schema'
 import './navigation'
 
+export { treegridVisibleRowKeys, treegridVisibleCells } from './navigation'
+
 const cellFocus = {
   tabIndex: {
     when: { kind: 'optionEquals', option: 'focusStrategy', value: 'rovingTabIndex' },
@@ -100,7 +102,7 @@ export const treegridDefinition = PatternDefinitionSchema.parse({
       {
         case: 'when',
         when: { kind: 'all', predicates: [activeAtFirstCol, activeRowHasChildren, { kind: 'not', predicate: activeRowIsExpanded }] },
-        events: [{ type: 'expand', key: '$activeRowKey', expanded: true }],
+        events: [{ type: 'extension', name: 'treegridToggleActiveRow', payload: { expanded: true } }],
       },
       { case: 'otherwise', events: [{ type: 'navigate', direction: 'right' }] },
     ] },
@@ -108,7 +110,7 @@ export const treegridDefinition = PatternDefinitionSchema.parse({
       {
         case: 'when',
         when: { kind: 'all', predicates: [activeAtFirstCol, activeRowHasChildren, activeRowIsExpanded] },
-        events: [{ type: 'expand', key: '$activeRowKey', expanded: false }],
+        events: [{ type: 'extension', name: 'treegridToggleActiveRow', payload: { expanded: false } }],
       },
       {
         case: 'when',

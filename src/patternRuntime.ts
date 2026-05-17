@@ -27,6 +27,7 @@ export interface PatternRuntime {
   getRootKeyboardHandler(): (event: KeyInput & { preventDefault?: () => void }) => void
   resolveKeyboardBinding(input: KeyInput, activeKey: Key): { events: readonly PatternEvent[]; preventDefault: boolean } | null
   getItemState(key: Key, partName: string): Record<string, unknown>
+  keyToElementId(key: Key): string
   emit(event: PatternEvent): void
 }
 
@@ -124,7 +125,7 @@ export function createPatternRuntime(input: CreatePatternRuntimeInput): PatternR
   }
   const getItemProps = (partName: string, key: Key): SlotProps => getPartProps(partName, key)
 
-  return { definition, data, options, visibleKeys, getRootProps, getItemProps, getPartProps, getRootKeyboardHandler, resolveKeyboardBinding, getItemState, emit }
+  return { definition, data, options, visibleKeys, getRootProps, getItemProps, getPartProps, getRootKeyboardHandler, resolveKeyboardBinding, getItemState, keyToElementId, emit }
 }
 
 function resolveAriaProjections(projections: readonly AriaProjection[], ctx: PatternRuntimeContext): SlotProps {
