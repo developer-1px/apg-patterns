@@ -1,10 +1,10 @@
 import { reducePatternData } from '../../../../src'
 import { AlertDialog } from './AlertDialog'
 import { initialAlertDialogData } from './alertdialogData'
-import { type PatternEntry } from '../../shared/demoPatternTypes'
+import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
 import { usePatternDataHost } from '../../shared/demoHostState'
 import { alertDialogDefinition } from '../../../../src/patterns/alertdialog/definition'
-import { renderDataInspect } from '../../shared/inspect/data'
+import { renderDataInspect } from '../../shared/inspect/genericInspect'
 
 export const entry: PatternEntry = {
   key: 'alertdialog',
@@ -16,7 +16,7 @@ export const entry: PatternEntry = {
       key: 'alertdialog',
       label: 'Alert Dialog',
       keyboardShortcuts: ['Tab', 'Shift+Tab', 'Escape', 'Enter', 'Space'],
-      sourceNames: ['AlertDialog.tsx', 'alertdialogData.ts', 'alertdialog/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
+      sourceNames: ['AlertDialog.tsx', 'alertdialogData.ts', 'alertdialog/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
       preview: <AlertDialog data={host.data} onEvent={(event) => {
         onEvent(event)

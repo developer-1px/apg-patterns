@@ -1,10 +1,10 @@
 import { menubarDefinition, menuButtonDefinition, reducePatternData } from '../../../../src'
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
-import { renderMenuInspect } from '../../shared/inspect/index'
+import { renderDataInspect } from '../../shared/inspect/index'
 import { Menu } from './Menu'
 import { menuVariantItems, menuVariants, type MenuVariantKey } from './menuData'
 import { VariantListbox } from '../../shared/VariantListbox'
-import { type PatternEntry } from '../../shared/demoPatternTypes'
+import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
 
 export const entry: PatternEntry = {
   key: 'menuAndMenubar',
@@ -24,8 +24,8 @@ export const entry: PatternEntry = {
       key: 'menuAndMenubar',
       label: 'Menu and Menubar',
       keyboardShortcuts: ['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Space', 'Escape'],
-      sourceNames: ['Menu.tsx', 'menuData.ts', 'menu/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
-      inspect: renderMenuInspect(host.data, apgPattern, focusStrategy),
+      sourceNames: ['Menu.tsx', 'menuData.ts', 'menu/definition.ts', ...KERNEL_SOURCES],
+      inspect: renderDataInspect(host.data),
       variants: <VariantListbox value={host.variant} items={menuVariantItems} label="menu and menubar variants" idPrefix="menu-variant" onChange={host.selectVariant} />,
       preview: <Menu key={host.variant} data={data} onEvent={(event) => {
         onEvent(event)

@@ -2,8 +2,8 @@ import { useReducer } from 'react'
 import { PatternDataSchema } from '../../../../src'
 import { Alert } from './Alert'
 import { type AlertDomainEvent, initialAlertData, reduceAlertState } from './alertData'
-import { type PatternEntry } from '../../shared/demoPatternTypes'
-import { renderDataInspect } from '../../shared/inspect/data'
+import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
+import { renderDataInspect } from '../../shared/inspect/genericInspect'
 
 type AlertDemoAction =
   | { type: 'event'; event: AlertDomainEvent }
@@ -24,7 +24,7 @@ export const entry: PatternEntry = {
       key: 'alert',
       label: 'Alert',
       keyboardShortcuts: ['Enter', 'Space'],
-      sourceNames: ['Alert.tsx', 'alertData.ts', 'alert/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
+      sourceNames: ['Alert.tsx', 'alertData.ts', 'alert/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(data),
       preview: <Alert data={data} onEvent={(event) => {
         if (event.type !== 'spawn') onEvent(event)

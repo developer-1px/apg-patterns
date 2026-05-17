@@ -58,6 +58,7 @@ export const PatternStateSchema = z
     valueByKey: z.record(KeySchema, z.union([z.string(), z.number(), z.boolean(), z.null()])).optional(),
     rangeValueByKey: z.record(KeySchema, z.object({ min: z.number().optional(), max: z.number().optional(), now: z.number(), text: z.string().optional() }).strict()).optional(),
     typeaheadTextByKey: z.record(KeySchema, z.string()).optional(),
+    lastEventReason: z.string().optional(),
   })
   .passthrough()
   .superRefine((value, ctx) =>
@@ -86,6 +87,7 @@ export const PatternStateSchema = z
         'valueByKey',
         'rangeValueByKey',
         'typeaheadTextByKey',
+        'lastEventReason',
       ],
       ctx,
     ),

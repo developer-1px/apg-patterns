@@ -26,6 +26,7 @@ export const treeviewDefinition = TreeviewDefinitionSchema.parse({
   rootRole: 'tree',
   containedRoles: ['treeitem'],
   focusModel: 'rovingTabIndex',
+  effects: [{ kind: 'focus', on: { state: 'activeKey', reasons: ['keyboard', 'typeahead'] }, scope: { kind: 'focusWithin' }, target: { kind: 'activeKeyElement' }, preventScroll: true }],
   parts: {
     tree: {
       role: 'tree',

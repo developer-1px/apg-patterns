@@ -11,6 +11,7 @@ export const feedDefinition = PatternDefinitionSchema.parse({
   rootRole: 'feed',
   containedRoles: ['article'],
   focusModel: 'rovingTabIndex',
+  effects: [{ kind: 'focus', on: { state: 'activeKey', reasons: ['keyboard'] }, scope: { kind: 'focusWithin' }, target: { kind: 'activeKeyElement' }, preventScroll: true }],
   parts: {
     feed: {
       role: 'feed',

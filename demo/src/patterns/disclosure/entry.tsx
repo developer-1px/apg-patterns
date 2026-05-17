@@ -10,9 +10,9 @@ import {
   initialNavMenuTopLinksDisclosureData,
   type DisclosureVariantKey,
 } from './disclosureData'
-import { renderDisclosureInspect } from '../../shared/inspect/index'
+import { renderDataInspect } from '../../shared/inspect/index'
 import { VariantListbox } from '../../shared/VariantListbox'
-import { type PatternEntry } from '../../shared/demoPatternTypes'
+import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
 
 function VariantControl({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -52,8 +52,8 @@ export const entry: PatternEntry = {
       key: 'disclosure',
       label: 'Disclosure',
       keyboardShortcuts: ['Enter', 'Space'],
-      sourceNames: ['Disclosure.tsx', 'disclosureData.ts', 'disclosure/runtime.ts', 'disclosure/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
-      inspect: renderDisclosureInspect(host.data),
+      sourceNames: ['Disclosure.tsx', 'disclosureData.ts', 'disclosure/runtime.ts', 'disclosure/definition.ts', ...KERNEL_SOURCES],
+      inspect: renderDataInspect(host.data),
       variants: (
         <VariantControl label="variant">
           <VariantListbox value={host.variant} items={items} label="disclosure variants" idPrefix="disclosure-variant" onChange={host.selectVariant} />

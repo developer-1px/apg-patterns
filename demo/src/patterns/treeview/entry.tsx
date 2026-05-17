@@ -3,11 +3,11 @@ import { z } from 'zod'
 import { PatternDataSchema } from '../../../../src'
 import type { PatternData, PatternEvent, PatternOptions } from '../../../../src'
 import { reduceData, resolveTarget } from './treeContract'
-import { renderAriaTree, renderHtmlTree } from '../../shared/inspect/index'
+import { renderAriaTree, renderHtmlTree } from './inspect'
 import { Tree } from './Tree'
 import { treeVariants, type TreeVariantKey } from './treeVariants'
 import { TreeVariantMenu } from './TreeVariantMenu'
-import { type PatternEntry, selectClass } from '../../shared/demoPatternTypes'
+import { type PatternEntry, selectClass, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
 
 const TreeviewDemoStateSchema = z.object({
   variant: z.string(),
@@ -73,7 +73,7 @@ export const entry: PatternEntry = {
       key: 'treeview',
       label: 'Treeview',
       keyboardShortcuts: ['ArrowDown', 'ArrowUp', 'Home', 'End', 'ArrowRight', 'ArrowLeft', 'Enter', 'Space'],
-      sourceNames: ['Tree.tsx', 'TreeVariantMenu.tsx', 'treeVariants.ts', 'react.ts', 'treeview/runtime.ts', 'treeview/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts', 'treeContract.ts'],
+      sourceNames: ['Tree.tsx', 'TreeVariantMenu.tsx', 'treeVariants.ts', 'react.ts', 'treeview/runtime.ts', 'treeview/definition.ts', ...KERNEL_SOURCES, 'treeContract.ts'],
       inspect: state.inspectMode === 'aria' ? renderAriaTree(state.data, treeOptions) : renderHtmlTree(state.data, treeOptions),
       inspectControls: (
         <select className={selectClass} value={state.inspectMode} onChange={(event) => dispatch({ type: 'setInspectMode', value: event.currentTarget.value as TreeviewDemoState['inspectMode'] })}>

@@ -1,7 +1,89 @@
 import { z } from 'zod'
 import { JsonValueSchema, type JsonValue, validateJsonExtensionFields } from './jsonValue'
 import { KeyTokenSchema } from './patternData'
-import { EventTemplateSchema } from './patternEvent'
+import { EventTemplateSchema, PatternEventReasonSchema, PatternEventTypeSchema } from './patternEvent'
+
+export const AriaRoleSchema = z.enum([
+  'alert', 'alertdialog', 'article', 'button', 'cell', 'checkbox', 'columnheader', 'combobox',
+  'dialog', 'feed', 'grid', 'gridcell', 'group', 'heading', 'link', 'list', 'listbox', 'listitem',
+  'menu', 'menubar', 'menuitem', 'menuitemcheckbox', 'menuitemradio', 'meter', 'navigation',
+  'option', 'paragraph', 'presentation', 'radio', 'radiogroup', 'region', 'row', 'rowheader',
+  'separator', 'slider', 'spinbutton', 'switch', 'tab', 'table', 'tablist', 'tabpanel', 'toolbar',
+  'tooltip', 'tree', 'treegrid', 'treeitem',
+])
+export type AriaRole = z.infer<typeof AriaRoleSchema>
+
+export const AriaAttributeSchema = z.enum([
+  'aria-activedescendant', 'aria-autocomplete', 'aria-checked', 'aria-colcount', 'aria-colindex',
+  'aria-controls', 'aria-current', 'aria-describedby', 'aria-disabled', 'aria-expanded',
+  'aria-haspopup', 'aria-hidden', 'aria-label', 'aria-labelledby', 'aria-level', 'aria-modal',
+  'aria-multiselectable', 'aria-orientation', 'aria-posinset', 'aria-pressed', 'aria-readonly',
+  'aria-roledescription', 'aria-rowcount', 'aria-rowindex', 'aria-selected', 'aria-setsize',
+  'aria-sort', 'aria-valuemax', 'aria-valuemin', 'aria-valuenow', 'aria-valuetext',
+  'href',
+])
+export type AriaAttribute = z.infer<typeof AriaAttributeSchema>
+
+export const FocusModelSchema = z.enum(['rovingTabIndex', 'ariaActiveDescendant', 'focusTrap'])
+export type FocusModel = z.infer<typeof FocusModelSchema>
+
+export const DomEventNameSchema = z.enum([
+  'blur', 'click', 'focus', 'input', 'mousedown', 'mouseenter', 'mouseleave',
+])
+export type DomEventName = z.infer<typeof DomEventNameSchema>
+
+export const KeySourceSchema = z.enum([
+  'collectionItemKey', 'columnHeaderKey', 'controlledPanelKey', 'gridCellKey', 'items',
+  'relations.rootKeys', 'relations.rowKeys', 'rowHeaderKey', 'tableCellKey',
+])
+export type KeySource = z.infer<typeof KeySourceSchema>
+
+export const VisibleOrderKindSchema = z.enum([
+  'flat', 'comboboxOptions', 'gridRows', 'treeVisibleDepthFirst', 'treegridVisibleCells',
+])
+export type VisibleOrderKind = z.infer<typeof VisibleOrderKindSchema>
+
+export const NavigationTargetKindSchema = z.enum([
+  'linear', 'linearWrap', 'firstChild', 'gridCell', 'gridPage', 'optionLinear',
+  'parentKey', 'tabsLinear', 'treegridCell', 'treegridParentRowFirstCell',
+])
+export type NavigationTargetKind = z.infer<typeof NavigationTargetKindSchema>
+
+export const AriaSourcePathSchema = z.enum([
+  '$activeKey',
+  '$event.expanded', '$event.extentKey', '$event.key', '$event.payload.value',
+  'combobox.autocomplete', 'combobox.haspopup', 'combobox.popupOpen',
+  'items.href', 'items.kind', 'items.label', 'items.labelledBy',
+  'items.valuemax', 'items.valuemin', 'items.valuetext',
+  'literal.true',
+  'menu.expandedIfHasPopup', 'menu.hasPopup',
+  'meter.items.valuemax', 'meter.items.valuemin', 'meter.items.valuetext',
+  'meter.options.max', 'meter.options.min',
+  'options.label', 'options.max', 'options.min', 'options.orientation',
+  'options.roledescription', 'options.selectionMode.multiple', 'options.slideRoledescription',
+  'refs.label', 'refs.labelledBy',
+  'relations.controlsByKey', 'relations.ownerByKey',
+  'state.activeKey', 'state.activeKey.elementId', 'state.checkedByKey',
+  'state.colCount', 'state.columnIndexByKey', 'state.currentKey',
+  'state.disabledKeys', 'state.expandedKeys', 'state.inactiveKey',
+  'state.levelByKey', 'state.multiselectable', 'state.posInSetByKey',
+  'state.pressedByKey', 'state.readonly', 'state.rowCount',
+  'state.rowExpanded', 'state.rowIndexByKey', 'state.rowLevelByKey',
+  'state.selectedKeys', 'state.selectedKeys.radioChecked', 'state.setSizeByKey',
+  'state.sortByKey', 'state.treegridColCount', 'state.treegridRowCount',
+  'state.valueByKey',
+])
+export type AriaSourcePath = z.infer<typeof AriaSourcePathSchema>
+
+export const StateFieldSchema = z.enum([
+  'activeKey', 'anchorKey', 'extentKey', 'selectedKeys', 'expandedKeys', 'disabledKeys',
+  'checkedByKey', 'pressedByKey', 'currentByKey', 'invalidByKey', 'requiredKeys',
+  'busyKeys', 'modalKeys', 'levelByKey', 'posInSetByKey', 'setSizeByKey',
+  'rowIndexByKey', 'columnIndexByKey', 'sortByKey', 'valueByKey', 'rangeValueByKey',
+  'typeaheadTextByKey',
+  'editDraftByKey', 'editingKey',
+])
+export type StateField = z.infer<typeof StateFieldSchema>
 
 export type Predicate =
   | { kind: 'always' }
@@ -52,23 +134,23 @@ export const KeyboardCaseSchema = z.discriminatedUnion('case', [
 export const KeyboardBindingSchema = z.object({ shortcut: z.string().min(1), preventDefault: z.boolean().optional(), cases: z.array(KeyboardCaseSchema).readonly() }).strict()
 export type KeyboardBinding = z.infer<typeof KeyboardBindingSchema>
 
-export const AriaSourceSchema = z.string().min(1)
-export const AriaProjectionSchema = z.object({ attribute: z.string().min(1), from: AriaSourceSchema, when: PredicateSchema.optional() }).strict()
+export const AriaSourceSchema = AriaSourcePathSchema
+export const AriaProjectionSchema = z.object({ attribute: AriaAttributeSchema, from: AriaSourceSchema, when: PredicateSchema.optional() }).strict()
 export type AriaProjection = z.infer<typeof AriaProjectionSchema>
 
-export const StateProjectionSchema = z.object({ name: z.string().min(1), from: z.string().min(1) }).strict()
+export const StateProjectionSchema = z.object({ name: z.string().min(1), from: AriaSourceSchema }).strict()
 export type StateProjection = z.infer<typeof StateProjectionSchema>
 
 export const FocusProjectionSchema = z.object({ tabIndex: z.object({ when: PredicateSchema, active: z.number().optional(), inactive: z.number().optional(), value: z.number().optional() }).strict() }).strict()
 export type FocusProjection = z.infer<typeof FocusProjectionSchema>
 
-export const PartEventBindingSchema = z.object({ event: z.string().min(1), when: PredicateSchema.optional(), events: z.array(EventTemplateSchema).readonly() }).strict()
+export const PartEventBindingSchema = z.object({ event: DomEventNameSchema, when: PredicateSchema.optional(), events: z.array(EventTemplateSchema).readonly() }).strict()
 export type PartEventBinding = z.infer<typeof PartEventBindingSchema>
 
 export const PartSchema = z
   .object({
-    role: z.string().min(1),
-    keySource: z.string().min(1).optional(),
+    role: AriaRoleSchema,
+    keySource: KeySourceSchema.optional(),
     aria: z.array(AriaProjectionSchema).readonly().optional(),
     focus: FocusProjectionSchema.optional(),
     state: z.array(StateProjectionSchema).readonly().optional(),
@@ -83,20 +165,46 @@ export const ElementTargetSchema = z.discriminatedUnion('kind', [
 ])
 export type ElementTarget = z.infer<typeof ElementTargetSchema>
 
+export const FocusEffectTriggerSchema = z.object({
+  state: z.literal('activeKey'),
+  reasons: z.array(PatternEventReasonSchema).readonly(),
+}).strict()
+export type FocusEffectTrigger = z.infer<typeof FocusEffectTriggerSchema>
+
+export const FocusEffectScopeSchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('focusWithin') }).strict(),
+  z.object({ kind: z.literal('always') }).strict(),
+])
+export type FocusEffectScope = z.infer<typeof FocusEffectScopeSchema>
+
+export const FocusEffectTargetSchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('activeKeyElement') }).strict(),
+  z.object({ kind: z.literal('activeDescendantHost') }).strict(),
+  ...ElementTargetSchema.options,
+])
+export type FocusEffectTarget = z.infer<typeof FocusEffectTargetSchema>
+
 export const EffectSchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('focus'), when: PredicateSchema, target: ElementTargetSchema, preventScroll: z.boolean().optional() }).strict(),
+  z.object({
+    kind: z.literal('focus'),
+    when: PredicateSchema.optional(),
+    on: FocusEffectTriggerSchema.optional(),
+    scope: FocusEffectScopeSchema.optional(),
+    target: FocusEffectTargetSchema,
+    preventScroll: z.boolean().optional(),
+  }).strict(),
   z.object({ kind: z.literal('restoreFocus'), when: PredicateSchema, target: ElementTargetSchema, preventScroll: z.boolean().optional() }).strict(),
   z.object({ kind: z.literal('trapFocus'), when: PredicateSchema, root: ElementTargetSchema }).strict(),
 ])
 export type EffectDefinition = z.infer<typeof EffectSchema>
 
 const NavigationTargetSchema = z
-  .object({ kind: z.string().min(1) })
+  .object({ kind: NavigationTargetKindSchema })
   .passthrough()
   .superRefine((value, ctx) => validateJsonExtensionFields(value, ['kind'], ctx))
 
 const VisibleOrderSchema = z
-  .object({ kind: z.string().min(1) })
+  .object({ kind: VisibleOrderKindSchema })
   .passthrough()
   .superRefine((value, ctx) => validateJsonExtensionFields(value, ['kind'], ctx))
 
@@ -129,19 +237,19 @@ export const TransitionValueSchema = z.union([
 export type TransitionValue = z.infer<typeof TransitionValueSchema>
 
 export const StateActionSchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('set'), field: z.string().min(1), value: TransitionValueSchema }).strict(),
-  z.object({ kind: z.literal('add'), field: z.string().min(1), value: TransitionValueSchema }).strict(),
-  z.object({ kind: z.literal('remove'), field: z.string().min(1), value: TransitionValueSchema }).strict(),
-  z.object({ kind: z.literal('setMembership'), field: z.string().min(1), value: TransitionValueSchema, present: TransitionValueSchema }).strict(),
-  z.object({ kind: z.literal('setRecordValue'), field: z.string().min(1), key: TransitionValueSchema, value: TransitionValueSchema }).strict(),
-  z.object({ kind: z.literal('toggleInSet'), field: z.string().min(1), value: TransitionValueSchema }).strict(),
-  z.object({ kind: z.literal('replaceSet'), field: z.string().min(1), values: z.array(TransitionValueSchema).readonly() }).strict(),
+  z.object({ kind: z.literal('set'), field: StateFieldSchema, value: TransitionValueSchema }).strict(),
+  z.object({ kind: z.literal('add'), field: StateFieldSchema, value: TransitionValueSchema }).strict(),
+  z.object({ kind: z.literal('remove'), field: StateFieldSchema, value: TransitionValueSchema }).strict(),
+  z.object({ kind: z.literal('setMembership'), field: StateFieldSchema, value: TransitionValueSchema, present: TransitionValueSchema }).strict(),
+  z.object({ kind: z.literal('setRecordValue'), field: StateFieldSchema, key: TransitionValueSchema, value: TransitionValueSchema }).strict(),
+  z.object({ kind: z.literal('toggleInSet'), field: StateFieldSchema, value: TransitionValueSchema }).strict(),
+  z.object({ kind: z.literal('replaceSet'), field: StateFieldSchema, values: z.array(TransitionValueSchema).readonly() }).strict(),
 ])
 export type StateAction = z.infer<typeof StateActionSchema>
 
 export const TransitionSchema = z
   .object({
-    on: z.string().min(1),
+    on: PatternEventTypeSchema,
     name: z.string().min(1).optional(),
     when: PredicateSchema.optional(),
     actions: z.array(StateActionSchema).readonly(),
@@ -152,9 +260,9 @@ export type Transition = z.infer<typeof TransitionSchema>
 export const PatternDefinitionSchema = z
   .object({
     apgPattern: z.string().min(1),
-    rootRole: z.string().min(1),
-    containedRoles: z.array(z.string().min(1)).readonly().optional(),
-    focusModel: z.string().min(1).optional(),
+    rootRole: AriaRoleSchema,
+    containedRoles: z.array(AriaRoleSchema).readonly().optional(),
+    focusModel: FocusModelSchema.optional(),
     parts: z.record(z.string().min(1), PartSchema),
     navigation: NavigationSchema,
     keyboard: z.array(KeyboardBindingSchema).readonly(),

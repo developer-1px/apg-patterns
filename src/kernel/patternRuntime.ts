@@ -1,5 +1,5 @@
 import { matchesShortcut, type KeyInput } from '@interactive-os/keyboard'
-import { PatternDataSchema, PatternDefinitionSchema, PatternOptionsSchema, type Key, type PatternData, type PatternEvent, type PatternOptions, type PatternDefinition, type PartEventBinding, type AriaProjection, type FocusProjection } from '../schema'
+import { PatternDataSchema, PatternDefinitionSchema, PatternOptionsSchema, type Key, type PatternData, type PatternEvent, type PatternEventReason, type PatternOptions, type PatternDefinition, type PartEventBinding, type AriaProjection, type FocusProjection } from '../schema'
 import {
   resolveAriaSource,
   resolveStateProjection,
@@ -83,7 +83,7 @@ export function createPatternRuntime(input: CreatePatternRuntimeInput): PatternR
     const result = resolveKeyboardBinding(event, active)
     if (!result) return
     if (result.preventDefault) event.preventDefault?.()
-    for (const next of result.events) emit(next)
+    for (const next of result.events) emit(withDefaultReason(next, 'keyboard'))
   }
 
   const getPartProps = (partName: string, key?: Key): SlotProps => {
@@ -182,11 +182,33 @@ function resolvePartEventBindings(
         if (binding.when && !evaluatePredicate(binding.when, ctx)) continue
         const active = ctx.activeKey ?? ctx.key
         if (!active) continue
-        for (const event of binding.events.flatMap((t) => resolveEventTemplate(t, active, ctx.data, ctx.key, ctx))) emit(event)
+        for (const event of binding.events.flatMap((t) => resolveEventTemplate(t, active, ctx.data, ctx.key, ctx))) emit(withDefaultReason(event, reasonForDomEvent(eventName)))
       }
     }
   }
   return out
+}
+
+function withDefaultReason(event: PatternEvent, reason: PatternEventReason): PatternEvent {
+  if (event.meta?.reason) return event
+  return withEventReason(event, reason)
+}
+
+function withEventReason(event: PatternEvent, reason: PatternEventReason): PatternEvent {
+  const next = { ...event } as PatternEvent
+  Object.defineProperty(next, 'meta', {
+    value: { ...event.meta, reason },
+    enumerable: false,
+    configurable: true,
+  })
+  return next
+}
+
+function reasonForDomEvent(eventName: string): PatternEventReason {
+  if (eventName === 'focus') return 'focus'
+  if (eventName === 'input' || eventName === 'keydown' || eventName === 'keyup') return 'keyboard'
+  if (eventName === 'click' || eventName === 'mousedown' || eventName.startsWith('pointer')) return 'pointer'
+  return 'external'
 }
 
 function compactProps(props: SlotProps): SlotProps {

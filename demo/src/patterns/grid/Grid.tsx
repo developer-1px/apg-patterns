@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import type { HTMLAttributes, KeyboardEvent } from 'react'
-import { createPatternRuntime, gridDefinition, gridRows, usePatternAutoFocus, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
+import { createPatternRuntime, gridDefinition, gridRows, usePatternEffects, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
 import { Icon, type IconName } from '../../shared/Icon'
 
 type Props = HTMLAttributes<HTMLElement>
@@ -55,7 +55,7 @@ export function Grid({
     keyToElementId: (key) => `gridcell-${key}`,
   })
 
-  usePatternAutoFocus(runtime, { suspend: Boolean(editingKey), getScopeElement: () => rootRef.current })
+  usePatternEffects({ definition: gridDefinition, data, keyToElementId: runtime.keyToElementId })
 
   const commitEdit = () => {
     if (editingKey) {

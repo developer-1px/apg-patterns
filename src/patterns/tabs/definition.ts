@@ -28,6 +28,7 @@ export const tabsDefinition = TabsDefinitionSchema.parse({
   rootRole: 'tablist',
   containedRoles: ['tab', 'tabpanel'],
   focusModel: 'rovingTabIndex',
+  effects: [{ kind: 'focus', on: { state: 'activeKey', reasons: ['keyboard'] }, scope: { kind: 'focusWithin' }, target: { kind: 'activeKeyElement' }, preventScroll: true }],
   parts: {
     tablist: {
       role: 'tablist',

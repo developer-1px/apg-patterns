@@ -13,12 +13,20 @@ export interface DemoPattern {
   keyboardShortcuts: readonly string[]
   inspect: string
   preview: ReactNode
-  reset: () => void
+  reset?: () => void
   variants?: ReactNode
   inspectControls?: ReactNode
 }
 
 export type EmitPatternEvent = (event: PatternEvent) => void
+
+/** Kernel source keys included in every pattern's sourceNames list. */
+export const KERNEL_SOURCES = [
+  'kernel/patternRuntime.ts',
+  'kernel/patternReducer.ts',
+  'kernel/patternKernel.ts',
+  'schema/index.ts',
+] as const satisfies readonly SourceName[]
 
 export interface PatternEntry {
   key: PatternKey

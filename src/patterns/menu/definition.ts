@@ -40,6 +40,7 @@ export const menubarDefinition = PatternDefinitionSchema.parse({
   rootRole: 'menubar',
   containedRoles: ['menuitem', 'menuitemcheckbox', 'menuitemradio'],
   focusModel: 'rovingTabIndex',
+  effects: [{ kind: 'focus', on: { state: 'activeKey', reasons: ['keyboard', 'typeahead'] }, scope: { kind: 'focusWithin' }, target: { kind: 'activeKeyElement' }, preventScroll: true }],
   parts: {
     menubar: {
       role: 'menubar',
@@ -119,6 +120,7 @@ export const menuButtonDefinition = PatternDefinitionSchema.parse({
   rootRole: 'button',
   containedRoles: ['menu', 'menuitem', 'menuitemcheckbox', 'menuitemradio'],
   focusModel: 'rovingTabIndex',
+  effects: [{ kind: 'focus', on: { state: 'activeKey', reasons: ['keyboard', 'typeahead', 'open'] }, scope: { kind: 'always' }, target: { kind: 'activeKeyElement' }, preventScroll: true }],
   parts: {
     trigger: {
       role: 'button',

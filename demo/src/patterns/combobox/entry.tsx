@@ -1,9 +1,9 @@
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { Combobox } from './Combobox'
 import { buildComboboxData, comboboxVariants, reduceComboboxData, type ComboboxVariantKey } from './comboboxData'
-import { renderComboboxInspect } from '../../shared/inspect/index'
+import { renderDataInspect } from '../../shared/inspect/index'
 import { VariantListbox } from '../../shared/VariantListbox'
-import { type PatternEntry } from '../../shared/demoPatternTypes'
+import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
 
 const comboboxVariantItems = (Object.keys(comboboxVariants) as ComboboxVariantKey[]).map((key) => ({
   key,
@@ -25,8 +25,8 @@ export const entry: PatternEntry = {
       key: 'combobox',
       label: 'Combobox',
       keyboardShortcuts: ['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Escape'],
-      sourceNames: ['Combobox.tsx', 'comboboxData.ts', 'combobox/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
-      inspect: renderComboboxInspect(host.data, { autocomplete: comboboxVariants[host.variant].autocomplete }),
+      sourceNames: ['Combobox.tsx', 'comboboxData.ts', 'combobox/definition.ts', ...KERNEL_SOURCES],
+      inspect: renderDataInspect(host.data),
       variants: <VariantListbox value={host.variant} items={comboboxVariantItems} label="combobox variants" idPrefix="combobox-variant" onChange={host.selectVariant} />,
       preview: (
         <Combobox

@@ -5,6 +5,7 @@ export const listboxDefinition = PatternDefinitionSchema.parse({
   rootRole: 'listbox',
   containedRoles: ['option'],
   focusModel: 'rovingTabIndex',
+  effects: [{ kind: 'focus', on: { state: 'activeKey', reasons: ['keyboard', 'typeahead'] }, scope: { kind: 'focusWithin' }, target: { kind: 'activeKeyElement' }, preventScroll: true }],
   parts: {
     listbox: {
       role: 'listbox',

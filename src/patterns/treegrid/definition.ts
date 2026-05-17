@@ -25,6 +25,7 @@ export const treegridDefinition = PatternDefinitionSchema.parse({
   rootRole: 'treegrid',
   containedRoles: ['row', 'gridcell', 'columnheader', 'rowheader'],
   focusModel: 'rovingTabIndex',
+  effects: [{ kind: 'focus', on: { state: 'activeKey', reasons: ['keyboard'] }, scope: { kind: 'focusWithin' }, target: { kind: 'activeKeyElement' }, preventScroll: true }],
   parts: {
     treegrid: {
       role: 'treegrid',

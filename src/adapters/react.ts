@@ -4,7 +4,7 @@ import { createTypeaheadBuffer } from '@interactive-os/keyboard'
 import { createTreeviewRuntime, type CreateTreeviewRuntimeInput, type TreeviewRuntime, type TreeviewSlotProps } from '../patterns/treeview/runtime'
 import { createTabsRuntime, type CreateTabsRuntimeInput, type TabsRuntime } from '../patterns/tabs/runtime'
 import type { Key, PatternData, PatternOptions } from '../schema'
-import type { ElementTarget, PatternDefinition } from '../schema'
+import type { ElementTarget, FocusEffectTarget, PatternDefinition } from '../schema'
 import type { PatternRuntime } from '../kernel/patternRuntime'
 import {
   createParentByKey,
@@ -106,10 +106,24 @@ export function usePatternEffects({
     const nextMatches: boolean[] = []
     for (const [index, effect] of (definition.effects ?? []).entries()) {
       const ctx = { data, activeKey: data.state?.activeKey ?? null, parentByKey: createParentByKey(data), keyToElementId }
-      const matches = evaluatePredicate(effect.when, ctx)
+      const matches = evaluatePredicate(effect.when ?? { kind: 'always' }, ctx)
       nextMatches[index] = matches
-      if (!matches || previousMatches.current[index] === matches) continue
-      if (effect.kind === 'focus' || effect.kind === 'restoreFocus') {
+      if (!matches) continue
+      if (effect.kind === 'focus' && effect.on?.state === 'activeKey') {
+        const activeKey = data.state?.activeKey
+        const reason = data.state?.lastEventReason
+        if (!activeKey || !reason || !effect.on.reasons.some((item) => item === reason)) continue
+        if (effect.scope?.kind === 'focusWithin' && !containsActiveElement(effect.target, data, keyToElementId, definition.rootRole)) continue
+        const target = resolveFocusEffectTarget(effect.target, data, keyToElementId)
+        target?.focus({ preventScroll: effect.preventScroll ?? true })
+        continue
+      }
+      if (previousMatches.current[index] === matches) continue
+      if (effect.kind === 'focus') {
+        const target = resolveFocusEffectTarget(effect.target, data, keyToElementId)
+        target?.focus({ preventScroll: effect.preventScroll })
+      }
+      if (effect.kind === 'restoreFocus') {
         const target = resolveElementTarget(effect.target, data, keyToElementId)
         target?.focus({ preventScroll: effect.preventScroll })
       }
@@ -157,6 +171,31 @@ function resolveElementTarget(target: ElementTarget, data: PatternData, keyToEle
   }
   const key = resolveElementTargetKey(target, data)
   return key ? document.getElementById(keyToElementId(key)) : null
+}
+
+function resolveFocusEffectTarget(target: FocusEffectTarget, data: PatternData, keyToElementId: (key: Key) => string): HTMLElement | null {
+  const activeKey = data.state?.activeKey
+  if (target.kind === 'activeKeyElement') return activeKey ? document.getElementById(keyToElementId(activeKey)) : null
+  if (target.kind === 'activeDescendantHost') {
+    if (!activeKey) return null
+    return findActiveDescendantHost(keyToElementId(activeKey))
+  }
+  return resolveElementTarget(target, data, keyToElementId)
+}
+
+function containsActiveElement(target: FocusEffectTarget, data: PatternData, keyToElementId: (key: Key) => string, rootRole: string): boolean {
+  const targetElement = resolveFocusEffectTarget(target, data, keyToElementId)
+  const root = targetElement ? closestRole(targetElement, rootRole) : null
+  return Boolean(root && document.activeElement && root.contains(document.activeElement))
+}
+
+function closestRole(element: HTMLElement, role: string): HTMLElement | null {
+  let current: HTMLElement | null = element
+  while (current) {
+    if (current.getAttribute('role') === role) return current
+    current = current.parentElement
+  }
+  return null
 }
 
 function resolveElementTargetKey(target: Exclude<ElementTarget, { kind: 'firstFocusable' }>, data: PatternData): Key | null {

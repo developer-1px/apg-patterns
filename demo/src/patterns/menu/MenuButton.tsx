@@ -1,5 +1,5 @@
 import type { HTMLAttributes, KeyboardEvent as ReactKeyboardEvent } from 'react'
-import { createPatternRuntime, menuButtonDefinition, usePatternAutoFocus } from '../../../../src'
+import { createPatternRuntime, menuButtonDefinition, usePatternEffects } from '../../../../src'
 import { Icon } from '../../shared/Icon'
 import type { MenuProps } from './menuTypes'
 
@@ -18,7 +18,7 @@ export function MenuButton({ data, onEvent }: MenuProps) {
   const menuKey = triggerKey ? data.relations?.controlsByKey?.[triggerKey]?.[0] : undefined
   const expanded = triggerKey ? data.state?.expandedKeys?.includes(triggerKey) ?? false : false
   const menuItemKeys = menuKey ? data.relations?.childrenByKey?.[menuKey] ?? [] : []
-  usePatternAutoFocus(runtime, { enabled: expanded })
+  usePatternEffects({ definition: menuButtonDefinition, data, keyToElementId: runtime.keyToElementId })
 
   if (!triggerKey || !menuKey) return null
   const triggerProps = runtime.getPartProps('trigger', triggerKey) as Props
@@ -30,8 +30,8 @@ export function MenuButton({ data, onEvent }: MenuProps) {
       <button type="button" id={`mb-${triggerKey}`} {...triggerProps} onKeyDown={(event) => {
         if (!expanded && (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ')) {
           event.preventDefault()
-          onEvent({ type: 'expand', key: triggerKey, expanded: true })
-          if (menuItemKeys[0]) onEvent({ type: 'focus', key: menuItemKeys[0] })
+          onEvent({ type: 'expand', key: triggerKey, expanded: true, meta: { reason: 'open' } })
+          if (menuItemKeys[0]) onEvent({ type: 'focus', key: menuItemKeys[0], meta: { reason: 'open' } })
         }
       }} className="inline-flex h-8 items-center justify-between rounded bg-zinc-100 px-3 text-sm text-zinc-800 outline-none hover:bg-zinc-200 focus:outline focus:outline-2 focus:outline-zinc-400 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:focus:outline-zinc-500">
         <span>{data.items[triggerKey]?.label ?? 'Menu'}</span>
@@ -48,7 +48,7 @@ export function MenuButton({ data, onEvent }: MenuProps) {
           const nextKey = resolveMenuButtonKey(event.key, menuItemKeys, data.state?.activeKey)
           if (nextKey) {
             event.preventDefault()
-            onEvent({ type: 'focus', key: nextKey })
+            onEvent({ type: 'focus', key: nextKey, meta: { reason: 'keyboard' } })
             return
           }
           rootKeyDown(event as any)

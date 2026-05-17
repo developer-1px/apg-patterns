@@ -1,9 +1,9 @@
 import { Checkbox } from './Checkbox'
 import { checkboxVariantItems, checkboxVariants, type CheckboxVariantKey } from './checkboxData'
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
-import { renderCheckboxInspect } from '../../shared/inspect/index'
+import { renderDataInspect } from '../../shared/inspect/index'
 import { VariantListbox } from '../../shared/VariantListbox'
-import { type PatternEntry } from '../../shared/demoPatternTypes'
+import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
 
 export const entry: PatternEntry = {
   key: 'checkbox',
@@ -20,8 +20,8 @@ export const entry: PatternEntry = {
       key: 'checkbox',
       label: 'Checkbox',
       keyboardShortcuts: ['Space'],
-      sourceNames: ['Checkbox.tsx', 'checkboxData.ts', 'checkbox/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
-      inspect: renderCheckboxInspect(host.data),
+      sourceNames: ['Checkbox.tsx', 'checkboxData.ts', 'checkbox/definition.ts', ...KERNEL_SOURCES],
+      inspect: renderDataInspect(host.data),
       variants: <VariantListbox value={host.variant} items={checkboxVariantItems} label="checkbox variants" idPrefix="checkbox-variant" onChange={host.selectVariant} />,
       preview: <Checkbox data={host.data} onEvent={(event) => {
         onEvent(event)

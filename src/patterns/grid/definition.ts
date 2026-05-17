@@ -79,6 +79,7 @@ export const gridDefinition = PatternDefinitionSchema.parse({
   rootRole: 'grid',
   containedRoles: ['row', 'gridcell', 'columnheader', 'rowheader'],
   focusModel: 'rovingTabIndex',
+  effects: [{ kind: 'focus', on: { state: 'activeKey', reasons: ['keyboard'] }, scope: { kind: 'focusWithin' }, target: { kind: 'activeKeyElement' }, preventScroll: true }],
   parts: {
     grid: {
       role: 'grid',

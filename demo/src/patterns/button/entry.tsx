@@ -2,8 +2,8 @@ import { Button } from './Button'
 import { buttonVariantItems, buttonVariants, type ButtonVariantKey } from './buttonData'
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { VariantListbox } from '../../shared/VariantListbox'
-import { type PatternEntry } from '../../shared/demoPatternTypes'
-import { renderDataInspect } from '../../shared/inspect/data'
+import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
+import { renderDataInspect } from '../../shared/inspect/genericInspect'
 
 export const entry: PatternEntry = {
   key: 'button',
@@ -20,7 +20,7 @@ export const entry: PatternEntry = {
       key: 'button',
       label: 'Button',
       keyboardShortcuts: ['Enter', 'Space'],
-      sourceNames: ['Button.tsx', 'buttonData.ts', 'button/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
+      sourceNames: ['Button.tsx', 'buttonData.ts', 'button/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
       variants: <VariantListbox value={host.variant} items={buttonVariantItems} label="button variants" idPrefix="button-variant" onChange={host.selectVariant} />,
       preview: <Button data={host.data} onEvent={(event) => {

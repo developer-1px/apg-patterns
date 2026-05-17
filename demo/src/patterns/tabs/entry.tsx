@@ -1,11 +1,11 @@
 import { type ReactNode } from 'react'
 import { reduceTabsData, type PatternData, type PatternEvent } from '../../../../src'
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
-import { renderTabsInspect } from '../../shared/inspect/index'
+import { renderDataInspect } from '../../shared/inspect/index'
 import { Tabs } from './Tabs'
 import { closeTabInData, initialTabsVariant, tabsVariantItems, tabsVariants, type TabsVariantKey } from './tabsData'
 import { VariantListbox } from '../../shared/VariantListbox'
-import { type PatternEntry } from '../../shared/demoPatternTypes'
+import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
 
 function VariantControl({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -38,8 +38,8 @@ export const entry: PatternEntry = {
       key: 'tabs',
       label: 'Tabs',
       keyboardShortcuts: ['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Space', 'Delete'],
-      sourceNames: ['Tabs.tsx', 'tabsData.ts', 'react.ts', 'tabs/runtime.ts', 'tabs/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
-      inspect: renderTabsInspect(host.data),
+      sourceNames: ['Tabs.tsx', 'tabsData.ts', 'react.ts', 'tabs/runtime.ts', 'tabs/definition.ts', ...KERNEL_SOURCES],
+      inspect: renderDataInspect(host.data),
       variants: (
         <VariantControl label="variant">
           <VariantListbox value={host.variant} items={tabsVariantItems} label="tabs variants" idPrefix="tabs-variant" onChange={host.selectVariant} />

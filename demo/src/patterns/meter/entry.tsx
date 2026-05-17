@@ -2,8 +2,8 @@ import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { Meter } from './Meter'
 import { meterVariantItems, meterVariants, type MeterVariantKey } from './meterData'
 import { VariantListbox } from '../../shared/VariantListbox'
-import { type PatternEntry } from '../../shared/demoPatternTypes'
-import { renderDataInspect } from '../../shared/inspect/data'
+import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
+import { renderDataInspect } from '../../shared/inspect/genericInspect'
 
 export const entry: PatternEntry = {
   key: 'meter',
@@ -20,7 +20,7 @@ export const entry: PatternEntry = {
       key: 'meter',
       label: 'Meter',
       keyboardShortcuts: [],
-      sourceNames: ['Meter.tsx', 'meterData.ts', 'meter/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
+      sourceNames: ['Meter.tsx', 'meterData.ts', 'meter/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
       variants: <VariantListbox value={host.variant} items={meterVariantItems} label="meter variants" idPrefix="meter-variant" onChange={host.selectVariant} />,
       preview: <Meter data={host.data} onEvent={onEvent} />,

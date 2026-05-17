@@ -45,6 +45,7 @@ export interface TreeviewRuntime {
   getTreeProps(): TreeviewSlotProps
   getTreeItemProps(key: Key): TreeviewSlotProps
   getIndicatorProps(key: Key): TreeviewSlotProps
+  keyToElementId(key: Key): string
   emit(event: PatternEvent): void
 }
 
@@ -68,7 +69,7 @@ const defaultOptions = {
 export function createTreeviewRuntime(input: CreateTreeviewRuntimeInput): TreeviewRuntime {
   const data = PatternDataSchema.parse(input.data)
   const options = { ...defaultOptions, ...PatternOptionsSchema.parse(input.options ?? {}) }
-  const emit = (event: PatternEvent) => input.onEvent(PatternEventSchema.parse(event))
+  const emit = (event: PatternEvent) => input.onEvent(withNonEnumerableMeta(PatternEventSchema.parse(event)))
   const keyToElementId = (key: Key) => `${options.elementIdPrefix ?? defaultOptions.elementIdPrefix}${key}`
   const typeahead = input.typeaheadBuffer ?? createTypeaheadBuffer()
   const runtime = createPatternRuntime({
@@ -90,7 +91,7 @@ export function createTreeviewRuntime(input: CreateTreeviewRuntimeInput): Treevi
         const typeaheadTarget = resolveTypeaheadTarget(typeaheadQuery, data, options)
         if (typeaheadTarget) {
           event.preventDefault?.()
-          emit({ type: 'focus', key: typeaheadTarget })
+          emit({ type: 'focus', key: typeaheadTarget, meta: { reason: 'typeahead' } })
           return
         }
         runtime.getRootKeyboardHandler()(event)
@@ -124,8 +125,20 @@ export function createTreeviewRuntime(input: CreateTreeviewRuntimeInput): Treevi
     getTreeProps,
     getTreeItemProps,
     getIndicatorProps,
+    keyToElementId,
     emit,
   }
+}
+
+function withNonEnumerableMeta(event: PatternEvent): PatternEvent {
+  if (!event.meta) return event
+  const next = { ...event } as PatternEvent
+  Object.defineProperty(next, 'meta', {
+    value: event.meta,
+    enumerable: false,
+    configurable: true,
+  })
+  return next
 }
 
 function getVisibleKeys(data: PatternData): readonly Key[] {

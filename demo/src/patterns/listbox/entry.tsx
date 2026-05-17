@@ -1,6 +1,6 @@
 import { listboxDefinition, reducePatternData, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
-import { renderListboxInspect } from '../../shared/inspect/index'
+import { renderDataInspect } from '../../shared/inspect/index'
 import { Listbox } from './Listbox'
 import {
   groupedListboxStructure,
@@ -11,7 +11,7 @@ import {
 } from './listboxData'
 import { RearrangeableListbox } from './RearrangeableListbox'
 import { VariantListbox } from '../../shared/VariantListbox'
-import { type PatternEntry } from '../../shared/demoPatternTypes'
+import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
 
 type ListboxVariantKey = 'basic' | 'scrollable' | 'grouped' | 'rearrangeable' | 'rearrangeableMulti'
 
@@ -80,8 +80,8 @@ export const entry: PatternEntry = {
       key: 'listbox',
       label: 'Listbox',
       keyboardShortcuts: ['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Space'],
-      sourceNames: ['Listbox.tsx', 'RearrangeableListbox.tsx', 'listboxData.ts', 'listbox/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
-      inspect: renderListboxInspect(host.data),
+      sourceNames: ['Listbox.tsx', 'RearrangeableListbox.tsx', 'listboxData.ts', 'listbox/definition.ts', ...KERNEL_SOURCES],
+      inspect: renderDataInspect(host.data),
       variants: <VariantListbox value={host.variant} items={listboxVariantItems} label="listbox variants" idPrefix="listbox-variant" onChange={host.selectVariant} />,
       preview,
       reset: host.reset,

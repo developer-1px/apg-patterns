@@ -1,9 +1,9 @@
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
-import { renderSliderInspect } from '../../shared/inspect/index'
+import { renderDataInspect } from '../../shared/inspect/index'
 import { Slider } from './Slider'
 import { reduceSliderData, sliderVariantItems, sliderVariants, type SliderVariantKey } from './sliderData'
 import { VariantListbox } from '../../shared/VariantListbox'
-import { type PatternEntry } from '../../shared/demoPatternTypes'
+import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
 
 export const entry: PatternEntry = {
   key: 'slider',
@@ -20,8 +20,8 @@ export const entry: PatternEntry = {
       key: 'slider',
       label: 'Slider',
       keyboardShortcuts: ['ArrowRight', 'ArrowUp', 'ArrowLeft', 'ArrowDown', 'Shift+ArrowRight', 'Shift+ArrowUp', 'Shift+ArrowLeft', 'Shift+ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'],
-      sourceNames: ['Slider.tsx', 'sliderData.ts', 'slider/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
-      inspect: renderSliderInspect(host.data),
+      sourceNames: ['Slider.tsx', 'sliderData.ts', 'slider/definition.ts', ...KERNEL_SOURCES],
+      inspect: renderDataInspect(host.data),
       variants: <VariantListbox value={host.variant} items={sliderVariantItems} label="slider variants" idPrefix="slider-variant" onChange={host.selectVariant} />,
       preview: <Slider data={host.data} onEvent={(event) => {
         onEvent(event)

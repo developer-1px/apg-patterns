@@ -1,5 +1,4 @@
-import { useRef } from 'react'
-import { usePatternAutoFocus, useTreeviewPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
+import { treeviewDefinition, usePatternEffects, useTreeviewPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
 import { Icon } from '../../shared/Icon'
 
 export function Tree({
@@ -11,11 +10,10 @@ export function Tree({
 }) {
   const options = (data.state?.options as PatternOptions | undefined) ?? {}
   const tree = useTreeviewPattern({ data, options, onEvent })
-  const rootRef = useRef<HTMLDivElement>(null)
-  usePatternAutoFocus(tree, { getScopeElement: () => rootRef.current })
+  usePatternEffects({ definition: treeviewDefinition, data, keyToElementId: tree.keyToElementId })
 
   return (
-    <div ref={rootRef} className="min-h-56 bg-white py-1 outline-none focus:outline focus:outline-2 focus:outline-zinc-400 dark:bg-zinc-950 dark:focus:outline-zinc-500" {...tree.getTreeProps()}>
+    <div className="min-h-56 bg-white py-1 outline-none focus:outline focus:outline-2 focus:outline-zinc-400 dark:bg-zinc-950 dark:focus:outline-zinc-500" {...tree.getTreeProps()}>
       {tree.items.map((item) => {
         const hasChildren = (data.relations?.childrenByKey?.[item.key]?.length ?? 0) > 0
         const expanded = data.state?.expandedKeys?.includes(item.key) ?? false

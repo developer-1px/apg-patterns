@@ -1,6 +1,2 @@
-export * from './basic'
-export * from './collection'
-export * from './tree'
-export * from './data'
-export { renderComboboxInspect } from '../../patterns/combobox/inspect'
-export { renderMenuInspect } from '../../patterns/menu/inspect'
+export * from './genericInspect'
+export * from './utils'

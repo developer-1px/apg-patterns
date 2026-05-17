@@ -1,9 +1,8 @@
-import { useRef } from 'react'
 import type { HTMLAttributes } from 'react'
 import {
   createPatternRuntime,
   accordionDefinition,
-  usePatternAutoFocus,
+  usePatternEffects,
   type PatternData,
   type PatternEvent,
 } from '../../../../src'
@@ -33,19 +32,11 @@ export function Accordion({ data, onEvent }: AccordionProps) {
   const expandedKeys = data.state?.expandedKeys ?? []
   const activeKey = data.state?.activeKey ?? rootKeys[0]
   const groupProps = runtime.getRootProps() as Props
-  const rootRef = useRef<HTMLDivElement>(null)
-  const didMountRef = useRef(false)
-
-  usePatternAutoFocus(runtime, {
-    skipInitialFocus: !didMountRef.current,
-    getScopeElement: () => rootRef.current,
-  })
-  didMountRef.current = true
+  usePatternEffects({ definition: accordionDefinition, data, keyToElementId: runtime.keyToElementId })
 
   return (
     <div
       {...groupProps}
-      ref={rootRef}
       className="grid max-w-xl gap-1 border border-zinc-200 rounded dark:border-zinc-800"
     >
       {rootKeys.map((key) => {

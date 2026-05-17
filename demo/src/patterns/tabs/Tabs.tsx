@@ -1,6 +1,5 @@
-import { useRef } from 'react'
 import type { HTMLAttributes } from 'react'
-import { usePatternAutoFocus, useTabsPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
+import { tabsDefinition, usePatternEffects, useTabsPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
 import { Icon } from '../../shared/Icon'
 
 type Props = HTMLAttributes<HTMLElement>
@@ -27,15 +26,11 @@ export function Tabs({
   const orientation = mergedOptions.orientation
   const scrollable = (mergedOptions as { scrollable?: boolean }).scrollable === true
   const closeable = (mergedOptions as { closeable?: boolean }).closeable === true
-  const tablistRef = useRef<HTMLDivElement>(null)
-  const didMountRef = useRef(false)
-
-  usePatternAutoFocus(tabs, {
-    skipInitialFocus: !didMountRef.current,
-    getScopeElement: () => tablistRef.current,
+  usePatternEffects({
+    definition: tabsDefinition,
+    data,
     keyToElementId: (key) => createTabElementId((mergedOptions as { elementIdPrefix?: string }).elementIdPrefix ?? 'tab-', key),
   })
-  didMountRef.current = true
 
   const isVertical = orientation === 'vertical'
   const containerClass = isVertical
@@ -54,7 +49,7 @@ export function Tabs({
   return (
     <div className="grid gap-3">
       <div className={containerClass}>
-        <div {...(tabs.getTablistProps() as Props)} ref={tablistRef} className={tablistClass}>
+        <div {...(tabs.getTablistProps() as Props)} className={tablistClass}>
           {tabs.tabs.map((key) => {
             const tabProps = tabs.getTabProps(key) as Props
             return (

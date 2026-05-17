@@ -1,6 +1,6 @@
 import { useReducer, useRef } from 'react'
 import type { HTMLAttributes } from 'react'
-import { createPatternRuntime, reducePatternData, usePatternAutoFocus, type PatternData, type PatternEvent } from '../../../../src'
+import { createPatternRuntime, reducePatternData, usePatternEffects, type PatternData, type PatternEvent } from '../../../../src'
 import { feedDefinition } from '../../../../src/patterns/feed/definition'
 import { feedArticles, initialFeedData } from './feedData'
 
@@ -27,7 +27,7 @@ export function Feed({ data: initialData = initialFeedData }: FeedProps = {}) {
     keyToElementId: (key) => `feed-article-${key}`,
   })
 
-  usePatternAutoFocus(runtime, { getScopeElement: () => rootRef.current })
+  usePatternEffects({ definition: feedDefinition, data, keyToElementId: runtime.keyToElementId })
 
   const rootProps = runtime.getRootProps() as DivProps
 

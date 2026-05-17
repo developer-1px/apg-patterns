@@ -3,14 +3,14 @@ import { resolveVisibleOrder, resolveNavigationTarget, createParentByKey, evalua
 
 export function reducePatternData(definition: PatternDefinition, data: PatternData, event: PatternEvent): PatternData {
   const declarative = reduceDeclarativeTransitions(definition, data, event)
-  if (declarative) return declarative
+  if (declarative) return withLastEventReason(declarative, event)
 
-  if (event.type === 'focus') return withActiveKey(data, event.key)
+  if (event.type === 'focus') return withLastEventReason(withActiveKey(data, event.key), event)
 
   if (event.type === 'navigate') {
     const visibleKeys = resolveVisibleOrder(definition.navigation.visibleOrder, data)
     const activeKey = data.state?.activeKey ?? visibleKeys[0]
-    if (!activeKey) return data
+    if (!activeKey) return withLastEventReason(data, event)
     const target = definition.navigation.targets[event.direction]
     if (!target) {
       throw new Error(
@@ -23,11 +23,11 @@ export function reducePatternData(definition: PatternDefinition, data: PatternDa
       parentByKey: createParentByKey(data),
       visibleKeys,
     })
-    return nextKey ? withActiveKey(data, nextKey) : data
+    return withLastEventReason(nextKey ? withActiveKey(data, nextKey) : data, event)
   }
 
   if (event.type === 'select') {
-    return {
+    return withLastEventReason({
       ...data,
       state: {
         ...data.state,
@@ -36,26 +36,26 @@ export function reducePatternData(definition: PatternDefinition, data: PatternDa
         anchorKey: event.anchorKey,
         extentKey: event.extentKey,
       },
-    }
+    }, event)
   }
 
   if (event.type === 'expand') {
     const expanded = new Set(data.state?.expandedKeys ?? [])
     if (event.expanded) expanded.add(event.key)
     else expanded.delete(event.key)
-    return { ...data, state: { ...data.state, activeKey: event.key, expandedKeys: [...expanded] } }
+    return withLastEventReason({ ...data, state: { ...data.state, activeKey: event.key, expandedKeys: [...expanded] } }, event)
   }
 
   if (event.type === 'check') {
-    return { ...data, state: { ...data.state, checkedByKey: { ...data.state?.checkedByKey, [event.key]: event.checked } } }
+    return withLastEventReason({ ...data, state: { ...data.state, checkedByKey: { ...data.state?.checkedByKey, [event.key]: event.checked } } }, event)
   }
 
   if (event.type === 'press') {
-    return { ...data, state: { ...data.state, pressedByKey: { ...data.state?.pressedByKey, [event.key]: event.pressed ?? true } } }
+    return withLastEventReason({ ...data, state: { ...data.state, pressedByKey: { ...data.state?.pressedByKey, [event.key]: event.pressed ?? true } } }, event)
   }
 
   if (event.type === 'value') {
-    return { ...data, state: { ...data.state, valueByKey: { ...data.state?.valueByKey, [event.key]: event.value } } }
+    return withLastEventReason({ ...data, state: { ...data.state, valueByKey: { ...data.state?.valueByKey, [event.key]: event.value } } }, event)
   }
 
   // 'open' 은 'expand' 의 별칭 — 둘 다 expandedKeys 갱신.
@@ -63,15 +63,20 @@ export function reducePatternData(definition: PatternDefinition, data: PatternDa
     const expanded = new Set(data.state?.expandedKeys ?? [])
     if (event.open) expanded.add(event.key)
     else expanded.delete(event.key)
-    return { ...data, state: { ...data.state, expandedKeys: [...expanded] } }
+    return withLastEventReason({ ...data, state: { ...data.state, expandedKeys: [...expanded] } }, event)
   }
 
   // 'activate'/'typeahead'/'dismiss'/'extension' 는 outbound-only signal — state 미갱신 (의도).
-  return data
+  return withLastEventReason(data, event)
 }
 
 function withActiveKey(data: PatternData, activeKey: Key): PatternData {
   return { ...data, state: { ...data.state, activeKey } }
+}
+
+function withLastEventReason(data: PatternData, event: PatternEvent): PatternData {
+  if (!event.meta?.reason) return data
+  return { ...data, state: { ...data.state, lastEventReason: event.meta.reason } }
 }
 
 function reduceDeclarativeTransitions(definition: PatternDefinition, data: PatternData, event: PatternEvent): PatternData | null {

@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import type { HTMLAttributes, KeyboardEvent as ReactKeyboardEvent } from 'react'
-import { createPatternRuntime, menubarDefinition, usePatternAutoFocus, type PatternData, type PatternEvent } from '../../../../src'
+import { createPatternRuntime, menubarDefinition, usePatternEffects, type PatternData, type PatternEvent } from '../../../../src'
 import { Icon } from '../../shared/Icon'
 import type { MenuProps } from './menuTypes'
 
@@ -17,16 +17,12 @@ export function Menubar({ data, onEvent }: MenuProps) {
   const rootKeys = data.relations?.rootKeys ?? []
   const typeahead = useTypeahead(data, rootKeys, onEvent)
   const rootProps = runtime.getPartProps('menubar') as Props
-  const rootRef = useRef<HTMLDivElement>(null)
 
-  usePatternAutoFocus(runtime, {
-    enabled: Boolean(data.state?.activeKey && rootKeys.includes(data.state.activeKey)),
-    getScopeElement: () => rootRef.current,
-  })
+  usePatternEffects({ definition: menubarDefinition, data, keyToElementId: runtime.keyToElementId })
 
   return (
     <div className="grid gap-2">
-      <div ref={rootRef} {...rootProps} onKeyDown={(event) => handleMenubarKey(event, rootProps.onKeyDown as ((event: ReactKeyboardEvent) => void) | undefined, typeahead)} className="flex items-center gap-0.5 rounded bg-zinc-50 px-1 py-1 outline-none dark:bg-zinc-900">
+      <div {...rootProps} onKeyDown={(event) => handleMenubarKey(event, rootProps.onKeyDown as ((event: ReactKeyboardEvent) => void) | undefined, typeahead)} className="flex items-center gap-0.5 rounded bg-zinc-50 px-1 py-1 outline-none dark:bg-zinc-900">
         {rootKeys.map((key) => (
           <RootMenuItem key={key} itemKey={key} data={data} runtime={runtime} expanded={(data.state?.expandedKeys ?? []).includes(key)} />
         ))}
@@ -109,7 +105,7 @@ function useTypeahead(data: PatternData, rootKeys: readonly string[], onEvent: (
     const start = data.state?.activeKey ? rootKeys.indexOf(data.state.activeKey) : -1
     const ordered = [...rootKeys.slice(start + 1), ...rootKeys.slice(0, start + 1)]
     const match = ordered.find((key) => (data.items[key]?.label ?? '').toLowerCase().startsWith(state.query))
-    if (match) onEvent({ type: 'focus', key: match })
+    if (match) onEvent({ type: 'focus', key: match, meta: { reason: 'typeahead' } })
   }
 }
 

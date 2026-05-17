@@ -1,7 +1,7 @@
 import { Breadcrumb } from './Breadcrumb'
 import { initialBreadcrumbData } from './breadcrumbData'
-import { type PatternEntry } from '../../shared/demoPatternTypes'
-import { renderDataInspect } from '../../shared/inspect/data'
+import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
+import { renderDataInspect } from '../../shared/inspect/genericInspect'
 
 export const entry: PatternEntry = {
   key: 'breadcrumb',
@@ -12,10 +12,10 @@ export const entry: PatternEntry = {
       key: 'breadcrumb',
       label: 'Breadcrumb',
       keyboardShortcuts: ['Tab', 'Enter'],
-      sourceNames: ['Breadcrumb.tsx', 'breadcrumbData.ts', 'breadcrumb/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
+      sourceNames: ['Breadcrumb.tsx', 'breadcrumbData.ts', 'breadcrumb/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(initialBreadcrumbData),
       preview: <Breadcrumb data={initialBreadcrumbData} onEvent={onEvent} />,
-      reset: () => {},
+      // stateless — no reset
     }
   },
 }

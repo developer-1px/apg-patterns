@@ -20,6 +20,7 @@ export const toolbarDefinition = ToolbarDefinitionSchema.parse({
   rootRole: 'toolbar',
   containedRoles: ['button'],
   focusModel: 'rovingTabIndex',
+  effects: [{ kind: 'focus', on: { state: 'activeKey', reasons: ['keyboard'] }, scope: { kind: 'focusWithin' }, target: { kind: 'activeKeyElement' }, preventScroll: true }],
   parts: {
     toolbar: {
       role: 'toolbar',
