@@ -97,8 +97,9 @@ function selectVariant<T extends string>(
 
 function currentHashVariant(routePattern: string | null) {
   if (typeof window === 'undefined') return null
+  if (!routePattern) return null
   const params = new URLSearchParams(window.location.hash.replace(/^#/, ''))
-  if (routePattern && params.get('pattern') !== routePattern) return null
+  if (params.get('pattern') !== routePattern) return null
   return params.get('variant')
 }
 

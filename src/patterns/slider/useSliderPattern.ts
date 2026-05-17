@@ -63,7 +63,7 @@ export function useSliderPattern(data: SliderData, onEvent: (event: PatternEvent
     orientation,
     get isMultiThumb() {
       return runtime.visibleKeys.length >= 2 && runtime.visibleKeys.every((key) => {
-        const item = runtime.data.items[key] as { valuemin?: number; valuemax?: number } | undefined
+        const item = runtime.data.items[key]
         return typeof item?.valuemin === 'number' || typeof item?.valuemax === 'number'
       })
     },

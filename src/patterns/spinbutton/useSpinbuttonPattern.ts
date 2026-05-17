@@ -1,8 +1,19 @@
 import type { KeyboardEvent } from 'react'
 import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternData, PatternEvent, PatternOptions, PatternValueStepDirection } from '../../schema'
+import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions, PatternState, PatternValueStepDirection } from '../../schema'
 import { reactKeyInput, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
 import { spinbuttonDefinition } from './definition'
+
+interface SpinbuttonItem extends PatternItem {
+  valuemin?: number
+  valuemax?: number
+}
+
+interface SpinbuttonState extends PatternState {
+  options?: PatternOptions
+}
+
+type SpinbuttonData = PatternData<SpinbuttonItem, SpinbuttonState>
 
 export interface ReactSpinbuttonRenderItem {
   key: Key
@@ -31,8 +42,8 @@ export interface ReactSpinbuttonRuntime {
   keyToElementId(key: Key): string
 }
 
-export function useSpinbuttonPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactSpinbuttonRuntime {
-  const runtimeOptions = options ?? (((data.state as { options?: PatternOptions } | undefined)?.options ?? {}) as PatternOptions)
+export function useSpinbuttonPattern(data: SpinbuttonData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactSpinbuttonRuntime {
+  const runtimeOptions = options ?? data.state?.options ?? {}
   const runtime = createPatternRuntime({
     definition: spinbuttonDefinition,
     data,
@@ -68,11 +79,11 @@ export function useSpinbuttonPattern(data: PatternData, onEvent: (event: Pattern
   }
 }
 
-function createSpinbuttonRenderItem(runtime: PatternRuntime, key: Key): ReactSpinbuttonRenderItem {
+function createSpinbuttonRenderItem(runtime: PatternRuntime<SpinbuttonData>, key: Key): ReactSpinbuttonRenderItem {
   const { onKeyDown: _onKeyDown, ...props } = runtime.getPartProps('spinbutton', key) as ReactPatternProps
   const state = runtime.getItemState(key, 'spinbutton')
   const label = runtime.data.items[key]?.label ?? key
-  const itemRange = runtime.data.items[key] as { valuemin?: number; valuemax?: number } | undefined
+  const itemRange = runtime.data.items[key]
   const min = Number(itemRange?.valuemin ?? runtime.options.min ?? 0)
   const max = Number(itemRange?.valuemax ?? runtime.options.max ?? 100)
   return {

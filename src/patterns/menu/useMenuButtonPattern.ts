@@ -90,7 +90,7 @@ export function useMenuButtonPattern(data: PatternData, onEvent: (event: Pattern
       }
     },
     get menuProps() {
-      if (!menuKey) return {}
+      if (!menuKey || !triggerKey) return {}
       const props = runtime.getPartProps('menu', menuKey) as ReactPatternProps
       const rootKeyDown = runtime.getRootKeyboardHandler()
       return {
@@ -100,6 +100,10 @@ export function useMenuButtonPattern(data: PatternData, onEvent: (event: Pattern
           if (event.key === 'Escape') {
             event.preventDefault()
             closeAndFocusTrigger()
+            return
+          }
+          if (event.key === 'Tab') {
+            if (triggerKey) onEvent({ type: 'expand', key: triggerKey, expanded: false, meta: { reason: 'keyboard' } })
             return
           }
           if (event.key === 'Enter' || event.key === ' ') {
