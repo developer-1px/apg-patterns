@@ -1,12 +1,29 @@
 ---
 type: proposal
-status: draft
+status: superseded
 date: 2026-05-17
 author: 유용태
 title: Declarative Runtime Expansion — useState 0 / 100% Serializable
 ---
 
 # Declarative Runtime Expansion
+
+> Status: superseded as an implementation plan.
+>
+> Keep this document only as historical diagnosis of declarative runtime gaps.
+> The current React-facing direction is:
+>
+> - `PatternDefinitionSchema.react` facade descriptors
+> - `useXPattern(data, onEvent, options?)`
+> - `rootProps` + `renderItems`
+> - optional future preset renderers for LLM-facing usage
+>
+> See:
+>
+> - `docs/proposals/2026-05-18-react-facade-zod-blind-loop.md`
+> - `docs/proposals/2026-05-18-llm-friendly-apg-react-api.md`
+>
+> Do not implement this proposal literally. In particular, the old `usePattern(definition, { data, onEvent })` public API and "per-pattern runtime.ts -> 0" target are no longer the active direction.
 
 > 27개 APG 패턴 등록 회고에서 발견한 **9곳의 useState 우회**와 **16곳의 명령형 중복**을 schema/runtime 어휘 확장으로 일거에 흡수한다.
 

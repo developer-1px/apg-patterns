@@ -40,9 +40,9 @@ W3C APG는 treegrid 컨테이너/row/cell 에 다음 속성을 명시한다. rep
 | `aria-expanded` | row (자식 있는 경우) | row | ✓ | ✓ |
 | `aria-selected` | row / cell | row, gridcell | ✓ | ✓ |
 | `aria-sort` | columnheader | columnheader | ✓ | ✓ |
-| `aria-rowspan` | cell (선택, non-HTML) | — | **✗ (enum 누락)** | **missing-in-zod + missing-in-repo** |
-| `aria-colspan` | cell (선택, non-HTML) | — | **✗ (enum 누락)** | **missing-in-zod + missing-in-repo** |
-| `aria-owns` | treegrid (소유 row/cell) | — | **✗ (enum 누락)** | **missing-in-zod + missing-in-repo** |
+| `aria-rowspan` | cell (선택, non-HTML) | — | ✓ | enum resolved; projection deferred |
+| `aria-colspan` | cell (선택, non-HTML) | — | ✓ | enum resolved; projection deferred |
+| `aria-owns` | treegrid (소유 row/cell) | — | ✓ | enum resolved; projection deferred |
 | `aria-posinset` | row (선택) | — | ✓ | naming/wiring: zod 에는 있고 listbox/menu 등 다른 패턴이 씀. treegrid 에선 `aria-rowindex` 로 대체 가능 — 의도적 omission 으로 보임 |
 | `aria-setsize` | row (선택) | — | ✓ | 위와 동일 사유 |
 
@@ -77,16 +77,21 @@ W3C APG는 treegrid 컨테이너/row/cell 에 다음 속성을 명시한다. rep
 
 | 항목 | W3C APG | repo |
 |---|---|---|
-| 지원 모드 | **row focus** (행 전체 포커스) **+ cell focus** (cell 별 포커스) 둘 다 | **cell focus 만** (cellFocus 적용 대상이 gridcell/columnheader) |
-| Δ | row-focus 모드 미모델 — `parts.row.focus` 누락. row tabIndex 미부여 → row 가 포커스 가질 수 없음 | partial |
+| 지원 모드 | **row focus** (행 전체 포커스) **+ cell focus** (cell 별 포커스) 둘 다 | cell focus + `options.focusMode === 'row'` 조건부 row focus |
+| Δ | APG의 동적 모드 전환 일부는 아직 follow-up. 정적 row-focus/cell-focus 표현은 코드에 반영됨 | partial |
 
 ## 5. zod 스키마 갭 요약
 
-이 감사에서 드러난 zod 보강 필요 항목:
+이 감사에서 드러났고 현재 코드에 반영된 항목:
 
-1. `AriaAttributeSchema` 에 추가 필요: `aria-rowspan`, `aria-colspan`, `aria-owns` (W3C APG treegrid 가 명시).
-2. (선택) `aria-describedby` 는 enum 에는 있으나 어떤 패턴도 project 하지 않음 — 컨테이너 패턴들에서 `refs.describedBy` AriaSourcePath 와 함께 도입 검토.
-3. row-focus 모드를 표현하려면 `parts.row.focus` 가 가능해야 하는데, `PartSchema` 자체는 이미 허용. 누락은 zod 가 아니라 treegrid definition.
+1. `AriaAttributeSchema` 에 `aria-rowspan`, `aria-colspan`, `aria-owns` 추가됨.
+2. `rowheader` role/part 추가됨.
+3. `activeKeyIsRow`, `treegridRow`, `treegridRowPage`, `treegridVisibleRows` 어휘가 추가됨.
+
+남은 검토 항목:
+
+1. (선택) `aria-describedby` 는 enum 에는 있으나 어떤 패턴도 project 하지 않음 — 컨테이너 패턴들에서 `refs.describedBy` AriaSourcePath 와 함께 도입 검토.
+2. APG의 dynamic mode transition: Right Arrow on leaf row → first cell, Left Arrow on first cell → row. 현재 문서상 follow-up.
 
 ## 6. 수렴 작업 (2026-05-18)
 
@@ -102,9 +107,9 @@ W3C APG는 treegrid 컨테이너/row/cell 에 다음 속성을 명시한다. rep
 
 ## 7. 결론 (treegrid)
 
-- **missing-in-repo (정합 위반)**: rowheader part, aria-readonly 프로젝션, row-focus 모드, Home/End 의 row-mode 분기, Ctrl+Space 의 row-mode all-select 분기, Shift+Arrow 의 row-extent 분기.
-- **missing-in-zod**: `aria-rowspan` / `aria-colspan` / `aria-owns` enum.
+- **resolved in code**: rowheader part, `aria-readonly` 프로젝션, row-focus 모드, Home/End row-mode 분기, Ctrl+Space row-mode all-select 분기, Shift+Arrow row-extent 분기, `aria-rowspan` / `aria-colspan` / `aria-owns` enum.
+- **remaining partial**: APG dynamic row/cell focus mode transition. 별도 `state.focusMode` 또는 equivalent transition 어휘가 필요.
 - **extra-in-repo (spec 초과)**: `Shift+Home` / `Shift+End` — APG treegrid 표에 없음. 다른 grid 패턴 관습이라면 출처 주석 필요.
 - **fully matched**: 컨테이너 ARIA(label/rowcount/colcount/multiselectable), row aria-level/expanded/selected, cell aria-rowindex/colindex/selected, columnheader aria-sort, Arrow/Ctrl+Home/Ctrl+End/Ctrl+A/Shift+Space/Page* 키.
 
-다음 단계는 위 갭 중 어느 항목을 실제 코드로 수렴시킬지 선택하는 것. (zod enum 보강 → repo definition 보강 → 테스트 보강 순서를 추천)
+다음 단계는 dynamic mode transition 과 `Shift+Home` / `Shift+End` 출처 주석 여부를 결정하는 것.
