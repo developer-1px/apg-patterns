@@ -1,13 +1,23 @@
+import { useEffect } from 'react'
 import { listboxDefinition, reducePatternData, useListboxPattern, type PatternData } from '../../../../src'
+import { readVariantRoute, useVariantRoutePattern, writeVariantRoute } from '../../shared/variantRoute'
 import { treeVariantItems, type TreeVariantKey } from './treeVariants'
 
 export function TreeVariantMenu({ value, onChange }: { value: TreeVariantKey; onChange: (value: TreeVariantKey) => void }) {
+  const routePattern = useVariantRoutePattern()
+
+  useEffect(() => {
+    const variant = readVariantRoute(routePattern)
+    if (!isTreeVariantKey(variant) || variant === value) return
+    onChange(variant)
+  }, [onChange, routePattern, value])
+
   const data = createTreeVariantData(value)
   const listbox = useListboxPattern(
     data,
     (event) => {
-      if (event.type === 'select') selectVariant(event.keys[0], onChange)
-      if (event.type === 'navigate') selectVariant(reducePatternData(listboxDefinition, data, event).state?.activeKey, onChange)
+      if (event.type === 'select') selectVariant(event.keys[0], onChange, routePattern)
+      if (event.type === 'navigate') selectVariant(reducePatternData(listboxDefinition, data, event).state?.activeKey, onChange, routePattern)
     },
     { focusStrategy: 'rovingTabIndex', selectionMode: 'single', elementIdPrefix: 'tree-variant-' },
   )
@@ -37,8 +47,10 @@ function createTreeVariantData(value: TreeVariantKey): PatternData {
   }
 }
 
-function selectVariant(key: string | null | undefined, onChange: (value: TreeVariantKey) => void) {
-  if (isTreeVariantKey(key)) onChange(key)
+function selectVariant(key: string | null | undefined, onChange: (value: TreeVariantKey) => void, routePattern: string | null) {
+  if (!isTreeVariantKey(key)) return
+  writeVariantRoute(routePattern, key)
+  onChange(key)
 }
 
 function isTreeVariantKey(key: string | null | undefined): key is TreeVariantKey {

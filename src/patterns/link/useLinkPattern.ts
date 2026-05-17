@@ -1,8 +1,15 @@
 import type { KeyboardEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
+import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { linkDefinition } from './definition'
+
+interface LinkItem extends PatternItem {
+  href?: unknown
+  variant?: string
+}
+
+type LinkData = PatternData<LinkItem>
 
 export interface ReactLinkRuntime {
   linkProps: ReactPatternProps
@@ -23,7 +30,7 @@ export interface ReactLinkRuntime {
   keyToElementId(key: Key): string
 }
 
-export function useLinkPattern(data: PatternData, onEvent: (event: PatternEvent) => void = () => undefined, options?: PatternOptions): ReactLinkRuntime {
+export function useLinkPattern(data: LinkData, onEvent: (event: PatternEvent) => void = () => undefined, options?: PatternOptions): ReactLinkRuntime {
   const runtime = createPatternRuntime({
     definition: linkDefinition,
     data,
@@ -48,10 +55,10 @@ export function useLinkPattern(data: PatternData, onEvent: (event: PatternEvent)
       return key ? data.items[key]?.label ?? key : ''
     },
     get href() {
-      return key ? String((data.items[key] as { href?: unknown } | undefined)?.href ?? '#') : '#'
+      return key ? String(data.items[key]?.href ?? '#') : '#'
     },
     get variant() {
-      return key ? (data.items[key] as { variant?: string } | undefined)?.variant ?? 'anchor' : 'anchor'
+      return key ? data.items[key]?.variant ?? 'anchor' : 'anchor'
     },
     get state() {
       const state = key ? runtime.getItemState(key, 'link') : {}

@@ -335,6 +335,26 @@ describe('App route state', () => {
     expect(screen.getByRole('tab', { name: 'Overview', selected: true })).toBeTruthy()
   })
 
+  it('opens custom grid variant deep links on the requested variant', async () => {
+    replaceHash('#pattern=grid&panel=code&source=Grid.tsx&variant=dataEditable')
+
+    render(<App />)
+
+    await waitFor(() => expect(screen.getByRole('option', { name: 'Data: editable', selected: true })).toBeTruthy())
+    expect(currentHashParam('variant')).toBe('dataEditable')
+    expect(screen.getByRole('grid').getAttribute('aria-label')).toBe('Editable contacts')
+  })
+
+  it('opens custom treeview variant deep links on the requested variant', async () => {
+    replaceHash('#pattern=treeview&panel=code&source=Tree.tsx&variant=navigation')
+
+    render(<App />)
+
+    await waitFor(() => expect(screen.getByRole('option', { name: 'Navigation', selected: true })).toBeTruthy())
+    expect(currentHashParam('variant')).toBe('navigation')
+    expect(screen.getByRole('tree').getAttribute('aria-label')).toBe('Navigation treeview')
+  })
+
   it('keeps the active variant in the route while inspecting source and state', async () => {
     replaceHash('#pattern=button&panel=code&source=Button.tsx')
 

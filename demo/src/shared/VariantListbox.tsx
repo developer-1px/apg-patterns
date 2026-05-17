@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import type { HTMLAttributes } from 'react'
 import { listboxDefinition, reducePatternData, useListboxPattern, type PatternData } from '../../../src'
-import { useVariantRoutePattern } from './variantRoute'
+import { readVariantRoute, useVariantRoutePattern, writeVariantRoute } from './variantRoute'
 
 type Props = HTMLAttributes<HTMLElement>
 
@@ -23,7 +23,7 @@ export function VariantListbox<T extends string>({
   const routePattern = useVariantRoutePattern()
 
   useEffect(() => {
-    const variant = currentHashVariant(routePattern)
+    const variant = readVariantRoute(routePattern)
     if (!variant || variant === value) return
     const item = items.find((candidate) => candidate.key === variant)
     if (item) onChange(item.key)
@@ -33,8 +33,8 @@ export function VariantListbox<T extends string>({
   const listbox = useListboxPattern(
     data,
     (event) => {
-      if (event.type === 'select') selectVariant(event.keys[0], items, onChange)
-      if (event.type === 'navigate') selectVariant(reducePatternData(listboxDefinition, data, event).state?.activeKey, items, onChange)
+      if (event.type === 'select') selectVariant(event.keys[0], items, onChange, routePattern)
+      if (event.type === 'navigate') selectVariant(reducePatternData(listboxDefinition, data, event).state?.activeKey, items, onChange, routePattern)
     },
     { focusStrategy: 'rovingTabIndex', selectionMode: 'single', elementIdPrefix: `${idPrefix}-` },
   )
@@ -88,25 +88,10 @@ function selectVariant<T extends string>(
   key: string | null | undefined,
   items: readonly { key: T; label: string }[],
   onChange: (value: T) => void,
+  routePattern: string | null,
 ) {
   const item = items.find((candidate) => candidate.key === key)
   if (!item) return
-  writeHashVariant(item.key)
+  writeVariantRoute(routePattern, item.key)
   onChange(item.key)
-}
-
-function currentHashVariant(routePattern: string | null) {
-  if (typeof window === 'undefined') return null
-  if (!routePattern) return null
-  const params = new URLSearchParams(window.location.hash.replace(/^#/, ''))
-  if (params.get('pattern') !== routePattern) return null
-  return params.get('variant')
-}
-
-function writeHashVariant(variant: string) {
-  if (typeof window === 'undefined') return
-  const params = new URLSearchParams(window.location.hash.replace(/^#/, ''))
-  params.set('variant', variant)
-  const nextHash = `#${params.toString()}`
-  if (window.location.hash !== nextHash) window.history.replaceState(null, '', nextHash)
 }

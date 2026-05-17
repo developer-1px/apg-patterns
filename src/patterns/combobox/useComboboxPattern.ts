@@ -1,9 +1,19 @@
 import { useLayoutEffect, useRef } from 'react'
 import type { HTMLAttributes, InputHTMLAttributes, KeyboardEvent, MouseEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
+import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions, PatternState } from '../../schema'
 import type { ReactPatternProps, ReactRenderItemState } from '../../adapters/reactBaseTypes'
 import { COMBOBOX_KEY, comboboxDefinition } from './definition'
+
+type ComboboxVariant = 'selectOnly' | 'listAutocomplete' | 'listWithInlineAutocomplete'
+
+interface ComboboxState extends PatternState {
+  variant?: ComboboxVariant
+  query?: string
+  inlineCompletion?: { start: number; end: number } | null
+}
+
+type ComboboxData = PatternData<PatternItem, ComboboxState>
 
 export interface ReactComboboxOption {
   key: Key
@@ -22,17 +32,14 @@ export interface ReactComboboxRuntime {
   setInputRef(node: HTMLInputElement | null): void
 }
 
-export function useComboboxPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactComboboxRuntime {
-  const variant = (data.state?.variant as string | undefined) ?? 'listAutocomplete'
+export function useComboboxPattern(data: ComboboxData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactComboboxRuntime {
+  const variant = data.state?.variant ?? 'listAutocomplete'
   const autocomplete = variant === 'selectOnly' ? 'none' : variant === 'listAutocomplete' ? 'list' : 'both'
   const editable = variant !== 'selectOnly'
   const listboxId = options?.listboxId ? String(options.listboxId) : 'combobox-popup'
   const inputRef = useRef<HTMLInputElement>(null)
-  const query = ((data.state as { query?: string } | undefined)?.query ?? '') as string
-  const inlineCompletion = ((data.state as { inlineCompletion?: { start: number; end: number } | null } | undefined)?.inlineCompletion ?? null) as {
-    start: number
-    end: number
-  } | null
+  const query = data.state?.query ?? ''
+  const inlineCompletion = data.state?.inlineCompletion ?? null
   const runtime = createPatternRuntime({
     definition: comboboxDefinition,
     data,

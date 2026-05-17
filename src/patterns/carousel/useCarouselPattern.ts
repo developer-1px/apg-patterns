@@ -1,7 +1,19 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternDataWithOptions, PatternEvent, PatternOptions } from '../../schema'
+import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions, PatternStateWithOptions } from '../../schema'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { carouselDefinition } from './definition'
+
+interface CarouselItem extends PatternItem {
+  title?: unknown
+  caption?: unknown
+  imageUrl?: unknown
+}
+
+interface CarouselState extends PatternStateWithOptions {
+  showDots?: boolean
+}
+
+type CarouselData = PatternData<CarouselItem, CarouselState>
 
 export interface ReactCarouselSlide {
   key: Key
@@ -27,7 +39,7 @@ export interface ReactCarouselRuntime {
   keyToElementId(key: Key): string
 }
 
-export function useCarouselPattern(data: PatternDataWithOptions, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactCarouselRuntime {
+export function useCarouselPattern(data: CarouselData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactCarouselRuntime {
   const runtimeOptions = {
     roledescription: 'carousel',
     slideRoledescription: 'slide',
@@ -55,7 +67,7 @@ export function useCarouselPattern(data: PatternDataWithOptions, onEvent: (event
     },
     get slides() {
       return slideKeys.map((key, index) => {
-        const item = data.items[key] as { title?: unknown; caption?: unknown; imageUrl?: unknown } | undefined
+        const item = data.items[key]
         return {
           key,
           title: String(item?.title ?? data.items[key]?.label ?? key),
@@ -69,7 +81,7 @@ export function useCarouselPattern(data: PatternDataWithOptions, onEvent: (event
       })
     },
     activeKey,
-    showDots: ((data.state as { showDots?: boolean } | undefined)?.showDots ?? true) === true,
+    showDots: (data.state?.showDots ?? true) === true,
     get ids() {
       return { forKey: runtime.keyToElementId }
     },

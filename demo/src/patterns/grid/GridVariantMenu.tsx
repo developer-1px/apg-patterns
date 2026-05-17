@@ -1,13 +1,23 @@
+import { useEffect } from 'react'
 import { listboxDefinition, reducePatternData, useListboxPattern, type PatternData } from '../../../../src'
+import { readVariantRoute, useVariantRoutePattern, writeVariantRoute } from '../../shared/variantRoute'
 import { gridVariantItems, type GridVariantKey } from './gridData'
 
 export function GridVariantMenu({ value, onChange }: { value: GridVariantKey; onChange: (value: GridVariantKey) => void }) {
+  const routePattern = useVariantRoutePattern()
+
+  useEffect(() => {
+    const variant = readVariantRoute(routePattern)
+    if (!isGridVariantKey(variant) || variant === value) return
+    onChange(variant)
+  }, [onChange, routePattern, value])
+
   const data = createGridVariantData(value)
   const listbox = useListboxPattern(
     data,
     (event) => {
-      if (event.type === 'select') selectVariant(event.keys[0], onChange)
-      if (event.type === 'navigate') selectVariant(reducePatternData(listboxDefinition, data, event).state?.activeKey, onChange)
+      if (event.type === 'select') selectVariant(event.keys[0], onChange, routePattern)
+      if (event.type === 'navigate') selectVariant(reducePatternData(listboxDefinition, data, event).state?.activeKey, onChange, routePattern)
     },
     { focusStrategy: 'rovingTabIndex', selectionMode: 'single', elementIdPrefix: 'grid-variant-' },
   )
@@ -42,8 +52,10 @@ function createGridVariantData(value: GridVariantKey): PatternData {
   }
 }
 
-function selectVariant(key: string | null | undefined, onChange: (value: GridVariantKey) => void) {
-  if (isGridVariantKey(key)) onChange(key)
+function selectVariant(key: string | null | undefined, onChange: (value: GridVariantKey) => void, routePattern: string | null) {
+  if (!isGridVariantKey(key)) return
+  writeVariantRoute(routePattern, key)
+  onChange(key)
 }
 
 function isGridVariantKey(key: string | null | undefined): key is GridVariantKey {

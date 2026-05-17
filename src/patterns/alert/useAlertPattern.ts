@@ -1,8 +1,14 @@
 import type { KeyboardEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
+import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { alertDefinition } from './definition'
+
+interface AlertItem extends PatternItem {
+  message?: unknown
+}
+
+type AlertData = PatternData<AlertItem>
 
 export interface ReactAlertRuntime {
   rootProps: ReactPatternProps
@@ -21,7 +27,7 @@ export interface ReactAlertRuntime {
   keyToElementId(key: Key): string
 }
 
-export function useAlertPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactAlertRuntime {
+export function useAlertPattern(data: AlertData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactAlertRuntime {
   const runtime = createPatternRuntime({
     definition: alertDefinition,
     data,
@@ -46,7 +52,7 @@ export function useAlertPattern(data: PatternData, onEvent: (event: PatternEvent
     },
     key,
     get message() {
-      return key ? String((data.items[key] as { message?: unknown } | undefined)?.message ?? '') : ''
+      return key ? String(data.items[key]?.message ?? '') : ''
     },
     get state() {
       return {
