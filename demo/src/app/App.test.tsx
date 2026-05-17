@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { render } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { coerceRightMode, formatEvent, loadSourcePreview } from './App'
+import { App } from './App'
 import { patternEntries } from '../shared/demoPatterns'
 import { sourceLoaders } from '../shared/sources'
 import type { PatternEvent } from '../../../src'
@@ -34,6 +35,53 @@ describe('coerceRightMode', () => {
 describe('loadSourcePreview', () => {
   it('returns a readable missing-source marker instead of throwing', async () => {
     await expect(loadSourcePreview('__missing__.tsx')).resolves.toBe('missing source: __missing__.tsx')
+  })
+})
+
+describe('App route state', () => {
+  it('normalizes legacy aria panel deep links to the state panel', async () => {
+    replaceHash('#pattern=accordion&panel=aria&source=Accordion.tsx')
+
+    render(<App />)
+
+    expect(screen.getByRole('heading', { name: 'Accordion' })).toBeTruthy()
+    await waitFor(() => expect(currentHashParam('panel')).toBe('state'))
+    expect(screen.getByRole('tab', { name: 'state', selected: true })).toBeTruthy()
+  })
+
+  it('keeps panel=off deep links closed while preserving pattern and source state', async () => {
+    replaceHash('#pattern=accordion&panel=off&source=Accordion.tsx')
+
+    render(<App />)
+
+    expect(screen.getByRole('heading', { name: 'Accordion' })).toBeTruthy()
+    await waitFor(() => expect(window.location.hash).toContain('panel=off'))
+    expect(currentHashParam('pattern')).toBe('accordion')
+    expect(currentHashParam('source')).toBe('Accordion.tsx')
+    expect(screen.queryByRole('tablist', { name: 'source files' })).toBeNull()
+  })
+
+  it('replaces invalid source deep links with the active pattern default source', async () => {
+    replaceHash('#pattern=checkbox&panel=code&source=Missing.tsx')
+
+    render(<App />)
+
+    expect(screen.getByRole('heading', { name: 'Checkbox' })).toBeTruthy()
+    await waitFor(() => expect(currentHashParam('source')).toBe('Checkbox.tsx'))
+    expect(screen.getByTitle('Checkbox.tsx')).toBeTruthy()
+    expect(screen.queryByText('missing source: Missing.tsx')).toBeNull()
+  })
+
+  it('restores demo state when the hash changes after initial render', async () => {
+    replaceHash('#pattern=tabs&panel=code&source=Tabs.tsx')
+    render(<App />)
+
+    replaceHash('#pattern=accordion&panel=events&source=Accordion.tsx')
+    window.dispatchEvent(new window.HashChangeEvent('hashchange'))
+
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Accordion' })).toBeTruthy())
+    expect(screen.getByRole('tab', { name: 'events', selected: true })).toBeTruthy()
+    expect(screen.getByText('0 events')).toBeTruthy()
   })
 })
 
@@ -139,4 +187,12 @@ function duplicates(values: readonly string[]) {
     seen.add(value)
   }
   return [...duplicateValues]
+}
+
+function replaceHash(hash: string) {
+  window.history.replaceState(null, '', hash)
+}
+
+function currentHashParam(name: string) {
+  return new URLSearchParams(window.location.hash.replace(/^#/, '')).get(name)
 }
