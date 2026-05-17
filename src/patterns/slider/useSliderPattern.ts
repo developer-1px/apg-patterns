@@ -1,8 +1,20 @@
 import type { KeyboardEvent, PointerEvent } from 'react'
 import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
+import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions, PatternState } from '../../schema'
 import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { sliderDefinition } from './definition'
+
+interface SliderItem extends PatternItem {
+  valuemin?: number
+  valuemax?: number
+  valuetext?: string
+}
+
+interface SliderState extends PatternState {
+  options?: PatternOptions
+}
+
+type SliderData = PatternData<SliderItem, SliderState>
 
 export interface ReactSliderRenderItem {
   key: Key
@@ -32,8 +44,8 @@ export interface ReactSliderRuntime {
   keyToElementId(key: Key): string
 }
 
-export function useSliderPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactSliderRuntime {
-  const runtimeOptions = options ?? (((data.state as { options?: PatternOptions } | undefined)?.options ?? {}) as PatternOptions)
+export function useSliderPattern(data: SliderData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactSliderRuntime {
+  const runtimeOptions = options ?? data.state?.options ?? {}
   const runtime = createPatternRuntime({
     definition: sliderDefinition,
     data,
@@ -68,9 +80,9 @@ export function useSliderPattern(data: PatternData, onEvent: (event: PatternEven
   }
 }
 
-function createSliderRenderItem(runtime: PatternRuntime, key: Key, orientation: 'horizontal' | 'vertical'): ReactSliderRenderItem {
+function createSliderRenderItem(runtime: PatternRuntime<SliderData>, key: Key, orientation: 'horizontal' | 'vertical'): ReactSliderRenderItem {
   const { onKeyDown: _onKeyDown, ...props } = runtime.getPartProps('slider', key) as ReactPatternProps
-  const item = runtime.data.items[key] as { label?: string; valuemin?: number; valuemax?: number; valuetext?: string } | undefined
+  const item = runtime.data.items[key]
   const min = Number(item?.valuemin ?? runtime.options.min ?? 0)
   const max = Number(item?.valuemax ?? runtime.options.max ?? 100)
   const step = Number(runtime.options.step ?? 1)
