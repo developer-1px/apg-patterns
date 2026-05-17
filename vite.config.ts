@@ -3,6 +3,7 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   root: 'demo',
   base: './',
+  appType: 'mpa',
   cacheDir: '../node_modules/.vite-demo',
   server: {
     host: '127.0.0.1',

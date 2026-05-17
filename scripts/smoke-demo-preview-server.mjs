@@ -42,6 +42,7 @@ try {
   await verifyServedIndex(origin)
   await verifyServedIndex(`${origin}/#pattern=treeview&panel=code&source=Tree.tsx`)
   await verifyServedAssets()
+  await verifyMissingAsset(`${origin}/assets/__missing-demo-asset__.js`)
   await verifyStaticSubpathServing()
   console.log('demo preview server smoke passed')
 } finally {
@@ -127,6 +128,7 @@ async function verifyStaticSubpathServing() {
   try {
     await verifyStaticSubpathIndex(`${subpathOrigin}${prefix}`)
     await verifyStaticSubpathIndex(`${subpathOrigin}${prefix}#pattern=treeview&panel=code&source=Tree.tsx`)
+    await verifyMissingAsset(`${subpathOrigin}${prefix}assets/__missing-demo-asset__.js`)
 
     const indexResponse = await fetch(`${subpathOrigin}${prefix}`)
     const html = await indexResponse.text()
@@ -145,6 +147,17 @@ async function verifyStaticSubpathServing() {
     }
   } finally {
     await new Promise((resolve) => staticServer.close(resolve))
+  }
+}
+
+async function verifyMissingAsset(url) {
+  const response = await fetch(url)
+  const body = await response.text()
+  if (response.status !== 404) {
+    throw new Error(`demo preview server smoke failed: missing asset returned ${response.status} for ${url}`)
+  }
+  if (body.includes('<div id="root"></div>')) {
+    throw new Error(`demo preview server smoke failed: missing asset returned the app shell for ${url}`)
   }
 }
 
