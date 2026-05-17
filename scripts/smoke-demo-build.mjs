@@ -622,10 +622,12 @@ function describePreviewTabs(key) {
 }
 
 async function verifyPatternPanelRoutes({ key, label, sourceName }) {
-  await verifyHashRoute(buildHash({ pattern: key, panel: 'state', source: sourceName }), () => {
+  const stateHash = buildHash({ pattern: key, panel: 'state', source: sourceName })
+  await verifyHashRoute(stateHash, () => {
     const inspectText = activePreText()
     return (
-      currentHashParam('pattern') === key
+      window.location.hash === stateHash
+      && currentHashParam('pattern') === key
       && currentHashParam('panel') === 'state'
       && hasActiveDemoHeading(label)
       && findRightPanelTab('state')?.getAttribute('aria-selected') === 'true'
@@ -637,10 +639,12 @@ async function verifyPatternPanelRoutes({ key, label, sourceName }) {
     `${label}: state panel route did not render`,
   )
 
-  await verifyHashRoute(buildHash({ pattern: key, panel: 'events', source: sourceName }), (text) => {
+  const eventsHash = buildHash({ pattern: key, panel: 'events', source: sourceName })
+  await verifyHashRoute(eventsHash, (text) => {
     const logText = activePreText()
     return (
-      currentHashParam('pattern') === key
+      window.location.hash === eventsHash
+      && currentHashParam('pattern') === key
       && currentHashParam('panel') === 'events'
       && hasActiveDemoHeading(label)
       && findRightPanelTab('events')?.getAttribute('aria-selected') === 'true'
@@ -651,8 +655,10 @@ async function verifyPatternPanelRoutes({ key, label, sourceName }) {
     `${label}: events panel route did not render`,
   )
 
-  await verifyHashRoute(buildHash({ pattern: key, panel: 'off', source: sourceName }), () =>
-    currentHashParam('pattern') === key
+  const offHash = buildHash({ pattern: key, panel: 'off', source: sourceName })
+  await verifyHashRoute(offHash, () =>
+    window.location.hash === offHash
+    && currentHashParam('pattern') === key
     && currentHashParam('panel') === 'off'
     && hasActiveDemoHeading(label)
     && !document.querySelector('[role="tablist"][aria-label="right panel"]')
@@ -661,10 +667,12 @@ async function verifyPatternPanelRoutes({ key, label, sourceName }) {
     `${label}: closed panel route did not render`,
   )
 
-  await verifyHashRoute(buildHash({ pattern: key, panel: 'code', source: sourceName }), () => {
+  const codeHash = buildHash({ pattern: key, panel: 'code', source: sourceName })
+  await verifyHashRoute(codeHash, () => {
     const sourceText = sourcePanelText()
     return (
-      currentHashParam('pattern') === key
+      window.location.hash === codeHash
+      && currentHashParam('pattern') === key
       && currentHashParam('panel') === 'code'
       && hasActiveDemoHeading(label)
       && findRightPanelTab('code')?.getAttribute('aria-selected') === 'true'
