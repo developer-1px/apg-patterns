@@ -243,6 +243,24 @@ describe('App route state', () => {
       unmount()
     }
   })
+
+  it('links the selected right panel tab to the rendered right panel content', async () => {
+    replaceHash('#pattern=accordion&panel=code&source=Accordion.tsx')
+
+    render(<App />)
+
+    await waitFor(() => expect(currentHashParam('panel')).toBe('code'))
+    const selectedRightPanelTab = screen.getAllByRole('tab')
+      .filter((tab) => tab.closest('[aria-label="right panel"]'))
+      .find((tab) => tab.getAttribute('aria-selected') === 'true')
+    const panelId = selectedRightPanelTab?.getAttribute('aria-controls')
+    const rightPanel = panelId ? document.getElementById(panelId) : null
+
+    expect(selectedRightPanelTab?.textContent).toBe('code')
+    expect(rightPanel).toBeTruthy()
+    expect(rightPanel?.getAttribute('aria-labelledby')).toBe(selectedRightPanelTab?.id)
+    expect(rightPanel?.textContent).toContain('Accordion.tsx')
+  })
 })
 
 describe('SourceTabs', () => {
