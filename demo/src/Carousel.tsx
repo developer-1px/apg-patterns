@@ -1,5 +1,7 @@
-import { useState } from 'react'
-import { carouselSlides, type CarouselSlide } from './carouselData'
+import { useReducer, type HTMLAttributes } from 'react'
+import { createPatternRuntime, reducePatternData } from '../../src'
+import { carouselDefinition } from '../../src/patterns/carousel/definition'
+import { carouselSlides, initialCarouselData, type CarouselSlide } from './carouselData'
 
 export interface CarouselProps {
   slides?: readonly CarouselSlide[]
@@ -8,33 +10,42 @@ export interface CarouselProps {
 }
 
 export function Carousel({ slides = carouselSlides, showDots = true, label = 'Featured photos' }: CarouselProps) {
-  const [index, setIndex] = useState(0)
+  const [data, dispatch] = useReducer(
+    (current: typeof initialCarouselData, event: Parameters<typeof reducePatternData>[2]) =>
+      reducePatternData(carouselDefinition, current, event),
+    { ...initialCarouselData, refs: { label } },
+  )
+  const runtime = createPatternRuntime({
+    definition: carouselDefinition,
+    data,
+    options: { roledescription: 'carousel', slideRoledescription: 'slide' },
+    onEvent: dispatch,
+  })
+  const activeKey = data.state?.activeKey ?? slides[0]?.key
   const count = slides.length
-  const go = (next: number) => setIndex(((next % count) + count) % count)
+  const rootProps = runtime.getPartProps('root') as HTMLAttributes<HTMLElement>
+  const prevProps = runtime.getPartProps('prev', 'prev') as HTMLAttributes<HTMLButtonElement>
+  const nextProps = runtime.getPartProps('next', 'next') as HTMLAttributes<HTMLButtonElement>
 
   return (
     <div
-      role="region"
-      aria-roledescription="carousel"
-      aria-label={label}
+      {...rootProps}
       className="grid max-w-xl gap-3"
     >
       <div className="flex items-center gap-2">
         <button
+          {...prevProps}
           type="button"
-          aria-label="Previous Slide"
-          onClick={() => go(index - 1)}
           className="h-8 rounded bg-zinc-100 px-3 text-sm hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800"
         >
           Prev
         </button>
         <div className="flex-1 text-center text-xs uppercase tracking-wide text-zinc-500">
-          {`Slide ${index + 1} of ${count}`}
+          {`Slide ${slides.findIndex((slide) => slide.key === activeKey) + 1} of ${count}`}
         </div>
         <button
+          {...nextProps}
           type="button"
-          aria-label="Next Slide"
-          onClick={() => go(index + 1)}
           className="h-8 rounded bg-zinc-100 px-3 text-sm hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800"
         >
           Next
@@ -42,14 +53,13 @@ export function Carousel({ slides = carouselSlides, showDots = true, label = 'Fe
       </div>
       <div className="relative grid">
         {slides.map((slide, i) => {
-          const active = i === index
+          const active = slide.key === activeKey
+          const slideProps = runtime.getPartProps('slide', slide.key) as HTMLAttributes<HTMLElement>
           return (
             <div
+              {...slideProps}
               key={slide.key}
-              role="group"
-              aria-roledescription="slide"
               aria-label={`${i + 1} of ${count}: ${slide.title}`}
-              aria-hidden={active ? undefined : true}
               data-testid={`slide-${slide.key}`}
               className={active ? 'block rounded bg-zinc-50 p-4 dark:bg-zinc-900/70' : 'hidden'}
             >
@@ -63,13 +73,11 @@ export function Carousel({ slides = carouselSlides, showDots = true, label = 'Fe
         <div role="group" aria-label="Choose slide" className="flex justify-center gap-2">
           {slides.map((slide, i) => (
             <button
+              {...(runtime.getPartProps('picker', slide.key) as HTMLAttributes<HTMLButtonElement>)}
               key={slide.key}
               type="button"
-              aria-label={`Slide ${i + 1}`}
-              aria-pressed={i === index}
               data-testid={`dot-${slide.key}`}
-              onClick={() => go(i)}
-              className={`size-3 rounded-full ${i === index ? 'bg-zinc-900 dark:bg-zinc-100' : 'bg-zinc-300 dark:bg-zinc-700'}`}
+              className={`size-3 rounded-full ${slide.key === activeKey ? 'bg-zinc-900 dark:bg-zinc-100' : 'bg-zinc-300 dark:bg-zinc-700'}`}
             />
           ))}
         </div>
