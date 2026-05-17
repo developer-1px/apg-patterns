@@ -1,5 +1,4 @@
-import type { PatternData, PatternOptions } from '../../src'
-import { gridRows } from './gridRuntime'
+import { gridRows, type PatternData, type PatternOptions } from '../../src'
 import type { PatternKey } from './patterns'
 
 export function renderAriaTree(data: PatternData, options: PatternOptions) {

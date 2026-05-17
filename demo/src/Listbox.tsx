@@ -1,7 +1,6 @@
 import { useLayoutEffect, useMemo } from 'react'
 import type { HTMLAttributes } from 'react'
-import { createPatternRuntime, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
-import { listboxDefinition } from './listboxRuntime'
+import { createPatternRuntime, listboxDefinition, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
 
 type Props = HTMLAttributes<HTMLElement>
 
