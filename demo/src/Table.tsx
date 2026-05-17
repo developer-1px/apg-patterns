@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import type { HTMLAttributes } from 'react'
 import { createPatternRuntime, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
 import { tableDefinition } from '../../src/patterns/table/definition'
@@ -16,28 +15,24 @@ export function Table({
 }) {
   const sortByKey = data.state?.sortByKey ?? {}
 
-  const runtime = useMemo(
-    () =>
-      createPatternRuntime({
-        definition: tableDefinition,
-        data,
-        options,
-        onEvent: (event) => {
-          if (event.type === 'activate') {
-            const key = event.key
-            if (data.items[key]?.kind === 'columnheader') {
-              const current = sortByKey[key]
-              const next: 'ascending' | 'descending' | 'other' = current === 'ascending' ? 'descending' : 'ascending'
-              onEvent({ type: 'extension', name: 'tableSort', key, payload: { sort: next } })
-              return
-            }
-          }
-          onEvent(event)
-        },
-        keyToElementId: (key) => `tablecell-${key}`,
-      }),
-    [data, onEvent, options, sortByKey],
-  )
+  const runtime = createPatternRuntime({
+    definition: tableDefinition,
+    data,
+    options,
+    onEvent: (event) => {
+      if (event.type === 'activate') {
+        const key = event.key
+        if (data.items[key]?.kind === 'columnheader') {
+          const current = sortByKey[key]
+          const next: 'ascending' | 'descending' | 'other' = current === 'ascending' ? 'descending' : 'ascending'
+          onEvent({ type: 'extension', name: 'tableSort', key, payload: { sort: next } })
+          return
+        }
+      }
+      onEvent(event)
+    },
+    keyToElementId: (key) => `tablecell-${key}`,
+  })
 
   const rootProps = runtime.getPartProps('table') as Props
   const rowKeys = data.relations?.rowKeys ?? []

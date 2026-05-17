@@ -1,4 +1,3 @@
-import { useCallback } from 'react'
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { type PatternData, type PatternEvent, type PatternOptions } from '../../src'
 import { Listbox } from './Listbox'
@@ -23,23 +22,20 @@ export function RearrangeableListbox({
   const activeKey = data.state?.activeKey ?? rootKeys[0] ?? null
   const selectedKeys = data.state?.selectedKeys ?? []
 
-  const moveActive = useCallback(
-    (delta: -1 | 1) => {
-      if (!activeKey) return
-      const next = [...rootKeys]
-      const idx = next.indexOf(activeKey)
-      const target = idx + delta
-      if (idx === -1 || target < 0 || target >= next.length) return
-      ;[next[idx], next[target]] = [next[target]!, next[idx]!]
-      onChange({
-        ...data,
-        relations: { ...data.relations, rootKeys: next },
-      })
-    },
-    [activeKey, data, onChange, rootKeys],
-  )
+  const moveActive = (delta: -1 | 1) => {
+    if (!activeKey) return
+    const next = [...rootKeys]
+    const idx = next.indexOf(activeKey)
+    const target = idx + delta
+    if (idx === -1 || target < 0 || target >= next.length) return
+    ;[next[idx], next[target]] = [next[target]!, next[idx]!]
+    onChange({
+      ...data,
+      relations: { ...data.relations, rootKeys: next },
+    })
+  }
 
-  const removeActive = useCallback(() => {
+  const removeActive = () => {
     if (!activeKey) return
     const idx = rootKeys.indexOf(activeKey)
     if (idx === -1) return
@@ -51,7 +47,7 @@ export function RearrangeableListbox({
       relations: { ...data.relations, rootKeys: nextKeys },
       state: { ...data.state, activeKey: nextActive, selectedKeys: nextSelected },
     })
-  }, [activeKey, data, onChange, rootKeys, selectedKeys])
+  }
 
   // Alt+ArrowUp/Down 키 처리 — Listbox 외부 wrapper 에서 capture.
   const handleKeyDown = (event: ReactKeyboardEvent) => {

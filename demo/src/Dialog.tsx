@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react'
+import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react'
 import { dialogContent } from './dialogData'
 
 const triggerClass =
@@ -33,18 +33,14 @@ export function Dialog() {
   const titleId = 'dialog-title'
   const descId = 'dialog-description'
 
-  const close = useCallback(() => {
-    setOpen(false)
-  }, [])
+  const close = () => setOpen(false)
 
   useEffect(() => {
-    if (!open) return
-    const first = focusableIn(panelRef.current)[0]
-    first?.focus()
-  }, [open])
-
-  useEffect(() => {
-    if (open) return
+    if (open) {
+      const first = focusableIn(panelRef.current)[0]
+      first?.focus()
+      return
+    }
     triggerRef.current?.focus()
   }, [open])
 

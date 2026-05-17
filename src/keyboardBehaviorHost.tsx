@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { useLayoutEffect, useReducer, useState } from 'react'
+import { useLayoutEffect, useReducer } from 'react'
 import { useTreeviewPattern, type PatternData, type PatternEvent } from './index'
 
 const initialData = {
@@ -52,7 +52,6 @@ export function renderHost(options: HostOptions = {}) {
 function Host({ options = {}, onEmit }: { options?: HostOptions; onEmit?: (event: PatternEvent) => void }) {
   const seed: PatternData = options.initialActiveKey ? { ...initialData, state: { ...initialData.state, activeKey: options.initialActiveKey } } : initialData
   const [data, dispatch] = useReducer(reduce, seed)
-  const [, force] = useState(0)
   const treeRuntime = useTreeviewPattern({
     data,
     options: {
@@ -65,7 +64,6 @@ function Host({ options = {}, onEmit }: { options?: HostOptions; onEmit?: (event
     onEvent: (event) => {
       onEmit?.(event)
       dispatch(event)
-      force((n) => n + 1)
     },
   })
   useLayoutEffect(() => {

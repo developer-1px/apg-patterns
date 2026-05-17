@@ -78,6 +78,11 @@ const buildTree = (): Built => {
     valueByKey: {},
   }
 
+  // Column key item entries (required by PatternData schema for relations.cells.columnKey refs).
+  COLUMNS.forEach((col) => {
+    built.items[col] = { label: COLUMN_LABELS[col] }
+  })
+
   // Column header row: rowKey 'headerRow' at rowIndex 1.
   built.rowKeys.push('headerRow')
   built.rowIndexByKey['headerRow'] = 1
