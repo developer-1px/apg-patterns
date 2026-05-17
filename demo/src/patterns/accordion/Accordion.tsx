@@ -5,6 +5,7 @@ import {
   type PatternItem,
   type PatternOptions,
 } from '../../../../src'
+import { Icon } from '../../shared/Icon'
 
 type AccordionItem = PatternItem & {
   content?: string
@@ -34,7 +35,7 @@ export function Accordion({ data, onEvent, options }: AccordionProps) {
                 className="flex w-full items-center justify-between px-3 py-2 text-left text-sm text-zinc-800 outline-none hover:bg-zinc-100 focus:outline focus:outline-2 focus:outline-zinc-400 dark:text-zinc-200 dark:hover:bg-zinc-900 dark:focus:outline-zinc-500"
               >
                 <span>{section.label}</span>
-                <span aria-hidden="true">{section.state.expanded ? '−' : '+'}</span>
+                <Icon name={section.state.expanded ? 'minus' : 'plus'} className="text-xs text-zinc-500 dark:text-zinc-400" />
               </button>
             </h3>
             {section.state.expanded && section.panelProps ? (

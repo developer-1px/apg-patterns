@@ -223,7 +223,7 @@ function ShortcutIndicator({ shortcut }: { shortcut: string }) {
         const icon = shortcutIconByToken[token]
         return (
           <span key={`${shortcut}-${token}-${index}`} className="inline-flex items-center gap-1">
-            {index > 0 ? <span aria-hidden="true" className="text-zinc-400 dark:text-zinc-600">+</span> : null}
+            {index > 0 ? <Icon name="plus" className="text-[9px] text-zinc-400 dark:text-zinc-600" /> : null}
             {icon ? <Icon name={icon} className="text-xs" /> : <span>{token}</span>}
           </span>
         )
