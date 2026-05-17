@@ -200,6 +200,7 @@ async function runSmoke() {
 
   await verifyTabsKeyboardEventLog()
   await verifyInteractionEventLog()
+  await verifyEventLogClear()
   await verifyLinkInteractionStaysInDemo()
   await verifyCopyLoadedSource()
 
@@ -270,6 +271,28 @@ async function verifyInteractionEventLog() {
     })
   } catch {
     patternFailures.push('accordion interaction did not record an event log entry')
+  }
+}
+
+async function verifyEventLogClear() {
+  window.location.hash = '#pattern=accordion&panel=events&source=Accordion.tsx'
+  window.dispatchEvent(new dom.window.HashChangeEvent('hashchange'))
+
+  try {
+    const accordionButton = await waitFor(() => document.querySelector('button[aria-expanded]'))
+    accordionButton.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
+    await waitFor(() => rootText().includes('1 events') && rootText().includes('expand'))
+
+    const clearButton = await waitFor(() => Array.from(document.querySelectorAll('button'))
+      .find((button) => button.textContent?.trim() === 'clear'))
+    clearButton.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
+
+    await waitFor(() => {
+      const text = rootText()
+      return text.includes('0 events') && text.includes('none') && !text.includes('expand key=')
+    })
+  } catch {
+    patternFailures.push(`event log clear did not reset count and rendered log: text=${rootText().slice(0, 180)}`)
   }
 }
 
