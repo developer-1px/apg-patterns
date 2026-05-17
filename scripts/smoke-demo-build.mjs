@@ -146,6 +146,14 @@ async function runSmoke() {
       patternFailures.push(`${label}: missing source tablist`)
       continue
     }
+    verifySingleSelectedTab(sourceTablist, `${label}: source files tablist`)
+
+    const rightPanelTablist = document.querySelector('[role="tablist"][aria-label="right panel"]')
+    if (!rightPanelTablist) {
+      patternFailures.push(`${label}: missing right panel tablist`)
+      continue
+    }
+    verifySingleSelectedTab(rightPanelTablist, `${label}: right panel tablist`)
 
     const sourceNames = sourceTabNames()
     const duplicateSourceNames = duplicates(sourceNames)
@@ -723,10 +731,24 @@ function describeRouteState() {
 }
 
 function selectedTabName(tablistSelector) {
-  return Array.from(document.querySelectorAll(`${tablistSelector} [role="tab"]`))
-    .find((tab) => tab.getAttribute('aria-selected') === 'true')
+  return selectedTabs(document.querySelector(tablistSelector))
+    .at(0)
     ?.textContent
     ?.trim()
+}
+
+function verifySingleSelectedTab(tablist, label) {
+  const selected = selectedTabs(tablist)
+  if (selected.length !== 1) {
+    const selectedLabels = selected.map((tab) => tab.textContent?.trim() || tab.id || 'unknown').join(', ') || 'none'
+    patternFailures.push(`${label}: expected exactly one selected tab, got ${selected.length}: ${selectedLabels}`)
+  }
+}
+
+function selectedTabs(tablist) {
+  if (!tablist) return []
+  return Array.from(tablist.querySelectorAll('[role="tab"]'))
+    .filter((tab) => tab.getAttribute('aria-selected') === 'true')
 }
 
 function activePreText() {
