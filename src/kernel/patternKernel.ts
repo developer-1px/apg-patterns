@@ -197,7 +197,6 @@ export function resolveEventTemplate(
     const expanded = template.expanded ?? !(data.state?.expandedKeys?.includes(key) ?? false)
     return [{ type: 'expand', key, expanded }]
   }
-  if (template.type === 'open') return [{ type: 'open', key, open: template.open ?? true }]
   if (template.type === 'check') return [{ type: 'check', key, checked: template.checked ?? true }]
   if (template.type === 'press') return [{ type: 'press', key, pressed: template.pressed }]
   if (template.type === 'value') return [{ type: 'value', key, value: template.value }]

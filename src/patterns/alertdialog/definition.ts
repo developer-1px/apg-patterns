@@ -33,7 +33,7 @@ export const alertDialogDefinition = AlertDialogDefinitionSchema.parse({
     dialog: {
       role: 'alertdialog',
       aria: [
-        { attribute: 'aria-modal', from: 'items.kind' },
+        { attribute: 'aria-modal', from: 'literal.true' },
         { attribute: 'aria-labelledby', from: 'relations.ownerByKey' },
         { attribute: 'aria-describedby', from: 'relations.controlsByKey' },
       ],

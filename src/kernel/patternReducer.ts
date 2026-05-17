@@ -61,14 +61,6 @@ export function reducePatternData(definition: PatternDefinition, data: PatternDa
     return withLastEventReason({ ...data, state: { ...data.state, valueByKey: { ...data.state?.valueByKey, [event.key]: event.value } } }, event)
   }
 
-  // 'open' 은 'expand' 의 별칭 — 둘 다 expandedKeys 갱신.
-  if (event.type === 'open') {
-    const expanded = new Set(data.state?.expandedKeys ?? [])
-    if (event.open) expanded.add(event.key)
-    else expanded.delete(event.key)
-    return withLastEventReason({ ...data, state: { ...data.state, expandedKeys: [...expanded] } }, event)
-  }
-
   // 'activate'/'typeahead'/'dismiss'/'extension' 는 outbound-only signal — state 미갱신 (의도).
   return withLastEventReason(data, event)
 }
@@ -147,7 +139,6 @@ function resolveTransitionValue(value: TransitionValue, event: PatternEvent, dat
   if (value.from === '$event.anchorKey') return 'anchorKey' in event ? event.anchorKey : null
   if (value.from === '$event.extentKey') return 'extentKey' in event ? event.extentKey : null
   if (value.from === '$event.expanded') return 'expanded' in event ? event.expanded : null
-  if (value.from === '$event.open') return 'open' in event ? event.open : null
   if (value.from === '$event.checked') return 'checked' in event ? event.checked : null
   if (value.from === '$event.pressed') return 'pressed' in event ? event.pressed : null
   if (value.from === '$event.value') return 'value' in event ? event.value : null

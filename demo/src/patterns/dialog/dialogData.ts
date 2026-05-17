@@ -2,7 +2,7 @@ import type { PatternData } from '../../../../src'
 
 export const initialDialogData: PatternData = {
   items: {
-    trigger: { label: 'Add delivery address' },
+    trigger: { label: 'Add delivery address', kind: 'dialog' },
     dialog: { label: 'Add Delivery Address' },
     title: { label: 'Add Delivery Address' },
     description: { label: 'Provide an address where you would like your order delivered.' },

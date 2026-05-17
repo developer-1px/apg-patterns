@@ -106,6 +106,7 @@ export const DomEvents = {
   keyup: 'keyup',
   input: 'input',
   change: 'change',
+  mousedown: 'mousedown',
   pointerdown: 'pointerdown',
   pointerup: 'pointerup',
   pointermove: 'pointermove',

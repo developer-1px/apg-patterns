@@ -29,7 +29,8 @@ export const FocusModelSchema = z.enum(['rovingTabIndex', 'ariaActiveDescendant'
 export type FocusModel = z.infer<typeof FocusModelSchema>
 
 export const DomEventNameSchema = z.enum([
-  'blur', 'click', 'focus', 'input', 'mousedown', 'mouseenter', 'mouseleave',
+  'blur', 'change', 'click', 'dblclick', 'focus', 'input', 'keydown', 'keyup',
+  'mousedown', 'mouseenter', 'mouseleave', 'pointerdown', 'pointermove', 'pointerup',
 ])
 export type DomEventName = z.infer<typeof DomEventNameSchema>
 
@@ -208,7 +209,6 @@ export const EventValueSourceSchema = z.enum([
   '$event.anchorKey',
   '$event.extentKey',
   '$event.expanded',
-  '$event.open',
   '$event.checked',
   '$event.pressed',
   '$event.value',

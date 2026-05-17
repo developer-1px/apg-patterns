@@ -18,7 +18,7 @@ export const dialogDefinition = DialogDefinitionSchema.parse({
     trigger: {
       role: 'button',
       aria: [
-        { attribute: 'aria-haspopup', from: 'items.label' },
+        { attribute: 'aria-haspopup', from: 'items.kind' },
         { attribute: 'aria-expanded', from: 'state.expandedKeys' },
         { attribute: 'aria-controls', from: 'relations.controlsByKey' },
       ],
