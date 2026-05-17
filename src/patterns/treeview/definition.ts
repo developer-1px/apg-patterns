@@ -39,7 +39,7 @@ const indicatorClickToggleExpand = { kind: 'optionEquals', option: 'indicatorCli
 const activeClickSelect = { kind: 'optionEquals', option: 'itemClickAction', value: 'select' } as const
 const activeClickToggleExpand = { kind: 'optionEquals', option: 'itemClickAction', value: 'toggleExpand' } as const
 
-export const TreeviewPatternDefinitionSchema = PatternDefinitionSchema.superRefine((value, ctx) => {
+export const TreeviewDefinitionSchema = PatternDefinitionSchema.superRefine((value, ctx) => {
   const containedRoles = value.containedRoles ?? []
   if (value.apgPattern !== 'treeview') ctx.addIssue({ code: 'custom', path: ['apgPattern'], message: 'expected "treeview"' })
   if (value.rootRole !== 'tree') ctx.addIssue({ code: 'custom', path: ['rootRole'], message: 'expected "tree"' })
@@ -50,7 +50,7 @@ export const TreeviewPatternDefinitionSchema = PatternDefinitionSchema.superRefi
   if (!value.parts.treeitem) ctx.addIssue({ code: 'custom', path: ['parts', 'treeitem'], message: 'treeview requires parts.treeitem' })
 })
 
-export const treeviewPatternDefinition = TreeviewPatternDefinitionSchema.parse({
+export const treeviewDefinition = TreeviewDefinitionSchema.parse({
   apgPattern: 'treeview',
   rootRole: 'tree',
   containedRoles: ['treeitem'],
@@ -213,6 +213,6 @@ export const treeviewPatternDefinition = TreeviewPatternDefinitionSchema.parse({
   ],
 })
 
-export const serializableTreeviewPatternDefinition = JSON.parse(
-  JSON.stringify(treeviewPatternDefinition),
-) as typeof treeviewPatternDefinition
+export const serializableTreeviewDefinition = JSON.parse(
+  JSON.stringify(treeviewDefinition),
+) as typeof treeviewDefinition

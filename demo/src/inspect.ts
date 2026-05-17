@@ -81,6 +81,18 @@ export function renderListboxInspect(data: PatternData) {
   return lines.filter(Boolean).join('\n')
 }
 
+export function renderSliderInspect(data: PatternData) {
+  const key = data.relations?.rootKeys?.[0]
+  if (!key) return ''
+  return [
+    'slider',
+    attrLine({
+      'aria-label': data.items[key]?.label,
+      'aria-valuenow': data.state?.valueByKey?.[key],
+    }, ['aria-label', 'aria-valuenow']),
+  ].filter(Boolean).join('\n')
+}
+
 export function renderGridInspect(data: PatternData) {
   const activeKey = data.state?.activeKey
   const lines = ['grid', attrLine({ 'aria-label': data.refs?.label, 'aria-labelledby': data.refs?.labelledBy }, ['aria-label', 'aria-labelledby'])]

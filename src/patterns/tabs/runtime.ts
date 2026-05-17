@@ -6,10 +6,10 @@ import {
 } from '../../patternRuntime'
 import { reducePatternData } from '../../patternReducer'
 import { PatternDataSchema, PatternEventSchema, PatternOptionsSchema, type Key, type PatternData, type PatternEvent, type PatternOptions } from '../../schema'
-import { tabsPatternDefinition } from './definition'
+import { tabsDefinition } from './definition'
 
 export interface TabsRuntime {
-  definition: typeof tabsPatternDefinition
+  definition: typeof tabsDefinition
   data: PatternData
   options: PatternOptions
   tabs: readonly Key[]
@@ -38,7 +38,7 @@ export function createTabsRuntime(input: CreateTabsRuntimeInput): TabsRuntime {
   const options = { ...defaultOptions, ...PatternOptionsSchema.parse(input.options ?? {}) }
   const emit = (event: PatternEvent) => input.onEvent(PatternEventSchema.parse(event))
   const runtime = createPatternRuntime({
-    definition: tabsPatternDefinition,
+    definition: tabsDefinition,
     data,
     options,
     keyToElementId: (key) => createTabsElementId(options.elementIdPrefix ?? 'tab-', key),
@@ -50,7 +50,7 @@ export function createTabsRuntime(input: CreateTabsRuntimeInput): TabsRuntime {
   const selectedPanelKey = selectedKey ? data.relations?.controlsByKey?.[selectedKey]?.[0] ?? null : null
 
   return {
-    definition: tabsPatternDefinition,
+    definition: tabsDefinition,
     data,
     options,
     get tabs() {
@@ -66,7 +66,7 @@ export function createTabsRuntime(input: CreateTabsRuntimeInput): TabsRuntime {
 }
 
 export function reduceTabsData(data: PatternData, event: PatternEvent): PatternData {
-  return reducePatternData(tabsPatternDefinition, data, event)
+  return reducePatternData(tabsDefinition, data, event)
 }
 
 function createTabsElementId(prefix: string, key: Key) {

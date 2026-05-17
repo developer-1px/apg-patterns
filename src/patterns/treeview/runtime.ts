@@ -10,12 +10,12 @@ import {
   type PatternEvent,
   type PatternOptions,
 } from '../../schema'
-import { treeviewPatternDefinition } from './definition'
+import { treeviewDefinition } from './definition'
 import {
   createParentByKey,
   evaluatePredicate,
   resolveEventTemplate,
-  dispatchNavigationTarget,
+  resolveNavigationTarget,
   resolveVisibleOrder,
 } from '../../patternKernel'
 import { createPatternRuntime, type CreatePatternRuntimeInput } from '../../patternRuntime'
@@ -35,7 +35,7 @@ export interface TreeviewRenderItem {
 }
 
 export interface TreeviewRuntime {
-  definition: typeof treeviewPatternDefinition
+  definition: typeof treeviewDefinition
   data: PatternData
   options: PatternOptions
   items: readonly TreeviewRenderItem[]
@@ -72,7 +72,7 @@ export function createTreeviewRuntime(input: CreateTreeviewRuntimeInput): Treevi
   const keyToElementId = (key: Key) => `${options.elementIdPrefix ?? defaultOptions.elementIdPrefix}${key}`
   const typeahead = input.typeaheadBuffer ?? createTypeaheadBuffer()
   const runtime = createPatternRuntime({
-    definition: treeviewPatternDefinition,
+    definition: treeviewDefinition,
     data,
     options,
     keyToElementId,
@@ -108,7 +108,7 @@ export function createTreeviewRuntime(input: CreateTreeviewRuntimeInput): Treevi
   }
 
   return {
-    definition: treeviewPatternDefinition,
+    definition: treeviewDefinition,
     data,
     options,
     get items() {
@@ -129,12 +129,12 @@ export function createTreeviewRuntime(input: CreateTreeviewRuntimeInput): Treevi
 }
 
 function getVisibleKeys(data: PatternData): readonly Key[] {
-  return resolveVisibleOrder(treeviewPatternDefinition.navigation.visibleOrder, data)
+  return resolveVisibleOrder(treeviewDefinition.navigation.visibleOrder, data)
 }
 
 export function getTreeItemState(data: PatternData, key: Key): TreeviewRenderState {
   const runtime = createPatternRuntime({
-    definition: treeviewPatternDefinition,
+    definition: treeviewDefinition,
     data: PatternDataSchema.parse(data),
     options: defaultOptions,
     onEvent: () => undefined,
@@ -159,7 +159,7 @@ export function resolveTreeKeyboardBinding(
   activeKey: Key,
   data: PatternData,
   options: PatternOptions = defaultOptions,
-  keyboard: readonly KeyboardBinding[] = treeviewPatternDefinition.keyboard,
+  keyboard: readonly KeyboardBinding[] = treeviewDefinition.keyboard,
 ): ResolvedKeyboardBinding | null {
   for (const binding of keyboard) {
     if (!matchesShortcut(input, binding.shortcut)) continue
@@ -180,15 +180,15 @@ export function resolveTreeKeyboardBinding(
 // 호환용 re-export — 기존 import 경로 유지
 export { resolveEventTemplate, evaluatePredicate, createParentByKey } from '../../patternKernel'
 
-export function resolveNavigationTarget(
+export function resolveTreeviewNavigationTarget(
   direction: Extract<PatternEvent, { type: 'navigate' }>,
   activeKey: Key,
   data: PatternData,
   parentByKey: ReadonlyMap<Key, Key> = createParentByKey(data),
 ): Key | null {
-  const target = treeviewPatternDefinition.navigation.targets[direction.direction]
+  const target = treeviewDefinition.navigation.targets[direction.direction]
   if (!target) return null
-  return dispatchNavigationTarget(target, {
+  return resolveNavigationTarget(target, {
     activeKey,
     data,
     parentByKey,

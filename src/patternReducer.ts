@@ -1,5 +1,5 @@
 import type { Key, PatternData, PatternEvent, PatternDefinition } from './schema'
-import { resolveVisibleOrder, dispatchNavigationTarget, createParentByKey } from './patternKernel'
+import { resolveVisibleOrder, resolveNavigationTarget, createParentByKey } from './patternKernel'
 
 export function reducePatternData(definition: PatternDefinition, data: PatternData, event: PatternEvent): PatternData {
   if (event.type === 'focus') return withActiveKey(data, event.key)
@@ -14,7 +14,7 @@ export function reducePatternData(definition: PatternDefinition, data: PatternDa
         `[apg-pattern] navigate(direction="${event.direction}") emitted but definition.navigation.targets["${event.direction}"] is missing — register a target or fix the keyboard binding.`,
       )
     }
-    const nextKey = dispatchNavigationTarget(target, {
+    const nextKey = resolveNavigationTarget(target, {
       activeKey,
       data,
       parentByKey: createParentByKey(data),

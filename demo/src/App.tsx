@@ -4,11 +4,13 @@ import { initialData, reduceData, resolveTarget } from './demoData'
 import { Grid } from './Grid'
 import { gridDefinition, listboxDefinition } from '../../src'
 import { gridVariantItems, gridVariants, type GridVariantKey } from './gridData'
-import { renderAriaTree, renderGridInspect, renderHtmlTree, renderListboxInspect, renderStaticInspect, renderTabsInspect } from './inspect'
+import { renderAriaTree, renderGridInspect, renderHtmlTree, renderListboxInspect, renderSliderInspect, renderStaticInspect, renderTabsInspect } from './inspect'
 import { Listbox } from './Listbox'
 import { initialListboxData } from './listboxData'
 import { PatternMenu } from './PatternMenu'
 import { patternItems, type PatternKey } from './patterns'
+import { Slider } from './Slider'
+import { initialSliderData, reduceSliderData, sliderOptions } from './sliderData'
 import { sources } from './sources'
 import { SourceTabs, useSourceTabs } from './SourceTabs'
 import { Tabs } from './Tabs'
@@ -30,6 +32,7 @@ export function App() {
   const [gridVariant, setGridVariant] = useState<GridVariantKey>('dataTransactions')
   const [gridData, setGridData] = useState(gridVariants.dataTransactions.data)
   const [tabsData, setTabsData] = useState(initialTabsData)
+  const [sliderData, setSliderData] = useState(initialSliderData)
   const [listboxData, dispatchListbox] = useReducer((current: typeof initialListboxData, event: PatternEvent | { type: 'reset' }) => {
     if (event.type === 'reset') return initialListboxData
     return reducePatternData(listboxDefinition, current, event)
@@ -74,6 +77,11 @@ export function App() {
     setEvents((current) => [event, ...current].slice(0, 12))
   }
 
+  const handleSliderEvent = (event: PatternEvent) => {
+    setEvents((current) => [event, ...current].slice(0, 12))
+    setSliderData((current) => reduceSliderData(current, event, sliderOptions))
+  }
+
   const handleTabsDataChange = (nextData: PatternData, event: PatternEvent) => {
     const activeKey = nextData.state?.activeKey
     setTabsData(event.type === 'navigate' && activeKey ? reduceTabsData(nextData, { type: 'select', keys: [activeKey], anchorKey: activeKey, extentKey: activeKey }) : nextData)
@@ -98,7 +106,9 @@ export function App() {
           ? renderListboxInspect(listboxData)
           : patternKey === 'tabs'
             ? renderTabsInspect(tabsData)
-            : renderStaticInspect(patternKey)
+            : patternKey === 'slider'
+              ? renderSliderInspect(sliderData)
+              : renderStaticInspect(patternKey)
   const eventLog = events.map((event) => JSON.stringify(event)).join('\n') || 'none'
 
   return (
@@ -159,7 +169,9 @@ export function App() {
                   ? dispatchListbox({ type: 'reset' })
                   : patternKey === 'tabs'
                     ? setTabsData(initialTabsData)
-                    : dispatch({ type: 'reset' })
+                    : patternKey === 'slider'
+                      ? setSliderData(initialSliderData)
+                      : dispatch({ type: 'reset' })
             }
           >
             reset
@@ -169,6 +181,7 @@ export function App() {
         {patternKey === 'listbox' ? <Listbox data={listboxData} options={{ focusStrategy: 'rovingTabIndex', selectionMode: 'single' }} onEvent={handleListboxEvent} /> : null}
         {patternKey === 'grid' ? <Grid data={gridData} options={{ focusStrategy: 'rovingTabIndex', selectionMode: 'single' }} onEvent={handleGridEvent} /> : null}
         {patternKey === 'tabs' ? <Tabs data={tabsData} onEvent={handleTabsEvent} onDataChange={handleTabsDataChange} /> : null}
+        {patternKey === 'slider' ? <Slider data={sliderData} options={sliderOptions} onEvent={handleSliderEvent} /> : null}
       </section>
 
       <section className={`${panelClass} flex min-h-0 flex-col`}>

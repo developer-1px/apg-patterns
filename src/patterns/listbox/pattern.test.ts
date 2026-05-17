@@ -13,7 +13,7 @@ import {
   defineAriaSource,
   resolveAriaSource,
   resolveVisibleOrder,
-  dispatchNavigationTarget,
+  resolveNavigationTarget,
   evaluatePredicate,
   createParentByKey,
 } from '../../index'
@@ -95,10 +95,10 @@ describe('listbox via kernel (OCP 실증)', () => {
       parentByKey: createParentByKey(data),
       visibleKeys: ['a', 'b', 'c'] as const,
     }
-    expect(dispatchNavigationTarget(listboxDefinition.navigation.targets.next!, ctx)).toBe('c')
-    expect(dispatchNavigationTarget(listboxDefinition.navigation.targets.previous!, ctx)).toBe('a')
-    expect(dispatchNavigationTarget(listboxDefinition.navigation.targets.first!, ctx)).toBe('a')
-    expect(dispatchNavigationTarget(listboxDefinition.navigation.targets.last!, ctx)).toBe('c')
+    expect(resolveNavigationTarget(listboxDefinition.navigation.targets.next!, ctx)).toBe('c')
+    expect(resolveNavigationTarget(listboxDefinition.navigation.targets.previous!, ctx)).toBe('a')
+    expect(resolveNavigationTarget(listboxDefinition.navigation.targets.first!, ctx)).toBe('a')
+    expect(resolveNavigationTarget(listboxDefinition.navigation.targets.last!, ctx)).toBe('c')
   })
 
   it('resolves aria-source tokens reused from kernel defaults', () => {

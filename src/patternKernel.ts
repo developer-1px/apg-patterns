@@ -120,7 +120,7 @@ export function resolveVisibleOrder(visibleOrder: { kind: string } & Record<stri
   return resolver(visibleOrder, data)
 }
 
-export function dispatchNavigationTarget(
+export function resolveNavigationTarget(
   target: { kind: string; key?: '$key' | '$activeKey' } & Record<string, unknown>,
   ctx: NavigationTargetContext,
 ): Key | null {

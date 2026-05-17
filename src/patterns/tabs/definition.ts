@@ -11,7 +11,7 @@ defineNavigationTarget('tabsLinear', (target, ctx) => {
   return moveLinear(ctx.visibleKeys, ctx.activeKey, action)
 })
 
-export const TabsPatternDefinitionSchema = PatternDefinitionSchema.superRefine((value, ctx) => {
+export const TabsDefinitionSchema = PatternDefinitionSchema.superRefine((value, ctx) => {
   const containedRoles = value.containedRoles ?? []
   if (value.apgPattern !== 'tabs') ctx.addIssue({ code: 'custom', path: ['apgPattern'], message: 'expected "tabs"' })
   if (value.rootRole !== 'tablist') ctx.addIssue({ code: 'custom', path: ['rootRole'], message: 'expected "tablist"' })
@@ -23,7 +23,7 @@ export const TabsPatternDefinitionSchema = PatternDefinitionSchema.superRefine((
   if (!value.parts.tabpanel) ctx.addIssue({ code: 'custom', path: ['parts', 'tabpanel'], message: 'tabs requires parts.tabpanel' })
 })
 
-export const tabsPatternDefinition = TabsPatternDefinitionSchema.parse({
+export const tabsDefinition = TabsDefinitionSchema.parse({
   apgPattern: 'tabs',
   rootRole: 'tablist',
   containedRoles: ['tab', 'tabpanel'],
@@ -95,6 +95,6 @@ export const tabsPatternDefinition = TabsPatternDefinitionSchema.parse({
   ],
 })
 
-export const serializableTabsPatternDefinition = JSON.parse(
-  JSON.stringify(tabsPatternDefinition),
-) as typeof tabsPatternDefinition
+export const serializableTabsDefinition = JSON.parse(
+  JSON.stringify(tabsDefinition),
+) as typeof tabsDefinition

@@ -3,13 +3,13 @@ import {
   PatternDataSchema,
   PatternEventSchema,
   PatternOptionsSchema,
-  TreeviewPatternDefinitionSchema,
+  TreeviewDefinitionSchema,
   createParentByKey,
   createTreeviewRuntime,
-  resolveNavigationTarget,
+  resolveTreeviewNavigationTarget,
   resolveTreeKeyboardBinding,
-  serializableTreeviewPatternDefinition,
-  treeviewPatternDefinition,
+  serializableTreeviewDefinition,
+  treeviewDefinition,
   type PatternData,
   type PatternEvent,
 } from '../../index'
@@ -56,9 +56,9 @@ const data = {
 
 describe('@interactive-os/apg-treeview-contract', () => {
   it('keeps the treeview definition serializable and schema-validated', () => {
-    expect(TreeviewPatternDefinitionSchema.parse(treeviewPatternDefinition)).toEqual(treeviewPatternDefinition)
-    expect(TreeviewPatternDefinitionSchema.parse(serializableTreeviewPatternDefinition)).toEqual(treeviewPatternDefinition)
-    expect(serializableTreeviewPatternDefinition.keyboard).toContainEqual({
+    expect(TreeviewDefinitionSchema.parse(treeviewDefinition)).toEqual(treeviewDefinition)
+    expect(TreeviewDefinitionSchema.parse(serializableTreeviewDefinition)).toEqual(treeviewDefinition)
+    expect(serializableTreeviewDefinition.keyboard).toContainEqual({
       shortcut: 'ArrowDown',
       preventDefault: true,
       cases: [
@@ -146,15 +146,15 @@ describe('@interactive-os/apg-treeview-contract', () => {
 
   it('rejects incomplete or cross-shaped event templates', () => {
     expect(() =>
-      TreeviewPatternDefinitionSchema.parse({
-        ...treeviewPatternDefinition,
+      TreeviewDefinitionSchema.parse({
+        ...treeviewDefinition,
         keyboard: [{ shortcut: 'ArrowDown', cases: [{ case: 'always', events: [{ type: 'navigate' }] }] }],
       }),
     ).toThrow()
 
     expect(() =>
-      TreeviewPatternDefinitionSchema.parse({
-        ...treeviewPatternDefinition,
+      TreeviewDefinitionSchema.parse({
+        ...treeviewDefinition,
         keyboard: [{ shortcut: 'ArrowDown', cases: [{ case: 'always', events: [{ type: 'focus', direction: 'next' }] }] }],
       }),
     ).toThrow()
@@ -162,8 +162,8 @@ describe('@interactive-os/apg-treeview-contract', () => {
 
   it('rejects string predicates and unknown predicate vocabulary', () => {
     expect(() =>
-      TreeviewPatternDefinitionSchema.parse({
-        ...treeviewPatternDefinition,
+      TreeviewDefinitionSchema.parse({
+        ...treeviewDefinition,
         keyboard: [
           {
             shortcut: 'ArrowRight',
@@ -180,8 +180,8 @@ describe('@interactive-os/apg-treeview-contract', () => {
     ).toThrow()
 
     expect(() =>
-      TreeviewPatternDefinitionSchema.parse({
-        ...treeviewPatternDefinition,
+      TreeviewDefinitionSchema.parse({
+        ...treeviewDefinition,
         keyboard: [
           {
             shortcut: 'ArrowRight',
@@ -395,12 +395,12 @@ describe('@interactive-os/apg-treeview-contract', () => {
   it('resolves navigate events through keyboard-navigation primitives', () => {
     const parentByKey = createParentByKey(data)
 
-    expect(resolveNavigationTarget({ type: 'navigate', direction: 'next' }, 'a', data)).toBe('b')
-    expect(resolveNavigationTarget({ type: 'navigate', direction: 'previous' }, 'b', data)).toBe('a')
-    expect(resolveNavigationTarget({ type: 'navigate', direction: 'first' }, 'b', data)).toBe('a')
-    expect(resolveNavigationTarget({ type: 'navigate', direction: 'last' }, 'a', data)).toBe('c')
-    expect(resolveNavigationTarget({ type: 'navigate', direction: 'child' }, 'a', data)).toBe('b')
-    expect(resolveNavigationTarget({ type: 'navigate', direction: 'parent' }, 'b', data, parentByKey)).toBe('a')
-    expect(resolveNavigationTarget({ type: 'navigate', direction: 'parent' }, 'c', data, parentByKey)).toBe('a')
+    expect(resolveTreeviewNavigationTarget({ type: 'navigate', direction: 'next' }, 'a', data)).toBe('b')
+    expect(resolveTreeviewNavigationTarget({ type: 'navigate', direction: 'previous' }, 'b', data)).toBe('a')
+    expect(resolveTreeviewNavigationTarget({ type: 'navigate', direction: 'first' }, 'b', data)).toBe('a')
+    expect(resolveTreeviewNavigationTarget({ type: 'navigate', direction: 'last' }, 'a', data)).toBe('c')
+    expect(resolveTreeviewNavigationTarget({ type: 'navigate', direction: 'child' }, 'a', data)).toBe('b')
+    expect(resolveTreeviewNavigationTarget({ type: 'navigate', direction: 'parent' }, 'b', data, parentByKey)).toBe('a')
+    expect(resolveTreeviewNavigationTarget({ type: 'navigate', direction: 'parent' }, 'c', data, parentByKey)).toBe('a')
   })
 })
