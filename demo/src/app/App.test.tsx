@@ -259,6 +259,24 @@ describe('event log', () => {
     expect(screen.getByText('1 events')).toBeTruthy()
   })
 
+  it('does not record source or inspection navigation as pattern events', async () => {
+    replaceHash('#pattern=accordion&panel=code&source=Accordion.tsx')
+
+    render(<App />)
+
+    fireEvent.click(screen.getByRole('tab', { name: 'accordionData.ts' }))
+    await waitFor(() => expect(currentHashParam('source')).toBe('accordionData.ts'))
+
+    fireEvent.click(screen.getByRole('tab', { name: 'state' }))
+    await waitFor(() => expect(currentHashParam('panel')).toBe('state'))
+
+    fireEvent.click(screen.getByRole('tab', { name: 'events' }))
+    await waitFor(() => expect(currentHashParam('panel')).toBe('events'))
+
+    expect(screen.getByText('0 events')).toBeTruthy()
+    expect(screen.getByText('none')).toBeTruthy()
+  })
+
   it('records pattern events and clears them explicitly', async () => {
     replaceHash('#pattern=accordion&panel=events&source=Accordion.tsx')
 
