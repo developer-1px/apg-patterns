@@ -1,7 +1,4 @@
 import { PatternDefinitionSchema } from './schema'
-import { defineVisibleOrder } from './patternKernel'
-
-defineVisibleOrder('flat', (_visibleOrder, data) => data.relations?.rootKeys ?? [])
 
 export const listboxDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'listbox',
