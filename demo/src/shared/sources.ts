@@ -32,7 +32,6 @@ const demoDataModules = import.meta.glob([
   '../app/*.ts',
   '../shared/*.ts',
   '../shared/inspect/*.ts',
-  './*.ts',
   '!../patterns/**/*.test.ts',
   '!../patterns/**/*.apg.test.ts',
   '!../app/**/*.test.ts',

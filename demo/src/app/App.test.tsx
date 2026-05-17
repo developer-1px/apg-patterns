@@ -384,6 +384,14 @@ describe('demo source wiring', () => {
     expect(servedCollisions).toEqual([])
   })
 
+  it('does not report the same source file as a collision with itself', () => {
+    const duplicateCollisionPaths = sourceNameCollisions.flatMap((collision) => (
+      duplicates([...collision.paths]).map((path) => `${collision.name}: ${path}`)
+    ))
+
+    expect(duplicateCollisionPaths).toEqual([])
+  })
+
   it('loads every exposed source tab as non-empty source text', async () => {
     const exposedSourceNames = new Set<string>()
     const failedSources: string[] = []
