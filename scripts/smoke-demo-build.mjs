@@ -981,7 +981,8 @@ async function verifyVariantControls(key, label) {
     }
 
     if (options.length > 1) {
-      const expectedOptionId = options[1].id
+      const selectedOptionIndex = options.findIndex((option) => option.getAttribute('aria-selected') === 'true')
+      const expectedOptionId = options[((selectedOptionIndex < 0 ? 0 : selectedOptionIndex) + 1) % options.length].id
       listbox.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'ArrowDown', code: 'ArrowDown', bubbles: true, cancelable: true }))
 
       try {
