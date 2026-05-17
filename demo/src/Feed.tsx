@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 import type { HTMLAttributes } from 'react'
 import { createPatternRuntime, reducePatternData, type PatternData, type PatternEvent } from '../../src'
 import { feedDefinition } from '../../src/patterns/feed/definition'
@@ -11,17 +11,13 @@ export function Feed({ initialData }: { initialData?: PatternData } = {}) {
   const handleEvent = (event: PatternEvent) =>
     setData((current) => reducePatternData(feedDefinition, current, event))
 
-  const runtime = useMemo(
-    () =>
-      createPatternRuntime({
-        definition: feedDefinition,
-        data,
-        options: {},
-        onEvent: handleEvent,
-        keyToElementId: (key) => `feed-article-${key}`,
-      }),
-    [data],
-  )
+  const runtime = createPatternRuntime({
+    definition: feedDefinition,
+    data,
+    options: {},
+    onEvent: handleEvent,
+    keyToElementId: (key) => `feed-article-${key}`,
+  })
 
   useLayoutEffect(() => {
     const activeKey = data.state?.activeKey

@@ -1,5 +1,4 @@
 import type { HTMLAttributes, KeyboardEvent } from 'react'
-import { useMemo } from 'react'
 import type { KeyInput } from '@interactive-os/keyboard'
 import { createPatternRuntime, type PatternData, type PatternEvent } from '../../src'
 import { buttonDefinition } from '../../src/patterns/button/definition'
@@ -17,17 +16,13 @@ export interface ButtonProps {
 }
 
 export function Button({ data, onEvent, variant = 'action' }: ButtonProps) {
-  const runtime = useMemo(
-    () =>
-      createPatternRuntime({
-        definition: buttonDefinition,
-        data,
-        options: {},
-        onEvent,
-        keyToElementId: (key) => `button-${key}`,
-      }),
-    [data, onEvent],
-  )
+  const runtime = createPatternRuntime({
+    definition: buttonDefinition,
+    data,
+    options: {},
+    onEvent,
+    keyToElementId: (key) => `button-${key}`,
+  })
 
   const rootKeys = data.relations?.rootKeys ?? []
   if (rootKeys.length === 0) return null

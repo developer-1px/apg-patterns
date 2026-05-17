@@ -1,5 +1,4 @@
 import type { HTMLAttributes, KeyboardEvent } from 'react'
-import { useMemo } from 'react'
 import type { KeyInput } from '@interactive-os/keyboard'
 import { createPatternRuntime, type PatternData, type PatternEvent } from '../../src'
 import { switchDefinition } from '../../src/patterns/switch/definition'
@@ -16,17 +15,13 @@ export function Switch({
   data: PatternData
   onEvent: (event: PatternEvent) => void
 }) {
-  const runtime = useMemo(
-    () =>
-      createPatternRuntime({
-        definition: switchDefinition,
-        data,
-        options: {},
-        onEvent,
-        keyToElementId: (key) => `switch-${key}`,
-      }),
-    [data, onEvent],
-  )
+  const runtime = createPatternRuntime({
+    definition: switchDefinition,
+    data,
+    options: {},
+    onEvent,
+    keyToElementId: (key) => `switch-${key}`,
+  })
 
   const rootKeys = data.relations?.rootKeys ?? []
   if (rootKeys.length === 0) return null

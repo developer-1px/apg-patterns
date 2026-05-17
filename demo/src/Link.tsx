@@ -1,5 +1,4 @@
 import type { AnchorHTMLAttributes, HTMLAttributes, KeyboardEvent, MouseEvent } from 'react'
-import { useMemo } from 'react'
 import type { KeyInput } from '@interactive-os/keyboard'
 import { createPatternRuntime, type PatternData, type PatternEvent } from '../../src'
 import { linkDefinition } from '../../src/patterns/link/definition'
@@ -26,17 +25,13 @@ export function Link({ data, href, variant = 'anchor', onActivate, onEvent }: Li
     if (event.type === 'activate' && onActivate) onActivate(event.key, href)
   }
 
-  const runtime = useMemo(
-    () =>
-      createPatternRuntime({
-        definition: linkDefinition,
-        data,
-        options: {},
-        onEvent: emit,
-        keyToElementId: (key) => `link-${key}`,
-      }),
-    [data],
-  )
+  const runtime = createPatternRuntime({
+    definition: linkDefinition,
+    data,
+    options: {},
+    onEvent: emit,
+    keyToElementId: (key) => `link-${key}`,
+  })
 
   if (!rootKey) return null
   const { onKeyDown: _ignore, ...partProps } = runtime.getPartProps('link', rootKey) as Props & {

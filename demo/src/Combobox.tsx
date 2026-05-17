@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import type { HTMLAttributes, InputHTMLAttributes, KeyboardEvent } from 'react'
 import { COMBOBOX_KEY, comboboxDefinition, createPatternRuntime, type PatternData, type PatternEvent } from '../../src'
 import { FRUITS, filterFruits, firstMatch } from './comboboxData'
@@ -23,17 +23,13 @@ export function Combobox({
   const [query, setQuery] = useState('')
   const [inlineCompletion, setInlineCompletion] = useState<{ start: number; end: number } | null>(null)
 
-  const runtime = useMemo(
-    () =>
-      createPatternRuntime({
-        definition: comboboxDefinition,
-        data,
-        options: { focusStrategy: 'ariaActiveDescendant', haspopup: 'listbox', autocomplete },
-        onEvent,
-        keyToElementId: (key) => `combobox-option-${key}`,
-      }),
-    [data, onEvent, autocomplete],
-  )
+  const runtime = createPatternRuntime({
+    definition: comboboxDefinition,
+    data,
+    options: { focusStrategy: 'ariaActiveDescendant', haspopup: 'listbox', autocomplete },
+    onEvent,
+    keyToElementId: (key) => `combobox-option-${key}`,
+  })
 
   const rootProps = runtime.getPartProps('combobox') as unknown as RootProps
   const listProps = runtime.getPartProps('listbox') as HTMLAttributes<HTMLElement>

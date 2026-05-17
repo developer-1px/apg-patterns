@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react'
+import { useRef } from 'react'
 import type { HTMLAttributes } from 'react'
 import { createTypeaheadBuffer } from '@interactive-os/keyboard'
 import { createTreeviewRuntime, type CreateTreeviewRuntimeInput, type TreeviewRuntime, type TreeviewSlotProps } from './patterns/treeview/runtime'
@@ -22,21 +22,15 @@ export interface ReactTreeviewRuntime extends Omit<TreeviewRuntime, 'getTreeProp
 }
 
 export function useTreeviewPattern(input: CreateTreeviewRuntimeInput): ReactTreeviewRuntime {
-  const onEventRef = useRef(input.onEvent)
   const typeaheadBufferRef = useRef(createTypeaheadBuffer())
-  onEventRef.current = input.onEvent
 
-  return useMemo(
-    () =>
-      adaptRuntime(
-        createTreeviewRuntime({
-          data: input.data,
-          options: input.options,
-          typeaheadBuffer: input.typeaheadBuffer ?? typeaheadBufferRef.current,
-          onEvent: (event) => onEventRef.current(event),
-        }),
-      ),
-    [input.data, input.options, input.typeaheadBuffer],
+  return adaptRuntime(
+    createTreeviewRuntime({
+      data: input.data,
+      options: input.options,
+      typeaheadBuffer: input.typeaheadBuffer ?? typeaheadBufferRef.current,
+      onEvent: input.onEvent,
+    }),
   )
 }
 
@@ -90,22 +84,13 @@ export interface ReactTabsRuntime extends Omit<TabsRuntime, 'getTablistProps' | 
 }
 
 export function useTabsPattern(input: CreateTabsRuntimeInput): ReactTabsRuntime {
-  const onEventRef = useRef(input.onEvent)
-  const onDataChangeRef = useRef(input.onDataChange)
-  onEventRef.current = input.onEvent
-  onDataChangeRef.current = input.onDataChange
-
-  return useMemo(
-    () =>
-      adaptTabsRuntime(
-        createTabsRuntime({
-          data: input.data,
-          options: input.options,
-          onEvent: (event) => onEventRef.current(event),
-          onDataChange: (data, event) => onDataChangeRef.current?.(data, event),
-        }),
-      ),
-    [input.data, input.options],
+  return adaptTabsRuntime(
+    createTabsRuntime({
+      data: input.data,
+      options: input.options,
+      onEvent: input.onEvent,
+      onDataChange: input.onDataChange,
+    }),
   )
 }
 
