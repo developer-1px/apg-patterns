@@ -146,6 +146,24 @@ describe('App route state', () => {
     expect(screen.queryByRole('tablist', { name: 'source files' })).toBeNull()
   })
 
+  it('restores the previous source panel state when the right panel is reopened', async () => {
+    replaceHash('#pattern=accordion&panel=code&source=accordionData.ts')
+
+    render(<App />)
+
+    await waitFor(() => expect(currentHashParam('source')).toBe('accordionData.ts'))
+    expect(screen.getByTitle('accordionData.ts')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'code' }))
+    await waitFor(() => expect(currentHashParam('panel')).toBe('off'))
+    expect(screen.queryByRole('tablist', { name: 'source files' })).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: 'code' }))
+    await waitFor(() => expect(currentHashParam('panel')).toBe('code'))
+    expect(currentHashParam('source')).toBe('accordionData.ts')
+    expect(screen.getByTitle('accordionData.ts')).toBeTruthy()
+  })
+
   it('replaces invalid source deep links with the active pattern default source', async () => {
     replaceHash('#pattern=checkbox&panel=code&source=Missing.tsx')
 
