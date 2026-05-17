@@ -860,10 +860,22 @@ function verifyPreviewSurface(key, label) {
     patternFailures.push(`${label}: missing preview smoke selector`)
     return
   }
-  const preview = document.querySelector(`[data-demo-preview="${key}"]`)
+  const previews = Array.from(document.querySelectorAll('[data-demo-preview]'))
+  const matchingPreviews = previews.filter((preview) => preview.getAttribute('data-demo-preview') === key)
+  const preview = matchingPreviews[0]
   if (!preview) {
     patternFailures.push(`${label}: missing preview container`)
     return
+  }
+  if (matchingPreviews.length > 1) {
+    patternFailures.push(`${label}: rendered duplicate preview containers`)
+  }
+  if (previews.length !== 1) {
+    const renderedKeys = previews.map((renderedPreview) => renderedPreview.getAttribute('data-demo-preview') ?? 'unknown')
+    patternFailures.push(`${label}: stale preview containers rendered: ${renderedKeys.join(', ')}`)
+  }
+  if (!preview.firstElementChild) {
+    patternFailures.push(`${label}: preview container rendered empty`)
   }
   if (!preview.querySelector(selector)) {
     patternFailures.push(`${label}: preview did not render expected surface: ${selector}`)
