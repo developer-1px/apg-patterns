@@ -10,6 +10,7 @@ import disclosureRuntimeSource from '../../src/patterns/disclosure/runtime.ts?ra
 import checkboxDefinitionSource from '../../src/patterns/checkbox/definition.ts?raw'
 import radioDefinitionSource from '../../src/patterns/radio/definition.ts?raw'
 import menuDefinitionSource from '../../src/patterns/menu/definition.ts?raw'
+import comboboxDefinitionSource from '../../src/patterns/combobox/definition.ts?raw'
 import patternKernelSource from '../../src/patternKernel.ts?raw'
 import patternReducerSource from '../../src/patternReducer.ts?raw'
 import patternRuntimeSource from '../../src/patternRuntime.ts?raw'
@@ -35,6 +36,8 @@ import radioSource from './RadioGroup.tsx?raw'
 import radioDataSource from './radioData.ts?raw'
 import menuSource from './Menu.tsx?raw'
 import menuDataSource from './menuData.ts?raw'
+import comboboxSource from './Combobox.tsx?raw'
+import comboboxDataSource from './comboboxData.ts?raw'
 import demoDataSource from './demoData.ts?raw'
 import focusHookSource from './useTreeDomFocus.ts?raw'
 
@@ -74,6 +77,9 @@ export const sources = {
   'Menu.tsx': menuSource,
   'menuData.ts': menuDataSource,
   'menu/definition.ts': menuDefinitionSource,
+  'Combobox.tsx': comboboxSource,
+  'comboboxData.ts': comboboxDataSource,
+  'combobox/definition.ts': comboboxDefinitionSource,
   'patternRuntime.ts': patternRuntimeSource,
   'patternReducer.ts': patternReducerSource,
   'patternKernel.ts': patternKernelSource,
