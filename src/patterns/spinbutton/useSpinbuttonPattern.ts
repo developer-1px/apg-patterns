@@ -1,7 +1,7 @@
 import type { KeyboardEvent } from 'react'
 import type { KeyInput } from '@interactive-os/keyboard'
 import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
+import type { Key, PatternData, PatternEvent, PatternOptions, PatternValueStepDirection } from '../../schema'
 import type { ReactPatternProps, ReactRenderItemState } from '../../adapters/reactBaseTypes'
 import { spinbuttonDefinition } from './definition'
 
@@ -24,7 +24,7 @@ export interface ReactSpinbuttonRuntime {
   }
   actions: {
     focus(key: Key): void
-    step(key: Key, direction: string): void
+    step(key: Key, direction: PatternValueStepDirection): void
   }
   ids: {
     forKey(key: Key): string
@@ -55,7 +55,7 @@ export function useSpinbuttonPattern(data: PatternData, onEvent: (event: Pattern
     get actions() {
       return {
         focus: (key: Key) => runtime.emit({ type: 'focus', key }),
-        step: (key: Key, direction: string) => {
+        step: (key: Key, direction: PatternValueStepDirection) => {
           runtime.emit({ type: 'focus', key })
           runtime.emit({ type: 'valueStep', key, direction })
         },

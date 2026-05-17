@@ -1,59 +1,28 @@
-import type { HTMLAttributes, KeyboardEvent } from 'react'
-import type { KeyInput } from '@interactive-os/keyboard'
-import { createPatternRuntime, type Key, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
-import { windowsplitterDefinition } from '../../../../src/patterns/windowsplitter/definition'
+import { useWindowSplitterPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
 import { Icon } from '../../shared/Icon'
-
-type Props = HTMLAttributes<HTMLElement>
-const keyToElementId = (key: Key) => `windowsplitter-${key}`
 
 export function WindowSplitter({
   data,
   onEvent,
+  options,
 }: {
   data: PatternData
   onEvent: (event: PatternEvent) => void
+  options?: PatternOptions
 }) {
-  const options = ((data.state as { options?: PatternOptions } | undefined)?.options ?? {}) as PatternOptions
-  const runtime = createPatternRuntime({
-    definition: windowsplitterDefinition,
-    data,
-    options,
-    onEvent,
-    keyToElementId,
-  })
-  const rootKeys = data.relations?.rootKeys ?? []
-  if (rootKeys.length === 0) return null
-  const key = rootKeys[0] as Key
-  const controlled = data.relations?.controlsByKey?.[key]?.[0] ?? 'primary'
-
-  const min = Number(options.min ?? 0)
-  const max = Number(options.max ?? 100)
-  const value = Number(data.state?.valueByKey?.[key] ?? min)
-  const position = max === min ? 0 : ((value - min) / (max - min)) * 100
-
-  const { onKeyDown: _drop, ...props } = runtime.getPartProps('separator', key) as Props
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    onEvent({ type: 'focus', key })
-    const result = runtime.resolveKeyboardBinding(event as unknown as KeyInput, key)
-    if (!result) return
-    if (result.preventDefault) event.preventDefault()
-    for (const ev of result.events) onEvent(ev)
-  }
+  const splitter = useWindowSplitterPattern(data, onEvent, options)
+  if (!splitter.key) return null
 
   return (
     <div className="flex h-32 w-full overflow-hidden rounded border border-zinc-300 dark:border-zinc-700">
       <div
-        id={keyToElementId(controlled)}
+        id={splitter.controlledKey ? splitter.ids.forKey(splitter.controlledKey) : undefined}
         className="bg-zinc-100 dark:bg-zinc-900"
-        style={{ width: `${position}%` }}
+        style={{ width: `${splitter.state.position}%` }}
         data-testid="windowsplitter-primary"
       />
       <div
-        {...props}
-        onKeyDown={handleKeyDown}
-        onFocus={() => onEvent({ type: 'focus', key })}
+        {...splitter.separatorProps}
         className="grid w-4 cursor-col-resize place-items-center bg-zinc-200 text-xs text-zinc-500 outline-none focus:bg-zinc-300 focus:text-zinc-900 dark:bg-zinc-800 dark:text-zinc-400 dark:focus:bg-zinc-700 dark:focus:text-zinc-100"
       >
         <Icon name="grip-vertical" />

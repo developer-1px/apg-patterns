@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { coerceRightMode, formatEvent } from './App'
+import { coerceRightMode, formatEvent, loadSourcePreview } from './App'
 import type { PatternEvent } from '../../../src'
 
 describe('formatEvent', () => {
@@ -25,5 +25,11 @@ describe('coerceRightMode', () => {
   it('treats off and unknown panels as no right panel', () => {
     expect(coerceRightMode('off')).toBeNull()
     expect(coerceRightMode('missing')).toBeNull()
+  })
+})
+
+describe('loadSourcePreview', () => {
+  it('returns a readable missing-source marker instead of throwing', async () => {
+    await expect(loadSourcePreview('__missing__.tsx')).resolves.toBe('missing source: __missing__.tsx')
   })
 })

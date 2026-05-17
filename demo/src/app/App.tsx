@@ -121,13 +121,9 @@ function ActiveDemoWorkspace({
     let cancelled = false
     setCopyState('idle')
     setSource('loading')
-    sourceLoaders[activeSourceName]?.()
-      .then((nextSource) => {
-        if (!cancelled) setSource(nextSource)
-      })
-      .catch(() => {
-        if (!cancelled) setSource('missing source')
-      })
+    loadSourcePreview(activeSourceName).then((nextSource) => {
+      if (!cancelled) setSource(nextSource)
+    })
     return () => {
       cancelled = true
     }
@@ -291,6 +287,17 @@ async function copyText(value: string): Promise<void> {
     await navigator.clipboard?.writeText(value)
   } catch {
     // Clipboard access can be denied in preview browsers; copying should not break the demo.
+  }
+}
+
+export async function loadSourcePreview(sourceName: SourceName): Promise<string> {
+  const loadSource = sourceLoaders[sourceName]
+  if (!loadSource) return `missing source: ${sourceName}`
+
+  try {
+    return await loadSource()
+  } catch {
+    return `missing source: ${sourceName}`
   }
 }
 

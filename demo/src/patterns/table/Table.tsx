@@ -43,7 +43,7 @@ export function Table({
   const bodyRowKeys = rowKeys.slice(1)
 
   return (
-    <table {...rootProps} className="border-collapse text-sm text-zinc-800 dark:text-zinc-300">
+    <table {...rootProps} className="overflow-hidden rounded-xl bg-white/55 text-sm text-zinc-800 shadow-[0_12px_32px_rgba(24,24,27,0.06)] dark:bg-white/[0.04] dark:text-zinc-300 dark:shadow-black/20">
       {headerRowKey ? (
         <thead>
           <TableRow runtime={runtime} data={data} rowKey={headerRowKey} cellKeys={cellsByRow(headerRowKey)} />
@@ -79,7 +79,7 @@ function TableRow({
         const Tag = part === 'columnheader' || part === 'rowheader' ? 'th' : 'td'
         const label = data.items[cellKey]?.label
         return (
-          <Tag key={cellKey} {...cellProps} className="border border-zinc-200 px-3 py-1 text-left dark:border-zinc-800">
+          <Tag key={cellKey} {...cellProps} className="px-3 py-2 text-left first:pl-4 odd:bg-zinc-100/35 dark:odd:bg-white/[0.025]">
             {label}
           </Tag>
         )

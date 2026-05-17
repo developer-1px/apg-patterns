@@ -1,7 +1,7 @@
 import type { KeyboardEvent } from 'react'
 import type { KeyInput } from '@interactive-os/keyboard'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
+import type { Key, PatternData, PatternEvent, PatternOptions, PatternValueStepDirection } from '../../schema'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { windowsplitterDefinition } from './definition'
 
@@ -18,7 +18,7 @@ export interface ReactWindowSplitterRuntime {
   }
   actions: {
     focus(): void
-    step(direction: string): void
+    step(direction: PatternValueStepDirection): void
     collapse(): void
   }
   ids: {
@@ -67,7 +67,7 @@ export function useWindowSplitterPattern(data: PatternData, onEvent: (event: Pat
         focus: () => {
           if (key) runtime.emit({ type: 'focus', key })
         },
-        step: (direction: string) => {
+        step: (direction: PatternValueStepDirection) => {
           if (key) runtime.emit({ type: 'valueStep', key, direction })
         },
         collapse: () => {

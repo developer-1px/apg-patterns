@@ -37,14 +37,14 @@ export function Tabs({
     ? 'grid max-w-2xl gap-4 grid-cols-[140px_minmax(0,1fr)]'
     : 'grid max-w-2xl gap-4'
   const tablistClass = isVertical
-    ? 'flex flex-col gap-1 border-r border-zinc-200 pr-2 dark:border-zinc-800'
-    : 'flex gap-1 bg-white py-1 dark:bg-zinc-950'
+    ? 'flex flex-col gap-1 rounded-xl bg-zinc-100/70 p-1 dark:bg-white/[0.045]'
+    : 'flex gap-1 overflow-x-auto rounded-xl bg-zinc-100/70 p-1 dark:bg-white/[0.045]'
   const tabClass = isVertical
-    ? 'h-8 rounded px-3 text-left text-sm text-zinc-600 outline-none hover:bg-zinc-100 aria-selected:bg-zinc-900 aria-selected:text-white focus:outline focus:outline-2 focus:outline-zinc-400 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:aria-selected:bg-zinc-100 dark:aria-selected:text-zinc-950 dark:focus:outline-zinc-500'
-    : 'h-8 rounded px-3 text-sm text-zinc-600 outline-none hover:bg-zinc-100 aria-selected:bg-zinc-900 aria-selected:text-white focus:outline focus:outline-2 focus:outline-zinc-400 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:aria-selected:bg-zinc-100 dark:aria-selected:text-zinc-950 dark:focus:outline-zinc-500'
+    ? 'h-8 rounded-lg px-3 text-left text-sm font-medium text-zinc-600 outline-none transition hover:bg-white/70 aria-selected:bg-white aria-selected:text-zinc-950 aria-selected:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:text-zinc-400 dark:hover:bg-white/[0.06] dark:aria-selected:bg-zinc-100 dark:aria-selected:text-zinc-950 dark:focus-visible:outline-zinc-500'
+    : 'h-8 shrink-0 rounded-lg px-3 text-sm font-medium text-zinc-600 outline-none transition hover:bg-white/70 aria-selected:bg-white aria-selected:text-zinc-950 aria-selected:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:text-zinc-400 dark:hover:bg-white/[0.06] dark:aria-selected:bg-zinc-100 dark:aria-selected:text-zinc-950 dark:focus-visible:outline-zinc-500'
   const panelClass = scrollable
-    ? 'max-h-48 overflow-auto bg-zinc-50 p-3 text-sm leading-relaxed text-zinc-700 outline-none focus:outline focus:outline-2 focus:outline-zinc-400 dark:bg-zinc-900/70 dark:text-zinc-300 dark:focus:outline-zinc-500'
-    : 'min-h-32 bg-zinc-50 p-3 text-sm leading-relaxed text-zinc-700 outline-none dark:bg-zinc-900/70 dark:text-zinc-300'
+    ? 'max-h-48 overflow-auto rounded-xl bg-zinc-100/70 p-3 text-sm leading-relaxed text-zinc-700 shadow-inner shadow-zinc-200/50 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.045] dark:text-zinc-300 dark:shadow-black/10 dark:focus-visible:outline-zinc-500'
+    : 'min-h-32 rounded-xl bg-zinc-100/70 p-3 text-sm leading-relaxed text-zinc-700 shadow-inner shadow-zinc-200/50 outline-none dark:bg-white/[0.045] dark:text-zinc-300 dark:shadow-black/10'
 
   return (
     <div className="grid gap-3">
@@ -66,7 +66,7 @@ export function Tabs({
                       event.stopPropagation()
                       onEvent({ type: 'close', key })
                     }}
-                    className="ml-1 grid size-5 place-items-center rounded text-xs text-zinc-500 hover:bg-zinc-200 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                    className="ml-1 grid size-5 place-items-center rounded-lg text-xs text-zinc-500 transition hover:bg-white/70 dark:text-zinc-400 dark:hover:bg-white/[0.06]"
                   >
                     <Icon name="x" />
                   </button>

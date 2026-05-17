@@ -35,7 +35,7 @@ export function Feed({ data: initialData = initialFeedData }: FeedProps = {}) {
     <div
       ref={rootRef}
       {...rootProps}
-      className="grid max-w-2xl gap-3 outline-none focus:outline focus:outline-2 focus:outline-zinc-400 dark:focus:outline-zinc-500"
+      className="grid max-w-2xl gap-3 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:focus-visible:outline-zinc-500"
     >
       {feedArticles.map((article) => {
         const itemProps = runtime.getItemProps('article', article.key) as DivProps
@@ -46,7 +46,7 @@ export function Feed({ data: initialData = initialFeedData }: FeedProps = {}) {
             key={article.key}
             {...itemProps}
             data-active={state.active ? '' : undefined}
-            className="rounded border border-zinc-200 bg-white p-3 outline-none focus:outline focus:outline-2 focus:outline-zinc-400 data-active:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-950 dark:focus:outline-zinc-500 dark:data-active:border-zinc-500"
+            className="rounded-xl bg-white/70 p-3 shadow-[0_10px_28px_rgba(24,24,27,0.06)] outline-none transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 data-active:bg-white data-active:shadow-[0_16px_40px_rgba(24,24,27,0.1)] dark:bg-white/[0.045] dark:shadow-black/15 dark:focus-visible:outline-zinc-500 dark:data-active:bg-white/[0.07]"
           >
             <h3 id={titleId} className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
               {article.title}
