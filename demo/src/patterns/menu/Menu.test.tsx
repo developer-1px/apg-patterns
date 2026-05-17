@@ -177,6 +177,30 @@ describe('Menu — actionMenuButton (rovingTabIndex)', () => {
     expect(screen.getByRole('menuitem', { name: 'Action 2' }).getAttribute('tabindex')).toBe('0')
   })
 
+  it('Arrow keys wrap within an open menu', () => {
+    render(<MenuDemo variant="actionMenuButton" />)
+    const trigger = screen.getByRole('button', { name: /Actions/ })
+
+    fireEvent.keyDown(trigger, { key: 'ArrowUp' })
+    expect(screen.getByRole('menuitem', { name: 'Last action' }).getAttribute('tabindex')).toBe('0')
+
+    fireEvent.keyDown(screen.getByRole('menu'), { key: 'ArrowDown' })
+    expect(screen.getByRole('menuitem', { name: 'Action 1' }).getAttribute('tabindex')).toBe('0')
+
+    fireEvent.keyDown(screen.getByRole('menu'), { key: 'ArrowUp' })
+    expect(screen.getByRole('menuitem', { name: 'Last action' }).getAttribute('tabindex')).toBe('0')
+  })
+
+  it('typeahead moves focus to the next matching menu item', () => {
+    render(<MenuDemo variant="actionMenuButton" />)
+    const trigger = screen.getByRole('button', { name: /Actions/ })
+
+    fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+    fireEvent.keyDown(screen.getByRole('menu'), { key: 'l' })
+
+    expect(screen.getByRole('menuitem', { name: 'Last action' }).getAttribute('tabindex')).toBe('0')
+  })
+
   it('hovering a menuitem (focus event) updates active item', () => {
     render(<MenuDemo variant="actionMenuButton" />)
     const trigger = screen.getByRole('button', { name: /Actions/ })
