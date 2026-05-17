@@ -108,28 +108,60 @@ export function usePatternEffects({
       const ctx = { data, activeKey: data.state?.activeKey ?? null, parentByKey: createParentByKey(data), keyToElementId }
       const matches = evaluatePredicate(effect.when ?? { kind: 'always' }, ctx)
       nextMatches[index] = matches
-      if (!matches) continue
-      if (effect.kind === 'focus' && effect.on?.state === 'activeKey') {
-        const activeKey = data.state?.activeKey
-        const reason = data.state?.lastEventReason
-        if (!activeKey || !reason || !effect.on.reasons.some((item) => item === reason)) continue
-        if (effect.scope?.kind === 'focusWithin' && !containsActiveElement(effect.target, data, keyToElementId, definition.rootRole)) continue
-        const target = resolveFocusEffectTarget(effect.target, data, keyToElementId)
-        target?.focus({ preventScroll: effect.preventScroll ?? true })
-        continue
-      }
-      if (previousMatches.current[index] === matches) continue
-      if (effect.kind === 'focus') {
-        const target = resolveFocusEffectTarget(effect.target, data, keyToElementId)
-        target?.focus({ preventScroll: effect.preventScroll })
-      }
-      if (effect.kind === 'restoreFocus') {
-        const target = resolveElementTarget(effect.target, data, keyToElementId)
-        target?.focus({ preventScroll: effect.preventScroll })
-      }
+      if (!shouldRunEffect({ effect, matches, previousMatches: previousMatches.current[index], data, definition, keyToElementId })) continue
+      runEffectPrimitive({ effect, data, keyToElementId })
     }
     previousMatches.current = nextMatches
   }, [data, definition, keyToElementId])
+}
+
+type EffectPrimitiveContext = {
+  effect: NonNullable<PatternDefinition['effects']>[number]
+  data: PatternData
+  keyToElementId: (key: Key) => string
+}
+
+const effectPrimitives = {
+  focus: ({ effect, data, keyToElementId }: EffectPrimitiveContext) => {
+    if (effect.kind !== 'focus') return
+    const target = resolveFocusEffectTarget(effect.target, data, keyToElementId)
+    target?.focus({ preventScroll: effect.preventScroll ?? Boolean(effect.on) })
+  },
+  restoreFocus: ({ effect, data, keyToElementId }: EffectPrimitiveContext) => {
+    if (effect.kind !== 'restoreFocus') return
+    const target = resolveElementTarget(effect.target, data, keyToElementId)
+    target?.focus({ preventScroll: effect.preventScroll })
+  },
+} satisfies Partial<Record<NonNullable<PatternDefinition['effects']>[number]['kind'], (ctx: EffectPrimitiveContext) => void>>
+
+function runEffectPrimitive(ctx: EffectPrimitiveContext) {
+  const primitive = effectPrimitives[ctx.effect.kind as keyof typeof effectPrimitives]
+  primitive?.(ctx)
+}
+
+function shouldRunEffect({
+  effect,
+  matches,
+  previousMatches,
+  data,
+  definition,
+  keyToElementId,
+}: {
+  effect: NonNullable<PatternDefinition['effects']>[number]
+  matches: boolean
+  previousMatches: boolean | undefined
+  data: PatternData
+  definition: PatternDefinition
+  keyToElementId: (key: Key) => string
+}): boolean {
+  if (!matches) return false
+  if (effect.kind === 'focus' && effect.on?.state === 'activeKey') {
+    const activeKey = data.state?.activeKey
+    const reason = data.state?.lastEventReason
+    if (!activeKey || !reason || !effect.on.reasons.some((item) => item === reason)) return false
+    return effect.scope?.kind !== 'focusWithin' || containsActiveElement(effect.target, data, keyToElementId, definition.rootRole)
+  }
+  return previousMatches !== matches
 }
 
 export function handlePatternTrapFocus({
