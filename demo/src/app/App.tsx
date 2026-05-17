@@ -1,11 +1,12 @@
 import { useEffect, useReducer, useRef, useState } from 'react'
-import { z } from 'zod'
-import type { PatternEvent } from '../../../src'
 import { PatternMenu } from './PatternMenu'
-import { defaultPatternKey, defaultSourceName, patternItems, type PatternKey, useDemoPattern } from '../shared/demoPatterns'
+import { useDemoPattern } from '../shared/demoPatterns'
 import { Icon, type IconName } from '../shared/Icon'
-import { sourceLoaders, type SourceName } from '../shared/sources'
+import type { SourceName } from '../shared/sources'
 import { SourceTabs, useSourceTabs } from './SourceTabs'
+import { defaultAppState, readInitialAppState, reduceAppState, rightModeLabels, rightModes, type AppAction, type AppState, writeAppHash } from './appState'
+import { formatEvent } from './eventLog'
+import { isCopyableSource, loadSourcePreview } from './sourcePreview'
 
 const panelClass = 'min-h-0 rounded-xl bg-white/92 p-3 shadow-[0_16px_48px_rgba(24,24,27,0.07)] backdrop-blur dark:bg-zinc-950/90 dark:shadow-[0_18px_54px_rgba(0,0,0,0.34)]'
 const scrollPanelClass = `${panelClass} overflow-auto`
@@ -17,62 +18,12 @@ const sourcePreClass = 'max-h-[44dvh] min-h-0 overflow-auto rounded-xl bg-zinc-9
 const optionButtonClass =
   'inline-flex h-8 items-center rounded-lg px-2.5 text-left text-xs font-medium text-zinc-500 outline-none transition hover:bg-white/70 hover:text-zinc-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 aria-selected:bg-white aria-selected:text-zinc-950 aria-selected:shadow-sm dark:text-zinc-500 dark:hover:bg-white/[0.06] dark:hover:text-zinc-100 dark:focus-visible:outline-zinc-500 dark:aria-selected:bg-zinc-100 dark:aria-selected:text-zinc-950'
 const keycapClass = 'inline-flex min-h-6 items-center gap-1 rounded-md bg-gradient-to-b from-white to-zinc-100 px-1.5 py-0.5 font-mono text-[11px] font-medium text-zinc-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(39,39,42,0.12),0_1px_1px_rgba(39,39,42,0.14)] dark:from-zinc-800 dark:to-zinc-900 dark:text-zinc-300 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.09),inset_0_-1px_0_rgba(0,0,0,0.55),0_1px_1px_rgba(0,0,0,0.45)]'
-const rightModes = ['source', 'inspect', 'log'] as const
-const rightModeLabels: Record<(typeof rightModes)[number], string> = {
-  source: 'code',
-  inspect: 'state',
-  log: 'events',
-}
-const rightModesByLabel = {
-  code: 'source',
-  aria: 'inspect',
-  state: 'inspect',
-  events: 'log',
-} as const satisfies Record<string, (typeof rightModes)[number]>
-
-const AppStateSchema = z.object({
-  patternKey: z.string(),
-  events: z.array(z.custom<PatternEvent>()),
-  sourceName: z.string(),
-  rightMode: z.enum(rightModes),
-  rightPanelOpen: z.boolean(),
-}).strict()
-
-type AppState = z.infer<typeof AppStateSchema>
-
-type AppAction =
-  | { type: 'selectPattern'; patternKey: PatternKey }
-  | { type: 'recordEvent'; event: PatternEvent }
-  | { type: 'clearEvents' }
-  | { type: 'selectSource'; sourceName: SourceName }
-  | { type: 'selectRightMode'; rightMode: AppState['rightMode'] }
-  | { type: 'toggleRightPanel' }
-  | { type: 'restoreState'; state: AppState }
-
 type SourcePreviewState = {
   name: SourceName
   text: string
 }
 
 const sourcePreviewCache = new Map<SourceName, string>()
-
-const defaultAppState = AppStateSchema.parse({
-  patternKey: defaultPatternKey,
-  events: [],
-  sourceName: defaultSourceName,
-  rightMode: 'source',
-  rightPanelOpen: true,
-})
-
-const reduceAppState = (state: AppState, action: AppAction): AppState => {
-  if (action.type === 'selectPattern') return AppStateSchema.parse({ ...state, patternKey: action.patternKey, events: [], sourceName: '' })
-  if (action.type === 'recordEvent') return AppStateSchema.parse({ ...state, events: [action.event, ...state.events].slice(0, 12) })
-  if (action.type === 'clearEvents') return AppStateSchema.parse({ ...state, events: [] })
-  if (action.type === 'selectSource') return AppStateSchema.parse({ ...state, sourceName: action.sourceName })
-  if (action.type === 'selectRightMode') return AppStateSchema.parse({ ...state, rightMode: action.rightMode, rightPanelOpen: true })
-  if (action.type === 'restoreState') return AppStateSchema.parse(action.state)
-  return AppStateSchema.parse({ ...state, rightPanelOpen: !state.rightPanelOpen })
-}
 
 export function App() {
   const [state, dispatch] = useReducer(reduceAppState, defaultAppState, readInitialAppState)
@@ -283,42 +234,6 @@ function ShortcutIndicator({ shortcut }: { shortcut: string }) {
   )
 }
 
-function readInitialAppState(fallback: AppState): AppState {
-  if (typeof window === 'undefined') return fallback
-  const params = new URLSearchParams(window.location.hash.replace(/^#/, ''))
-  const patternKey = coercePatternKey(params.get('pattern')) ?? fallback.patternKey
-  const rightMode = coerceRightMode(params.get('panel')) ?? fallback.rightMode
-  const sourceName = params.get('source') || fallback.sourceName
-  const rightPanelOpen = params.get('panel') === 'off' ? false : fallback.rightPanelOpen
-  return AppStateSchema.parse({ ...fallback, patternKey, sourceName, rightMode, rightPanelOpen })
-}
-
-function writeAppHash({
-  patternKey,
-  sourceName,
-  rightMode,
-  rightPanelOpen,
-}: Pick<AppState, 'patternKey' | 'sourceName' | 'rightMode' | 'rightPanelOpen'>) {
-  if (typeof window === 'undefined') return
-  const params = new URLSearchParams()
-  params.set('pattern', patternKey)
-  params.set('panel', rightPanelOpen ? rightModeLabels[rightMode] : 'off')
-  params.set('source', sourceName)
-  const nextHash = `#${params.toString()}`
-  if (window.location.hash !== nextHash) window.history.replaceState(null, '', nextHash)
-}
-
-function coercePatternKey(value: string | null): PatternKey | null {
-  if (!value) return null
-  return patternItems.some((item) => item.key === value) ? value : null
-}
-
-export function coerceRightMode(value: string | null): AppState['rightMode'] | null {
-  if (!value || value === 'off') return null
-  if (value in rightModesByLabel) return rightModesByLabel[value as keyof typeof rightModesByLabel]
-  return rightModes.includes(value as AppState['rightMode']) ? value as AppState['rightMode'] : null
-}
-
 async function copyText(value: string): Promise<boolean> {
   try {
     await navigator.clipboard?.writeText(value)
@@ -327,38 +242,4 @@ async function copyText(value: string): Promise<boolean> {
     // Clipboard access can be denied in preview browsers; copying should not break the demo.
     return false
   }
-}
-
-type SourceLoaderMap = Readonly<Record<string, (() => Promise<string>) | undefined>>
-
-export async function loadSourcePreview(sourceName: SourceName, loaders: SourceLoaderMap = sourceLoaders): Promise<string> {
-  const loadSource = loaders[sourceName]
-  if (!loadSource) return `missing source: ${sourceName}`
-
-  try {
-    return await loadSource()
-  } catch {
-    return `failed source: ${sourceName}`
-  }
-}
-
-export function isCopyableSource(source: string): boolean {
-  return source.length > 0 && source !== 'loading' && !isSourceLoadFailure(source)
-}
-
-export function isSourceLoadFailure(source: string): boolean {
-  return source.startsWith('missing source:') || source.startsWith('failed source:')
-}
-
-export function formatEvent(event: PatternEvent): string {
-  const fields = Object.entries(event)
-    .filter(([key, value]) => key !== 'type' && key !== 'meta' && value !== undefined && value !== null)
-    .map(([key, value]) => `${key}=${formatEventValue(value)}`)
-  const reason = event.meta?.reason ? ` via ${event.meta.reason}` : ''
-  return fields.length > 0 ? `${event.type} ${fields.join(' ')}${reason}` : `${event.type}${reason}`
-}
-
-function formatEventValue(value: unknown): string {
-  if (Array.isArray(value)) return `[${value.join(',')}]`
-  return String(value)
 }
