@@ -148,6 +148,8 @@ async function runSmoke() {
     }
 
     const sourceNames = sourceTabNames()
+    const duplicateSourceNames = duplicates(sourceNames)
+    if (duplicateSourceNames.length > 0) patternFailures.push(`${label}: duplicate source tabs: ${duplicateSourceNames.join(', ')}`)
     const firstSourceName = sourceNames[0]
     const renderedSourceByName = new Map()
     for (const sourceName of sourceNames) {
@@ -718,6 +720,16 @@ function verifyPreviewSurfaceRegistry(patternKeys) {
   for (const key of selectorKeys) {
     if (!patternKeySet.has(key)) patternFailures.push(`${key}: stale preview smoke selector`)
   }
+}
+
+function duplicates(values) {
+  const seen = new Set()
+  const duplicateValues = new Set()
+  for (const value of values) {
+    if (seen.has(value)) duplicateValues.add(value)
+    seen.add(value)
+  }
+  return [...duplicateValues]
 }
 
 async function verifyDistIndexAssets() {
