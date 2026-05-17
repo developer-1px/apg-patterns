@@ -161,6 +161,7 @@ async function runSmoke() {
     const duplicateSourceNames = duplicates(sourceNames)
     if (duplicateSourceNames.length > 0) patternFailures.push(`${label}: duplicate source tabs: ${duplicateSourceNames.join(', ')}`)
     const firstSourceName = sourceNames[0]
+    const entrySourceName = sourceNames.find((sourceName) => sourceName === expectedEntrySourceName(key))
     const renderedSourceByName = new Map()
     for (const sourceName of sourceNames) {
       const tab = findSourceTab(sourceName)
@@ -198,6 +199,7 @@ async function runSmoke() {
     }
 
     if (firstSourceName) await verifyPatternPanelRoutes({ key, label, sourceName: firstSourceName })
+    if (entrySourceName) await verifyPatternPanelRoutes({ key, label, sourceName: entrySourceName })
   }
 
   await verifyHashRoute('#pattern=accordion&panel=aria&source=Accordion.tsx', (text) =>
@@ -808,6 +810,10 @@ function sourceIdentityNeedles(sourceName, patternKey) {
   if (sourceName === 'treeVariants.ts') return ['treeVariants']
 
   return [patternKey]
+}
+
+function expectedEntrySourceName(patternKey) {
+  return `${patternKey === 'menuAndMenubar' ? 'menu' : patternKey}/entry.tsx`
 }
 
 function findSourceTab(sourceName) {

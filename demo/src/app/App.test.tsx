@@ -222,6 +222,23 @@ describe('App route state', () => {
     }
   })
 
+  it('opens every pattern entry source from its deep link', async () => {
+    const routes = collectPatternEntrySourceRoutes()
+
+    for (const route of routes) {
+      replaceHash(routeHash(route))
+      const { unmount } = render(<App />)
+
+      expect(screen.getByRole('heading', { name: route.label })).toBeTruthy()
+      await waitFor(() => expect(currentHashParam('pattern')).toBe(route.key))
+      expect(currentHashParam('source')).toBe(route.sourceName)
+      expect(screen.getByTitle(route.sourceName)).toBeTruthy()
+      await expectActiveSourceText(route.sourceName)
+
+      unmount()
+    }
+  })
+
   it('keeps generated source tab ids and panel links unique for each pattern', async () => {
     const routes = collectPatternRoutes()
 
@@ -705,6 +722,14 @@ function collectPatternRoutes() {
   render(<PatternRouteProbe onRoute={(route) => routes.push(route)} />).unmount()
 
   return routes
+}
+
+function collectPatternEntrySourceRoutes() {
+  return patternEntries.map((entry) => ({
+    key: entry.key,
+    label: entry.label,
+    sourceName: expectedEntrySource(entry.key),
+  }))
 }
 
 function PatternRouteProbe({
