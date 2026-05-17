@@ -30,7 +30,7 @@ export function Combobox({
                 key={option.key}
                 {...option.optionProps}
                 data-active={option.state.active ? '' : undefined}
-                className="cursor-pointer rounded-lg px-2.5 py-1.5 text-sm text-zinc-800 outline-none transition aria-selected:bg-zinc-100 aria-selected:text-zinc-950 data-active:bg-zinc-100/70 dark:text-zinc-200 dark:aria-selected:bg-white/[0.08] dark:aria-selected:text-zinc-50 dark:data-active:bg-white/[0.06]"
+                className="cursor-pointer rounded-md px-2.5 py-1.5 text-sm text-zinc-800 outline-none transition aria-selected:font-medium aria-selected:ring-1 aria-selected:ring-inset aria-selected:ring-zinc-300 data-active:bg-zinc-900 data-active:text-white data-active:shadow-sm dark:text-zinc-200 dark:aria-selected:ring-white/20 dark:data-active:bg-zinc-100 dark:data-active:text-zinc-950"
               >
                 {option.label}
               </div>
