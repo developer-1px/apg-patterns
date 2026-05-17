@@ -128,7 +128,7 @@ function ThumbSlider({
       {...props}
       onKeyDown={handleKeyDown}
       onFocus={() => onEvent({ type: 'focus', key: thumbKey })}
-      className="grid gap-2 outline-none focus:outline focus:outline-2 focus:outline-zinc-400 dark:focus:outline-zinc-500"
+      className="grid gap-2 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:focus-visible:outline-zinc-500"
     >
       <div className="flex items-center justify-between text-sm text-zinc-800 dark:text-zinc-200">
         <span>{item?.label}</span>
@@ -137,7 +137,7 @@ function ThumbSlider({
       {isVertical ? (
         <div
           data-testid={`slider-track-${thumbKey}`}
-          className="relative h-32 w-2 rounded bg-zinc-100 dark:bg-zinc-900"
+          className="relative h-32 w-2 rounded-full bg-zinc-100/80 shadow-inner shadow-zinc-200/60 dark:bg-white/[0.06] dark:shadow-black/10"
           onPointerDown={(event) => {
             event.currentTarget.setPointerCapture?.(event.pointerId)
             event.currentTarget.parentElement?.focus({ preventScroll: true })
@@ -148,16 +148,16 @@ function ThumbSlider({
             updateFromPointer(event)
           }}
         >
-          <div className="absolute inset-x-0 bottom-0 rounded bg-zinc-900 dark:bg-zinc-100" style={{ height: `${position}%` }} />
+          <div className="absolute inset-x-0 bottom-0 rounded-full bg-zinc-900 dark:bg-zinc-100" style={{ height: `${position}%` }} />
           <div
-            className={`absolute left-1/2 size-4 -translate-x-1/2 translate-y-1/2 rounded-full border border-zinc-900 bg-white dark:border-zinc-100 dark:bg-zinc-950 ${thumbColorClass[String(thumbKey)] ?? ''}`}
+            className={`absolute left-1/2 size-4 -translate-x-1/2 translate-y-1/2 rounded-full bg-white shadow-[0_4px_14px_rgba(24,24,27,0.24)] ring-1 ring-black/10 dark:bg-zinc-100 dark:ring-white/10 ${thumbColorClass[String(thumbKey)] ?? ''}`}
             style={{ bottom: `${position}%` }}
           />
         </div>
       ) : (
         <div
           data-testid={`slider-track-${thumbKey}`}
-          className="relative h-2 rounded bg-zinc-100 dark:bg-zinc-900"
+          className="relative h-2 rounded-full bg-zinc-100/80 shadow-inner shadow-zinc-200/60 dark:bg-white/[0.06] dark:shadow-black/10"
           onPointerDown={(event) => {
             event.currentTarget.setPointerCapture?.(event.pointerId)
             event.currentTarget.parentElement?.focus({ preventScroll: true })
@@ -168,9 +168,9 @@ function ThumbSlider({
             updateFromPointer(event)
           }}
         >
-          <div className={`absolute inset-y-0 left-0 rounded ${thumbColorClass[String(thumbKey)] ?? 'bg-zinc-900 dark:bg-zinc-100'}`} style={{ width: `${position}%` }} />
+          <div className={`absolute inset-y-0 left-0 rounded-full ${thumbColorClass[String(thumbKey)] ?? 'bg-zinc-900 dark:bg-zinc-100'}`} style={{ width: `${position}%` }} />
           <div
-            className="absolute top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border border-zinc-900 bg-white dark:border-zinc-100 dark:bg-zinc-950"
+            className="absolute top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_4px_14px_rgba(24,24,27,0.24)] ring-1 ring-black/10 dark:bg-zinc-100 dark:ring-white/10"
             style={{ left: `${position}%` }}
           />
         </div>

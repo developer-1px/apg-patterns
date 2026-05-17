@@ -34,9 +34,9 @@ export function MultiThumbSlider({
         <span>Price range</span>
         <span>${minValue} - ${maxValue}</span>
       </div>
-      <div className="relative h-2 rounded bg-zinc-100 dark:bg-zinc-900">
+      <div className="relative h-2 rounded-full bg-zinc-100/80 shadow-inner shadow-zinc-200/60 dark:bg-white/[0.06] dark:shadow-black/10">
         <div
-          className="absolute inset-y-0 rounded bg-zinc-900 dark:bg-zinc-100"
+          className="absolute inset-y-0 rounded-full bg-zinc-900 dark:bg-zinc-100"
           style={{ left: `${minPos}%`, width: `${Math.max(0, maxPos - minPos)}%` }}
         />
         <MultiThumbSliderThumb data={data} thumbKey={minKey} value={minValue} position={minPos} runtime={runtime} onEvent={onEvent} getThumbKeyDownHandler={getThumbKeyDownHandler} />
@@ -75,7 +75,7 @@ function MultiThumbSliderThumb({
       onFocus={() => onEvent({ type: 'focus', key: thumbKey })}
       aria-valuenow={value}
       style={{ left: `${position}%` }}
-      className="absolute top-1/2 size-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-zinc-900 bg-white outline-none focus:outline focus:outline-2 focus:outline-zinc-400 dark:border-zinc-100 dark:bg-zinc-950"
+      className="absolute top-1/2 size-5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_4px_14px_rgba(24,24,27,0.24)] ring-1 ring-black/10 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-zinc-100 dark:ring-white/10 dark:focus-visible:outline-zinc-500"
     >
       <span className="sr-only">{(data.items[thumbKey] as { label?: string } | undefined)?.label}</span>
     </button>

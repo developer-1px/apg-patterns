@@ -2,7 +2,7 @@ import { useCheckboxPattern, type PatternData, type PatternEvent } from '../../.
 import { Icon } from '../../shared/Icon'
 
 const itemClass =
-  'inline-flex h-8 max-w-sm items-center gap-2 rounded px-2 text-sm text-zinc-800 outline-none hover:bg-zinc-100 focus:outline focus:outline-2 focus:outline-zinc-400 dark:text-zinc-200 dark:hover:bg-zinc-900 dark:focus:outline-zinc-500'
+  'inline-flex h-8 max-w-sm items-center gap-2 rounded-lg px-2 text-sm text-zinc-800 outline-none transition hover:bg-white/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:text-zinc-200 dark:hover:bg-white/[0.06] dark:focus-visible:outline-zinc-500'
 
 export function Checkbox({
   data,
@@ -25,7 +25,7 @@ export function Checkbox({
       >
         <span
           aria-hidden="true"
-          className="grid size-4 place-items-center rounded border border-zinc-400 text-xs text-zinc-900 dark:border-zinc-600 dark:text-zinc-100"
+          className="grid size-4 place-items-center rounded bg-white text-xs text-zinc-900 shadow-sm ring-1 ring-black/10 dark:bg-white/[0.06] dark:text-zinc-100 dark:ring-white/10"
         >
           {checked === 'mixed' ? <Icon name="minus" /> : null}
           {checked === true ? <Icon name="x" /> : null}
