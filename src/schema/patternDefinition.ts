@@ -18,7 +18,8 @@ export const AriaAttributeSchema = z.enum([
   'aria-controls', 'aria-current', 'aria-describedby', 'aria-disabled', 'aria-expanded',
   'aria-haspopup', 'aria-hidden', 'aria-label', 'aria-labelledby', 'aria-level', 'aria-modal',
   'aria-multiselectable', 'aria-orientation', 'aria-posinset', 'aria-pressed', 'aria-readonly',
-  'aria-roledescription', 'aria-rowcount', 'aria-rowindex', 'aria-selected', 'aria-setsize',
+  'aria-roledescription', 'aria-rowcount', 'aria-rowindex', 'aria-rowspan',
+  'aria-colspan', 'aria-owns', 'aria-selected', 'aria-setsize',
   'aria-sort', 'aria-valuemax', 'aria-valuemin', 'aria-valuenow', 'aria-valuetext',
   'href',
 ])

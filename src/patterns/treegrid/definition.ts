@@ -35,6 +35,7 @@ export const treegridDefinition = PatternDefinitionSchema.parse({
         { attribute: 'aria-rowcount', from: 'state.rowCount' },
         { attribute: 'aria-colcount', from: 'state.colCount' },
         { attribute: 'aria-multiselectable', from: 'options.selectionMode.multiple' },
+        { attribute: 'aria-readonly', from: 'state.readonly' },
       ],
     },
     row: {
@@ -56,6 +57,7 @@ export const treegridDefinition = PatternDefinitionSchema.parse({
         { attribute: 'aria-rowindex', from: 'state.rowIndexByKey' },
         { attribute: 'aria-colindex', from: 'state.columnIndexByKey' },
         { attribute: 'aria-selected', from: 'state.selectedKeys' },
+        { attribute: 'aria-readonly', from: 'state.readonly' },
       ],
       focus: cellFocus,
       events: cellEvents,
@@ -78,6 +80,21 @@ export const treegridDefinition = PatternDefinitionSchema.parse({
         { event: 'click', events: [{ type: 'activate', key: '$key' }] },
       ],
       state: [{ name: 'active', from: 'state.activeKey' }],
+    },
+    rowheader: {
+      role: 'rowheader',
+      aria: [
+        { attribute: 'aria-rowindex', from: 'state.rowIndexByKey' },
+        { attribute: 'aria-colindex', from: 'state.columnIndexByKey' },
+        { attribute: 'aria-selected', from: 'state.selectedKeys' },
+      ],
+      focus: cellFocus,
+      events: cellEvents,
+      state: [
+        { name: 'active', from: 'state.activeKey' },
+        { name: 'selected', from: 'state.selectedKeys' },
+        { name: 'disabled', from: 'state.disabledKeys' },
+      ],
     },
   },
   navigation: {
