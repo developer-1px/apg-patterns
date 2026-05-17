@@ -280,7 +280,7 @@ async function verifyHashRoute(hash, predicate, failure) {
   try {
     await waitFor(() => predicate(rootText()))
   } catch {
-    patternFailures.push(`${failure}: expected ${hash}, current ${window.location.hash}, text=${rootText().slice(0, 180)}`)
+    patternFailures.push(`${failure}: expected ${hash}, current ${window.location.hash}, ${describeRouteState()}, text=${rootText().slice(0, 180)}`)
   }
 }
 
@@ -706,6 +706,27 @@ function sourcePanelIsLabelledBy(tab) {
     && Boolean(panel)
     && tab.getAttribute('aria-controls') === panel.id
     && panel.getAttribute('aria-labelledby') === tab.id
+}
+
+function describeRouteState() {
+  const selectedRightTab = selectedTabName('[role="tablist"][aria-label="right panel"]')
+  const selectedSourceTab = selectedTabName('[role="tablist"][aria-label="source files"]')
+  const sourcePanel = sourcePanelElement()
+  return [
+    `pattern=${currentHashParam('pattern') ?? 'none'}`,
+    `panel=${currentHashParam('panel') ?? 'none'}`,
+    `source=${currentHashParam('source') ?? 'none'}`,
+    `rightTab=${selectedRightTab ?? 'none'}`,
+    `sourceTab=${selectedSourceTab ?? 'none'}`,
+    `sourcePanel=${sourcePanel ? `${sourcePanel.id}/${sourcePanel.getAttribute('aria-labelledby') ?? 'unlabelled'}` : 'none'}`,
+  ].join(', ')
+}
+
+function selectedTabName(tablistSelector) {
+  return Array.from(document.querySelectorAll(`${tablistSelector} [role="tab"]`))
+    .find((tab) => tab.getAttribute('aria-selected') === 'true')
+    ?.textContent
+    ?.trim()
 }
 
 function activePreText() {
