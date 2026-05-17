@@ -136,7 +136,7 @@ function ActiveDemoWorkspace({
             </button>
             <button
               type="button"
-              className={buttonClass}
+              className={`${buttonClass} aria-pressed:bg-zinc-900 aria-pressed:text-white dark:aria-pressed:bg-zinc-100 dark:aria-pressed:text-zinc-950`}
               aria-pressed={state.rightPanelOpen}
               onClick={() => dispatch({ type: 'toggleRightPanel' })}
               title={state.rightPanelOpen ? 'Hide source panel' : 'Show source panel'}
