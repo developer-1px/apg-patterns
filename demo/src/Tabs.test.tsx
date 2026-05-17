@@ -5,7 +5,7 @@ import { reduceTabsData, type PatternData, type PatternEvent } from '../../src'
 import { Tabs } from './Tabs'
 import { closeTabInData, tabsVariants, type TabsVariantKey } from './tabsData'
 
-function TabsDemo({ variant }: { variant: TabsVariantKey }) {
+function TabsDemo({ variant, onEvent: onEventOuter }: { variant: TabsVariantKey; onEvent?: (e: PatternEvent) => void }) {
   const spec = tabsVariants[variant]
   const [data, setData] = useState<PatternData>(spec.data)
   const handleDataChange = (nextData: PatternData, event: PatternEvent) => {
@@ -17,6 +17,7 @@ function TabsDemo({ variant }: { variant: TabsVariantKey }) {
     setData(nextData)
   }
   const handleEvent = (event: PatternEvent) => {
+    onEventOuter?.(event)
     if (event.type === 'extension' && event.name === 'closeTab' && event.key) {
       setData((current) => closeTabInData(current, event.key as string))
     }
@@ -123,7 +124,13 @@ describe('Tabs demo — closeable', () => {
     const initialCount = tabsBefore.length
     const firstLabel = tabsBefore[0].textContent
     const tablist = screen.getByRole('tablist')
-    expect.fail(`tablist onKeyDown? attrs=${tablist.outerHTML.slice(0, 300)}`)
+    try {
+      fireEvent.keyDown(tablist, { key: 'Delete', code: 'Delete' })
+    } catch (e) {
+      expect.fail(`threw: ${(e as Error).message}`)
+    }
+    const tabsAfter = screen.getAllByRole('tab')
+    expect.fail(`labels: ${tabsAfter.map(t => t.textContent).join('|')}`)
     expect(tabsAfter[0].textContent).not.toBe(firstLabel)
     // one tab is selected (adjacent neighbor activated)
     const selected = tabsAfter.filter((t) => t.getAttribute('aria-selected') === 'true')

@@ -41,7 +41,7 @@ function useMenuDemoPattern(onEvent: EmitPatternEvent): DemoPattern {
         ))}
       </div>
     ),
-    preview: <Menu key={variant} data={data} apgPattern={apgPattern} focusStrategy={focusStrategy} onEvent={(event) => {
+    preview: <Menu key={variant} data={data} flavor={apgPattern} focusStrategy={focusStrategy} onEvent={(event) => {
       onEvent(event)
       setData((current) => reducePatternData(definition, current, event))
     }} />,
