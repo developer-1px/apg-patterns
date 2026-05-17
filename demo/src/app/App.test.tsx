@@ -231,10 +231,14 @@ describe('App route state', () => {
       const sourceTabs = screen.getAllByRole('tab').filter((tab) => tab.closest('[aria-label="source files"]'))
       const tabIds = sourceTabs.map((tab) => tab.id)
       const controlledPanelIds = sourceTabs.map((tab) => tab.getAttribute('aria-controls') ?? '')
+      const selectedSourceTab = sourceTabs.find((tab) => tab.getAttribute('aria-selected') === 'true')
+      const sourcePanel = getSourcePanel()
 
       expect(duplicates(tabIds)).toEqual([])
       expect(duplicates(controlledPanelIds)).toEqual([])
       expect(controlledPanelIds.every((id) => id.startsWith('tab-source-panel-'))).toBe(true)
+      expect(selectedSourceTab?.getAttribute('aria-controls')).toBe(sourcePanel.id)
+      expect(sourcePanel.getAttribute('aria-labelledby')).toBe(selectedSourceTab?.id)
 
       unmount()
     }
