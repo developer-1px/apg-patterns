@@ -24,7 +24,7 @@ export const entry: PatternEntry = {
       key: 'link',
       label: 'Link',
       keyboardShortcuts: ['Enter'],
-      sourceNames: ['Link.tsx', 'useLinkPattern.ts', 'linkData.ts', 'link/definition.ts', ...KERNEL_SOURCES],
+      sourceNames: ['Link.tsx', 'link/useLinkPattern.ts', 'linkData.ts', 'link/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
       variants: <VariantListbox orientation="horizontal" value={host.variant} items={items} label="link variants" idPrefix="link-variant" onChange={host.selectVariant} />,
       preview: <Link data={host.data} onEvent={onEvent} />,

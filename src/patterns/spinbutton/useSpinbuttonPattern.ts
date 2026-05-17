@@ -33,12 +33,13 @@ export interface ReactSpinbuttonRuntime {
 }
 
 export function useSpinbuttonPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactSpinbuttonRuntime {
+  const runtimeOptions = options ?? (((data.state as { options?: PatternOptions } | undefined)?.options ?? {}) as PatternOptions)
   const runtime = createPatternRuntime({
     definition: spinbuttonDefinition,
     data,
-    options: options ?? {},
+    options: runtimeOptions,
     onEvent,
-    keyToElementId: (key) => `${options?.elementIdPrefix ?? 'spinbutton-'}${key}`,
+    keyToElementId: (key) => `${runtimeOptions.elementIdPrefix ?? 'spinbutton-'}${key}`,
   })
 
   return {
@@ -72,8 +73,9 @@ function createSpinbuttonRenderItem(runtime: PatternRuntime, key: Key): ReactSpi
   const { onKeyDown: _onKeyDown, ...props } = runtime.getPartProps('spinbutton', key) as ReactPatternProps
   const state = runtime.getItemState(key, 'spinbutton')
   const label = runtime.data.items[key]?.label ?? key
-  const min = Number(runtime.options.min ?? 0)
-  const max = Number(runtime.options.max ?? 100)
+  const itemRange = runtime.data.items[key] as { valuemin?: number; valuemax?: number } | undefined
+  const min = Number(itemRange?.valuemin ?? runtime.options.min ?? 0)
+  const max = Number(itemRange?.valuemax ?? runtime.options.max ?? 100)
   return {
     key,
     label,

@@ -40,20 +40,20 @@ function SpinField({
         <div className="flex items-center gap-1">
           <button
             {...item.decrementButtonProps}
-            className="grid size-6 place-items-center rounded border border-zinc-300 text-xs text-zinc-600 dark:border-zinc-700 dark:text-zinc-300"
+            className="grid size-7 place-items-center rounded-lg bg-zinc-100/80 text-xs text-zinc-600 shadow-sm outline-none transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.06] dark:text-zinc-300 dark:hover:bg-white/[0.08] dark:focus-visible:outline-zinc-500"
           >
             <Icon name="minus" />
           </button>
           <div
             {...item.spinbuttonProps}
             data-testid={`spinbutton-${item.key}`}
-            className="min-w-[2.5rem] rounded border border-zinc-300 px-2 py-1 text-center outline-none focus:outline focus:outline-2 focus:outline-zinc-400 dark:border-zinc-700 dark:focus:outline-zinc-500"
+            className="min-w-[2.75rem] rounded-lg bg-white/75 px-2.5 py-1 text-center shadow-sm outline-none ring-1 ring-black/[0.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.06] dark:ring-white/[0.04] dark:focus-visible:outline-zinc-500"
           >
             {item.value}
           </div>
           <button
             {...item.incrementButtonProps}
-            className="grid size-6 place-items-center rounded border border-zinc-300 text-xs text-zinc-600 dark:border-zinc-700 dark:text-zinc-300"
+            className="grid size-7 place-items-center rounded-lg bg-zinc-100/80 text-xs text-zinc-600 shadow-sm outline-none transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.06] dark:text-zinc-300 dark:hover:bg-white/[0.08] dark:focus-visible:outline-zinc-500"
           >
             <Icon name="plus" />
           </button>

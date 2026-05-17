@@ -37,16 +37,25 @@ export function Menubar({ data, onEvent }: MenuProps) {
 function RootMenuItem({ itemKey, data, runtime, expanded, onEvent }: { itemKey: string; data: PatternData; runtime: ReturnType<typeof createPatternRuntime>; expanded: boolean; onEvent: (event: PatternEvent) => void }) {
   const itemProps = runtime.getPartProps('menuitem', itemKey) as Props
   const children = data.relations?.childrenByKey?.[itemKey] ?? []
+  const rootKeys = data.relations?.rootKeys ?? []
   return (
     <button
       type="button"
       id={`menubar-${itemKey}`}
       {...itemProps}
       onKeyDown={(event) => {
-        if (event.key === 'ArrowUp' && children.length > 0) {
+        if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
           event.preventDefault()
+          event.stopPropagation()
+          const target = siblingKey(rootKeys, itemKey, event.key === 'ArrowRight' ? 'next' : 'previous')
+          if (target) onEvent({ type: 'focus', key: target, meta: { reason: 'keyboard' } })
+          return
+        }
+        if ((event.key === 'ArrowDown' || event.key === 'ArrowUp') && children.length > 0) {
+          event.preventDefault()
+          event.stopPropagation()
           onEvent({ type: 'expand', key: itemKey, expanded: true })
-          onEvent({ type: 'focus', key: children[children.length - 1]!, meta: { reason: 'keyboard' } })
+          onEvent({ type: 'focus', key: event.key === 'ArrowDown' ? children[0]! : children[children.length - 1]!, meta: { reason: 'keyboard' } })
           return
         }
         ;(itemProps.onKeyDown as ((event: ReactKeyboardEvent) => void) | undefined)?.(event)
@@ -74,13 +83,13 @@ function Submenu({ data, ownerKey, rootKeys, onEvent }: { data: PatternData; own
   const openSibling = (direction: 'next' | 'previous') => {
     const target = siblingKey(rootKeys, ownerKey, direction)
     if (!target) return
-    close()
     onEvent({ type: 'focus', key: target, meta: { reason: 'keyboard' } })
     const targetChildren = data.relations?.childrenByKey?.[target] ?? []
     if (targetChildren.length > 0) {
       onEvent({ type: 'expand', key: target, expanded: true })
       focusChild(targetChildren[0])
     }
+    close()
   }
   return (
     <ul role="menu" aria-labelledby={`menubar-${ownerKey}`} className="ml-2 grid w-56 gap-0.5 rounded border border-zinc-200 bg-white p-1 text-sm shadow dark:border-zinc-800 dark:bg-zinc-950" onKeyDown={(event) => {

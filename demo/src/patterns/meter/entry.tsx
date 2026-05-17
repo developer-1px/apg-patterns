@@ -19,7 +19,7 @@ export const entry: PatternEntry = {
       key: 'meter',
       label: 'Meter',
       keyboardShortcuts: [],
-      sourceNames: ['Meter.tsx', 'useMeterPattern.ts', 'meterData.ts', 'meter/definition.ts', ...KERNEL_SOURCES],
+      sourceNames: ['Meter.tsx', 'meter/useMeterPattern.ts', 'meterData.ts', 'meter/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
       variants: <VariantListbox orientation="horizontal" value={host.variant} items={meterVariantItems} label="meter variants" idPrefix="meter-variant" onChange={host.selectVariant} />,
       preview: <Meter data={host.data} onEvent={onEvent} options={meterVariants[host.variant].options} />,

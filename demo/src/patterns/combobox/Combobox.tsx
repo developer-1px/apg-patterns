@@ -81,13 +81,13 @@ export function Combobox({
         onChange={(e) => editable && handleInput(e.currentTarget.value)}
         onKeyDown={handleKeyDown}
         onClick={() => !open && onEvent({ type: 'expand', key: COMBOBOX_KEY, expanded: true })}
-        className="h-9 w-full rounded border border-zinc-300 bg-white px-2 text-sm text-zinc-900 outline-none focus:border-zinc-500 focus:outline focus:outline-2 focus:outline-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:outline-zinc-500"
+        className="h-9 w-full rounded-xl bg-white/80 px-3 text-sm text-zinc-900 shadow-sm outline-none ring-1 ring-black/[0.03] transition placeholder:text-zinc-400 focus:bg-white focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-zinc-400 dark:bg-white/[0.06] dark:text-zinc-100 dark:ring-white/[0.04] dark:focus:bg-white/[0.08] dark:focus:outline-zinc-500"
       />
       {open ? (
         <div
           {...listProps}
           id={listboxId}
-          className="absolute left-0 right-0 top-10 z-10 max-h-56 overflow-auto rounded border border-zinc-200 bg-white py-1 shadow-md dark:border-zinc-800 dark:bg-zinc-950"
+          className="absolute left-0 right-0 top-11 z-10 max-h-56 overflow-auto rounded-xl bg-white/95 p-1 shadow-[0_18px_50px_rgba(24,24,27,0.14)] ring-1 ring-black/[0.03] backdrop-blur dark:bg-zinc-950/95 dark:shadow-black/30 dark:ring-white/[0.05]"
         >
           {visibleKeys.length === 0 ? (
             <div className="px-2 py-1.5 text-xs text-zinc-500">No matches</div>
@@ -108,7 +108,7 @@ export function Combobox({
                       onEvent({ type: 'commitValue', key, value: data.items[key]?.label ?? '' })
                     }
                   }}
-                  className="cursor-pointer px-2 py-1.5 text-sm text-zinc-800 aria-selected:bg-zinc-100 aria-selected:text-zinc-950 data-active:bg-zinc-50 dark:text-zinc-200 dark:aria-selected:bg-zinc-800 dark:aria-selected:text-zinc-50 dark:data-active:bg-zinc-900"
+                  className="cursor-pointer rounded-lg px-2.5 py-1.5 text-sm text-zinc-800 outline-none transition aria-selected:bg-zinc-100 aria-selected:text-zinc-950 data-active:bg-zinc-100/70 dark:text-zinc-200 dark:aria-selected:bg-white/[0.08] dark:aria-selected:text-zinc-50 dark:data-active:bg-white/[0.06]"
                 >
                   {data.items[key]?.label}
                 </div>

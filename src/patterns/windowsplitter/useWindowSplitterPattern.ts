@@ -28,17 +28,18 @@ export interface ReactWindowSplitterRuntime {
 }
 
 export function useWindowSplitterPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactWindowSplitterRuntime {
+  const runtimeOptions = options ?? (((data.state as { options?: PatternOptions } | undefined)?.options ?? {}) as PatternOptions)
   const runtime = createPatternRuntime({
     definition: windowsplitterDefinition,
     data,
-    options: options ?? {},
+    options: runtimeOptions,
     onEvent,
-    keyToElementId: (key) => `${options?.elementIdPrefix ?? 'windowsplitter-'}${key}`,
+    keyToElementId: (key) => `${runtimeOptions.elementIdPrefix ?? 'windowsplitter-'}${key}`,
   })
   const key = data.relations?.rootKeys?.[0] ?? null
   const controlledKey = key ? data.relations?.controlsByKey?.[key]?.[0] ?? null : null
-  const min = Number(options?.min ?? 0)
-  const max = Number(options?.max ?? 100)
+  const min = Number(runtimeOptions.min ?? 0)
+  const max = Number(runtimeOptions.max ?? 100)
   const value = key ? Number(data.state?.valueByKey?.[key] ?? min) : min
   const position = max === min ? 0 : ((value - min) / (max - min)) * 100
 
@@ -51,6 +52,7 @@ export function useWindowSplitterPattern(data: PatternData, onEvent: (event: Pat
         ...props,
         'aria-valuemin': min,
         'aria-valuemax': max,
+        'aria-orientation': runtimeOptions.orientation,
         onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
           runtime.emit({ type: 'focus', key })
           const result = runtime.resolveKeyboardBinding(event as unknown as KeyInput, key)

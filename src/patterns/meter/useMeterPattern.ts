@@ -28,12 +28,13 @@ export interface ReactMeterRuntime {
 }
 
 export function useMeterPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactMeterRuntime {
+  const runtimeOptions = options ?? (((data.state as { options?: PatternOptions } | undefined)?.options ?? {}) as PatternOptions)
   const runtime = createPatternRuntime({
     definition: meterDefinition,
     data,
-    options: options ?? {},
+    options: runtimeOptions,
     onEvent,
-    keyToElementId: (key) => `${options?.elementIdPrefix ?? 'meter-'}${key}`,
+    keyToElementId: (key) => `${runtimeOptions.elementIdPrefix ?? 'meter-'}${key}`,
   })
 
   return {

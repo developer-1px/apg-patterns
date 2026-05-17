@@ -13,7 +13,7 @@ export const entry: PatternEntry = {
       key: 'accordion',
       label: 'Accordion',
       keyboardShortcuts: ['Enter', 'Space', 'ArrowDown', 'ArrowUp', 'Home', 'End'],
-      sourceNames: ['Accordion.tsx', 'accordionData.ts', 'useAccordionPattern.ts', 'accordion/definition.ts', ...KERNEL_SOURCES],
+      sourceNames: ['Accordion.tsx', 'accordionData.ts', 'accordion/useAccordionPattern.ts', 'accordion/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
       preview: <Accordion data={host.data} onEvent={(event) => {
         onEvent(event)
