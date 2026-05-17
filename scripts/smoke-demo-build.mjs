@@ -127,8 +127,10 @@ for (const { key, label } of patternOptions) {
     continue
   }
 
+  const sourceNames = sourceTabNames()
+  const firstSourceName = sourceNames[0]
   const renderedSourceByName = new Map()
-  for (const sourceName of Array.from(sourceTablist.querySelectorAll('[role="tab"]'), (tab) => tab.textContent?.trim()).filter(Boolean)) {
+  for (const sourceName of sourceNames) {
     const tab = findSourceTab(sourceName)
     if (!sourceName) continue
     if (!tab) {
@@ -156,6 +158,8 @@ for (const { key, label } of patternOptions) {
       patternFailures.push(`${label}: source tab failed: ${sourceName}`)
     }
   }
+
+  if (firstSourceName) await verifyPatternPanelRoutes({ key, label, sourceName: firstSourceName })
 }
 
 await verifyHashRoute('#pattern=accordion&panel=aria&source=Accordion.tsx', (text) =>
@@ -244,6 +248,48 @@ async function verifyInteractionEventLog() {
   }
 }
 
+async function verifyPatternPanelRoutes({ key, label, sourceName }) {
+  await verifyHashRoute(buildHash({ pattern: key, panel: 'state', source: sourceName }), () =>
+    currentHashParam('pattern') === key
+    && currentHashParam('panel') === 'state'
+    && hasActiveDemoHeading(label)
+    && findRightPanelTab('state')?.getAttribute('aria-selected') === 'true',
+    `${label}: state panel route did not render`,
+  )
+
+  await verifyHashRoute(buildHash({ pattern: key, panel: 'events', source: sourceName }), (text) =>
+    currentHashParam('pattern') === key
+    && currentHashParam('panel') === 'events'
+    && hasActiveDemoHeading(label)
+    && findRightPanelTab('events')?.getAttribute('aria-selected') === 'true'
+    && text.includes('events'),
+    `${label}: events panel route did not render`,
+  )
+
+  await verifyHashRoute(buildHash({ pattern: key, panel: 'off', source: sourceName }), () =>
+    currentHashParam('pattern') === key
+    && currentHashParam('panel') === 'off'
+    && hasActiveDemoHeading(label)
+    && !document.querySelector('[role="tablist"][aria-label="right panel"]'),
+    `${label}: closed panel route did not render`,
+  )
+
+  await verifyHashRoute(buildHash({ pattern: key, panel: 'code', source: sourceName }), () =>
+    currentHashParam('pattern') === key
+    && currentHashParam('panel') === 'code'
+    && hasActiveDemoHeading(label)
+    && findRightPanelTab('code')?.getAttribute('aria-selected') === 'true'
+    && sourceFilenameIs(sourceName),
+    `${label}: code panel route did not restore after panel route checks`,
+  )
+}
+
+function buildHash(params) {
+  const hashParams = new URLSearchParams()
+  for (const [key, value] of Object.entries(params)) hashParams.set(key, value)
+  return `#${hashParams.toString()}`
+}
+
 function currentHashParam(name) {
   return new URLSearchParams(window.location.hash.replace(/^#/, '')).get(name)
 }
@@ -266,6 +312,11 @@ function sourceFilenameIs(sourceName) {
 function findSourceTab(sourceName) {
   return Array.from(document.querySelectorAll('[role="tablist"][aria-label="source files"] [role="tab"]'))
     .find((tab) => tab.textContent?.trim() === sourceName)
+}
+
+function findRightPanelTab(name) {
+  return Array.from(document.querySelectorAll('[role="tablist"][aria-label="right panel"] [role="tab"]'))
+    .find((tab) => tab.textContent?.trim() === name)
 }
 
 function findPatternOption(key) {
