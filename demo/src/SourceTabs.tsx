@@ -56,7 +56,7 @@ export function SourceTabs<T extends SourceTabKey>({ tabs, getTablistProps, getT
           {...getTabProps(tab)}
           key={tab}
           type="button"
-          className="h-7 rounded-md border border-zinc-200 bg-white px-2 text-xs text-zinc-700 hover:bg-zinc-50 aria-selected:border-zinc-300 aria-selected:bg-zinc-100 aria-selected:text-zinc-950 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-900 dark:aria-selected:border-zinc-700 dark:aria-selected:bg-zinc-800 dark:aria-selected:text-zinc-50"
+          className="h-7 rounded px-2 text-xs text-zinc-500 hover:bg-zinc-100 aria-selected:bg-zinc-900 aria-selected:text-white dark:text-zinc-500 dark:hover:bg-zinc-900 dark:aria-selected:bg-zinc-100 dark:aria-selected:text-zinc-950"
         >
           {tab}
         </button>

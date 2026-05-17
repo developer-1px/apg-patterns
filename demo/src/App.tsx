@@ -15,14 +15,14 @@ import { Tabs } from './Tabs'
 import { initialTabsData } from './tabsData'
 import { Tree } from './Tree'
 
-const panelClass = 'min-h-0 rounded-md border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950'
-const headerClass = 'mb-3 flex items-center justify-between gap-3'
-const titleClass = 'text-sm font-medium text-zinc-800 dark:text-zinc-200'
-const buttonClass = 'h-7 rounded-md border border-zinc-200 bg-white px-2 text-xs text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-900'
-const selectClass = 'h-7 rounded-md border border-zinc-200 bg-white px-2 text-xs text-zinc-700 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300'
-const preClass = 'h-full min-h-0 overflow-auto rounded-md border border-zinc-200 bg-white p-2.5 font-mono text-xs leading-relaxed text-zinc-700 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300'
+const panelClass = 'min-h-0 bg-white p-1 dark:bg-zinc-950'
+const headerClass = 'mb-4 flex items-center justify-between gap-3'
+const titleClass = 'text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-500'
+const buttonClass = 'h-7 rounded px-2 text-xs text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-900'
+const selectClass = 'h-7 rounded bg-zinc-50 px-2 text-xs text-zinc-700 outline-none focus:bg-white focus:outline focus:outline-2 focus:outline-zinc-400 dark:bg-zinc-900 dark:text-zinc-300 dark:focus:bg-zinc-950'
+const preClass = 'h-full min-h-0 overflow-auto bg-zinc-50 p-3 font-mono text-xs leading-relaxed text-zinc-700 dark:bg-zinc-900/70 dark:text-zinc-300'
 const optionButtonClass =
-  'h-7 rounded-md border border-zinc-200 bg-white px-2 text-left text-xs text-zinc-700 hover:bg-zinc-50 aria-selected:border-zinc-400 aria-selected:bg-zinc-100 aria-selected:text-zinc-950 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-900 dark:aria-selected:border-zinc-700 dark:aria-selected:bg-zinc-800 dark:aria-selected:text-zinc-50'
+  'h-7 rounded px-2 text-left text-xs text-zinc-600 hover:bg-zinc-100 aria-selected:bg-zinc-900 aria-selected:text-white dark:text-zinc-400 dark:hover:bg-zinc-900 dark:aria-selected:bg-zinc-100 dark:aria-selected:text-zinc-950'
 
 export function App() {
   const [patternKey, setPatternKey] = useState<PatternKey>('treeview')
@@ -102,16 +102,16 @@ export function App() {
   const eventLog = events.map((event) => JSON.stringify(event)).join('\n') || 'none'
 
   return (
-    <main className="grid h-screen grid-cols-1 grid-rows-[auto_minmax(0,1fr)_minmax(260px,40vh)] gap-3 bg-white p-3 dark:bg-zinc-950 lg:grid-cols-[240px_minmax(360px,1fr)_minmax(380px,0.95fr)] lg:grid-rows-[minmax(0,1fr)]">
+    <main className="grid h-screen grid-cols-1 grid-rows-[auto_minmax(0,1fr)_minmax(260px,40vh)] gap-8 bg-white px-6 py-5 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 lg:grid-cols-[180px_minmax(360px,1fr)_minmax(380px,0.9fr)] lg:grid-rows-[minmax(0,1fr)]">
       <section className={`${panelClass} overflow-auto`}>
         <header className={headerClass}>
           <h1 className={titleClass}>patterns</h1>
         </header>
         <PatternMenu value={patternKey} onChange={setPatternKey} />
-        <div className="mt-5 border-t border-zinc-200 pt-3 dark:border-zinc-800">
+        <div className="mt-6 pt-2">
           <h2 className="mb-2 text-xs font-medium text-zinc-500 dark:text-zinc-500">variants</h2>
           {patternKey === 'treeview' ? (
-            <div className="grid gap-3 text-xs text-zinc-700 dark:text-zinc-300">
+            <div className="grid gap-3 text-xs text-zinc-600 dark:text-zinc-400">
               <label className="inline-flex items-center gap-1.5">
                 <input type="checkbox" checked={followFocus} onChange={(event) => setFollowFocus(event.currentTarget.checked)} />
                 followFocus

@@ -36,7 +36,7 @@ export function Listbox({
   return (
     <div
       {...rootProps}
-      className="grid max-w-sm gap-1 rounded-md border border-zinc-200 bg-white p-1.5 outline-none focus:outline focus:outline-2 focus:outline-zinc-500 dark:border-zinc-800 dark:bg-zinc-950 dark:focus:outline-zinc-400"
+      className="grid max-w-sm gap-0.5 bg-white py-1 outline-none focus:outline focus:outline-2 focus:outline-zinc-400 dark:bg-zinc-950 dark:focus:outline-zinc-500"
     >
       {(data.relations?.rootKeys ?? []).map((key) => {
         const optionProps = runtime.getPartProps('option', key) as Props
@@ -46,7 +46,7 @@ export function Listbox({
             key={key}
             {...optionProps}
             data-active={state.active ? '' : undefined}
-            className="min-h-8 rounded px-2 py-1.5 text-sm text-zinc-800 outline-none aria-disabled:text-zinc-400 aria-selected:bg-zinc-100 aria-selected:text-zinc-950 data-active:bg-zinc-50 focus:outline focus:outline-2 focus:outline-zinc-500 dark:text-zinc-300 dark:aria-disabled:text-zinc-600 dark:aria-selected:bg-zinc-800 dark:aria-selected:text-zinc-50 dark:data-active:bg-zinc-900 dark:focus:outline-zinc-400"
+            className="min-h-8 rounded px-2 py-1.5 text-sm text-zinc-800 outline-none aria-disabled:text-zinc-400 aria-selected:bg-zinc-100 aria-selected:text-zinc-950 data-active:bg-zinc-50 focus:outline focus:outline-2 focus:outline-zinc-400 dark:text-zinc-300 dark:aria-disabled:text-zinc-600 dark:aria-selected:bg-zinc-900 dark:aria-selected:text-zinc-50 dark:data-active:bg-zinc-900 dark:focus:outline-zinc-500"
           >
             {data.items[key]?.label}
           </div>
