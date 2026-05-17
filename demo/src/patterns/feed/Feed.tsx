@@ -29,7 +29,7 @@ export function Feed({ data = initialFeedData, onEvent }: FeedProps = {}) {
             key={article.key}
             {...article.articleProps}
             data-active={article.state.active ? '' : undefined}
-            className="rounded-xl bg-white/70 p-3 shadow-[0_10px_28px_rgba(24,24,27,0.06)] outline-none transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 data-active:bg-white data-active:shadow-[0_16px_40px_rgba(24,24,27,0.1)] dark:bg-white/[0.045] dark:shadow-black/15 dark:focus-visible:outline-zinc-500 dark:data-active:bg-white/[0.07]"
+            className="rounded-xl bg-white/70 p-3 shadow-[0_10px_28px_rgba(24,24,27,0.06)] outline-none transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 data-[active]:bg-white data-[active]:shadow-[0_16px_40px_rgba(24,24,27,0.1)] dark:bg-white/[0.045] dark:shadow-black/15 dark:focus-visible:outline-zinc-500 dark:data-[active]:bg-white/[0.07]"
           >
             <h3 id={titleId} className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
               {content?.title ?? article.label}

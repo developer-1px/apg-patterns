@@ -226,6 +226,17 @@ describe('Menu — actionMenuButton (rovingTabIndex)', () => {
     expect(document.activeElement).toBe(trigger)
   })
 
+  it('Tab closes an open menu without trapping focus', () => {
+    render(<MenuDemo variant="actionMenuButton" />)
+    const trigger = screen.getByRole('button', { name: /Actions/ })
+
+    fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+    fireEvent.keyDown(screen.getByRole('menu'), { key: 'Tab' })
+
+    expect(screen.queryByRole('menu')).toBeNull()
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+  })
+
   it('click on menuitem activates + closes + emits activate event', () => {
     const onEvent = vi.fn()
     render(<MenuDemo variant="actionMenuButton" onEvent={onEvent} />)

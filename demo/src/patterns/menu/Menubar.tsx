@@ -121,7 +121,7 @@ function SubmenuItem({ itemKey, data, active, radioGroup, onEvent, onClose }: { 
         event.preventDefault()
         activate()
       }
-    }} className="cursor-default rounded-[4px] px-2.5 py-1.5 text-zinc-800 outline-none transition hover:bg-zinc-100/80 aria-disabled:text-zinc-400 data-active:bg-zinc-100/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:text-zinc-200 dark:hover:bg-white/[0.06] dark:aria-disabled:text-zinc-600 dark:data-active:bg-white/[0.07] dark:focus-visible:outline-zinc-500">
+    }} className="cursor-default rounded-[4px] px-2.5 py-1.5 text-zinc-800 outline-none transition hover:bg-zinc-100/80 aria-disabled:text-zinc-400 data-[active]:bg-zinc-100/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:text-zinc-200 dark:hover:bg-white/[0.06] dark:aria-disabled:text-zinc-600 dark:data-[active]:bg-white/[0.07] dark:focus-visible:outline-zinc-500">
       <span className="mr-2 inline-grid w-4 place-items-center text-xs text-zinc-500">
         {role === 'menuitemcheckbox' ? <Icon name={checked ? 'square-check' : 'square'} /> : null}
         {role === 'menuitemradio' ? <Icon name="circle-dot" className={checked ? '' : 'opacity-0'} /> : null}

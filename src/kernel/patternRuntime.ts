@@ -12,9 +12,9 @@ import {
 
 export type SlotProps = Record<string, unknown>
 
-export interface PatternRuntime {
+export interface PatternRuntime<TData extends PatternData = PatternData> {
   definition: PatternDefinition
-  data: PatternData
+  data: TData
   options: PatternOptions
   visibleKeys: readonly Key[]
   /** Root part 의 slot props. onKeyDown handler 자동 포함. */
@@ -38,10 +38,10 @@ export interface CreatePatternRuntimeInput {
   keyToElementId?: (key: Key) => string
 }
 
-export function createPatternRuntime(input: CreatePatternRuntimeInput): PatternRuntime {
+export function createPatternRuntime<TData extends PatternData = PatternData>(input: Omit<CreatePatternRuntimeInput, 'data'> & { data: TData }): PatternRuntime<TData> {
   // 진입 시점 fail-fast — schema 위반을 boundary 에서 잡는다.
   const definition = PatternDefinitionSchema.parse(input.definition)
-  const data = PatternDataSchema.parse(input.data)
+  const data = PatternDataSchema.parse(input.data) as TData
   const options = PatternOptionsSchema.parse(input.options ?? {})
   const { onEvent } = input
   const visibleKeys = resolveVisibleOrder(definition.navigation.visibleOrder, data)

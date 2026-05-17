@@ -35,7 +35,7 @@ function GridCell({ cell }: { cell: ReactGridCell }) {
       {...cell.cellProps}
       data-active={cell.state.active ? '' : undefined}
       data-editable={cell.editable ? '' : undefined}
-      className="min-h-9 px-2 py-2 outline-none aria-selected:bg-zinc-100/90 aria-selected:text-zinc-950 data-active:bg-white/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-zinc-400 dark:aria-selected:bg-white/[0.08] dark:aria-selected:text-zinc-50 dark:data-active:bg-white/[0.05] dark:focus-visible:outline-zinc-500"
+      className="min-h-9 px-2 py-2 outline-none aria-selected:bg-zinc-100/90 aria-selected:text-zinc-950 data-[active]:bg-white/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-zinc-400 dark:aria-selected:bg-white/[0.08] dark:aria-selected:text-zinc-50 dark:data-[active]:bg-white/[0.05] dark:focus-visible:outline-zinc-500"
     >
       {cell.editing ? (
         <input

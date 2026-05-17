@@ -26,7 +26,7 @@ export function MenuButton({ data, onEvent }: MenuProps) {
               key={item.key}
               {...item.itemProps}
               data-active={item.state.active ? '' : undefined}
-              className="cursor-default rounded-[4px] px-2.5 py-1.5 text-zinc-800 outline-none transition aria-disabled:text-zinc-400 data-active:bg-zinc-100/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:text-zinc-200 dark:aria-disabled:text-zinc-600 dark:data-active:bg-white/[0.07] dark:focus-visible:outline-zinc-500"
+              className="cursor-default rounded-[4px] px-2.5 py-1.5 text-zinc-800 outline-none transition aria-disabled:text-zinc-400 data-[active]:bg-zinc-100/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:text-zinc-200 dark:aria-disabled:text-zinc-600 dark:data-[active]:bg-white/[0.07] dark:focus-visible:outline-zinc-500"
             >
               {item.label}
             </li>

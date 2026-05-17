@@ -22,7 +22,7 @@ export function Treegrid({
               key={cell.key}
               {...cell.cellProps}
               data-active={cell.state.active ? '' : undefined}
-              className="min-h-8 px-2 py-1 outline-none aria-selected:bg-zinc-100/90 data-active:bg-white/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-zinc-400 dark:aria-selected:bg-white/[0.08] dark:data-active:bg-white/[0.05] dark:focus-visible:outline-zinc-500"
+              className="min-h-8 px-2 py-1 outline-none aria-selected:bg-zinc-100/90 data-[active]:bg-white/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-zinc-400 dark:aria-selected:bg-white/[0.08] dark:data-[active]:bg-white/[0.05] dark:focus-visible:outline-zinc-500"
               style={cell.indent ? { paddingLeft: `${8 + cell.indent}px` } : undefined}
             >
               {cell.value}
