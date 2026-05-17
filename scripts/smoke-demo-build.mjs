@@ -69,15 +69,20 @@ for (const option of patternListbox.querySelectorAll('[role="option"]')) {
     continue
   }
 
-  for (const tab of Array.from(sourceTablist.querySelectorAll('[role="tab"]'))) {
-    const sourceName = tab.textContent?.trim()
+  for (const sourceName of Array.from(sourceTablist.querySelectorAll('[role="tab"]'), (tab) => tab.textContent?.trim()).filter(Boolean)) {
+    const tab = findSourceTab(sourceName)
     if (!sourceName) continue
+    if (!tab) {
+      patternFailures.push(`${label}: source tab missing: ${sourceName}`)
+      continue
+    }
     tab.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
 
     try {
       await waitFor(() => {
+        const currentTab = findSourceTab(sourceName)
         const sourceText = document.querySelector('pre')?.textContent ?? ''
-        return tab.getAttribute('aria-selected') === 'true'
+        return currentTab?.getAttribute('aria-selected') === 'true'
           && currentHashParam('source') === sourceName
           && sourceText !== 'loading'
           && sourceText.length > 0
@@ -144,4 +149,9 @@ async function verifyHashRoute(hash, predicate, failure) {
 
 function currentHashParam(name) {
   return new URLSearchParams(window.location.hash.replace(/^#/, '')).get(name)
+}
+
+function findSourceTab(sourceName) {
+  return Array.from(document.querySelectorAll('[role="tablist"][aria-label="source files"] [role="tab"]'))
+    .find((tab) => tab.textContent?.trim() === sourceName)
 }
