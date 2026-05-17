@@ -536,6 +536,14 @@ describe('demo source wiring', () => {
     expect(missingHookSources).toEqual([])
   })
 
+  it('exposes each pattern entry source so demo wiring can be inspected', () => {
+    const missingEntrySources: string[] = []
+
+    render(<DemoSourceProbe onMissingEntrySource={(sourceName) => missingEntrySources.push(sourceName)} />)
+
+    expect(missingEntrySources).toEqual([])
+  })
+
   it('does not expose source tabs backed by colliding collected filenames', () => {
     const collidingSourceNames = new Set(sourceNameCollisions.map((collision) => collision.name))
     const exposedCollisions: string[] = []
@@ -596,6 +604,7 @@ describe('demo source wiring', () => {
 function DemoSourceProbe({
   onMissingSource,
   onMissingHookSource = () => undefined,
+  onMissingEntrySource = () => undefined,
   onInvalidEntry = () => undefined,
   onCollidingSource = () => undefined,
   onSourceName = () => undefined,
@@ -604,6 +613,7 @@ function DemoSourceProbe({
 }: {
   onMissingSource?: (sourceName: string) => void
   onMissingHookSource?: (sourceName: string) => void
+  onMissingEntrySource?: (sourceName: string) => void
   onInvalidEntry?: (issue: string) => void
   onCollidingSource?: (sourceName: string) => void
   onSourceName?: (sourceName: string) => void
@@ -618,6 +628,7 @@ function DemoSourceProbe({
           entry={entry}
           onMissingSource={onMissingSource}
           onMissingHookSource={onMissingHookSource}
+          onMissingEntrySource={onMissingEntrySource}
           onInvalidEntry={onInvalidEntry}
           onCollidingSource={onCollidingSource}
           onSourceName={onSourceName}
@@ -645,6 +656,7 @@ function DemoSourceProbeItem({
   entry,
   onMissingSource,
   onMissingHookSource,
+  onMissingEntrySource,
   onInvalidEntry,
   onCollidingSource,
   onSourceName,
@@ -654,6 +666,7 @@ function DemoSourceProbeItem({
   entry: (typeof patternEntries)[number]
   onMissingSource?: (sourceName: string) => void
   onMissingHookSource: (sourceName: string) => void
+  onMissingEntrySource: (sourceName: string) => void
   onInvalidEntry: (issue: string) => void
   onCollidingSource: (sourceName: string) => void
   onSourceName: (sourceName: string) => void
@@ -681,6 +694,8 @@ function DemoSourceProbeItem({
   for (const sourceName of expectedHookSources(entry.key)) {
     if (!demo.sourceNames.includes(sourceName)) onMissingHookSource(`${entry.key}: ${sourceName}`)
   }
+  const entrySource = expectedEntrySource(entry.key)
+  if (!demo.sourceNames.includes(entrySource)) onMissingEntrySource(`${entry.key}: ${entrySource}`)
   return null
 }
 
@@ -723,6 +738,10 @@ function expectedHookSources(patternKey: string) {
     sourceName.startsWith(`${patternKey}/`)
     && /\/use[A-Z].*Pattern\.ts$/.test(sourceName)
   ))
+}
+
+function expectedEntrySource(patternKey: string) {
+  return `${patternKey === 'menuAndMenubar' ? 'menu' : patternKey}/entry.tsx`
 }
 
 const validShortcutModifiers = new Set(['Alt', 'Ctrl', 'Meta', 'Shift'])

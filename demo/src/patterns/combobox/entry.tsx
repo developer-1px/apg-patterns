@@ -24,7 +24,7 @@ export const entry: PatternEntry = {
       key: 'combobox',
       label: 'Combobox',
       keyboardShortcuts: ['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Escape'],
-      sourceNames: ['Combobox.tsx', 'combobox/useComboboxPattern.ts', 'comboboxData.ts', 'combobox/definition.ts', ...KERNEL_SOURCES],
+      sourceNames: ['Combobox.tsx', 'combobox/entry.tsx', 'combobox/useComboboxPattern.ts', 'comboboxData.ts', 'combobox/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
       variants: <VariantListbox orientation="horizontal" value={host.variant} items={comboboxVariantItems} label="combobox variants" idPrefix="combobox-variant" onChange={host.selectVariant} />,
       preview: (

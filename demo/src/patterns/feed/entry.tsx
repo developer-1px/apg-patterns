@@ -15,7 +15,7 @@ export const entry: PatternEntry = {
       key: 'feed',
       label: 'Feed',
       keyboardShortcuts: ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End'],
-      sourceNames: ['Feed.tsx', 'feed/useFeedPattern.ts', 'feedData.ts', 'feed/definition.ts', ...KERNEL_SOURCES],
+      sourceNames: ['Feed.tsx', 'feed/entry.tsx', 'feed/useFeedPattern.ts', 'feedData.ts', 'feed/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
       preview: <Feed data={host.data} onEvent={(event) => {
         onEvent(event)

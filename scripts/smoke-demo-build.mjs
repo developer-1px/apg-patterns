@@ -772,6 +772,14 @@ function hasSourceLoadFailure(text) {
 }
 
 function sourceIdentityNeedles(sourceName, patternKey) {
+  const entrySource = sourceName.match(/^([^/]+)\/entry\.tsx$/)
+  if (entrySource) {
+    const [, sourcePatternKey] = entrySource
+    return sourcePatternKey === (patternKey === 'menuAndMenubar' ? 'menu' : patternKey)
+      ? ['export const entry']
+      : [patternKey]
+  }
+
   if (sourceName.endsWith('.tsx')) {
     const componentName = sourceName.replace(/\.tsx$/, '')
     return [`export function ${componentName}`]

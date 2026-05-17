@@ -15,7 +15,7 @@ export const entry: PatternEntry = {
       key: 'carousel',
       label: 'Carousel',
       keyboardShortcuts: ['ArrowRight', 'ArrowLeft', 'Tab', 'Enter', 'Space'],
-      sourceNames: ['Carousel.tsx', 'carousel/useCarouselPattern.ts', 'carouselData.ts', 'carousel/definition.ts', ...KERNEL_SOURCES],
+      sourceNames: ['Carousel.tsx', 'carousel/entry.tsx', 'carousel/useCarouselPattern.ts', 'carouselData.ts', 'carousel/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
       preview: <Carousel data={host.data} onEvent={(event) => {
         onEvent(event)

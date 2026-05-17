@@ -51,7 +51,7 @@ export const entry: PatternEntry = {
       key: 'disclosure',
       label: 'Disclosure',
       keyboardShortcuts: ['Enter', 'Space'],
-      sourceNames: ['Disclosure.tsx', 'NavMenuDisclosure.tsx', 'disclosureData.ts', 'disclosure/useDisclosurePattern.ts', 'disclosure/runtime.ts', 'disclosure/definition.ts', ...KERNEL_SOURCES],
+      sourceNames: ['Disclosure.tsx', 'disclosure/entry.tsx', 'NavMenuDisclosure.tsx', 'disclosureData.ts', 'disclosure/useDisclosurePattern.ts', 'disclosure/runtime.ts', 'disclosure/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
       variants: (
         <VariantControl label="variant">

@@ -13,7 +13,7 @@ export const entry: PatternEntry = {
       key: 'radio',
       label: 'Radio Group',
       keyboardShortcuts: ['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp', 'Home', 'End', 'Space'],
-      sourceNames: ['RadioGroup.tsx', 'radioData.ts', 'radio/useRadioGroupPattern.ts', 'radio/definition.ts', ...KERNEL_SOURCES],
+      sourceNames: ['RadioGroup.tsx', 'radio/entry.tsx', 'radioData.ts', 'radio/useRadioGroupPattern.ts', 'radio/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
       preview: <RadioGroup data={host.data} onEvent={(event) => {
         onEvent(event)

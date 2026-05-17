@@ -40,10 +40,12 @@ const demoDataModules = import.meta.glob([
 
 const collected: Record<string, SourceLoader> = {}
 const collectedPaths = new Map<string, string[]>()
+const collectedLoadersByPath = new Map<string, SourceLoader>()
 
 function registerSource(name: string, path: string, load: SourceLoader) {
   collected[name] = load
   collectedPaths.set(name, [...(collectedPaths.get(name) ?? []), path])
+  collectedLoadersByPath.set(path, load)
 }
 
 // src root: keep filename only (e.g. index.ts)
@@ -82,9 +84,21 @@ export const sourceNameCollisions: readonly SourceCollision[] = Array.from(colle
   .filter(([, paths]) => paths.length > 1)
   .map(([name, paths]) => ({ name, paths: [...paths].sort((a, b) => a.localeCompare(b)) }))
   .sort((a, b) => a.name.localeCompare(b.name))
-for (const { name } of sourceNameCollisions) delete collected[name]
+for (const { name, paths } of sourceNameCollisions) {
+  delete collected[name]
+  for (const path of paths) {
+    const qualifiedName = qualifyCollisionSourceName(path)
+    const load = collectedLoadersByPath.get(path)
+    if (qualifiedName && load) collected[qualifiedName] = load
+  }
+}
 
 export const sourceLoaders: Readonly<Record<string, SourceLoader>> = Object.fromEntries(
   Object.entries(collected).sort(([a], [b]) => a.localeCompare(b)),
 )
 export type SourceName = string
+
+function qualifyCollisionSourceName(path: string) {
+  const match = path.match(/\/patterns\/([^/]+)\/([^/]+)$/)
+  return match ? `${match[1]}/${match[2]}` : null
+}

@@ -11,7 +11,7 @@ export const entry: PatternEntry = {
       key: 'tooltip',
       label: 'Tooltip',
       keyboardShortcuts: ['Escape'],
-      sourceNames: ['Tooltip.tsx', 'tooltipData.ts', 'tooltip/useTooltipPattern.ts', 'tooltip/definition.ts', ...KERNEL_SOURCES],
+      sourceNames: ['Tooltip.tsx', 'tooltip/entry.tsx', 'tooltipData.ts', 'tooltip/useTooltipPattern.ts', 'tooltip/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(initialTooltipData),
       preview: <Tooltip />,
     }

@@ -13,7 +13,7 @@ export const entry: PatternEntry = {
       key: 'windowsplitter',
       label: 'Window Splitter',
       keyboardShortcuts: ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'Enter'],
-      sourceNames: ['WindowSplitter.tsx', 'windowsplitter/useWindowSplitterPattern.ts', 'windowsplitterData.ts', 'windowsplitter/definition.ts', ...KERNEL_SOURCES],
+      sourceNames: ['WindowSplitter.tsx', 'windowsplitter/entry.tsx', 'windowsplitter/useWindowSplitterPattern.ts', 'windowsplitterData.ts', 'windowsplitter/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
       preview: <WindowSplitter data={host.data} onEvent={(event) => {
         onEvent(event)
