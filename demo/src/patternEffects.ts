@@ -38,6 +38,8 @@ export function usePatternEffects({
       if (!matches || previousMatches.current[index] === matches) continue
       if (effect.kind === 'focus' || effect.kind === 'restoreFocus') {
         const target = resolveElementTarget(effect.target, data, keyToElementId)
+        // eslint-disable-next-line no-console
+        console.log('effect', effect.kind, target?.id)
         target?.focus({ preventScroll: effect.preventScroll })
       }
     }
