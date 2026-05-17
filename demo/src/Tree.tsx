@@ -1,4 +1,5 @@
 import { useTreeviewPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
+import { Icon } from './Icon'
 import { useTreeDomFocus } from './useTreeDomFocus'
 
 export type TreeItemKind = 'folder' | 'link'
@@ -32,9 +33,9 @@ export function Tree({
             type="button"
             {...item.slotProps.indicator}
             aria-label={`toggle ${item.key}`}
-            className="h-6 w-6 rounded p-0 font-mono text-xs text-zinc-500 hover:bg-zinc-100 dark:text-zinc-500 dark:hover:bg-zinc-900"
+            className="grid size-6 place-items-center rounded p-0 text-xs text-zinc-500 hover:bg-zinc-100 dark:text-zinc-500 dark:hover:bg-zinc-900"
           >
-            {expanded ? '▾' : '▸'}
+            <Icon name="chevron-right" className={expanded ? 'rotate-90' : ''} />
           </button>
         ) : (
           <span className="inline-block h-6 w-6" aria-hidden="true" />

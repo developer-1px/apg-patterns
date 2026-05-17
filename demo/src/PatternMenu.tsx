@@ -5,6 +5,8 @@ import { patternItems, type PatternKey } from './demoPatterns'
 
 type Props = HTMLAttributes<HTMLElement>
 
+export const patternMenuKeyboardShortcuts = listboxDefinition.keyboard.map((binding) => binding.shortcut)
+
 export function PatternMenu({ value, onChange }: { value: PatternKey; onChange: (value: PatternKey) => void }) {
   const data = useMemo(() => createPatternMenuData(value), [value])
   const runtime = useMemo(
@@ -26,7 +28,11 @@ export function PatternMenu({ value, onChange }: { value: PatternKey; onChange: 
   const rootProps = runtime.getPartProps('listbox') as Props
 
   return (
-    <div {...rootProps} className="mt-3 grid gap-0.5 outline-none focus:outline focus:outline-2 focus:outline-zinc-400 dark:focus:outline-zinc-500">
+    <div
+      {...rootProps}
+      aria-keyshortcuts={patternMenuKeyboardShortcuts.join(' ')}
+      className="mt-3 grid gap-0.5 outline-none focus:outline focus:outline-2 focus:outline-zinc-400 dark:focus:outline-zinc-500"
+    >
       {patternItems.map((item) => {
         const optionProps = runtime.getPartProps('option', item.key) as Props
         return (

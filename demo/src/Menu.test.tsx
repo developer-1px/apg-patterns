@@ -95,8 +95,9 @@ describe('Menu — editorMenubar', () => {
 
   it('Space toggles menuitemcheckbox aria-checked', () => {
     render(<MenuDemo variant="editorMenubar" />)
-    const view = screen.getAllByRole('menuitem')[2]!
-    fireEvent.keyDown(view, { key: 'ArrowDown' })
+    const [file, , view] = screen.getAllByRole('menuitem')
+    fireEvent.keyDown(file!, { key: 'End' }) // activate View
+    fireEvent.keyDown(view!, { key: 'ArrowDown' })
 
     const wrap = screen.getByRole('menuitemcheckbox', { name: /Word Wrap/ })
     expect(wrap.getAttribute('aria-checked')).toBe('true')
@@ -107,8 +108,9 @@ describe('Menu — editorMenubar', () => {
 
   it('Selecting a menuitemradio clears sibling radios', () => {
     render(<MenuDemo variant="editorMenubar" />)
-    const view = screen.getAllByRole('menuitem')[2]!
-    fireEvent.keyDown(view, { key: 'ArrowDown' })
+    const [file, , view] = screen.getAllByRole('menuitem')
+    fireEvent.keyDown(file!, { key: 'End' }) // activate View
+    fireEvent.keyDown(view!, { key: 'ArrowDown' })
 
     const dark = screen.getByRole('menuitemradio', { name: /Dark/ })
     const light = screen.getByRole('menuitemradio', { name: /Light/ })
@@ -143,17 +145,27 @@ describe('Menu — actionMenuButton (rovingTabIndex)', () => {
     expect(items[0]!.getAttribute('tabindex')).toBe('0')
   })
 
-  it('ArrowDown on open menu moves active to next item', () => {
+  it('Space on trigger opens menu and focuses first item', () => {
+    render(<MenuDemo variant="actionMenuButton" />)
+    const trigger = screen.getByRole('button', { name: /Actions/ })
+
+    fireEvent.keyDown(trigger, { key: ' ', code: 'Space' })
+
+    expect(trigger.getAttribute('aria-expanded')).toBe('true')
+    const items = screen.getAllByRole('menuitem')
+    expect(items[0]!.getAttribute('tabindex')).toBe('0')
+  })
+
+  it('hovering a menuitem (focus event) updates active item', () => {
     render(<MenuDemo variant="actionMenuButton" />)
     const trigger = screen.getByRole('button', { name: /Actions/ })
 
     fireEvent.keyDown(trigger, { key: 'ArrowDown' })
     const items = screen.getAllByRole('menuitem')
-    expect(items[0]!.getAttribute('tabindex')).toBe('0')
 
-    fireEvent.keyDown(items[0]!, { key: 'ArrowDown' })
+    fireEvent.focus(items[2]!)
     const items2 = screen.getAllByRole('menuitem')
-    expect(items2[1]!.getAttribute('tabindex')).toBe('0')
+    expect(items2[2]!.getAttribute('tabindex')).toBe('0')
   })
 
   it('Escape closes menu and returns focus to trigger', () => {
@@ -185,7 +197,7 @@ describe('Menu — actionMenuButton (rovingTabIndex)', () => {
 })
 
 describe('Menu — actionMenuButtonActiveDescendant', () => {
-  it('open menu sets aria-activedescendant; ArrowDown updates it', () => {
+  it('open menu sets aria-activedescendant to first item id', () => {
     render(<MenuDemo variant="actionMenuButtonActiveDescendant" />)
     const trigger = screen.getByRole('button', { name: /Actions/ })
 
@@ -194,11 +206,19 @@ describe('Menu — actionMenuButtonActiveDescendant', () => {
     const menu = screen.getByRole('menu')
     const first = menu.getAttribute('aria-activedescendant')
     expect(first).toBeTruthy()
+    const items = screen.getAllByRole('menuitem')
+    expect(first).toBe(items[0]!.id)
+  })
 
-    fireEvent.keyDown(menu, { key: 'ArrowDown' })
+  it('focus event on a menuitem updates aria-activedescendant', () => {
+    render(<MenuDemo variant="actionMenuButtonActiveDescendant" />)
+    const trigger = screen.getByRole('button', { name: /Actions/ })
 
-    const next = menu.getAttribute('aria-activedescendant')
-    expect(next).toBeTruthy()
-    expect(next).not.toBe(first)
+    fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+    const menu = screen.getByRole('menu')
+    const items = screen.getAllByRole('menuitem')
+
+    fireEvent.focus(items[2]!)
+    expect(menu.getAttribute('aria-activedescendant')).toBe(items[2]!.id)
   })
 })
