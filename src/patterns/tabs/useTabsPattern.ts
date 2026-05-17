@@ -1,6 +1,6 @@
 import { createTabsRuntime, type CreateTabsRuntimeInput, type TabsRuntime } from './runtime'
 import type { ReactTabsProps, ReactTabsRuntime } from '../../adapters/reactTypes'
-import { usePatternEffects } from '../../adapters/reactPatternEffects'
+import { usePatternEffects, useRovingFocusEventHandler } from '../../adapters/reactPatternEffects'
 import type { PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { tabsDefinition } from './definition'
 
@@ -18,11 +18,19 @@ export function useTabsPattern(
         onEvent: onEvent ?? (() => undefined),
         options,
       }
-  const runtime = createTabsRuntime(input)
+  const keyToElementId = (key: string) => createTabElementId((input.options as PatternOptions | undefined)?.elementIdPrefix ?? 'tab-', key)
+  const handleEvent = useRovingFocusEventHandler({
+    definition: tabsDefinition,
+    data: input.data as PatternData,
+    options: (input.options as PatternOptions | undefined) ?? {},
+    keyToElementId,
+    onEvent: input.onEvent,
+  })
+  const runtime = createTabsRuntime({ ...input, onEvent: handleEvent })
   usePatternEffects({
     definition: tabsDefinition,
     data: runtime.data,
-    keyToElementId: (key) => createTabElementId(runtime.options.elementIdPrefix ?? 'tab-', key),
+    keyToElementId,
   })
   return adaptTabsRuntime(runtime)
 }

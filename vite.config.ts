@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite'
+import { resolve } from 'node:path'
 
 export default defineConfig({
   root: 'demo',
@@ -23,5 +24,10 @@ export default defineConfig({
   },
   build: {
     chunkSizeWarningLimit: 700,
+  },
+  resolve: {
+    alias: {
+      '@interactive-os/devtools/rec': resolve(__dirname, '../devtools/src/rec/index.ts'),
+    },
   },
 })

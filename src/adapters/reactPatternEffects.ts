@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef } from 'react'
-import type { ElementTarget, Key, PatternData, PatternDefinition } from '../schema'
+import type { ElementTarget, Key, PatternData, PatternDefinition, PatternEvent, PatternOptions } from '../schema'
+import { reducePatternData } from '../kernel/patternReducer'
 import { createParentByKey, evaluatePredicate, resolveKeyToken } from '../kernel/patternKernel'
 
 const FOCUSABLE_SELECTOR = [
@@ -36,6 +37,37 @@ export function usePatternEffects({
   }, [data, definition, keyToElementId])
 }
 
+export function useRovingFocusEventHandler({
+  definition,
+  data,
+  options,
+  keyToElementId,
+  onEvent,
+}: {
+  definition: PatternDefinition
+  data: PatternData
+  options: PatternOptions
+  keyToElementId: (key: Key) => string
+  onEvent: (event: PatternEvent) => void
+}) {
+  const pendingFocusKeyRef = useRef<Key | null>(null)
+
+  useLayoutEffect(() => {
+    if (!usesRovingFocus(definition, options)) return
+    const pendingFocusKey = pendingFocusKeyRef.current
+    if (!pendingFocusKey || pendingFocusKey !== data.state?.activeKey) return
+    pendingFocusKeyRef.current = null
+    document.getElementById(keyToElementId(pendingFocusKey))?.focus({ preventScroll: true })
+  }, [data.state?.activeKey, definition, keyToElementId, options])
+
+  return (event: PatternEvent) => {
+    if (shouldFocusAfterControlledUpdate(event, definition, options)) {
+      pendingFocusKeyRef.current = resolveEventActiveKey(definition, data, event)
+    }
+    onEvent(event)
+  }
+}
+
 type EffectDefinition = NonNullable<PatternDefinition['effects']>[number]
 type FocusEffect = Extract<EffectDefinition, { kind: 'focus' }>
 type RestoreFocusEffect = Extract<EffectDefinition, { kind: 'restoreFocus' }>
@@ -44,6 +76,21 @@ type FocusEffectTarget = FocusEffect['target']
 function runFocusEffect(effect: FocusEffect, data: PatternData, keyToElementId: (key: Key) => string) {
   const target = resolveFocusEffectTarget(effect.target, data, keyToElementId)
   target?.focus({ preventScroll: effect.preventScroll ?? Boolean(effect.on) })
+}
+
+function shouldFocusAfterControlledUpdate(event: PatternEvent, definition: PatternDefinition, options: PatternOptions) {
+  if (!usesRovingFocus(definition, options)) return false
+  const reason = event.meta?.reason
+  return (event.type === 'navigate' || event.type === 'focus') && (reason === 'keyboard' || reason === 'typeahead')
+}
+
+function usesRovingFocus(definition: PatternDefinition, options: PatternOptions) {
+  return definition.focusModel === 'rovingTabIndex' && options.focusStrategy !== 'ariaActiveDescendant'
+}
+
+function resolveEventActiveKey(definition: PatternDefinition, data: PatternData, event: PatternEvent): Key | null {
+  if (event.type === 'focus') return event.key
+  return reducePatternData(definition, data, event).state?.activeKey ?? null
 }
 
 function runRestoreFocusEffect(effect: RestoreFocusEffect, data: PatternData, keyToElementId: (key: Key) => string) {
