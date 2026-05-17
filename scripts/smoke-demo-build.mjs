@@ -64,6 +64,23 @@ for (const option of patternListbox.querySelectorAll('[role="option"]')) {
   if (rootText().includes('missing source:')) patternFailures.push(`${label}: missing source marker rendered`)
 }
 
+await verifyHashRoute('#pattern=accordion&panel=aria&source=Accordion.tsx', (text) =>
+  window.location.hash.includes('pattern=accordion')
+  && window.location.hash.includes('panel=state')
+  && text.includes('Accordion')
+  && text.includes('state'),
+  'legacy aria panel route did not normalize to state',
+)
+
+await verifyHashRoute('#pattern=accordion&panel=events&source=Accordion.tsx', (text) =>
+  window.location.hash.includes('pattern=accordion')
+  && window.location.hash.includes('panel=events')
+  && text.includes('Accordion')
+  && text.includes('0 events')
+  && text.includes('none'),
+  'events panel route did not render empty event log',
+)
+
 process.removeListener('uncaughtException', recordError)
 process.removeListener('unhandledRejection', recordError)
 
@@ -87,4 +104,15 @@ async function waitFor(predicate, timeoutMs = 1000) {
     await new Promise((resolve) => setTimeout(resolve, 10))
   }
   throw new Error('timed out')
+}
+
+async function verifyHashRoute(hash, predicate, failure) {
+  window.location.hash = hash
+  window.dispatchEvent(new dom.window.HashChangeEvent('hashchange'))
+
+  try {
+    await waitFor(() => predicate(rootText()))
+  } catch {
+    patternFailures.push(failure)
+  }
 }
