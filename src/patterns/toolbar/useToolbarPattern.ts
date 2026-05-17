@@ -1,8 +1,8 @@
 import type { KeyInput } from '@interactive-os/keyboard'
-import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
+import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import type { ReactPatternProps, ReactRenderItemState } from '../../adapters/reactBaseTypes'
-import { usePatternEffects } from '../../adapters/reactPatternEffects'
+import { useReactPatternRuntime } from '../../adapters/reactPatternEffects'
 import { toolbarDefinition } from './definition'
 
 export interface ReactToolbarRenderItem {
@@ -32,7 +32,7 @@ export interface ReactToolbarRuntime {
 
 export function useToolbarPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactToolbarRuntime {
   const mergedOptions: PatternOptions = { focusStrategy: 'rovingTabIndex', orientation: 'horizontal', ...options }
-  const runtime = createPatternRuntime({
+  const runtime = useReactPatternRuntime({
     definition: toolbarDefinition,
     data,
     options: mergedOptions,
@@ -41,7 +41,6 @@ export function useToolbarPattern(data: PatternData, onEvent: (event: PatternEve
   })
   const rootProps = runtime.getPartProps('toolbar') as ReactPatternProps
   const onKeyDown = runtime.getRootKeyboardHandler()
-  usePatternEffects({ definition: toolbarDefinition, data: runtime.data, keyToElementId: runtime.keyToElementId })
 
   return {
     rootProps: {

@@ -40,16 +40,18 @@ export function usePatternEffects({
 
 export function useReactPatternRuntime(input: CreatePatternRuntimeInput): PatternRuntime {
   const keyToElementId = input.keyToElementId ?? ((key: Key) => `${key}`)
+  const keyboardFocusKeyRef = useRef<Key | null>(null)
   const onEvent = useRovingFocusEventHandler({
     definition: input.definition,
     data: input.data,
     options: input.options ?? {},
     keyToElementId,
+    keyboardFocusKeyRef,
     onEvent: input.onEvent,
   })
   const runtime = createPatternRuntime({ ...input, onEvent, keyToElementId })
   usePatternEffects({ definition: runtime.definition, data: runtime.data, keyToElementId: runtime.keyToElementId })
-  return runtime
+  return withKeyboardFocusVisibleProps(runtime, keyboardFocusKeyRef.current)
 }
 
 export function useRovingFocusEventHandler({
@@ -57,12 +59,14 @@ export function useRovingFocusEventHandler({
   data,
   options,
   keyToElementId,
+  keyboardFocusKeyRef,
   onEvent,
 }: {
   definition: PatternDefinition
   data: PatternData
   options: PatternOptions
   keyToElementId: (key: Key) => string
+  keyboardFocusKeyRef?: { current: Key | null }
   onEvent: (event: PatternEvent) => void
 }) {
   const pendingFocusKeyRef = useRef<Key | null>(null)
@@ -76,12 +80,31 @@ export function useRovingFocusEventHandler({
   }, [data.state?.activeKey, definition, keyToElementId, options])
 
   return (event: PatternEvent) => {
+    let nextFocusKey: Key | null = null
     if (shouldFocusAfterControlledUpdate(event, definition, options)) {
-      const nextFocusKey = resolveEventActiveKey(definition, data, event)
+      nextFocusKey = resolveEventActiveKey(definition, data, event)
       pendingFocusKeyRef.current = nextFocusKey
-      if (nextFocusKey) document.getElementById(keyToElementId(nextFocusKey))?.focus({ preventScroll: true })
+      if (keyboardFocusKeyRef) keyboardFocusKeyRef.current = nextFocusKey
+    } else if (event.meta?.reason === 'pointer' && keyboardFocusKeyRef) {
+      keyboardFocusKeyRef.current = null
     }
     onEvent(event)
+    if (nextFocusKey) {
+      window.setTimeout(() => document.getElementById(keyToElementId(nextFocusKey))?.focus({ preventScroll: true }))
+    }
+  }
+}
+
+function withKeyboardFocusVisibleProps(runtime: PatternRuntime, keyboardFocusKey: Key | null): PatternRuntime {
+  if (!keyboardFocusKey) return runtime
+  const addFocusVisible = (props: Record<string, unknown>, key?: Key) => {
+    if (key !== keyboardFocusKey) return props
+    return { ...props, 'data-focus-visible': '' }
+  }
+  return {
+    ...runtime,
+    getItemProps: (partName, key) => addFocusVisible(runtime.getItemProps(partName, key), key),
+    getPartProps: (partName, key) => addFocusVisible(runtime.getPartProps(partName, key), key),
   }
 }
 

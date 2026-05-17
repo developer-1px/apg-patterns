@@ -338,14 +338,15 @@ async function verifyEventLogClear() {
 }
 
 async function verifyTabsKeyboardEventLog() {
+  window.location.hash = '#pattern=accordion&panel=events&source=Accordion.tsx'
+  window.dispatchEvent(new dom.window.HashChangeEvent('hashchange'))
+  await waitForPatternRoute({ pattern: 'accordion', panel: 'events', source: 'Accordion.tsx', label: 'Accordion' })
+
   window.location.hash = '#pattern=tabs&panel=events&source=Tabs.tsx'
   window.dispatchEvent(new dom.window.HashChangeEvent('hashchange'))
 
   try {
     await waitForPatternRoute({ pattern: 'tabs', panel: 'events', source: 'Tabs.tsx', label: 'Tabs' })
-    const automaticVariant = Array.from(document.querySelectorAll('[role="listbox"][aria-label="tabs variants"] [role="option"]'))
-      .find((option) => option.textContent?.trim() === 'Automatic activation')
-    automaticVariant?.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
     const tabs = await waitFor(() => {
       const renderedTabs = Array.from(document.querySelectorAll('[data-demo-preview="tabs"] [role="tab"]'))
       return renderedTabs.length > 1 ? renderedTabs : false
@@ -354,6 +355,7 @@ async function verifyTabsKeyboardEventLog() {
     const sourceTab = tabs[selectedIndex < 0 ? 0 : selectedIndex]
     const expectedTab = tabs[((selectedIndex < 0 ? 0 : selectedIndex) + 1) % tabs.length]
 
+    sourceTab.focus()
     sourceTab.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'ArrowRight', code: 'ArrowRight', bubbles: true, cancelable: true }))
     await waitFor(() => {
       const text = rootText()

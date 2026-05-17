@@ -1,7 +1,8 @@
 import type { KeyInput } from '@interactive-os/keyboard'
-import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
+import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import type { ReactPatternProps, ReactRenderItemState } from '../../adapters/reactBaseTypes'
+import { useReactPatternRuntime } from '../../adapters/reactPatternEffects'
 import { radioGroupDefinition } from './definition'
 
 export interface ReactRadioRenderItem {
@@ -31,7 +32,7 @@ export interface ReactRadioGroupRuntime {
 
 export function useRadioGroupPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactRadioGroupRuntime {
   const mergedOptions: PatternOptions = { focusStrategy: 'rovingTabIndex', ...options }
-  const runtime = createPatternRuntime({
+  const runtime = useReactPatternRuntime({
     definition: radioGroupDefinition,
     data,
     options: mergedOptions,
