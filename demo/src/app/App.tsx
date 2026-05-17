@@ -91,6 +91,7 @@ function ActiveDemoWorkspace({
   const sourceNames = activeDemo.sourceNames
   const activeSourceName = sourceNames.includes(state.sourceName as SourceName) ? state.sourceName as SourceName : sourceNames[0]
   const [source, setSource] = useState('loading')
+  const [copyState, setCopyState] = useState<'idle' | 'copied' | 'failed'>('idle')
   const sourceTabs = useSourceTabs({ label: 'source files', tabs: sourceNames, value: activeSourceName, onChange: (sourceName) => dispatch({ type: 'selectSource', sourceName }) })
   const rightModeTabs = useSourceTabs({ label: 'right panel', tabs: rightModes, value: state.rightMode, onChange: (rightMode) => dispatch({ type: 'selectRightMode', rightMode }) })
   const eventLog = state.events.map((event) => JSON.stringify(event)).join('\n') || 'none'
@@ -116,6 +117,7 @@ function ActiveDemoWorkspace({
 
   useEffect(() => {
     let cancelled = false
+    setCopyState('idle')
     setSource('loading')
     sourceLoaders[activeSourceName]?.()
       .then((nextSource) => {
@@ -128,6 +130,19 @@ function ActiveDemoWorkspace({
       cancelled = true
     }
   }, [activeSourceName])
+
+  useEffect(() => {
+    if (copyState === 'idle') return
+    const timer = window.setTimeout(() => setCopyState('idle'), 1200)
+    return () => window.clearTimeout(timer)
+  }, [copyState])
+
+  const copySource = () => {
+    copyText(source).then(
+      () => setCopyState('copied'),
+      () => setCopyState('failed'),
+    )
+  }
 
   return (
     <>
@@ -177,8 +192,8 @@ function ActiveDemoWorkspace({
               <div className="grid gap-1">
                 <div className="flex min-w-0 items-start gap-2">
                   <SourceTabs tabs={sourceTabs.tabs} getTablistProps={sourceTabs.getTablistProps} getTabProps={sourceTabs.getTabProps} />
-                  <button type="button" className={`${buttonClass} shrink-0`} onClick={() => copyText(source)}>
-                    copy
+                  <button type="button" className={`${buttonClass} w-14 shrink-0`} onClick={copySource}>
+                    {copyState === 'idle' ? 'copy' : copyState}
                   </button>
                 </div>
                 <div className="truncate px-1 font-mono text-[11px] text-zinc-400 dark:text-zinc-600" title={activeSourceName}>
@@ -269,6 +284,6 @@ function coerceRightMode(value: string | null): AppState['rightMode'] | null {
   return rightModes.includes(value as AppState['rightMode']) ? value as AppState['rightMode'] : null
 }
 
-function copyText(value: string) {
-  void navigator.clipboard?.writeText(value)
+async function copyText(value: string): Promise<void> {
+  await navigator.clipboard?.writeText(value)
 }

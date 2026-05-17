@@ -1,6 +1,7 @@
 export * from './reactTypes'
 export * from './reactPatternEffects'
 export * from '../patterns/accordion/useAccordionPattern'
+export * from '../patterns/button/useButtonPattern'
 export * from '../patterns/listbox/useListboxPattern'
 export * from '../patterns/treeview/useTreeviewPattern'
 export * from '../patterns/tabs/useTabsPattern'
