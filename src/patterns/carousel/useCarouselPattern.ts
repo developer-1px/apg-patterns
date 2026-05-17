@@ -7,6 +7,7 @@ export interface ReactCarouselSlide {
   key: Key
   title: string
   caption: string
+  imageUrl: string | null
   active: boolean
   index: number
   slideProps: ReactPatternProps
@@ -54,11 +55,12 @@ export function useCarouselPattern(data: PatternData, onEvent: (event: PatternEv
     },
     get slides() {
       return slideKeys.map((key, index) => {
-        const item = data.items[key] as { title?: unknown; caption?: unknown } | undefined
+        const item = data.items[key] as { title?: unknown; caption?: unknown; imageUrl?: unknown } | undefined
         return {
           key,
           title: String(item?.title ?? data.items[key]?.label ?? key),
           caption: String(item?.caption ?? ''),
+          imageUrl: typeof item?.imageUrl === 'string' ? item.imageUrl : null,
           active: key === activeKey,
           index,
           slideProps: runtime.getPartProps('slide', key) as ReactPatternProps,

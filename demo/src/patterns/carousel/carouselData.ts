@@ -10,27 +10,27 @@ export type CarouselSlide = {
 export const carouselSlides: readonly CarouselSlide[] = [
   {
     key: 'slide1',
-    title: 'Hiking',
-    caption: 'A hiker enjoys a mountain trail at sunrise.',
-    imageUrl: 'https://www.w3.org/WAI/ARIA/apg/patterns/carousel/examples/images/hiking.jpg',
+    title: 'Ridgeline',
+    caption: 'Open mountain terrain with a long horizon line.',
+    imageUrl: 'https://picsum.photos/id/1018/900/520',
   },
   {
     key: 'slide2',
-    title: 'Jellyfish',
-    caption: 'A bioluminescent jellyfish glides through dark water.',
-    imageUrl: 'https://www.w3.org/WAI/ARIA/apg/patterns/carousel/examples/images/jellyfish.jpg',
+    title: 'Current',
+    caption: 'A quiet water scene with layered depth.',
+    imageUrl: 'https://picsum.photos/id/1069/900/520',
   },
   {
     key: 'slide3',
-    title: 'Beach',
-    caption: 'Waves wash over a quiet sandy shoreline.',
-    imageUrl: 'https://www.w3.org/WAI/ARIA/apg/patterns/carousel/examples/images/beach.jpg',
+    title: 'Shore',
+    caption: 'A broad coastal view with soft natural light.',
+    imageUrl: 'https://picsum.photos/id/1015/900/520',
   },
   {
     key: 'slide4',
-    title: 'Forest',
-    caption: 'Sunlight filters through tall evergreen trees.',
-    imageUrl: 'https://www.w3.org/WAI/ARIA/apg/patterns/carousel/examples/images/forest.jpg',
+    title: 'Canopy',
+    caption: 'Dense landscape texture framed for scanning.',
+    imageUrl: 'https://picsum.photos/id/1039/900/520',
   },
 ]
 
