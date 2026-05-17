@@ -25,7 +25,11 @@ export function VariantListbox<T extends string>({
     options: { focusStrategy: 'rovingTabIndex', selectionMode: 'single' },
     onEvent: (event) => {
       if (event.type === 'select') selectVariant(event.keys[0], items, onChange)
-      if (event.type === 'navigate') selectVariant(reducePatternData(listboxDefinition, data, event).state?.activeKey, items, onChange)
+      if (event.type === 'navigate') {
+        const nextKey = reducePatternData(listboxDefinition, data, event).state?.activeKey
+        focusVariant(idPrefix, nextKey)
+        selectVariant(nextKey, items, onChange)
+      }
     },
     keyToElementId: (key) => `${idPrefix}-${key}`,
   })
@@ -81,4 +85,9 @@ function selectVariant<T extends string>(
   onChange: (value: T) => void,
 ) {
   if (items.some((item) => item.key === key)) onChange(key as T)
+}
+
+function focusVariant(idPrefix: string, key: string | null | undefined) {
+  if (!key) return
+  document.getElementById(`${idPrefix}-${key}`)?.focus({ preventScroll: true })
 }

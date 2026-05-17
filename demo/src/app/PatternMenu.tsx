@@ -14,7 +14,11 @@ export function PatternMenu({ value, onChange }: { value: PatternKey; onChange: 
     options: { focusStrategy: 'rovingTabIndex', selectionMode: 'single' },
     onEvent: (event) => {
       if (event.type === 'select') selectPattern(event.keys[0], onChange)
-      if (event.type === 'navigate') selectPattern(reducePatternData(listboxDefinition, data, event).state?.activeKey, onChange)
+      if (event.type === 'navigate') {
+        const nextKey = reducePatternData(listboxDefinition, data, event).state?.activeKey
+        focusPattern(nextKey)
+        selectPattern(nextKey, onChange)
+      }
     },
     keyToElementId: (key) => `pattern-${key}`,
   })
@@ -59,4 +63,9 @@ function createPatternMenuData(value: PatternKey): PatternData {
 
 function selectPattern(key: string | null | undefined, onChange: (value: PatternKey) => void) {
   if (patternItems.some((item) => item.key === key)) onChange(key as PatternKey)
+}
+
+function focusPattern(key: string | null | undefined) {
+  if (!key) return
+  document.getElementById(`pattern-${key}`)?.focus({ preventScroll: true })
 }
