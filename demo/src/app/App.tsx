@@ -7,12 +7,12 @@ import { Icon, type IconName } from '../shared/Icon'
 import { sourceLoaders, type SourceName } from '../shared/sources'
 import { SourceTabs, useSourceTabs } from './SourceTabs'
 
-const panelClass = 'min-h-0 rounded-xl bg-white/90 p-3 shadow-[0_18px_50px_rgba(24,24,27,0.08)] ring-1 ring-black/[0.03] backdrop-blur dark:bg-zinc-950/88 dark:shadow-[0_18px_50px_rgba(0,0,0,0.32)] dark:ring-white/[0.04]'
+const panelClass = 'min-h-0 rounded-xl bg-white/92 p-3 shadow-[0_16px_48px_rgba(24,24,27,0.07)] backdrop-blur dark:bg-zinc-950/90 dark:shadow-[0_18px_54px_rgba(0,0,0,0.34)]'
 const scrollPanelClass = `${panelClass} overflow-auto`
 const headerClass = 'mb-4 flex items-center justify-between gap-3'
 const titleClass = 'truncate text-[11px] font-semibold uppercase text-zinc-500 dark:text-zinc-500'
 const buttonClass = 'inline-flex h-8 items-center justify-center rounded-lg px-2.5 text-xs font-medium text-zinc-600 outline-none transition hover:bg-zinc-100 hover:text-zinc-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-100 dark:focus-visible:outline-zinc-500'
-const preClass = 'max-h-[44dvh] min-h-0 overflow-auto rounded-xl bg-zinc-100/70 p-4 font-mono text-[12px] leading-6 text-zinc-700 shadow-inner shadow-zinc-200/50 dark:bg-white/[0.045] dark:text-zinc-300 dark:shadow-black/10 lg:h-full lg:max-h-none'
+const preClass = 'max-h-[44dvh] min-h-0 overflow-auto rounded-xl bg-zinc-100/65 p-4 font-mono text-[12px] leading-6 text-zinc-700 shadow-inner shadow-zinc-200/35 dark:bg-white/[0.04] dark:text-zinc-300 dark:shadow-black/10 lg:h-full lg:max-h-none'
 const optionButtonClass =
   'inline-flex h-8 items-center rounded-lg px-2.5 text-left text-xs font-medium text-zinc-500 outline-none transition hover:bg-white/70 hover:text-zinc-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 aria-selected:bg-white aria-selected:text-zinc-950 aria-selected:shadow-sm dark:text-zinc-500 dark:hover:bg-white/[0.06] dark:hover:text-zinc-100 dark:focus-visible:outline-zinc-500 dark:aria-selected:bg-zinc-100 dark:aria-selected:text-zinc-950'
 const rightModes = ['source', 'inspect', 'log'] as const
@@ -69,7 +69,7 @@ export function App() {
   const [state, dispatch] = useReducer(reduceAppState, defaultAppState, readInitialAppState)
 
   return (
-    <main className={`grid min-h-dvh grid-cols-1 gap-3 bg-zinc-100 px-3 py-3 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 sm:px-4 sm:py-4 ${state.rightPanelOpen ? 'lg:grid-cols-[220px_minmax(420px,1fr)_minmax(420px,0.92fr)]' : 'lg:grid-cols-[220px_minmax(420px,1fr)]'} lg:h-dvh lg:grid-rows-[minmax(0,1fr)] lg:gap-4 lg:px-5 lg:py-5`}>
+    <main className={`grid min-h-dvh grid-cols-1 gap-3 bg-zinc-100/90 px-3 py-3 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 sm:px-4 sm:py-4 ${state.rightPanelOpen ? 'lg:grid-cols-[220px_minmax(420px,1fr)_minmax(420px,0.92fr)]' : 'lg:grid-cols-[220px_minmax(420px,1fr)]'} lg:h-dvh lg:grid-rows-[minmax(0,1fr)] lg:gap-4 lg:px-5 lg:py-5`}>
       <section className={scrollPanelClass}>
         <header className={headerClass}>
           <h1 className={titleClass}>patterns</h1>
@@ -165,7 +165,7 @@ function ActiveDemoWorkspace({
             <div className="mb-1.5 text-[10px] font-semibold uppercase text-zinc-400 dark:text-zinc-600">keys</div>
             <div className="flex flex-wrap gap-1">
               {activeDemo.keyboardShortcuts.map((shortcut) => (
-                <kbd key={shortcut} className="inline-flex min-h-6 items-center gap-1 rounded-md bg-white px-1.5 py-0.5 font-mono text-[11px] text-zinc-500 shadow-sm dark:bg-white/[0.06] dark:text-zinc-400">
+                <kbd key={shortcut} className="inline-flex min-h-6 items-center gap-1 rounded-md bg-zinc-100/70 px-1.5 py-0.5 font-mono text-[11px] text-zinc-500 dark:bg-white/[0.045] dark:text-zinc-400">
                   <ShortcutIndicator shortcut={shortcut} />
                 </kbd>
               ))}

@@ -37,6 +37,25 @@ describe('loadSourcePreview', () => {
   })
 })
 
+describe('demo pattern registry', () => {
+  it('keeps pattern keys and labels unique for stable menus and deep links', () => {
+    const keys = patternEntries.map((entry) => entry.key)
+    const labels = patternEntries.map((entry) => entry.label)
+
+    expect(duplicates(keys)).toEqual([])
+    expect(duplicates(labels)).toEqual([])
+    expect(keys).toEqual([...keys].sort((a, b) => a.localeCompare(b)))
+  })
+
+  it('uses valid, non-empty demo metadata for every registered pattern', () => {
+    const invalidEntries: string[] = []
+
+    render(<DemoSourceProbe onInvalidEntry={(issue) => invalidEntries.push(issue)} />)
+
+    expect(invalidEntries).toEqual([])
+  })
+})
+
 describe('demo source wiring', () => {
   it('connects every pattern source tab to a collected source file', () => {
     const missingSources: string[] = []
@@ -58,14 +77,22 @@ describe('demo source wiring', () => {
 function DemoSourceProbe({
   onMissingSource,
   onMissingHookSource = () => undefined,
+  onInvalidEntry = () => undefined,
 }: {
   onMissingSource?: (sourceName: string) => void
   onMissingHookSource?: (sourceName: string) => void
+  onInvalidEntry?: (issue: string) => void
 }) {
   return (
     <>
       {patternEntries.map((entry) => (
-        <DemoSourceProbeItem key={entry.key} entry={entry} onMissingSource={onMissingSource} onMissingHookSource={onMissingHookSource} />
+        <DemoSourceProbeItem
+          key={entry.key}
+          entry={entry}
+          onMissingSource={onMissingSource}
+          onMissingHookSource={onMissingHookSource}
+          onInvalidEntry={onInvalidEntry}
+        />
       ))}
     </>
   )
@@ -79,8 +106,14 @@ function DemoSourceProbeItem({
   entry: (typeof patternEntries)[number]
   onMissingSource?: (sourceName: string) => void
   onMissingHookSource: (sourceName: string) => void
+  onInvalidEntry: (issue: string) => void
 }) {
   const demo = entry.useDemoPattern(() => undefined)
+  if (demo.key !== entry.key) onInvalidEntry(`${entry.key}: demo key ${demo.key}`)
+  if (demo.label !== entry.label) onInvalidEntry(`${entry.key}: demo label ${demo.label}`)
+  if (demo.sourceNames.length === 0) onInvalidEntry(`${entry.key}: no source tabs`)
+  if (duplicates([...demo.sourceNames]).length > 0) onInvalidEntry(`${entry.key}: duplicate source tabs`)
+  if (demo.keyboardShortcuts.some((shortcut) => shortcut.trim().length === 0)) onInvalidEntry(`${entry.key}: empty keyboard shortcut`)
   for (const sourceName of demo.sourceNames) {
     if (!sourceLoaders[sourceName]) onMissingSource?.(`${entry.key}: ${sourceName}`)
   }
@@ -95,4 +128,14 @@ function expectedHookSources(patternKey: string) {
     sourceName.startsWith(`${patternKey}/`)
     && /\/use[A-Z].*Pattern\.ts$/.test(sourceName)
   ))
+}
+
+function duplicates(values: readonly string[]) {
+  const seen = new Set<string>()
+  const duplicateValues = new Set<string>()
+  for (const value of values) {
+    if (seen.has(value)) duplicateValues.add(value)
+    seen.add(value)
+  }
+  return [...duplicateValues]
 }
