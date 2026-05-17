@@ -144,6 +144,8 @@ describe('App route state', () => {
     expect(currentHashParam('pattern')).toBe('accordion')
     expect(currentHashParam('source')).toBe('Accordion.tsx')
     expect(screen.queryByRole('tablist', { name: 'source files' })).toBeNull()
+    expect(screen.queryByRole('tablist', { name: 'right panel' })).toBeNull()
+    expect(screen.queryByRole('tabpanel')).toBeNull()
   })
 
   it('restores the previous source panel state when the right panel is reopened', async () => {
