@@ -72,6 +72,8 @@ function createSpinbuttonRenderItem(runtime: PatternRuntime, key: Key): ReactSpi
   const { onKeyDown: _onKeyDown, ...props } = runtime.getPartProps('spinbutton', key) as ReactPatternProps
   const state = runtime.getItemState(key, 'spinbutton')
   const label = runtime.data.items[key]?.label ?? key
+  const min = Number(runtime.options.min ?? 0)
+  const max = Number(runtime.options.max ?? 100)
   return {
     key,
     label,
@@ -84,6 +86,8 @@ function createSpinbuttonRenderItem(runtime: PatternRuntime, key: Key): ReactSpi
     },
     spinbuttonProps: {
       ...props,
+      'aria-valuemin': min,
+      'aria-valuemax': max,
       onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
         runtime.emit({ type: 'focus', key })
         const result = runtime.resolveKeyboardBinding(event as unknown as KeyInput, key)

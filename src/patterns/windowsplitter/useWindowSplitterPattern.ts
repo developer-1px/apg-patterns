@@ -49,6 +49,8 @@ export function useWindowSplitterPattern(data: PatternData, onEvent: (event: Pat
       const { onKeyDown: _onKeyDown, ...props } = runtime.getPartProps('separator', key) as ReactPatternProps
       return {
         ...props,
+        'aria-valuemin': min,
+        'aria-valuemax': max,
         onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
           runtime.emit({ type: 'focus', key })
           const result = runtime.resolveKeyboardBinding(event as unknown as KeyInput, key)

@@ -69,6 +69,10 @@ function createMeterRenderItem(runtime: PatternRuntime, key: Key): ReactMeterRen
     ratio,
     percent: ratio * 100,
     valueText: itemRange?.valuetext,
-    meterProps: runtime.getPartProps('meter', key) as ReactPatternProps,
+    meterProps: {
+      ...(runtime.getPartProps('meter', key) as ReactPatternProps),
+      'aria-valuemin': min,
+      'aria-valuemax': max,
+    } as ReactPatternProps,
   }
 }

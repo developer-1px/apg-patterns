@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
+import { render } from '@testing-library/react'
 import { coerceRightMode, formatEvent, loadSourcePreview } from './App'
+import { patternEntries } from '../shared/demoPatterns'
+import { sourceLoaders } from '../shared/sources'
 import type { PatternEvent } from '../../../src'
 
 describe('formatEvent', () => {
@@ -33,3 +36,37 @@ describe('loadSourcePreview', () => {
     await expect(loadSourcePreview('__missing__.tsx')).resolves.toBe('missing source: __missing__.tsx')
   })
 })
+
+describe('demo source wiring', () => {
+  it('connects every pattern source tab to a collected source file', () => {
+    const missingSources: string[] = []
+
+    render(<DemoSourceProbe onMissingSource={(sourceName) => missingSources.push(sourceName)} />)
+
+    expect(missingSources).toEqual([])
+  })
+})
+
+function DemoSourceProbe({ onMissingSource }: { onMissingSource: (sourceName: string) => void }) {
+  return (
+    <>
+      {patternEntries.map((entry) => (
+        <DemoSourceProbeItem key={entry.key} entry={entry} onMissingSource={onMissingSource} />
+      ))}
+    </>
+  )
+}
+
+function DemoSourceProbeItem({
+  entry,
+  onMissingSource,
+}: {
+  entry: (typeof patternEntries)[number]
+  onMissingSource: (sourceName: string) => void
+}) {
+  const demo = entry.useDemoPattern(() => undefined)
+  for (const sourceName of demo.sourceNames) {
+    if (!sourceLoaders[sourceName]) onMissingSource(`${entry.key}: ${sourceName}`)
+  }
+  return null
+}

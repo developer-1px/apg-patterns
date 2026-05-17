@@ -50,8 +50,8 @@ export function Table({
         </thead>
       ) : null}
       <tbody>
-        {bodyRowKeys.map((rowKey) => (
-          <TableRow key={rowKey} runtime={runtime} data={data} rowKey={rowKey} cellKeys={cellsByRow(rowKey)} />
+        {bodyRowKeys.map((rowKey, rowIndex) => (
+          <TableRow key={rowKey} runtime={runtime} data={data} rowKey={rowKey} cellKeys={cellsByRow(rowKey)} rowIndex={rowIndex} />
         ))}
       </tbody>
     </table>
@@ -63,15 +63,18 @@ function TableRow({
   data,
   rowKey,
   cellKeys,
+  rowIndex,
 }: {
   runtime: ReturnType<typeof createPatternRuntime>
   data: PatternData
   rowKey: string
   cellKeys: readonly string[]
+  rowIndex?: number
 }) {
   const rowProps = runtime.getPartProps('row', rowKey) as Props
+  const isStriped = rowIndex !== undefined && rowIndex % 2 === 0
   return (
-    <tr {...rowProps}>
+    <tr {...rowProps} className={isStriped ? 'bg-zinc-100/35 dark:bg-white/[0.025]' : undefined}>
       {cellKeys.map((cellKey) => {
         const kind = data.items[cellKey]?.kind
         const part = kind === 'columnheader' ? 'columnheader' : kind === 'rowheader' ? 'rowheader' : 'cell'
@@ -79,7 +82,7 @@ function TableRow({
         const Tag = part === 'columnheader' || part === 'rowheader' ? 'th' : 'td'
         const label = data.items[cellKey]?.label
         return (
-          <Tag key={cellKey} {...cellProps} className="px-3 py-2 text-left first:pl-4 odd:bg-zinc-100/35 dark:odd:bg-white/[0.025]">
+          <Tag key={cellKey} {...cellProps} className="px-3 py-2 text-left first:pl-4">
             {label}
           </Tag>
         )

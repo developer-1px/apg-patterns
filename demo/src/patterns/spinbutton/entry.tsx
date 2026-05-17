@@ -24,13 +24,13 @@ export const entry: PatternEntry = {
       key: 'spinbutton',
       label: 'Spinbutton',
       keyboardShortcuts: ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'],
-      sourceNames: ['Spinbutton.tsx', 'spinbuttonData.ts', 'spinbutton/definition.ts', ...KERNEL_SOURCES],
+      sourceNames: ['Spinbutton.tsx', 'useSpinbuttonPattern.ts', 'spinbuttonData.ts', 'spinbutton/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
       variants: <VariantListbox orientation="horizontal" value={host.variant} items={items} label="spinbutton variants" idPrefix="spinbutton-variant" onChange={host.selectVariant} />,
       preview: <Spinbutton data={host.data} onEvent={(event) => {
         onEvent(event)
         host.dispatchEvent(event)
-      }} />,
+      }} options={spinbuttonVariants[host.variant].options} />,
     }
   },
 }

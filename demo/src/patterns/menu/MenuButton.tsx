@@ -24,6 +24,19 @@ export function MenuButton({ data, onEvent }: MenuProps) {
   const triggerProps = runtime.getPartProps('trigger', triggerKey) as Props
   const menuProps = runtime.getPartProps('menu', menuKey) as Props
   const rootKeyDown = runtime.getRootKeyboardHandler()
+  const closeAndFocusTrigger = () => {
+    onEvent({ type: 'expand', key: triggerKey, expanded: false })
+    document.getElementById(`mb-${triggerKey}`)?.focus({ preventScroll: true })
+  }
+  const focusItem = (key: string | undefined) => {
+    if (key) onEvent({ type: 'focus', key, meta: { reason: 'keyboard' } })
+  }
+  const activateActiveItem = () => {
+    const activeKey = data.state?.activeKey && menuItemKeys.includes(data.state.activeKey) ? data.state.activeKey : menuItemKeys[0]
+    if (!activeKey) return
+    onEvent({ type: 'activate', key: activeKey })
+    closeAndFocusTrigger()
+  }
 
   return (
     <div className="grid max-w-xs gap-2">
@@ -32,6 +45,12 @@ export function MenuButton({ data, onEvent }: MenuProps) {
           event.preventDefault()
           onEvent({ type: 'expand', key: triggerKey, expanded: true, meta: { reason: 'open' } })
           if (menuItemKeys[0]) onEvent({ type: 'focus', key: menuItemKeys[0], meta: { reason: 'open' } })
+          return
+        }
+        if (!expanded && event.key === 'ArrowUp') {
+          event.preventDefault()
+          onEvent({ type: 'expand', key: triggerKey, expanded: true, meta: { reason: 'open' } })
+          if (menuItemKeys.length > 0) onEvent({ type: 'focus', key: menuItemKeys[menuItemKeys.length - 1]!, meta: { reason: 'open' } })
         }
       }} className="inline-flex h-8 items-center justify-between rounded bg-zinc-100 px-3 text-sm text-zinc-800 outline-none hover:bg-zinc-200 focus:outline focus:outline-2 focus:outline-zinc-400 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:focus:outline-zinc-500">
         <span>{data.items[triggerKey]?.label ?? 'Menu'}</span>
@@ -41,14 +60,18 @@ export function MenuButton({ data, onEvent }: MenuProps) {
         <ul {...menuProps} tabIndex={focusStrategy === 'ariaActiveDescendant' ? 0 : -1} onKeyDown={(event: ReactKeyboardEvent) => {
           if (event.key === 'Escape') {
             event.preventDefault()
-            onEvent({ type: 'expand', key: triggerKey, expanded: false })
-            document.getElementById(`mb-${triggerKey}`)?.focus({ preventScroll: true })
+            closeAndFocusTrigger()
+            return
+          }
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault()
+            activateActiveItem()
             return
           }
           const nextKey = resolveMenuButtonKey(event.key, menuItemKeys, data.state?.activeKey)
           if (nextKey) {
             event.preventDefault()
-            onEvent({ type: 'focus', key: nextKey, meta: { reason: 'keyboard' } })
+            focusItem(nextKey)
             return
           }
           rootKeyDown(event as any)
@@ -59,8 +82,7 @@ export function MenuButton({ data, onEvent }: MenuProps) {
             return (
               <li key={key} id={`mb-${key}`} {...itemProps} data-active={itemState.active ? '' : undefined} onFocus={() => onEvent({ type: 'focus', key })} onClick={(event) => {
                 ;(itemProps.onClick as ((event: unknown) => void) | undefined)?.(event)
-                onEvent({ type: 'expand', key: triggerKey, expanded: false })
-                document.getElementById(`mb-${triggerKey}`)?.focus({ preventScroll: true })
+                closeAndFocusTrigger()
               }} className="cursor-default rounded px-2 py-1 text-zinc-800 outline-none aria-disabled:text-zinc-400 data-active:bg-zinc-100 focus:outline focus:outline-2 focus:outline-zinc-400 dark:text-zinc-200 dark:aria-disabled:text-zinc-600 dark:data-active:bg-zinc-900 dark:focus:outline-zinc-500">
                 {data.items[key]?.label ?? key}
               </li>

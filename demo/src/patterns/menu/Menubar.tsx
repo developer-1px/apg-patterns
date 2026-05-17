@@ -24,23 +24,33 @@ export function Menubar({ data, onEvent }: MenuProps) {
     <div className="grid gap-2">
       <div {...rootProps} onKeyDown={(event) => handleMenubarKey(event, rootProps.onKeyDown as ((event: ReactKeyboardEvent) => void) | undefined, typeahead)} className="flex items-center gap-0.5 rounded bg-zinc-50 px-1 py-1 outline-none dark:bg-zinc-900">
         {rootKeys.map((key) => (
-          <RootMenuItem key={key} itemKey={key} data={data} runtime={runtime} expanded={(data.state?.expandedKeys ?? []).includes(key)} />
+          <RootMenuItem key={key} itemKey={key} data={data} runtime={runtime} expanded={(data.state?.expandedKeys ?? []).includes(key)} onEvent={onEvent} />
         ))}
       </div>
       {rootKeys.filter((key) => (data.state?.expandedKeys ?? []).includes(key)).map((rootKey) => (
-        <Submenu key={rootKey} data={data} ownerKey={rootKey} onEvent={onEvent} onClose={() => onEvent({ type: 'expand', key: rootKey, expanded: false })} />
+        <Submenu key={rootKey} data={data} ownerKey={rootKey} rootKeys={rootKeys} onEvent={onEvent} />
       ))}
     </div>
   )
 }
 
-function RootMenuItem({ itemKey, data, runtime, expanded }: { itemKey: string; data: PatternData; runtime: ReturnType<typeof createPatternRuntime>; expanded: boolean }) {
+function RootMenuItem({ itemKey, data, runtime, expanded, onEvent }: { itemKey: string; data: PatternData; runtime: ReturnType<typeof createPatternRuntime>; expanded: boolean; onEvent: (event: PatternEvent) => void }) {
   const itemProps = runtime.getPartProps('menuitem', itemKey) as Props
+  const children = data.relations?.childrenByKey?.[itemKey] ?? []
   return (
     <button
       type="button"
       id={`menubar-${itemKey}`}
       {...itemProps}
+      onKeyDown={(event) => {
+        if (event.key === 'ArrowUp' && children.length > 0) {
+          event.preventDefault()
+          onEvent({ type: 'expand', key: itemKey, expanded: true })
+          onEvent({ type: 'focus', key: children[children.length - 1]!, meta: { reason: 'keyboard' } })
+          return
+        }
+        ;(itemProps.onKeyDown as ((event: ReactKeyboardEvent) => void) | undefined)?.(event)
+      }}
       className="h-7 rounded px-2 text-sm text-zinc-800 outline-none aria-disabled:text-zinc-400 aria-expanded:bg-white aria-expanded:text-zinc-950 focus:outline focus:outline-2 focus:outline-zinc-400 dark:text-zinc-200 dark:aria-disabled:text-zinc-600 dark:aria-expanded:bg-zinc-950 dark:aria-expanded:text-zinc-50 dark:focus:outline-zinc-500"
     >
       {data.items[itemKey]?.label}
@@ -49,22 +59,73 @@ function RootMenuItem({ itemKey, data, runtime, expanded }: { itemKey: string; d
   )
 }
 
-function Submenu({ data, ownerKey, onEvent, onClose }: { data: PatternData; ownerKey: string; onEvent: (event: PatternEvent) => void; onClose: () => void }) {
+function Submenu({ data, ownerKey, rootKeys, onEvent }: { data: PatternData; ownerKey: string; rootKeys: readonly string[]; onEvent: (event: PatternEvent) => void }) {
   const children = data.relations?.childrenByKey?.[ownerKey] ?? []
   const radioGroup = children.filter((key) => (data.items[key] as { kind?: string } | undefined)?.kind === 'menuitemradio')
+  const activeKey = children.includes(data.state?.activeKey ?? '') ? data.state?.activeKey : children[0]
+  const focusOwner = () => {
+    onEvent({ type: 'focus', key: ownerKey, meta: { reason: 'keyboard' } })
+    document.getElementById(`menubar-${ownerKey}`)?.focus({ preventScroll: true })
+  }
+  const close = () => onEvent({ type: 'expand', key: ownerKey, expanded: false })
+  const focusChild = (key: string | undefined) => {
+    if (key) onEvent({ type: 'focus', key, meta: { reason: 'keyboard' } })
+  }
+  const openSibling = (direction: 'next' | 'previous') => {
+    const target = siblingKey(rootKeys, ownerKey, direction)
+    if (!target) return
+    close()
+    onEvent({ type: 'focus', key: target, meta: { reason: 'keyboard' } })
+    const targetChildren = data.relations?.childrenByKey?.[target] ?? []
+    if (targetChildren.length > 0) {
+      onEvent({ type: 'expand', key: target, expanded: true })
+      focusChild(targetChildren[0])
+    }
+  }
   return (
     <ul role="menu" aria-labelledby={`menubar-${ownerKey}`} className="ml-2 grid w-56 gap-0.5 rounded border border-zinc-200 bg-white p-1 text-sm shadow dark:border-zinc-800 dark:bg-zinc-950" onKeyDown={(event) => {
-      if (event.key === 'Escape' || event.key === 'ArrowLeft') {
+      if (event.key === 'Escape') {
         event.preventDefault()
-        onClose()
+        close()
+        focusOwner()
+        return
+      }
+      if (event.key === 'ArrowDown') {
+        event.preventDefault()
+        focusChild(stepKey(children, activeKey, 1))
+        return
+      }
+      if (event.key === 'ArrowUp') {
+        event.preventDefault()
+        focusChild(stepKey(children, activeKey, -1))
+        return
+      }
+      if (event.key === 'Home') {
+        event.preventDefault()
+        focusChild(children[0])
+        return
+      }
+      if (event.key === 'End') {
+        event.preventDefault()
+        focusChild(children[children.length - 1])
+        return
+      }
+      if (event.key === 'ArrowRight') {
+        event.preventDefault()
+        openSibling('next')
+        return
+      }
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault()
+        openSibling('previous')
       }
     }}>
-      {children.map((key) => <SubmenuItem key={key} itemKey={key} data={data} radioGroup={radioGroup} onEvent={onEvent} onClose={onClose} />)}
+      {children.map((key) => <SubmenuItem key={key} itemKey={key} data={data} active={key === activeKey} radioGroup={radioGroup} onEvent={onEvent} onClose={close} />)}
     </ul>
   )
 }
 
-function SubmenuItem({ itemKey, data, radioGroup, onEvent, onClose }: { itemKey: string; data: PatternData; radioGroup: readonly string[]; onEvent: (event: PatternEvent) => void; onClose: () => void }) {
+function SubmenuItem({ itemKey, data, active, radioGroup, onEvent, onClose }: { itemKey: string; data: PatternData; active: boolean; radioGroup: readonly string[]; onEvent: (event: PatternEvent) => void; onClose: () => void }) {
   const item = data.items[itemKey] as { label?: string; kind?: string } | undefined
   const role = item?.kind === 'menuitemcheckbox' ? 'menuitemcheckbox' : item?.kind === 'menuitemradio' ? 'menuitemradio' : 'menuitem'
   const checked = data.state?.checkedByKey?.[itemKey]
@@ -77,12 +138,12 @@ function SubmenuItem({ itemKey, data, radioGroup, onEvent, onClose }: { itemKey:
     onClose()
   }
   return (
-    <li role={role} tabIndex={-1} aria-disabled={disabled || undefined} aria-checked={role === 'menuitemcheckbox' || role === 'menuitemradio' ? Boolean(checked) : undefined} onClick={activate} onKeyDown={(event) => {
+    <li id={`menubar-${itemKey}`} role={role} tabIndex={active ? 0 : -1} data-active={active ? '' : undefined} aria-disabled={disabled || undefined} aria-checked={role === 'menuitemcheckbox' || role === 'menuitemradio' ? Boolean(checked) : undefined} onFocus={() => onEvent({ type: 'focus', key: itemKey })} onClick={activate} onKeyDown={(event) => {
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault()
         activate()
       }
-    }} className="cursor-default rounded px-2 py-1 text-zinc-800 outline-none hover:bg-zinc-100 aria-disabled:text-zinc-400 dark:text-zinc-200 dark:hover:bg-zinc-900 dark:aria-disabled:text-zinc-600">
+    }} className="cursor-default rounded px-2 py-1 text-zinc-800 outline-none hover:bg-zinc-100 aria-disabled:text-zinc-400 data-active:bg-zinc-100 focus:outline focus:outline-2 focus:outline-zinc-400 dark:text-zinc-200 dark:hover:bg-zinc-900 dark:aria-disabled:text-zinc-600 dark:data-active:bg-zinc-900 dark:focus:outline-zinc-500">
       <span className="mr-2 inline-grid w-4 place-items-center text-xs text-zinc-500">
         {role === 'menuitemcheckbox' ? <Icon name={checked ? 'square-check' : 'square'} /> : null}
         {role === 'menuitemradio' ? <Icon name="circle-dot" className={checked ? '' : 'opacity-0'} /> : null}
@@ -117,4 +178,18 @@ function handleMenubarKey(event: ReactKeyboardEvent, baseKeyDown: ((event: React
     return
   }
   baseKeyDown?.(event)
+}
+
+function stepKey(keys: readonly string[], activeKey: string | null | undefined, delta: 1 | -1) {
+  if (keys.length === 0) return undefined
+  const index = activeKey ? keys.indexOf(activeKey) : -1
+  if (index === -1) return keys[delta === 1 ? 0 : keys.length - 1]
+  return keys[(index + delta + keys.length) % keys.length]
+}
+
+function siblingKey(keys: readonly string[], key: string, direction: 'next' | 'previous') {
+  if (keys.length === 0) return undefined
+  const index = keys.indexOf(key)
+  if (index === -1) return undefined
+  return keys[(index + (direction === 'next' ? 1 : -1) + keys.length) % keys.length]
 }
