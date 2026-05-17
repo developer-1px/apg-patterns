@@ -40,20 +40,27 @@ const requiredText = ['patterns', 'Tabs', 'code', 'Tabs.tsx']
 const missingText = requiredText.filter((text) => !rootText().includes(text))
 const patternFailures = []
 
-for (const option of patternListbox.querySelectorAll('[role="option"]')) {
-  const label = option.textContent?.trim()
-  const key = option.id?.replace(/^pattern-/, '')
+for (const { key, label } of Array.from(patternListbox.querySelectorAll('[role="option"]'), (option) => ({
+  key: option.id?.replace(/^pattern-/, ''),
+  label: option.textContent?.trim(),
+})).filter((item) => item.key && item.label)) {
+  const option = findPatternOption(key)
   if (!label) continue
+  if (!option) {
+    patternFailures.push(`${label}: pattern option missing`)
+    continue
+  }
   option.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
 
   try {
     await waitFor(() => {
+      const currentOption = findPatternOption(key)
       const text = rootText()
       const sourceText = document.querySelector('pre')?.textContent ?? ''
       return text.includes(label)
         && sourceText !== 'loading'
         && sourceText.length > 0
-        && option.getAttribute('aria-selected') === 'true'
+        && currentOption?.getAttribute('aria-selected') === 'true'
         && (!key || window.location.hash.includes(`pattern=${key}`))
     })
   } catch {
@@ -111,6 +118,14 @@ await verifyHashRoute('#pattern=accordion&panel=events&source=Accordion.tsx', (t
   'events panel route did not render empty event log',
 )
 
+await verifyHashRoute('#pattern=accordion&panel=off&source=Accordion.tsx', (text) =>
+  window.location.hash.includes('pattern=accordion')
+  && window.location.hash.includes('panel=off')
+  && text.includes('Accordion')
+  && !text.includes('Accordion.tsx'),
+  'closed right panel route did not keep the source panel closed',
+)
+
 process.removeListener('uncaughtException', recordError)
 process.removeListener('unhandledRejection', recordError)
 
@@ -154,4 +169,8 @@ function currentHashParam(name) {
 function findSourceTab(sourceName) {
   return Array.from(document.querySelectorAll('[role="tablist"][aria-label="source files"] [role="tab"]'))
     .find((tab) => tab.textContent?.trim() === sourceName)
+}
+
+function findPatternOption(key) {
+  return document.getElementById(`pattern-${key}`)
 }
