@@ -16,6 +16,7 @@ const preClass = 'max-h-[44dvh] min-h-0 overflow-auto rounded-xl bg-zinc-100/65 
 const sourcePreClass = 'max-h-[44dvh] min-h-0 overflow-auto rounded-xl bg-zinc-950 p-4 font-mono text-[11px] leading-5 text-zinc-200 shadow-inner shadow-black/30 lg:h-full lg:max-h-none'
 const optionButtonClass =
   'inline-flex h-8 items-center rounded-lg px-2.5 text-left text-xs font-medium text-zinc-500 outline-none transition hover:bg-white/70 hover:text-zinc-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 aria-selected:bg-white aria-selected:text-zinc-950 aria-selected:shadow-sm dark:text-zinc-500 dark:hover:bg-white/[0.06] dark:hover:text-zinc-100 dark:focus-visible:outline-zinc-500 dark:aria-selected:bg-zinc-100 dark:aria-selected:text-zinc-950'
+const keycapClass = 'inline-flex min-h-6 items-center gap-1 rounded-md bg-gradient-to-b from-white to-zinc-100 px-1.5 py-0.5 font-mono text-[11px] font-medium text-zinc-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(39,39,42,0.12),0_1px_1px_rgba(39,39,42,0.14)] dark:from-zinc-800 dark:to-zinc-900 dark:text-zinc-300 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.09),inset_0_-1px_0_rgba(0,0,0,0.55),0_1px_1px_rgba(0,0,0,0.45)]'
 const rightModes = ['source', 'inspect', 'log'] as const
 const rightModeLabels: Record<(typeof rightModes)[number], string> = {
   source: 'code',
@@ -190,7 +191,7 @@ function ActiveDemoWorkspace({
             <div className="mb-1.5 text-[10px] font-semibold uppercase text-zinc-400 dark:text-zinc-600">keys</div>
             <div className="flex flex-wrap gap-1">
               {activeDemo.keyboardShortcuts.map((shortcut) => (
-                <kbd key={shortcut} className="inline-flex min-h-6 items-center gap-1 rounded-md bg-zinc-100/70 px-1.5 py-0.5 font-mono text-[11px] text-zinc-500 dark:bg-white/[0.045] dark:text-zinc-400">
+                <kbd key={shortcut} className={keycapClass}>
                   <ShortcutIndicator shortcut={shortcut} />
                 </kbd>
               ))}
