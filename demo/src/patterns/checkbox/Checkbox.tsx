@@ -15,12 +15,12 @@ export function Checkbox({
   const items = checkbox.renderItems
   if (items.length === 0) return null
 
-  const renderItem = ({ key, props, state }: (typeof items)[number]) => {
+  const renderItem = ({ key, label, checkboxProps, state }: (typeof items)[number]) => {
     const checked = state.checked
     return (
       <div
         key={key}
-        {...props}
+        {...checkboxProps}
         className={itemClass}
       >
         <span
@@ -30,7 +30,7 @@ export function Checkbox({
           {checked === 'mixed' ? <Icon name="minus" /> : null}
           {checked === true ? <Icon name="x" /> : null}
         </span>
-        <span>{items.find((item) => item.key === key)?.label}</span>
+        <span>{label}</span>
       </div>
     )
   }
