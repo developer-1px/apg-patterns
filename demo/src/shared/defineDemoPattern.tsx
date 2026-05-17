@@ -44,6 +44,9 @@ export function defineDemoPattern({
   useRuntime: (onEvent: (event: PatternEvent) => void) => DemoRuntime
 }): PatternEntry {
   const parsed = DemoPatternDefinitionSchema.parse(definition) as DemoPatternDefinition
+  assertUnique(`${parsed.key} keyboardShortcuts`, parsed.keyboardShortcuts)
+  const sourceNames = sourceNamesFromDefinition(parsed.sources)
+  assertUnique(`${parsed.key} sources`, sourceNames)
   return {
     key: parsed.key,
     label: parsed.label,
@@ -53,7 +56,7 @@ export function defineDemoPattern({
         key: parsed.key,
         label: parsed.label,
         keyboardShortcuts: parsed.keyboardShortcuts,
-        sourceNames: sourceNamesFromDefinition(parsed.sources),
+        sourceNames,
         inspect: runtime.inspect,
         variants: runtime.variants,
         inspectControls: runtime.inspectControls,
@@ -74,4 +77,19 @@ function sourceNamesFromDefinition(sources: DemoPatternDefinition['sources']) {
     ...((sources.includeKernel ?? true) ? KERNEL_SOURCES : []),
     ...(sources.extra ?? []),
   ]
+}
+
+function assertUnique(label: string, values: readonly string[]) {
+  const duplicates = duplicateValues(values)
+  if (duplicates.length > 0) throw new Error(`[defineDemoPattern] duplicate ${label}: ${duplicates.join(', ')}`)
+}
+
+function duplicateValues(values: readonly string[]) {
+  const seen = new Set<string>()
+  const duplicates = new Set<string>()
+  for (const value of values) {
+    if (seen.has(value)) duplicates.add(value)
+    seen.add(value)
+  }
+  return [...duplicates]
 }

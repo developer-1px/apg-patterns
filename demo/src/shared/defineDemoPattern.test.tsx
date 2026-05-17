@@ -67,4 +67,32 @@ describe('defineDemoPattern', () => {
       }),
     ).toThrow()
   })
+
+  it('rejects duplicate keyboard shortcuts before an entry is created', () => {
+    expect(() =>
+      defineDemoPattern({
+        definition: { ...definition, keyboardShortcuts: ['Enter', 'Enter'] },
+        useRuntime: () => {
+          throw new Error('unused')
+        },
+      }),
+    ).toThrow('[defineDemoPattern] duplicate example keyboardShortcuts: Enter')
+  })
+
+  it('rejects duplicate source names before an entry is created', () => {
+    expect(() =>
+      defineDemoPattern({
+        definition: {
+          ...definition,
+          sources: {
+            ...definition.sources,
+            data: ['Example.tsx'],
+          },
+        },
+        useRuntime: () => {
+          throw new Error('unused')
+        },
+      }),
+    ).toThrow('[defineDemoPattern] duplicate example sources: Example.tsx')
+  })
 })
