@@ -184,6 +184,26 @@ describe('App route state', () => {
       unmount()
     }
   })
+
+  it('keeps generated source tab ids and panel links unique for each pattern', async () => {
+    const routes = collectPatternRoutes()
+
+    for (const route of routes) {
+      replaceHash(routeHash(route))
+      const { unmount } = render(<App />)
+
+      await waitFor(() => expect(currentHashParam('pattern')).toBe(route.key))
+      const sourceTabs = screen.getAllByRole('tab').filter((tab) => tab.closest('[aria-label="source files"]'))
+      const tabIds = sourceTabs.map((tab) => tab.id)
+      const controlledPanelIds = sourceTabs.map((tab) => tab.getAttribute('aria-controls') ?? '')
+
+      expect(duplicates(tabIds)).toEqual([])
+      expect(duplicates(controlledPanelIds)).toEqual([])
+      expect(controlledPanelIds.every((id) => id.startsWith('tab-source-panel-'))).toBe(true)
+
+      unmount()
+    }
+  })
 })
 
 describe('event log', () => {
