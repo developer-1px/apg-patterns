@@ -18,7 +18,9 @@ import { TreeVariantMenu } from './TreeVariantMenu'
 import { Grid } from './Grid'
 import { gridVariants, type GridVariantKey } from './gridData'
 import { GridVariantMenu } from './GridVariantMenu'
-import { renderAriaTree, renderCheckboxInspect, renderDisclosureInspect, renderGridInspect, renderHtmlTree, renderListboxInspect, renderMenuInspect, renderRadioInspect, renderSliderInspect, renderTabsInspect } from './inspect'
+import { renderAriaTree, renderCheckboxInspect, renderComboboxInspect, renderDisclosureInspect, renderGridInspect, renderHtmlTree, renderListboxInspect, renderMenuInspect, renderRadioInspect, renderSliderInspect, renderTabsInspect } from './inspect'
+import { Combobox } from './Combobox'
+import { buildComboboxData, comboboxVariants, reduceComboboxData, type ComboboxVariantKey } from './comboboxData'
 import { Menu } from './Menu'
 import { menuVariantItems, menuVariants, type MenuVariantKey } from './menuData'
 import { Listbox } from './Listbox'
@@ -41,7 +43,7 @@ import { Tree } from './Tree'
 
 const selectClass = 'h-7 rounded bg-zinc-50 px-2 text-xs text-zinc-700 outline-none focus:bg-white focus:outline focus:outline-2 focus:outline-zinc-400 dark:bg-zinc-900 dark:text-zinc-300 dark:focus:bg-zinc-950'
 
-export type PatternKey = 'treeview' | 'listbox' | 'grid' | 'tabs' | 'slider' | 'disclosure' | 'checkbox' | 'radio'
+export type PatternKey = 'treeview' | 'listbox' | 'grid' | 'tabs' | 'slider' | 'disclosure' | 'checkbox' | 'radio' | 'menu' | 'combobox'
 
 export type ListboxVariantKey = 'basic' | 'scrollable' | 'grouped' | 'rearrangeable' | 'rearrangeableMulti'
 const listboxVariantItems: readonly { key: ListboxVariantKey; label: string }[] = [
@@ -72,6 +74,8 @@ export const patternItems: readonly { key: PatternKey; label: string }[] = [
   { key: 'disclosure', label: 'Disclosure' },
   { key: 'checkbox', label: 'Checkbox' },
   { key: 'radio', label: 'Radio Group' },
+  { key: 'menu', label: 'Menu / Menubar' },
+  { key: 'combobox', label: 'Combobox' },
 ]
 
 export function useDemoPatterns(onEvent: (event: PatternEvent) => void): readonly DemoPattern[] {
@@ -185,6 +189,25 @@ export function useDemoPatterns(onEvent: (event: PatternEvent) => void): readonl
   const [checkboxVariant, setCheckboxVariant] = useState<CheckboxVariantKey>('twoState')
   const [checkboxData, setCheckboxData] = useState(checkboxVariants.twoState.data)
   const [radioData, setRadioData] = useState(initialRadioData)
+
+  // ── Combobox ───────────────────────────────────────────────────────────────
+  const [comboboxVariant, setComboboxVariant] = useState<ComboboxVariantKey>('autocompleteList')
+  const [comboboxData, setComboboxData] = useState<PatternData>(buildComboboxData())
+  const selectComboboxVariant = (variant: ComboboxVariantKey) => {
+    setComboboxVariant(variant)
+    setComboboxData(buildComboboxData())
+  }
+
+  // ── Menu / Menubar ─────────────────────────────────────────────────────────
+  const [menuVariant, setMenuVariant] = useState<MenuVariantKey>('editorMenubar')
+  const [menuData, setMenuData] = useState<PatternData>(menuVariants.editorMenubar.data)
+  const selectMenuVariant = (variant: MenuVariantKey) => {
+    setMenuVariant(variant)
+    setMenuData(menuVariants[variant].data)
+  }
+  const menuFlavor = menuVariants[menuVariant].flavor
+  const menuFocusStrategy = menuVariants[menuVariant].focusStrategy
+  const menuDefinition = menuFlavor === 'menubar' ? menubarDefinition : menuButtonDefinition
   const selectCheckboxVariant = (variant: CheckboxVariantKey) => {
     setCheckboxVariant(variant)
     setCheckboxData(checkboxVariants[variant].data)
@@ -399,6 +422,72 @@ export function useDemoPatterns(onEvent: (event: PatternEvent) => void): readonl
         setRadioData((current) => reduceRadioData(current, event))
       }} />,
       reset: () => setRadioData(initialRadioData),
+    },
+    {
+      key: 'menu',
+      label: 'Menu / Menubar',
+      sourceNames: ['Menu.tsx', 'menuData.ts', 'menu/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
+      inspect: renderMenuInspect(menuData, menuFlavor, menuFocusStrategy),
+      variants: (
+        <div className="grid gap-1">
+          {menuVariantItems.map((variant) => (
+            <button
+              key={variant.key}
+              type="button"
+              onClick={() => selectMenuVariant(variant.key)}
+              aria-pressed={menuVariant === variant.key}
+              className="h-7 rounded px-2 text-left text-xs text-zinc-600 hover:bg-zinc-100 aria-pressed:bg-zinc-900 aria-pressed:text-white dark:text-zinc-400 dark:hover:bg-zinc-900 dark:aria-pressed:bg-zinc-100 dark:aria-pressed:text-zinc-950"
+            >
+              {variant.label}
+            </button>
+          ))}
+        </div>
+      ),
+      preview: (
+        <Menu
+          key={menuVariant}
+          data={menuData}
+          flavor={menuFlavor}
+          focusStrategy={menuFocusStrategy}
+          onEvent={(event) => {
+            onEvent(event)
+            setMenuData((current) => reducePatternData(menuDefinition, current, event))
+          }}
+        />
+      ),
+      reset: () => setMenuData(menuVariants[menuVariant].data),
+    },
+    {
+      key: 'combobox',
+      label: 'Combobox',
+      sourceNames: ['Combobox.tsx', 'comboboxData.ts', 'combobox/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
+      inspect: renderComboboxInspect(comboboxData, { autocomplete: comboboxVariants[comboboxVariant].autocomplete }),
+      variants: (
+        <select
+          className={selectClass}
+          value={comboboxVariant}
+          onChange={(event) => selectComboboxVariant(event.currentTarget.value as ComboboxVariantKey)}
+        >
+          {(Object.keys(comboboxVariants) as ComboboxVariantKey[]).map((key) => (
+            <option key={key} value={key}>{comboboxVariants[key].label}</option>
+          ))}
+        </select>
+      ),
+      preview: (
+        <Combobox
+          data={comboboxData}
+          variant={comboboxVariant}
+          onEvent={(event) => {
+            onEvent(event)
+            setComboboxData((current) => reduceComboboxData(current, event))
+          }}
+          onVisibleKeysChange={(keys) => setComboboxData(() => {
+            const next = buildComboboxData(keys)
+            return { ...next, state: { ...next.state, expandedKeys: ['combobox'] } }
+          })}
+        />
+      ),
+      reset: () => setComboboxData(buildComboboxData()),
     },
   ]
 }
