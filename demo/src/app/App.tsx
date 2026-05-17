@@ -2,7 +2,7 @@ import { useEffect, useReducer, useRef, useState } from 'react'
 import { z } from 'zod'
 import type { PatternEvent } from '../../../src'
 import { PatternMenu } from './PatternMenu'
-import { defaultPatternKey, patternItems, type PatternKey, useDemoPattern } from '../shared/demoPatterns'
+import { defaultPatternKey, defaultSourceName, patternItems, type PatternKey, useDemoPattern } from '../shared/demoPatterns'
 import { Icon, type IconName } from '../shared/Icon'
 import { sourceLoaders, type SourceName } from '../shared/sources'
 import { SourceTabs, useSourceTabs } from './SourceTabs'
@@ -50,7 +50,7 @@ type AppAction =
 const defaultAppState = AppStateSchema.parse({
   patternKey: defaultPatternKey,
   events: [],
-  sourceName: 'Tree.tsx',
+  sourceName: defaultSourceName,
   rightMode: 'source',
   rightPanelOpen: true,
 })

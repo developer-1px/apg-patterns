@@ -1,5 +1,6 @@
 import type { PatternEvent } from '../../../src'
 import { type DemoPattern, type PatternEntry, type PatternKey } from './demoPatternTypes'
+import type { SourceName } from './sources'
 
 export type { DemoPattern, PatternKey } from './demoPatternTypes'
 
@@ -11,6 +12,7 @@ const keyByPatternFolder: Readonly<Record<string, string>> = {
   menu: 'menuAndMenubar',
 }
 export const defaultPatternKey: PatternKey = 'treeview'
+export const defaultSourceName: SourceName = 'Tree.tsx'
 
 const collected: CollectedPatternEntry[] = []
 for (const [path, mod] of Object.entries(modules)) {

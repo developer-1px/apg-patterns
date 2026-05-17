@@ -3,7 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { act } from 'react'
 import { coerceRightMode, formatEvent, isCopyableSource, loadSourcePreview } from './App'
 import { App } from './App'
-import { defaultPatternKey, patternEntries, validatePatternEntries } from '../shared/demoPatterns'
+import { defaultPatternKey, defaultSourceName, patternEntries, validatePatternEntries } from '../shared/demoPatterns'
 import { sourceLoaders, sourceNameCollisions } from '../shared/sources'
 import type { PatternEvent } from '../../../src'
 
@@ -256,6 +256,14 @@ describe('demo pattern registry', () => {
     expect(patternEntries.some((entry) => entry.key === defaultPatternKey)).toBe(true)
   })
 
+  it('keeps the default source registered on the default pattern', () => {
+    const invalidEntries: string[] = []
+
+    render(<DemoSourceProbe onInvalidEntry={(issue) => invalidEntries.push(issue)} />)
+
+    expect(invalidEntries.filter((issue) => issue.includes('default source'))).toEqual([])
+  })
+
   it('fails fast when no pattern entries are registered', () => {
     expect(() => validatePatternEntries([])).toThrow('[demoPatterns] no pattern entries were registered')
   })
@@ -421,6 +429,7 @@ function DemoSourceProbeItem({
   if (demo.key !== entry.key) onInvalidEntry(`${entry.key}: demo key ${demo.key}`)
   if (demo.label !== entry.label) onInvalidEntry(`${entry.key}: demo label ${demo.label}`)
   if (demo.sourceNames.length === 0) onInvalidEntry(`${entry.key}: no source tabs`)
+  if (entry.key === defaultPatternKey && !demo.sourceNames.includes(defaultSourceName)) onInvalidEntry(`${entry.key}: missing default source ${defaultSourceName}`)
   if (duplicates([...demo.sourceNames]).length > 0) onInvalidEntry(`${entry.key}: duplicate source tabs`)
   if (demo.keyboardShortcuts.some((shortcut) => shortcut.trim().length === 0)) onInvalidEntry(`${entry.key}: empty keyboard shortcut`)
   for (const sourceName of demo.sourceNames) {
