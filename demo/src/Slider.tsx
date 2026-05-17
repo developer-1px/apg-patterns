@@ -1,4 +1,3 @@
-import { useLayoutEffect, useMemo } from 'react'
 import type { HTMLAttributes, KeyboardEvent, PointerEvent } from 'react'
 import type { KeyInput } from '@interactive-os/keyboard'
 import { createPatternRuntime, sliderDefinition, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
@@ -14,23 +13,14 @@ export function Slider({
   onEvent: (event: PatternEvent) => void
   options: PatternOptions
 }) {
-  const runtime = useMemo(
-    () =>
-      createPatternRuntime({
-        definition: sliderDefinition,
-        data,
-        options,
-        onEvent,
-        keyToElementId: (key) => `slider-${key}`,
-      }),
-    [data, onEvent, options],
-  )
+  const runtime = createPatternRuntime({
+    definition: sliderDefinition,
+    data,
+    options,
+    onEvent,
+    keyToElementId: (key) => `slider-${key}`,
+  })
   const key = data.relations?.rootKeys?.[0]
-
-  useLayoutEffect(() => {
-    if (!key || data.state?.activeKey !== key) return
-    document.getElementById(`slider-${cssEscape(key)}`)?.focus({ preventScroll: true })
-  }, [data.state?.activeKey, key])
 
   if (!key) return null
 
@@ -60,6 +50,7 @@ export function Slider({
           className="relative h-2 rounded bg-zinc-100 dark:bg-zinc-900"
           onPointerDown={(event) => {
             event.currentTarget.setPointerCapture?.(event.pointerId)
+            event.currentTarget.parentElement?.focus({ preventScroll: true })
             updateFromPointer(event)
           }}
           onPointerMove={(event) => {
@@ -73,8 +64,4 @@ export function Slider({
       </div>
     </div>
   )
-}
-
-function cssEscape(value: string) {
-  return globalThis.CSS?.escape ? globalThis.CSS.escape(value) : value.replace(/["\\]/g, '\\$&')
 }
