@@ -32,7 +32,7 @@ function getPatternEntry(patternKey: PatternKey): PatternEntry {
   return patternEntries.find((entry) => entry.key === patternKey) ?? patternEntries[0]
 }
 
-function validatePatternEntries(entries: readonly PatternEntry[]) {
+export function validatePatternEntries(entries: readonly Pick<PatternEntry, 'key' | 'label'>[]) {
   if (entries.length === 0) throw new Error('[demoPatterns] no pattern entries were registered')
 
   const duplicateKeys = duplicates(entries.map((entry) => entry.key))

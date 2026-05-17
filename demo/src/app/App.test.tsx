@@ -3,7 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { act } from 'react'
 import { coerceRightMode, formatEvent, isCopyableSource, loadSourcePreview } from './App'
 import { App } from './App'
-import { patternEntries } from '../shared/demoPatterns'
+import { patternEntries, validatePatternEntries } from '../shared/demoPatterns'
 import { sourceLoaders, sourceNameCollisions } from '../shared/sources'
 import type { PatternEvent } from '../../../src'
 
@@ -246,6 +246,24 @@ describe('demo pattern registry', () => {
     expect(duplicates(keys)).toEqual([])
     expect(duplicates(labels)).toEqual([])
     expect(keys).toEqual([...keys].sort((a, b) => a.localeCompare(b)))
+  })
+
+  it('fails fast when no pattern entries are registered', () => {
+    expect(() => validatePatternEntries([])).toThrow('[demoPatterns] no pattern entries were registered')
+  })
+
+  it('fails fast on duplicate pattern keys', () => {
+    expect(() => validatePatternEntries([
+      { key: 'accordion', label: 'Accordion' },
+      { key: 'accordion', label: 'Duplicate Accordion' },
+    ])).toThrow('[demoPatterns] duplicate pattern keys: accordion')
+  })
+
+  it('fails fast on duplicate pattern labels', () => {
+    expect(() => validatePatternEntries([
+      { key: 'accordion', label: 'Accordion' },
+      { key: 'accordion-copy', label: 'Accordion' },
+    ])).toThrow('[demoPatterns] duplicate pattern labels: Accordion')
   })
 
   it('uses valid, non-empty demo metadata for every registered pattern', () => {
