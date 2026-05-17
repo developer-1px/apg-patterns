@@ -79,7 +79,7 @@ export function App() {
   }, [activeDemo.key, activeSourceName, state.rightMode, state.rightPanelOpen])
 
   return (
-    <main className={`grid h-screen grid-cols-1 ${state.rightPanelOpen ? 'grid-rows-[auto_minmax(0,1fr)_minmax(260px,40vh)]' : 'grid-rows-[auto_minmax(0,1fr)]'} gap-8 bg-white px-6 py-5 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 ${state.rightPanelOpen ? 'lg:grid-cols-[180px_minmax(360px,1fr)_minmax(380px,0.9fr)]' : 'lg:grid-cols-[180px_minmax(360px,1fr)]'} lg:grid-rows-[minmax(0,1fr)]`}>
+    <main className={`grid h-dvh grid-cols-1 ${state.rightPanelOpen ? 'grid-rows-[minmax(80px,14dvh)_minmax(280px,1fr)_minmax(260px,34dvh)]' : 'grid-rows-[minmax(80px,16dvh)_minmax(0,1fr)]'} gap-4 bg-white px-4 py-4 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 ${state.rightPanelOpen ? 'lg:grid-cols-[180px_minmax(360px,1fr)_minmax(380px,0.9fr)]' : 'lg:grid-cols-[180px_minmax(360px,1fr)]'} lg:grid-rows-[minmax(0,1fr)] lg:gap-8 lg:px-6 lg:py-5`}>
       <section className={`${panelClass} overflow-auto`}>
         <header className={headerClass}>
           <h1 className={titleClass}>patterns</h1>
