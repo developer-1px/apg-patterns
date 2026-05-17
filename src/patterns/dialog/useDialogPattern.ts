@@ -1,5 +1,4 @@
 import type { KeyboardEvent } from 'react'
-import type { KeyInput } from '@interactive-os/keyboard'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import { handlePatternTrapFocus } from '../../adapters/reactPatternEffects'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
@@ -43,7 +42,7 @@ export function useDialogPattern(data: PatternData, onEvent: (event: PatternEven
       return {
         ...(runtime.getPartProps('dialog', 'dialog') as ReactPatternProps),
         onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
-          rootKeyDown(event as unknown as KeyInput & { preventDefault?: () => void })
+          rootKeyDown(event)
           handlePatternTrapFocus({ event, definition: dialogDefinition, data, keyToElementId })
         },
         tabIndex: -1,

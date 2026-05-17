@@ -1,7 +1,7 @@
 import type { KeyboardEvent } from 'react'
 import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { checkboxDefinition } from './definition'
 
 export interface ReactCheckboxRenderItem {
@@ -86,7 +86,7 @@ function createCheckboxRenderItem(runtime: PatternRuntime, key: Key): ReactCheck
 }
 
 function handleCheckboxKeyDown(runtime: PatternRuntime, key: Key, event: KeyboardEvent<HTMLElement>) {
-  const result = runtime.resolveKeyboardBinding(event, key)
+  const result = runtime.resolveKeyboardBinding(reactKeyInput(event), key)
   if (!result) return
   if (result.preventDefault) event.preventDefault()
   for (const next of result.events) runtime.emit(next)

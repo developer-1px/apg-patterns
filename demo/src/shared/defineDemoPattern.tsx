@@ -22,10 +22,12 @@ export const DemoPatternDefinitionSchema = z.object({
   label: z.string().min(1),
   keyboardShortcuts: z.array(z.string().min(1)).readonly(),
   sources: DemoSourcesSchema,
+  controls: UiNodeSchema.optional(),
   view: UiNodeSchema,
 }).strict()
 
-export type DemoPatternDefinition = Omit<z.infer<typeof DemoPatternDefinitionSchema>, 'view'> & {
+export type DemoPatternDefinition = Omit<z.infer<typeof DemoPatternDefinitionSchema>, 'controls' | 'view'> & {
+  controls?: UiNode
   view: UiNode
 }
 
@@ -58,7 +60,7 @@ export function defineDemoPattern({
         keyboardShortcuts: parsed.keyboardShortcuts,
         sourceNames,
         inspect: runtime.inspect,
-        variants: runtime.variants,
+        variants: runtime.variants ?? (parsed.controls ? renderUiNode(parsed.controls, runtime.context) : undefined),
         inspectControls: runtime.inspectControls,
         preview: renderUiNode(parsed.view, runtime.context),
       }

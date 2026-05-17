@@ -1,4 +1,3 @@
-import type { KeyInput } from '@interactive-os/keyboard'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
@@ -43,7 +42,7 @@ export function useTooltipPattern(data: PatternData, onEvent: (event: PatternEve
       return {
         ...props,
         type: 'button',
-        onKeyDown: (event) => rootKeyDown(event as unknown as KeyInput & { preventDefault?: () => void }),
+        onKeyDown: (event) => rootKeyDown(event),
       } as ReactPatternProps
     },
     get tooltipProps() {

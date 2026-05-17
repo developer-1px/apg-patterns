@@ -35,7 +35,7 @@ defineVisibleOrder('comboboxOptions', (_v, data) => Object.keys(data.items).filt
 defineNavigationTarget('optionLinear', (target, ctx) => {
   const options = ctx.visibleKeys
   if (options.length === 0) return null
-  const direction = (target as unknown as { direction: string }).direction
+  const direction = typeof target.direction === 'string' ? target.direction : null
   const currentIdx = ctx.activeKey === COMBOBOX_KEY ? -1 : options.indexOf(ctx.activeKey)
   if (direction === 'next') return options[Math.min(currentIdx + 1, options.length - 1)] ?? options[0]
   if (direction === 'previous') return currentIdx <= 0 ? options[0] : options[currentIdx - 1]

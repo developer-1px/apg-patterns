@@ -1,4 +1,3 @@
-import type { KeyInput } from '@interactive-os/keyboard'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import type { ReactPatternProps, ReactRenderItemState } from '../../adapters/reactBaseTypes'
@@ -45,7 +44,7 @@ export function useToolbarPattern(data: PatternData, onEvent: (event: PatternEve
   return {
     rootProps: {
       ...rootProps,
-      onKeyDown: (event) => onKeyDown(event as unknown as KeyInput & { preventDefault?: () => void }),
+      onKeyDown: (event) => onKeyDown(event),
     },
     get renderItems() {
       return runtime.visibleKeys.map((key) => createToolbarRenderItem(runtime, key))

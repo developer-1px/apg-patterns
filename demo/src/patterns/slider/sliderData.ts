@@ -182,7 +182,7 @@ export function reduceSliderData(
     return { ...data, state: { ...data.state, activeKey: event.key } }
   }
   if ((event.type !== 'valueStep' && event.type !== 'value') || !event.key) return data
-  const key = event.key as Key
+  const key = event.key
   const defaultMin = Number(options.min ?? 0)
   const defaultMax = Number(options.max ?? 100)
   const step = Number(options.step ?? 1)

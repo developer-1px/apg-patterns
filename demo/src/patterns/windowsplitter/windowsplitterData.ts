@@ -45,7 +45,7 @@ export function reduceWindowSplitterData(
     return { ...data, state: { ...data.state, activeKey: event.key } }
   }
   if ((event.type !== 'collapse' && event.type !== 'valueStep') || !event.key) return data
-  const key = event.key as Key
+  const key = event.key
   const min = Number(options.min ?? 0)
   const max = Number(options.max ?? 100)
   const step = Number(options.step ?? 1)

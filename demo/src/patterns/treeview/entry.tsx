@@ -9,13 +9,18 @@ import { treeVariants, type TreeVariantKey } from './treeVariants'
 import { TreeVariantMenu } from './TreeVariantMenu'
 import { type PatternEntry, selectClass, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
 
+const treeVariantKeys = ['fileDirectoryComputed', 'fileDirectoryDeclared', 'navigation'] as const
+const focusStrategies = ['rovingTabIndex', 'ariaActiveDescendant'] as const
+const itemClickActions = ['select', 'toggleExpand', 'none'] as const
+const inspectModes = ['aria', 'html'] as const
+
 const TreeviewDemoStateSchema = z.object({
-  variant: z.string(),
+  variant: z.enum(treeVariantKeys),
   data: PatternDataSchema,
   followFocus: z.boolean(),
-  focusStrategy: z.enum(['rovingTabIndex', 'ariaActiveDescendant']),
-  itemClickAction: z.enum(['select', 'toggleExpand', 'none']),
-  inspectMode: z.enum(['aria', 'html']),
+  focusStrategy: z.enum(focusStrategies),
+  itemClickAction: z.enum(itemClickActions),
+  inspectMode: z.enum(inspectModes),
 }).strict()
 
 type TreeviewDemoState = z.infer<typeof TreeviewDemoStateSchema>
@@ -70,14 +75,14 @@ export const entry: PatternEntry = {
       sourceNames: ['Tree.tsx', 'treeview/entry.tsx', 'TreeVariantMenu.tsx', 'treeVariants.ts', 'treeview/useTreeviewPattern.ts', 'treeview/runtime.ts', 'treeview/definition.ts', ...KERNEL_SOURCES, 'treeContract.ts'],
       inspect: state.inspectMode === 'aria' ? renderAriaTree(state.data, treeOptions) : renderHtmlTree(state.data, treeOptions),
       inspectControls: (
-        <select className={selectClass} value={state.inspectMode} onChange={(event) => dispatch({ type: 'setInspectMode', value: event.currentTarget.value as TreeviewDemoState['inspectMode'] })}>
+        <select className={selectClass} value={state.inspectMode} onChange={(event) => dispatch({ type: 'setInspectMode', value: parseInspectMode(event.currentTarget.value) })}>
           <option value="aria">aria</option>
           <option value="html">html</option>
         </select>
       ),
       variants: (
         <div className="grid gap-3 text-xs text-zinc-600 dark:text-zinc-400">
-          <TreeVariantMenu value={state.variant as TreeVariantKey} onChange={(variant) => dispatch({ type: 'selectVariant', variant })} />
+          <TreeVariantMenu value={state.variant} onChange={(variant) => dispatch({ type: 'selectVariant', variant })} />
           <label className="inline-flex items-center gap-2">
             <input
               type="checkbox"
@@ -89,7 +94,7 @@ export const entry: PatternEntry = {
           </label>
           <label className="grid gap-1">
             itemClickAction
-            <select className={selectClass} value={state.itemClickAction} onChange={(event) => dispatch({ type: 'setItemClickAction', value: event.currentTarget.value as TreeviewDemoState['itemClickAction'] })}>
+            <select className={selectClass} value={state.itemClickAction} onChange={(event) => dispatch({ type: 'setItemClickAction', value: parseItemClickAction(event.currentTarget.value) })}>
               <option value="select">select</option>
               <option value="toggleExpand">toggleExpand</option>
               <option value="none">none</option>
@@ -97,7 +102,7 @@ export const entry: PatternEntry = {
           </label>
           <label className="grid gap-1">
             focusStrategy
-            <select className={selectClass} value={state.focusStrategy} onChange={(event) => dispatch({ type: 'setFocusStrategy', value: event.currentTarget.value as TreeviewDemoState['focusStrategy'] })}>
+            <select className={selectClass} value={state.focusStrategy} onChange={(event) => dispatch({ type: 'setFocusStrategy', value: parseFocusStrategy(event.currentTarget.value) })}>
               <option value="rovingTabIndex">rovingTabIndex</option>
               <option value="ariaActiveDescendant">ariaActiveDescendant</option>
             </select>
@@ -107,4 +112,16 @@ export const entry: PatternEntry = {
       preview: <Tree data={state.data} onEvent={handleTreeEvent} options={treeOptions} />,
     }
   },
+}
+
+function parseInspectMode(value: string): TreeviewDemoState['inspectMode'] {
+  return z.enum(inspectModes).parse(value)
+}
+
+function parseItemClickAction(value: string): TreeviewDemoState['itemClickAction'] {
+  return z.enum(itemClickActions).parse(value)
+}
+
+function parseFocusStrategy(value: string): TreeviewDemoState['focusStrategy'] {
+  return z.enum(focusStrategies).parse(value)
 }

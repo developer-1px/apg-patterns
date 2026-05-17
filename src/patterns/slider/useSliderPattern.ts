@@ -1,7 +1,7 @@
 import type { KeyboardEvent, PointerEvent } from 'react'
 import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { sliderDefinition } from './definition'
 
 export interface ReactSliderRenderItem {
@@ -90,7 +90,7 @@ function createSliderRenderItem(runtime: PatternRuntime, key: Key, orientation: 
       ...props,
       onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
         runtime.emit({ type: 'focus', key })
-        const result = runtime.resolveKeyboardBinding(event, key)
+        const result = runtime.resolveKeyboardBinding(reactKeyInput(event), key)
         if (!result) return
         if (result.preventDefault) event.preventDefault()
         for (const next of result.events) runtime.emit(next)

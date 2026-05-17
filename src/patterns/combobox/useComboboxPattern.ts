@@ -40,7 +40,7 @@ export function useComboboxPattern(data: PatternData, onEvent: (event: PatternEv
     onEvent,
     keyToElementId: (key) => `${options?.elementIdPrefix ?? 'combobox-option-'}${key}`,
   })
-  const rootProps = runtime.getPartProps('combobox') as unknown as InputHTMLAttributes<HTMLInputElement>
+  const rootProps = runtime.getPartProps('combobox') as InputHTMLAttributes<HTMLInputElement>
   const open = data.state?.expandedKeys?.includes(COMBOBOX_KEY) ?? false
   const selectedKey = data.state?.selectedKeys?.[0]
   const selectedLabel = selectedKey ? data.items[selectedKey]?.label ?? '' : ''

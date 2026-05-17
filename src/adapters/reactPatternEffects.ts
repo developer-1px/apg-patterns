@@ -1,4 +1,5 @@
-import { useLayoutEffect, useRef } from 'react'
+import { useLayoutEffect, useRef, type KeyboardEvent } from 'react'
+import type { KeyInput } from '@interactive-os/keyboard'
 import type { ElementTarget, Key, PatternData, PatternDefinition, PatternEvent, PatternOptions } from '../schema'
 import { reducePatternData } from '../kernel/patternReducer'
 import { createParentByKey, evaluatePredicate, resolveKeyToken } from '../kernel/patternKernel'
@@ -52,6 +53,10 @@ export function useReactPatternRuntime(input: CreatePatternRuntimeInput): Patter
   const runtime = createPatternRuntime({ ...input, onEvent, keyToElementId })
   usePatternEffects({ definition: runtime.definition, data: runtime.data, keyToElementId: runtime.keyToElementId })
   return withKeyboardFocusVisibleProps(runtime, keyboardFocusKeyRef.current)
+}
+
+export function asKeyboardInput(event: KeyboardEvent<HTMLElement>): KeyInput & { preventDefault?: () => void } {
+  return event as unknown as KeyInput & { preventDefault?: () => void }
 }
 
 export function useRovingFocusEventHandler({

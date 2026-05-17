@@ -1,5 +1,4 @@
 import type { KeyboardEvent } from 'react'
-import type { KeyInput } from '@interactive-os/keyboard'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
@@ -38,7 +37,7 @@ export function useAlertPattern(data: PatternData, onEvent: (event: PatternEvent
       if (!key) return {}
       return {
         ...(runtime.getPartProps('alert', key) as ReactPatternProps),
-        onKeyDown: (event: KeyboardEvent<HTMLElement>) => rootKeyDown(event as unknown as KeyInput & { preventDefault?: () => void }),
+        onKeyDown: (event: KeyboardEvent<HTMLElement>) => rootKeyDown(event),
         tabIndex: -1,
       }
     },

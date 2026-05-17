@@ -107,7 +107,7 @@ export function useMenuButtonPattern(data: PatternData, onEvent: (event: Pattern
             onEvent({ type: 'focus', key: nextKey, meta: { reason: 'keyboard' } })
             return
           }
-          rootKeyDown(event as never)
+          rootKeyDown(event)
         },
       }
     },

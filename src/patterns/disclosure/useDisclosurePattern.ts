@@ -1,5 +1,4 @@
 import type { KeyboardEvent } from 'react'
-import type { KeyInput } from '@interactive-os/keyboard'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
@@ -79,7 +78,7 @@ function createTriggerProps(runtime: ReturnType<typeof createPatternRuntime>, ke
   const rootKeyDown = runtime.getRootKeyboardHandler()
   return {
     ...props,
-    onKeyDown: (event: KeyboardEvent<HTMLElement>) => rootKeyDown(event as unknown as KeyInput & { preventDefault?: () => void }),
+    onKeyDown: (event: KeyboardEvent<HTMLElement>) => rootKeyDown(event),
   }
 }
 
