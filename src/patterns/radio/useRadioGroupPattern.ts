@@ -59,7 +59,7 @@ export function useRadioGroupPattern(data: PatternData, onEvent: (event: Pattern
     get actions() {
       return {
         focus: (key: Key) => runtime.emit({ type: 'focus', key }),
-        select: (key: Key) => runtime.emit({ type: 'select', key }),
+        select: (key: Key) => runtime.emit({ type: 'select', keys: [key], anchorKey: key, extentKey: key }),
       }
     },
     get ids() {
