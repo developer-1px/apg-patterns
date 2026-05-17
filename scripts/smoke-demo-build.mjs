@@ -242,7 +242,7 @@ async function verifyHashRoute(hash, predicate, failure) {
   try {
     await waitFor(() => predicate(rootText()))
   } catch {
-    patternFailures.push(failure)
+    patternFailures.push(`${failure}: expected ${hash}, current ${window.location.hash}, text=${rootText().slice(0, 180)}`)
   }
 }
 
