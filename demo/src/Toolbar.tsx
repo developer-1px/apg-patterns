@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import type { HTMLAttributes, KeyboardEvent } from 'react'
 import type { KeyInput } from '@interactive-os/keyboard'
-import { createPatternRuntime, type PatternData, type PatternEvent } from '../../src'
+import { createPatternRuntime, usePatternAutoFocus, type PatternData, type PatternEvent } from '../../src'
 import { toolbarDefinition } from '../../src/patterns/toolbar/definition'
 
 type Props = HTMLAttributes<HTMLElement>
@@ -25,13 +25,8 @@ export function Toolbar({
   const activeKey = data.state?.activeKey
   const previousActive = useRef<string | null | undefined>(null)
 
-  useEffect(() => {
-    if (previousActive.current && previousActive.current !== activeKey && activeKey) {
-      const el = document.getElementById(`toolbar-item-${activeKey}`)
-      el?.focus()
-    }
-    previousActive.current = activeKey
-  }, [activeKey])
+  usePatternAutoFocus(runtime, { skipInitialFocus: !previousActive.current })
+  previousActive.current = activeKey
 
   return (
     <div

@@ -1,6 +1,6 @@
-import { useLayoutEffect, useRef } from 'react'
+import { useRef } from 'react'
 import type { HTMLAttributes, KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent } from 'react'
-import { createPatternRuntime, listboxDefinition, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
+import { createPatternRuntime, listboxDefinition, usePatternAutoFocus, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
 
 type Props = HTMLAttributes<HTMLElement>
 
@@ -35,11 +35,7 @@ export function Listbox({
     keyToElementId: (key) => `option-${key}`,
   })
 
-  useLayoutEffect(() => {
-    const activeKey = data.state?.activeKey
-    if (!activeKey) return
-    document.getElementById(`option-${CSS.escape(activeKey)}`)?.focus({ preventScroll: true })
-  }, [data.state?.activeKey])
+  usePatternAutoFocus(runtime)
 
   // ── Type-ahead (APG: printable character search) ──
   const typeaheadRef = useRef<{ query: string; timer: number | null }>({ query: '', timer: null })

@@ -1,6 +1,5 @@
 import type { HTMLAttributes } from 'react'
-import { useEffect, useRef } from 'react'
-import { useTabsPattern, type PatternData, type PatternEvent } from '../../src'
+import { usePatternAutoFocus, useTabsPattern, type PatternData, type PatternEvent } from '../../src'
 
 type SourceTabKey = string
 
@@ -20,7 +19,6 @@ interface SourceTabsViewProps<T extends SourceTabKey> {
 export function useSourceTabs<T extends SourceTabKey>({ label, tabs, value, onChange }: UseSourceTabsInput<T>) {
   const data = createSourceTabsData(label, tabs, value)
   const tabSet = new Set<SourceTabKey>(tabs)
-  const previousValueRef = useRef(value)
 
   const runtime = useTabsPattern({
     data,
@@ -33,12 +31,10 @@ export function useSourceTabs<T extends SourceTabKey>({ label, tabs, value, onCh
     },
   })
 
-  useEffect(() => {
-    if (previousValueRef.current === value) return
-    previousValueRef.current = value
-    const id = runtime.getTabProps(value).id
-    if (typeof id === 'string') requestAnimationFrame(() => document.getElementById(id)?.focus())
-  }, [runtime, value])
+  usePatternAutoFocus(runtime, {
+    skipInitialFocus: true,
+    keyToElementId: (key) => `tab-${key.toLowerCase().replace(/[^a-z0-9_-]+/g, '-')}`,
+  })
 
   return {
     tabs,

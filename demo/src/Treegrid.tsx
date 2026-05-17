@@ -1,6 +1,5 @@
-import { useLayoutEffect } from 'react'
 import type { HTMLAttributes } from 'react'
-import { createPatternRuntime, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
+import { createPatternRuntime, usePatternAutoFocus, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
 import { treegridDefinition, treegridVisibleCells, treegridVisibleRowKeys } from '../../src/patterns/treegrid/definition'
 
 type Props = HTMLAttributes<HTMLElement>
@@ -35,12 +34,7 @@ export function Treegrid({
     keyToElementId: (key) => `treegridcell-${key}`,
   })
 
-  useLayoutEffect(() => {
-    const activeKey = data.state?.activeKey
-    if (!activeKey) return
-    const id = `treegridcell-${activeKey}`
-    document.getElementById(id)?.focus({ preventScroll: true })
-  }, [data.state?.activeKey])
+  usePatternAutoFocus(runtime)
 
   const rowKeys = treegridVisibleRowKeys(data)
   const cells = treegridVisibleCells(data)

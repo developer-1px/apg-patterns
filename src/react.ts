@@ -1,8 +1,80 @@
-import { useRef } from 'react'
+import { useLayoutEffect, useRef } from 'react'
 import type { HTMLAttributes } from 'react'
 import { createTypeaheadBuffer } from '@interactive-os/keyboard'
 import { createTreeviewRuntime, type CreateTreeviewRuntimeInput, type TreeviewRuntime, type TreeviewSlotProps } from './patterns/treeview/runtime'
 import { createTabsRuntime, type CreateTabsRuntimeInput, type TabsRuntime } from './patterns/tabs/runtime'
+import type { Key, PatternData, PatternOptions } from './schema'
+import type { PatternRuntime } from './patternRuntime'
+
+export interface PatternAutoFocusRuntime {
+  data: PatternData
+  options?: PatternOptions
+  keyToElementId?: (key: Key) => string
+}
+
+export interface PatternAutoFocusOptions {
+  enabled?: boolean
+  skipInitialFocus?: boolean
+  suspend?: boolean
+  preventScroll?: boolean
+  keyToElementId?: (key: Key) => string
+  getScopeElement?: () => HTMLElement | null
+  getTargetElement?: (runtime: PatternAutoFocusRuntime, activeKey: Key) => HTMLElement | null
+}
+
+export function usePatternAutoFocus(
+  runtime: PatternAutoFocusRuntime | PatternRuntime,
+  {
+    enabled = true,
+    skipInitialFocus = false,
+    suspend = false,
+    preventScroll = true,
+    keyToElementId = runtime.keyToElementId,
+    getScopeElement,
+    getTargetElement,
+  }: PatternAutoFocusOptions = {},
+) {
+  const didMountRef = useRef(false)
+  const activeKey = runtime.data.state?.activeKey ?? null
+  const focusStrategy = runtime.options?.focusStrategy ?? 'rovingTabIndex'
+
+  useLayoutEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true
+      if (skipInitialFocus) return
+    }
+    if (!enabled || suspend || !activeKey) return
+    const scope = getScopeElement?.()
+    if (scope && !scope.contains(document.activeElement)) return
+    const target =
+      getTargetElement?.(runtime, activeKey) ??
+      resolveAutoFocusTarget({ activeKey, focusStrategy, keyToElementId })
+    target?.focus({ preventScroll })
+  }, [activeKey, enabled, focusStrategy, getScopeElement, getTargetElement, keyToElementId, preventScroll, skipInitialFocus, suspend])
+}
+
+function resolveAutoFocusTarget({
+  activeKey,
+  focusStrategy,
+  keyToElementId,
+}: {
+  activeKey: Key
+  focusStrategy: PatternOptions['focusStrategy']
+  keyToElementId?: (key: Key) => string
+}) {
+  const id = keyToElementId?.(activeKey) ?? activeKey
+  if (focusStrategy === 'ariaActiveDescendant') {
+    return findActiveDescendantHost(id) ?? document.getElementById(id)
+  }
+  return document.getElementById(id)
+}
+
+function findActiveDescendantHost(id: string) {
+  for (const element of Array.from(document.querySelectorAll<HTMLElement>('[aria-activedescendant]'))) {
+    if (element.getAttribute('aria-activedescendant') === id) return element
+  }
+  return null
+}
 
 export type ReactTreeviewProps = HTMLAttributes<HTMLElement>
 

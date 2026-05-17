@@ -1,6 +1,5 @@
-import { useTreeviewPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
+import { usePatternAutoFocus, useTreeviewPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
 import { Icon } from './Icon'
-import { useTreeDomFocus } from './useTreeDomFocus'
 
 export type TreeItemKind = 'folder' | 'link'
 
@@ -16,7 +15,7 @@ export function Tree({
   itemKind?: TreeItemKind
 }) {
   const tree = useTreeviewPattern({ data, options, onEvent })
-  useTreeDomFocus(data, options?.focusStrategy)
+  usePatternAutoFocus(tree)
 
   return (
     <div className="min-h-56 bg-white py-1 outline-none focus:outline focus:outline-2 focus:outline-zinc-400 dark:bg-zinc-950 dark:focus:outline-zinc-500" {...tree.getTreeProps()}>

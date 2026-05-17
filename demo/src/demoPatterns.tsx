@@ -1,28 +1,34 @@
 import type { PatternEvent } from '../../src'
-import { useCollectionDemoPatterns } from './collectionDemoPatterns'
-import { type DemoPattern, type PatternKey } from './demoPatternTypes'
-import { usePopupDemoPatterns } from './popupDemoPatterns'
-import { useWidgetDemoPatterns } from './widgetDemoPatterns'
+import { type DemoPattern, type PatternEntry, type PatternKey } from './demoPatternTypes'
 
 export type { DemoPattern, PatternKey } from './demoPatternTypes'
 
-export const patternItems: readonly { key: PatternKey; label: string }[] = [
-  { key: 'treeview', label: 'Treeview' },
-  { key: 'listbox', label: 'Listbox' },
-  { key: 'grid', label: 'Grid' },
-  { key: 'tabs', label: 'Tabs' },
-  { key: 'slider', label: 'Slider' },
-  { key: 'disclosure', label: 'Disclosure' },
-  { key: 'checkbox', label: 'Checkbox' },
-  { key: 'radio', label: 'Radio Group' },
-  { key: 'menuAndMenubar', label: 'Menu and Menubar' },
-  { key: 'combobox', label: 'Combobox' },
-]
+const modules = import.meta.glob<{ entry: PatternEntry }>('./entries/*.tsx', { eager: true })
+
+const collected: PatternEntry[] = []
+for (const [path, mod] of Object.entries(modules)) {
+  if (!mod.entry) {
+    if (typeof console !== 'undefined') console.warn(`[demoPatterns] ${path} has no exported \`entry\``)
+    continue
+  }
+  collected.push(mod.entry)
+}
+
+// Stable ordering: explicit `order` first (ascending), then key alphabetical.
+collected.sort((a, b) => {
+  const ao = a.order ?? Number.POSITIVE_INFINITY
+  const bo = b.order ?? Number.POSITIVE_INFINITY
+  if (ao !== bo) return ao - bo
+  return a.key.localeCompare(b.key)
+})
+
+export const patternEntries: readonly PatternEntry[] = collected
+
+export const patternItems: readonly { key: PatternKey; label: string }[] = collected.map((e) => ({
+  key: e.key,
+  label: e.label,
+}))
 
 export function useDemoPatterns(onEvent: (event: PatternEvent) => void): readonly DemoPattern[] {
-  return [
-    ...useCollectionDemoPatterns(onEvent),
-    ...useWidgetDemoPatterns(onEvent),
-    ...usePopupDemoPatterns(onEvent),
-  ]
+  return patternEntries.map((entry) => entry.useDemoPattern(onEvent))
 }

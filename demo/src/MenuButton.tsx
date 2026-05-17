@@ -1,6 +1,5 @@
-import { useLayoutEffect, useRef } from 'react'
 import type { HTMLAttributes, KeyboardEvent as ReactKeyboardEvent } from 'react'
-import { createPatternRuntime, menuButtonDefinition } from '../../src'
+import { createPatternRuntime, menuButtonDefinition, usePatternAutoFocus } from '../../src'
 import { Icon } from './Icon'
 import type { MenuProps } from './menuTypes'
 
@@ -18,17 +17,7 @@ export function MenuButton({ data, onEvent, focusStrategy = 'rovingTabIndex' }: 
   const menuKey = triggerKey ? data.relations?.controlsByKey?.[triggerKey]?.[0] : undefined
   const expanded = triggerKey ? data.state?.expandedKeys?.includes(triggerKey) ?? false : false
   const menuItemKeys = menuKey ? data.relations?.childrenByKey?.[menuKey] ?? [] : []
-  const menuContainerRef = useRef<HTMLUListElement>(null)
-
-  useLayoutEffect(() => {
-    if (!expanded || focusStrategy !== 'rovingTabIndex') return
-    const activeKey = data.state?.activeKey
-    if (activeKey && menuItemKeys.includes(activeKey)) document.getElementById(`mb-${activeKey}`)?.focus({ preventScroll: true })
-  }, [expanded, focusStrategy, data.state?.activeKey, menuItemKeys])
-
-  useLayoutEffect(() => {
-    if (expanded && focusStrategy === 'ariaActiveDescendant') menuContainerRef.current?.focus({ preventScroll: true })
-  }, [expanded, focusStrategy])
+  usePatternAutoFocus(runtime, { enabled: expanded })
 
   if (!triggerKey || !menuKey) return null
   const triggerProps = runtime.getPartProps('trigger', triggerKey) as Props
@@ -48,7 +37,7 @@ export function MenuButton({ data, onEvent, focusStrategy = 'rovingTabIndex' }: 
         <Icon name="chevron-right" className={`ml-3 text-xs text-zinc-500 ${expanded ? 'rotate-90' : ''}`} />
       </button>
       {expanded ? (
-        <ul ref={menuContainerRef} {...menuProps} tabIndex={focusStrategy === 'ariaActiveDescendant' ? 0 : -1} onKeyDown={(event: ReactKeyboardEvent) => {
+        <ul {...menuProps} tabIndex={focusStrategy === 'ariaActiveDescendant' ? 0 : -1} onKeyDown={(event: ReactKeyboardEvent) => {
           if (event.key === 'Escape') {
             event.preventDefault()
             onEvent({ type: 'expand', key: triggerKey, expanded: false })

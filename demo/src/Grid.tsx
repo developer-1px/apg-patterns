@@ -1,6 +1,5 @@
-import { useLayoutEffect, useState } from 'react'
 import type { HTMLAttributes, KeyboardEvent } from 'react'
-import { createPatternRuntime, gridDefinition, gridRows, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
+import { createPatternRuntime, gridDefinition, gridRows, usePatternAutoFocus, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
 import { Icon, type IconName } from './Icon'
 
 type Props = HTMLAttributes<HTMLElement>
@@ -14,9 +13,9 @@ export function Grid({
   onEvent: (event: PatternEvent) => void
   options?: PatternOptions
 }) {
-  const [editingKey, setEditingKey] = useState<string | null>(null)
-  const [editDraft, setEditDraft] = useState<string>('')
   const editableKeys = ((data.state as { editableKeys?: readonly string[] } | undefined)?.editableKeys ?? []) as readonly string[]
+  const editingKey = ((data.state as { editingKey?: string | null } | undefined)?.editingKey ?? null) as string | null
+  const editDraftByKey = ((data.state as { editDraftByKey?: Record<string, string> } | undefined)?.editDraftByKey ?? {}) as Record<string, string>
   const valueByKey = data.state?.valueByKey ?? {}
   const sortByKey = data.state?.sortByKey ?? {}
 
@@ -36,13 +35,17 @@ export function Grid({
           return
         }
         if (editableKeys.includes(key)) {
-          setEditingKey(key)
-          setEditDraft(String(valueByKey[key] ?? data.items[key]?.label ?? ''))
+          onEvent({
+            type: 'extension',
+            name: 'gridEditStart',
+            key,
+            payload: { value: String(valueByKey[key] ?? data.items[key]?.label ?? '') },
+          })
           return
         }
       }
       if (event.type === 'dismiss') {
-        setEditingKey(null)
+        onEvent({ type: 'extension', name: 'gridEditEnd' })
         return
       }
       onEvent(event)
@@ -50,17 +53,15 @@ export function Grid({
     keyToElementId: (key) => `gridcell-${key}`,
   })
 
-  useLayoutEffect(() => {
-    const activeKey = data.state?.activeKey
-    if (!activeKey || editingKey) return
-    document.getElementById(`gridcell-${CSS.escape(activeKey)}`)?.focus({ preventScroll: true })
-  }, [data.state?.activeKey, editingKey])
+  usePatternAutoFocus(runtime, { suspend: Boolean(editingKey) })
 
   const commitEdit = () => {
-    if (editingKey) onEvent({ type: 'value', key: editingKey, value: editDraft })
-    setEditingKey(null)
+    if (editingKey) {
+      onEvent({ type: 'value', key: editingKey, value: editDraftByKey[editingKey] ?? '' })
+      onEvent({ type: 'extension', name: 'gridEditEnd' })
+    }
   }
-  const cancelEdit = () => setEditingKey(null)
+  const cancelEdit = () => onEvent({ type: 'extension', name: 'gridEditEnd' })
 
   const handleEditKeydown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
@@ -114,8 +115,10 @@ export function Grid({
                       autoFocus
                       data-edit=""
                       className="w-full bg-transparent outline-none ring-1 ring-zinc-400 px-1 dark:ring-zinc-500"
-                      value={editDraft}
-                      onChange={(event) => setEditDraft(event.currentTarget.value)}
+                      value={editDraftByKey[cellKey] ?? ''}
+                      onChange={(event) =>
+                        onEvent({ type: 'extension', name: 'gridEditDraft', key: cellKey, payload: { value: event.currentTarget.value } })
+                      }
                       onKeyDown={handleEditKeydown}
                       onBlur={commitEdit}
                     />

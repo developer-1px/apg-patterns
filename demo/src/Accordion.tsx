@@ -1,8 +1,9 @@
-import { useLayoutEffect, useRef } from 'react'
+import { useRef } from 'react'
 import type { HTMLAttributes } from 'react'
 import {
-  accordionDefinition,
   createPatternRuntime,
+  accordionDefinition,
+  usePatternAutoFocus,
   type PatternData,
   type PatternEvent,
 } from '../../src'
@@ -35,15 +36,11 @@ export function Accordion({ data, onEvent }: AccordionProps) {
   const rootRef = useRef<HTMLDivElement>(null)
   const didMountRef = useRef(false)
 
-  useLayoutEffect(() => {
-    if (!didMountRef.current) {
-      didMountRef.current = true
-      return
-    }
-    if (!activeKey) return
-    if (!rootRef.current?.contains(document.activeElement)) return
-    document.getElementById(keyToElementId(activeKey))?.focus({ preventScroll: true })
-  }, [activeKey])
+  usePatternAutoFocus(runtime, {
+    skipInitialFocus: !didMountRef.current,
+    getScopeElement: () => rootRef.current,
+  })
+  didMountRef.current = true
 
   return (
     <div

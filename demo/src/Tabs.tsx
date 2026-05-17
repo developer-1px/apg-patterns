@@ -1,6 +1,6 @@
-import { useLayoutEffect, useRef } from 'react'
+import { useRef } from 'react'
 import type { HTMLAttributes } from 'react'
-import { useTabsPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
+import { usePatternAutoFocus, useTabsPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
 import { Icon } from './Icon'
 
 type Props = HTMLAttributes<HTMLElement>
@@ -34,17 +34,11 @@ export function Tabs({
   const tablistRef = useRef<HTMLDivElement>(null)
   const didMountRef = useRef(false)
 
-  const activeKey = data.state?.activeKey
-  useLayoutEffect(() => {
-    if (!didMountRef.current) {
-      didMountRef.current = true
-      return
-    }
-    if (!activeKey) return
-    const prefix = (mergedOptions as { elementIdPrefix?: string }).elementIdPrefix ?? 'tab-'
-    const id = `${prefix}${activeKey.toLowerCase().replace(/[^a-z0-9_-]+/g, '-')}`
-    document.getElementById(id)?.focus({ preventScroll: true })
-  }, [activeKey, mergedOptions])
+  usePatternAutoFocus(tabs, {
+    skipInitialFocus: !didMountRef.current,
+    keyToElementId: (key) => createTabElementId((mergedOptions as { elementIdPrefix?: string }).elementIdPrefix ?? 'tab-', key),
+  })
+  didMountRef.current = true
 
   const isVertical = orientation === 'vertical'
   const containerClass = isVertical
@@ -102,4 +96,8 @@ export function Tabs({
       </div>
     </div>
   )
+}
+
+function createTabElementId(prefix: string, key: string) {
+  return `${prefix}${key.toLowerCase().replace(/[^a-z0-9_-]+/g, '-')}`
 }

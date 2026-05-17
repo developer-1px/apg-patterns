@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import { PatternMenu, patternMenuKeyboardShortcuts } from './PatternMenu'
+import { patternItems } from './demoPatterns'
 import type { PatternKey } from './demoPatterns'
 
 function PatternMenuDemo() {
@@ -32,11 +33,14 @@ describe('PatternMenu', () => {
     render(<PatternMenuDemo />)
     const listbox = screen.getByRole('listbox', { name: /APG patterns/i })
 
+    const lastLabel = patternItems[patternItems.length - 1].label
+    const firstLabel = patternItems[0].label
+
     fireEvent.keyDown(listbox, { key: 'End', code: 'End' })
-    expect(screen.getByRole('option', { name: 'Combobox' }).getAttribute('aria-selected')).toBe('true')
+    expect(screen.getByRole('option', { name: lastLabel }).getAttribute('aria-selected')).toBe('true')
 
     fireEvent.keyDown(listbox, { key: 'Home', code: 'Home' })
-    expect(screen.getByRole('option', { name: 'Treeview' }).getAttribute('aria-selected')).toBe('true')
+    expect(screen.getByRole('option', { name: firstLabel }).getAttribute('aria-selected')).toBe('true')
   })
 
   it('click selects a pattern', () => {

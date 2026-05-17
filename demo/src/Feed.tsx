@@ -1,6 +1,6 @@
-import { useLayoutEffect, useState } from 'react'
+import { useState } from 'react'
 import type { HTMLAttributes } from 'react'
-import { createPatternRuntime, reducePatternData, type PatternData, type PatternEvent } from '../../src'
+import { createPatternRuntime, reducePatternData, usePatternAutoFocus, type PatternData, type PatternEvent } from '../../src'
 import { feedDefinition } from '../../src/patterns/feed/definition'
 import { feedArticles, initialFeedData } from './feedData'
 
@@ -23,12 +23,7 @@ export function Feed({ data: initialData = initialFeedData }: FeedProps = {}) {
     keyToElementId: (key) => `feed-article-${key}`,
   })
 
-  useLayoutEffect(() => {
-    const activeKey = data.state?.activeKey
-    if (!activeKey) return
-    const node = document.getElementById(`feed-article-${activeKey}`)
-    node?.focus({ preventScroll: true })
-  }, [data.state?.activeKey])
+  usePatternAutoFocus(runtime)
 
   const rootProps = runtime.getRootProps() as DivProps
 

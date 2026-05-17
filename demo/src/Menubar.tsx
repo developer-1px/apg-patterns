@@ -1,6 +1,6 @@
-import { useLayoutEffect, useRef } from 'react'
+import { useRef } from 'react'
 import type { HTMLAttributes, KeyboardEvent as ReactKeyboardEvent } from 'react'
-import { createPatternRuntime, menubarDefinition, type PatternData, type PatternEvent } from '../../src'
+import { createPatternRuntime, menubarDefinition, usePatternAutoFocus, type PatternData, type PatternEvent } from '../../src'
 import { Icon } from './Icon'
 import type { MenuProps } from './menuTypes'
 
@@ -18,10 +18,7 @@ export function Menubar({ data, onEvent }: MenuProps) {
   const typeahead = useTypeahead(data, rootKeys, onEvent)
   const rootProps = runtime.getPartProps('menubar') as Props
 
-  useLayoutEffect(() => {
-    const activeKey = data.state?.activeKey
-    if (activeKey && rootKeys.includes(activeKey)) document.getElementById(`menubar-${activeKey}`)?.focus({ preventScroll: true })
-  }, [data.state?.activeKey, rootKeys])
+  usePatternAutoFocus(runtime, { enabled: Boolean(data.state?.activeKey && rootKeys.includes(data.state.activeKey)) })
 
   return (
     <div className="grid gap-2">
