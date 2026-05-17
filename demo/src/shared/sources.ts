@@ -1,10 +1,16 @@
 // Auto-collected source files for the source viewer.
 // Uses Vite's import.meta.glob to gather raw text contents of:
-//   - All pattern kernel files (src/*.ts at the top level)
+//   - Top-level src files (src/*.ts — e.g. index.ts)
+//   - Layered kernel files (src/schema/*.ts, src/kernel/*.ts, src/adapters/*.ts)
 //   - All pattern definition/runtime files (src/patterns/<name>/*.ts)
 //   - All demo files in demo/src (*.tsx, *Data.ts, plus a few helpers)
 
-const kernelModules = import.meta.glob('../../../src/*.ts', { eager: true, query: '?raw', import: 'default' }) as Record<string, string>
+const rootModules = import.meta.glob('../../../src/*.ts', { eager: true, query: '?raw', import: 'default' }) as Record<string, string>
+const layerModules = import.meta.glob([
+  '../../../src/schema/*.ts',
+  '../../../src/kernel/*.ts',
+  '../../../src/adapters/*.ts',
+], { eager: true, query: '?raw', import: 'default' }) as Record<string, string>
 const patternModules = import.meta.glob('../../../src/patterns/*/*.ts', { eager: true, query: '?raw', import: 'default' }) as Record<string, string>
 const demoTsxModules = import.meta.glob([
   '../patterns/*/*.tsx',
@@ -21,10 +27,17 @@ const demoDataModules = import.meta.glob([
 
 const collected: Record<string, string> = {}
 
-// kernel: keep top-level filename only (e.g. patternKernel.ts)
-for (const [path, src] of Object.entries(kernelModules)) {
+// src root: keep filename only (e.g. index.ts)
+for (const [path, src] of Object.entries(rootModules)) {
   const name = path.split('/').pop()!
   collected[name] = src
+}
+// schema/kernel/adapters: keep <folder>/<file>.ts to preserve concept map
+for (const [path, src] of Object.entries(layerModules)) {
+  const parts = path.split('/')
+  const file = parts.pop()!
+  const dir = parts.pop()!
+  collected[`${dir}/${file}`] = src
 }
 // patterns: keep <patternName>/<file>.ts
 for (const [path, src] of Object.entries(patternModules)) {
