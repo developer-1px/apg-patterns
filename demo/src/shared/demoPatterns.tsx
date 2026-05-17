@@ -25,7 +25,7 @@ validatePatternEntries(collected)
 
 export const patternEntries: readonly PatternEntry[] = collected.map(({ sourcePath, ...entry }) => entry)
 
-export const patternItems: readonly { key: PatternKey; label: string }[] = collected.map((e) => ({
+export const patternItems: readonly { key: PatternKey; label: string }[] = patternEntries.map((e) => ({
   key: e.key,
   label: e.label,
 }))
