@@ -1,5 +1,6 @@
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
+import { Icon } from '../../shared/Icon'
 import { Listbox } from './Listbox'
 
 /**
@@ -62,19 +63,19 @@ export function RearrangeableListbox({
   const canDown = activeKey ? rootKeys.indexOf(activeKey) < rootKeys.length - 1 : false
 
   const buttonClass =
-    'rounded border border-zinc-300 bg-white px-2 py-1 text-xs text-zinc-700 outline-none hover:bg-zinc-50 focus:outline focus:outline-2 focus:outline-zinc-400 disabled:opacity-40 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:focus:outline-zinc-500'
+    'grid size-7 place-items-center rounded border border-zinc-300 bg-white text-xs text-zinc-700 outline-none hover:bg-zinc-50 focus:outline focus:outline-2 focus:outline-zinc-400 disabled:opacity-40 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:focus:outline-zinc-500'
 
   return (
     <div className="grid gap-2" onKeyDown={handleKeyDown}>
       <div className="flex gap-1.5" role="toolbar" aria-label="Rearrange">
-        <button type="button" className={buttonClass} onClick={() => moveActive(-1)} disabled={!canUp} aria-keyshortcuts="Alt+ArrowUp">
-          Up
+        <button type="button" className={buttonClass} onClick={() => moveActive(-1)} disabled={!canUp} aria-keyshortcuts="Alt+ArrowUp" aria-label="Move up">
+          <Icon name="arrow-up" />
         </button>
-        <button type="button" className={buttonClass} onClick={() => moveActive(1)} disabled={!canDown} aria-keyshortcuts="Alt+ArrowDown">
-          Down
+        <button type="button" className={buttonClass} onClick={() => moveActive(1)} disabled={!canDown} aria-keyshortcuts="Alt+ArrowDown" aria-label="Move down">
+          <Icon name="arrow-down" />
         </button>
-        <button type="button" className={buttonClass} onClick={removeActive} disabled={!activeKey} aria-keyshortcuts="Delete">
-          Remove
+        <button type="button" className={buttonClass} onClick={removeActive} disabled={!activeKey} aria-keyshortcuts="Delete" aria-label="Remove">
+          <Icon name="trash-2" />
         </button>
       </div>
       <Listbox data={data} onEvent={onEvent} options={options} />

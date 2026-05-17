@@ -26,7 +26,10 @@ globalThis.HTMLElement = dom.window.HTMLElement
 globalThis.HTMLIFrameElement = dom.window.HTMLIFrameElement
 globalThis.SVGElement = dom.window.SVGElement
 globalThis.Node = dom.window.Node
-globalThis.navigator = dom.window.navigator
+Object.defineProperty(globalThis, 'navigator', {
+  configurable: true,
+  value: dom.window.navigator,
+})
 
 await import(new URL(entryFile, assetsDir).href)
 await new Promise((resolve) => setTimeout(resolve, 50))

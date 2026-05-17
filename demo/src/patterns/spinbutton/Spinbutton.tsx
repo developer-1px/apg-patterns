@@ -2,6 +2,7 @@ import type { KeyboardEvent } from 'react'
 import type { KeyInput } from '@interactive-os/keyboard'
 import { createPatternRuntime, type Key, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
 import { spinbuttonDefinition } from '../../../../src/patterns/spinbutton/definition'
+import { Icon } from '../../shared/Icon'
 
 export function Spinbutton({
   data,
@@ -84,9 +85,9 @@ function SpinField({
             type="button"
             aria-label={`Decrement ${label ?? fieldKey}`}
             onClick={() => emit('decrement')}
-            className="size-6 rounded border border-zinc-300 dark:border-zinc-700"
+            className="grid size-6 place-items-center rounded border border-zinc-300 text-xs text-zinc-600 dark:border-zinc-700 dark:text-zinc-300"
           >
-            −
+            <Icon name="minus" />
           </button>
           <div
             {...(props as Record<string, unknown>)}
@@ -101,9 +102,9 @@ function SpinField({
             type="button"
             aria-label={`Increment ${label ?? fieldKey}`}
             onClick={() => emit('increment')}
-            className="size-6 rounded border border-zinc-300 dark:border-zinc-700"
+            className="grid size-6 place-items-center rounded border border-zinc-300 text-xs text-zinc-600 dark:border-zinc-700 dark:text-zinc-300"
           >
-            +
+            <Icon name="plus" />
           </button>
         </div>
       </div>
