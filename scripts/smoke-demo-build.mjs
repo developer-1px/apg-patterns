@@ -42,6 +42,35 @@ const rootText = () => root?.textContent ?? ''
 const requiredText = ['patterns', 'Tabs', 'code', 'Tabs.tsx']
 const missingText = requiredText.filter((text) => !rootText().includes(text))
 const patternFailures = []
+const previewSurfaceSelectors = {
+  accordion: '[role="group"]',
+  alert: 'button',
+  alertdialog: 'button',
+  breadcrumb: 'nav,[role="navigation"]',
+  button: 'button',
+  carousel: '[role="region"][aria-roledescription="carousel"]',
+  checkbox: '[role="checkbox"]',
+  combobox: '[role="combobox"]',
+  dialog: 'button',
+  disclosure: 'button',
+  feed: '[role="feed"]',
+  grid: '[role="grid"]',
+  link: 'a,[role="link"]',
+  listbox: '[role="listbox"]',
+  menuAndMenubar: '[role="menubar"],button',
+  meter: '[role="meter"]',
+  radio: '[role="radiogroup"]',
+  slider: '[role="slider"]',
+  spinbutton: '[role="spinbutton"]',
+  switch: '[role="switch"]',
+  table: '[role="table"],table',
+  tabs: '[role="tablist"]',
+  toolbar: '[role="toolbar"]',
+  tooltip: 'button',
+  treegrid: '[role="treegrid"]',
+  treeview: '[role="tree"]',
+  windowsplitter: '[role="separator"]',
+}
 
 if (!hasActiveDemoHeading('Tabs')) patternFailures.push('initial tabs route did not render Tabs workspace')
 
@@ -74,6 +103,7 @@ for (const { key, label } of Array.from(patternListbox.querySelectorAll('[role="
   }
 
   if (rootText().includes('missing source:')) patternFailures.push(`${label}: missing source marker rendered`)
+  verifyPreviewSurface(key, label)
 
   const sourceTablist = document.querySelector('[role="tablist"][aria-label="source files"]')
   if (!sourceTablist) {
@@ -217,6 +247,22 @@ function findSourceTab(sourceName) {
 
 function findPatternOption(key) {
   return document.getElementById(`pattern-${key}`)
+}
+
+function verifyPreviewSurface(key, label) {
+  const selector = previewSurfaceSelectors[key]
+  if (!selector) {
+    patternFailures.push(`${label}: missing preview smoke selector`)
+    return
+  }
+  const preview = document.querySelector(`[data-demo-preview="${key}"]`)
+  if (!preview) {
+    patternFailures.push(`${label}: missing preview container`)
+    return
+  }
+  if (!preview.querySelector(selector)) {
+    patternFailures.push(`${label}: preview did not render expected surface: ${selector}`)
+  }
 }
 
 async function verifyDistIndexAssets() {

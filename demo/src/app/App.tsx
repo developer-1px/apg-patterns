@@ -174,7 +174,9 @@ function ActiveDemoWorkspace({
             </div>
           </div>
         ) : null}
-        {activeDemo.preview}
+        <div data-demo-preview={activeDemo.key}>
+          {activeDemo.preview}
+        </div>
       </section>
 
       {state.rightPanelOpen ? (
