@@ -672,6 +672,8 @@ async function verifyPatternPanelRoutes({ key, label, sourceName }) {
   const codeHash = buildHash({ pattern: key, panel: 'code', source: sourceName })
   await verifyHashRoute(codeHash, () => {
     const sourceText = sourcePanelText()
+    const missingNeedles = sourceIdentityNeedles(sourceName, key)
+      .filter((needle) => !sourceText.includes(needle))
     return (
       window.location.hash === codeHash
       && currentHashParam('pattern') === key
@@ -682,6 +684,7 @@ async function verifyPatternPanelRoutes({ key, label, sourceName }) {
       && sourceText.trim().length > 0
       && sourceText !== 'loading'
       && !hasSourceLoadFailure(sourceText)
+      && missingNeedles.length === 0
     )
   },
     `${label}: code panel route did not restore after panel route checks`,
