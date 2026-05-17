@@ -43,7 +43,10 @@ export function reducePatternData(definition: PatternDefinition, data: PatternDa
     const expanded = new Set(data.state?.expandedKeys ?? [])
     if (event.expanded) expanded.add(event.key)
     else expanded.delete(event.key)
-    return withLastEventReason({ ...data, state: { ...data.state, activeKey: event.key, expandedKeys: [...expanded] } }, event)
+    // Preserve a pre-existing activeKey (e.g. a treegrid cell key) — only adopt the row key when no active.
+    const currentActive = data.state?.activeKey
+    const nextActive = currentActive ?? event.key
+    return withLastEventReason({ ...data, state: { ...data.state, activeKey: nextActive, expandedKeys: [...expanded] } }, event)
   }
 
   if (event.type === 'check') {
