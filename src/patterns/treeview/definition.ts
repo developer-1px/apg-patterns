@@ -1,34 +1,5 @@
 import { PatternDefinitionSchema } from '../../schema'
-import { defineNavigationTarget, defineVisibleOrder, resolveKeyToken } from '../../patternKernel'
-import { moveLinear, visibleTreeItems } from '@interactive-os/collection-navigation'
-
-// 패턴 무관 'linear' navigation target — kernel 에 있어도 되지만
-// 사용 시점(treeview/listbox)이 공유하는 첫 패턴이므로 여기서 등록.
-defineNavigationTarget('linear', (target, ctx) => {
-  const action = target.action as 'next' | 'previous' | 'first' | 'last'
-  return moveLinear(ctx.visibleKeys, ctx.activeKey, action)
-})
-
-// 트리 특화 — child / parent
-defineNavigationTarget('firstChild', (target, ctx) => {
-  const key = resolveKeyToken(target.key ?? '$activeKey', undefined, ctx.activeKey)
-  return ctx.data.relations?.childrenByKey?.[key]?.[0] ?? null
-})
-
-defineNavigationTarget('parentKey', (target, ctx) => {
-  const key = resolveKeyToken(target.key ?? '$activeKey', undefined, ctx.activeKey)
-  return ctx.parentByKey.get(key) ?? ctx.visibleKeys[0] ?? null
-})
-
-// 트리 특화 visibleOrder
-defineVisibleOrder('treeVisibleDepthFirst', (_v, data) => {
-  const expanded = new Set(data.state?.expandedKeys ?? [])
-  return visibleTreeItems({
-    roots: data.relations?.rootKeys ?? [],
-    children: (key) => data.relations?.childrenByKey?.[key] ?? [],
-    isExpanded: (key) => expanded.has(key),
-  })
-})
+import './navigation'
 
 const activeHasChildren = { kind: 'hasChildren', key: '$activeKey' } as const
 const activeIsExpanded = { kind: 'isExpanded', key: '$activeKey' } as const

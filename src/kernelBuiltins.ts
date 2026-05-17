@@ -8,11 +8,13 @@
  */
 import {
   defineAriaSource,
+  defineNavigationTarget,
   defineStateProjection,
   definePredicate,
   defineVisibleOrder,
   resolveKeyToken,
 } from './patternKernel'
+import { moveLinear } from '@interactive-os/collection-navigation'
 
 // AriaSource — common
 defineAriaSource('refs.label', (ctx) => ctx.data.refs?.label)
@@ -88,3 +90,9 @@ definePredicate('isDisabled', (p, ctx) => {
 
 // VisibleOrder — kernel 기본 'flat'.
 defineVisibleOrder('flat', (_v, data) => data.relations?.rootKeys ?? [])
+
+// NavigationTarget — kernel 기본 linear movement over the resolved visible order.
+defineNavigationTarget('linear', (target, ctx) => {
+  const action = target.action as 'next' | 'previous' | 'first' | 'last'
+  return moveLinear(ctx.visibleKeys, ctx.activeKey, action)
+})
