@@ -94,7 +94,7 @@ function ActiveDemoWorkspace({
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle')
   const sourceTabs = useSourceTabs({ label: 'source files', tabs: sourceNames, value: activeSourceName, onChange: (sourceName) => dispatch({ type: 'selectSource', sourceName }) })
   const rightModeTabs = useSourceTabs({ label: 'right panel', tabs: rightModes, value: state.rightMode, onChange: (rightMode) => dispatch({ type: 'selectRightMode', rightMode }) })
-  const eventLog = state.events.map((event) => JSON.stringify(event)).join('\n') || 'none'
+  const eventLog = state.events.map(formatEvent).join('\n') || 'none'
 
   useEffect(() => {
     writeAppHash({
@@ -284,4 +284,17 @@ function coerceRightMode(value: string | null): AppState['rightMode'] | null {
 
 async function copyText(value: string): Promise<void> {
   await navigator.clipboard?.writeText(value)
+}
+
+function formatEvent(event: PatternEvent): string {
+  const fields = Object.entries(event)
+    .filter(([key, value]) => key !== 'type' && key !== 'meta' && value !== undefined && value !== null)
+    .map(([key, value]) => `${key}=${formatEventValue(value)}`)
+  const reason = event.meta?.reason ? ` via ${event.meta.reason}` : ''
+  return fields.length > 0 ? `${event.type} ${fields.join(' ')}${reason}` : `${event.type}${reason}`
+}
+
+function formatEventValue(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.join(',')}]`
+  return String(value)
 }

@@ -1,9 +1,5 @@
-import type { HTMLAttributes, KeyboardEvent } from 'react'
-import type { KeyInput } from '@interactive-os/keyboard'
-import { checkboxDefinition, createPatternRuntime, type PatternData, type PatternEvent } from '../../../../src'
+import { useCheckboxPattern, type PatternData, type PatternEvent } from '../../../../src'
 import { Icon } from '../../shared/Icon'
-
-type Props = HTMLAttributes<HTMLElement>
 
 const itemClass =
   'inline-flex h-8 max-w-sm items-center gap-2 rounded px-2 text-sm text-zinc-800 outline-none hover:bg-zinc-100 focus:outline focus:outline-2 focus:outline-zinc-400 dark:text-zinc-200 dark:hover:bg-zinc-900 dark:focus:outline-zinc-500'
@@ -15,31 +11,9 @@ export function Checkbox({
   data: PatternData
   onEvent: (event: PatternEvent) => void
 }) {
-  const runtime = createPatternRuntime({
-    definition: checkboxDefinition,
-    data,
-    options: {},
-    onEvent,
-    keyToElementId: (key) => `checkbox-${key}`,
-  })
-
-  const rootKeys = data.relations?.rootKeys ?? []
-  if (rootKeys.length === 0) return null
-
-  const items = rootKeys.map((key) => {
-    const { onKeyDown: _ignore, ...props } = runtime.getPartProps('checkbox', key) as Props
-    const state = runtime.getItemState(key, 'checkbox')
-    return { key, props, state }
-  })
-
-  const onItemKeyDown = (key: string) => (event: KeyboardEvent<HTMLDivElement>) => {
-    const result = runtime.resolveKeyboardBinding(event as unknown as KeyInput, key)
-    if (!result) return
-    if (result.preventDefault) event.preventDefault()
-    for (const next of result.events) runtime.emit(next)
-  }
-
-  const onItemFocus = (key: string) => () => runtime.emit({ type: 'focus', key })
+  const checkbox = useCheckboxPattern(data, onEvent)
+  const items = checkbox.renderItems
+  if (items.length === 0) return null
 
   const renderItem = ({ key, props, state }: (typeof items)[number]) => {
     const checked = state.checked
@@ -47,9 +21,6 @@ export function Checkbox({
       <div
         key={key}
         {...props}
-        tabIndex={0}
-        onKeyDown={onItemKeyDown(key)}
-        onFocus={onItemFocus(key)}
         className={itemClass}
       >
         <span
@@ -59,7 +30,7 @@ export function Checkbox({
           {checked === 'mixed' ? <Icon name="minus" /> : null}
           {checked === true ? <Icon name="x" /> : null}
         </span>
-        <span>{data.items[key]?.label}</span>
+        <span>{items.find((item) => item.key === key)?.label}</span>
       </div>
     )
   }
