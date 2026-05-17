@@ -209,6 +209,7 @@ async function runSmoke() {
   await verifyTabsKeyboardEventLog()
   await verifySourceTabKeyboardNavigation()
   await verifyRightPanelKeyboardNavigation()
+  await verifyRightPanelToggleRestoresSourceState()
   await verifyPreviewStateSurvivesInspection()
   await verifyPatternSwitchResetsStaleSource()
   await verifyInteractionEventLog()
@@ -394,6 +395,50 @@ async function verifyRightPanelKeyboardNavigation() {
     })
   } catch {
     patternFailures.push(`right panel keyboard navigation did not switch code to state: current ${window.location.hash}, text=${rootText().slice(0, 180)}`)
+  }
+}
+
+async function verifyRightPanelToggleRestoresSourceState() {
+  window.location.hash = '#pattern=accordion&panel=code&source=accordionData.ts'
+  window.dispatchEvent(new dom.window.HashChangeEvent('hashchange'))
+
+  try {
+    await waitForPatternRoute({ pattern: 'accordion', panel: 'code', source: 'accordionData.ts', label: 'Accordion' })
+    await waitFor(() => {
+      const sourceText = sourcePanelText()
+      return sourceFilenameIs('accordionData.ts')
+        && sourceText.includes('export const initialAccordionData')
+        && !hasSourceLoadFailure(sourceText)
+    })
+
+    const closeToggle = await waitFor(() => findRightPanelToggle())
+    closeToggle.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
+
+    await waitFor(() =>
+      currentHashParam('pattern') === 'accordion'
+      && currentHashParam('panel') === 'off'
+      && currentHashParam('source') === 'accordionData.ts'
+      && hasActiveDemoHeading('Accordion')
+      && !document.querySelector('[role="tablist"][aria-label="right panel"]')
+      && !document.querySelector('[role="tablist"][aria-label="source files"]'),
+    )
+
+    const reopenToggle = await waitFor(() => findRightPanelToggle())
+    reopenToggle.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
+
+    await waitFor(() => {
+      const sourceText = sourcePanelText()
+      return currentHashParam('pattern') === 'accordion'
+        && currentHashParam('panel') === 'code'
+        && currentHashParam('source') === 'accordionData.ts'
+        && hasActiveDemoHeading('Accordion')
+        && findRightPanelTab('code')?.getAttribute('aria-selected') === 'true'
+        && sourceFilenameIs('accordionData.ts')
+        && sourceText.includes('export const initialAccordionData')
+        && !hasSourceLoadFailure(sourceText)
+    })
+  } catch {
+    patternFailures.push(`right panel toggle did not restore source state: current ${window.location.hash}, text=${rootText().slice(0, 180)}`)
   }
 }
 
@@ -662,6 +707,11 @@ function findSourceTab(sourceName) {
 function findRightPanelTab(name) {
   return Array.from(document.querySelectorAll('[role="tablist"][aria-label="right panel"] [role="tab"]'))
     .find((tab) => tab.textContent?.trim() === name)
+}
+
+function findRightPanelToggle() {
+  return Array.from(document.querySelectorAll('button[aria-pressed]'))
+    .find((button) => button.textContent?.trim() === 'code')
 }
 
 function findPatternOption(key) {
