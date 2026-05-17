@@ -44,7 +44,11 @@ function flattenTree(roots: readonly Node[]) {
 
   const visit = (nodes: readonly Node[], level: number) => {
     nodes.forEach((node, index) => {
-      items[node.key] = { label: node.label, textValue: node.label.toLowerCase(), href: node.href }
+      items[node.key] = {
+        label: node.label,
+        textValue: node.label.toLowerCase(),
+        ...(node.href !== undefined ? { href: node.href } : {}),
+      }
       typeaheadTextByKey[node.key] = node.label.toLowerCase()
       levelByKey[node.key] = level
       posInSetByKey[node.key] = index + 1
