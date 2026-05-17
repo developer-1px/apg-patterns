@@ -644,6 +644,7 @@ function DemoSourceProbeItem({
   if (duplicates([...demo.sourceNames]).length > 0) onInvalidEntry(`${entry.key}: duplicate source tabs`)
   if (demo.inspect.trim().length === 0) onInvalidEntry(`${entry.key}: empty inspect output`)
   if (demo.keyboardShortcuts.some((shortcut) => shortcut.trim().length === 0)) onInvalidEntry(`${entry.key}: empty keyboard shortcut`)
+  if (duplicates([...demo.keyboardShortcuts]).length > 0) onInvalidEntry(`${entry.key}: duplicate keyboard shortcuts`)
   for (const shortcut of demo.keyboardShortcuts) {
     if (!isValidShortcut(shortcut)) onInvalidEntry(`${entry.key}: invalid keyboard shortcut ${shortcut}`)
   }
