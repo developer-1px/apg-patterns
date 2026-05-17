@@ -1,4 +1,16 @@
-import { PatternDataSchema, type Key, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
+import { PatternDataSchema, type Key, type PatternData, type PatternEvent, type PatternItem, type PatternOptions, type PatternState } from '../../../../src'
+
+interface SpinbuttonDemoItem extends PatternItem {
+  valuemin?: number
+  valuemax?: number
+  valuetext?: string
+}
+
+interface SpinbuttonDemoState extends PatternState {
+  options?: PatternOptions
+}
+
+type SpinbuttonDemoData = PatternData<SpinbuttonDemoItem, SpinbuttonDemoState>
 
 export type SpinbuttonVariantKey = 'numeric' | 'time'
 
@@ -10,14 +22,14 @@ const timeValuetext = (key: Key, value: number): string => {
   return String(value)
 }
 
-const numericData = (): PatternData =>
+const numericData = (): SpinbuttonDemoData =>
   PatternDataSchema.parse({
     items: { count: { label: 'Quantity' } },
     relations: { rootKeys: ['count'] },
     state: { activeKey: 'count', valueByKey: { count: 5 } },
   })
 
-const timeData = (): PatternData =>
+const timeData = (): SpinbuttonDemoData =>
   PatternDataSchema.parse({
     items: {
       hours: { label: 'Hours', valuemin: 0, valuemax: 23, valuetext: timeValuetext('hours', 9) },
@@ -30,11 +42,11 @@ const timeData = (): PatternData =>
 export interface SpinbuttonVariant {
   key: SpinbuttonVariantKey
   label: string
-  data: PatternData
+  data: SpinbuttonDemoData
   options: PatternOptions
 }
 
-const withOptions = (data: PatternData, options: PatternOptions): PatternData => ({
+const withOptions = (data: SpinbuttonDemoData, options: PatternOptions): SpinbuttonDemoData => ({
   ...data,
   state: { ...data.state, options },
 })
@@ -66,15 +78,15 @@ const computeDelta = (direction: unknown, step: number, large: number): number =
 }
 
 const itemRange = (data: PatternData, key: Key, fallbackMin: number, fallbackMax: number): [number, number] => {
-  const item = data.items[key] as { valuemin?: number; valuemax?: number } | undefined
+  const item = data.items[key]
   return [item?.valuemin ?? fallbackMin, item?.valuemax ?? fallbackMax]
 }
 
 export function reduceSpinbuttonData(
-  data: PatternData,
+  data: SpinbuttonDemoData,
   event: PatternEvent,
   options: PatternOptions = spinbuttonOptions,
-): PatternData {
+): SpinbuttonDemoData {
   if (event.type === 'focus' && event.key) {
     return { ...data, state: { ...data.state, activeKey: event.key } }
   }
@@ -98,7 +110,7 @@ export function reduceSpinbuttonData(
 
   const valueByKey = { ...data.state?.valueByKey, [key]: clamped }
   let items = data.items
-  const item = items[key] as { valuetext?: string } | undefined
+  const item = items[key]
   if (item?.valuetext !== undefined) {
     items = { ...items, [key]: { ...items[key], valuetext: timeValuetext(key, clamped) } }
   }
