@@ -308,75 +308,9 @@ react: {
 }
 ```
 
-## Blind Loop Results
+## Blind Loop Result
 
-### Round 1
-
-Initial schema exposed `indentStyle`, `hasChildren`, `expanded`, `treeitemProps`, and `indicatorProps`.
-
-Failures:
-
-- Agents attached `indentStyle` inconsistently to row, label, or wrapper.
-- `indicatorProps` sounded decorative and was not clearly branch-only.
-- `state` and `label` were underspecified.
-
-Changes:
-
-- Introduce discriminated tree item variants.
-- Move from `indicatorProps` toward behavior-named toggle props.
-- Require explicit `label` and state shape.
-
-### Round 2
-
-Tried `rowLayoutProps` plus branch/leaf variants.
-
-Failures:
-
-- `rowLayoutProps` contradicted "props are semantic-only".
-- Agents nested an extra wrapper and were unsure whether `treeitemProps` or layout props owned the row.
-- `expanded` existed both top-level and in state.
-
-Changes:
-
-- Remove layout props from hook output.
-- Keep app-owned layout via `level`.
-- Keep expansion only in branch `state.expanded`.
-
-### Round 3
-
-Used `level`, branch-only `indicatorButtonProps`, and semantic-only props.
-
-Failures:
-
-- `level` base was unclear.
-- `indicatorButtonProps` still sounded visual.
-- Missing `textValue` for typeahead/search.
-
-Changes:
-
-- Make `level` 1-based.
-- Rename to `toggleButtonProps`.
-- Add required `textValue`.
-
-### Round 4
-
-Added `textValue`, `toggleButtonProps`, and `level` base.
-
-Failures:
-
-- Root host element needed explicit docs.
-- Tree metadata `index` was ambiguous.
-- Agents asked for parent metadata without raw data access.
-
-Changes:
-
-- Root descriptor names host element.
-- Add `parentKey`.
-- Rename `index` to `indexInParent` and define it as 1-based.
-
-### Round 5
-
-Final candidate produced correct JSX across agents.
+Five blind rounds converged on the descriptor above. Discarded candidates were removed from the active spec because they caused repeated DOM-placement or naming mistakes.
 
 Remaining non-blocking questions:
 

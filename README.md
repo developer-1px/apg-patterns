@@ -163,4 +163,3 @@ npm test
 
 - [React facade zod blind loop](docs/proposals/2026-05-18-react-facade-zod-blind-loop.md)
 - [LLM-friendly APG React API](docs/proposals/2026-05-18-llm-friendly-apg-react-api.md)
-- [Declarative runtime expansion](docs/proposals/2026-05-17-declarative-runtime-expansion.md)
