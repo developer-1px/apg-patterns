@@ -39,13 +39,13 @@ export function useSourceTabs<T extends SourceTabKey>({ label, tabs, value, onCh
 
 export function SourceTabs<T extends SourceTabKey>({ tabs, getTablistProps, getTabProps }: SourceTabsViewProps<T>) {
   return (
-    <div {...getTablistProps()} className="flex min-w-0 gap-1 overflow-x-auto whitespace-nowrap rounded-md bg-zinc-100 p-1 dark:bg-zinc-900">
+    <div {...getTablistProps()} className="flex min-w-0 gap-1 overflow-x-auto whitespace-nowrap rounded-xl bg-zinc-100/75 p-1 dark:bg-white/[0.045]">
       {tabs.map((tab) => (
         <button
           {...getTabProps(tab)}
           key={tab}
           type="button"
-          className="h-8 shrink-0 rounded-md px-2.5 text-xs font-medium text-zinc-500 outline-none transition hover:bg-zinc-200/70 hover:text-zinc-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 aria-selected:bg-white aria-selected:text-zinc-950 aria-selected:shadow-sm dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-100 dark:focus-visible:outline-zinc-500 dark:aria-selected:bg-zinc-950 dark:aria-selected:text-zinc-50"
+          className="h-8 shrink-0 rounded-lg px-2.5 text-xs font-medium text-zinc-500 outline-none transition hover:bg-white/70 hover:text-zinc-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 aria-selected:bg-white aria-selected:text-zinc-950 aria-selected:shadow-sm dark:text-zinc-500 dark:hover:bg-white/[0.06] dark:hover:text-zinc-100 dark:focus-visible:outline-zinc-500 dark:aria-selected:bg-zinc-100 dark:aria-selected:text-zinc-950"
         >
           {tab}
         </button>

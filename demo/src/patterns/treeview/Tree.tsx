@@ -17,7 +17,7 @@ export function Tree({
   const tree = useTreeviewPattern(data, onEvent, options ?? {})
 
   return (
-    <div {...tree.rootProps} className="min-h-56 bg-white py-1 outline-none focus:outline focus:outline-2 focus:outline-zinc-400 dark:bg-zinc-950 dark:focus:outline-zinc-500">
+    <div {...tree.rootProps} className="min-h-56 rounded-xl bg-white/40 py-1 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-transparent dark:focus-visible:outline-zinc-500">
       {tree.renderItems.map((item) => {
         const href = data.items[item.key]?.href
         const indent = item.level * 18
@@ -26,7 +26,7 @@ export function Tree({
           <button
             {...item.toggleButtonProps}
             aria-label={`toggle ${item.key}`}
-            className="grid size-6 place-items-center rounded p-0 text-xs text-zinc-500 hover:bg-zinc-100 dark:text-zinc-500 dark:hover:bg-zinc-900"
+            className="grid size-6 place-items-center rounded-lg p-0 text-xs text-zinc-500 transition hover:bg-zinc-100 dark:text-zinc-500 dark:hover:bg-white/[0.06]"
           >
             <Icon name="chevron-right" className={item.state.expanded ? 'rotate-90' : ''} />
           </button>
@@ -55,7 +55,7 @@ export function Tree({
           <div
             key={item.key}
             {...item.treeitemProps}
-            className="flex min-h-8 items-center gap-1.5 rounded px-1 text-sm text-zinc-800 outline-none aria-selected:bg-zinc-100 aria-selected:text-zinc-950 focus:outline focus:outline-2 focus:outline-zinc-400 dark:text-zinc-300 dark:aria-selected:bg-zinc-900 dark:aria-selected:text-zinc-50 dark:focus:outline-zinc-500"
+            className="flex min-h-8 items-center gap-1.5 rounded-lg px-1 text-sm text-zinc-800 outline-none transition aria-selected:bg-zinc-100 aria-selected:text-zinc-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:text-zinc-300 dark:aria-selected:bg-white/[0.07] dark:aria-selected:text-zinc-50 dark:focus-visible:outline-zinc-500"
             style={{ paddingLeft: `${indent}px` }}
           >
             {indicator}

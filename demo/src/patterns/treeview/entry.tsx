@@ -78,8 +78,13 @@ export const entry: PatternEntry = {
       variants: (
         <div className="grid gap-3 text-xs text-zinc-600 dark:text-zinc-400">
           <TreeVariantMenu value={state.variant as TreeVariantKey} onChange={(variant) => dispatch({ type: 'selectVariant', variant })} />
-          <label className="inline-flex items-center gap-1.5">
-            <input type="checkbox" checked={state.followFocus} onChange={(event) => dispatch({ type: 'setFollowFocus', value: event.currentTarget.checked })} />
+          <label className="inline-flex items-center gap-2">
+            <input
+              type="checkbox"
+              className="size-4 rounded bg-white text-zinc-900 accent-zinc-900 shadow-sm outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.08] dark:accent-zinc-100 dark:focus-visible:outline-zinc-500"
+              checked={state.followFocus}
+              onChange={(event) => dispatch({ type: 'setFollowFocus', value: event.currentTarget.checked })}
+            />
             followFocus
           </label>
           <label className="grid gap-1">

@@ -1,10 +1,5 @@
-import type { HTMLAttributes, KeyboardEvent } from 'react'
-import type { KeyInput } from '@interactive-os/keyboard'
-import { createPatternRuntime, type PatternData, type PatternEvent } from '../../../../src'
-import { alertDefinition } from '../../../../src/patterns/alert/definition'
+import { useAlertPattern, type PatternData, type PatternEvent } from '../../../../src'
 import type { AlertDomainEvent } from './alertData'
-
-type Props = HTMLAttributes<HTMLElement>
 
 const triggerClass =
   'inline-flex h-8 items-center rounded bg-zinc-100 px-3 text-sm text-zinc-800 outline-none hover:bg-zinc-200 focus:outline focus:outline-2 focus:outline-zinc-400 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:focus:outline-zinc-500'
@@ -19,22 +14,8 @@ export interface AlertProps {
 }
 
 export function Alert({ data, onEvent }: AlertProps) {
-  const runtime = createPatternRuntime({
-    definition: alertDefinition,
-    data,
-    options: {},
-    onEvent: onEvent as (event: PatternEvent) => void,
-    keyToElementId: (key) => `alert-${String(key).toLowerCase().replace(/[^a-z0-9_-]+/g, '-')}`,
-  })
-
-  const alertKey = data.relations?.rootKeys?.[0] ?? 'alert'
-  const visible = (data.state?.expandedKeys ?? []).includes(alertKey)
-  const message = String((data.items[alertKey] as { message?: unknown } | undefined)?.message ?? '')
-
-  const onKeyDown = runtime.getRootKeyboardHandler()
-
-  const alertProps = runtime.getPartProps('alert', alertKey) as Props
-  const dismissProps = runtime.getItemProps('dismiss', 'dismiss') as Props
+  const alert = useAlertPattern(data, onEvent as (event: PatternEvent) => void)
+  const alertKey = alert.key ?? 'alert'
 
   const nextMessage = `Alert at ${new Date().toLocaleTimeString()}`
 
@@ -47,17 +28,13 @@ export function Alert({ data, onEvent }: AlertProps) {
       >
         Trigger alert
       </button>
-      {visible ? (
+      {alert.state.visible ? (
         <div
-          {...alertProps}
-          onKeyDown={(event: KeyboardEvent<HTMLDivElement>) =>
-            onKeyDown(event as unknown as KeyInput & { preventDefault?: () => void })
-          }
-          tabIndex={-1}
+          {...alert.rootProps}
           className={alertClass}
         >
-          <span>{message}</span>
-          <button type="button" {...dismissProps} className={dismissClass}>
+          <span>{alert.message}</span>
+          <button type="button" {...alert.dismissProps} className={dismissClass}>
             Dismiss
           </button>
         </div>

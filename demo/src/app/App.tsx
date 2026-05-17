@@ -7,13 +7,13 @@ import { Icon, type IconName } from '../shared/Icon'
 import { sourceLoaders, type SourceName } from '../shared/sources'
 import { SourceTabs, useSourceTabs } from './SourceTabs'
 
-const panelClass = 'min-h-0 rounded-lg border border-zinc-200/80 bg-white/95 p-3 shadow-sm shadow-zinc-200/70 dark:border-zinc-800 dark:bg-zinc-950/95 dark:shadow-black/20'
+const panelClass = 'min-h-0 rounded-xl bg-white/90 p-3 shadow-[0_18px_50px_rgba(24,24,27,0.08)] ring-1 ring-black/[0.03] backdrop-blur dark:bg-zinc-950/88 dark:shadow-[0_18px_50px_rgba(0,0,0,0.32)] dark:ring-white/[0.04]'
 const headerClass = 'mb-4 flex items-center justify-between gap-3'
 const titleClass = 'truncate text-[11px] font-semibold uppercase text-zinc-500 dark:text-zinc-500'
-const buttonClass = 'inline-flex h-8 items-center justify-center rounded-md border border-transparent px-2.5 text-xs font-medium text-zinc-600 outline-none transition hover:border-zinc-200 hover:bg-zinc-100 hover:text-zinc-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:text-zinc-400 dark:hover:border-zinc-800 dark:hover:bg-zinc-900 dark:hover:text-zinc-100 dark:focus-visible:outline-zinc-500'
-const preClass = 'h-full min-h-0 overflow-auto rounded-md border border-zinc-200 bg-zinc-50/80 p-4 font-mono text-[12px] leading-6 text-zinc-700 shadow-inner shadow-zinc-200/50 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-300 dark:shadow-black/10'
+const buttonClass = 'inline-flex h-8 items-center justify-center rounded-lg px-2.5 text-xs font-medium text-zinc-600 outline-none transition hover:bg-zinc-100 hover:text-zinc-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-100 dark:focus-visible:outline-zinc-500'
+const preClass = 'h-full min-h-0 overflow-auto rounded-xl bg-zinc-100/70 p-4 font-mono text-[12px] leading-6 text-zinc-700 shadow-inner shadow-zinc-200/50 dark:bg-white/[0.045] dark:text-zinc-300 dark:shadow-black/10'
 const optionButtonClass =
-  'inline-flex h-8 items-center rounded-md px-2.5 text-left text-xs font-medium text-zinc-500 outline-none transition hover:bg-zinc-100 hover:text-zinc-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 aria-selected:bg-zinc-900 aria-selected:text-white dark:text-zinc-500 dark:hover:bg-zinc-900 dark:hover:text-zinc-100 dark:focus-visible:outline-zinc-500 dark:aria-selected:bg-zinc-100 dark:aria-selected:text-zinc-950'
+  'inline-flex h-8 items-center rounded-lg px-2.5 text-left text-xs font-medium text-zinc-500 outline-none transition hover:bg-white/70 hover:text-zinc-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 aria-selected:bg-white aria-selected:text-zinc-950 aria-selected:shadow-sm dark:text-zinc-500 dark:hover:bg-white/[0.06] dark:hover:text-zinc-100 dark:focus-visible:outline-zinc-500 dark:aria-selected:bg-zinc-100 dark:aria-selected:text-zinc-950'
 const rightModes = ['source', 'inspect', 'log'] as const
 const rightModeLabels: Record<(typeof rightModes)[number], string> = {
   source: 'code',
@@ -68,13 +68,10 @@ export function App() {
   const [state, dispatch] = useReducer(reduceAppState, defaultAppState, readInitialAppState)
 
   return (
-    <main className={`grid h-dvh grid-cols-1 ${state.rightPanelOpen ? 'grid-rows-[minmax(112px,16dvh)_minmax(320px,1fr)_minmax(300px,36dvh)]' : 'grid-rows-[minmax(112px,18dvh)_minmax(0,1fr)]'} gap-4 bg-zinc-50 px-3 py-3 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 sm:px-4 sm:py-4 ${state.rightPanelOpen ? 'lg:grid-cols-[220px_minmax(420px,1fr)_minmax(420px,0.92fr)]' : 'lg:grid-cols-[220px_minmax(420px,1fr)]'} lg:grid-rows-[minmax(0,1fr)] lg:gap-4 lg:px-5 lg:py-5`}>
+    <main className={`grid h-dvh grid-cols-1 ${state.rightPanelOpen ? 'grid-rows-[minmax(112px,16dvh)_minmax(320px,1fr)_minmax(300px,36dvh)]' : 'grid-rows-[minmax(112px,18dvh)_minmax(0,1fr)]'} gap-4 bg-zinc-100 px-3 py-3 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 sm:px-4 sm:py-4 ${state.rightPanelOpen ? 'lg:grid-cols-[220px_minmax(420px,1fr)_minmax(420px,0.92fr)]' : 'lg:grid-cols-[220px_minmax(420px,1fr)]'} lg:grid-rows-[minmax(0,1fr)] lg:gap-4 lg:px-5 lg:py-5`}>
       <section className={`${panelClass} overflow-auto`}>
         <header className={headerClass}>
           <h1 className={titleClass}>patterns</h1>
-          <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] font-medium text-zinc-500 dark:bg-zinc-900 dark:text-zinc-500">
-            {patternItems.length}
-          </span>
         </header>
         <PatternMenu value={state.patternKey} onChange={(patternKey) => dispatch({ type: 'selectPattern', patternKey })} />
       </section>
@@ -156,7 +153,7 @@ function ActiveDemoWorkspace({
           <div className="flex items-center gap-1">
             <button
               type="button"
-              className={`${buttonClass} aria-pressed:border-zinc-900 aria-pressed:bg-zinc-900 aria-pressed:text-white dark:aria-pressed:border-zinc-100 dark:aria-pressed:bg-zinc-100 dark:aria-pressed:text-zinc-950`}
+              className={`${buttonClass} aria-pressed:bg-zinc-900 aria-pressed:text-white dark:aria-pressed:bg-zinc-100 dark:aria-pressed:text-zinc-950`}
               aria-pressed={state.rightPanelOpen}
               onClick={() => dispatch({ type: 'toggleRightPanel' })}
               title={state.rightPanelOpen ? 'Hide source panel' : 'Show source panel'}
@@ -165,13 +162,13 @@ function ActiveDemoWorkspace({
             </button>
           </div>
         </header>
-        {activeDemo.variants ? <div className="mb-4 rounded-md border border-zinc-200 bg-zinc-50/70 p-2 dark:border-zinc-800 dark:bg-zinc-900/40">{activeDemo.variants}</div> : null}
+        {activeDemo.variants ? <div className="mb-4 rounded-xl bg-zinc-100/70 p-2 dark:bg-white/[0.045]">{activeDemo.variants}</div> : null}
         {activeDemo.keyboardShortcuts.length > 0 ? (
           <div className="mb-5">
             <div className="mb-1.5 text-[10px] font-semibold uppercase text-zinc-400 dark:text-zinc-600">keys</div>
             <div className="flex flex-wrap gap-1">
               {activeDemo.keyboardShortcuts.map((shortcut) => (
-                <kbd key={shortcut} className="inline-flex min-h-6 items-center gap-1 rounded border border-zinc-200 bg-white px-1.5 py-0.5 font-mono text-[11px] text-zinc-500 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
+                <kbd key={shortcut} className="inline-flex min-h-6 items-center gap-1 rounded-md bg-white px-1.5 py-0.5 font-mono text-[11px] text-zinc-500 shadow-sm dark:bg-white/[0.06] dark:text-zinc-400">
                   <ShortcutIndicator shortcut={shortcut} />
                 </kbd>
               ))}
@@ -184,7 +181,7 @@ function ActiveDemoWorkspace({
       {state.rightPanelOpen ? (
       <section className={`${panelClass} flex min-h-0 flex-col`}>
         <header className="mb-3 grid gap-2">
-          <div {...rightModeTabs.getTablistProps()} className="flex items-center gap-1 rounded-md bg-zinc-100 p-1 dark:bg-zinc-900">
+          <div {...rightModeTabs.getTablistProps()} className="flex items-center gap-1 rounded-xl bg-zinc-100/75 p-1 dark:bg-white/[0.045]">
             {rightModes.map((mode) => (
               <button {...rightModeTabs.getTabProps(mode)} key={mode} type="button" className={optionButtonClass}>
                 {rightModeLabels[mode]}
@@ -292,7 +289,7 @@ async function copyText(value: string): Promise<void> {
   await navigator.clipboard?.writeText(value)
 }
 
-function formatEvent(event: PatternEvent): string {
+export function formatEvent(event: PatternEvent): string {
   const fields = Object.entries(event)
     .filter(([key, value]) => key !== 'type' && key !== 'meta' && value !== undefined && value !== null)
     .map(([key, value]) => `${key}=${formatEventValue(value)}`)

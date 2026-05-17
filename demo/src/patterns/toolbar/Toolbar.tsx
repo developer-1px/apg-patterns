@@ -1,9 +1,4 @@
-import type { HTMLAttributes, KeyboardEvent } from 'react'
-import type { KeyInput } from '@interactive-os/keyboard'
-import { createPatternRuntime, usePatternEffects, type PatternData, type PatternEvent } from '../../../../src'
-import { toolbarDefinition } from '../../../../src/patterns/toolbar/definition'
-
-type Props = HTMLAttributes<HTMLElement>
+import { useToolbarPattern, type PatternData, type PatternEvent } from '../../../../src'
 
 export function Toolbar({
   data,
@@ -12,33 +7,22 @@ export function Toolbar({
   data: PatternData
   onEvent: (event: PatternEvent) => void
 }) {
-  const runtime = createPatternRuntime({
-    definition: toolbarDefinition,
-    data,
-    options: { focusStrategy: 'rovingTabIndex', orientation: 'horizontal' },
-    onEvent,
-    keyToElementId: (key) => `toolbar-item-${key}`,
-  })
-  const rootProps = runtime.getPartProps('toolbar') as Props
-  const onKeyDown = runtime.getRootKeyboardHandler()
-  usePatternEffects({ definition: toolbarDefinition, data, keyToElementId: runtime.keyToElementId })
+  const toolbar = useToolbarPattern(data, onEvent)
 
   return (
     <div
-      {...rootProps}
-      onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => onKeyDown(event as unknown as KeyInput & { preventDefault?: () => void })}
+      {...toolbar.rootProps}
       className="inline-flex gap-1 rounded border border-zinc-300 bg-zinc-50 p-1 dark:border-zinc-700 dark:bg-zinc-900"
     >
-      {(data.relations?.rootKeys ?? []).map((key) => {
-        const itemProps = runtime.getPartProps('item', key) as Props
+      {toolbar.renderItems.map((item) => {
         return (
           <button
             type="button"
-            {...itemProps}
-            key={key}
+            {...item.itemProps}
+            key={item.key}
             className="inline-flex h-8 items-center rounded px-2 text-sm text-zinc-800 outline-none hover:bg-zinc-100 focus:outline focus:outline-2 focus:outline-zinc-400 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:focus:outline-zinc-500"
           >
-            {data.items[key]?.label}
+            {item.label}
           </button>
         )
       })}
