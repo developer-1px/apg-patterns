@@ -116,6 +116,39 @@ describe('App route state', () => {
   })
 })
 
+describe('event log', () => {
+  it('records pattern events and clears them explicitly', async () => {
+    replaceHash('#pattern=accordion&panel=events&source=Accordion.tsx')
+
+    render(<App />)
+
+    fireEvent.click(screen.getByRole('button', { name: /Personal Information/ }))
+
+    await waitFor(() => expect(screen.getByText('1 events')).toBeTruthy())
+    expect(screen.getByText(/expand key=personal expanded=true via pointer/)).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'clear' }))
+
+    expect(screen.getByText('0 events')).toBeTruthy()
+    expect(screen.getByText('none')).toBeTruthy()
+  })
+
+  it('clears stale events when switching to another pattern', async () => {
+    replaceHash('#pattern=accordion&panel=events&source=Accordion.tsx')
+
+    render(<App />)
+
+    fireEvent.click(screen.getByRole('button', { name: /Personal Information/ }))
+    await waitFor(() => expect(screen.getByText('1 events')).toBeTruthy())
+
+    fireEvent.click(screen.getByRole('option', { name: 'Checkbox' }))
+
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Checkbox' })).toBeTruthy())
+    expect(screen.getByText('0 events')).toBeTruthy()
+    expect(screen.getByText('none')).toBeTruthy()
+  })
+})
+
 describe('demo pattern registry', () => {
   it('keeps pattern keys and labels unique for stable menus and deep links', () => {
     const keys = patternEntries.map((entry) => entry.key)
