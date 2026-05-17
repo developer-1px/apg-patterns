@@ -632,7 +632,9 @@ async function verifyPatternPanelRoutes({ key, label, sourceName }) {
     currentHashParam('pattern') === key
     && currentHashParam('panel') === 'off'
     && hasActiveDemoHeading(label)
-    && !document.querySelector('[role="tablist"][aria-label="right panel"]'),
+    && !document.querySelector('[role="tablist"][aria-label="right panel"]')
+    && !document.querySelector('[role="tablist"][aria-label="source files"]')
+    && !sourcePanelElement(),
     `${label}: closed panel route did not render`,
   )
 
