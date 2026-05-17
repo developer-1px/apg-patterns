@@ -302,7 +302,7 @@ export const ReactSemanticDefaultPropSchema = z.enum([
 ])
 export type ReactSemanticDefaultProp = z.infer<typeof ReactSemanticDefaultPropSchema>
 
-export const ReactSemanticDefaultsSchema = z.record(
+export const ReactSemanticDefaultsSchema = z.partialRecord(
   ReactSemanticDefaultPropSchema,
   z.union([z.string(), z.number(), z.boolean()]),
 )
@@ -356,7 +356,7 @@ export const ReactRenderVariantSchema = z
   .object({
     kind: z.string().min(1),
     when: ReactRenderVariantWhenSchema,
-    fields: z.record(ReactItemFieldNameSchema, ReactRenderValueSchema),
+    fields: z.partialRecord(ReactItemFieldNameSchema, ReactRenderValueSchema),
     props: z.record(ReactPropNameSchema, ReactItemPropSchema),
   })
   .strict()
