@@ -275,6 +275,24 @@ describe('event log', () => {
     expect(screen.getByText('none')).toBeTruthy()
   })
 
+  it('keeps the event log bounded to the newest 12 entries', async () => {
+    replaceHash('#pattern=accordion&panel=events&source=Accordion.tsx')
+
+    render(<App />)
+
+    const personalButton = screen.getByRole('button', { name: /Personal Information/ })
+    for (let index = 0; index < 13; index += 1) fireEvent.click(personalButton)
+
+    await waitFor(() => expect(screen.getByText('12 events')).toBeTruthy())
+
+    const eventLogText = getVisibleLogPanel().textContent ?? ''
+    const eventRows = eventLogText.split('\n').filter(Boolean)
+
+    expect(eventRows).toHaveLength(12)
+    expect(eventRows[0]).toContain('expanded=true')
+    expect(eventRows.at(-1)).toContain('expanded=false')
+  })
+
   it('clears stale events when switching to another pattern', async () => {
     replaceHash('#pattern=accordion&panel=events&source=Accordion.tsx')
 
@@ -676,6 +694,13 @@ function getSourcePanel() {
   const sourcePanel = screen.getAllByRole('tabpanel').find((panel) => panel.id.startsWith('tab-source-panel-'))
   if (!sourcePanel) throw new Error('missing source panel')
   return sourcePanel
+}
+
+function getVisibleLogPanel() {
+  const logPanel = Array.from(document.querySelectorAll('pre'))
+    .find((panel) => panel.textContent?.includes('expand key='))
+  if (!logPanel) throw new Error('missing log panel')
+  return logPanel
 }
 
 function currentHashParam(name: string) {
