@@ -10,6 +10,7 @@ const modules = import.meta.glob<{ entry: PatternEntry }>('../patterns/*/entry.t
 const keyByPatternFolder: Readonly<Record<string, string>> = {
   menu: 'menuAndMenubar',
 }
+export const defaultPatternKey: PatternKey = 'treeview'
 
 const collected: CollectedPatternEntry[] = []
 for (const [path, mod] of Object.entries(modules)) {
@@ -21,7 +22,7 @@ for (const [path, mod] of Object.entries(modules)) {
 }
 
 collected.sort((a, b) => a.key.localeCompare(b.key))
-validatePatternEntries(collected)
+validatePatternEntries(collected, { defaultPatternKey })
 
 export const patternEntries: readonly PatternEntry[] = collected.map(({ sourcePath, ...entry }) => entry)
 
@@ -38,7 +39,10 @@ function getPatternEntry(patternKey: PatternKey): PatternEntry {
   return patternEntries.find((entry) => entry.key === patternKey) ?? patternEntries[0]
 }
 
-export function validatePatternEntries(entries: readonly ValidatedPatternEntry[]) {
+export function validatePatternEntries(
+  entries: readonly ValidatedPatternEntry[],
+  options: { defaultPatternKey?: PatternKey } = {},
+) {
   if (entries.length === 0) throw new Error('[demoPatterns] no pattern entries were registered')
 
   const invalidEntries = entries.flatMap((entry) => {
@@ -71,6 +75,10 @@ export function validatePatternEntries(entries: readonly ValidatedPatternEntry[]
   const duplicateLabels = duplicates(entries.map((entry) => entry.label))
   if (duplicateLabels.length > 0) {
     throw new Error(`[demoPatterns] duplicate pattern labels: ${duplicateLabels.join(', ')}`)
+  }
+
+  if (options.defaultPatternKey && !entries.some((entry) => entry.key === options.defaultPatternKey)) {
+    throw new Error(`[demoPatterns] default pattern is not registered: ${options.defaultPatternKey}`)
   }
 }
 

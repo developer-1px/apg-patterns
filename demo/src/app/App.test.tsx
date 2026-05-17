@@ -3,7 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { act } from 'react'
 import { coerceRightMode, formatEvent, isCopyableSource, loadSourcePreview } from './App'
 import { App } from './App'
-import { patternEntries, validatePatternEntries } from '../shared/demoPatterns'
+import { defaultPatternKey, patternEntries, validatePatternEntries } from '../shared/demoPatterns'
 import { sourceLoaders, sourceNameCollisions } from '../shared/sources'
 import type { PatternEvent } from '../../../src'
 
@@ -252,6 +252,10 @@ describe('demo pattern registry', () => {
     expect(patternEntries.some((entry) => 'sourcePath' in entry)).toBe(false)
   })
 
+  it('keeps the default pattern registered for deep-link recovery', () => {
+    expect(patternEntries.some((entry) => entry.key === defaultPatternKey)).toBe(true)
+  })
+
   it('fails fast when no pattern entries are registered', () => {
     expect(() => validatePatternEntries([])).toThrow('[demoPatterns] no pattern entries were registered')
   })
@@ -279,6 +283,12 @@ describe('demo pattern registry', () => {
     expect(() => validatePatternEntries([
       { key: 'menuAndMenubar', label: 'Menu and Menubar', sourcePath: '../patterns/menu/entry.tsx' },
     ])).not.toThrow()
+  })
+
+  it('fails fast when the configured default pattern is not registered', () => {
+    expect(() => validatePatternEntries([
+      { key: 'accordion', label: 'Accordion' },
+    ], { defaultPatternKey: 'treeview' })).toThrow('[demoPatterns] default pattern is not registered: treeview')
   })
 
   it('fails fast on duplicate pattern keys', () => {
