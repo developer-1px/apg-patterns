@@ -70,11 +70,12 @@ export function createPatternRuntime(input: CreatePatternRuntimeInput): PatternR
     for (const binding of definition.keyboard) {
       if (!matchesShortcut(input, binding.shortcut)) continue
       for (const item of binding.cases) {
-        const matches = item.case === 'otherwise' || item.case === 'always' || evaluatePredicate(item.when, { data, options, activeKey })
+        const ctx = { data, options, activeKey, parentByKey }
+        const matches = item.case === 'otherwise' || item.case === 'always' || evaluatePredicate(item.when, ctx)
         if (!matches) continue
         return {
           preventDefault: binding.preventDefault ?? false,
-          events: item.events.flatMap((t) => resolveEventTemplate(t, activeKey, data)),
+          events: item.events.flatMap((t) => resolveEventTemplate(t, activeKey, data, undefined, ctx)),
         }
       }
     }

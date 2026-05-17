@@ -177,18 +177,19 @@ export function resolveEventTemplate(
   activeKey: Key,
   data: PatternData,
   keyContext?: Key,
+  ctx?: PatternRuntimeContext,
 ): readonly PatternEvent[] {
   if (template.type === 'navigate') return [{ type: 'navigate', direction: template.direction }]
   if (template.type === 'typeahead') return [{ type: 'typeahead', query: template.query }]
   if (template.type === 'dismiss') {
-    const key = template.key ? resolveKeyToken(template.key, keyContext, activeKey) : undefined
+    const key = template.key ? resolveKeyToken(template.key, keyContext, activeKey, ctx) : undefined
     return [{ type: 'dismiss', ...(key ? { key } : {}) }]
   }
   if (template.type === 'extension') {
-    const key = template.key ? resolveKeyToken(template.key, keyContext, activeKey) : undefined
+    const key = template.key ? resolveKeyToken(template.key, keyContext, activeKey, ctx) : undefined
     return [{ type: 'extension', name: template.name, ...(key ? { key } : {}), ...(template.payload ? { payload: template.payload } : {}) }]
   }
-  const key = resolveKeyToken(template.key, keyContext, activeKey)
+  const key = resolveKeyToken(template.key, keyContext, activeKey, ctx)
   if (template.type === 'focus') return [{ type: 'focus', key }]
   if (template.type === 'activate') return [{ type: 'activate', key }]
   if (template.type === 'select') return [{ type: 'select', keys: [key], anchorKey: key, extentKey: key }]
