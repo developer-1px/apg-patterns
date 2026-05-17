@@ -1,9 +1,8 @@
 import { useReducer, type HTMLAttributes, type KeyboardEvent, type MouseEvent } from 'react'
 import type { KeyInput } from '@interactive-os/keyboard'
-import { createPatternRuntime, reducePatternData, type Key, type PatternData, type PatternEvent } from '../../src'
+import { createPatternRuntime, handlePatternTrapFocus, reducePatternData, usePatternEffects, type Key, type PatternData, type PatternEvent } from '../../src'
 import { alertDialogDefinition } from '../../src/patterns/alertdialog/definition'
 import { initialAlertDialogData } from './alertdialogData'
-import { handlePatternTrapFocus, usePatternEffects } from './patternEffects'
 
 export interface AlertDialogProps {
   data?: PatternData

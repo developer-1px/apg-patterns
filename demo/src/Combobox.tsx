@@ -1,7 +1,6 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useRef } from 'react'
 import type { HTMLAttributes, InputHTMLAttributes, KeyboardEvent } from 'react'
 import { COMBOBOX_KEY, comboboxDefinition, createPatternRuntime, type PatternData, type PatternEvent } from '../../src'
-import { FRUITS, filterFruits, firstMatch } from './comboboxData'
 
 type RootProps = InputHTMLAttributes<HTMLInputElement> & { onKeyDown: (e: KeyboardEvent) => void }
 
@@ -20,8 +19,11 @@ export function Combobox({
   const editable = variant !== 'selectOnly'
   const listboxId = 'combobox-popup'
   const inputRef = useRef<HTMLInputElement>(null)
-  const [query, setQuery] = useState('')
-  const [inlineCompletion, setInlineCompletion] = useState<{ start: number; end: number } | null>(null)
+  const query = ((data.state as { query?: string } | undefined)?.query ?? '') as string
+  const inlineCompletion = ((data.state as { inlineCompletion?: { start: number; end: number } | null } | undefined)?.inlineCompletion ?? null) as {
+    start: number
+    end: number
+  } | null
 
   const runtime = createPatternRuntime({
     definition: comboboxDefinition,
@@ -38,52 +40,23 @@ export function Combobox({
   const visibleKeys = Object.keys(data.items).filter((k) => k !== COMBOBOX_KEY)
   const selectedLabel = selectedKey ? data.items[selectedKey]?.label ?? '' : ''
 
-  // Compute displayed input value: query (editable) or selected label (select-only).
-  const displayValue = editable ? query : selectedLabel
+  const displayValue = editable ? (selectedKey && !open ? selectedLabel : query) : selectedLabel
 
-  useLayoutEffect(() => {
-    if (!editable) return
-    // When the parent committed a selection (selectedKey changed via Enter), sync the query.
-    if (selectedKey && !open) setQuery(data.items[selectedKey]?.label ?? '')
-  }, [selectedKey, open, editable, data.items])
-
-  useLayoutEffect(() => {
-    if (variant === 'listWithInlineAutocomplete' && inlineCompletion && inputRef.current) {
-      inputRef.current.setSelectionRange(inlineCompletion.start, inlineCompletion.end)
+  const setInputRef = (node: HTMLInputElement | null) => {
+    inputRef.current = node
+    if (variant === 'listWithInlineAutocomplete' && inlineCompletion && node) {
+      node.setSelectionRange(inlineCompletion.start, inlineCompletion.end)
     }
-  }, [inlineCompletion, variant])
+  }
 
   const handleInput = (next: string) => {
-    setQuery(next)
-    setInlineCompletion(null)
     if (variant === 'selectOnly') return
-    const filtered = filterFruits(next)
-    onVisibleKeysChange?.(filtered)
-    // Open popup on typing.
-    if (!open) onEvent({ type: 'expand', key: COMBOBOX_KEY, expanded: true })
-    if (variant === 'listWithInlineAutocomplete' && next.length > 0) {
-      const match = firstMatch(next)
-      if (match) {
-        const matchLabel = FRUITS.find((f) => f.key === match)?.label ?? ''
-        if (matchLabel.toLowerCase().startsWith(next.toLowerCase()) && matchLabel.length > next.length) {
-          setQuery(matchLabel)
-          setInlineCompletion({ start: next.length, end: matchLabel.length })
-          onEvent({ type: 'focus', key: match })
-          return
-        }
-      }
-    }
-    // Pre-select first filtered option for visibility.
-    if (filtered.length > 0) onEvent({ type: 'focus', key: filtered[0] })
+    onEvent({ type: 'extension', name: 'comboboxInput', key: COMBOBOX_KEY, payload: { value: next, inline: variant === 'listWithInlineAutocomplete' } })
   }
 
   const handleSelectOnlyTypeahead = (key: string) => {
     if (!/^[\w]$/.test(key)) return false
-    const nextQuery = query + key.toLowerCase()
-    setQuery(nextQuery)
-    const match = firstMatch(nextQuery) ?? firstMatch(key)
-    if (match) onEvent({ type: 'focus', key: match })
-    window.setTimeout(() => setQuery(''), 500)
+    onEvent({ type: 'extension', name: 'comboboxTypeahead', key: COMBOBOX_KEY, payload: { value: key.toLowerCase() } })
     return true
   }
 
@@ -100,7 +73,7 @@ export function Combobox({
   return (
     <div className="relative grid max-w-sm gap-1">
       <input
-        ref={inputRef}
+        ref={setInputRef}
         {...(rootProps as InputHTMLAttributes<HTMLInputElement>)}
         type="text"
         readOnly={!editable}
@@ -132,7 +105,9 @@ export function Combobox({
                     e.preventDefault()
                     onEvent({ type: 'select', keys: [key], anchorKey: key, extentKey: key })
                     onEvent({ type: 'expand', key: COMBOBOX_KEY, expanded: false })
-                    if (editable) setQuery(data.items[key]?.label ?? '')
+                    if (editable) {
+                      onEvent({ type: 'extension', name: 'comboboxCommit', key, payload: { value: data.items[key]?.label ?? '' } })
+                    }
                   }}
                   className="cursor-pointer px-2 py-1.5 text-sm text-zinc-800 aria-selected:bg-zinc-100 aria-selected:text-zinc-950 data-active:bg-zinc-50 dark:text-zinc-200 dark:aria-selected:bg-zinc-800 dark:aria-selected:text-zinc-50 dark:data-active:bg-zinc-900"
                 >

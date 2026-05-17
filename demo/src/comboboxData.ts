@@ -34,7 +34,7 @@ export function buildComboboxData(visibleKeys: readonly string[] = FRUITS.map((f
   for (const k of visibleKeys) if (items[k]) filteredItems[k] = items[k]
   return PatternDataSchema.parse({
     items: filteredItems,
-    state: { activeKey: null, expandedKeys: [], selectedKeys: [] },
+    state: { activeKey: null, expandedKeys: [], selectedKeys: [], query: '', inlineCompletion: null },
     refs: { label: 'Fruit' },
   })
 }
@@ -66,6 +66,47 @@ export function reduceComboboxData(current: PatternData, event: PatternEvent): P
   }
   if (event.type === 'focus') {
     return { ...current, state: { ...current.state, activeKey: event.key } }
+  }
+  if (event.type === 'extension' && event.name === 'comboboxInput') {
+    const raw = typeof event.payload?.value === 'string' ? event.payload.value : ''
+    const inline = event.payload?.inline === true
+    const filtered = filterFruits(raw)
+    const match = inline ? firstMatch(raw) : null
+    const matchLabel = match ? FRUITS.find((f) => f.key === match)?.label ?? '' : ''
+    const shouldComplete = inline && raw.length > 0 && match && matchLabel.toLowerCase().startsWith(raw.toLowerCase()) && matchLabel.length > raw.length
+    const next = buildComboboxData(filtered)
+    return {
+      ...next,
+      state: {
+        ...current.state,
+        query: shouldComplete ? matchLabel : raw,
+        inlineCompletion: shouldComplete ? { start: raw.length, end: matchLabel.length } : null,
+        expandedKeys: [COMBOBOX_KEY],
+        activeKey: shouldComplete ? match : filtered[0] ?? null,
+      },
+    }
+  }
+  if (event.type === 'extension' && event.name === 'comboboxCommit') {
+    return {
+      ...current,
+      state: {
+        ...current.state,
+        query: typeof event.payload?.value === 'string' ? event.payload.value : '',
+        inlineCompletion: null,
+      },
+    }
+  }
+  if (event.type === 'extension' && event.name === 'comboboxTypeahead') {
+    const nextQuery = `${(current.state as { query?: string } | undefined)?.query ?? ''}${typeof event.payload?.value === 'string' ? event.payload.value : ''}`
+    const match = firstMatch(nextQuery) ?? firstMatch(typeof event.payload?.value === 'string' ? event.payload.value : '')
+    return {
+      ...current,
+      state: {
+        ...current.state,
+        query: nextQuery,
+        activeKey: match ?? current.state?.activeKey ?? null,
+      },
+    }
   }
   return current
 }
