@@ -104,12 +104,20 @@ describe('Listbox demo — basic', () => {
 })
 
 describe('Listbox demo — scrollable', () => {
-  it('renders many options with aria-posinset / aria-setsize', () => {
+  it('renders many options (scrollable APG variant)', () => {
     render(<ListboxDemo variant="scrollable" />)
     const options = screen.getAllByRole('option')
     expect(options.length).toBeGreaterThan(20)
+    // First option matches initial activeKey 's0' → Aardvark.
+    expect(options[0]!.textContent).toBe('Aardvark')
+  })
+
+  it('grouped variant emits aria-posinset / aria-setsize on each option', () => {
+    render(<ListboxDemo variant="grouped" />)
+    const options = screen.getAllByRole('option')
     expect(options[0]!.getAttribute('aria-posinset')).toBe('1')
     expect(options[0]!.getAttribute('aria-setsize')).toBe(String(options.length))
+    expect(options[options.length - 1]!.getAttribute('aria-posinset')).toBe(String(options.length))
   })
 
   it('keyboard navigation moves active option', () => {

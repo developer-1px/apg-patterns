@@ -123,10 +123,7 @@ describe('Tabs demo — closeable', () => {
     const initialCount = tabsBefore.length
     const firstLabel = tabsBefore[0].textContent
     const tablist = screen.getByRole('tablist')
-    fireEvent.keyDown(tablist, { key: 'Delete', code: 'Delete' })
-    const tabsAfter = screen.getAllByRole('tab')
-    console.log('labels after delete:', tabsAfter.map(t => t.textContent))
-    expect(tabsAfter).toHaveLength(initialCount - 1)
+    expect.fail(`tablist onKeyDown? attrs=${tablist.outerHTML.slice(0, 300)}`)
     expect(tabsAfter[0].textContent).not.toBe(firstLabel)
     // one tab is selected (adjacent neighbor activated)
     const selected = tabsAfter.filter((t) => t.getAttribute('aria-selected') === 'true')
