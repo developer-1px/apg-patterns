@@ -63,7 +63,7 @@ export function RearrangeableListbox({
   const canDown = activeKey ? rootKeys.indexOf(activeKey) < rootKeys.length - 1 : false
 
   const buttonClass =
-    'grid size-7 place-items-center rounded border border-zinc-300 bg-white text-xs text-zinc-700 outline-none hover:bg-zinc-50 focus:outline focus:outline-2 focus:outline-zinc-400 disabled:opacity-40 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:focus:outline-zinc-500'
+    'grid size-7 place-items-center rounded-lg bg-zinc-100/80 text-xs text-zinc-700 shadow-sm outline-none transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 disabled:opacity-40 dark:bg-white/[0.06] dark:text-zinc-300 dark:hover:bg-white/[0.08] dark:focus-visible:outline-zinc-500'
 
   return (
     <div className="grid gap-2" onKeyDown={handleKeyDown}>

@@ -19,7 +19,7 @@ export function ListboxOption({
       aria-setsize={setSize}
       data-active={item.state.active ? '' : undefined}
       data-multiselectable={isMulti ? '' : undefined}
-      className="min-h-8 rounded px-2 py-1.5 text-sm text-zinc-800 outline-none aria-disabled:text-zinc-400 aria-selected:bg-zinc-100 aria-selected:text-zinc-950 data-active:bg-zinc-50 focus:outline focus:outline-2 focus:outline-zinc-400 dark:text-zinc-300 dark:aria-disabled:text-zinc-600 dark:aria-selected:bg-zinc-900 dark:aria-selected:text-zinc-50 dark:data-active:bg-zinc-900 dark:focus:outline-zinc-500"
+      className="min-h-8 rounded-lg px-2.5 py-1.5 text-sm text-zinc-800 outline-none transition aria-disabled:text-zinc-400 aria-selected:bg-zinc-100 aria-selected:text-zinc-950 data-active:bg-white/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:text-zinc-300 dark:aria-disabled:text-zinc-600 dark:aria-selected:bg-white/[0.07] dark:aria-selected:text-zinc-50 dark:data-active:bg-white/[0.05] dark:focus-visible:outline-zinc-500"
     >
       {item.label}
     </div>

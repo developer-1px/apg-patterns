@@ -8,9 +8,9 @@ import { NavMenuDisclosure, NavMenuTopLinksDisclosure } from './NavMenuDisclosur
 type Props = HTMLAttributes<HTMLElement>
 
 const buttonClass =
-  'inline-flex h-8 items-center justify-between rounded bg-zinc-100 px-3 text-sm text-zinc-800 outline-none hover:bg-zinc-200 focus:outline focus:outline-2 focus:outline-zinc-400 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:focus:outline-zinc-500'
+  'inline-flex h-8 items-center justify-between rounded-xl bg-zinc-100/80 px-3 text-sm font-medium text-zinc-800 shadow-sm outline-none transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.06] dark:text-zinc-200 dark:hover:bg-white/[0.08] dark:focus-visible:outline-zinc-500'
 const panelClass =
-  'rounded bg-zinc-50 p-3 text-sm text-zinc-700 dark:bg-zinc-900/70 dark:text-zinc-300'
+  'rounded-xl bg-zinc-100/70 p-3 text-sm leading-relaxed text-zinc-700 shadow-inner shadow-zinc-200/50 dark:bg-white/[0.045] dark:text-zinc-300 dark:shadow-black/10'
 
 export interface DisclosureProps {
   data: PatternData
@@ -51,7 +51,7 @@ function ImageDisclosure({ data, onEvent }: { data: PatternData; onEvent: (event
 
   return (
     <div className="grid max-w-md gap-3">
-      <img src={imageDisclosureContent.imageUrl} alt={imageDisclosureContent.imageAlt} className="h-40 w-full rounded object-cover" />
+      <img src={imageDisclosureContent.imageUrl} alt={imageDisclosureContent.imageAlt} className="h-40 w-full rounded-xl object-cover shadow-[0_12px_32px_rgba(24,24,27,0.08)]" />
       <button type="button" {...triggerProps} onKeyDown={(event: KeyboardEvent<HTMLButtonElement>) => onKeyDown(event as unknown as KeyInput & { preventDefault?: () => void })} className={buttonClass}>
         <span>{runtime.expanded ? 'Hide description' : 'Show description'}</span>
         <Chevron expanded={runtime.expanded} />

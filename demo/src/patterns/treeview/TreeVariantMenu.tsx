@@ -1,28 +1,22 @@
-import type { HTMLAttributes } from 'react'
-import { createPatternRuntime, listboxDefinition, reducePatternData, type PatternData } from '../../../../src'
+import { listboxDefinition, reducePatternData, useListboxPattern, type PatternData } from '../../../../src'
 import { treeVariantItems, type TreeVariantKey } from './treeVariants'
-
-type Props = HTMLAttributes<HTMLElement>
 
 export function TreeVariantMenu({ value, onChange }: { value: TreeVariantKey; onChange: (value: TreeVariantKey) => void }) {
   const data = createTreeVariantData(value)
-  const runtime = createPatternRuntime({
-    definition: listboxDefinition,
+  const listbox = useListboxPattern(
     data,
-    options: { focusStrategy: 'rovingTabIndex', selectionMode: 'single' },
-    onEvent: (event) => {
+    (event) => {
       if (event.type === 'select') selectVariant(event.keys[0], onChange)
       if (event.type === 'navigate') selectVariant(reducePatternData(listboxDefinition, data, event).state?.activeKey, onChange)
     },
-    keyToElementId: (key) => `tree-variant-${key}`,
-  })
-  const rootProps = runtime.getPartProps('listbox') as Props
+    { focusStrategy: 'rovingTabIndex', selectionMode: 'single', elementIdPrefix: 'tree-variant-' },
+  )
 
   return (
-    <div {...rootProps} className="grid gap-1 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:focus-visible:outline-zinc-500">
-      {treeVariantItems.map((variant) => (
+    <div {...listbox.rootProps} className="grid gap-1 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:focus-visible:outline-zinc-500">
+      {listbox.renderItems.map((variant) => (
         <button
-          {...(runtime.getPartProps('option', variant.key) as Props)}
+          {...variant.optionProps}
           key={variant.key}
           type="button"
           className="min-h-8 rounded-lg px-2.5 text-left text-xs font-medium text-zinc-600 outline-none transition hover:bg-white/70 hover:text-zinc-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 aria-selected:bg-zinc-900 aria-selected:text-white aria-selected:shadow-sm dark:text-zinc-400 dark:hover:bg-white/[0.06] dark:hover:text-zinc-100 dark:focus-visible:outline-zinc-500 dark:aria-selected:bg-zinc-100 dark:aria-selected:text-zinc-950"
