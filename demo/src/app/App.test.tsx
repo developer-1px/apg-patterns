@@ -169,6 +169,29 @@ describe('App route state', () => {
 })
 
 describe('event log', () => {
+  it('preserves the active preview state while inspecting code, state, and events', async () => {
+    replaceHash('#pattern=accordion&panel=code&source=Accordion.tsx')
+
+    render(<App />)
+
+    const personalButton = screen.getByRole('button', { name: /Personal Information/ })
+    fireEvent.click(personalButton)
+    expect(personalButton.getAttribute('aria-expanded')).toBe('true')
+
+    fireEvent.click(screen.getByRole('tab', { name: 'accordionData.ts' }))
+    await waitFor(() => expect(currentHashParam('source')).toBe('accordionData.ts'))
+    expect(personalButton.getAttribute('aria-expanded')).toBe('true')
+
+    fireEvent.click(screen.getByRole('tab', { name: 'state' }))
+    await waitFor(() => expect(currentHashParam('panel')).toBe('state'))
+    expect(personalButton.getAttribute('aria-expanded')).toBe('true')
+
+    fireEvent.click(screen.getByRole('tab', { name: 'events' }))
+    await waitFor(() => expect(currentHashParam('panel')).toBe('events'))
+    expect(personalButton.getAttribute('aria-expanded')).toBe('true')
+    expect(screen.getByText('1 events')).toBeTruthy()
+  })
+
   it('records pattern events and clears them explicitly', async () => {
     replaceHash('#pattern=accordion&panel=events&source=Accordion.tsx')
 

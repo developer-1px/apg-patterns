@@ -202,6 +202,7 @@ async function runSmoke() {
   await verifyTabsKeyboardEventLog()
   await verifySourceTabKeyboardNavigation()
   await verifyRightPanelKeyboardNavigation()
+  await verifyPreviewStateSurvivesInspection()
   await verifyPatternSwitchResetsStaleSource()
   await verifyInteractionEventLog()
   await verifyEventLogClear()
@@ -386,6 +387,38 @@ async function verifyRightPanelKeyboardNavigation() {
     })
   } catch {
     patternFailures.push(`right panel keyboard navigation did not switch code to state: current ${window.location.hash}, text=${rootText().slice(0, 180)}`)
+  }
+}
+
+async function verifyPreviewStateSurvivesInspection() {
+  window.location.hash = '#pattern=accordion&panel=code&source=Accordion.tsx'
+  window.dispatchEvent(new dom.window.HashChangeEvent('hashchange'))
+
+  try {
+    await waitForPatternRoute({ pattern: 'accordion', panel: 'code', source: 'Accordion.tsx', label: 'Accordion' })
+    const accordionButton = await waitFor(() => document.querySelector('[data-demo-preview="accordion"] button[aria-expanded]'))
+    accordionButton.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
+    await waitFor(() => accordionButton.getAttribute('aria-expanded') === 'true')
+
+    const dataSourceTab = await waitFor(() => findSourceTab('accordionData.ts'))
+    dataSourceTab.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
+    await waitFor(() => currentHashParam('source') === 'accordionData.ts'
+      && sourceFilenameIs('accordionData.ts')
+      && accordionButton.getAttribute('aria-expanded') === 'true')
+
+    const stateTab = await waitFor(() => findRightPanelTab('state'))
+    stateTab.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
+    await waitFor(() => currentHashParam('panel') === 'state'
+      && accordionButton.getAttribute('aria-expanded') === 'true'
+      && (document.querySelector('pre')?.textContent ?? '').includes('"items"'))
+
+    const eventsTab = await waitFor(() => findRightPanelTab('events'))
+    eventsTab.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
+    await waitFor(() => currentHashParam('panel') === 'events'
+      && accordionButton.getAttribute('aria-expanded') === 'true'
+      && rootText().includes('1 events'))
+  } catch {
+    patternFailures.push(`preview state did not survive inspection panel/source navigation: current ${window.location.hash}, text=${rootText().slice(0, 180)}`)
   }
 }
 
