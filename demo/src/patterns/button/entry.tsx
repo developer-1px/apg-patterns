@@ -4,6 +4,7 @@ import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
 import { renderDataInspect } from '../../shared/inspect/genericInspect'
 import { renderUiNode, type UiNode } from '../../shared/uiSchema'
+import type { PatternEvent } from '../../../../src'
 
 const buttonDemoView = {
   kind: 'stack',
@@ -56,7 +57,7 @@ export const entry: PatternEntry = {
         },
         actions: {
           selectVariant: host.selectVariant,
-          dispatchEvent: (event) => {
+          dispatchEvent: (event: PatternEvent) => {
             onEvent(event)
             host.dispatchEvent(event)
           },
