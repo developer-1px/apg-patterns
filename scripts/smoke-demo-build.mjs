@@ -25,32 +25,8 @@ console.warn = (...args) => {
   originalConsoleWarn(...args)
 }
 
-const dom = new JSDOM('<!doctype html><html><head></head><body><div id="root"></div></body></html>', {
-  pretendToBeVisual: true,
-  url: demoUrl,
-})
-
-globalThis.window = dom.window
-globalThis.document = dom.window.document
-globalThis.location = dom.window.location
-globalThis.history = dom.window.history
-globalThis.MutationObserver = dom.window.MutationObserver
-globalThis.HTMLElement = dom.window.HTMLElement
-globalThis.HTMLIFrameElement = dom.window.HTMLIFrameElement
-globalThis.SVGElement = dom.window.SVGElement
-globalThis.Node = dom.window.Node
-Object.defineProperty(globalThis, 'navigator', {
-  configurable: true,
-  value: dom.window.navigator,
-})
-
-await import(new URL(entryFile, assetsDir).href)
-const patternListbox = await waitFor(() => document.querySelector('[role="listbox"][aria-label="APG patterns"]'))
-
-const root = document.getElementById('root')
-const rootText = () => root?.textContent ?? ''
-const requiredText = ['patterns', 'Tabs', 'code', 'Tabs.tsx']
-const missingText = requiredText.filter((text) => !rootText().includes(text))
+let dom
+let root
 const patternFailures = []
 const previewSurfaceSelectors = {
   accordion: '[role="group"]',
@@ -81,6 +57,33 @@ const previewSurfaceSelectors = {
   treeview: '[role="tree"]',
   windowsplitter: '[role="separator"]',
 }
+
+try {
+dom = new JSDOM('<!doctype html><html><head></head><body><div id="root"></div></body></html>', {
+  pretendToBeVisual: true,
+  url: demoUrl,
+})
+
+globalThis.window = dom.window
+globalThis.document = dom.window.document
+globalThis.location = dom.window.location
+globalThis.history = dom.window.history
+globalThis.MutationObserver = dom.window.MutationObserver
+globalThis.HTMLElement = dom.window.HTMLElement
+globalThis.HTMLIFrameElement = dom.window.HTMLIFrameElement
+globalThis.SVGElement = dom.window.SVGElement
+globalThis.Node = dom.window.Node
+Object.defineProperty(globalThis, 'navigator', {
+  configurable: true,
+  value: dom.window.navigator,
+})
+
+await import(new URL(entryFile, assetsDir).href)
+const patternListbox = await waitFor(() => document.querySelector('[role="listbox"][aria-label="APG patterns"]'))
+
+root = document.getElementById('root')
+const requiredText = ['patterns', 'Tabs', 'code', 'Tabs.tsx']
+const missingText = requiredText.filter((text) => !rootText().includes(text))
 
 if (!hasActiveDemoHeading('Tabs')) patternFailures.push('initial tabs route did not render Tabs workspace')
 
@@ -182,11 +185,6 @@ await verifyHashRoute('#pattern=accordion&panel=off&source=Accordion.tsx', (text
   'closed right panel route did not keep the source panel closed',
 )
 
-process.removeListener('uncaughtException', recordError)
-process.removeListener('unhandledRejection', recordError)
-console.error = originalConsoleError
-console.warn = originalConsoleWarn
-
 if (errors.length > 0 || missingText.length > 0 || patternFailures.length > 0) {
   const details = [
     errors.length > 0 ? `runtime errors:\n${errors.join('\n')}` : null,
@@ -198,6 +196,12 @@ if (errors.length > 0 || missingText.length > 0 || patternFailures.length > 0) {
 }
 
 console.log('demo build smoke passed')
+} finally {
+  process.removeListener('uncaughtException', recordError)
+  process.removeListener('unhandledRejection', recordError)
+  console.error = originalConsoleError
+  console.warn = originalConsoleWarn
+}
 
 async function waitFor(predicate, timeoutMs = 1000) {
   const deadline = Date.now() + timeoutMs
@@ -207,6 +211,10 @@ async function waitFor(predicate, timeoutMs = 1000) {
     await new Promise((resolve) => setTimeout(resolve, 10))
   }
   throw new Error('timed out')
+}
+
+function rootText() {
+  return root?.textContent ?? ''
 }
 
 async function verifyHashRoute(hash, predicate, failure) {
