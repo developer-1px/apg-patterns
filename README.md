@@ -158,11 +158,12 @@ npm run demo
 npm run check
 ```
 
-`check` runs TypeScript validation, the Vitest suite, and the production demo smoke test:
+`check` runs TypeScript validation, the Vitest suite, the package build, and the production demo smoke test:
 
 ```bash
 npm run typecheck
 npm test
+npm run build
 npm run demo:smoke
 ```
 
