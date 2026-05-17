@@ -54,7 +54,7 @@ const faqRows: readonly FaqRow[] = [
   { key: 'faq1', question: 'What is the cost of a basic membership?', answer: 'Basic membership is free for everyone and includes access to community discussions.' },
   { key: 'faq2', question: 'Can I become a member without a credit card?', answer: 'Yes. Bank transfer and PayPal are supported for paid tiers; basic tier requires no payment method.' },
   { key: 'faq3', question: 'How do I cancel my membership?', answer: 'Open Account Settings → Membership → Cancel. Cancellation takes effect at the end of the current billing period.' },
-  { key: 'faq4', question: 'Where do I send suggestions or feedback?', answer: 'Email feedback@example.com or open an issue on our GitHub repository.' },
+  { key: 'faq4', question: 'Where do I send suggestions or feedback?', answer: 'Send product suggestions from Account Settings so they stay attached to your workspace.' },
 ]
 
 export const faqDisclosureContent = faqRows

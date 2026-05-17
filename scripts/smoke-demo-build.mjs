@@ -123,6 +123,8 @@ await verifyHashRoute('#pattern=accordion&panel=events&source=Accordion.tsx', (t
   'events panel route did not render empty event log',
 )
 
+await verifyInteractionEventLog()
+
 await verifyHashRoute('#pattern=accordion&panel=off&source=Accordion.tsx', (text) =>
   window.location.hash.includes('pattern=accordion')
   && window.location.hash.includes('panel=off')
@@ -164,6 +166,22 @@ async function verifyHashRoute(hash, predicate, failure) {
     await waitFor(() => predicate(rootText()))
   } catch {
     patternFailures.push(failure)
+  }
+}
+
+async function verifyInteractionEventLog() {
+  window.location.hash = '#pattern=accordion&panel=events&source=Accordion.tsx'
+  window.dispatchEvent(new dom.window.HashChangeEvent('hashchange'))
+
+  try {
+    const accordionButton = await waitFor(() => document.querySelector('button[aria-expanded]'))
+    accordionButton.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
+    await waitFor(() => {
+      const text = rootText()
+      return text.includes('1 events') && text.includes('expand') && text.includes('via pointer')
+    })
+  } catch {
+    patternFailures.push('accordion interaction did not record an event log entry')
   }
 }
 

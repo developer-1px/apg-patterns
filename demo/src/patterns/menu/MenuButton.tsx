@@ -19,7 +19,7 @@ export function MenuButton({ data, onEvent }: MenuProps) {
       {menuButton.expanded ? (
         <ul
           {...menuButton.menuProps}
-          className="absolute top-10 z-10 grid w-56 gap-0.5 rounded-[6px] bg-white/95 p-1 text-sm shadow-lg ring-1 ring-black/[0.03] outline-none backdrop-blur focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-zinc-950/95 dark:shadow-black/30 dark:ring-white/[0.05] dark:focus-visible:outline-zinc-500"
+          className="absolute top-10 z-10 grid w-56 gap-0.5 rounded-[6px] bg-white/96 p-1 text-sm shadow-[0_20px_56px_rgba(24,24,27,0.15)] outline-none backdrop-blur focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-zinc-950/96 dark:shadow-black/35 dark:focus-visible:outline-zinc-500"
         >
           {menuButton.items.map((item) => (
             <li
