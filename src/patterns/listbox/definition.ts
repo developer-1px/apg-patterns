@@ -9,7 +9,6 @@ export const listboxDefinition = PatternDefinitionSchema.parse({
   parts: {
     listbox: {
       role: 'listbox',
-      keySource: 'relations.rootKeys',
       aria: [
         { attribute: 'aria-label', from: 'refs.label' },
         { attribute: 'aria-labelledby', from: 'refs.labelledBy' },
@@ -24,7 +23,6 @@ export const listboxDefinition = PatternDefinitionSchema.parse({
     },
     option: {
       role: 'option',
-      keySource: 'collectionItemKey',
       aria: [
         { attribute: 'aria-selected', from: 'state.selectedKeys' },
         { attribute: 'aria-disabled', from: 'state.disabledKeys' },

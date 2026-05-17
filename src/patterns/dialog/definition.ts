@@ -17,7 +17,6 @@ export const dialogDefinition = DialogDefinitionSchema.parse({
   parts: {
     trigger: {
       role: 'button',
-      keySource: 'relations.rootKeys',
       aria: [
         { attribute: 'aria-haspopup', from: 'items.label' },
         { attribute: 'aria-expanded', from: 'state.expandedKeys' },
@@ -29,7 +28,6 @@ export const dialogDefinition = DialogDefinitionSchema.parse({
     },
     dialog: {
       role: 'dialog',
-      keySource: 'items',
       aria: [
         { attribute: 'aria-modal', from: 'literal.true' },
         { attribute: 'aria-labelledby', from: 'relations.ownerByKey' },
@@ -44,12 +42,10 @@ export const dialogDefinition = DialogDefinitionSchema.parse({
     description: { role: 'paragraph' },
     cancel: {
       role: 'button',
-      keySource: 'items',
       events: [{ event: 'click', events: [{ type: 'expand', key: '$triggerKey', expanded: false }] }],
     },
     submit: {
       role: 'button',
-      keySource: 'items',
       events: [{ event: 'click', events: [{ type: 'expand', key: '$triggerKey', expanded: false }] }],
     },
   },

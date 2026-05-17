@@ -29,7 +29,6 @@ export const breadcrumbDefinition = BreadcrumbDefinitionSchema.parse({
     },
     crumb: {
       role: 'link',
-      keySource: 'items',
       aria: [
         { attribute: 'aria-current', from: 'state.currentKey' },
         { attribute: 'href', from: 'items.href' },

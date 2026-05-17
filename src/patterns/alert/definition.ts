@@ -18,7 +18,6 @@ export const alertDefinition = AlertDefinitionSchema.parse({
   parts: {
     alert: {
       role: 'alert',
-      keySource: 'relations.rootKeys',
       aria: [
         { attribute: 'aria-label', from: 'items.label' },
       ],
@@ -28,7 +27,6 @@ export const alertDefinition = AlertDefinitionSchema.parse({
     },
     dismiss: {
       role: 'button',
-      keySource: 'items',
       aria: [
         { attribute: 'aria-label', from: 'items.label' },
         { attribute: 'aria-controls', from: 'relations.controlsByKey' },

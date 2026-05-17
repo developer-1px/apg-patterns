@@ -83,7 +83,6 @@ export const gridDefinition = PatternDefinitionSchema.parse({
   parts: {
     grid: {
       role: 'grid',
-      keySource: 'relations.rowKeys',
       aria: [
         { attribute: 'aria-label', from: 'refs.label' },
         { attribute: 'aria-labelledby', from: 'refs.labelledBy' },
@@ -95,12 +94,10 @@ export const gridDefinition = PatternDefinitionSchema.parse({
     },
     row: {
       role: 'row',
-      keySource: 'relations.rowKeys',
       aria: [{ attribute: 'aria-rowindex', from: 'state.rowIndexByKey' }],
     },
     gridcell: {
       role: 'gridcell',
-      keySource: 'gridCellKey',
       aria: [
         { attribute: 'aria-rowindex', from: 'state.rowIndexByKey' },
         { attribute: 'aria-colindex', from: 'state.columnIndexByKey' },
@@ -116,7 +113,6 @@ export const gridDefinition = PatternDefinitionSchema.parse({
     },
     columnheader: {
       role: 'columnheader',
-      keySource: 'columnHeaderKey',
       aria: [
         { attribute: 'aria-rowindex', from: 'state.rowIndexByKey' },
         { attribute: 'aria-colindex', from: 'state.columnIndexByKey' },

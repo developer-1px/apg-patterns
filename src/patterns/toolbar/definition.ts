@@ -24,7 +24,6 @@ export const toolbarDefinition = ToolbarDefinitionSchema.parse({
   parts: {
     toolbar: {
       role: 'toolbar',
-      keySource: 'relations.rootKeys',
       aria: [
         { attribute: 'aria-label', from: 'refs.label' },
         { attribute: 'aria-orientation', from: 'options.orientation' },
@@ -32,7 +31,6 @@ export const toolbarDefinition = ToolbarDefinitionSchema.parse({
     },
     item: {
       role: 'button',
-      keySource: 'collectionItemKey',
       aria: [
         { attribute: 'aria-pressed', from: 'state.selectedKeys' },
         { attribute: 'aria-disabled', from: 'state.disabledKeys' },

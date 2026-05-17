@@ -17,7 +17,6 @@ export const carouselDefinition = CarouselDefinitionSchema.parse({
   parts: {
     root: {
       role: 'region',
-      keySource: 'relations.rootKeys',
       aria: [
         { attribute: 'aria-roledescription', from: 'options.roledescription' },
         { attribute: 'aria-label', from: 'refs.label' },
@@ -25,7 +24,6 @@ export const carouselDefinition = CarouselDefinitionSchema.parse({
     },
     slide: {
       role: 'group',
-      keySource: 'collectionItemKey',
       aria: [
         { attribute: 'aria-roledescription', from: 'options.slideRoledescription' },
         { attribute: 'aria-labelledby', from: 'relations.ownerByKey' },
@@ -34,19 +32,16 @@ export const carouselDefinition = CarouselDefinitionSchema.parse({
     },
     prev: {
       role: 'button',
-      keySource: 'relations.rootKeys',
       aria: [{ attribute: 'aria-label', from: 'items.label' }],
       events: [{ event: 'click', events: [{ type: 'navigate', direction: 'previous' }] }],
     },
     next: {
       role: 'button',
-      keySource: 'relations.rootKeys',
       aria: [{ attribute: 'aria-label', from: 'items.label' }],
       events: [{ event: 'click', events: [{ type: 'navigate', direction: 'next' }] }],
     },
     playPause: {
       role: 'button',
-      keySource: 'relations.rootKeys',
       aria: [
         { attribute: 'aria-label', from: 'items.label' },
         { attribute: 'aria-pressed', from: 'state.expandedKeys' },
@@ -54,7 +49,6 @@ export const carouselDefinition = CarouselDefinitionSchema.parse({
     },
     picker: {
       role: 'button',
-      keySource: 'collectionItemKey',
       aria: [
         { attribute: 'aria-label', from: 'items.label' },
         { attribute: 'aria-pressed', from: 'state.selectedKeys' },

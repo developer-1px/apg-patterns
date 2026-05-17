@@ -15,7 +15,6 @@ export const feedDefinition = PatternDefinitionSchema.parse({
   parts: {
     feed: {
       role: 'feed',
-      keySource: 'relations.rootKeys',
       aria: [
         { attribute: 'aria-label', from: 'refs.label' },
         { attribute: 'aria-labelledby', from: 'refs.labelledBy' },
@@ -23,7 +22,6 @@ export const feedDefinition = PatternDefinitionSchema.parse({
     },
     article: {
       role: 'article',
-      keySource: 'collectionItemKey',
       aria: [
         { attribute: 'aria-posinset', from: 'state.posInSetByKey' },
         { attribute: 'aria-setsize', from: 'state.setSizeByKey' },

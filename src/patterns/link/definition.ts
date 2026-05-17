@@ -14,7 +14,6 @@ export const linkDefinition = LinkDefinitionSchema.parse({
   parts: {
     link: {
       role: 'link',
-      keySource: 'relations.rootKeys',
       aria: [
         { attribute: 'aria-label', from: 'items.label' },
         { attribute: 'aria-disabled', from: 'state.disabledKeys' },

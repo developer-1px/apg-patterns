@@ -15,7 +15,6 @@ export const tooltipDefinition = TooltipDefinitionSchema.parse({
   parts: {
     trigger: {
       role: 'button',
-      keySource: 'relations.rootKeys',
       aria: [
         { attribute: 'aria-describedby', from: 'relations.controlsByKey' },
         { attribute: 'aria-label', from: 'items.label' },
@@ -32,7 +31,6 @@ export const tooltipDefinition = TooltipDefinitionSchema.parse({
     },
     tooltip: {
       role: 'tooltip',
-      keySource: 'items',
       aria: [
         { attribute: 'aria-labelledby', from: 'relations.ownerByKey' },
       ],

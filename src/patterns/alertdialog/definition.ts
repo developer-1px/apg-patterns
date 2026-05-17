@@ -17,7 +17,6 @@ export const alertDialogDefinition = AlertDialogDefinitionSchema.parse({
   parts: {
     trigger: {
       role: 'button',
-      keySource: 'relations.rootKeys',
       aria: [
         { attribute: 'aria-expanded', from: 'state.expandedKeys' },
         { attribute: 'aria-controls', from: 'relations.controlsByKey' },
@@ -33,7 +32,6 @@ export const alertDialogDefinition = AlertDialogDefinitionSchema.parse({
     },
     dialog: {
       role: 'alertdialog',
-      keySource: 'items',
       aria: [
         { attribute: 'aria-modal', from: 'items.kind' },
         { attribute: 'aria-labelledby', from: 'relations.ownerByKey' },
@@ -42,7 +40,6 @@ export const alertDialogDefinition = AlertDialogDefinitionSchema.parse({
     },
     confirm: {
       role: 'button',
-      keySource: 'items',
       events: [
         {
           event: 'click',
@@ -52,7 +49,6 @@ export const alertDialogDefinition = AlertDialogDefinitionSchema.parse({
     },
     cancel: {
       role: 'button',
-      keySource: 'items',
       events: [
         {
           event: 'click',

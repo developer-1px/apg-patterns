@@ -32,7 +32,6 @@ export const tabsDefinition = TabsDefinitionSchema.parse({
   parts: {
     tablist: {
       role: 'tablist',
-      keySource: 'relations.rootKeys',
       aria: [
         { attribute: 'aria-label', from: 'refs.label' },
         { attribute: 'aria-labelledby', from: 'refs.labelledBy' },
@@ -41,7 +40,6 @@ export const tabsDefinition = TabsDefinitionSchema.parse({
     },
     tab: {
       role: 'tab',
-      keySource: 'collectionItemKey',
       aria: [
         { attribute: 'aria-selected', from: 'state.selectedKeys' },
         { attribute: 'aria-controls', from: 'relations.controlsByKey' },
@@ -65,7 +63,6 @@ export const tabsDefinition = TabsDefinitionSchema.parse({
     },
     tabpanel: {
       role: 'tabpanel',
-      keySource: 'controlledPanelKey',
       aria: [{ attribute: 'aria-labelledby', from: 'relations.ownerByKey' }],
       focus: {
         tabIndex: {

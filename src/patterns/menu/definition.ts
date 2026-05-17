@@ -44,7 +44,6 @@ export const menubarDefinition = PatternDefinitionSchema.parse({
   parts: {
     menubar: {
       role: 'menubar',
-      keySource: 'relations.rootKeys',
       aria: [
         { attribute: 'aria-label', from: 'refs.label' },
         { attribute: 'aria-orientation', from: 'options.orientation' },
@@ -52,7 +51,6 @@ export const menubarDefinition = PatternDefinitionSchema.parse({
     },
     menuitem: {
       role: 'menuitem',
-      keySource: 'collectionItemKey',
       aria: [
         { attribute: 'aria-haspopup', from: 'menu.hasPopup' },
         { attribute: 'aria-expanded', from: 'menu.expandedIfHasPopup' },
@@ -124,7 +122,6 @@ export const menuButtonDefinition = PatternDefinitionSchema.parse({
   parts: {
     trigger: {
       role: 'button',
-      keySource: 'relations.rootKeys',
       aria: [
         { attribute: 'aria-haspopup', from: 'menu.hasPopup' },
         { attribute: 'aria-expanded', from: 'state.expandedKeys' },
@@ -152,7 +149,6 @@ export const menuButtonDefinition = PatternDefinitionSchema.parse({
     },
     menu: {
       role: 'menu',
-      keySource: 'items',
       aria: [
         { attribute: 'aria-labelledby', from: 'relations.ownerByKey' },
         { attribute: 'aria-activedescendant', from: 'state.activeKey.elementId' },
@@ -160,7 +156,6 @@ export const menuButtonDefinition = PatternDefinitionSchema.parse({
     },
     menuitem: {
       role: 'menuitem',
-      keySource: 'collectionItemKey',
       aria: [
         { attribute: 'aria-disabled', from: 'state.disabledKeys' },
         { attribute: 'aria-checked', from: 'state.checkedByKey' },

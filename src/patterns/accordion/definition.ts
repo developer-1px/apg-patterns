@@ -17,7 +17,6 @@ export const accordionDefinition = AccordionDefinitionSchema.parse({
   parts: {
     accordion: {
       role: 'group',
-      keySource: 'relations.rootKeys',
       aria: [
         { attribute: 'aria-label', from: 'refs.label' },
         { attribute: 'aria-labelledby', from: 'refs.labelledBy' },
@@ -25,7 +24,6 @@ export const accordionDefinition = AccordionDefinitionSchema.parse({
     },
     header: {
       role: 'button',
-      keySource: 'collectionItemKey',
       aria: [
         { attribute: 'aria-expanded', from: 'state.expandedKeys' },
         { attribute: 'aria-controls', from: 'relations.controlsByKey' },
@@ -57,7 +55,6 @@ export const accordionDefinition = AccordionDefinitionSchema.parse({
     },
     panel: {
       role: 'region',
-      keySource: 'items',
       aria: [
         { attribute: 'aria-labelledby', from: 'relations.ownerByKey' },
       ],

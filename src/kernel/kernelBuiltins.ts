@@ -29,6 +29,11 @@ defineAriaSource('state.activeKey.elementId', (ctx) => (ctx.activeKey && ctx.key
 defineAriaSource('state.inactiveKey', (ctx) => (ctx.key != null && ctx.activeKey !== ctx.key ? true : undefined))
 defineAriaSource('items.label', (ctx) => (ctx.key ? ctx.data.items[ctx.key]?.label : undefined))
 defineAriaSource('items.labelledBy', (ctx) => (ctx.key ? ctx.data.items[ctx.key]?.labelledBy : undefined))
+defineAriaSource('items.valuemin', (ctx) => (ctx.key ? (ctx.data.items[ctx.key] as { valuemin?: number } | undefined)?.valuemin : undefined))
+defineAriaSource('items.valuemax', (ctx) => (ctx.key ? (ctx.data.items[ctx.key] as { valuemax?: number } | undefined)?.valuemax : undefined))
+defineAriaSource('items.valuetext', (ctx) => (ctx.key ? (ctx.data.items[ctx.key] as { valuetext?: string } | undefined)?.valuetext : undefined))
+defineAriaSource('options.min', (ctx) => (ctx.options as { min?: number } | undefined)?.min)
+defineAriaSource('options.max', (ctx) => (ctx.options as { max?: number } | undefined)?.max)
 defineAriaSource('relations.controlsByKey', (ctx) => {
   const controlledKey = ctx.key ? ctx.data.relations?.controlsByKey?.[ctx.key]?.[0] : undefined
   return controlledKey ? (ctx.keyToElementId?.(controlledKey) ?? controlledKey) : undefined

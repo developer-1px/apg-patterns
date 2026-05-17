@@ -22,7 +22,6 @@ export const windowsplitterDefinition = PatternDefinitionSchema.parse({
   parts: {
     separator: {
       role: 'separator',
-      keySource: 'relations.rootKeys',
       aria: [
         { attribute: 'aria-label', from: 'items.label' },
         { attribute: 'aria-labelledby', from: 'items.labelledBy' },

@@ -15,7 +15,6 @@ export const buttonDefinition = PatternDefinitionSchema.parse({
   parts: {
     button: {
       role: 'button',
-      keySource: 'relations.rootKeys',
       aria: [
         { attribute: 'aria-label', from: 'items.label' },
         { attribute: 'aria-pressed', from: 'state.pressedByKey' },

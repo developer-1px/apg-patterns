@@ -15,7 +15,6 @@ export const checkboxDefinition = PatternDefinitionSchema.parse({
   parts: {
     checkbox: {
       role: 'checkbox',
-      keySource: 'relations.rootKeys',
       aria: [
         { attribute: 'aria-label', from: 'items.label' },
         { attribute: 'aria-checked', from: 'state.checkedByKey' },

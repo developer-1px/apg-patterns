@@ -30,7 +30,6 @@ export const treeviewDefinition = TreeviewDefinitionSchema.parse({
   parts: {
     tree: {
       role: 'tree',
-      keySource: 'relations.rootKeys',
       aria: [
         { attribute: 'aria-label', from: 'refs.label' },
         { attribute: 'aria-labelledby', from: 'refs.labelledBy' },
@@ -50,7 +49,6 @@ export const treeviewDefinition = TreeviewDefinitionSchema.parse({
     },
     treeitem: {
       role: 'treeitem',
-      keySource: 'collectionItemKey',
       aria: [
         { attribute: 'aria-label', from: 'items.label' },
         { attribute: 'aria-labelledby', from: 'items.labelledBy' },
@@ -98,7 +96,6 @@ export const treeviewDefinition = TreeviewDefinitionSchema.parse({
     },
     indicator: {
       role: 'presentation',
-      keySource: 'collectionItemKey',
       events: [
         {
           event: 'click',

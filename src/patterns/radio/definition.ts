@@ -20,12 +20,10 @@ export const radioGroupDefinition = PatternDefinitionSchema.parse({
   parts: {
     radiogroup: {
       role: 'radiogroup',
-      keySource: 'relations.rootKeys',
       aria: [{ attribute: 'aria-label', from: 'refs.label' }],
     },
     radio: {
       role: 'radio',
-      keySource: 'collectionItemKey',
       aria: [
         { attribute: 'aria-checked', from: 'state.selectedKeys.radioChecked' },
         { attribute: 'aria-disabled', from: 'state.disabledKeys' },

@@ -29,7 +29,6 @@ export const treegridDefinition = PatternDefinitionSchema.parse({
   parts: {
     treegrid: {
       role: 'treegrid',
-      keySource: 'relations.rowKeys',
       aria: [
         { attribute: 'aria-label', from: 'refs.label' },
         { attribute: 'aria-labelledby', from: 'refs.labelledBy' },
@@ -40,7 +39,6 @@ export const treegridDefinition = PatternDefinitionSchema.parse({
     },
     row: {
       role: 'row',
-      keySource: 'relations.rowKeys',
       aria: [
         { attribute: 'aria-rowindex', from: 'state.rowIndexByKey' },
         { attribute: 'aria-level', from: 'state.rowLevelByKey' },
@@ -54,7 +52,6 @@ export const treegridDefinition = PatternDefinitionSchema.parse({
     },
     gridcell: {
       role: 'gridcell',
-      keySource: 'gridCellKey',
       aria: [
         { attribute: 'aria-rowindex', from: 'state.rowIndexByKey' },
         { attribute: 'aria-colindex', from: 'state.columnIndexByKey' },
@@ -70,7 +67,6 @@ export const treegridDefinition = PatternDefinitionSchema.parse({
     },
     columnheader: {
       role: 'columnheader',
-      keySource: 'columnHeaderKey',
       aria: [
         { attribute: 'aria-rowindex', from: 'state.rowIndexByKey' },
         { attribute: 'aria-colindex', from: 'state.columnIndexByKey' },

@@ -32,12 +32,6 @@ export const DomEventNameSchema = z.enum([
 ])
 export type DomEventName = z.infer<typeof DomEventNameSchema>
 
-export const KeySourceSchema = z.enum([
-  'collectionItemKey', 'columnHeaderKey', 'controlledPanelKey', 'gridCellKey', 'items',
-  'relations.rootKeys', 'relations.rowKeys', 'rowHeaderKey', 'tableCellKey',
-])
-export type KeySource = z.infer<typeof KeySourceSchema>
-
 export const VisibleOrderKindSchema = z.enum([
   'flat', 'comboboxOptions', 'gridRows', 'treeVisibleDepthFirst', 'treegridVisibleCells',
 ])
@@ -57,8 +51,6 @@ export const AriaSourcePathSchema = z.enum([
   'items.valuemax', 'items.valuemin', 'items.valuetext',
   'literal.true',
   'menu.expandedIfHasPopup', 'menu.hasPopup',
-  'meter.items.valuemax', 'meter.items.valuemin', 'meter.items.valuetext',
-  'meter.options.max', 'meter.options.min',
   'options.label', 'options.max', 'options.min', 'options.orientation',
   'options.roledescription', 'options.selectionMode.multiple', 'options.slideRoledescription',
   'refs.label', 'refs.labelledBy',
@@ -150,7 +142,6 @@ export type PartEventBinding = z.infer<typeof PartEventBindingSchema>
 export const PartSchema = z
   .object({
     role: AriaRoleSchema,
-    keySource: KeySourceSchema.optional(),
     aria: z.array(AriaProjectionSchema).readonly().optional(),
     focus: FocusProjectionSchema.optional(),
     state: z.array(StateProjectionSchema).readonly().optional(),
@@ -169,20 +160,16 @@ export const FocusEffectTriggerSchema = z.object({
   state: z.literal('activeKey'),
   reasons: z.array(PatternEventReasonSchema).readonly(),
 }).strict()
-export type FocusEffectTrigger = z.infer<typeof FocusEffectTriggerSchema>
 
 export const FocusEffectScopeSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('focusWithin') }).strict(),
   z.object({ kind: z.literal('always') }).strict(),
 ])
-export type FocusEffectScope = z.infer<typeof FocusEffectScopeSchema>
 
 export const FocusEffectTargetSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('activeKeyElement') }).strict(),
-  z.object({ kind: z.literal('activeDescendantHost') }).strict(),
   ...ElementTargetSchema.options,
 ])
-export type FocusEffectTarget = z.infer<typeof FocusEffectTargetSchema>
 
 export const EffectSchema = z.discriminatedUnion('kind', [
   z.object({

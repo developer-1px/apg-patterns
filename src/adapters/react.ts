@@ -4,7 +4,7 @@ import { createTypeaheadBuffer } from '@interactive-os/keyboard'
 import { createTreeviewRuntime, type CreateTreeviewRuntimeInput, type TreeviewRuntime, type TreeviewSlotProps } from '../patterns/treeview/runtime'
 import { createTabsRuntime, type CreateTabsRuntimeInput, type TabsRuntime } from '../patterns/tabs/runtime'
 import type { Key, PatternData, PatternOptions } from '../schema'
-import type { ElementTarget, FocusEffectTarget, PatternDefinition } from '../schema'
+import type { ElementTarget, PatternDefinition } from '../schema'
 import type { PatternRuntime } from '../kernel/patternRuntime'
 import {
   createParentByKey,
@@ -109,34 +109,26 @@ export function usePatternEffects({
       const matches = evaluatePredicate(effect.when ?? { kind: 'always' }, ctx)
       nextMatches[index] = matches
       if (!shouldRunEffect({ effect, matches, previousMatches: previousMatches.current[index], data, definition, keyToElementId })) continue
-      runEffectPrimitive({ effect, data, keyToElementId })
+      if (effect.kind === 'focus') runFocusEffect(effect, data, keyToElementId)
+      if (effect.kind === 'restoreFocus') runRestoreFocusEffect(effect, data, keyToElementId)
     }
     previousMatches.current = nextMatches
   }, [data, definition, keyToElementId])
 }
 
-type EffectPrimitiveContext = {
-  effect: NonNullable<PatternDefinition['effects']>[number]
-  data: PatternData
-  keyToElementId: (key: Key) => string
+type EffectDefinition = NonNullable<PatternDefinition['effects']>[number]
+type FocusEffect = Extract<EffectDefinition, { kind: 'focus' }>
+type RestoreFocusEffect = Extract<EffectDefinition, { kind: 'restoreFocus' }>
+type FocusEffectTarget = FocusEffect['target']
+
+function runFocusEffect(effect: FocusEffect, data: PatternData, keyToElementId: (key: Key) => string) {
+  const target = resolveFocusEffectTarget(effect.target, data, keyToElementId)
+  target?.focus({ preventScroll: effect.preventScroll ?? Boolean(effect.on) })
 }
 
-const effectPrimitives = {
-  focus: ({ effect, data, keyToElementId }: EffectPrimitiveContext) => {
-    if (effect.kind !== 'focus') return
-    const target = resolveFocusEffectTarget(effect.target, data, keyToElementId)
-    target?.focus({ preventScroll: effect.preventScroll ?? Boolean(effect.on) })
-  },
-  restoreFocus: ({ effect, data, keyToElementId }: EffectPrimitiveContext) => {
-    if (effect.kind !== 'restoreFocus') return
-    const target = resolveElementTarget(effect.target, data, keyToElementId)
-    target?.focus({ preventScroll: effect.preventScroll })
-  },
-} satisfies Partial<Record<NonNullable<PatternDefinition['effects']>[number]['kind'], (ctx: EffectPrimitiveContext) => void>>
-
-function runEffectPrimitive(ctx: EffectPrimitiveContext) {
-  const primitive = effectPrimitives[ctx.effect.kind as keyof typeof effectPrimitives]
-  primitive?.(ctx)
+function runRestoreFocusEffect(effect: RestoreFocusEffect, data: PatternData, keyToElementId: (key: Key) => string) {
+  const target = resolveElementTarget(effect.target, data, keyToElementId)
+  target?.focus({ preventScroll: effect.preventScroll })
 }
 
 function shouldRunEffect({
@@ -147,7 +139,7 @@ function shouldRunEffect({
   definition,
   keyToElementId,
 }: {
-  effect: NonNullable<PatternDefinition['effects']>[number]
+  effect: EffectDefinition
   matches: boolean
   previousMatches: boolean | undefined
   data: PatternData
@@ -208,10 +200,6 @@ function resolveElementTarget(target: ElementTarget, data: PatternData, keyToEle
 function resolveFocusEffectTarget(target: FocusEffectTarget, data: PatternData, keyToElementId: (key: Key) => string): HTMLElement | null {
   const activeKey = data.state?.activeKey
   if (target.kind === 'activeKeyElement') return activeKey ? document.getElementById(keyToElementId(activeKey)) : null
-  if (target.kind === 'activeDescendantHost') {
-    if (!activeKey) return null
-    return findActiveDescendantHost(keyToElementId(activeKey))
-  }
   return resolveElementTarget(target, data, keyToElementId)
 }
 

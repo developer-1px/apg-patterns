@@ -15,7 +15,6 @@ export const switchDefinition = PatternDefinitionSchema.parse({
   parts: {
     switch: {
       role: 'switch',
-      keySource: 'relations.rootKeys',
       aria: [
         { attribute: 'aria-label', from: 'items.label' },
         { attribute: 'aria-checked', from: 'state.checkedByKey' },

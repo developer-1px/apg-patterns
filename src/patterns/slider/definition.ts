@@ -1,11 +1,4 @@
-import { defineAriaSource } from '../../kernel/patternKernel'
 import { PatternDefinitionSchema } from '../../schema'
-
-defineAriaSource('options.min', (ctx) => ctx.options?.min)
-defineAriaSource('options.max', (ctx) => ctx.options?.max)
-defineAriaSource('items.valuetext', (ctx) => (ctx.key ? (ctx.data.items[ctx.key] as { valuetext?: string } | undefined)?.valuetext : undefined))
-defineAriaSource('items.valuemin', (ctx) => (ctx.key ? (ctx.data.items[ctx.key] as { valuemin?: number } | undefined)?.valuemin : undefined))
-defineAriaSource('items.valuemax', (ctx) => (ctx.key ? (ctx.data.items[ctx.key] as { valuemax?: number } | undefined)?.valuemax : undefined))
 
 const change = (direction: string) => ({
   events: [{ type: 'extension', name: 'value-change', key: '$activeKey', payload: { direction } }],
@@ -19,7 +12,6 @@ export const sliderDefinition = PatternDefinitionSchema.parse({
   parts: {
     slider: {
       role: 'slider',
-      keySource: 'relations.rootKeys',
       aria: [
         { attribute: 'aria-label', from: 'items.label' },
         { attribute: 'aria-labelledby', from: 'items.labelledBy' },

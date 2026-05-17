@@ -15,7 +15,7 @@ export const PatternEventTypeSchema = z.enum([
 ])
 export type PatternEventType = z.infer<typeof PatternEventTypeSchema>
 
-export const PatternEventReasonSchema = z.enum(['keyboard', 'typeahead', 'pointer', 'focus', 'external', 'open', 'restore'])
+export const PatternEventReasonSchema = z.enum(['keyboard', 'typeahead', 'pointer', 'focus', 'external', 'open'])
 export type PatternEventReason = z.infer<typeof PatternEventReasonSchema>
 
 export const PatternEventMetaSchema = z.object({ reason: PatternEventReasonSchema.optional() }).strict()

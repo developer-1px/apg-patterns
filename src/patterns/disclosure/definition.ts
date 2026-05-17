@@ -15,7 +15,6 @@ export const disclosureDefinition = DisclosureDefinitionSchema.parse({
   parts: {
     trigger: {
       role: 'button',
-      keySource: 'relations.rootKeys',
       aria: [
         { attribute: 'aria-expanded', from: 'state.expandedKeys' },
         { attribute: 'aria-controls', from: 'relations.controlsByKey' },
@@ -43,7 +42,6 @@ export const disclosureDefinition = DisclosureDefinitionSchema.parse({
     },
     panel: {
       role: 'region',
-      keySource: 'items',
       aria: [
         { attribute: 'aria-labelledby', from: 'relations.ownerByKey' },
       ],

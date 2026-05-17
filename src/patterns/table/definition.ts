@@ -18,7 +18,6 @@ export const tableDefinition = PatternDefinitionSchema.parse({
   parts: {
     table: {
       role: 'table',
-      keySource: 'relations.rowKeys',
       aria: [
         { attribute: 'aria-label', from: 'refs.label' },
         { attribute: 'aria-labelledby', from: 'refs.labelledBy' },
@@ -28,12 +27,10 @@ export const tableDefinition = PatternDefinitionSchema.parse({
     },
     row: {
       role: 'row',
-      keySource: 'relations.rowKeys',
       aria: [{ attribute: 'aria-rowindex', from: 'state.rowIndexByKey' }],
     },
     columnheader: {
       role: 'columnheader',
-      keySource: 'columnHeaderKey',
       aria: [
         { attribute: 'aria-rowindex', from: 'state.rowIndexByKey' },
         { attribute: 'aria-colindex', from: 'state.columnIndexByKey' },
@@ -45,7 +42,6 @@ export const tableDefinition = PatternDefinitionSchema.parse({
     },
     rowheader: {
       role: 'rowheader',
-      keySource: 'rowHeaderKey',
       aria: [
         { attribute: 'aria-rowindex', from: 'state.rowIndexByKey' },
         { attribute: 'aria-colindex', from: 'state.columnIndexByKey' },
@@ -53,7 +49,6 @@ export const tableDefinition = PatternDefinitionSchema.parse({
     },
     cell: {
       role: 'cell',
-      keySource: 'tableCellKey',
       aria: [
         { attribute: 'aria-rowindex', from: 'state.rowIndexByKey' },
         { attribute: 'aria-colindex', from: 'state.columnIndexByKey' },
