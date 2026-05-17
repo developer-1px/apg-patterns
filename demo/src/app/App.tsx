@@ -105,6 +105,10 @@ function ActiveDemoWorkspace({
   }, [activeDemo.key, activeSourceName, state.rightMode, state.rightPanelOpen])
 
   useEffect(() => {
+    if (state.sourceName !== activeSourceName) dispatch({ type: 'selectSource', sourceName: activeSourceName })
+  }, [activeSourceName, state.sourceName])
+
+  useEffect(() => {
     const restoreFromHash = () => dispatch({ type: 'restoreState', state: readInitialAppState(defaultAppState) })
     window.addEventListener('hashchange', restoreFromHash)
     return () => window.removeEventListener('hashchange', restoreFromHash)
@@ -131,11 +135,6 @@ function ActiveDemoWorkspace({
         <header className={headerClass}>
           <h2 className={titleClass}>{activeDemo.label}</h2>
           <div className="flex items-center gap-1">
-            {activeDemo.reset ? (
-              <button type="button" className={buttonClass} onClick={activeDemo.reset}>
-                reset
-              </button>
-            ) : null}
             <button
               type="button"
               className={`${buttonClass} aria-pressed:bg-zinc-900 aria-pressed:text-white dark:aria-pressed:bg-zinc-100 dark:aria-pressed:text-zinc-950`}
