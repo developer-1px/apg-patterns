@@ -632,6 +632,7 @@ async function verifyPatternPanelRoutes({ key, label, sourceName }) {
       && currentHashParam('pattern') === key
       && currentHashParam('panel') === 'state'
       && hasActiveDemoHeading(label)
+      && previewSurfaceIsMounted(key)
       && findRightPanelTab('state')?.getAttribute('aria-selected') === 'true'
       && inspectText.trim().length > 0
       && inspectText !== 'loading'
@@ -649,6 +650,7 @@ async function verifyPatternPanelRoutes({ key, label, sourceName }) {
       && currentHashParam('pattern') === key
       && currentHashParam('panel') === 'events'
       && hasActiveDemoHeading(label)
+      && previewSurfaceIsMounted(key)
       && findRightPanelTab('events')?.getAttribute('aria-selected') === 'true'
       && text.includes('events')
       && logText.trim() === 'none'
@@ -663,6 +665,7 @@ async function verifyPatternPanelRoutes({ key, label, sourceName }) {
     && currentHashParam('pattern') === key
     && currentHashParam('panel') === 'off'
     && hasActiveDemoHeading(label)
+    && previewSurfaceIsMounted(key)
     && !document.querySelector('[role="tablist"][aria-label="right panel"]')
     && !document.querySelector('[role="tablist"][aria-label="source files"]')
     && !sourcePanelElement(),
@@ -679,6 +682,7 @@ async function verifyPatternPanelRoutes({ key, label, sourceName }) {
       && currentHashParam('pattern') === key
       && currentHashParam('panel') === 'code'
       && hasActiveDemoHeading(label)
+      && previewSurfaceIsMounted(key)
       && findRightPanelTab('code')?.getAttribute('aria-selected') === 'true'
       && sourceFilenameIs(sourceName)
       && sourceText.trim().length > 0
@@ -883,6 +887,13 @@ function verifyPreviewSurface(key, label) {
   if (!preview.querySelector(selector)) {
     patternFailures.push(`${label}: preview did not render expected surface: ${selector}`)
   }
+}
+
+function previewSurfaceIsMounted(key) {
+  const selector = previewSurfaceSelectors[key]
+  const previews = Array.from(document.querySelectorAll('[data-demo-preview]'))
+  const preview = previews.find((renderedPreview) => renderedPreview.getAttribute('data-demo-preview') === key)
+  return Boolean(selector && preview && previews.length === 1 && preview.firstElementChild && preview.querySelector(selector))
 }
 
 async function verifyVariantControls(key, label) {
