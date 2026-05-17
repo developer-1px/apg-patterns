@@ -61,7 +61,7 @@ const reduceAppState = (state: AppState, action: AppAction): AppState => {
   if (action.type === 'clearEvents') return AppStateSchema.parse({ ...state, events: [] })
   if (action.type === 'selectSource') return AppStateSchema.parse({ ...state, sourceName: action.sourceName })
   if (action.type === 'selectRightMode') return AppStateSchema.parse({ ...state, rightMode: action.rightMode, rightPanelOpen: true })
-  if (action.type === 'restoreState') return action.state
+  if (action.type === 'restoreState') return AppStateSchema.parse(action.state)
   return AppStateSchema.parse({ ...state, rightPanelOpen: !state.rightPanelOpen })
 }
 
