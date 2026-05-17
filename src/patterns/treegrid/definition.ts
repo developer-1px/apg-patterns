@@ -34,9 +34,9 @@ const rowEvents = [
   { event: 'click', when: rowFocusMode, events: [{ type: 'select', key: '$key' }] },
 ] as const
 
-const activeAtFirstCol = { kind: 'activeCellInFirstColumn' } as const
+const activeCellInFirstColumn = { kind: 'activeCellInFirstColumn' } as const
 const activeRowHasChildren = { kind: 'activeRowHasChildren' } as const
-const activeRowIsExpanded = { kind: 'activeRowExpanded' } as const
+const activeRowExpanded = { kind: 'activeRowExpanded' } as const
 const activeKeyIsRow = { kind: 'activeKeyIsRow' } as const
 
 export const treegridDefinition = PatternDefinitionSchema.parse({
@@ -145,12 +145,12 @@ export const treegridDefinition = PatternDefinitionSchema.parse({
     { shortcut: 'ArrowRight', preventDefault: true, cases: [
       {
         case: 'when',
-        when: { kind: 'all', predicates: [activeKeyIsRow, activeRowHasChildren, { kind: 'not', predicate: activeRowIsExpanded }] },
+        when: { kind: 'all', predicates: [activeKeyIsRow, activeRowHasChildren, { kind: 'not', predicate: activeRowExpanded }] },
         events: [{ type: 'expandActiveRow', expanded: true }, { type: 'focus', key: '$activeKey' }],
       },
       {
         case: 'when',
-        when: { kind: 'all', predicates: [activeAtFirstCol, activeRowHasChildren, { kind: 'not', predicate: activeRowIsExpanded }] },
+        when: { kind: 'all', predicates: [activeCellInFirstColumn, activeRowHasChildren, { kind: 'not', predicate: activeRowExpanded }] },
         events: [{ type: 'expandActiveRow', expanded: true }],
       },
       { case: 'when', when: activeKeyIsRow, events: [] },
@@ -159,17 +159,17 @@ export const treegridDefinition = PatternDefinitionSchema.parse({
     { shortcut: 'ArrowLeft', preventDefault: true, cases: [
       {
         case: 'when',
-        when: { kind: 'all', predicates: [activeKeyIsRow, activeRowHasChildren, activeRowIsExpanded] },
+        when: { kind: 'all', predicates: [activeKeyIsRow, activeRowHasChildren, activeRowExpanded] },
         events: [{ type: 'expandActiveRow', expanded: false }, { type: 'focus', key: '$activeKey' }],
       },
       {
         case: 'when',
-        when: { kind: 'all', predicates: [activeAtFirstCol, activeRowHasChildren, activeRowIsExpanded] },
+        when: { kind: 'all', predicates: [activeCellInFirstColumn, activeRowHasChildren, activeRowExpanded] },
         events: [{ type: 'expandActiveRow', expanded: false }],
       },
       {
         case: 'when',
-        when: activeAtFirstCol,
+        when: activeCellInFirstColumn,
         events: [{ type: 'navigate', direction: 'parentRow' }],
       },
       { case: 'when', when: activeKeyIsRow, events: [] },
@@ -234,22 +234,22 @@ export const treegridDefinition = PatternDefinitionSchema.parse({
     { shortcut: 'Enter', preventDefault: true, cases: [
       {
         case: 'when',
-        when: { kind: 'all', predicates: [activeKeyIsRow, activeRowHasChildren, { kind: 'not', predicate: activeRowIsExpanded }] },
+        when: { kind: 'all', predicates: [activeKeyIsRow, activeRowHasChildren, { kind: 'not', predicate: activeRowExpanded }] },
         events: [{ type: 'expandActiveRow', expanded: true }, { type: 'focus', key: '$activeKey' }],
       },
       {
         case: 'when',
-        when: { kind: 'all', predicates: [activeKeyIsRow, activeRowHasChildren, activeRowIsExpanded] },
+        when: { kind: 'all', predicates: [activeKeyIsRow, activeRowHasChildren, activeRowExpanded] },
         events: [{ type: 'expandActiveRow', expanded: false }, { type: 'focus', key: '$activeKey' }],
       },
       {
         case: 'when',
-        when: { kind: 'all', predicates: [activeAtFirstCol, activeRowHasChildren, { kind: 'not', predicate: activeRowIsExpanded }] },
+        when: { kind: 'all', predicates: [activeCellInFirstColumn, activeRowHasChildren, { kind: 'not', predicate: activeRowExpanded }] },
         events: [{ type: 'expandActiveRow', expanded: true }],
       },
       {
         case: 'when',
-        when: { kind: 'all', predicates: [activeAtFirstCol, activeRowHasChildren, activeRowIsExpanded] },
+        when: { kind: 'all', predicates: [activeCellInFirstColumn, activeRowHasChildren, activeRowExpanded] },
         events: [{ type: 'expandActiveRow', expanded: false }],
       },
       { case: 'otherwise', events: [{ type: 'activate', key: '$activeKey' }] },
