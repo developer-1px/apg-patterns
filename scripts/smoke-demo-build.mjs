@@ -15,9 +15,14 @@ const recordError = (error) => errors.push(error instanceof Error ? error.stack 
 process.once('uncaughtException', recordError)
 process.once('unhandledRejection', recordError)
 const originalConsoleError = console.error
+const originalConsoleWarn = console.warn
 console.error = (...args) => {
-  errors.push(args.map(String).join(' '))
+  errors.push(`console.error: ${args.map(String).join(' ')}`)
   originalConsoleError(...args)
+}
+console.warn = (...args) => {
+  errors.push(`console.warn: ${args.map(String).join(' ')}`)
+  originalConsoleWarn(...args)
 }
 
 const dom = new JSDOM('<!doctype html><html><head></head><body><div id="root"></div></body></html>', {
@@ -180,6 +185,7 @@ await verifyHashRoute('#pattern=accordion&panel=off&source=Accordion.tsx', (text
 process.removeListener('uncaughtException', recordError)
 process.removeListener('unhandledRejection', recordError)
 console.error = originalConsoleError
+console.warn = originalConsoleWarn
 
 if (errors.length > 0 || missingText.length > 0 || patternFailures.length > 0) {
   const details = [
