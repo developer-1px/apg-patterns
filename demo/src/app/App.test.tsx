@@ -767,7 +767,11 @@ async function expectActiveSourceText(sourceName: string) {
 }
 
 function getSourcePanel() {
-  const sourcePanel = screen.getAllByRole('tabpanel').find((panel) => panel.id.startsWith('tab-source-panel-'))
+  const selectedSourceTab = screen.getAllByRole('tab')
+    .filter((tab) => tab.closest('[aria-label="source files"]'))
+    .find((tab) => tab.getAttribute('aria-selected') === 'true')
+  const panelId = selectedSourceTab?.getAttribute('aria-controls')
+  const sourcePanel = panelId ? document.getElementById(panelId) : null
   if (!sourcePanel) throw new Error('missing source panel')
   return sourcePanel
 }

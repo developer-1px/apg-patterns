@@ -147,6 +147,7 @@ async function runSmoke() {
       continue
     }
     verifySingleSelectedTab(sourceTablist, `${label}: source files tablist`)
+    verifySelectedTabControlsPanel(sourceTablist, `${label}: source files tablist`)
 
     const rightPanelTablist = document.querySelector('[role="tablist"][aria-label="right panel"]')
     if (!rightPanelTablist) {
@@ -154,6 +155,7 @@ async function runSmoke() {
       continue
     }
     verifySingleSelectedTab(rightPanelTablist, `${label}: right panel tablist`)
+    verifySelectedTabControlsPanel(rightPanelTablist, `${label}: right panel tablist`)
 
     const sourceNames = sourceTabNames()
     const duplicateSourceNames = duplicates(sourceNames)
@@ -704,8 +706,9 @@ function sourcePanelText() {
 }
 
 function sourcePanelElement() {
-  return Array.from(document.querySelectorAll('[role="tabpanel"]'))
-    .find((panel) => panel.id.startsWith('tab-source-panel-'))
+  const selectedSourceTab = selectedTabs(document.querySelector('[role="tablist"][aria-label="source files"]')).at(0)
+  const panelId = selectedSourceTab?.getAttribute('aria-controls')
+  return panelId ? document.getElementById(panelId) : undefined
 }
 
 function sourcePanelIsLabelledBy(tab) {
@@ -742,6 +745,15 @@ function verifySingleSelectedTab(tablist, label) {
   if (selected.length !== 1) {
     const selectedLabels = selected.map((tab) => tab.textContent?.trim() || tab.id || 'unknown').join(', ') || 'none'
     patternFailures.push(`${label}: expected exactly one selected tab, got ${selected.length}: ${selectedLabels}`)
+  }
+}
+
+function verifySelectedTabControlsPanel(tablist, label) {
+  const tab = selectedTabs(tablist).at(0)
+  const panelId = tab?.getAttribute('aria-controls')
+  const panel = panelId ? document.getElementById(panelId) : null
+  if (!tab || !panel || panel.getAttribute('aria-labelledby') !== tab.id) {
+    patternFailures.push(`${label}: selected tab is not linked to its panel`)
   }
 }
 

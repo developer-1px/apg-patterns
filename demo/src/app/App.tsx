@@ -187,16 +187,17 @@ function ActiveDemoWorkspace({
       </section>
 
       {state.rightPanelOpen ? (
-      <section className={`${panelClass} flex min-h-0 flex-col`}>
-        <header className="mb-3 grid gap-2">
-          <div {...rightModeTabs.getTablistProps()} className="flex items-center gap-1 rounded-xl bg-zinc-100/75 p-1 dark:bg-white/[0.045]">
-            {rightModes.map((mode) => (
-              <button {...rightModeTabs.getTabProps(mode)} key={mode} type="button" className={optionButtonClass}>
-                {rightModeLabels[mode]}
-              </button>
-            ))}
-          </div>
-          <div className="min-w-0">
+        <section className={`${panelClass} flex min-h-0 flex-col`}>
+          <header className="mb-3 grid gap-2">
+            <div {...rightModeTabs.getTablistProps()} className="flex items-center gap-1 rounded-xl bg-zinc-100/75 p-1 dark:bg-white/[0.045]">
+              {rightModes.map((mode) => (
+                <button {...rightModeTabs.getTabProps(mode)} key={mode} type="button" className={optionButtonClass}>
+                  {rightModeLabels[mode]}
+                </button>
+              ))}
+            </div>
+          </header>
+          <div {...rightModeTabs.getPanelProps()} className="flex min-h-0 flex-col gap-3">
             {state.rightMode === 'source' ? (
               <div className="grid gap-1">
                 <div className="flex min-w-0 items-start gap-2">
@@ -219,16 +220,15 @@ function ActiveDemoWorkspace({
                 </button>
               </div>
             ) : null}
+            {state.rightMode === 'source' ? (
+              <pre {...sourceTabs.getPanelProps()} className={`${preClass} select-text cursor-text`}>
+                {source}
+              </pre>
+            ) : null}
+            {state.rightMode === 'inspect' ? <pre className={preClass}>{activeDemo.inspect}</pre> : null}
+            {state.rightMode === 'log' ? <pre className={preClass}>{eventLog}</pre> : null}
           </div>
-        </header>
-        {state.rightMode === 'source' ? (
-          <pre {...sourceTabs.getPanelProps()} className={`${preClass} select-text cursor-text`}>
-            {source}
-          </pre>
-        ) : null}
-        {state.rightMode === 'inspect' ? <pre className={preClass}>{activeDemo.inspect}</pre> : null}
-        {state.rightMode === 'log' ? <pre className={preClass}>{eventLog}</pre> : null}
-      </section>
+        </section>
       ) : null}
     </>
   )
