@@ -219,6 +219,14 @@ export function resolveEventTemplate(
   if (template.type === 'selectRow') return [{ type: 'selectRow' }]
   if (template.type === 'extendSelection') return [{ type: 'extendSelection', direction: template.direction }]
   if (template.type === 'expandActiveRow') return [{ type: 'expandActiveRow', expanded: template.expanded }]
+  if (template.type === 'inputValue') {
+    const key = template.key ? resolveKeyToken(template.key, keyContext, activeKey, ctx) : undefined
+    return [{ type: 'inputValue', ...(key ? { key } : {}), value: template.value ?? '', ...(template.inline !== undefined ? { inline: template.inline } : {}) }]
+  }
+  if (template.type === 'commitValue') {
+    const key = template.key ? resolveKeyToken(template.key, keyContext, activeKey, ctx) : undefined
+    return [{ type: 'commitValue', ...(key ? { key } : {}), value: template.value ?? '' }]
+  }
   if (template.type === 'typeahead') return [{ type: 'typeahead', query: template.query }]
   if (template.type === 'dismiss') {
     const key = template.key ? resolveKeyToken(template.key, keyContext, activeKey, ctx) : undefined
@@ -239,6 +247,9 @@ export function resolveEventTemplate(
   if (template.type === 'check') return [{ type: 'check', key, checked: template.checked ?? true }]
   if (template.type === 'press') return [{ type: 'press', key, pressed: template.pressed }]
   if (template.type === 'value') return [{ type: 'value', key, value: template.value }]
+  if (template.type === 'valueStep') return [{ type: 'valueStep', key, direction: template.direction }]
+  if (template.type === 'collapse') return [{ type: 'collapse', key }]
+  if (template.type === 'close') return [{ type: 'close', key }]
   return []
 }
 

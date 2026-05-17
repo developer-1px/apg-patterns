@@ -97,7 +97,7 @@ export const tabsDefinition = TabsDefinitionSchema.parse({
         {
           case: 'when',
           when: { kind: 'optionEquals', option: 'closeable', value: true },
-          events: [{ type: 'extension', name: 'closeTab', key: '$activeKey' }],
+          events: [{ type: 'close', key: '$activeKey' }],
         },
       ],
     },

@@ -64,7 +64,7 @@ export function Tabs({
                     tabIndex={-1}
                     onClick={(event) => {
                       event.stopPropagation()
-                      onEvent({ type: 'extension', name: 'closeTab', key })
+                      onEvent({ type: 'close', key })
                     }}
                     className="ml-1 grid size-5 place-items-center rounded text-xs text-zinc-500 hover:bg-zinc-200 dark:text-zinc-400 dark:hover:bg-zinc-800"
                   >

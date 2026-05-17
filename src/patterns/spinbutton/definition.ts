@@ -1,7 +1,7 @@
 import { PatternDefinitionSchema } from '../../schema'
 
 const change = (direction: string) => ({
-  events: [{ type: 'extension', name: 'value-change', key: '$activeKey', payload: { direction } }],
+  events: [{ type: 'valueStep', key: '$activeKey', direction }],
 })
 
 export const spinbuttonDefinition = PatternDefinitionSchema.parse({

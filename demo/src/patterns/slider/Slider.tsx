@@ -115,7 +115,7 @@ function ThumbSlider({
       : rect.width <= 0 ? 0 : Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width))
     const raw = min + ratio * (max - min)
     const next = Math.round(raw / step) * step
-    onEvent({ type: 'extension', name: 'value-change', key: thumbKey, payload: { value: next } })
+    onEvent({ type: 'value', key: thumbKey, value: next })
   }
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {

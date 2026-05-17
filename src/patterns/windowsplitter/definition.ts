@@ -7,11 +7,11 @@ import { PatternDefinitionSchema } from '../../schema'
 //   relations.controlsByKey
 
 const change = (direction: string) => ({
-  events: [{ type: 'extension', name: 'value-change', key: '$activeKey', payload: { direction } }],
+  events: [{ type: 'valueStep', key: '$activeKey', direction }],
 })
 
 const collapse = {
-  events: [{ type: 'extension', name: 'collapse-toggle', key: '$activeKey' }],
+  events: [{ type: 'collapse', key: '$activeKey' }],
 }
 
 export const windowsplitterDefinition = PatternDefinitionSchema.parse({

@@ -44,7 +44,7 @@ export function reduceWindowSplitterData(
   if (event.type === 'focus' && event.key) {
     return { ...data, state: { ...data.state, activeKey: event.key } }
   }
-  if (event.type !== 'extension' || !event.key) return data
+  if ((event.type !== 'collapse' && event.type !== 'valueStep') || !event.key) return data
   const key = event.key as Key
   const min = Number(options.min ?? 0)
   const max = Number(options.max ?? 100)
@@ -53,7 +53,7 @@ export function reduceWindowSplitterData(
   const prev = data.state as { previousValueByKey?: Record<string, number> } | undefined
   const previousValueByKey = { ...(prev?.previousValueByKey ?? {}) }
 
-  if (event.name === 'collapse-toggle') {
+  if (event.type === 'collapse') {
     let next: number
     if (current === min) {
       next = previousValueByKey[key] ?? Math.round((min + max) / 2)
@@ -73,12 +73,10 @@ export function reduceWindowSplitterData(
     }
   }
 
-  if (event.name !== 'value-change') return data
-  const payload = (event.payload ?? {}) as { direction?: unknown }
   let nextValue: number
-  if (payload.direction === 'min') nextValue = min
-  else if (payload.direction === 'max') nextValue = max
-  else nextValue = current + computeDelta(payload.direction, step)
+  if (event.direction === 'min') nextValue = min
+  else if (event.direction === 'max') nextValue = max
+  else nextValue = current + computeDelta(event.direction, step)
   const clamped = Math.min(max, Math.max(min, nextValue))
   if (clamped === current) return { ...data, state: { ...data.state, activeKey: key } }
   return {

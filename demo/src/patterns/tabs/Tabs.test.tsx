@@ -10,8 +10,8 @@ function TabsDemo({ variant, onEvent: onEventOuter }: { variant: TabsVariantKey;
   const [data, setData] = useState<PatternData>(spec.data)
   const handleEvent = (event: PatternEvent) => {
     onEventOuter?.(event)
-    if (event.type === 'extension' && event.name === 'closeTab' && event.key) {
-      setData((current) => closeTabInData(current, event.key as string))
+    if (event.type === 'close') {
+      setData((current) => closeTabInData(current, event.key))
       return
     }
     setData((current) => reduceTabsData(current, event))

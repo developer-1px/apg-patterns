@@ -72,7 +72,7 @@ function SpinField({
 
   const emit = (direction: 'increment' | 'decrement') => {
     onEvent({ type: 'focus', key: fieldKey })
-    onEvent({ type: 'extension', name: 'value-change', key: fieldKey, payload: { direction } })
+    onEvent({ type: 'valueStep', key: fieldKey, direction })
   }
 
   return (

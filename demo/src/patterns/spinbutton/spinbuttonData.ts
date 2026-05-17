@@ -78,8 +78,7 @@ export function reduceSpinbuttonData(
   if (event.type === 'focus' && event.key) {
     return { ...data, state: { ...data.state, activeKey: event.key } }
   }
-  if (event.type !== 'extension' || event.name !== 'value-change' || !event.key) return data
-  const payload = (event.payload ?? {}) as { direction?: unknown; value?: unknown }
+  if ((event.type !== 'valueStep' && event.type !== 'value') || !event.key) return data
   const key = event.key as Key
   const defaultMin = Number(options.min ?? 0)
   const defaultMax = Number(options.max ?? 100)
@@ -89,10 +88,10 @@ export function reduceSpinbuttonData(
   const current = Number(data.state?.valueByKey?.[key] ?? min)
 
   let nextValue: number
-  if (payload.direction === 'min') nextValue = min
-  else if (payload.direction === 'max') nextValue = max
-  else if (typeof payload.value === 'number') nextValue = payload.value
-  else nextValue = current + computeDelta(payload.direction, step, large)
+  if (event.type === 'value') nextValue = typeof event.value === 'number' ? event.value : current
+  else if (event.direction === 'min') nextValue = min
+  else if (event.direction === 'max') nextValue = max
+  else nextValue = current + computeDelta(event.direction, step, large)
 
   const clamped = Math.min(max, Math.max(min, Math.round(nextValue / step) * step))
   if (clamped === current) return { ...data, state: { ...data.state, activeKey: key } }

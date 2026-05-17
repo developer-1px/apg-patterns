@@ -49,12 +49,12 @@ export function Combobox({
 
   const handleInput = (next: string) => {
     if (variant === 'selectOnly') return
-    onEvent({ type: 'extension', name: 'comboboxInput', key: COMBOBOX_KEY, payload: { value: next, inline: variant === 'listWithInlineAutocomplete' } })
+    onEvent({ type: 'inputValue', key: COMBOBOX_KEY, value: next, inline: variant === 'listWithInlineAutocomplete' })
   }
 
   const handleSelectOnlyTypeahead = (key: string) => {
     if (!/^[\w]$/.test(key)) return false
-    onEvent({ type: 'extension', name: 'comboboxTypeahead', key: COMBOBOX_KEY, payload: { value: key.toLowerCase() } })
+    onEvent({ type: 'typeahead', query: key.toLowerCase() })
     return true
   }
 
@@ -104,7 +104,7 @@ export function Combobox({
                     onEvent({ type: 'select', keys: [key], anchorKey: key, extentKey: key })
                     onEvent({ type: 'expand', key: COMBOBOX_KEY, expanded: false })
                     if (editable) {
-                      onEvent({ type: 'extension', name: 'comboboxCommit', key, payload: { value: data.items[key]?.label ?? '' } })
+                      onEvent({ type: 'commitValue', key, value: data.items[key]?.label ?? '' })
                     }
                   }}
                   className="cursor-pointer px-2 py-1.5 text-sm text-zinc-800 aria-selected:bg-zinc-100 aria-selected:text-zinc-950 data-active:bg-zinc-50 dark:text-zinc-200 dark:aria-selected:bg-zinc-800 dark:aria-selected:text-zinc-50 dark:data-active:bg-zinc-900"

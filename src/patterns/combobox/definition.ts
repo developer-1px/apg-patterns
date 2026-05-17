@@ -62,7 +62,7 @@ export const comboboxDefinition = PatternDefinitionSchema.parse({
       events: [
         {
           event: DomEvents.input,
-          events: [{ type: 'extension', name: 'input', payload: { source: 'combobox' } }],
+          events: [{ type: 'inputValue', key: COMBOBOX_TOKEN }],
         },
       ],
     },

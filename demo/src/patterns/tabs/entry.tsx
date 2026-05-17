@@ -25,8 +25,8 @@ export const entry: PatternEntry = {
       initialTabsVariant,
       tabsVariants[initialTabsVariant].data,
       (variant) => tabsVariants[variant].data,
-      (_variant, data, event) => event.type === 'extension' && event.name === 'closeTab' && event.key
-        ? closeTabInData(data, event.key as string)
+      (_variant, data, event) => event.type === 'close'
+        ? closeTabInData(data, event.key)
         : reduceTabsData(data, event),
     )
     const active = tabsVariants[host.variant]

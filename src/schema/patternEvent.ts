@@ -10,10 +10,16 @@ export const PatternDirectionSchema = z.enum([
 ])
 export type PatternDirection = z.infer<typeof PatternDirectionSchema>
 
+export const PatternValueStepDirectionSchema = z.enum([
+  'increment', 'decrement', 'incrementLarge', 'decrementLarge', 'min', 'max',
+])
+export type PatternValueStepDirection = z.infer<typeof PatternValueStepDirectionSchema>
+
 export const PatternEventTypeSchema = z.enum([
   'focus', 'navigate', 'select', 'selectAll', 'selectColumn', 'selectRow',
   'extendSelection', 'expand', 'expandActiveRow', 'activate', 'check',
-  'press', 'value', 'typeahead', 'dismiss', 'extension',
+  'press', 'value', 'valueStep', 'collapse', 'close', 'inputValue', 'commitValue',
+  'typeahead', 'dismiss', 'extension',
 ])
 export type PatternEventType = z.infer<typeof PatternEventTypeSchema>
 
@@ -37,6 +43,11 @@ export const PatternEventSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('check'), key: KeySchema, checked: z.union([z.boolean(), z.literal('mixed')]), ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('press'), key: KeySchema, pressed: z.union([z.boolean(), z.literal('mixed')]).optional(), ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('value'), key: KeySchema, value: z.union([z.string(), z.number(), z.boolean(), z.null()]), ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('valueStep'), key: KeySchema, direction: PatternValueStepDirectionSchema, ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('collapse'), key: KeySchema, ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('close'), key: KeySchema, ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('inputValue'), key: KeySchema.optional(), value: z.string(), inline: z.boolean().optional(), ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('commitValue'), key: KeySchema.optional(), value: z.string(), ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('typeahead'), query: z.string(), ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('dismiss'), key: KeySchema.optional(), ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('extension'), name: z.string().min(1), key: KeySchema.optional(), payload: z.record(z.string(), JsonValueSchema).optional(), ...EventMetaFieldSchema }).strict(),
@@ -58,6 +69,11 @@ export const EventTemplateSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('check'), key: KeyTokenSchema, checked: z.union([z.boolean(), z.literal('mixed')]).optional(), ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('press'), key: KeyTokenSchema, pressed: z.union([z.boolean(), z.literal('mixed')]).optional(), ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('value'), key: KeyTokenSchema, value: z.union([z.string(), z.number(), z.boolean(), z.null()]), ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('valueStep'), key: KeyTokenSchema, direction: PatternValueStepDirectionSchema, ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('collapse'), key: KeyTokenSchema, ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('close'), key: KeyTokenSchema, ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('inputValue'), key: KeyTokenSchema.optional(), value: z.string().optional(), inline: z.boolean().optional(), ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('commitValue'), key: KeyTokenSchema.optional(), value: z.string().optional(), ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('typeahead'), query: z.string(), ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('dismiss'), key: KeyTokenSchema.optional(), ...EventMetaFieldSchema }).strict(),
   z

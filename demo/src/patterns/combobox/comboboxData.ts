@@ -70,9 +70,9 @@ export function reduceComboboxData(current: PatternData, event: PatternEvent): P
   if (event.type === 'focus') {
     return { ...current, state: { ...current.state, activeKey: event.key } }
   }
-  if (event.type === 'extension' && event.name === 'comboboxInput') {
-    const raw = typeof event.payload?.value === 'string' ? event.payload.value : ''
-    const inline = event.payload?.inline === true
+  if (event.type === 'inputValue') {
+    const raw = event.value
+    const inline = event.inline === true
     const filtered = filterFruits(raw)
     const match = inline ? firstMatch(raw) : null
     const matchLabel = match ? FRUITS.find((f) => f.key === match)?.label ?? '' : ''
@@ -90,19 +90,19 @@ export function reduceComboboxData(current: PatternData, event: PatternEvent): P
       },
     }
   }
-  if (event.type === 'extension' && event.name === 'comboboxCommit') {
+  if (event.type === 'commitValue') {
     return {
       ...current,
       state: {
         ...current.state,
-        query: typeof event.payload?.value === 'string' ? event.payload.value : '',
+        query: event.value,
         inlineCompletion: null,
       },
     }
   }
-  if (event.type === 'extension' && event.name === 'comboboxTypeahead') {
-    const nextQuery = `${(current.state as { query?: string } | undefined)?.query ?? ''}${typeof event.payload?.value === 'string' ? event.payload.value : ''}`
-    const match = firstMatch(nextQuery) ?? firstMatch(typeof event.payload?.value === 'string' ? event.payload.value : '')
+  if (event.type === 'typeahead') {
+    const nextQuery = `${(current.state as { query?: string } | undefined)?.query ?? ''}${event.query}`
+    const match = firstMatch(nextQuery) ?? firstMatch(event.query)
     return {
       ...current,
       state: {
