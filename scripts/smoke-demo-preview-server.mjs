@@ -1,8 +1,9 @@
 import { spawn } from 'node:child_process'
 import { readFile } from 'node:fs/promises'
+import { createServer } from 'node:net'
 
 const host = '127.0.0.1'
-const port = 4177
+const port = await getAvailablePort()
 const origin = `http://${host}:${port}`
 const viteBin = new URL('../node_modules/.bin/vite', import.meta.url)
 const configPath = new URL('../vite.config.ts', import.meta.url)
@@ -98,4 +99,18 @@ async function waitForServer() {
   }
 
   throw new Error(`demo preview server smoke failed: server did not start\n${serverOutput}`)
+}
+
+async function getAvailablePort() {
+  return await new Promise((resolve, reject) => {
+    const probe = createServer()
+    probe.once('error', reject)
+    probe.listen(0, host, () => {
+      const address = probe.address()
+      probe.close(() => {
+        if (address && typeof address === 'object') resolve(address.port)
+        else reject(new Error('demo preview server smoke failed: could not allocate a port'))
+      })
+    })
+  })
 }
