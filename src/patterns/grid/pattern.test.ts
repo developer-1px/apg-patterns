@@ -275,7 +275,11 @@ describe('grid via kernel (APG layout/data/advanced specimen)', () => {
 
   it('exported gridDefinition emits aria-rowcount/aria-colcount/aria-readonly on grid root', () => {
     const data = PatternDataSchema.parse({
-      items: { hA: { label: 'A' }, hB: { label: 'B' }, c1: { label: '1' }, c2: { label: '2' } },
+      items: {
+        header: { label: 'h' }, r1: { label: 'r1' },
+        cA: { label: 'cA' }, cB: { label: 'cB' },
+        hA: { label: 'A' }, hB: { label: 'B' }, c1: { label: '1' }, c2: { label: '2' },
+      },
       relations: {
         rowKeys: ['header', 'r1'],
         columnKeys: ['cA', 'cB'],
@@ -299,12 +303,16 @@ describe('grid via kernel (APG layout/data/advanced specimen)', () => {
     const cells: { rowKey: string; columnKey: string; cellKey: string }[] = []
     const rowIndexByKey: Record<string, number> = {}
     const columnIndexByKey: Record<string, number> = {}
+    items['col0'] = { label: 'col0' }
+    items['col1'] = { label: 'col1' }
     for (let r = 0; r < 10; r += 1) {
-      rows.push(`r${r}`)
+      const rowKey = `r${r}`
+      rows.push(rowKey)
+      items[rowKey] = { label: rowKey }
       for (let c = 0; c < 2; c += 1) {
         const k = `c${r}-${c}`
         items[k] = { label: k }
-        cells.push({ rowKey: `r${r}`, columnKey: `col${c}`, cellKey: k })
+        cells.push({ rowKey, columnKey: `col${c}`, cellKey: k })
         rowIndexByKey[k] = r + 1
         columnIndexByKey[k] = c + 1
       }
