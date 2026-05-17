@@ -201,6 +201,7 @@ async function runSmoke() {
 
   await verifyTabsKeyboardEventLog()
   await verifySourceTabKeyboardNavigation()
+  await verifyRightPanelKeyboardNavigation()
   await verifyPatternSwitchResetsStaleSource()
   await verifyInteractionEventLog()
   await verifyEventLogClear()
@@ -360,6 +361,31 @@ async function verifySourceTabKeyboardNavigation() {
     })
   } catch {
     patternFailures.push(`source tab keyboard navigation did not update the selected source route: current ${window.location.hash}, selected=${sourceTabNames().join(',')}, text=${rootText().slice(0, 180)}`)
+  }
+}
+
+async function verifyRightPanelKeyboardNavigation() {
+  window.location.hash = '#pattern=accordion&panel=code&source=Accordion.tsx'
+  window.dispatchEvent(new dom.window.HashChangeEvent('hashchange'))
+
+  try {
+    await waitForPatternRoute({ pattern: 'accordion', panel: 'code', source: 'Accordion.tsx', label: 'Accordion' })
+    const selectedRightPanelTab = await waitFor(() => findRightPanelTab('code'))
+    selectedRightPanelTab.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'ArrowRight', code: 'ArrowRight', bubbles: true, cancelable: true }))
+
+    await waitFor(() => {
+      const panelText = document.querySelector('pre')?.textContent ?? ''
+      return currentHashParam('pattern') === 'accordion'
+        && currentHashParam('panel') === 'state'
+        && currentHashParam('source') === 'Accordion.tsx'
+        && hasActiveDemoHeading('Accordion')
+        && findRightPanelTab('state')?.getAttribute('aria-selected') === 'true'
+        && panelText.includes('"items"')
+        && panelText.includes('"relations"')
+        && !panelText.includes('export function Accordion')
+    })
+  } catch {
+    patternFailures.push(`right panel keyboard navigation did not switch code to state: current ${window.location.hash}, text=${rootText().slice(0, 180)}`)
   }
 }
 
