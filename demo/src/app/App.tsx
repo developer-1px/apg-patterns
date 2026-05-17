@@ -91,7 +91,7 @@ function ActiveDemoWorkspace({
   const sourceNames = activeDemo.sourceNames
   const activeSourceName = sourceNames.includes(state.sourceName as SourceName) ? state.sourceName as SourceName : sourceNames[0]
   const [source, setSource] = useState('loading')
-  const [copyState, setCopyState] = useState<'idle' | 'copied' | 'failed'>('idle')
+  const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle')
   const sourceTabs = useSourceTabs({ label: 'source files', tabs: sourceNames, value: activeSourceName, onChange: (sourceName) => dispatch({ type: 'selectSource', sourceName }) })
   const rightModeTabs = useSourceTabs({ label: 'right panel', tabs: rightModes, value: state.rightMode, onChange: (rightMode) => dispatch({ type: 'selectRightMode', rightMode }) })
   const eventLog = state.events.map((event) => JSON.stringify(event)).join('\n') || 'none'
@@ -138,10 +138,8 @@ function ActiveDemoWorkspace({
   }, [copyState])
 
   const copySource = () => {
-    copyText(source).then(
-      () => setCopyState('copied'),
-      () => setCopyState('failed'),
-    )
+    setCopyState('copied')
+    void copyText(source)
   }
 
   return (
