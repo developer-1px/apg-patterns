@@ -1,5 +1,6 @@
 import { spawn } from 'node:child_process'
 import { readFile } from 'node:fs/promises'
+import { createServer as createHttpServer } from 'node:http'
 import { createServer } from 'node:net'
 
 const host = '127.0.0.1'
@@ -7,6 +8,7 @@ const port = await getAvailablePort()
 const origin = `http://${host}:${port}`
 const viteBin = new URL('../node_modules/.bin/vite', import.meta.url)
 const configPath = new URL('../vite.config.ts', import.meta.url)
+const distDir = new URL('../demo/dist/', import.meta.url)
 const distIndex = new URL('../demo/dist/index.html', import.meta.url)
 const server = spawn(viteBin.pathname, [
   'preview',
@@ -39,6 +41,7 @@ try {
   await waitForServer()
   await verifyServedIndex()
   await verifyServedAssets()
+  await verifyStaticSubpathServing()
   console.log('demo preview server smoke passed')
 } finally {
   await stopServer()
@@ -88,6 +91,63 @@ async function verifyServedAssets() {
   }
 }
 
+async function verifyStaticSubpathServing() {
+  const prefix = '/nested-demo/'
+  const subpathPort = await getAvailablePort()
+  const subpathOrigin = `http://${host}:${subpathPort}`
+  const staticServer = createHttpServer(async (request, response) => {
+    const pathname = new URL(request.url ?? '/', subpathOrigin).pathname
+    if (!pathname.startsWith(prefix)) {
+      response.writeHead(404).end()
+      return
+    }
+
+    const relativePath = decodeURIComponent(pathname.slice(prefix.length)) || 'index.html'
+    if (relativePath.includes('..')) {
+      response.writeHead(400).end()
+      return
+    }
+
+    const fileUrl = new URL(relativePath, distDir)
+    try {
+      const body = await readFile(fileUrl)
+      response.writeHead(200, { 'content-type': contentTypeFor(relativePath) })
+      response.end(body)
+    } catch {
+      response.writeHead(404).end()
+    }
+  })
+
+  await new Promise((resolve, reject) => {
+    staticServer.once('error', reject)
+    staticServer.listen(subpathPort, host, resolve)
+  })
+
+  try {
+    const indexResponse = await fetch(`${subpathOrigin}${prefix}`)
+    const html = await indexResponse.text()
+    if (!indexResponse.ok || !html.includes('<div id="root"></div>')) {
+      throw new Error(`demo preview server smoke failed: static subpath index returned ${indexResponse.status}`)
+    }
+
+    const assetRefs = Array.from(html.matchAll(/(?:src|href)="([^"]+)"/g), ([, assetRef]) => assetRef)
+      .filter((assetRef) => assetRef?.startsWith('./assets/'))
+    const failures = []
+    await Promise.all(assetRefs.map(async (assetRef) => {
+      const assetUrl = new URL(assetRef, `${subpathOrigin}${prefix}`)
+      const response = await fetch(assetUrl)
+      if (!response.ok) failures.push(`${assetRef}: ${response.status}`)
+    }))
+
+    if (assetRefs.length === 0) failures.push('no relative assets')
+    if (failures.length > 0) {
+      throw new Error(`demo preview server smoke failed: static subpath assets failed: ${failures.join(', ')}`)
+    }
+  } finally {
+    await new Promise((resolve) => staticServer.close(resolve))
+  }
+}
+
 async function waitForServer() {
   const deadline = Date.now() + 10_000
   while (Date.now() < deadline) {
@@ -107,6 +167,13 @@ async function waitForServer() {
   }
 
   throw new Error(`demo preview server smoke failed: server did not start\n${serverOutput}`)
+}
+
+function contentTypeFor(pathname) {
+  if (pathname.endsWith('.html')) return 'text/html; charset=utf-8'
+  if (pathname.endsWith('.js')) return 'text/javascript; charset=utf-8'
+  if (pathname.endsWith('.css')) return 'text/css; charset=utf-8'
+  return 'application/octet-stream'
 }
 
 async function stopServer() {
