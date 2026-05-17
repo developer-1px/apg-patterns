@@ -8,10 +8,11 @@ import { sourceLoaders, type SourceName } from '../shared/sources'
 import { SourceTabs, useSourceTabs } from './SourceTabs'
 
 const panelClass = 'min-h-0 rounded-xl bg-white/90 p-3 shadow-[0_18px_50px_rgba(24,24,27,0.08)] ring-1 ring-black/[0.03] backdrop-blur dark:bg-zinc-950/88 dark:shadow-[0_18px_50px_rgba(0,0,0,0.32)] dark:ring-white/[0.04]'
+const scrollPanelClass = `${panelClass} overflow-auto`
 const headerClass = 'mb-4 flex items-center justify-between gap-3'
 const titleClass = 'truncate text-[11px] font-semibold uppercase text-zinc-500 dark:text-zinc-500'
 const buttonClass = 'inline-flex h-8 items-center justify-center rounded-lg px-2.5 text-xs font-medium text-zinc-600 outline-none transition hover:bg-zinc-100 hover:text-zinc-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-100 dark:focus-visible:outline-zinc-500'
-const preClass = 'h-full min-h-0 overflow-auto rounded-xl bg-zinc-100/70 p-4 font-mono text-[12px] leading-6 text-zinc-700 shadow-inner shadow-zinc-200/50 dark:bg-white/[0.045] dark:text-zinc-300 dark:shadow-black/10'
+const preClass = 'max-h-[44dvh] min-h-0 overflow-auto rounded-xl bg-zinc-100/70 p-4 font-mono text-[12px] leading-6 text-zinc-700 shadow-inner shadow-zinc-200/50 dark:bg-white/[0.045] dark:text-zinc-300 dark:shadow-black/10 lg:h-full lg:max-h-none'
 const optionButtonClass =
   'inline-flex h-8 items-center rounded-lg px-2.5 text-left text-xs font-medium text-zinc-500 outline-none transition hover:bg-white/70 hover:text-zinc-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 aria-selected:bg-white aria-selected:text-zinc-950 aria-selected:shadow-sm dark:text-zinc-500 dark:hover:bg-white/[0.06] dark:hover:text-zinc-100 dark:focus-visible:outline-zinc-500 dark:aria-selected:bg-zinc-100 dark:aria-selected:text-zinc-950'
 const rightModes = ['source', 'inspect', 'log'] as const
@@ -68,8 +69,8 @@ export function App() {
   const [state, dispatch] = useReducer(reduceAppState, defaultAppState, readInitialAppState)
 
   return (
-    <main className={`grid h-dvh grid-cols-1 ${state.rightPanelOpen ? 'grid-rows-[minmax(112px,16dvh)_minmax(320px,1fr)_minmax(300px,36dvh)]' : 'grid-rows-[minmax(112px,18dvh)_minmax(0,1fr)]'} gap-4 bg-zinc-100 px-3 py-3 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 sm:px-4 sm:py-4 ${state.rightPanelOpen ? 'lg:grid-cols-[220px_minmax(420px,1fr)_minmax(420px,0.92fr)]' : 'lg:grid-cols-[220px_minmax(420px,1fr)]'} lg:grid-rows-[minmax(0,1fr)] lg:gap-4 lg:px-5 lg:py-5`}>
-      <section className={`${panelClass} overflow-auto`}>
+    <main className={`grid min-h-dvh grid-cols-1 gap-3 bg-zinc-100 px-3 py-3 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 sm:px-4 sm:py-4 ${state.rightPanelOpen ? 'lg:grid-cols-[220px_minmax(420px,1fr)_minmax(420px,0.92fr)]' : 'lg:grid-cols-[220px_minmax(420px,1fr)]'} lg:h-dvh lg:grid-rows-[minmax(0,1fr)] lg:gap-4 lg:px-5 lg:py-5`}>
+      <section className={scrollPanelClass}>
         <header className={headerClass}>
           <h1 className={titleClass}>patterns</h1>
         </header>
@@ -145,7 +146,7 @@ function ActiveDemoWorkspace({
 
   return (
     <>
-      <section className={`${panelClass} overflow-auto`}>
+      <section className={scrollPanelClass}>
         <header className={headerClass}>
           <div className="min-w-0">
             <h2 className="truncate text-sm font-semibold text-zinc-950 dark:text-zinc-50">{activeDemo.label}</h2>
@@ -279,14 +280,18 @@ function coercePatternKey(value: string | null): PatternKey | null {
   return patternItems.some((item) => item.key === value) ? value : null
 }
 
-function coerceRightMode(value: string | null): AppState['rightMode'] | null {
+export function coerceRightMode(value: string | null): AppState['rightMode'] | null {
   if (!value || value === 'off') return null
   if (value in rightModesByLabel) return rightModesByLabel[value as keyof typeof rightModesByLabel]
   return rightModes.includes(value as AppState['rightMode']) ? value as AppState['rightMode'] : null
 }
 
 async function copyText(value: string): Promise<void> {
-  await navigator.clipboard?.writeText(value)
+  try {
+    await navigator.clipboard?.writeText(value)
+  } catch {
+    // Clipboard access can be denied in preview browsers; copying should not break the demo.
+  }
 }
 
 export function formatEvent(event: PatternEvent): string {

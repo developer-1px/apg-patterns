@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatEvent } from './App'
+import { coerceRightMode, formatEvent } from './App'
 import type { PatternEvent } from '../../../src'
 
 describe('formatEvent', () => {
@@ -13,5 +13,17 @@ describe('formatEvent', () => {
     const event: PatternEvent = { type: 'select', keys: ['runtime', 'schema'], anchorKey: 'runtime', extentKey: 'schema' }
 
     expect(formatEvent(event)).toBe('select keys=[runtime,schema] anchorKey=runtime extentKey=schema')
+  })
+})
+
+describe('coerceRightMode', () => {
+  it('keeps legacy aria panel links working as state links', () => {
+    expect(coerceRightMode('aria')).toBe('inspect')
+    expect(coerceRightMode('state')).toBe('inspect')
+  })
+
+  it('treats off and unknown panels as no right panel', () => {
+    expect(coerceRightMode('off')).toBeNull()
+    expect(coerceRightMode('missing')).toBeNull()
   })
 })
