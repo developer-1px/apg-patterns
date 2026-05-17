@@ -23,7 +23,7 @@ for (const [path, mod] of Object.entries(modules)) {
 collected.sort((a, b) => a.key.localeCompare(b.key))
 validatePatternEntries(collected)
 
-export const patternEntries: readonly PatternEntry[] = collected
+export const patternEntries: readonly PatternEntry[] = collected.map(({ sourcePath, ...entry }) => entry)
 
 export const patternItems: readonly { key: PatternKey; label: string }[] = collected.map((e) => ({
   key: e.key,

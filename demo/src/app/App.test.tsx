@@ -248,6 +248,10 @@ describe('demo pattern registry', () => {
     expect(keys).toEqual([...keys].sort((a, b) => a.localeCompare(b)))
   })
 
+  it('does not expose internal collection metadata from pattern entries', () => {
+    expect(patternEntries.some((entry) => 'sourcePath' in entry)).toBe(false)
+  })
+
   it('fails fast when no pattern entries are registered', () => {
     expect(() => validatePatternEntries([])).toThrow('[demoPatterns] no pattern entries were registered')
   })
