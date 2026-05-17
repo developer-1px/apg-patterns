@@ -257,8 +257,8 @@ export interface ReactTreeviewRuntime extends Omit<TreeviewRuntime, 'getTreeProp
   getIndicatorProps(key: string): ReactTreeviewProps
 }
 
-export function useTreeviewPattern(input: CreateTreeviewRuntimeInput): ReactTreeviewRuntime
 export function useTreeviewPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactTreeviewRuntime
+export function useTreeviewPattern(input: CreateTreeviewRuntimeInput): ReactTreeviewRuntime
 export function useTreeviewPattern(inputOrData: CreateTreeviewRuntimeInput | PatternData, onEvent?: (event: PatternEvent) => void, options?: PatternOptions): ReactTreeviewRuntime {
   const input = normalizePatternInput(inputOrData, onEvent, options)
   const typeaheadBufferRef = useRef(createTypeaheadBuffer())
@@ -308,9 +308,9 @@ function adaptRuntime(runtime: TreeviewRuntime): ReactTreeviewRuntime {
     },
     get actions() {
       return {
-        focus: (key) => runtime.emit({ type: 'focus', key }),
-        select: (key) => runtime.emit({ type: 'select', key }),
-        toggle: (key) => runtime.emit({ type: 'expand', key }),
+        focus: (key: Key) => runtime.emit({ type: 'focus', key }),
+        select: (key: Key) => runtime.emit({ type: 'select', keys: [key], anchorKey: key, extentKey: key }),
+        toggle: (key: Key) => runtime.emit({ type: 'expand', key, expanded: !(runtime.data.state?.expandedKeys ?? []).includes(key) }),
       }
     },
     get ids() {
@@ -352,8 +352,8 @@ export function useListboxPattern(data: PatternData, onEvent: (event: PatternEve
     },
     get actions() {
       return {
-        focus: (key) => runtime.emit({ type: 'focus', key }),
-        select: (key) => runtime.emit({ type: 'select', key }),
+        focus: (key: Key) => runtime.emit({ type: 'focus', key }),
+        select: (key: Key) => runtime.emit({ type: 'select', keys: [key], anchorKey: key, extentKey: key }),
       }
     },
     get ids() {
@@ -374,7 +374,7 @@ function toListboxRootProps(runtime: PatternRuntime, typeahead: ReturnType<typeo
   return {
     ...props,
     onKeyDown: (event) => {
-      const query = typeahead.feed(event)
+      const query = typeahead.feed(event as Parameters<typeof typeahead.feed>[0])
       const match = resolveListboxTypeaheadTarget(query, runtime)
       if (match) {
         event.preventDefault()
@@ -498,7 +498,7 @@ function toIndicatorProps(props: TreeviewSlotProps): ReactTreeviewProps {
       event.stopPropagation()
       onClick?.(event)
     },
-  }
+  } as ReactTreeviewProps
 }
 
 export type ReactTabsProps = HTMLAttributes<HTMLElement>
