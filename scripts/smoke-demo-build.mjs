@@ -111,6 +111,7 @@ async function runSmoke() {
     label: option.textContent?.trim(),
   })).filter((item) => item.key && item.label)
   verifyPreviewSurfaceRegistry(patternOptions.map((option) => option.key))
+  await verifyPatternMenuKeyboardNavigation(patternOptions)
 
   for (const { key, label } of patternOptions) {
     const option = findPatternOption(key)
@@ -582,6 +583,37 @@ async function verifyCopyLoadedSource() {
   }
 }
 
+async function verifyPatternMenuKeyboardNavigation(patternOptions) {
+  window.location.hash = '#pattern=tabs&panel=code&source=Tabs.tsx'
+  window.dispatchEvent(new dom.window.HashChangeEvent('hashchange'))
+
+  const currentIndex = patternOptions.findIndex((option) => option.key === 'tabs')
+  const expectedOption = patternOptions[currentIndex + 1] ?? patternOptions[0]
+  if (currentIndex < 0 || !expectedOption) {
+    patternFailures.push('pattern menu keyboard route check could not resolve the next pattern option')
+    return
+  }
+
+  try {
+    await waitForPatternRoute({ pattern: 'tabs', panel: 'code', source: 'Tabs.tsx', label: 'Tabs' })
+    const patternListbox = await waitFor(() => document.querySelector('[role="listbox"][aria-label="APG patterns"]'))
+    patternListbox.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'ArrowDown', code: 'ArrowDown', bubbles: true, cancelable: true }))
+
+    await waitFor(() => {
+      const sourceText = sourcePanelText()
+      return currentHashParam('pattern') === expectedOption.key
+        && findPatternOption(expectedOption.key)?.getAttribute('aria-selected') === 'true'
+        && hasActiveDemoHeading(expectedOption.label)
+        && previewSurfaceIsMounted(expectedOption.key)
+        && sourceText !== 'loading'
+        && sourceText.length > 0
+        && !hasSourceLoadFailure(sourceText)
+    })
+  } catch {
+    patternFailures.push(`pattern menu keyboard navigation did not update route and preview: expected=${expectedOption.key}, current=${window.location.hash}, selected=${selectedPatternOptionName() ?? 'none'}`)
+  }
+}
+
 async function verifyTreeviewInspectControls() {
   window.location.hash = '#pattern=treeview&panel=state&source=Tree.tsx'
   window.dispatchEvent(new dom.window.HashChangeEvent('hashchange'))
@@ -769,6 +801,13 @@ function describePreviewState() {
 function selectedTabName(tablistSelector) {
   return selectedTabs(document.querySelector(tablistSelector))
     .at(0)
+    ?.textContent
+    ?.trim()
+}
+
+function selectedPatternOptionName() {
+  return Array.from(document.querySelectorAll('[role="listbox"][aria-label="APG patterns"] [role="option"]'))
+    .find((option) => option.getAttribute('aria-selected') === 'true')
     ?.textContent
     ?.trim()
 }
