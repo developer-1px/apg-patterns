@@ -142,25 +142,32 @@ function resolveFocusProjection(focus: FocusProjection | undefined, ctx: Pattern
   return value === undefined ? {} : { tabIndex: value }
 }
 
-// DOM event 이름 → React handler prop 매핑 — 등록 기반.
-const domEventHandlerPropRegistry = new Map<string, string>([
-  ['focus', 'onFocus'],
-  ['blur', 'onBlur'],
-  ['click', 'onClick'],
-  ['dblclick', 'onDoubleClick'],
-  ['mousedown', 'onMouseDown'],
-  ['keydown', 'onKeyDown'],
-  ['keyup', 'onKeyUp'],
-  ['input', 'onInput'],
-  ['change', 'onChange'],
-  ['pointerdown', 'onPointerDown'],
-  ['pointerup', 'onPointerUp'],
-  ['pointermove', 'onPointerMove'],
-  ['mouseenter', 'onMouseEnter'],
-  ['mouseleave', 'onMouseLeave'],
+type DomEventDescriptor = {
+  handlerProp: string
+  reason?: PatternEventReason
+}
+
+// DOM event 이름 → React handler prop + 기본 event reason 매핑 — 등록 기반.
+const domEventRegistry = new Map<string, DomEventDescriptor>([
+  ['focus', { handlerProp: 'onFocus', reason: 'focus' }],
+  ['blur', { handlerProp: 'onBlur', reason: 'external' }],
+  ['click', { handlerProp: 'onClick', reason: 'pointer' }],
+  ['dblclick', { handlerProp: 'onDoubleClick', reason: 'pointer' }],
+  ['mousedown', { handlerProp: 'onMouseDown', reason: 'pointer' }],
+  ['keydown', { handlerProp: 'onKeyDown', reason: 'keyboard' }],
+  ['keyup', { handlerProp: 'onKeyUp', reason: 'keyboard' }],
+  ['input', { handlerProp: 'onInput', reason: 'keyboard' }],
+  ['change', { handlerProp: 'onChange', reason: 'external' }],
+  ['pointerdown', { handlerProp: 'onPointerDown', reason: 'pointer' }],
+  ['pointerup', { handlerProp: 'onPointerUp', reason: 'pointer' }],
+  ['pointermove', { handlerProp: 'onPointerMove', reason: 'pointer' }],
+  ['mouseenter', { handlerProp: 'onMouseEnter', reason: 'external' }],
+  ['mouseleave', { handlerProp: 'onMouseLeave', reason: 'external' }],
 ])
+export const defineDomEvent = (eventName: string, descriptor: DomEventDescriptor) =>
+  void domEventRegistry.set(eventName, descriptor)
 export const defineDomEventHandlerProp = (eventName: string, handlerProp: string) =>
-  void domEventHandlerPropRegistry.set(eventName, handlerProp)
+  defineDomEvent(eventName, { handlerProp })
 
 function resolvePartEventBindings(
   bindings: readonly PartEventBinding[],
@@ -175,14 +182,14 @@ function resolvePartEventBindings(
   }
   const out: SlotProps = {}
   for (const [eventName, eventBindings] of byEvent) {
-    const handlerProp = domEventHandlerPropRegistry.get(eventName)
-    if (!handlerProp) throw new Error(`[apg-pattern] unknown domEvent token: "${eventName}" — register via defineDomEventHandlerProp()`)
-    out[handlerProp] = () => {
+    const descriptor = domEventRegistry.get(eventName)
+    if (!descriptor) throw new Error(`[apg-pattern] unknown domEvent token: "${eventName}" — register via defineDomEvent()`)
+    out[descriptor.handlerProp] = () => {
       for (const binding of eventBindings) {
         if (binding.when && !evaluatePredicate(binding.when, ctx)) continue
         const active = ctx.activeKey ?? ctx.key
         if (!active) continue
-        for (const event of binding.events.flatMap((t) => resolveEventTemplate(t, active, ctx.data, ctx.key, ctx))) emit(withDefaultReason(event, reasonForDomEvent(eventName)))
+        for (const event of binding.events.flatMap((t) => resolveEventTemplate(t, active, ctx.data, ctx.key, ctx))) emit(withDefaultReason(event, descriptor.reason ?? 'external'))
       }
     }
   }
@@ -202,13 +209,6 @@ function withEventReason(event: PatternEvent, reason: PatternEventReason): Patte
     configurable: true,
   })
   return next
-}
-
-function reasonForDomEvent(eventName: string): PatternEventReason {
-  if (eventName === 'focus') return 'focus'
-  if (eventName === 'input' || eventName === 'keydown' || eventName === 'keyup') return 'keyboard'
-  if (eventName === 'click' || eventName === 'mousedown' || eventName.startsWith('pointer')) return 'pointer'
-  return 'external'
 }
 
 function compactProps(props: SlotProps): SlotProps {
