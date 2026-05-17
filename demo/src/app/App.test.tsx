@@ -252,6 +252,19 @@ describe('demo pattern registry', () => {
     expect(() => validatePatternEntries([])).toThrow('[demoPatterns] no pattern entries were registered')
   })
 
+  it('fails fast on empty pattern keys and labels', () => {
+    expect(() => validatePatternEntries([
+      { key: '', label: 'Missing Key' },
+      { key: 'missingLabel', label: ' ' },
+    ])).toThrow('[demoPatterns] invalid pattern entries: empty key, empty label')
+  })
+
+  it('fails fast when pattern keys are not stable hash tokens', () => {
+    expect(() => validatePatternEntries([
+      { key: 'menu-and-menubar', label: 'Menu and Menubar' },
+    ])).toThrow('[demoPatterns] invalid pattern entries: invalid key menu-and-menubar')
+  })
+
   it('fails fast on duplicate pattern keys', () => {
     expect(() => validatePatternEntries([
       { key: 'accordion', label: 'Accordion' },
@@ -262,7 +275,7 @@ describe('demo pattern registry', () => {
   it('fails fast on duplicate pattern labels', () => {
     expect(() => validatePatternEntries([
       { key: 'accordion', label: 'Accordion' },
-      { key: 'accordion-copy', label: 'Accordion' },
+      { key: 'accordionCopy', label: 'Accordion' },
     ])).toThrow('[demoPatterns] duplicate pattern labels: Accordion')
   })
 

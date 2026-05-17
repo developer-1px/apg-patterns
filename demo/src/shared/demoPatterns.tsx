@@ -35,6 +35,17 @@ function getPatternEntry(patternKey: PatternKey): PatternEntry {
 export function validatePatternEntries(entries: readonly Pick<PatternEntry, 'key' | 'label'>[]) {
   if (entries.length === 0) throw new Error('[demoPatterns] no pattern entries were registered')
 
+  const invalidEntries = entries.flatMap((entry) => {
+    const issues = []
+    if (!entry.key.trim()) issues.push('empty key')
+    else if (!/^[a-z][A-Za-z0-9]*$/.test(entry.key)) issues.push(`invalid key ${entry.key}`)
+    if (!entry.label.trim()) issues.push('empty label')
+    return issues
+  })
+  if (invalidEntries.length > 0) {
+    throw new Error(`[demoPatterns] invalid pattern entries: ${invalidEntries.join(', ')}`)
+  }
+
   const duplicateKeys = duplicates(entries.map((entry) => entry.key))
   if (duplicateKeys.length > 0) {
     throw new Error(`[demoPatterns] duplicate pattern keys: ${duplicateKeys.join(', ')}`)
