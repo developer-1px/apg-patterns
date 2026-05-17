@@ -185,7 +185,7 @@ export function App() {
       </section>
 
       <section className={`${panelClass} flex min-h-0 flex-col`}>
-        <header className={headerClass}>
+        <header className="mb-3 grid gap-2">
           <div className="flex items-center gap-1" role="tablist" aria-label="right panel">
             {(['source', 'inspect', 'log'] as const).map((mode) => (
               <button key={mode} type="button" role="tab" aria-selected={rightMode === mode} className={optionButtonClass} onClick={() => setRightMode(mode)}>
@@ -193,13 +193,15 @@ export function App() {
               </button>
             ))}
           </div>
-          {rightMode === 'source' ? <SourceTabs tabs={sourceTabs.tabs} getTablistProps={sourceTabs.getTablistProps} getTabProps={sourceTabs.getTabProps} /> : null}
-          {rightMode === 'inspect' && patternKey === 'treeview' ? (
-            <select className={selectClass} value={inspectMode} onChange={(event) => setInspectMode(event.currentTarget.value as typeof inspectMode)}>
-              <option value="aria">aria</option>
-              <option value="html">html</option>
-            </select>
-          ) : null}
+          <div className="min-w-0">
+            {rightMode === 'source' ? <SourceTabs tabs={sourceTabs.tabs} getTablistProps={sourceTabs.getTablistProps} getTabProps={sourceTabs.getTabProps} /> : null}
+            {rightMode === 'inspect' && patternKey === 'treeview' ? (
+              <select className={selectClass} value={inspectMode} onChange={(event) => setInspectMode(event.currentTarget.value as typeof inspectMode)}>
+                <option value="aria">aria</option>
+                <option value="html">html</option>
+              </select>
+            ) : null}
+          </div>
         </header>
         {rightMode === 'source' ? (
           <pre {...sourceTabs.getPanelProps()} className={`${preClass} select-text cursor-text`}>

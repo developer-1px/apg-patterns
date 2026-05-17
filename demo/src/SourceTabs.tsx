@@ -50,13 +50,13 @@ export function useSourceTabs<T extends SourceTabKey>({ label, tabs, value, onCh
 
 export function SourceTabs<T extends SourceTabKey>({ tabs, getTablistProps, getTabProps }: SourceTabsViewProps<T>) {
   return (
-    <div {...getTablistProps()} className="flex max-w-[70%] flex-wrap justify-end gap-1">
+    <div {...getTablistProps()} className="flex min-w-0 gap-1 overflow-x-auto whitespace-nowrap pb-1">
       {tabs.map((tab) => (
         <button
           {...getTabProps(tab)}
           key={tab}
           type="button"
-          className="h-7 rounded px-2 text-xs text-zinc-500 hover:bg-zinc-100 aria-selected:bg-zinc-900 aria-selected:text-white dark:text-zinc-500 dark:hover:bg-zinc-900 dark:aria-selected:bg-zinc-100 dark:aria-selected:text-zinc-950"
+          className="h-7 shrink-0 rounded px-2 text-xs text-zinc-500 hover:bg-zinc-100 aria-selected:bg-zinc-900 aria-selected:text-white dark:text-zinc-500 dark:hover:bg-zinc-900 dark:aria-selected:bg-zinc-100 dark:aria-selected:text-zinc-950"
         >
           {tab}
         </button>
