@@ -27,6 +27,7 @@ console.warn = (...args) => {
 
 let dom
 let root
+let clipboardWrites = []
 const patternFailures = []
 const previewSurfaceSelectors = {
   accordion: '[role="group"]',
@@ -86,6 +87,14 @@ async function runSmoke() {
   Object.defineProperty(globalThis, 'navigator', {
     configurable: true,
     value: dom.window.navigator,
+  })
+  Object.defineProperty(dom.window.navigator, 'clipboard', {
+    configurable: true,
+    value: {
+      writeText: async (value) => {
+        clipboardWrites.push(value)
+      },
+    },
   })
 
   await import(new URL(entryFile, assetsDir).href)
@@ -192,6 +201,7 @@ async function runSmoke() {
   await verifyTabsKeyboardEventLog()
   await verifyInteractionEventLog()
   await verifyLinkInteractionStaysInDemo()
+  await verifyCopyLoadedSource()
 
   await verifyHashRoute('#pattern=accordion&panel=off&source=Accordion.tsx', (text) =>
     currentHashParam('pattern') === 'accordion'
@@ -302,6 +312,36 @@ async function verifyLinkInteractionStaysInDemo() {
     })
   } catch {
     patternFailures.push(`link interaction did not record an event while staying in the demo: current ${window.location.href}, text=${rootText().slice(0, 180)}`)
+  }
+}
+
+async function verifyCopyLoadedSource() {
+  window.location.hash = '#pattern=accordion&panel=code&source=Accordion.tsx'
+  window.dispatchEvent(new dom.window.HashChangeEvent('hashchange'))
+  clipboardWrites = []
+
+  try {
+    const copyButton = await waitFor(() => {
+      const button = Array.from(document.querySelectorAll('button'))
+        .find((candidate) => candidate.textContent?.trim() === 'copy')
+      const sourceText = document.querySelector('pre')?.textContent ?? ''
+      const ready = button
+        && !button.disabled
+        && sourceFilenameIs('Accordion.tsx')
+        && sourceText.includes('export function Accordion')
+        && !sourceText.includes('loading')
+      return ready ? button : false
+    })
+    copyButton.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
+    await waitFor(() => {
+      const copiedText = clipboardWrites.at(-1) ?? ''
+      return copiedText.includes('export function Accordion')
+        && !copiedText.includes('loading')
+        && Array.from(document.querySelectorAll('button'))
+          .some((button) => button.textContent?.trim() === 'copied')
+    })
+  } catch {
+    patternFailures.push(`source copy did not write the loaded Accordion source: writes=${clipboardWrites.length}, text=${rootText().slice(0, 180)}`)
   }
 }
 
