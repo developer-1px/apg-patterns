@@ -38,9 +38,11 @@ type AppState = z.infer<typeof AppStateSchema>
 type AppAction =
   | { type: 'selectPattern'; patternKey: PatternKey }
   | { type: 'recordEvent'; event: PatternEvent }
+  | { type: 'clearEvents' }
   | { type: 'selectSource'; sourceName: SourceName }
   | { type: 'selectRightMode'; rightMode: AppState['rightMode'] }
   | { type: 'toggleRightPanel' }
+  | { type: 'restoreState'; state: AppState }
 
 const defaultAppState = AppStateSchema.parse({
   patternKey: 'treeview',
@@ -53,8 +55,10 @@ const defaultAppState = AppStateSchema.parse({
 const reduceAppState = (state: AppState, action: AppAction): AppState => {
   if (action.type === 'selectPattern') return AppStateSchema.parse({ ...state, patternKey: action.patternKey, events: [] })
   if (action.type === 'recordEvent') return AppStateSchema.parse({ ...state, events: [action.event, ...state.events].slice(0, 12) })
+  if (action.type === 'clearEvents') return AppStateSchema.parse({ ...state, events: [] })
   if (action.type === 'selectSource') return AppStateSchema.parse({ ...state, sourceName: action.sourceName })
   if (action.type === 'selectRightMode') return AppStateSchema.parse({ ...state, rightMode: action.rightMode, rightPanelOpen: true })
+  if (action.type === 'restoreState') return action.state
   return AppStateSchema.parse({ ...state, rightPanelOpen: !state.rightPanelOpen })
 }
 
@@ -77,6 +81,12 @@ export function App() {
       rightPanelOpen: state.rightPanelOpen,
     })
   }, [activeDemo.key, activeSourceName, state.rightMode, state.rightPanelOpen])
+
+  useEffect(() => {
+    const restoreFromHash = () => dispatch({ type: 'restoreState', state: readInitialAppState(defaultAppState) })
+    window.addEventListener('hashchange', restoreFromHash)
+    return () => window.removeEventListener('hashchange', restoreFromHash)
+  }, [])
 
   return (
     <main className={`grid h-dvh grid-cols-1 ${state.rightPanelOpen ? 'grid-rows-[minmax(80px,14dvh)_minmax(280px,1fr)_minmax(260px,34dvh)]' : 'grid-rows-[minmax(80px,16dvh)_minmax(0,1fr)]'} gap-4 bg-white px-4 py-4 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 ${state.rightPanelOpen ? 'lg:grid-cols-[180px_minmax(360px,1fr)_minmax(380px,0.9fr)]' : 'lg:grid-cols-[180px_minmax(360px,1fr)]'} lg:grid-rows-[minmax(0,1fr)] lg:gap-8 lg:px-6 lg:py-5`}>
@@ -146,6 +156,14 @@ export function App() {
               </div>
             ) : null}
             {state.rightMode === 'inspect' ? activeDemo.inspectControls : null}
+            {state.rightMode === 'log' ? (
+              <div className="flex items-center justify-between gap-2 px-1">
+                <div className="font-mono text-[11px] text-zinc-400 dark:text-zinc-600">{state.events.length} events</div>
+                <button type="button" className={buttonClass} onClick={() => dispatch({ type: 'clearEvents' })}>
+                  clear
+                </button>
+              </div>
+            ) : null}
           </div>
         </header>
         {state.rightMode === 'source' ? (

@@ -1,10 +1,10 @@
 import { useRef } from 'react'
 import { createTypeaheadBuffer } from '@interactive-os/keyboard'
-import { createTreeviewRuntime, type CreateTreeviewRuntimeInput, type TreeviewRuntime, type TreeviewSlotProps } from '../patterns/treeview/runtime'
-import { createParentByKey, resolveVisibleOrder } from '../kernel/patternKernel'
-import type { Key, PatternData, PatternEvent, PatternOptions } from '../schema'
-import { usePatternEffects } from './reactPatternEffects'
-import type { ReactRenderItemState, ReactTreeviewProps, ReactTreeviewRenderItem, ReactTreeviewRuntime } from './reactTypes'
+import { createTreeviewRuntime, type CreateTreeviewRuntimeInput, type TreeviewRuntime, type TreeviewSlotProps } from './runtime'
+import { createParentByKey, resolveVisibleOrder } from '../../kernel/patternKernel'
+import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
+import { usePatternEffects } from '../../adapters/reactPatternEffects'
+import type { ReactRenderItemState, ReactTreeviewProps, ReactTreeviewRenderItem, ReactTreeviewRuntime } from '../../adapters/reactTypes'
 
 export function useTreeviewPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactTreeviewRuntime
 export function useTreeviewPattern(input: CreateTreeviewRuntimeInput): ReactTreeviewRuntime

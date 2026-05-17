@@ -1,8 +1,8 @@
-import { accordionDefinition } from '../patterns/accordion/definition'
-import { createPatternRuntime, type PatternRuntime } from '../kernel/patternRuntime'
-import type { Key, PatternData, PatternEvent, PatternOptions } from '../schema'
-import { usePatternEffects } from './reactPatternEffects'
-import type { ReactAccordionRenderItem, ReactAccordionRuntime, ReactPatternProps } from './reactTypes'
+import { accordionDefinition } from './definition'
+import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
+import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
+import { usePatternEffects } from '../../adapters/reactPatternEffects'
+import type { ReactAccordionRenderItem, ReactAccordionRuntime, ReactPatternProps } from '../../adapters/reactTypes'
 
 const DEFAULT_ID_PREFIX = 'accordion-'
 

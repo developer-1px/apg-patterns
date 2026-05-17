@@ -1,5 +1,5 @@
-import { createTabsRuntime, type CreateTabsRuntimeInput, type TabsRuntime } from '../patterns/tabs/runtime'
-import type { ReactTabsProps, ReactTabsRuntime } from './reactTypes'
+import { createTabsRuntime, type CreateTabsRuntimeInput, type TabsRuntime } from './runtime'
+import type { ReactTabsProps, ReactTabsRuntime } from '../../adapters/reactTypes'
 
 export function useTabsPattern(input: CreateTabsRuntimeInput): ReactTabsRuntime {
   return adaptTabsRuntime(

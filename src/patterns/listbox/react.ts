@@ -1,11 +1,11 @@
 import { useRef } from 'react'
 import { createTypeaheadBuffer } from '@interactive-os/keyboard'
 import { findTypeaheadMatch } from '@interactive-os/collection-navigation'
-import { listboxDefinition } from '../patterns/listbox/definition'
-import { createPatternRuntime, type PatternRuntime } from '../kernel/patternRuntime'
-import type { Key, PatternData, PatternEvent, PatternOptions } from '../schema'
-import { usePatternEffects } from './reactPatternEffects'
-import type { ReactListboxRenderItem, ReactListboxRuntime, ReactPatternProps, ReactRenderItemState } from './reactTypes'
+import { listboxDefinition } from './definition'
+import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
+import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
+import { usePatternEffects } from '../../adapters/reactPatternEffects'
+import type { ReactListboxRenderItem, ReactListboxRuntime, ReactPatternProps, ReactRenderItemState } from '../../adapters/reactTypes'
 
 export function useListboxPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactListboxRuntime {
   const typeaheadBufferRef = useRef(createTypeaheadBuffer())
