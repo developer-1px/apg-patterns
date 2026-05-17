@@ -139,6 +139,7 @@ async function runSmoke() {
 
     if (rootText().includes('missing source:')) patternFailures.push(`${label}: missing source marker rendered`)
     verifyPreviewSurface(key, label)
+    await verifyVariantControls(key, label)
 
     const sourceTablist = document.querySelector('[role="tablist"][aria-label="source files"]')
     if (!sourceTablist) {
@@ -462,6 +463,33 @@ function verifyPreviewSurface(key, label) {
   }
   if (!preview.querySelector(selector)) {
     patternFailures.push(`${label}: preview did not render expected surface: ${selector}`)
+  }
+}
+
+async function verifyVariantControls(key, label) {
+  const variantListboxes = Array.from(document.querySelectorAll('[role="listbox"]'))
+    .filter((listbox) => listbox.getAttribute('aria-label')?.includes('variants'))
+
+  for (const listbox of variantListboxes) {
+    const listboxLabel = listbox.getAttribute('aria-label') ?? 'variants'
+    const options = Array.from(listbox.querySelectorAll('[role="option"]'))
+    if (options.length === 0) {
+      patternFailures.push(`${label}: ${listboxLabel} has no options`)
+      continue
+    }
+
+    for (const option of options) {
+      const optionLabel = option.textContent?.trim() || option.id || 'unknown'
+      option.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
+
+      try {
+        await waitFor(() => option.getAttribute('aria-selected') === 'true'
+          && currentHashParam('pattern') === key)
+        verifyPreviewSurface(key, `${label} / ${optionLabel}`)
+      } catch {
+        patternFailures.push(`${label}: ${listboxLabel} option did not select: ${optionLabel}`)
+      }
+    }
   }
 }
 
