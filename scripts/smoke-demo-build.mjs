@@ -147,6 +147,7 @@ async function runSmoke() {
       continue
     }
     verifySingleSelectedTab(sourceTablist, `${label}: source files tablist`)
+    verifySingleTabStop(sourceTablist, `${label}: source files tablist`)
     verifySelectedTabControlsPanel(sourceTablist, `${label}: source files tablist`)
 
     const rightPanelTablist = document.querySelector('[role="tablist"][aria-label="right panel"]')
@@ -155,6 +156,7 @@ async function runSmoke() {
       continue
     }
     verifySingleSelectedTab(rightPanelTablist, `${label}: right panel tablist`)
+    verifySingleTabStop(rightPanelTablist, `${label}: right panel tablist`)
     verifySelectedTabControlsPanel(rightPanelTablist, `${label}: right panel tablist`)
 
     const sourceNames = sourceTabNames()
@@ -755,6 +757,15 @@ function verifySingleSelectedTab(tablist, label) {
   if (selected.length !== 1) {
     const selectedLabels = selected.map((tab) => tab.textContent?.trim() || tab.id || 'unknown').join(', ') || 'none'
     patternFailures.push(`${label}: expected exactly one selected tab, got ${selected.length}: ${selectedLabels}`)
+  }
+}
+
+function verifySingleTabStop(tablist, label) {
+  const tabbableTabs = Array.from(tablist.querySelectorAll('[role="tab"]'))
+    .filter((tab) => tab.getAttribute('tabindex') === '0')
+  if (tabbableTabs.length !== 1) {
+    const tabbableLabels = tabbableTabs.map((tab) => tab.textContent?.trim() || tab.id || 'unknown').join(', ') || 'none'
+    patternFailures.push(`${label}: expected exactly one tabbable tab, got ${tabbableTabs.length}: ${tabbableLabels}`)
   }
 }
 
