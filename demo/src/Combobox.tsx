@@ -1,20 +1,18 @@
 import { useRef } from 'react'
 import type { HTMLAttributes, InputHTMLAttributes, KeyboardEvent } from 'react'
 import { COMBOBOX_KEY, comboboxDefinition, createPatternRuntime, type PatternData, type PatternEvent } from '../../src'
+import type { ComboboxVariantKey } from './comboboxData'
 
 type RootProps = InputHTMLAttributes<HTMLInputElement> & { onKeyDown: (e: KeyboardEvent) => void }
 
 export function Combobox({
   data,
-  variant,
   onEvent,
-  onVisibleKeysChange,
 }: {
   data: PatternData
-  variant: 'selectOnly' | 'listAutocomplete' | 'listWithInlineAutocomplete'
   onEvent: (event: PatternEvent) => void
-  onVisibleKeysChange?: (keys: readonly string[]) => void
 }) {
+  const variant = (data.state?.variant as ComboboxVariantKey | undefined) ?? 'listAutocomplete'
   const autocomplete = variant === 'selectOnly' ? 'none' : variant === 'listAutocomplete' ? 'list' : 'both'
   const editable = variant !== 'selectOnly'
   const listboxId = 'combobox-popup'

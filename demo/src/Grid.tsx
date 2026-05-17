@@ -7,12 +7,12 @@ type Props = HTMLAttributes<HTMLElement>
 export function Grid({
   data,
   onEvent,
-  options,
 }: {
   data: PatternData
   onEvent: (event: PatternEvent) => void
-  options?: PatternOptions
 }) {
+  const options = ((data.state as { options?: PatternOptions; multiselectable?: boolean } | undefined)?.options ?? {}) as PatternOptions
+  const selectionMode = (data.state as { multiselectable?: boolean } | undefined)?.multiselectable ? 'multiple' : 'single'
   const editableKeys = ((data.state as { editableKeys?: readonly string[] } | undefined)?.editableKeys ?? []) as readonly string[]
   const editingKey = ((data.state as { editingKey?: string | null } | undefined)?.editingKey ?? null) as string | null
   const editDraftByKey = ((data.state as { editDraftByKey?: Record<string, string> } | undefined)?.editDraftByKey ?? {}) as Record<string, string>
@@ -22,7 +22,7 @@ export function Grid({
   const runtime = createPatternRuntime({
     definition: gridDefinition,
     data,
-    options: { focusStrategy: 'rovingTabIndex', selectionMode: 'single', ...options },
+    options: { focusStrategy: 'rovingTabIndex', selectionMode, ...options },
     onEvent: (event) => {
       // Translate Enter/F2 activate into edit-mode entry for editable cells, sort toggle for headers.
       if (event.type === 'activate') {

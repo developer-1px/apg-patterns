@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useVariantPatternDataHost } from '../demoHostState'
 import { Link } from '../Link'
 import { linkVariants, type LinkVariantKey } from '../linkData'
 import { VariantListbox } from '../VariantListbox'
@@ -15,17 +15,21 @@ export const entry: PatternEntry = {
   label: 'Link',
   order: 19,
   useDemoPattern: (onEvent) => {
-    const [variant, setVariant] = useState<LinkVariantKey>('anchor')
-    const data = linkVariants[variant].data
+    const host = useVariantPatternDataHost<LinkVariantKey>(
+      'anchor',
+      linkVariants.anchor.data,
+      (variant) => linkVariants[variant].data,
+      (_variant, data) => data,
+    )
     return {
       key: 'link',
       label: 'Link',
       keyboardShortcuts: ['Enter'],
       sourceNames: ['Link.tsx', 'linkData.ts', 'link/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
-      inspect: renderDataInspect(data),
-      variants: <VariantListbox value={variant} items={items} label="link variants" idPrefix="link-variant" onChange={setVariant} />,
-      preview: <Link data={data} onEvent={onEvent} />,
-      reset: () => setVariant('anchor'),
+      inspect: renderDataInspect(host.data),
+      variants: <VariantListbox value={host.variant} items={items} label="link variants" idPrefix="link-variant" onChange={host.selectVariant} />,
+      preview: <Link data={host.data} onEvent={onEvent} />,
+      reset: () => host.selectVariant('anchor'),
     }
   },
 }

@@ -12,11 +12,9 @@ import { gridVariants, type GridVariantKey } from './gridData'
 
 function GridDemo({ variant }: { variant: GridVariantKey }) {
   const [data, setData] = useState<PatternData>(gridVariants[variant].data)
-  const multiselectable = (data.state as { multiselectable?: boolean } | undefined)?.multiselectable
   return (
     <Grid
       data={data}
-      options={{ focusStrategy: 'rovingTabIndex', selectionMode: multiselectable ? 'multiple' : 'single' }}
       onEvent={(event: PatternEvent) => {
         if (event.type === 'extension' && event.name === 'gridSort' && event.key) {
           const next = (event.payload?.sort as 'ascending' | 'descending' | 'other') ?? 'ascending'

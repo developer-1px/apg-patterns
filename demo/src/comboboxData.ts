@@ -23,7 +23,10 @@ export const FRUITS = [
   { key: 'strawberry', label: 'Strawberry' },
 ] as const
 
-export function buildComboboxData(visibleKeys: readonly string[] = FRUITS.map((f) => f.key)): PatternData {
+export function buildComboboxData(
+  visibleKeys: readonly string[] = FRUITS.map((f) => f.key),
+  variant: ComboboxVariantKey = 'listAutocomplete',
+): PatternData {
   const items: PatternData['items'] = { [COMBOBOX_KEY]: { label: 'Fruit' } }
   for (const f of FRUITS) items[f.key] = { label: f.label }
   // Only the keys that pass the current filter are exposed as options (visible in popup).
@@ -34,7 +37,7 @@ export function buildComboboxData(visibleKeys: readonly string[] = FRUITS.map((f
   for (const k of visibleKeys) if (items[k]) filteredItems[k] = items[k]
   return PatternDataSchema.parse({
     items: filteredItems,
-    state: { activeKey: null, expandedKeys: [], selectedKeys: [], query: '', inlineCompletion: null },
+    state: { activeKey: null, expandedKeys: [], selectedKeys: [], query: '', inlineCompletion: null, variant },
     refs: { label: 'Fruit' },
   })
 }
@@ -74,7 +77,8 @@ export function reduceComboboxData(current: PatternData, event: PatternEvent): P
     const match = inline ? firstMatch(raw) : null
     const matchLabel = match ? FRUITS.find((f) => f.key === match)?.label ?? '' : ''
     const shouldComplete = inline && raw.length > 0 && match && matchLabel.toLowerCase().startsWith(raw.toLowerCase()) && matchLabel.length > raw.length
-    const next = buildComboboxData(filtered)
+    const variant = (current.state?.variant as ComboboxVariantKey | undefined) ?? 'listAutocomplete'
+    const next = buildComboboxData(filtered, variant)
     return {
       ...next,
       state: {

@@ -15,10 +15,10 @@ const panelClass =
 export interface DisclosureProps {
   data: PatternData
   onEvent: (event: PatternEvent) => void
-  variant?: DisclosureVariantKey
 }
 
-export function Disclosure({ data, onEvent, variant = 'simple' }: DisclosureProps) {
+export function Disclosure({ data, onEvent }: DisclosureProps) {
+  const variant = (data.state?.variant as DisclosureVariantKey | undefined) ?? 'simple'
   if (variant === 'image') return <ImageDisclosure data={data} onEvent={onEvent} />
   if (variant === 'faq') return <FaqDisclosure data={data} onEvent={onEvent} />
   if (variant === 'navMenu') return <NavMenuDisclosure data={data} onEvent={onEvent} />

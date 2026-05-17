@@ -9,12 +9,11 @@ const keyToElementId = (key: Key) => `windowsplitter-${key}`
 export function WindowSplitter({
   data,
   onEvent,
-  options,
 }: {
   data: PatternData
   onEvent: (event: PatternEvent) => void
-  options: PatternOptions
 }) {
+  const options = ((data.state as { options?: PatternOptions } | undefined)?.options ?? {}) as PatternOptions
   const runtime = createPatternRuntime({
     definition: windowsplitterDefinition,
     data,

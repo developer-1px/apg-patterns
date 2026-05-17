@@ -16,7 +16,7 @@ export const entry: PatternEntry = {
       keyboardShortcuts: ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'Enter'],
       sourceNames: ['WindowSplitter.tsx', 'windowsplitterData.ts', 'windowsplitter/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
       inspect: renderDataInspect(host.data),
-      preview: <WindowSplitter data={host.data} options={windowSplitterOptions} onEvent={(event) => {
+      preview: <WindowSplitter data={host.data} onEvent={(event) => {
         onEvent(event)
         host.dispatchEvent(event)
       }} />,

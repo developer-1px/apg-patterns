@@ -10,7 +10,7 @@ function Demo() {
   const handleEvent = (event: PatternEvent) => {
     setData((current) => reduceWindowSplitterData(current, event, windowSplitterOptions))
   }
-  return <WindowSplitter data={data} options={windowSplitterOptions} onEvent={handleEvent} />
+  return <WindowSplitter data={data} onEvent={handleEvent} />
 }
 
 describe('WindowSplitter demo', () => {

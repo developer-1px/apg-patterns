@@ -18,7 +18,7 @@ export const entry: PatternEntry = {
       keyboardShortcuts: ['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End', 'PageUp', 'PageDown'],
       sourceNames: ['Treegrid.tsx', 'treegridData.ts', 'treegrid/definition.ts', 'treegrid/navigation.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
       inspect: renderDataInspect(host.data),
-      preview: <Treegrid data={host.data} options={{ focusStrategy: 'rovingTabIndex' }} onEvent={(event) => {
+      preview: <Treegrid data={host.data} onEvent={(event) => {
         onEvent(event)
         host.dispatchEvent(event)
       }} />,

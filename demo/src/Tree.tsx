@@ -1,19 +1,14 @@
 import { usePatternAutoFocus, useTreeviewPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
 import { Icon } from './Icon'
 
-export type TreeItemKind = 'folder' | 'link'
-
 export function Tree({
   data,
   onEvent,
-  options,
-  itemKind = 'folder',
 }: {
   data: PatternData
   onEvent: (event: PatternEvent) => void
-  options?: PatternOptions
-  itemKind?: TreeItemKind
 }) {
+  const options = (data.state?.options as PatternOptions | undefined) ?? {}
   const tree = useTreeviewPattern({ data, options, onEvent })
   usePatternAutoFocus(tree)
 
@@ -41,7 +36,7 @@ export function Tree({
         )
 
         const labelNode =
-          itemKind === 'link' && href ? (
+          href ? (
             <a
               href={href}
               tabIndex={-1}
@@ -52,7 +47,7 @@ export function Tree({
             </a>
           ) : (
             <span className="inline-flex items-center gap-1">
-              {itemKind === 'folder' ? <Icon name={hasChildren ? 'folder' : 'file'} className="text-zinc-500" /> : null}
+              <Icon name={hasChildren ? 'folder' : 'file'} className="text-zinc-500" />
               {label}
             </span>
           )

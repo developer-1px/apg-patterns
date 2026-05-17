@@ -7,12 +7,11 @@ type Props = HTMLAttributes<HTMLElement>
 export function Table({
   data,
   onEvent,
-  options,
 }: {
   data: PatternData
   onEvent: (event: PatternEvent) => void
-  options?: PatternOptions
 }) {
+  const options = (data.state?.options as PatternOptions | undefined) ?? {}
   const sortByKey = data.state?.sortByKey ?? {}
 
   const runtime = createPatternRuntime({

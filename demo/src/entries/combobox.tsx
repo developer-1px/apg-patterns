@@ -17,8 +17,8 @@ export const entry: PatternEntry = {
   useDemoPattern: (onEvent) => {
     const host = useVariantPatternDataHost<ComboboxVariantKey>(
       'listAutocomplete',
-      buildComboboxData(),
-      () => buildComboboxData(),
+      buildComboboxData(undefined, 'listAutocomplete'),
+      (variant) => buildComboboxData(undefined, variant),
       (_variant, data, event) => reduceComboboxData(data, event),
     )
     return {
@@ -31,14 +31,9 @@ export const entry: PatternEntry = {
       preview: (
         <Combobox
           data={host.data}
-          variant={host.variant}
           onEvent={(event) => {
             onEvent(event)
             host.dispatchEvent(event)
-          }}
-          onVisibleKeysChange={(keys) => {
-            const next = buildComboboxData(keys)
-            host.replaceData({ ...next, state: { ...next.state, expandedKeys: ['combobox'] } })
           }}
         />
       ),

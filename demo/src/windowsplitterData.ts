@@ -12,6 +12,13 @@ export const initialWindowSplitterData: PatternData = PatternDataSchema.parse({
   state: {
     activeKey: 'splitter',
     valueByKey: { splitter: 50 },
+    options: {
+      focusStrategy: 'rovingTabIndex',
+      min: 0,
+      max: 100,
+      step: 1,
+      orientation: 'horizontal',
+    },
   },
 })
 

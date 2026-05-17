@@ -16,7 +16,6 @@ export const entry: PatternEntry = {
       (variant) => sliderVariants[variant].data,
       (variant, data, event) => reduceSliderData(data, event, sliderVariants[variant].options),
     )
-    const options = sliderVariants[host.variant].options
     return {
       key: 'slider',
       label: 'Slider',
@@ -24,7 +23,7 @@ export const entry: PatternEntry = {
       sourceNames: ['Slider.tsx', 'sliderData.ts', 'slider/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
       inspect: renderSliderInspect(host.data),
       variants: <VariantListbox value={host.variant} items={sliderVariantItems} label="slider variants" idPrefix="slider-variant" onChange={host.selectVariant} />,
-      preview: <Slider data={host.data} options={options} onEvent={(event) => {
+      preview: <Slider data={host.data} onEvent={(event) => {
         onEvent(event)
         host.dispatchEvent(event)
       }} />,

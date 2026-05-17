@@ -45,15 +45,20 @@ export interface MeterVariant {
   options: PatternOptions
 }
 
+const withOptions = (data: PatternData, options: PatternOptions): PatternData => ({
+  ...data,
+  state: { ...data.state, options },
+})
+
 export const meterVariants: Record<MeterVariantKey, MeterVariant> = {
-  disk: { key: 'disk', label: 'Disk Usage', data: diskData(), options: { min: 0, max: 100 } },
-  battery: { key: 'battery', label: 'Battery', data: batteryData(), options: { min: 0, max: 100 } },
-  cpu: { key: 'cpu', label: 'CPU Load', data: cpuData(), options: { min: 0, max: 100 } },
-  storage: { key: 'storage', label: 'Storage', data: storageData(), options: { min: 0, max: 256 } },
+  disk: { key: 'disk', label: 'Disk Usage', options: { min: 0, max: 100 }, data: withOptions(diskData(), { min: 0, max: 100 }) },
+  battery: { key: 'battery', label: 'Battery', options: { min: 0, max: 100 }, data: withOptions(batteryData(), { min: 0, max: 100 }) },
+  cpu: { key: 'cpu', label: 'CPU Load', options: { min: 0, max: 100 }, data: withOptions(cpuData(), { min: 0, max: 100 }) },
+  storage: { key: 'storage', label: 'Storage', options: { min: 0, max: 256 }, data: withOptions(storageData(), { min: 0, max: 256 }) },
 }
 
 export const meterVariantItems = Object.values(meterVariants).map((v) => ({ key: v.key, label: v.label }))
 
 // Back-compat — simple single-meter exports.
-export const initialMeterData = diskData()
+export const initialMeterData = meterVariants.disk.data
 export const meterOptions: PatternOptions = { min: 0, max: 100 }

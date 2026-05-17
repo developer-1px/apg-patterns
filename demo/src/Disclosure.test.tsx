@@ -11,10 +11,10 @@ import {
   type DisclosureVariantKey,
 } from './disclosureData'
 
-function DisclosureDemo({ variant, initial }: { variant: DisclosureVariantKey; initial: PatternData }) {
+function DisclosureDemo({ initial }: { variant: DisclosureVariantKey; initial: PatternData }) {
   const [data, setData] = useState(initial)
   const handleEvent = (event: PatternEvent) => setData((current) => reduceDisclosureData(current, event))
-  return <Disclosure data={data} variant={variant} onEvent={handleEvent} />
+  return <Disclosure data={data} onEvent={handleEvent} />
 }
 
 describe('Disclosure demo (image)', () => {

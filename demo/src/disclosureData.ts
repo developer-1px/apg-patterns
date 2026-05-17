@@ -15,6 +15,7 @@ export const initialDisclosureData: PatternData = {
   state: {
     activeKey: 'trigger',
     expandedKeys: [],
+    variant: 'simple',
   },
 }
 
@@ -35,6 +36,7 @@ export const initialImageDisclosureData: PatternData = {
   state: {
     activeKey: 'trigger',
     expandedKeys: [],
+    variant: 'image',
   },
 }
 
@@ -72,7 +74,7 @@ export const initialFaqDisclosureData: PatternData = (() => {
   return {
     items,
     relations: { rootKeys, controlsByKey, ownerByKey },
-    state: { activeKey: rootKeys[0], expandedKeys: [] },
+    state: { activeKey: rootKeys[0], expandedKeys: [], variant: 'faq' },
   }
 })()
 
@@ -125,7 +127,7 @@ export const initialNavMenuDisclosureData: PatternData = (() => {
   return {
     items,
     relations: { rootKeys, controlsByKey, ownerByKey },
-    state: { activeKey: rootKeys[0], expandedKeys: [] },
+    state: { activeKey: rootKeys[0], expandedKeys: [], variant: 'navMenu' },
   }
 })()
 
@@ -165,6 +167,6 @@ export const initialNavMenuTopLinksDisclosureData: PatternData = (() => {
   return {
     items,
     relations: { rootKeys, controlsByKey, ownerByKey },
-    state: { activeKey: rootKeys[0], expandedKeys: [] },
+    state: { activeKey: rootKeys[0], expandedKeys: [], variant: 'navMenuTopLinks' },
   }
 })()

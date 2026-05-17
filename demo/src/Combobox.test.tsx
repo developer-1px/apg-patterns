@@ -3,21 +3,14 @@ import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import type { PatternData, PatternEvent } from '../../src'
 import { Combobox } from './Combobox'
-import { buildComboboxData, FRUITS, initialComboboxData, reduceComboboxData } from './comboboxData'
+import { buildComboboxData, FRUITS, reduceComboboxData } from './comboboxData'
 
 type Variant = 'selectOnly' | 'listAutocomplete' | 'listWithInlineAutocomplete'
 
 function ComboboxDemo({ variant }: { variant: Variant }) {
-  const [data, setData] = useState<PatternData>(initialComboboxData)
+  const [data, setData] = useState<PatternData>(() => buildComboboxData(undefined, variant))
   const handleEvent = (event: PatternEvent) => setData((current) => reduceComboboxData(current, event))
-  const handleVisibleKeysChange = (keys: readonly string[]) => {
-    // Rebuild items registry to match visible keys (the demo pattern uses items as the visible set).
-    setData((current) => {
-      const next = buildComboboxData(keys)
-      return { ...next, state: { ...current.state, expandedKeys: current.state?.expandedKeys ?? [] } }
-    })
-  }
-  return <Combobox data={data} variant={variant} onEvent={handleEvent} onVisibleKeysChange={handleVisibleKeysChange} />
+  return <Combobox data={data} onEvent={handleEvent} />
 }
 
 describe('Combobox demo — selectOnly', () => {

@@ -88,36 +88,41 @@ export interface SliderVariant {
   options: PatternOptions
 }
 
+const withOptions = (data: PatternData, options: PatternOptions): PatternData => ({
+  ...data,
+  state: { ...data.state, options },
+})
+
 export const sliderVariants: Record<SliderVariantKey, SliderVariant> = {
   color: {
     key: 'color',
     label: 'Color Viewer',
-    data: colorData(),
     options: { focusStrategy: 'rovingTabIndex', min: 0, max: 255, step: 1, orientation: 'horizontal' },
+    data: withOptions(colorData(), { focusStrategy: 'rovingTabIndex', min: 0, max: 255, step: 1, orientation: 'horizontal' }),
   },
   temperature: {
     key: 'temperature',
     label: 'Vertical Temperature',
-    data: temperatureData(),
     options: { focusStrategy: 'rovingTabIndex', min: 10, max: 38, step: 1, orientation: 'vertical' },
+    data: withOptions(temperatureData(), { focusStrategy: 'rovingTabIndex', min: 10, max: 38, step: 1, orientation: 'vertical' }),
   },
   rating: {
     key: 'rating',
     label: 'Rating',
-    data: ratingData(),
     options: { focusStrategy: 'rovingTabIndex', min: 0, max: 9, step: 1, orientation: 'horizontal' },
+    data: withOptions(ratingData(), { focusStrategy: 'rovingTabIndex', min: 0, max: 9, step: 1, orientation: 'horizontal' }),
   },
   seek: {
     key: 'seek',
     label: 'Media Seek',
-    data: seekData(),
     options: { focusStrategy: 'rovingTabIndex', min: 0, max: 300, step: 1, orientation: 'horizontal' },
+    data: withOptions(seekData(), { focusStrategy: 'rovingTabIndex', min: 0, max: 300, step: 1, orientation: 'horizontal' }),
   },
   range: {
     key: 'range',
     label: 'Multi-Thumb (Range)',
-    data: rangeData(),
     options: { focusStrategy: 'rovingTabIndex', min: 0, max: 500, step: 10, orientation: 'horizontal' },
+    data: withOptions(rangeData(), { focusStrategy: 'rovingTabIndex', min: 0, max: 500, step: 10, orientation: 'horizontal' }),
   },
 }
 
@@ -127,7 +132,7 @@ export const sliderVariantItems = Object.values(sliderVariants).map((v) => ({ ke
 export const initialSliderData = PatternDataSchema.parse({
   items: { volume: { label: 'Volume' } },
   relations: { rootKeys: ['volume'] },
-  state: { activeKey: 'volume', valueByKey: { volume: 50 } },
+  state: { activeKey: 'volume', valueByKey: { volume: 50 }, options: { focusStrategy: 'rovingTabIndex', min: 0, max: 100, step: 5, orientation: 'horizontal' } },
 })
 export const sliderOptions: PatternOptions = {
   focusStrategy: 'rovingTabIndex',

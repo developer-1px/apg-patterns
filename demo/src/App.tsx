@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useReducer } from 'react'
+import { z } from 'zod'
 import type { PatternEvent } from '../../src'
 import { PatternMenu } from './PatternMenu'
 import { type PatternKey, useDemoPatterns } from './demoPatterns'
@@ -15,24 +16,52 @@ const optionButtonClass =
 const rightModes = ['source', 'inspect', 'log'] as const
 const previewModes = ['preview', 'variants'] as const
 
-export function App() {
-  const [patternKey, setPatternKey] = useState<PatternKey>('treeview')
-  const [events, setEvents] = useState<PatternEvent[]>([])
-  const [sourceName, setSourceName] = useState<SourceName>('Tree.tsx')
-  const [rightMode, setRightMode] = useState<'source' | 'inspect' | 'log'>('source')
-  const [previewMode, setPreviewMode] = useState<'preview' | 'variants'>('preview')
+const AppStateSchema = z.object({
+  patternKey: z.string(),
+  events: z.array(z.custom<PatternEvent>()),
+  sourceName: z.string(),
+  rightMode: z.enum(rightModes),
+  previewMode: z.enum(previewModes),
+}).strict()
 
-  const demos = useDemoPatterns((event) => setEvents((current) => [event, ...current].slice(0, 12)))
-  const activeDemo = demos.find((demo) => demo.key === patternKey) ?? demos[0]
+type AppState = z.infer<typeof AppStateSchema>
+
+type AppAction =
+  | { type: 'selectPattern'; patternKey: PatternKey }
+  | { type: 'recordEvent'; event: PatternEvent }
+  | { type: 'selectSource'; sourceName: SourceName }
+  | { type: 'selectRightMode'; rightMode: AppState['rightMode'] }
+  | { type: 'selectPreviewMode'; previewMode: AppState['previewMode'] }
+
+const initialAppState = AppStateSchema.parse({
+  patternKey: 'treeview',
+  events: [],
+  sourceName: 'Tree.tsx',
+  rightMode: 'source',
+  previewMode: 'preview',
+})
+
+const reduceAppState = (state: AppState, action: AppAction): AppState => {
+  if (action.type === 'selectPattern') return AppStateSchema.parse({ ...state, patternKey: action.patternKey, previewMode: 'preview' })
+  if (action.type === 'recordEvent') return AppStateSchema.parse({ ...state, events: [action.event, ...state.events].slice(0, 12) })
+  if (action.type === 'selectSource') return AppStateSchema.parse({ ...state, sourceName: action.sourceName })
+  if (action.type === 'selectRightMode') return AppStateSchema.parse({ ...state, rightMode: action.rightMode })
+  return AppStateSchema.parse({ ...state, previewMode: action.previewMode })
+}
+
+export function App() {
+  const [state, dispatch] = useReducer(reduceAppState, initialAppState)
+  const demos = useDemoPatterns((event) => dispatch({ type: 'recordEvent', event }))
+  const activeDemo = demos.find((demo) => demo.key === state.patternKey) ?? demos[0]
   const sourceNames = activeDemo.sourceNames
-  const activeSourceName = sourceNames.includes(sourceName) ? sourceName : sourceNames[0]
+  const activeSourceName = sourceNames.includes(state.sourceName as SourceName) ? state.sourceName as SourceName : sourceNames[0]
   const source = sources[activeSourceName]
-  const sourceTabs = useSourceTabs({ label: 'source files', tabs: sourceNames, value: activeSourceName, onChange: setSourceName })
-  const rightModeTabs = useSourceTabs({ label: 'right panel', tabs: rightModes, value: rightMode, onChange: setRightMode })
+  const sourceTabs = useSourceTabs({ label: 'source files', tabs: sourceNames, value: activeSourceName, onChange: (sourceName) => dispatch({ type: 'selectSource', sourceName }) })
+  const rightModeTabs = useSourceTabs({ label: 'right panel', tabs: rightModes, value: state.rightMode, onChange: (rightMode) => dispatch({ type: 'selectRightMode', rightMode }) })
   const availablePreviewModes = activeDemo.variants ? previewModes : previewModes.slice(0, 1)
-  const activePreviewMode = activeDemo.variants ? previewMode : 'preview'
-  const previewModeTabs = useSourceTabs({ label: 'preview panel', tabs: availablePreviewModes, value: activePreviewMode, onChange: setPreviewMode })
-  const eventLog = events.map((event) => JSON.stringify(event)).join('\n') || 'none'
+  const activePreviewMode = activeDemo.variants ? state.previewMode : 'preview'
+  const previewModeTabs = useSourceTabs({ label: 'preview panel', tabs: availablePreviewModes, value: activePreviewMode, onChange: (previewMode) => dispatch({ type: 'selectPreviewMode', previewMode }) })
+  const eventLog = state.events.map((event) => JSON.stringify(event)).join('\n') || 'none'
 
   return (
     <main className="grid h-screen grid-cols-1 grid-rows-[auto_minmax(0,1fr)_minmax(260px,40vh)] gap-8 bg-white px-6 py-5 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 lg:grid-cols-[180px_minmax(360px,1fr)_minmax(380px,0.9fr)] lg:grid-rows-[minmax(0,1fr)]">
@@ -40,7 +69,7 @@ export function App() {
         <header className={headerClass}>
           <h1 className={titleClass}>patterns</h1>
         </header>
-        <PatternMenu value={patternKey} onChange={setPatternKey} />
+        <PatternMenu value={state.patternKey} onChange={(patternKey) => dispatch({ type: 'selectPattern', patternKey })} />
       </section>
 
       <section className={`${panelClass} overflow-auto`}>
@@ -88,24 +117,24 @@ export function App() {
             ))}
           </div>
           <div className="min-w-0">
-            {rightMode === 'source' ? (
+            {state.rightMode === 'source' ? (
               <div className="grid gap-1">
                 <SourceTabs tabs={sourceTabs.tabs} getTablistProps={sourceTabs.getTablistProps} getTabProps={sourceTabs.getTabProps} />
                 <div className="truncate px-1 font-mono text-[11px] text-zinc-400 dark:text-zinc-600">
-                  {patternKey} / {activeSourceName}
+                  {state.patternKey} / {activeSourceName}
                 </div>
               </div>
             ) : null}
-            {rightMode === 'inspect' ? activeDemo.inspectControls : null}
+            {state.rightMode === 'inspect' ? activeDemo.inspectControls : null}
           </div>
         </header>
-        {rightMode === 'source' ? (
+        {state.rightMode === 'source' ? (
           <pre {...sourceTabs.getPanelProps()} className={`${preClass} select-text cursor-text`}>
             {source}
           </pre>
         ) : null}
-        {rightMode === 'inspect' ? <pre className={preClass}>{activeDemo.inspect}</pre> : null}
-        {rightMode === 'log' ? <pre className={preClass}>{eventLog}</pre> : null}
+        {state.rightMode === 'inspect' ? <pre className={preClass}>{activeDemo.inspect}</pre> : null}
+        {state.rightMode === 'log' ? <pre className={preClass}>{eventLog}</pre> : null}
       </section>
     </main>
   )

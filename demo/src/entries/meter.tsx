@@ -16,7 +16,6 @@ export const entry: PatternEntry = {
       (variant) => meterVariants[variant].data,
       (_variant, data) => data,
     )
-    const variantDef = meterVariants[host.variant]
     return {
       key: 'meter',
       label: 'Meter',
@@ -24,7 +23,7 @@ export const entry: PatternEntry = {
       sourceNames: ['Meter.tsx', 'meterData.ts', 'meter/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
       inspect: renderDataInspect(host.data),
       variants: <VariantListbox value={host.variant} items={meterVariantItems} label="meter variants" idPrefix="meter-variant" onChange={host.selectVariant} />,
-      preview: <Meter data={host.data} options={variantDef.options ?? { min: 0, max: 100 }} onEvent={onEvent} />,
+      preview: <Meter data={host.data} onEvent={onEvent} />,
       reset: () => host.selectVariant('disk'),
     }
   },

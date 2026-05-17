@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useReducer } from 'react'
 import type { HTMLAttributes } from 'react'
 import { createPatternRuntime, reducePatternData, usePatternAutoFocus, type PatternData, type PatternEvent } from '../../src'
 import { feedDefinition } from '../../src/patterns/feed/definition'
@@ -11,9 +11,12 @@ export interface FeedProps {
 }
 
 export function Feed({ data: initialData = initialFeedData }: FeedProps = {}) {
-  const [data, setData] = useState<PatternData>(initialData)
+  const [data, dispatch] = useReducer(
+    (current: PatternData, event: PatternEvent) => reducePatternData(feedDefinition, current, event),
+    initialData,
+  )
   const handleEvent = (event: PatternEvent) =>
-    setData((current) => reducePatternData(feedDefinition, current, event))
+    dispatch(event)
 
   const runtime = createPatternRuntime({
     definition: feedDefinition,

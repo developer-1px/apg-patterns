@@ -21,7 +21,6 @@ export const entry: PatternEntry = {
       (variant) => spinbuttonVariants[variant].data,
       (variant, data, event) => reduceSpinbuttonData(data, event, spinbuttonVariants[variant].options),
     )
-    const options = spinbuttonVariants[host.variant].options
     return {
       key: 'spinbutton',
       label: 'Spinbutton',
@@ -29,7 +28,7 @@ export const entry: PatternEntry = {
       sourceNames: ['Spinbutton.tsx', 'spinbuttonData.ts', 'spinbutton/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
       inspect: renderDataInspect(host.data),
       variants: <VariantListbox value={host.variant} items={items} label="spinbutton variants" idPrefix="spinbutton-variant" onChange={host.selectVariant} />,
-      preview: <Spinbutton data={host.data} options={options} onEvent={(event) => {
+      preview: <Spinbutton data={host.data} onEvent={(event) => {
         onEvent(event)
         host.dispatchEvent(event)
       }} />,

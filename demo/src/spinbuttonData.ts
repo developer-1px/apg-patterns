@@ -34,22 +34,27 @@ export interface SpinbuttonVariant {
   options: PatternOptions
 }
 
+const withOptions = (data: PatternData, options: PatternOptions): PatternData => ({
+  ...data,
+  state: { ...data.state, options },
+})
+
 export const spinbuttonVariants: Record<SpinbuttonVariantKey, SpinbuttonVariant> = {
   numeric: {
     key: 'numeric',
     label: 'Numeric',
-    data: numericData(),
     options: { focusStrategy: 'rovingTabIndex', min: 0, max: 100, step: 1 },
+    data: withOptions(numericData(), { focusStrategy: 'rovingTabIndex', min: 0, max: 100, step: 1 }),
   },
   time: {
     key: 'time',
     label: 'Time Picker',
-    data: timeData(),
     options: { focusStrategy: 'rovingTabIndex', min: 0, max: 59, step: 1 },
+    data: withOptions(timeData(), { focusStrategy: 'rovingTabIndex', min: 0, max: 59, step: 1 }),
   },
 }
 
-export const initialSpinbuttonData = numericData()
+export const initialSpinbuttonData = spinbuttonVariants.numeric.data
 export const spinbuttonOptions: PatternOptions = spinbuttonVariants.numeric.options
 
 const computeDelta = (direction: unknown, step: number, large: number): number => {

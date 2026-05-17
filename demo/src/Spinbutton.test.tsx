@@ -12,7 +12,7 @@ function SpinbuttonDemo({ onEvent, variant }: { onEvent?: (event: PatternEvent) 
     onEvent?.(event)
     setData((current) => reduceSpinbuttonData(current, event, init.options))
   }
-  return <Spinbutton data={data} options={init.options} onEvent={handleEvent} />
+  return <Spinbutton data={data} onEvent={handleEvent} />
 }
 
 describe('Spinbutton — numeric variant', () => {

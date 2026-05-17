@@ -7,12 +7,11 @@ type Props = HTMLAttributes<HTMLElement>
 export function Treegrid({
   data,
   onEvent,
-  options,
 }: {
   data: PatternData
   onEvent: (event: PatternEvent) => void
-  options?: PatternOptions
 }) {
+  const options = ((data.state as { options?: PatternOptions } | undefined)?.options ?? {}) as PatternOptions
   const runtime = createPatternRuntime({
     definition: treegridDefinition,
     data,

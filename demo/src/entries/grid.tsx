@@ -32,7 +32,7 @@ export const entry: PatternEntry = {
       sourceNames: ['Grid.tsx', 'gridData.ts', 'grid/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
       inspect: renderGridInspect(host.data),
       variants: <GridVariantMenu value={host.variant} onChange={host.selectVariant} />,
-      preview: <Grid data={host.data} options={{ focusStrategy: 'rovingTabIndex', selectionMode: (host.data.state as { multiselectable?: boolean } | undefined)?.multiselectable ? 'multiple' : 'single' }} onEvent={(event) => {
+      preview: <Grid data={host.data} onEvent={(event) => {
         onEvent(event)
         host.dispatchEvent(event)
       }} />,

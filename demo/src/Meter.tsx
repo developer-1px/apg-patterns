@@ -6,13 +6,14 @@ type Props = HTMLAttributes<HTMLElement>
 
 export function Meter({
   data,
+  options: providedOptions,
   onEvent,
-  options,
 }: {
   data: PatternData
+  options?: PatternOptions
   onEvent?: (event: PatternEvent) => void
-  options: PatternOptions
 }) {
+  const options = providedOptions ?? (((data.state as { options?: PatternOptions } | undefined)?.options ?? {}) as PatternOptions)
   const runtime = createPatternRuntime({
     definition: meterDefinition,
     data,
