@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import type { HTMLAttributes } from 'react'
 import { createPatternRuntime, listboxDefinition, type PatternData } from '../../src'
 import { patternItems, type PatternKey } from './demoPatterns'
@@ -8,23 +7,19 @@ type Props = HTMLAttributes<HTMLElement>
 export const patternMenuKeyboardShortcuts = listboxDefinition.keyboard.map((binding) => binding.shortcut)
 
 export function PatternMenu({ value, onChange }: { value: PatternKey; onChange: (value: PatternKey) => void }) {
-  const data = useMemo(() => createPatternMenuData(value), [value])
-  const runtime = useMemo(
-    () =>
-      createPatternRuntime({
-        definition: listboxDefinition,
-        data,
-        options: { focusStrategy: 'rovingTabIndex', selectionMode: 'single' },
-        onEvent: (event) => {
-          if (event.type === 'select') selectPattern(event.keys[0], onChange)
-        },
-        onDataChange: (nextData, event) => {
-          if (event.type === 'navigate') selectPattern(nextData.state?.activeKey, onChange)
-        },
-        keyToElementId: (key) => `pattern-${key}`,
-      }),
-    [data, onChange],
-  )
+  const data = createPatternMenuData(value)
+  const runtime = createPatternRuntime({
+    definition: listboxDefinition,
+    data,
+    options: { focusStrategy: 'rovingTabIndex', selectionMode: 'single' },
+    onEvent: (event) => {
+      if (event.type === 'select') selectPattern(event.keys[0], onChange)
+    },
+    onDataChange: (nextData, event) => {
+      if (event.type === 'navigate') selectPattern(nextData.state?.activeKey, onChange)
+    },
+    keyToElementId: (key) => `pattern-${key}`,
+  })
   const rootProps = runtime.getPartProps('listbox') as Props
 
   return (

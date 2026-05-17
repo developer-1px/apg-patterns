@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import type { HTMLAttributes } from 'react'
 import { createPatternRuntime, listboxDefinition, type PatternData } from '../../src'
 import { treeVariantItems, type TreeVariantKey } from './treeVariants'
@@ -6,23 +5,19 @@ import { treeVariantItems, type TreeVariantKey } from './treeVariants'
 type Props = HTMLAttributes<HTMLElement>
 
 export function TreeVariantMenu({ value, onChange }: { value: TreeVariantKey; onChange: (value: TreeVariantKey) => void }) {
-  const data = useMemo(() => createTreeVariantData(value), [value])
-  const runtime = useMemo(
-    () =>
-      createPatternRuntime({
-        definition: listboxDefinition,
-        data,
-        options: { focusStrategy: 'rovingTabIndex', selectionMode: 'single' },
-        onEvent: (event) => {
-          if (event.type === 'select') selectVariant(event.keys[0], onChange)
-        },
-        onDataChange: (nextData, event) => {
-          if (event.type === 'navigate') selectVariant(nextData.state?.activeKey, onChange)
-        },
-        keyToElementId: (key) => `tree-variant-${key}`,
-      }),
-    [data, onChange],
-  )
+  const data = createTreeVariantData(value)
+  const runtime = createPatternRuntime({
+    definition: listboxDefinition,
+    data,
+    options: { focusStrategy: 'rovingTabIndex', selectionMode: 'single' },
+    onEvent: (event) => {
+      if (event.type === 'select') selectVariant(event.keys[0], onChange)
+    },
+    onDataChange: (nextData, event) => {
+      if (event.type === 'navigate') selectVariant(nextData.state?.activeKey, onChange)
+    },
+    keyToElementId: (key) => `tree-variant-${key}`,
+  })
   const rootProps = runtime.getPartProps('listbox') as Props
 
   return (

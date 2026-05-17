@@ -1,17 +1,19 @@
-import { useLayoutEffect, useMemo, useRef } from 'react'
+import { useLayoutEffect, useRef } from 'react'
 import type { HTMLAttributes, KeyboardEvent as ReactKeyboardEvent } from 'react'
-import { createPatternRuntime, menuButtonDefinition, type PatternOptions } from '../../src'
+import { createPatternRuntime, menuButtonDefinition } from '../../src'
 import { Icon } from './Icon'
 import type { MenuProps } from './menuTypes'
 
 type Props = HTMLAttributes<HTMLElement>
 
 export function MenuButton({ data, onEvent, focusStrategy = 'rovingTabIndex' }: MenuProps) {
-  const options = useMemo<PatternOptions>(() => ({ focusStrategy }), [focusStrategy])
-  const runtime = useMemo(
-    () => createPatternRuntime({ definition: menuButtonDefinition, data, options, onEvent, keyToElementId: (key) => `mb-${key}` }),
-    [data, onEvent, options],
-  )
+  const runtime = createPatternRuntime({
+    definition: menuButtonDefinition,
+    data,
+    options: { focusStrategy },
+    onEvent,
+    keyToElementId: (key) => `mb-${key}`,
+  })
   const triggerKey = data.relations?.rootKeys?.[0]
   const menuKey = triggerKey ? data.relations?.controlsByKey?.[triggerKey]?.[0] : undefined
   const expanded = triggerKey ? data.state?.expandedKeys?.includes(triggerKey) ?? false : false

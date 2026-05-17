@@ -1,5 +1,4 @@
 import type { HTMLAttributes, KeyboardEvent } from 'react'
-import { useMemo } from 'react'
 import type { KeyInput } from '@interactive-os/keyboard'
 import { checkboxDefinition, createPatternRuntime, type PatternData, type PatternEvent } from '../../src'
 import { Icon } from './Icon'
@@ -18,17 +17,13 @@ export function Checkbox({
   onEvent: (event: PatternEvent) => void
   groupLabel?: string
 }) {
-  const runtime = useMemo(
-    () =>
-      createPatternRuntime({
-        definition: checkboxDefinition,
-        data,
-        options: {},
-        onEvent,
-        keyToElementId: (key) => `checkbox-${key}`,
-      }),
-    [data, onEvent],
-  )
+  const runtime = createPatternRuntime({
+    definition: checkboxDefinition,
+    data,
+    options: {},
+    onEvent,
+    keyToElementId: (key) => `checkbox-${key}`,
+  })
 
   const rootKeys = data.relations?.rootKeys ?? []
   if (rootKeys.length === 0) return null

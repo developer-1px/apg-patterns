@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from 'react'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useTabsPattern, type PatternData, type PatternEvent } from '../../src'
 
 type SourceTabKey = string
@@ -18,8 +18,8 @@ interface SourceTabsViewProps<T extends SourceTabKey> {
 }
 
 export function useSourceTabs<T extends SourceTabKey>({ label, tabs, value, onChange }: UseSourceTabsInput<T>) {
-  const data = useMemo(() => createSourceTabsData(label, tabs, value), [label, tabs, value])
-  const tabSet = useMemo(() => new Set<SourceTabKey>(tabs), [tabs])
+  const data = createSourceTabsData(label, tabs, value)
+  const tabSet = new Set<SourceTabKey>(tabs)
   const previousValueRef = useRef(value)
 
   const runtime = useTabsPattern({

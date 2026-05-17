@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import type { HTMLAttributes } from 'react'
 import { createPatternRuntime, listboxDefinition, type PatternData } from '../../src'
 
@@ -17,23 +16,19 @@ export function VariantListbox<T extends string>({
   idPrefix: string
   onChange: (value: T) => void
 }) {
-  const data = useMemo(() => createVariantData(value, items, label), [value, items, label])
-  const runtime = useMemo(
-    () =>
-      createPatternRuntime({
-        definition: listboxDefinition,
-        data,
-        options: { focusStrategy: 'rovingTabIndex', selectionMode: 'single' },
-        onEvent: (event) => {
-          if (event.type === 'select') selectVariant(event.keys[0], items, onChange)
-        },
-        onDataChange: (nextData, event) => {
-          if (event.type === 'navigate') selectVariant(nextData.state?.activeKey, items, onChange)
-        },
-        keyToElementId: (key) => `${idPrefix}-${key}`,
-      }),
-    [data, idPrefix, items, onChange],
-  )
+  const data = createVariantData(value, items, label)
+  const runtime = createPatternRuntime({
+    definition: listboxDefinition,
+    data,
+    options: { focusStrategy: 'rovingTabIndex', selectionMode: 'single' },
+    onEvent: (event) => {
+      if (event.type === 'select') selectVariant(event.keys[0], items, onChange)
+    },
+    onDataChange: (nextData, event) => {
+      if (event.type === 'navigate') selectVariant(nextData.state?.activeKey, items, onChange)
+    },
+    keyToElementId: (key) => `${idPrefix}-${key}`,
+  })
   const rootProps = runtime.getPartProps('listbox') as Props
 
   return (

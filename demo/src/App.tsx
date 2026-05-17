@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { PatternEvent } from '../../src'
 import { PatternMenu } from './PatternMenu'
 import { type PatternKey, useDemoPatterns } from './demoPatterns'
@@ -28,10 +28,6 @@ export function App() {
   const sourceTabs = useSourceTabs({ label: 'source files', tabs: sourceNames, value: activeSourceName, onChange: setSourceName })
   const rightModeTabs = useSourceTabs({ label: 'right panel', tabs: rightModes, value: rightMode, onChange: setRightMode })
   const eventLog = events.map((event) => JSON.stringify(event)).join('\n') || 'none'
-
-  useEffect(() => {
-    if (!sourceNames.includes(sourceName)) setSourceName(sourceNames[0])
-  }, [sourceName, sourceNames])
 
   return (
     <main className="grid h-screen grid-cols-1 grid-rows-[auto_minmax(0,1fr)_minmax(260px,40vh)] gap-8 bg-white px-6 py-5 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 lg:grid-cols-[180px_minmax(360px,1fr)_minmax(380px,0.9fr)] lg:grid-rows-[minmax(0,1fr)]">

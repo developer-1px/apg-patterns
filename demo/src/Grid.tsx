@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 import type { HTMLAttributes, KeyboardEvent } from 'react'
 import { createPatternRuntime, gridDefinition, gridRows, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
 import { Icon, type IconName } from './Icon'
@@ -20,39 +20,35 @@ export function Grid({
   const valueByKey = data.state?.valueByKey ?? {}
   const sortByKey = data.state?.sortByKey ?? {}
 
-  const runtime = useMemo(
-    () =>
-      createPatternRuntime({
-        definition: gridDefinition,
-        data,
-        options: { focusStrategy: 'rovingTabIndex', selectionMode: 'single', ...options },
-        onEvent: (event) => {
-          // Translate Enter/F2 activate into edit-mode entry for editable cells, sort toggle for headers.
-          if (event.type === 'activate') {
-            const key = event.key
-            const isHeader = data.items[key]?.kind === 'columnheader'
-            if (isHeader) {
-              const current = sortByKey[key]
-              const next: 'ascending' | 'descending' | 'other' = current === 'ascending' ? 'descending' : 'ascending'
-              onEvent({ type: 'extension', name: 'gridSort', key, payload: { sort: next } })
-              return
-            }
-            if (editableKeys.includes(key)) {
-              setEditingKey(key)
-              setEditDraft(String(valueByKey[key] ?? data.items[key]?.label ?? ''))
-              return
-            }
-          }
-          if (event.type === 'dismiss') {
-            setEditingKey(null)
-            return
-          }
-          onEvent(event)
-        },
-        keyToElementId: (key) => `gridcell-${key}`,
-      }),
-    [data, onEvent, options, editableKeys, valueByKey, sortByKey],
-  )
+  const runtime = createPatternRuntime({
+    definition: gridDefinition,
+    data,
+    options: { focusStrategy: 'rovingTabIndex', selectionMode: 'single', ...options },
+    onEvent: (event) => {
+      // Translate Enter/F2 activate into edit-mode entry for editable cells, sort toggle for headers.
+      if (event.type === 'activate') {
+        const key = event.key
+        const isHeader = data.items[key]?.kind === 'columnheader'
+        if (isHeader) {
+          const current = sortByKey[key]
+          const next: 'ascending' | 'descending' | 'other' = current === 'ascending' ? 'descending' : 'ascending'
+          onEvent({ type: 'extension', name: 'gridSort', key, payload: { sort: next } })
+          return
+        }
+        if (editableKeys.includes(key)) {
+          setEditingKey(key)
+          setEditDraft(String(valueByKey[key] ?? data.items[key]?.label ?? ''))
+          return
+        }
+      }
+      if (event.type === 'dismiss') {
+        setEditingKey(null)
+        return
+      }
+      onEvent(event)
+    },
+    keyToElementId: (key) => `gridcell-${key}`,
+  })
 
   useLayoutEffect(() => {
     const activeKey = data.state?.activeKey

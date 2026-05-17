@@ -1,17 +1,19 @@
-import { useCallback, useLayoutEffect, useMemo, useRef } from 'react'
+import { useLayoutEffect, useRef } from 'react'
 import type { HTMLAttributes, KeyboardEvent as ReactKeyboardEvent } from 'react'
-import { createPatternRuntime, menubarDefinition, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
+import { createPatternRuntime, menubarDefinition, type PatternData, type PatternEvent } from '../../src'
 import { Icon } from './Icon'
 import type { MenuProps } from './menuTypes'
 
 type Props = HTMLAttributes<HTMLElement>
 
 export function Menubar({ data, onEvent }: MenuProps) {
-  const options = useMemo<PatternOptions>(() => ({ focusStrategy: 'rovingTabIndex', orientation: 'horizontal' }), [])
-  const runtime = useMemo(
-    () => createPatternRuntime({ definition: menubarDefinition, data, options, onEvent, keyToElementId: (key) => `menubar-${key}` }),
-    [data, onEvent, options],
-  )
+  const runtime = createPatternRuntime({
+    definition: menubarDefinition,
+    data,
+    options: { focusStrategy: 'rovingTabIndex', orientation: 'horizontal' },
+    onEvent,
+    keyToElementId: (key) => `menubar-${key}`,
+  })
   const rootKeys = data.relations?.rootKeys ?? []
   const typeahead = useTypeahead(data, rootKeys, onEvent)
   const rootProps = runtime.getPartProps('menubar') as Props
@@ -52,7 +54,7 @@ function RootMenuItem({ itemKey, data, runtime, expanded }: { itemKey: string; d
 
 function Submenu({ data, ownerKey, onEvent, onClose }: { data: PatternData; ownerKey: string; onEvent: (event: PatternEvent) => void; onClose: () => void }) {
   const children = data.relations?.childrenByKey?.[ownerKey] ?? []
-  const radioGroup = useMemo(() => children.filter((key) => (data.items[key] as { kind?: string } | undefined)?.kind === 'menuitemradio'), [children, data.items])
+  const radioGroup = children.filter((key) => (data.items[key] as { kind?: string } | undefined)?.kind === 'menuitemradio')
   return (
     <ul role="menu" aria-labelledby={`menubar-${ownerKey}`} className="ml-2 grid w-56 gap-0.5 rounded border border-zinc-200 bg-white p-1 text-sm shadow dark:border-zinc-800 dark:bg-zinc-950" onKeyDown={(event) => {
       if (event.key === 'Escape' || event.key === 'ArrowLeft') {
@@ -95,7 +97,7 @@ function SubmenuItem({ itemKey, data, radioGroup, onEvent, onClose }: { itemKey:
 
 function useTypeahead(data: PatternData, rootKeys: readonly string[], onEvent: (event: PatternEvent) => void) {
   const ref = useRef<{ query: string; timer: number | null }>({ query: '', timer: null })
-  return useCallback((char: string) => {
+  return (char: string) => {
     const state = ref.current
     state.query += char.toLowerCase()
     if (state.timer !== null) window.clearTimeout(state.timer)
@@ -107,7 +109,7 @@ function useTypeahead(data: PatternData, rootKeys: readonly string[], onEvent: (
     const ordered = [...rootKeys.slice(start + 1), ...rootKeys.slice(0, start + 1)]
     const match = ordered.find((key) => (data.items[key]?.label ?? '').toLowerCase().startsWith(state.query))
     if (match) onEvent({ type: 'focus', key: match })
-  }, [data, onEvent, rootKeys])
+  }
 }
 
 function handleMenubarKey(event: ReactKeyboardEvent, baseKeyDown: ((event: ReactKeyboardEvent) => void) | undefined, typeahead: (char: string) => void) {

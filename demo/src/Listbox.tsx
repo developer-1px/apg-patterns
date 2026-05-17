@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useMemo, useRef } from 'react'
+import { useLayoutEffect, useRef } from 'react'
 import type { HTMLAttributes, KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent } from 'react'
 import { createPatternRuntime, listboxDefinition, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
 
@@ -27,17 +27,13 @@ export function Listbox({
   scrollable?: boolean
   ariaLabelledBy?: string
 }) {
-  const runtime = useMemo(
-    () =>
-      createPatternRuntime({
-        definition: listboxDefinition,
-        data,
-        options: { focusStrategy: 'rovingTabIndex', selectionMode: 'single', ...options },
-        onEvent,
-        keyToElementId: (key) => `option-${key}`,
-      }),
-    [data, onEvent, options],
-  )
+  const runtime = createPatternRuntime({
+    definition: listboxDefinition,
+    data,
+    options: { focusStrategy: 'rovingTabIndex', selectionMode: 'single', ...options },
+    onEvent,
+    keyToElementId: (key) => `option-${key}`,
+  })
 
   useLayoutEffect(() => {
     const activeKey = data.state?.activeKey
@@ -48,61 +44,55 @@ export function Listbox({
   // ── Type-ahead (APG: printable character search) ──
   const typeaheadRef = useRef<{ query: string; timer: number | null }>({ query: '', timer: null })
   const visibleKeys = data.relations?.rootKeys ?? []
-  const handleTypeahead = useCallback(
-    (char: string) => {
-      const lower = char.toLowerCase()
-      const state = typeaheadRef.current
-      state.query += lower
-      if (state.timer !== null) window.clearTimeout(state.timer)
-      state.timer = window.setTimeout(() => {
-        state.query = ''
-        state.timer = null
-      }, 500)
-      const query = state.query
-      const start = data.state?.activeKey ? visibleKeys.indexOf(data.state.activeKey) : -1
-      const ordered = [...visibleKeys.slice(start + 1), ...visibleKeys.slice(0, start + 1)]
-      const match = ordered.find((k) => {
-        const item = data.items[k]
-        const text = (item?.textValue ?? item?.label ?? '').toLowerCase()
-        return text.startsWith(query)
-      })
-      if (match) onEvent({ type: 'focus', key: match })
-    },
-    [data, onEvent, visibleKeys],
-  )
+  const handleTypeahead = (char: string) => {
+    const lower = char.toLowerCase()
+    const state = typeaheadRef.current
+    state.query += lower
+    if (state.timer !== null) window.clearTimeout(state.timer)
+    state.timer = window.setTimeout(() => {
+      state.query = ''
+      state.timer = null
+    }, 500)
+    const query = state.query
+    const start = data.state?.activeKey ? visibleKeys.indexOf(data.state.activeKey) : -1
+    const ordered = [...visibleKeys.slice(start + 1), ...visibleKeys.slice(0, start + 1)]
+    const match = ordered.find((k) => {
+      const item = data.items[k]
+      const text = (item?.textValue ?? item?.label ?? '').toLowerCase()
+      return text.startsWith(query)
+    })
+    if (match) onEvent({ type: 'focus', key: match })
+  }
 
   // ── Multi-select click model (APG: Shift+Click = range, Ctrl/Cmd+Click = toggle) ──
   const selectionMode = options?.selectionMode ?? 'single'
   const isMulti = selectionMode === 'multiple'
   const selectedKeys = data.state?.selectedKeys ?? []
   const anchorKey = data.state?.anchorKey ?? data.state?.activeKey ?? null
-  const handleOptionClick = useCallback(
-    (event: ReactMouseEvent, key: string) => {
-      if (data.state?.disabledKeys?.includes(key)) return
-      if (!isMulti) return // fall through to runtime click handler
-      event.preventDefault()
-      event.stopPropagation()
-      if (event.shiftKey && anchorKey) {
-        const start = visibleKeys.indexOf(anchorKey)
-        const end = visibleKeys.indexOf(key)
-        if (start !== -1 && end !== -1) {
-          const [lo, hi] = start < end ? [start, end] : [end, start]
-          const range = visibleKeys.slice(lo, hi + 1)
-          onEvent({ type: 'select', keys: range, anchorKey, extentKey: key })
-        }
-        return
+  const handleOptionClick = (event: ReactMouseEvent, key: string) => {
+    if (data.state?.disabledKeys?.includes(key)) return
+    if (!isMulti) return // fall through to runtime click handler
+    event.preventDefault()
+    event.stopPropagation()
+    if (event.shiftKey && anchorKey) {
+      const start = visibleKeys.indexOf(anchorKey)
+      const end = visibleKeys.indexOf(key)
+      if (start !== -1 && end !== -1) {
+        const [lo, hi] = start < end ? [start, end] : [end, start]
+        const range = visibleKeys.slice(lo, hi + 1)
+        onEvent({ type: 'select', keys: range, anchorKey, extentKey: key })
       }
-      if (event.ctrlKey || event.metaKey) {
-        const next = new Set(selectedKeys)
-        if (next.has(key)) next.delete(key)
-        else next.add(key)
-        onEvent({ type: 'select', keys: [...next], anchorKey: key, extentKey: key })
-        return
-      }
-      onEvent({ type: 'select', keys: [key], anchorKey: key, extentKey: key })
-    },
-    [anchorKey, data.state?.disabledKeys, isMulti, onEvent, selectedKeys, visibleKeys],
-  )
+      return
+    }
+    if (event.ctrlKey || event.metaKey) {
+      const next = new Set(selectedKeys)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      onEvent({ type: 'select', keys: [...next], anchorKey: key, extentKey: key })
+      return
+    }
+    onEvent({ type: 'select', keys: [key], anchorKey: key, extentKey: key })
+  }
 
   // ── Root keyboard wrapper — adds typeahead + multi-select Shift+Arrow / Ctrl+A ──
   const rootProps = runtime.getPartProps('listbox') as Props

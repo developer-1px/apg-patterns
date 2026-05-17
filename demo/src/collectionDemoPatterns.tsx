@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { gridDefinition, listboxDefinition, reducePatternData, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
 import { initialData, reduceData, resolveTarget } from './demoData'
 import { Grid } from './Grid'
@@ -45,10 +45,7 @@ function useTreeDemoPattern(onEvent: EmitPatternEvent): DemoPattern {
   const [focusStrategy, setFocusStrategy] = useState<'rovingTabIndex' | 'ariaActiveDescendant'>('rovingTabIndex')
   const [itemClickAction, setItemClickAction] = useState<'select' | 'toggleExpand' | 'none'>('select')
   const [inspectMode, setInspectMode] = useState<'aria' | 'html'>('aria')
-  const treeOptions = useMemo<PatternOptions>(
-    () => ({ focusStrategy, followFocus, itemClickAction, indicatorClickAction: 'toggleExpand' }),
-    [focusStrategy, followFocus, itemClickAction],
-  )
+  const treeOptions: PatternOptions = { focusStrategy, followFocus, itemClickAction, indicatorClickAction: 'toggleExpand' }
   const dispatchTree = (event: PatternEvent | { type: 'reset' }) => {
     if (event.type === 'reset') return setTreeData(treeVariants[treeVariant].data)
     setTreeData((current) => reduceData(current, event))

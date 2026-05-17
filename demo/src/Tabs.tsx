@@ -41,7 +41,6 @@ export function Tabs({
       return
     }
     if (!activeKey) return
-    if (!tablistRef.current?.contains(document.activeElement)) return
     const prefix = (mergedOptions as { elementIdPrefix?: string }).elementIdPrefix ?? 'tab-'
     const id = `${prefix}${activeKey.toLowerCase().replace(/[^a-z0-9_-]+/g, '-')}`
     document.getElementById(id)?.focus({ preventScroll: true })
