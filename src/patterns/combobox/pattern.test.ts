@@ -17,144 +17,11 @@
  *       predicate 'isPopupOpen' → expandedKeys.includes('combobox').
  */
 import { describe, expect, it } from 'vitest'
-import {
-  AriaSources,
-  DomEvents,
-  KeyTokens,
-  createPatternRuntime,
-  defineAriaSource,
-  defineKeyToken,
-  defineNavigationTarget,
-  definePredicate,
-  defineVisibleOrder,
-  type PatternDefinition,
-  type PatternEvent,
-} from '../../index'
-
-// ── Token registrations ────────────────────────────────────────────
-
-const COMBOBOX_KEY = 'combobox'
-const COMBOBOX_TOKEN = '$combobox'
-defineKeyToken(COMBOBOX_TOKEN, () => COMBOBOX_KEY)
+import { createPatternRuntime, type PatternEvent } from '../../index'
+import { COMBOBOX_KEY, comboboxDefinition } from './definition'
 
 // aria-expanded must be explicit false when collapsed-but-expandable.
 // Kernel's 'state.expandedKeys' returns true|undefined (suppresses false). We need true|false.
-defineAriaSource('combobox.popupOpen', (ctx) => ctx.data.state?.expandedKeys?.includes(COMBOBOX_KEY) ?? false)
-
-// aria-haspopup / aria-autocomplete live on PatternOptions (passthrough).
-defineAriaSource('combobox.haspopup', (ctx) => (ctx.options as Record<string, unknown>).haspopup ?? 'listbox')
-defineAriaSource('combobox.autocomplete', (ctx) => (ctx.options as Record<string, unknown>).autocomplete ?? 'list')
-
-// visibleOrder — options only (exclude the synthetic combobox key).
-defineVisibleOrder('comboboxOptions', (_v, data) => Object.keys(data.items).filter((k) => k !== COMBOBOX_KEY))
-
-// navigationTarget — linear over options (skip combobox).
-defineNavigationTarget('optionLinear', (target, ctx) => {
-  const options = ctx.visibleKeys
-  if (options.length === 0) return null
-  const direction = (target as unknown as { direction: string }).direction
-  const currentIdx = ctx.activeKey === COMBOBOX_KEY ? -1 : options.indexOf(ctx.activeKey)
-  if (direction === 'next') return options[Math.min(currentIdx + 1, options.length - 1)] ?? options[0]
-  if (direction === 'previous') return currentIdx <= 0 ? options[0] : options[currentIdx - 1]
-  if (direction === 'first') return options[0]
-  if (direction === 'last') return options[options.length - 1]
-  return null
-})
-
-definePredicate('isPopupOpen', (_p, ctx) => ctx.data.state?.expandedKeys?.includes(COMBOBOX_KEY) ?? false)
-
-// ── Definition ─────────────────────────────────────────────────────
-
-const comboboxDefinition: PatternDefinition = {
-  apgPattern: 'combobox',
-  rootRole: 'combobox',
-  containedRoles: ['listbox', 'option'],
-  focusModel: 'ariaActiveDescendant',
-  parts: {
-    combobox: {
-      role: 'combobox',
-      aria: [
-        { attribute: 'aria-expanded', from: 'combobox.popupOpen' },
-        { attribute: 'aria-haspopup', from: 'combobox.haspopup' },
-        { attribute: 'aria-autocomplete', from: 'combobox.autocomplete' },
-        { attribute: 'aria-controls', from: AriaSources.relations.controlsByKey },
-        { attribute: 'aria-activedescendant', from: AriaSources.state.activeKeyElementId },
-        { attribute: 'aria-label', from: AriaSources.refs.label },
-      ],
-      events: [
-        {
-          event: DomEvents.input,
-          events: [{ type: 'extension', name: 'input', payload: { source: 'combobox' } }],
-        },
-      ],
-    },
-    listbox: {
-      role: 'listbox',
-      aria: [{ attribute: 'aria-label', from: AriaSources.items.label }],
-    },
-    option: {
-      role: 'option',
-      aria: [{ attribute: 'aria-selected', from: AriaSources.state.selectedKeys }],
-      state: [
-        { name: 'active', from: 'state.activeKey' },
-        { name: 'selected', from: 'state.selectedKeys' },
-      ],
-    },
-  },
-  navigation: {
-    visibleOrder: { kind: 'comboboxOptions' },
-    targets: {
-      next: { kind: 'optionLinear', direction: 'next' },
-      previous: { kind: 'optionLinear', direction: 'previous' },
-      first: { kind: 'optionLinear', direction: 'first' },
-      last: { kind: 'optionLinear', direction: 'last' },
-    },
-  },
-  keyboard: [
-    {
-      shortcut: 'ArrowDown',
-      preventDefault: true,
-      cases: [
-        // Popup closed → open it + move to first option.
-        {
-          case: 'when',
-          when: { kind: 'not', predicate: { kind: 'extension', name: 'isPopupOpen' } },
-          events: [
-            { type: 'expand', key: COMBOBOX_TOKEN, expanded: true },
-            { type: 'navigate', direction: 'first' },
-          ],
-        },
-        // Popup open → navigate next.
-        { case: 'otherwise', events: [{ type: 'navigate', direction: 'next' }] },
-      ],
-    },
-    {
-      shortcut: 'ArrowUp',
-      preventDefault: true,
-      cases: [{ case: 'always', events: [{ type: 'navigate', direction: 'previous' }] }],
-    },
-    {
-      shortcut: 'Enter',
-      preventDefault: true,
-      cases: [
-        {
-          case: 'when',
-          when: { kind: 'extension', name: 'isPopupOpen' },
-          events: [
-            { type: 'select', key: KeyTokens.activeKey },
-            { type: 'expand', key: COMBOBOX_TOKEN, expanded: false },
-          ],
-        },
-      ],
-    },
-    {
-      shortcut: 'Escape',
-      preventDefault: true,
-      cases: [{ case: 'always', events: [{ type: 'expand', key: COMBOBOX_TOKEN, expanded: false }] }],
-    },
-  ],
-}
-
 // ── Fixture ────────────────────────────────────────────────────────
 
 const makeData = (overrides: { activeKey?: string | null; expanded?: boolean; selectedKeys?: readonly string[] } = {}) => ({
@@ -236,6 +103,25 @@ describe('combobox pattern', () => {
     expect(events).toEqual([
       { type: 'select', keys: ['banana'], anchorKey: 'banana', extentKey: 'banana' },
       { type: 'expand', key: COMBOBOX_KEY, expanded: false },
+    ])
+  })
+
+  it('ArrowUp on a closed combobox opens popup and focuses last option', () => {
+    const { runtime, events } = makeRuntime()
+    runtime.getRootKeyboardHandler()(press('ArrowUp'))
+    expect(events).toEqual([
+      { type: 'expand', key: COMBOBOX_KEY, expanded: true },
+      { type: 'navigate', direction: 'last' },
+    ])
+  })
+
+  it('Home on an open popup navigates to first; End to last', () => {
+    const { runtime, events } = makeRuntime({ activeKey: 'banana', expanded: true })
+    runtime.getRootKeyboardHandler()(press('Home'))
+    runtime.getRootKeyboardHandler()(press('End'))
+    expect(events).toEqual([
+      { type: 'navigate', direction: 'first' },
+      { type: 'navigate', direction: 'last' },
     ])
   })
 

@@ -11,7 +11,14 @@ export const listboxDefinition = PatternDefinitionSchema.parse({
       keySource: 'relations.rootKeys',
       aria: [
         { attribute: 'aria-label', from: 'refs.label' },
+        { attribute: 'aria-labelledby', from: 'refs.labelledBy' },
         { attribute: 'aria-multiselectable', from: 'options.selectionMode.multiple' },
+        { attribute: 'aria-orientation', from: 'options.orientation' },
+        {
+          attribute: 'aria-activedescendant',
+          from: 'state.activeKey.elementId',
+          when: { kind: 'optionEquals', option: 'focusStrategy', value: 'ariaActiveDescendant' },
+        },
       ],
     },
     option: {
@@ -20,6 +27,8 @@ export const listboxDefinition = PatternDefinitionSchema.parse({
       aria: [
         { attribute: 'aria-selected', from: 'state.selectedKeys' },
         { attribute: 'aria-disabled', from: 'state.disabledKeys' },
+        { attribute: 'aria-posinset', from: 'state.posInSetByKey' },
+        { attribute: 'aria-setsize', from: 'state.setSizeByKey' },
       ],
       focus: {
         tabIndex: {
@@ -54,5 +63,6 @@ export const listboxDefinition = PatternDefinitionSchema.parse({
     { shortcut: 'Home', preventDefault: true, cases: [{ case: 'always', events: [{ type: 'navigate', direction: 'first' }] }] },
     { shortcut: 'End', preventDefault: true, cases: [{ case: 'always', events: [{ type: 'navigate', direction: 'last' }] }] },
     { shortcut: 'Enter', preventDefault: true, cases: [{ case: 'when', when: { kind: 'hasActiveKey' }, events: [{ type: 'select', key: '$activeKey' }] }] },
+    { shortcut: 'Space', preventDefault: true, cases: [{ case: 'when', when: { kind: 'hasActiveKey' }, events: [{ type: 'select', key: '$activeKey' }] }] },
   ],
 })

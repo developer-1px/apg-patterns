@@ -1,0 +1,152 @@
+import { useLayoutEffect, useMemo, useRef, useState } from 'react'
+import type { HTMLAttributes, InputHTMLAttributes, KeyboardEvent } from 'react'
+import { COMBOBOX_KEY, comboboxDefinition, createPatternRuntime, type PatternData, type PatternEvent } from '../../src'
+import { FRUITS, filterFruits, firstMatch } from './comboboxData'
+
+type RootProps = InputHTMLAttributes<HTMLInputElement> & { onKeyDown: (e: KeyboardEvent) => void }
+
+export function Combobox({
+  data,
+  variant,
+  onEvent,
+  onVisibleKeysChange,
+}: {
+  data: PatternData
+  variant: 'selectOnly' | 'autocompleteList' | 'autocompleteBoth'
+  onEvent: (event: PatternEvent) => void
+  onVisibleKeysChange?: (keys: readonly string[]) => void
+}) {
+  const autocomplete = variant === 'selectOnly' ? 'none' : variant === 'autocompleteList' ? 'list' : 'both'
+  const editable = variant !== 'selectOnly'
+  const listboxId = 'combobox-popup'
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [query, setQuery] = useState('')
+  const [inlineCompletion, setInlineCompletion] = useState<{ start: number; end: number } | null>(null)
+
+  const runtime = useMemo(
+    () =>
+      createPatternRuntime({
+        definition: comboboxDefinition,
+        data,
+        options: { focusStrategy: 'ariaActiveDescendant', haspopup: 'listbox', autocomplete },
+        onEvent,
+        keyToElementId: (key) => `combobox-option-${key}`,
+      }),
+    [data, onEvent, autocomplete],
+  )
+
+  const rootProps = runtime.getPartProps('combobox') as unknown as RootProps
+  const listProps = runtime.getPartProps('listbox') as HTMLAttributes<HTMLElement>
+  const open = data.state?.expandedKeys?.includes(COMBOBOX_KEY) ?? false
+  const selectedKey = data.state?.selectedKeys?.[0]
+  const visibleKeys = Object.keys(data.items).filter((k) => k !== COMBOBOX_KEY)
+  const selectedLabel = selectedKey ? data.items[selectedKey]?.label ?? '' : ''
+
+  // Compute displayed input value: query (editable) or selected label (select-only).
+  const displayValue = editable ? query : selectedLabel
+
+  useLayoutEffect(() => {
+    if (!editable) return
+    // When the parent committed a selection (selectedKey changed via Enter), sync the query.
+    if (selectedKey && !open) setQuery(data.items[selectedKey]?.label ?? '')
+  }, [selectedKey, open, editable, data.items])
+
+  useLayoutEffect(() => {
+    if (variant === 'autocompleteBoth' && inlineCompletion && inputRef.current) {
+      inputRef.current.setSelectionRange(inlineCompletion.start, inlineCompletion.end)
+    }
+  }, [inlineCompletion, variant])
+
+  const handleInput = (next: string) => {
+    setQuery(next)
+    setInlineCompletion(null)
+    if (variant === 'selectOnly') return
+    const filtered = filterFruits(next)
+    onVisibleKeysChange?.(filtered)
+    // Open popup on typing.
+    if (!open) onEvent({ type: 'expand', key: COMBOBOX_KEY, expanded: true })
+    if (variant === 'autocompleteBoth' && next.length > 0) {
+      const match = firstMatch(next)
+      if (match) {
+        const matchLabel = FRUITS.find((f) => f.key === match)?.label ?? ''
+        if (matchLabel.toLowerCase().startsWith(next.toLowerCase()) && matchLabel.length > next.length) {
+          setQuery(matchLabel)
+          setInlineCompletion({ start: next.length, end: matchLabel.length })
+          onEvent({ type: 'focus', key: match })
+          return
+        }
+      }
+    }
+    // Pre-select first filtered option for visibility.
+    if (filtered.length > 0) onEvent({ type: 'focus', key: filtered[0] })
+  }
+
+  const handleSelectOnlyTypeahead = (key: string) => {
+    if (!/^[\w]$/.test(key)) return false
+    const nextQuery = query + key.toLowerCase()
+    setQuery(nextQuery)
+    const match = firstMatch(nextQuery) ?? firstMatch(key)
+    if (match) onEvent({ type: 'focus', key: match })
+    window.setTimeout(() => setQuery(''), 500)
+    return true
+  }
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    // Select-only typeahead.
+    if (variant === 'selectOnly' && event.key.length === 1 && handleSelectOnlyTypeahead(event.key)) {
+      event.preventDefault()
+      return
+    }
+    rootProps.onKeyDown?.(event as unknown as Parameters<NonNullable<RootProps['onKeyDown']>>[0])
+  }
+
+  // Wrapper container so we can host the popup as a sibling of the input.
+  return (
+    <div className="relative grid max-w-sm gap-1">
+      <input
+        ref={inputRef}
+        {...(rootProps as InputHTMLAttributes<HTMLInputElement>)}
+        type="text"
+        readOnly={!editable}
+        value={displayValue}
+        aria-controls={listboxId}
+        onChange={(e) => editable && handleInput(e.currentTarget.value)}
+        onKeyDown={handleKeyDown}
+        onClick={() => !open && onEvent({ type: 'expand', key: COMBOBOX_KEY, expanded: true })}
+        className="h-9 w-full rounded border border-zinc-300 bg-white px-2 text-sm text-zinc-900 outline-none focus:border-zinc-500 focus:outline focus:outline-2 focus:outline-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:outline-zinc-500"
+      />
+      {open ? (
+        <div
+          {...listProps}
+          id={listboxId}
+          className="absolute left-0 right-0 top-10 z-10 max-h-56 overflow-auto rounded border border-zinc-200 bg-white py-1 shadow-md dark:border-zinc-800 dark:bg-zinc-950"
+        >
+          {visibleKeys.length === 0 ? (
+            <div className="px-2 py-1.5 text-xs text-zinc-500">No matches</div>
+          ) : (
+            visibleKeys.map((key) => {
+              const optionProps = runtime.getPartProps('option', key) as HTMLAttributes<HTMLElement>
+              const state = runtime.getItemState(key, 'option')
+              return (
+                <div
+                  key={key}
+                  {...optionProps}
+                  data-active={state.active ? '' : undefined}
+                  onMouseDown={(e) => {
+                    e.preventDefault()
+                    onEvent({ type: 'select', keys: [key], anchorKey: key, extentKey: key })
+                    onEvent({ type: 'expand', key: COMBOBOX_KEY, expanded: false })
+                    if (editable) setQuery(data.items[key]?.label ?? '')
+                  }}
+                  className="cursor-pointer px-2 py-1.5 text-sm text-zinc-800 aria-selected:bg-zinc-100 aria-selected:text-zinc-950 data-active:bg-zinc-50 dark:text-zinc-200 dark:aria-selected:bg-zinc-800 dark:aria-selected:text-zinc-50 dark:data-active:bg-zinc-900"
+                >
+                  {data.items[key]?.label}
+                </div>
+              )
+            })
+          )}
+        </div>
+      ) : null}
+    </div>
+  )
+}

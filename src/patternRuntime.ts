@@ -1,5 +1,5 @@
 import { matchesShortcut, type KeyInput } from '@interactive-os/keyboard'
-import { PatternDataSchema, PatternOptionsSchema, type Key, type PatternData, type PatternEvent, type PatternOptions, type PatternDefinition, type PartEventBinding, type AriaProjection, type FocusProjection } from './schema'
+import { PatternDataSchema, PatternDefinitionSchema, PatternOptionsSchema, type Key, type PatternData, type PatternEvent, type PatternOptions, type PatternDefinition, type PartEventBinding, type AriaProjection, type FocusProjection } from './schema'
 import {
   resolveAriaSource,
   resolveStateProjection,
@@ -33,7 +33,7 @@ export interface PatternRuntime {
 export interface CreatePatternRuntimeInput {
   definition: PatternDefinition
   data: PatternData
-  options: PatternOptions
+  options?: PatternOptions
   onEvent: (event: PatternEvent) => void
   onDataChange?: (data: PatternData, event: PatternEvent) => void
   keyToElementId?: (key: Key) => string
@@ -41,9 +41,10 @@ export interface CreatePatternRuntimeInput {
 
 export function createPatternRuntime(input: CreatePatternRuntimeInput): PatternRuntime {
   // 진입 시점 fail-fast — schema 위반을 boundary 에서 잡는다.
+  const definition = PatternDefinitionSchema.parse(input.definition)
   const data = PatternDataSchema.parse(input.data)
   const options = PatternOptionsSchema.parse(input.options ?? {})
-  const { definition, onEvent, onDataChange } = input
+  const { onEvent, onDataChange } = input
   const visibleKeys = resolveVisibleOrder(definition.navigation.visibleOrder, data)
   const parentByKey = createParentByKey(data)
   const keyToElementId = input.keyToElementId ?? ((k: Key) => `${k}`)

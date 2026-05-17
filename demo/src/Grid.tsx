@@ -1,5 +1,5 @@
-import { useLayoutEffect, useMemo } from 'react'
-import type { HTMLAttributes } from 'react'
+import { useLayoutEffect, useMemo, useState } from 'react'
+import type { HTMLAttributes, KeyboardEvent } from 'react'
 import { createPatternRuntime, gridDefinition, gridRows, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
 
 type Props = HTMLAttributes<HTMLElement>
@@ -13,23 +13,75 @@ export function Grid({
   onEvent: (event: PatternEvent) => void
   options?: PatternOptions
 }) {
+  const [editingKey, setEditingKey] = useState<string | null>(null)
+  const [editDraft, setEditDraft] = useState<string>('')
+  const editableKeys = ((data.state as { editableKeys?: readonly string[] } | undefined)?.editableKeys ?? []) as readonly string[]
+  const valueByKey = data.state?.valueByKey ?? {}
+  const sortByKey = data.state?.sortByKey ?? {}
+
   const runtime = useMemo(
     () =>
       createPatternRuntime({
         definition: gridDefinition,
         data,
         options: { focusStrategy: 'rovingTabIndex', selectionMode: 'single', ...options },
-        onEvent,
+        onEvent: (event) => {
+          // Translate Enter/F2 activate into edit-mode entry for editable cells, sort toggle for headers.
+          if (event.type === 'activate') {
+            const key = event.key
+            const isHeader = data.items[key]?.kind === 'columnheader'
+            if (isHeader) {
+              const current = sortByKey[key]
+              const next: 'ascending' | 'descending' | 'other' = current === 'ascending' ? 'descending' : 'ascending'
+              onEvent({ type: 'extension', name: 'gridSort', key, payload: { sort: next } })
+              return
+            }
+            if (editableKeys.includes(key)) {
+              setEditingKey(key)
+              setEditDraft(String(valueByKey[key] ?? data.items[key]?.label ?? ''))
+              return
+            }
+          }
+          if (event.type === 'dismiss') {
+            setEditingKey(null)
+            return
+          }
+          onEvent(event)
+        },
         keyToElementId: (key) => `gridcell-${key}`,
       }),
-    [data, onEvent, options],
+    [data, onEvent, options, editableKeys, valueByKey, sortByKey],
   )
 
   useLayoutEffect(() => {
     const activeKey = data.state?.activeKey
-    if (!activeKey) return
+    if (!activeKey || editingKey) return
     document.getElementById(`gridcell-${CSS.escape(activeKey)}`)?.focus({ preventScroll: true })
-  }, [data.state?.activeKey])
+  }, [data.state?.activeKey, editingKey])
+
+  const commitEdit = () => {
+    if (editingKey) onEvent({ type: 'value', key: editingKey, value: editDraft })
+    setEditingKey(null)
+  }
+  const cancelEdit = () => setEditingKey(null)
+
+  const handleEditKeydown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      event.stopPropagation()
+      commitEdit()
+    } else if (event.key === 'Escape') {
+      event.preventDefault()
+      event.stopPropagation()
+      cancelEdit()
+    } else if (event.key === 'Tab') {
+      event.stopPropagation()
+      commitEdit()
+    } else {
+      // prevent grid navigation while editing
+      event.stopPropagation()
+    }
+  }
 
   const rows = gridRows(data)
   const rootProps = runtime.getPartProps('grid') as Props
@@ -48,14 +100,31 @@ export function Grid({
               const part = data.items[cellKey]?.kind === 'columnheader' ? 'columnheader' : 'gridcell'
               const cellProps = runtime.getPartProps(part, cellKey) as Props
               const state = runtime.getItemState(cellKey, part)
+              const isEditing = editingKey === cellKey
+              const isEditable = editableKeys.includes(cellKey)
+              const displayValue = valueByKey[cellKey] !== undefined ? String(valueByKey[cellKey]) : data.items[cellKey]?.label
+              const sortMarker = part === 'columnheader' && sortByKey[cellKey] ? (sortByKey[cellKey] === 'ascending' ? ' ▲' : ' ▼') : ''
               return (
                 <div
                   key={cellKey}
                   {...cellProps}
                   data-active={state.active ? '' : undefined}
+                  data-editable={isEditable ? '' : undefined}
                   className="min-h-9 px-2 py-2 outline-none aria-selected:bg-zinc-100 aria-selected:text-zinc-950 data-active:bg-zinc-50 focus:outline focus:outline-2 focus:outline-zinc-400 dark:aria-selected:bg-zinc-900 dark:aria-selected:text-zinc-50 dark:data-active:bg-zinc-900 dark:focus:outline-zinc-500"
                 >
-                  {data.items[cellKey]?.label}
+                  {isEditing ? (
+                    <input
+                      autoFocus
+                      data-edit=""
+                      className="w-full bg-transparent outline-none ring-1 ring-zinc-400 px-1 dark:ring-zinc-500"
+                      value={editDraft}
+                      onChange={(event) => setEditDraft(event.currentTarget.value)}
+                      onKeyDown={handleEditKeydown}
+                      onBlur={commitEdit}
+                    />
+                  ) : (
+                    <>{displayValue}{sortMarker}</>
+                  )}
                 </div>
               )
             })}

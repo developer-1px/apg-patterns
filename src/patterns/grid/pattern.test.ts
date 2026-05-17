@@ -17,6 +17,7 @@ import {
   createPatternRuntime,
   defineNavigationTarget,
   defineVisibleOrder,
+  gridDefinition as exportedGridDefinition,
   type Key,
   type PatternData,
 } from '../../index'
@@ -264,6 +265,60 @@ describe('grid via kernel (APG layout/data/advanced specimen)', () => {
     expect(runtime.visibleKeys).toEqual(['hDate', 'hType', 'hAmount', 'c11', 'c12', 'c13', 'c21', 'c22', 'c23'])
     expect(runtime.getPartProps('columnheader', 'hDate')).toMatchObject({ role: 'columnheader', 'aria-colindex': 1, 'aria-sort': 'ascending' })
     expect(runtime.getPartProps('gridcell', 'c12')).toMatchObject({ role: 'gridcell', tabIndex: 0, 'aria-rowindex': 2, 'aria-colindex': 2 })
+  })
+
+  it('exported gridDefinition advertises APG keyboard surface (PageUp/PageDown/Enter/F2/Escape)', () => {
+    const shortcuts = exportedGridDefinition.keyboard.map((b) => b.shortcut)
+    expect(shortcuts).toEqual(expect.arrayContaining(['PageUp', 'PageDown', 'Enter', 'F2', 'Escape', 'Control+Home', 'Control+End']))
+    expect(exportedGridDefinition.navigation.targets.pageDown).toEqual({ kind: 'gridPage', action: 'pageDown' })
+  })
+
+  it('exported gridDefinition emits aria-rowcount/aria-colcount/aria-readonly on grid root', () => {
+    const data = PatternDataSchema.parse({
+      items: { hA: { label: 'A' }, hB: { label: 'B' }, c1: { label: '1' }, c2: { label: '2' } },
+      relations: {
+        rowKeys: ['header', 'r1'],
+        columnKeys: ['cA', 'cB'],
+        cells: [
+          { rowKey: 'header', columnKey: 'cA', cellKey: 'hA' },
+          { rowKey: 'header', columnKey: 'cB', cellKey: 'hB' },
+          { rowKey: 'r1', columnKey: 'cA', cellKey: 'c1' },
+          { rowKey: 'r1', columnKey: 'cB', cellKey: 'c2' },
+        ],
+      },
+      state: { activeKey: 'c1', rowCount: 2, colCount: 2, readonly: true, rowIndexByKey: { c1: 2 }, columnIndexByKey: { c1: 1 } },
+      refs: { label: 'Test' },
+    })
+    const runtime = createPatternRuntime({ definition: exportedGridDefinition, data, options: { focusStrategy: 'rovingTabIndex' }, onEvent: () => undefined })
+    expect(runtime.getPartProps('grid')).toMatchObject({ 'aria-rowcount': 2, 'aria-colcount': 2, 'aria-readonly': true })
+  })
+
+  it('exported gridDefinition routes PageDown to gridPage navigation target', () => {
+    const rows: string[] = []
+    const items: Record<string, { label: string }> = {}
+    const cells: { rowKey: string; columnKey: string; cellKey: string }[] = []
+    const rowIndexByKey: Record<string, number> = {}
+    const columnIndexByKey: Record<string, number> = {}
+    for (let r = 0; r < 10; r += 1) {
+      rows.push(`r${r}`)
+      for (let c = 0; c < 2; c += 1) {
+        const k = `c${r}-${c}`
+        items[k] = { label: k }
+        cells.push({ rowKey: `r${r}`, columnKey: `col${c}`, cellKey: k })
+        rowIndexByKey[k] = r + 1
+        columnIndexByKey[k] = c + 1
+      }
+    }
+    const data = PatternDataSchema.parse({
+      items,
+      relations: { rowKeys: rows, columnKeys: ['col0', 'col1'], cells },
+      state: { activeKey: 'c0-0', rowIndexByKey, columnIndexByKey },
+      refs: { label: 'paged' },
+    })
+    const changes: PatternData[] = []
+    const runtime = createPatternRuntime({ definition: exportedGridDefinition, data, options: { focusStrategy: 'rovingTabIndex' }, onEvent: () => undefined, onDataChange: (next) => changes.push(next) })
+    runtime.getRootKeyboardHandler()({ key: 'PageDown', code: 'PageDown', ctrlKey: false, shiftKey: false, altKey: false, metaKey: false, isComposing: false, repeat: false, location: 0 })
+    expect(changes[0]?.state?.activeKey).toBe('c5-0')
   })
 
   it('models advanced data grid cell selection and 2D movement', () => {

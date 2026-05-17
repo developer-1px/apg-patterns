@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { JsonValueSchema } from './jsonValueSchema'
 import { KeySchema, KeyTokenSchema } from './patternDataSchema'
 
 export const PatternDirectionSchema = z.string().min(1)
@@ -16,7 +17,7 @@ export const PatternEventSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('value'), key: KeySchema, value: z.union([z.string(), z.number(), z.boolean(), z.null()]) }).strict(),
   z.object({ type: z.literal('typeahead'), query: z.string() }).strict(),
   z.object({ type: z.literal('dismiss'), key: KeySchema.optional() }).strict(),
-  z.object({ type: z.literal('extension'), name: z.string().min(1), key: KeySchema.optional(), payload: z.record(z.string(), z.unknown()).optional() }).strict(),
+  z.object({ type: z.literal('extension'), name: z.string().min(1), key: KeySchema.optional(), payload: z.record(z.string(), JsonValueSchema).optional() }).strict(),
 ])
 
 export type PatternEvent = z.infer<typeof PatternEventSchema>
@@ -38,7 +39,7 @@ export const EventTemplateSchema = z.discriminatedUnion('type', [
       type: z.literal('extension'),
       name: z.string().min(1),
       key: KeyTokenSchema.optional(),
-      payload: z.record(z.string(), z.unknown()).optional(),
+      payload: z.record(z.string(), JsonValueSchema).optional(),
     })
     .strict(),
 ])

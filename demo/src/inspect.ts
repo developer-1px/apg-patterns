@@ -34,25 +34,58 @@ export function renderHtmlTree(data: PatternData, options: PatternOptions) {
 }
 
 export function renderDisclosureInspect(data: PatternData) {
-  const triggerKey = data.relations?.rootKeys?.[0]
-  if (!triggerKey) return ''
-  const expanded = data.state?.expandedKeys?.includes(triggerKey) ?? false
-  const panelKey = data.relations?.controlsByKey?.[triggerKey]?.[0]
-  const lines = [
-    `button "${data.items[triggerKey]?.label ?? triggerKey}" aria-expanded=${expanded} aria-controls=${JSON.stringify(panelKey ?? '')}`,
-  ]
-  if (panelKey && expanded) {
-    lines.push(`  region aria-labelledby=${JSON.stringify(triggerKey)}`)
+  const rootKeys = data.relations?.rootKeys ?? []
+  if (!rootKeys.length) return ''
+  const expandedKeys = data.state?.expandedKeys ?? []
+  const lines: string[] = []
+  for (const triggerKey of rootKeys) {
+    const expanded = expandedKeys.includes(triggerKey)
+    const panelKey = data.relations?.controlsByKey?.[triggerKey]?.[0]
+    lines.push(`button "${data.items[triggerKey]?.label ?? triggerKey}" aria-expanded=${expanded} aria-controls=${JSON.stringify(panelKey ?? '')}`)
+    if (panelKey && expanded) {
+      lines.push(`  region aria-labelledby=${JSON.stringify(triggerKey)}`)
+    }
   }
   return lines.join('\n')
 }
 
 export function renderCheckboxInspect(data: PatternData) {
-  const key = data.relations?.rootKeys?.[0]
-  if (!key) return ''
-  return `checkbox "${data.items[key]?.label ?? key}" ${attrLine({
-    'aria-checked': data.state?.checkedByKey?.[key] ?? false,
-  }, ['aria-checked'])}`
+  const rootKeys = data.relations?.rootKeys ?? []
+  if (rootKeys.length === 0) return ''
+  if (rootKeys.length === 1) {
+    const key = rootKeys[0]!
+    return `checkbox "${data.items[key]?.label ?? key}" ${attrLine({
+      'aria-checked': data.state?.checkedByKey?.[key] ?? false,
+    }, ['aria-checked'])}`
+  }
+  const [parentKey, ...childKeys] = rootKeys
+  const lines: string[] = []
+  lines.push(`checkbox "${data.items[parentKey!]?.label ?? parentKey}" ${attrLine({
+    'aria-checked': data.state?.checkedByKey?.[parentKey!] ?? false,
+  }, ['aria-checked'])}`)
+  lines.push(`group ${attrLine({ 'aria-label': data.refs?.label }, ['aria-label'])}`.trimEnd())
+  for (const key of childKeys) {
+    lines.push(`  checkbox "${data.items[key]?.label ?? key}" ${attrLine({
+      'aria-checked': data.state?.checkedByKey?.[key] ?? false,
+    }, ['aria-checked'])}`)
+  }
+  return lines.join('\n')
+}
+
+export function renderRadioInspect(data: PatternData) {
+  const activeKey = data.state?.activeKey
+  const lines = ['radiogroup', attrLine({ 'aria-label': data.refs?.label }, ['aria-label'])]
+
+  ;(data.relations?.rootKeys ?? []).forEach((key) => {
+    const label = data.items[key]?.label ?? key
+    const marker = key === activeKey ? '>' : ' '
+    lines.push(`${marker} radio "${label}" ${attrLine({
+      tabIndex: key === activeKey ? 0 : -1,
+      'aria-checked': data.state?.selectedKeys?.includes(key) ?? false,
+    }, ['tabIndex', 'aria-checked'])}`.trimEnd())
+  })
+
+  return lines.join('\n')
 }
 
 export function renderTabsInspect(data: PatternData) {
@@ -95,6 +128,40 @@ export function renderListboxInspect(data: PatternData) {
   return lines.filter(Boolean).join('\n')
 }
 
+export function renderComboboxInspect(
+  data: PatternData,
+  variant: { autocomplete: 'none' | 'list' | 'both' },
+) {
+  const COMBOBOX_KEY = 'combobox'
+  const expanded = data.state?.expandedKeys?.includes(COMBOBOX_KEY) ?? false
+  const activeKey = data.state?.activeKey
+  const lines = [
+    'combobox',
+    attrLine(
+      {
+        role: 'combobox',
+        'aria-expanded': expanded,
+        'aria-haspopup': 'listbox',
+        'aria-autocomplete': variant.autocomplete,
+        'aria-controls': 'combobox-popup',
+        'aria-activedescendant': activeKey ? `combobox-option-${activeKey}` : undefined,
+        'aria-label': data.refs?.label,
+      },
+      ['role', 'aria-expanded', 'aria-haspopup', 'aria-autocomplete', 'aria-controls', 'aria-activedescendant', 'aria-label'],
+    ),
+  ]
+  if (expanded) {
+    lines.push('listbox id="combobox-popup"')
+    for (const key of Object.keys(data.items).filter((k) => k !== COMBOBOX_KEY)) {
+      const label = data.items[key]?.label ?? key
+      const marker = key === activeKey ? '>' : ' '
+      const selected = data.state?.selectedKeys?.includes(key) || undefined
+      lines.push(`${marker} option "${label}" ${attrLine({ id: `combobox-option-${key}`, 'aria-selected': selected }, ['id', 'aria-selected'])}`.trimEnd())
+    }
+  }
+  return lines.filter(Boolean).join('\n')
+}
+
 export function renderSliderInspect(data: PatternData) {
   const key = data.relations?.rootKeys?.[0]
   if (!key) return ''
@@ -128,6 +195,72 @@ export function renderGridInspect(data: PatternData) {
     })
   })
 
+  return lines.filter(Boolean).join('\n')
+}
+
+export function renderMenuInspect(
+  data: PatternData,
+  flavor: 'menubar' | 'menu-button',
+  focusStrategy: 'rovingTabIndex' | 'ariaActiveDescendant' = 'rovingTabIndex',
+) {
+  if (flavor === 'menubar') {
+    const activeKey = data.state?.activeKey
+    const expandedKeys = data.state?.expandedKeys ?? []
+    const lines = ['menubar', attrLine({ 'aria-label': data.refs?.label, 'aria-orientation': 'horizontal' }, ['aria-label', 'aria-orientation'])]
+    ;(data.relations?.rootKeys ?? []).forEach((key) => {
+      const label = data.items[key]?.label ?? key
+      const marker = key === activeKey ? '>' : ' '
+      const hasPopup = (data.relations?.childrenByKey?.[key]?.length ?? 0) > 0
+      const expanded = expandedKeys.includes(key)
+      const disabled = data.state?.disabledKeys?.includes(key) || undefined
+      lines.push(`${marker} menuitem "${label}" ${attrLine({
+        tabIndex: key === activeKey ? 0 : -1,
+        'aria-haspopup': hasPopup ? 'menu' : undefined,
+        'aria-expanded': hasPopup ? expanded : undefined,
+        'aria-disabled': disabled,
+      }, ['tabIndex', 'aria-haspopup', 'aria-expanded', 'aria-disabled'])}`.trimEnd())
+      if (hasPopup && expanded) {
+        ;(data.relations?.childrenByKey?.[key] ?? []).forEach((childKey) => {
+          const item = data.items[childKey] as { label?: string; kind?: string } | undefined
+          const role = item?.kind === 'menuitemcheckbox' ? 'menuitemcheckbox' : item?.kind === 'menuitemradio' ? 'menuitemradio' : 'menuitem'
+          const checked = (role === 'menuitemcheckbox' || role === 'menuitemradio') ? Boolean(data.state?.checkedByKey?.[childKey]) : undefined
+          const childDisabled = data.state?.disabledKeys?.includes(childKey) || undefined
+          lines.push(`    ${role} "${item?.label ?? childKey}" ${attrLine({
+            'aria-checked': checked,
+            'aria-disabled': childDisabled,
+          }, ['aria-checked', 'aria-disabled'])}`.trimEnd())
+        })
+      }
+    })
+    return lines.filter(Boolean).join('\n')
+  }
+  // menu-button
+  const triggerKey = data.relations?.rootKeys?.[0]
+  if (!triggerKey) return ''
+  const menuKey = data.relations?.controlsByKey?.[triggerKey]?.[0]
+  const expanded = data.state?.expandedKeys?.includes(triggerKey) ?? false
+  const activeKey = data.state?.activeKey
+  const lines = [
+    `button "${data.items[triggerKey]?.label ?? triggerKey}" ${attrLine({
+      'aria-haspopup': 'menu',
+      'aria-expanded': expanded,
+      'aria-controls': menuKey,
+    }, ['aria-haspopup', 'aria-expanded', 'aria-controls'])}`,
+  ]
+  if (expanded && menuKey) {
+    lines.push(`  menu ${attrLine({
+      'aria-labelledby': triggerKey,
+      'aria-activedescendant': focusStrategy === 'ariaActiveDescendant' && activeKey ? `mb-${activeKey}` : undefined,
+    }, ['aria-labelledby', 'aria-activedescendant'])}`.trimEnd())
+    ;(data.relations?.childrenByKey?.[menuKey] ?? []).forEach((key) => {
+      const marker = key === activeKey ? '>' : ' '
+      const disabled = data.state?.disabledKeys?.includes(key) || undefined
+      lines.push(`  ${marker} menuitem "${data.items[key]?.label ?? key}" ${attrLine({
+        tabIndex: focusStrategy === 'rovingTabIndex' ? (key === activeKey ? 0 : -1) : undefined,
+        'aria-disabled': disabled,
+      }, ['tabIndex', 'aria-disabled'])}`.trimEnd())
+    })
+  }
   return lines.filter(Boolean).join('\n')
 }
 

@@ -15,8 +15,10 @@
   "sideEffects": [
     "./src/kernelBuiltins.ts",
     "./src/patterns/*/definition.ts",
+    "./src/patterns/*/navigation.ts",
     "./dist/kernelBuiltins.*",
-    "./dist/patterns/*/definition.*"
+    "./dist/patterns/*/definition.*",
+    "./dist/patterns/*/navigation.*"
   ],
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

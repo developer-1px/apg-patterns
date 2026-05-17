@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { JsonValueSchema, validateJsonExtensionFields } from './jsonValueSchema'
 import { validatePatternDataRefs } from './patternDataValidation'
 
 export const KeySchema = z.string().min(1)
@@ -12,10 +13,11 @@ export const PatternItemSchema = z
     label: z.string().optional(),
     labelledBy: IdRefListSchema.optional(),
     textValue: z.string().optional(),
-    itemValue: z.unknown().optional(),
+    itemValue: JsonValueSchema.optional(),
     kind: z.string().optional(),
   })
   .passthrough()
+  .superRefine((value, ctx) => validateJsonExtensionFields(value, ['label', 'labelledBy', 'textValue', 'itemValue', 'kind'], ctx))
 
 export const PatternRelationsSchema = z
   .object({
@@ -58,6 +60,36 @@ export const PatternStateSchema = z
     typeaheadTextByKey: z.record(KeySchema, z.string()).optional(),
   })
   .passthrough()
+  .superRefine((value, ctx) =>
+    validateJsonExtensionFields(
+      value,
+      [
+        'activeKey',
+        'anchorKey',
+        'extentKey',
+        'selectedKeys',
+        'expandedKeys',
+        'disabledKeys',
+        'checkedByKey',
+        'pressedByKey',
+        'currentByKey',
+        'invalidByKey',
+        'requiredKeys',
+        'busyKeys',
+        'modalKeys',
+        'levelByKey',
+        'posInSetByKey',
+        'setSizeByKey',
+        'rowIndexByKey',
+        'columnIndexByKey',
+        'sortByKey',
+        'valueByKey',
+        'rangeValueByKey',
+        'typeaheadTextByKey',
+      ],
+      ctx,
+    ),
+  )
 
 export const PatternRefsSchema = z
   .object({

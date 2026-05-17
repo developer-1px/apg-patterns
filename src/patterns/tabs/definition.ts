@@ -92,6 +92,17 @@ export const tabsDefinition = TabsDefinitionSchema.parse({
     { shortcut: 'End', preventDefault: true, cases: [{ case: 'always', events: [{ type: 'navigate', direction: 'last' }] }] },
     { shortcut: 'Enter', preventDefault: true, cases: [{ case: 'always', events: [{ type: 'select', key: '$activeKey' }] }] },
     { shortcut: 'Space', preventDefault: true, cases: [{ case: 'always', events: [{ type: 'select', key: '$activeKey' }] }] },
+    {
+      shortcut: 'Delete',
+      preventDefault: true,
+      cases: [
+        {
+          case: 'when',
+          when: { kind: 'optionEquals', option: 'closeable', value: true },
+          events: [{ type: 'extension', name: 'closeTab', key: '$activeKey' }],
+        },
+      ],
+    },
   ],
 })
 

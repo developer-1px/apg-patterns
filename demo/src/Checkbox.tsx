@@ -1,44 +1,91 @@
 import type { HTMLAttributes, KeyboardEvent } from 'react'
+import { useMemo } from 'react'
 import type { KeyInput } from '@interactive-os/keyboard'
 import { checkboxDefinition, createPatternRuntime, type PatternData, type PatternEvent } from '../../src'
 
 type Props = HTMLAttributes<HTMLElement>
 
+const itemClass =
+  'inline-flex h-8 max-w-sm items-center gap-2 rounded px-2 text-sm text-zinc-800 outline-none hover:bg-zinc-100 focus:outline focus:outline-2 focus:outline-zinc-400 dark:text-zinc-200 dark:hover:bg-zinc-900 dark:focus:outline-zinc-500'
+
 export function Checkbox({
   data,
   onEvent,
+  groupLabel,
 }: {
   data: PatternData
   onEvent: (event: PatternEvent) => void
+  groupLabel?: string
 }) {
-  const runtime = createPatternRuntime({
-    definition: checkboxDefinition,
-    data,
-    options: {},
-    onEvent,
-    keyToElementId: (key) => `checkbox-${key}`,
+  const runtime = useMemo(
+    () =>
+      createPatternRuntime({
+        definition: checkboxDefinition,
+        data,
+        options: {},
+        onEvent,
+        keyToElementId: (key) => `checkbox-${key}`,
+      }),
+    [data, onEvent],
+  )
+
+  const rootKeys = data.relations?.rootKeys ?? []
+  if (rootKeys.length === 0) return null
+
+  const items = rootKeys.map((key) => {
+    const { onKeyDown: _ignore, ...props } = runtime.getPartProps('checkbox', key) as Props
+    const state = runtime.getItemState(key, 'checkbox')
+    return { key, props, state }
   })
-  const key = data.relations?.rootKeys?.[0]
 
-  if (!key) return null
+  const onItemKeyDown = (key: string) => (event: KeyboardEvent<HTMLDivElement>) => {
+    const result = runtime.resolveKeyboardBinding(event as unknown as KeyInput, key)
+    if (!result) return
+    if (result.preventDefault) event.preventDefault()
+    for (const next of result.events) runtime.emit(next)
+  }
 
-  const { onKeyDown: _ignore, ...props } = runtime.getPartProps('checkbox', key) as Props
-  const state = runtime.getItemState(key, 'checkbox')
-  const onKeyDown = runtime.getRootKeyboardHandler()
+  const onItemFocus = (key: string) => () => runtime.emit({ type: 'focus', key })
 
-  return (
-    <div
-      {...props}
-      onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => onKeyDown(event as unknown as KeyInput & { preventDefault?: () => void })}
-      className="inline-flex h-8 max-w-sm items-center gap-2 rounded px-2 text-sm text-zinc-800 outline-none hover:bg-zinc-100 focus:outline focus:outline-2 focus:outline-zinc-400 dark:text-zinc-200 dark:hover:bg-zinc-900 dark:focus:outline-zinc-500"
-    >
-      <span
-        aria-hidden="true"
-        className="grid size-4 place-items-center rounded border border-zinc-400 text-xs text-zinc-900 dark:border-zinc-600 dark:text-zinc-100"
+  const renderItem = ({ key, props, state }: (typeof items)[number]) => {
+    const checked = state.checked
+    const mark = checked === 'mixed' ? '–' : checked === true ? 'x' : ''
+    return (
+      <div
+        key={key}
+        {...props}
+        tabIndex={0}
+        onKeyDown={onItemKeyDown(key)}
+        onFocus={onItemFocus(key)}
+        className={itemClass}
       >
-        {state.checked ? 'x' : ''}
-      </span>
-      <span>{data.items[key]?.label}</span>
+        <span
+          aria-hidden="true"
+          className="grid size-4 place-items-center rounded border border-zinc-400 text-xs text-zinc-900 dark:border-zinc-600 dark:text-zinc-100"
+        >
+          {mark}
+        </span>
+        <span>{data.items[key]?.label}</span>
+      </div>
+    )
+  }
+
+  if (items.length === 1) return renderItem(items[0]!)
+
+  const parent = items[0]!
+  const children = items.slice(1)
+  const groupId = `checkbox-group-${parent.key}-label`
+  return (
+    <div className="grid gap-1">
+      {groupLabel ? (
+        <div id={groupId} className="px-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">
+          {groupLabel}
+        </div>
+      ) : null}
+      {renderItem(parent)}
+      <div role="group" aria-labelledby={groupLabel ? groupId : undefined} className="ml-4 grid gap-0.5">
+        {children.map(renderItem)}
+      </div>
     </div>
   )
 }

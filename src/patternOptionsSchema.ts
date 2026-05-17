@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { validateJsonExtensionFields } from './jsonValueSchema'
 
 export const PatternOptionsSchema = z
   .object({
@@ -10,5 +11,12 @@ export const PatternOptionsSchema = z
     orientation: z.enum(['horizontal', 'vertical', 'both']).optional(),
   })
   .passthrough()
+  .superRefine((value, ctx) =>
+    validateJsonExtensionFields(
+      value,
+      ['selectionMode', 'focusStrategy', 'followFocus', 'typeaheadEnabled', 'elementIdPrefix', 'orientation'],
+      ctx,
+    ),
+  )
 
 export type PatternOptions = z.infer<typeof PatternOptionsSchema>

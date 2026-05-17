@@ -154,6 +154,11 @@ const keyTokenRegistry = new Map<string, KeyTokenResolver>([
   ['$extentKey', (_key, _activeKey, ctx) => ctx?.data.state?.extentKey ?? null],
 ])
 export const defineKeyToken = (token: string, resolve: KeyTokenResolver) => void keyTokenRegistry.set(token, resolve)
+export const hasAriaSource = isRegisteredAriaSource
+export const hasKeyToken = (token: string) => keyTokenRegistry.has(token)
+export const hasNavigationTarget = isRegisteredNavigationTarget
+export const hasPredicate = (kind: string) => predicateRegistry.has(kind)
+export const hasVisibleOrder = isRegisteredVisibleOrder
 
 export function resolveKeyToken(token: string, key: Key | undefined | null, activeKey: Key | undefined | null, ctx?: PatternRuntimeContext): Key {
   const resolver = keyTokenRegistry.get(token)
