@@ -35,6 +35,16 @@ describe('VariantListbox', () => {
     expect(screen.getByRole('option', { name: 'Two' }).getAttribute('aria-selected')).toBe('true')
   })
 
+  it('ArrowDown moves DOM focus to the selected variant', () => {
+    render(<VariantListboxDemo />)
+    const listbox = screen.getByRole('listbox', { name: 'variants' })
+
+    screen.getByRole('option', { name: 'One' }).focus()
+    fireEvent.keyDown(listbox, { key: 'ArrowDown', code: 'ArrowDown' })
+
+    expect(document.activeElement).toBe(screen.getByRole('option', { name: 'Two' }))
+  })
+
   it('ArrowRight and ArrowLeft change the selected horizontal variant', () => {
     render(<HorizontalVariantListboxDemo />)
 

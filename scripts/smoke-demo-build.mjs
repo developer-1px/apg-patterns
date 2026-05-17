@@ -980,6 +980,23 @@ async function verifyVariantControls(key, label) {
       continue
     }
 
+    if (options.length > 1) {
+      const expectedOptionId = options[1].id
+      listbox.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'ArrowDown', code: 'ArrowDown', bubbles: true, cancelable: true }))
+
+      try {
+        await waitFor(() => {
+          const expectedOption = document.getElementById(expectedOptionId)
+          return expectedOption?.getAttribute('aria-selected') === 'true'
+            && document.activeElement === expectedOption
+            && currentHashParam('pattern') === key
+        })
+        verifyPreviewSurface(key, `${label} / ${listboxLabel} keyboard`)
+      } catch {
+        patternFailures.push(`${label}: ${listboxLabel} keyboard navigation did not select and focus the next option`)
+      }
+    }
+
     for (const option of options) {
       const optionLabel = option.textContent?.trim() || option.id || 'unknown'
       option.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))

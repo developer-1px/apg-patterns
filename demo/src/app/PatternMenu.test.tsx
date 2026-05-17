@@ -31,6 +31,18 @@ describe('PatternMenu', () => {
     expect(screen.getByRole('option', { name: nextLabel }).getAttribute('aria-selected')).toBe('true')
   })
 
+  it('ArrowDown moves DOM focus to the selected pattern', () => {
+    render(<PatternMenuDemo />)
+    const listbox = screen.getByRole('listbox', { name: /APG patterns/i })
+    const treeviewIdx = patternItems.findIndex((p) => p.key === 'treeview')
+    const nextLabel = patternItems[treeviewIdx + 1]?.label ?? patternItems[0].label
+
+    screen.getByRole('option', { name: 'Treeview' }).focus()
+    fireEvent.keyDown(listbox, { key: 'ArrowDown', code: 'ArrowDown' })
+
+    expect(document.activeElement).toBe(screen.getByRole('option', { name: nextLabel }))
+  })
+
   it('End jumps to the last pattern and Home returns to the first', () => {
     render(<PatternMenuDemo />)
     const listbox = screen.getByRole('listbox', { name: /APG patterns/i })

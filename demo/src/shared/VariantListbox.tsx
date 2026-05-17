@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from 'react'
-import { createPatternRuntime, listboxDefinition, reducePatternData, type PatternData } from '../../../src'
+import { listboxDefinition, reducePatternData, useListboxPattern, type PatternData } from '../../../src'
 
 type Props = HTMLAttributes<HTMLElement>
 
@@ -19,21 +19,15 @@ export function VariantListbox<T extends string>({
   orientation?: 'horizontal' | 'vertical'
 }) {
   const data = createVariantData(value, items, label)
-  const runtime = createPatternRuntime({
-    definition: listboxDefinition,
+  const listbox = useListboxPattern(
     data,
-    options: { focusStrategy: 'rovingTabIndex', selectionMode: 'single' },
-    onEvent: (event) => {
+    (event) => {
       if (event.type === 'select') selectVariant(event.keys[0], items, onChange)
-      if (event.type === 'navigate') {
-        const nextKey = reducePatternData(listboxDefinition, data, event).state?.activeKey
-        focusVariant(idPrefix, nextKey)
-        selectVariant(nextKey, items, onChange)
-      }
+      if (event.type === 'navigate') selectVariant(reducePatternData(listboxDefinition, data, event).state?.activeKey, items, onChange)
     },
-    keyToElementId: (key) => `${idPrefix}-${key}`,
-  })
-  const rootProps = runtime.getPartProps('listbox') as Props
+    { focusStrategy: 'rovingTabIndex', selectionMode: 'single', elementIdPrefix: `${idPrefix}-` },
+  )
+  const rootProps = listbox.rootProps as Props
   const handleKeyDown = rootProps.onKeyDown
 
   return (
@@ -52,9 +46,9 @@ export function VariantListbox<T extends string>({
       }}
       className={`${orientation === 'horizontal' ? 'flex flex-wrap items-center gap-1' : 'grid gap-1'} outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:focus-visible:outline-zinc-500`}
     >
-      {items.map((item) => (
+      {listbox.renderItems.map((item) => (
         <button
-          {...(runtime.getPartProps('option', item.key) as Props)}
+          {...(item.optionProps as Props)}
           key={item.key}
           type="button"
           className="min-h-8 rounded-lg px-2.5 text-left text-xs font-medium text-zinc-600 outline-none transition hover:bg-white/70 hover:text-zinc-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 aria-selected:bg-white aria-selected:text-zinc-950 aria-selected:shadow-sm dark:text-zinc-400 dark:hover:bg-white/[0.06] dark:hover:text-zinc-100 dark:focus-visible:outline-zinc-500 dark:aria-selected:bg-zinc-100 dark:aria-selected:text-zinc-950"
@@ -85,9 +79,4 @@ function selectVariant<T extends string>(
   onChange: (value: T) => void,
 ) {
   if (items.some((item) => item.key === key)) onChange(key as T)
-}
-
-function focusVariant(idPrefix: string, key: string | null | undefined) {
-  if (!key) return
-  document.getElementById(`${idPrefix}-${key}`)?.focus({ preventScroll: true })
 }

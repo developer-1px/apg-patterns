@@ -7,11 +7,7 @@ export function TreeVariantMenu({ value, onChange }: { value: TreeVariantKey; on
     data,
     (event) => {
       if (event.type === 'select') selectVariant(event.keys[0], onChange)
-      if (event.type === 'navigate') {
-        const nextKey = reducePatternData(listboxDefinition, data, event).state?.activeKey
-        focusVariant(nextKey)
-        selectVariant(nextKey, onChange)
-      }
+      if (event.type === 'navigate') selectVariant(reducePatternData(listboxDefinition, data, event).state?.activeKey, onChange)
     },
     { focusStrategy: 'rovingTabIndex', selectionMode: 'single', elementIdPrefix: 'tree-variant-' },
   )
@@ -43,9 +39,4 @@ function createTreeVariantData(value: TreeVariantKey): PatternData {
 
 function selectVariant(key: string | null | undefined, onChange: (value: TreeVariantKey) => void) {
   if (treeVariantItems.some((variant) => variant.key === key)) onChange(key as TreeVariantKey)
-}
-
-function focusVariant(key: string | null | undefined) {
-  if (!key) return
-  document.getElementById(`tree-variant-${key}`)?.focus({ preventScroll: true })
 }

@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from 'react'
-import { createPatternRuntime, listboxDefinition, reducePatternData, type PatternData } from '../../../src'
+import { listboxDefinition, reducePatternData, useListboxPattern, type PatternData } from '../../../src'
 import { patternItems, type PatternKey } from '../shared/demoPatterns'
 
 type Props = HTMLAttributes<HTMLElement>
@@ -8,30 +8,23 @@ export const patternMenuKeyboardShortcuts = listboxDefinition.keyboard.map((bind
 
 export function PatternMenu({ value, onChange }: { value: PatternKey; onChange: (value: PatternKey) => void }) {
   const data = createPatternMenuData(value)
-  const runtime = createPatternRuntime({
-    definition: listboxDefinition,
+  const listbox = useListboxPattern(
     data,
-    options: { focusStrategy: 'rovingTabIndex', selectionMode: 'single' },
-    onEvent: (event) => {
+    (event) => {
       if (event.type === 'select') selectPattern(event.keys[0], onChange)
-      if (event.type === 'navigate') {
-        const nextKey = reducePatternData(listboxDefinition, data, event).state?.activeKey
-        focusPattern(nextKey)
-        selectPattern(nextKey, onChange)
-      }
+      if (event.type === 'navigate') selectPattern(reducePatternData(listboxDefinition, data, event).state?.activeKey, onChange)
     },
-    keyToElementId: (key) => `pattern-${key}`,
-  })
-  const rootProps = runtime.getPartProps('listbox') as Props
+    { focusStrategy: 'rovingTabIndex', selectionMode: 'single', elementIdPrefix: 'pattern-' },
+  )
 
   return (
     <div
-      {...rootProps}
+      {...listbox.rootProps}
       aria-keyshortcuts={patternMenuKeyboardShortcuts.join(' ')}
       className="mt-3 flex gap-1 overflow-x-auto whitespace-nowrap pb-1 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:focus-visible:outline-zinc-500 lg:grid lg:gap-0.5 lg:overflow-visible lg:whitespace-normal lg:pb-0"
     >
-      {patternItems.map((item) => {
-        const optionProps = runtime.getPartProps('option', item.key) as Props
+      {listbox.renderItems.map((item) => {
+        const optionProps = item.optionProps as Props
         return (
           <button
             {...optionProps}
@@ -63,9 +56,4 @@ function createPatternMenuData(value: PatternKey): PatternData {
 
 function selectPattern(key: string | null | undefined, onChange: (value: PatternKey) => void) {
   if (patternItems.some((item) => item.key === key)) onChange(key as PatternKey)
-}
-
-function focusPattern(key: string | null | undefined) {
-  if (!key) return
-  document.getElementById(`pattern-${key}`)?.focus({ preventScroll: true })
 }
