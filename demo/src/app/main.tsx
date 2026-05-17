@@ -1,8 +1,8 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { ReproRecorderOverlay } from '../../../../devtools/src/rec'
 import '../../../src/kernel/kernelBuiltins'
 import { App } from './App'
+import { ReproRecorderOverlay } from './ReproRecorderOverlay'
 import '../style.css'
 
 createRoot(document.getElementById('root')!).render(
