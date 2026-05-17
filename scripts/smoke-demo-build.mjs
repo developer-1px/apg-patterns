@@ -40,6 +40,8 @@ const requiredText = ['patterns', 'Tabs', 'code', 'Tabs.tsx']
 const missingText = requiredText.filter((text) => !rootText().includes(text))
 const patternFailures = []
 
+if (!hasActiveDemoHeading('Tabs')) patternFailures.push('initial tabs route did not render Tabs workspace')
+
 for (const { key, label } of Array.from(patternListbox.querySelectorAll('[role="option"]'), (option) => ({
   key: option.id?.replace(/^pattern-/, ''),
   label: option.textContent?.trim(),
@@ -55,13 +57,13 @@ for (const { key, label } of Array.from(patternListbox.querySelectorAll('[role="
   try {
     await waitFor(() => {
       const currentOption = findPatternOption(key)
-      const text = rootText()
       const sourceText = document.querySelector('pre')?.textContent ?? ''
-      return text.includes(label)
+      return hasActiveDemoHeading(label)
         && sourceText !== 'loading'
         && sourceText.length > 0
         && currentOption?.getAttribute('aria-selected') === 'true'
-        && (!key || window.location.hash.includes(`pattern=${key}`))
+        && currentHashParam('pattern') === key
+        && sourceTabNames().length > 0
     })
   } catch {
     patternFailures.push(`${label}: did not render selected pattern source route`)
@@ -92,6 +94,7 @@ for (const { key, label } of Array.from(patternListbox.querySelectorAll('[role="
         const sourceText = document.querySelector('pre')?.textContent ?? ''
         const loaded = currentTab?.getAttribute('aria-selected') === 'true'
           && currentHashParam('source') === sourceName
+          && sourceFilenameIs(sourceName)
           && sourceText !== 'loading'
           && sourceText.length > 0
           && !sourceText.startsWith('missing source:')
@@ -107,17 +110,17 @@ for (const { key, label } of Array.from(patternListbox.querySelectorAll('[role="
 }
 
 await verifyHashRoute('#pattern=accordion&panel=aria&source=Accordion.tsx', (text) =>
-  window.location.hash.includes('pattern=accordion')
-  && window.location.hash.includes('panel=state')
-  && text.includes('Accordion')
+  currentHashParam('pattern') === 'accordion'
+  && currentHashParam('panel') === 'state'
+  && hasActiveDemoHeading('Accordion')
   && text.includes('state'),
   'legacy aria panel route did not normalize to state',
 )
 
 await verifyHashRoute('#pattern=accordion&panel=events&source=Accordion.tsx', (text) =>
-  window.location.hash.includes('pattern=accordion')
-  && window.location.hash.includes('panel=events')
-  && text.includes('Accordion')
+  currentHashParam('pattern') === 'accordion'
+  && currentHashParam('panel') === 'events'
+  && hasActiveDemoHeading('Accordion')
   && text.includes('0 events')
   && text.includes('none'),
   'events panel route did not render empty event log',
@@ -126,9 +129,9 @@ await verifyHashRoute('#pattern=accordion&panel=events&source=Accordion.tsx', (t
 await verifyInteractionEventLog()
 
 await verifyHashRoute('#pattern=accordion&panel=off&source=Accordion.tsx', (text) =>
-  window.location.hash.includes('pattern=accordion')
-  && window.location.hash.includes('panel=off')
-  && text.includes('Accordion')
+  currentHashParam('pattern') === 'accordion'
+  && currentHashParam('panel') === 'off'
+  && hasActiveDemoHeading('Accordion')
   && !text.includes('Accordion.tsx'),
   'closed right panel route did not keep the source panel closed',
 )
@@ -187,6 +190,21 @@ async function verifyInteractionEventLog() {
 
 function currentHashParam(name) {
   return new URLSearchParams(window.location.hash.replace(/^#/, '')).get(name)
+}
+
+function hasActiveDemoHeading(label) {
+  return Array.from(document.querySelectorAll('h2'))
+    .some((heading) => heading.textContent?.trim() === label)
+}
+
+function sourceTabNames() {
+  return Array.from(document.querySelectorAll('[role="tablist"][aria-label="source files"] [role="tab"]'), (tab) => tab.textContent?.trim())
+    .filter(Boolean)
+}
+
+function sourceFilenameIs(sourceName) {
+  return Array.from(document.querySelectorAll('[title]'))
+    .some((element) => element.getAttribute('title') === sourceName && element.textContent?.trim() === sourceName)
 }
 
 function findSourceTab(sourceName) {
