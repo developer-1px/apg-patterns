@@ -6,12 +6,14 @@ import tabsDefinitionSource from '../../src/patterns/tabs/definition.ts?raw'
 import tabsRuntimeSource from '../../src/patterns/tabs/runtime.ts?raw'
 import demoSource from './App.tsx?raw'
 import sourceTabsSource from './SourceTabs.tsx?raw'
+import tabsSource from './Tabs.tsx?raw'
 import treeSource from './Tree.tsx?raw'
 import focusHookSource from './useTreeDomFocus.ts?raw'
 
 export const sources = {
   'Tree React': treeSource,
   'Source Tabs': sourceTabsSource,
+  'Tabs React': tabsSource,
   'focus hook': focusHookSource,
   'demo React': demoSource,
   'React adapter': reactSource,

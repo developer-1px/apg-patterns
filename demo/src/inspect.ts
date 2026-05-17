@@ -41,6 +41,27 @@ export function renderStaticInspect(patternKey: PatternKey) {
   return ''
 }
 
+export function renderTabsInspect(data: PatternData) {
+  const activeKey = data.state?.activeKey
+  const selectedKey = data.state?.selectedKeys?.[0]
+  const lines = ['tablist', attrLine({ 'aria-label': data.refs?.label }, ['aria-label'])]
+
+  ;(data.relations?.rootKeys ?? []).forEach((key) => {
+    const label = data.items[key]?.label ?? key
+    const marker = key === activeKey ? '>' : ' '
+    lines.push(`${marker} tab "${label}" ${attrLine({
+      tabIndex: key === activeKey ? 0 : -1,
+      'aria-selected': key === selectedKey,
+      'aria-controls': data.relations?.controlsByKey?.[key],
+    }, ['tabIndex', 'aria-selected', 'aria-controls'])}`.trimEnd())
+  })
+
+  const panelKey = selectedKey ? data.relations?.controlsByKey?.[selectedKey]?.[0] : undefined
+  if (panelKey) lines.push(`  tabpanel "${data.items[panelKey]?.label ?? panelKey}" aria-labelledby=${JSON.stringify(data.relations?.ownerByKey?.[panelKey])}`)
+
+  return lines.filter(Boolean).join('\n')
+}
+
 export function renderListboxInspect(data: PatternData) {
   const activeKey = data.state?.activeKey
   const lines = ['listbox', attrLine({ 'aria-label': data.refs?.label }, ['aria-label'])]

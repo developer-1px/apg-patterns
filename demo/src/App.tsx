@@ -1,16 +1,18 @@
 import { useMemo, useReducer, useState } from 'react'
-import { reducePatternData, type PatternEvent, type PatternOptions } from '../../src'
+import { reducePatternData, reduceTabsData, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
 import { initialData, reduceData, resolveTarget } from './demoData'
 import { Grid } from './Grid'
 import { gridDefinition, listboxDefinition } from '../../src'
 import { gridVariantItems, gridVariants, type GridVariantKey } from './gridData'
-import { renderAriaTree, renderGridInspect, renderHtmlTree, renderListboxInspect, renderStaticInspect } from './inspect'
+import { renderAriaTree, renderGridInspect, renderHtmlTree, renderListboxInspect, renderStaticInspect, renderTabsInspect } from './inspect'
 import { Listbox } from './Listbox'
 import { initialListboxData } from './listboxData'
 import { PatternMenu } from './PatternMenu'
 import { patternItems, type PatternKey } from './patterns'
 import { sources } from './sources'
 import { SourceTabs, useSourceTabs } from './SourceTabs'
+import { Tabs } from './Tabs'
+import { initialTabsData } from './tabsData'
 import { Tree } from './Tree'
 
 const panelClass = 'min-h-0 rounded-md border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950'
@@ -27,6 +29,7 @@ export function App() {
   const [data, dispatch] = useReducer(reduceData, initialData)
   const [gridVariant, setGridVariant] = useState<GridVariantKey>('dataTransactions')
   const [gridData, setGridData] = useState(gridVariants.dataTransactions.data)
+  const [tabsData, setTabsData] = useState(initialTabsData)
   const [listboxData, dispatchListbox] = useReducer((current: typeof initialListboxData, event: PatternEvent | { type: 'reset' }) => {
     if (event.type === 'reset') return initialListboxData
     return reducePatternData(listboxDefinition, current, event)
@@ -67,6 +70,15 @@ export function App() {
     dispatchListbox(event)
   }
 
+  const handleTabsEvent = (event: PatternEvent) => {
+    setEvents((current) => [event, ...current].slice(0, 12))
+  }
+
+  const handleTabsDataChange = (nextData: PatternData, event: PatternEvent) => {
+    const activeKey = nextData.state?.activeKey
+    setTabsData(event.type === 'navigate' && activeKey ? reduceTabsData(nextData, { type: 'select', keys: [activeKey], anchorKey: activeKey, extentKey: activeKey }) : nextData)
+  }
+
   const selectGridVariant = (variant: GridVariantKey) => {
     setGridVariant(variant)
     setGridData(gridVariants[variant].data)
@@ -84,7 +96,9 @@ export function App() {
         ? renderGridInspect(gridData)
         : patternKey === 'listbox'
           ? renderListboxInspect(listboxData)
-          : renderStaticInspect(patternKey)
+          : patternKey === 'tabs'
+            ? renderTabsInspect(tabsData)
+            : renderStaticInspect(patternKey)
   const eventLog = events.map((event) => JSON.stringify(event)).join('\n') || 'none'
 
   return (
@@ -138,7 +152,15 @@ export function App() {
           <button
             type="button"
             className={buttonClass}
-            onClick={() => (patternKey === 'grid' ? setGridData(gridVariants[gridVariant].data) : patternKey === 'listbox' ? dispatchListbox({ type: 'reset' }) : dispatch({ type: 'reset' }))}
+            onClick={() =>
+              patternKey === 'grid'
+                ? setGridData(gridVariants[gridVariant].data)
+                : patternKey === 'listbox'
+                  ? dispatchListbox({ type: 'reset' })
+                  : patternKey === 'tabs'
+                    ? setTabsData(initialTabsData)
+                    : dispatch({ type: 'reset' })
+            }
           >
             reset
           </button>
@@ -146,6 +168,7 @@ export function App() {
         {patternKey === 'treeview' ? <Tree data={data} options={options} onEvent={handlePatternEvent} /> : null}
         {patternKey === 'listbox' ? <Listbox data={listboxData} options={{ focusStrategy: 'rovingTabIndex', selectionMode: 'single' }} onEvent={handleListboxEvent} /> : null}
         {patternKey === 'grid' ? <Grid data={gridData} options={{ focusStrategy: 'rovingTabIndex', selectionMode: 'single' }} onEvent={handleGridEvent} /> : null}
+        {patternKey === 'tabs' ? <Tabs data={tabsData} onEvent={handleTabsEvent} onDataChange={handleTabsDataChange} /> : null}
       </section>
 
       <section className={`${panelClass} flex min-h-0 flex-col`}>
