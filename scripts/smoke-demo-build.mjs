@@ -1,9 +1,16 @@
 import { readdir } from 'node:fs/promises'
 import { JSDOM } from 'jsdom'
-import { previewSurfaceSelectors } from './demo-smoke/previewSurfaceSelectors.mjs'
 import { readDemoEntryKeyboardShortcuts } from './demo-smoke/readDemoEntryKeyboardShortcuts.mjs'
 import { sourceIdentityNeedles } from './demo-smoke/sourceIdentity.mjs'
 import { verifyDistIndexAssets } from './demo-smoke/verifyDistIndexAssets.mjs'
+import { verifyPatternPanelRoutes as verifyPatternPanelRoutesBase } from './demo-smoke/verifyPatternPanelRoutes.mjs'
+import {
+  previewSurfaceIsMounted,
+  verifyPreviewKeyboardShortcuts as verifyPreviewKeyboardShortcutsBase,
+  verifyPreviewSurface as verifyPreviewSurfaceBase,
+  verifyPreviewSurfaceRegistry as verifyPreviewSurfaceRegistryBase,
+  verifyVariantControls as verifyVariantControlsBase,
+} from './demo-smoke/verifyPreviewSurfaces.mjs'
 
 const demoUrl = 'http://127.0.0.1/#pattern=tabs&panel=code&source=Tabs.tsx'
 const distDir = new URL('../demo/dist/', import.meta.url)
@@ -637,84 +644,6 @@ function describePreviewTabs(key) {
   ).join(',')
 }
 
-async function verifyPatternPanelRoutes({ key, label, sourceName }) {
-  const stateHash = buildHash({ pattern: key, panel: 'state', source: sourceName })
-  await verifyHashRoute(stateHash, () => {
-    const inspectText = activePreText()
-    return (
-      window.location.hash === stateHash
-      && currentHashParam('pattern') === key
-      && currentHashParam('panel') === 'state'
-      && hasActiveDemoHeading(label)
-      && previewSurfaceIsMounted(key)
-      && findRightPanelTab('state')?.getAttribute('aria-selected') === 'true'
-      && inspectText.trim().length > 0
-      && inspectText !== 'loading'
-      && !inspectText.includes('export function ')
-    )
-  },
-    `${label}: state panel route did not render`,
-  )
-
-  const eventsHash = buildHash({ pattern: key, panel: 'events', source: sourceName })
-  await verifyHashRoute(eventsHash, (text) => {
-    const logText = activePreText()
-    return (
-      window.location.hash === eventsHash
-      && currentHashParam('pattern') === key
-      && currentHashParam('panel') === 'events'
-      && hasActiveDemoHeading(label)
-      && previewSurfaceIsMounted(key)
-      && findRightPanelTab('events')?.getAttribute('aria-selected') === 'true'
-      && text.includes('events')
-      && logText.trim() === 'none'
-    )
-  },
-    `${label}: events panel route did not render`,
-  )
-
-  const offHash = buildHash({ pattern: key, panel: 'off', source: sourceName })
-  await verifyHashRoute(offHash, () =>
-    window.location.hash === offHash
-    && currentHashParam('pattern') === key
-    && currentHashParam('panel') === 'off'
-    && hasActiveDemoHeading(label)
-    && previewSurfaceIsMounted(key)
-    && !document.querySelector('[role="tablist"][aria-label="right panel"]')
-    && !document.querySelector('[role="tablist"][aria-label="source files"]')
-    && !sourcePanelElement(),
-    `${label}: closed panel route did not render`,
-  )
-
-  const codeHash = buildHash({ pattern: key, panel: 'code', source: sourceName })
-  await verifyHashRoute(codeHash, () => {
-    const sourceText = sourcePanelText()
-    const missingNeedles = sourceIdentityNeedles(sourceName, key)
-      .filter((needle) => !sourceText.includes(needle))
-    return (
-      window.location.hash === codeHash
-      && currentHashParam('pattern') === key
-      && currentHashParam('panel') === 'code'
-      && hasActiveDemoHeading(label)
-      && previewSurfaceIsMounted(key)
-      && findRightPanelTab('code')?.getAttribute('aria-selected') === 'true'
-      && sourceFilenameIs(sourceName)
-      && sourceText.trim().length > 0
-      && sourceText !== 'loading'
-      && !hasSourceLoadFailure(sourceText)
-      && missingNeedles.length === 0
-    )
-  },
-    `${label}: code panel route did not restore after panel route checks`,
-  )
-}
-
-function buildHash(params) {
-  const hashParams = new URLSearchParams()
-  for (const [key, value] of Object.entries(params)) hashParams.set(key, value)
-  return `#${hashParams.toString()}`
-}
-
 function currentHashParam(name) {
   return new URLSearchParams(window.location.hash.replace(/^#/, '')).get(name)
 }
@@ -852,114 +781,37 @@ function findPatternOption(key) {
   return document.getElementById(`pattern-${key}`)
 }
 
+async function verifyPatternPanelRoutes({ key, label, sourceName }) {
+  await verifyPatternPanelRoutesBase({
+    key,
+    label,
+    sourceName,
+    verifyHashRoute,
+    currentHashParam,
+    hasActiveDemoHeading,
+    findRightPanelTab,
+    sourceFilenameIs,
+    sourcePanelText,
+    activePreText,
+    hasSourceLoadFailure,
+    sourcePanelElement,
+  })
+}
+
 function verifyPreviewSurface(key, label) {
-  const selector = previewSurfaceSelectors[key]
-  if (!selector) {
-    patternFailures.push(`${label}: missing preview smoke selector`)
-    return
-  }
-  const previews = Array.from(document.querySelectorAll('[data-demo-preview]'))
-  const matchingPreviews = previews.filter((preview) => preview.getAttribute('data-demo-preview') === key)
-  const preview = matchingPreviews[0]
-  if (!preview) {
-    patternFailures.push(`${label}: missing preview container`)
-    return
-  }
-  if (matchingPreviews.length > 1) {
-    patternFailures.push(`${label}: rendered duplicate preview containers`)
-  }
-  if (previews.length !== 1) {
-    const renderedKeys = previews.map((renderedPreview) => renderedPreview.getAttribute('data-demo-preview') ?? 'unknown')
-    patternFailures.push(`${label}: stale preview containers rendered: ${renderedKeys.join(', ')}`)
-  }
-  if (!preview.firstElementChild) {
-    patternFailures.push(`${label}: preview container rendered empty`)
-  }
-  if (!preview.querySelector(selector)) {
-    patternFailures.push(`${label}: preview did not render expected surface: ${selector}`)
-  }
+  verifyPreviewSurfaceBase({ key, label, patternFailures })
 }
 
 function verifyPreviewKeyboardShortcuts(key, label) {
-  const expectedShortcuts = expectedKeyboardShortcutsByPattern.get(key)
-  if (!expectedShortcuts) {
-    patternFailures.push(`${label}: missing demo entry keyboard shortcut metadata`)
-    return
-  }
-
-  const preview = document.querySelector(`[data-demo-preview="${key}"]`)
-  const expectedValue = expectedShortcuts.join(' ') || null
-  const actualValue = preview?.getAttribute('aria-keyshortcuts')
-  if (actualValue !== expectedValue) {
-    patternFailures.push(`${label}: preview aria-keyshortcuts mismatch: expected=${expectedValue ?? 'none'}, actual=${actualValue ?? 'none'}`)
-  }
-}
-
-function previewSurfaceIsMounted(key) {
-  const selector = previewSurfaceSelectors[key]
-  const previews = Array.from(document.querySelectorAll('[data-demo-preview]'))
-  const preview = previews.find((renderedPreview) => renderedPreview.getAttribute('data-demo-preview') === key)
-  return Boolean(selector && preview && previews.length === 1 && preview.firstElementChild && preview.querySelector(selector))
+  verifyPreviewKeyboardShortcutsBase({ key, label, expectedKeyboardShortcutsByPattern, patternFailures })
 }
 
 async function verifyVariantControls(key, label) {
-  const variantListboxes = Array.from(document.querySelectorAll('[role="listbox"]'))
-    .filter((listbox) => listbox.getAttribute('aria-label')?.includes('variants'))
-
-  for (const listbox of variantListboxes) {
-    const listboxLabel = listbox.getAttribute('aria-label') ?? 'variants'
-    const options = Array.from(listbox.querySelectorAll('[role="option"]'))
-    if (options.length === 0) {
-      patternFailures.push(`${label}: ${listboxLabel} has no options`)
-      continue
-    }
-
-    if (options.length > 1) {
-      const selectedOptionIndex = options.findIndex((option) => option.getAttribute('aria-selected') === 'true')
-      const expectedOptionId = options[((selectedOptionIndex < 0 ? 0 : selectedOptionIndex) + 1) % options.length].id
-      listbox.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'ArrowDown', code: 'ArrowDown', bubbles: true, cancelable: true }))
-
-      try {
-        await waitFor(() => {
-          const expectedOption = document.getElementById(expectedOptionId)
-          return expectedOption?.getAttribute('aria-selected') === 'true'
-            && document.activeElement === expectedOption
-            && currentHashParam('pattern') === key
-        })
-        verifyPreviewSurface(key, `${label} / ${listboxLabel} keyboard`)
-      } catch {
-        patternFailures.push(`${label}: ${listboxLabel} keyboard navigation did not select and focus the next option`)
-      }
-    }
-
-    for (const option of options) {
-      const optionLabel = option.textContent?.trim() || option.id || 'unknown'
-      option.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
-
-      try {
-        await waitFor(() => option.getAttribute('aria-selected') === 'true'
-          && currentHashParam('pattern') === key)
-        verifyPreviewSurface(key, `${label} / ${optionLabel}`)
-      } catch {
-        patternFailures.push(`${label}: ${listboxLabel} option did not select: ${optionLabel}`)
-      }
-    }
-  }
+  await verifyVariantControlsBase({ key, label, dom, waitFor, currentHashParam, patternFailures })
 }
 
 function verifyPreviewSurfaceRegistry(patternKeys) {
-  const patternKeySet = new Set(patternKeys)
-  const selectorKeys = Object.keys(previewSurfaceSelectors)
-  for (const key of patternKeys) {
-    if (!previewSurfaceSelectors[key]) patternFailures.push(`${key}: missing preview smoke selector`)
-    if (!expectedKeyboardShortcutsByPattern.has(key)) patternFailures.push(`${key}: missing keyboard shortcut metadata smoke fixture`)
-  }
-  for (const key of selectorKeys) {
-    if (!patternKeySet.has(key)) patternFailures.push(`${key}: stale preview smoke selector`)
-  }
-  for (const key of expectedKeyboardShortcutsByPattern.keys()) {
-    if (!patternKeySet.has(key)) patternFailures.push(`${key}: stale keyboard shortcut metadata smoke fixture`)
-  }
+  verifyPreviewSurfaceRegistryBase({ patternKeys, expectedKeyboardShortcutsByPattern, patternFailures })
 }
 
 function duplicates(values) {

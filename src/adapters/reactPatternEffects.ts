@@ -77,7 +77,9 @@ export function useRovingFocusEventHandler({
 
   return (event: PatternEvent) => {
     if (shouldFocusAfterControlledUpdate(event, definition, options)) {
-      pendingFocusKeyRef.current = resolveEventActiveKey(definition, data, event)
+      const nextFocusKey = resolveEventActiveKey(definition, data, event)
+      pendingFocusKeyRef.current = nextFocusKey
+      if (nextFocusKey) document.getElementById(keyToElementId(nextFocusKey))?.focus({ preventScroll: true })
     }
     onEvent(event)
   }
