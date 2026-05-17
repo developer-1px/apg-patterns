@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { act } from 'react'
+import { act, useState } from 'react'
 import { coerceRightMode, formatEvent, isCopyableSource, isSourceLoadFailure, loadSourcePreview } from './App'
 import { App } from './App'
 import { SourceTabs, useSourceTabs } from './SourceTabs'
@@ -297,6 +297,19 @@ describe('SourceTabs', () => {
 
     expect(duplicates(tabIds)).toEqual([])
     expect(duplicates(panelIds)).toEqual([])
+  })
+
+  it('ArrowRight moves DOM focus to the selected tab', () => {
+    render(<SourceTabsFocusProbe />)
+
+    const first = screen.getByRole('tab', { name: 'One.tsx' })
+    const second = screen.getByRole('tab', { name: 'Two.tsx' })
+
+    first.focus()
+    fireEvent.keyDown(screen.getByRole('tablist', { name: 'source files' }), { key: 'ArrowRight', code: 'ArrowRight' })
+
+    expect(second.getAttribute('aria-selected')).toBe('true')
+    expect(document.activeElement).toBe(second)
   })
 })
 
@@ -680,6 +693,19 @@ function SourceTabsCollisionProbe() {
     tabs,
     value: tabs[0],
     onChange: () => undefined,
+  })
+
+  return <SourceTabs tabs={sourceTabs.tabs} getTablistProps={sourceTabs.getTablistProps} getTabProps={sourceTabs.getTabProps} />
+}
+
+function SourceTabsFocusProbe() {
+  const tabs = ['One.tsx', 'Two.tsx'] as const
+  const [value, setValue] = useState<(typeof tabs)[number]>(tabs[0])
+  const sourceTabs = useSourceTabs({
+    label: 'source files',
+    tabs,
+    value,
+    onChange: setValue,
   })
 
   return <SourceTabs tabs={sourceTabs.tabs} getTablistProps={sourceTabs.getTablistProps} getTabProps={sourceTabs.getTabProps} />
