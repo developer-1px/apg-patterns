@@ -27,7 +27,6 @@ type TreeviewDemoAction =
   | { type: 'setItemClickAction'; value: TreeviewDemoState['itemClickAction'] }
   | { type: 'setInspectMode'; value: TreeviewDemoState['inspectMode'] }
   | { type: 'patternEvent'; event: PatternEvent }
-  | { type: 'reset' }
 
 const initialTreeviewDemoState = TreeviewDemoStateSchema.parse({
   variant: 'fileDirectoryComputed',
@@ -44,7 +43,6 @@ const reduceTreeviewDemoState = (state: TreeviewDemoState, action: TreeviewDemoA
   if (action.type === 'setFocusStrategy') return TreeviewDemoStateSchema.parse({ ...state, focusStrategy: action.value })
   if (action.type === 'setItemClickAction') return TreeviewDemoStateSchema.parse({ ...state, itemClickAction: action.value })
   if (action.type === 'setInspectMode') return TreeviewDemoStateSchema.parse({ ...state, inspectMode: action.value })
-  if (action.type === 'reset') return TreeviewDemoStateSchema.parse({ ...state, data: treeVariants[state.variant as TreeVariantKey].data })
   return TreeviewDemoStateSchema.parse({ ...state, data: reduceData(state.data, action.event) })
 }
 
@@ -54,10 +52,7 @@ export const entry: PatternEntry = {
   useDemoPattern: (onEvent) => {
     const [state, dispatch] = useReducer(reduceTreeviewDemoState, initialTreeviewDemoState)
     const treeOptions: PatternOptions = { focusStrategy: state.focusStrategy, followFocus: state.followFocus, itemClickAction: state.itemClickAction, indicatorClickAction: 'toggleExpand' }
-    const dispatchTree = (event: PatternEvent | { type: 'reset' }) => {
-      if (event.type === 'reset') return dispatch({ type: 'reset' })
-      dispatch({ type: 'patternEvent', event })
-    }
+    const dispatchTree = (event: PatternEvent) => dispatch({ type: 'patternEvent', event })
     const handleTreeEvent = (event: PatternEvent) => {
       onEvent(event)
       if (event.type !== 'navigate') return dispatchTree(event)

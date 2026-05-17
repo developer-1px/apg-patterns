@@ -7,10 +7,8 @@ import { renderDataInspect } from '../../shared/inspect/genericInspect'
 
 type AlertDemoAction =
   | { type: 'event'; event: AlertDomainEvent }
-  | { type: 'reset' }
 
 const reduceAlertDemoState = (data: typeof initialAlertData, action: AlertDemoAction) => {
-  if (action.type === 'reset') return PatternDataSchema.parse(initialAlertData)
   return PatternDataSchema.parse(reduceAlertState({ data }, action.event).data)
 }
 

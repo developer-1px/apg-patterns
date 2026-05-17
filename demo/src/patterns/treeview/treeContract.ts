@@ -30,11 +30,9 @@ export const initialData = {
   refs: { label: 'APG treeview contract demo' },
 } satisfies PatternData
 
-type Action = PatternEvent | { type: 'reset' }
 type NavigateDirection = Extract<PatternEvent, { type: 'navigate' }>['direction']
 
-export function reduceData(data: PatternData, event: Action): PatternData {
-  if (event.type === 'reset') return initialData
+export function reduceData(data: PatternData, event: PatternEvent): PatternData {
   const reason = 'meta' in event ? event.meta?.reason : undefined
   const withReason = (next: PatternData): PatternData =>
     reason ? { ...next, state: { ...next.state, lastEventReason: reason } } : next
