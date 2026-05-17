@@ -320,7 +320,8 @@ async function verifyInteractionEventLog() {
     accordionButton.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
     await waitFor(() => {
       const text = rootText()
-      return text.includes('1 events') && text.includes('expand') && text.includes('via pointer')
+      const logText = activePreText()
+      return text.includes('events') && logText.includes('expand') && logText.includes('via pointer')
     })
   } catch {
     patternFailures.push('accordion interaction did not record an event log entry')
@@ -335,7 +336,7 @@ async function verifyEventLogClear() {
     await waitForPatternRoute({ pattern: 'accordion', panel: 'events', source: 'Accordion.tsx', label: 'Accordion' })
     const accordionButton = await waitFor(() => document.querySelector('button[aria-expanded]'))
     accordionButton.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
-    await waitFor(() => rootText().includes('1 events') && rootText().includes('expand'))
+    await waitFor(() => rootText().includes('1 events') && activePreText().includes('expand'))
 
     const clearButton = await waitFor(() => Array.from(document.querySelectorAll('button'))
       .find((button) => button.textContent?.trim() === 'clear'))
@@ -343,7 +344,8 @@ async function verifyEventLogClear() {
 
     await waitFor(() => {
       const text = rootText()
-      return text.includes('0 events') && text.includes('none') && !text.includes('expand key=')
+      const logText = activePreText()
+      return text.includes('0 events') && logText.trim() === 'none' && !logText.includes('expand key=')
     })
   } catch {
     patternFailures.push(`event log clear did not reset count and rendered log: text=${rootText().slice(0, 180)}`)
@@ -362,10 +364,12 @@ async function verifyTabsKeyboardEventLog() {
       const codeTab = Array.from(document.querySelectorAll('[data-demo-preview="tabs"] [role="tab"]'))
         .find((tab) => tab.textContent?.trim() === 'Code')
       const text = rootText()
+      const logText = activePreText()
       return codeTab?.getAttribute('aria-selected') === 'true'
-        && text.includes('navigate')
-        && text.includes('direction=next')
-        && text.includes('via keyboard')
+        && text.includes('events')
+        && logText.includes('navigate')
+        && logText.includes('direction=next')
+        && logText.includes('via keyboard')
     })
   } catch {
     patternFailures.push(`tabs keyboard interaction did not update selection and event log: ${describePreviewTabs('tabs')} | text=${rootText().slice(0, 180)}`)
