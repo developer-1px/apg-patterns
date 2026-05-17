@@ -23,7 +23,7 @@ export function Combobox({
           className="absolute left-0 right-0 top-11 z-10 max-h-56 overflow-auto rounded-xl bg-white/95 p-1 shadow-[0_18px_50px_rgba(24,24,27,0.14)] ring-1 ring-black/[0.03] backdrop-blur dark:bg-zinc-950/95 dark:shadow-black/30 dark:ring-white/[0.05]"
         >
           {combobox.options.length === 0 ? (
-            <div className="px-2 py-1.5 text-xs text-zinc-500">No matches</div>
+            <div className="rounded-lg px-2.5 py-2 text-sm text-zinc-500 dark:text-zinc-400">No results</div>
           ) : (
             combobox.options.map((option) => (
               <div
