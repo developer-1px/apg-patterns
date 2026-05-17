@@ -63,7 +63,14 @@ export function App() {
             ))}
           </div>
           <div className="min-w-0">
-            {rightMode === 'source' ? <SourceTabs tabs={sourceTabs.tabs} getTablistProps={sourceTabs.getTablistProps} getTabProps={sourceTabs.getTabProps} /> : null}
+            {rightMode === 'source' ? (
+              <div className="grid gap-1">
+                <SourceTabs tabs={sourceTabs.tabs} getTablistProps={sourceTabs.getTablistProps} getTabProps={sourceTabs.getTabProps} />
+                <div className="truncate px-1 font-mono text-[11px] text-zinc-400 dark:text-zinc-600">
+                  {patternKey} / {activeSourceName}
+                </div>
+              </div>
+            ) : null}
             {rightMode === 'inspect' ? activeDemo.inspectControls : null}
           </div>
         </header>
