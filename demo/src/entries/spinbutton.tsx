@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useVariantPatternDataHost } from '../demoHostState'
 import { Spinbutton } from '../Spinbutton'
 import { reduceSpinbuttonData, spinbuttonVariants, type SpinbuttonVariantKey } from '../spinbuttonData'
 import { VariantListbox } from '../VariantListbox'
@@ -15,24 +15,25 @@ export const entry: PatternEntry = {
   label: 'Spinbutton',
   order: 21,
   useDemoPattern: (onEvent) => {
-    const [variant, setVariant] = useState<SpinbuttonVariantKey>('numeric')
-    const [data, setData] = useState(spinbuttonVariants.numeric.data)
-    const options = spinbuttonVariants[variant].options
+    const host = useVariantPatternDataHost<SpinbuttonVariantKey>(
+      'numeric',
+      spinbuttonVariants.numeric.data,
+      (variant) => spinbuttonVariants[variant].data,
+      (variant, data, event) => reduceSpinbuttonData(data, event, spinbuttonVariants[variant].options),
+    )
+    const options = spinbuttonVariants[host.variant].options
     return {
       key: 'spinbutton',
       label: 'Spinbutton',
       keyboardShortcuts: ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'],
       sourceNames: ['Spinbutton.tsx', 'spinbuttonData.ts', 'spinbutton/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
-      inspect: renderDataInspect(data),
-      variants: <VariantListbox value={variant} items={items} label="spinbutton variants" idPrefix="spinbutton-variant" onChange={(next) => {
-        setVariant(next)
-        setData(spinbuttonVariants[next].data)
-      }} />,
-      preview: <Spinbutton data={data} options={options} onEvent={(event) => {
+      inspect: renderDataInspect(host.data),
+      variants: <VariantListbox value={host.variant} items={items} label="spinbutton variants" idPrefix="spinbutton-variant" onChange={host.selectVariant} />,
+      preview: <Spinbutton data={host.data} options={options} onEvent={(event) => {
         onEvent(event)
-        setData((current) => reduceSpinbuttonData(current, event, options))
+        host.dispatchEvent(event)
       }} />,
-      reset: () => setData(spinbuttonVariants[variant].data),
+      reset: host.reset,
     }
   },
 }

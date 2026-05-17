@@ -1,33 +1,36 @@
-import { useState } from 'react'
-import { reducePatternData } from '../../../src'
+import { reducePatternData, type PatternData, type PatternEvent } from '../../../src'
 import { tableDefinition } from '../../../src/patterns/table/definition'
+import { usePatternDataHost } from '../demoHostState'
 import { Table } from '../Table'
 import { initialTableData } from '../tableData'
 import { type PatternEntry } from '../demoPatternTypes'
 import { renderDataInspect } from './_inspect'
+
+const reduceTableDemoData = (data: PatternData, event: PatternEvent): PatternData => {
+  if (event.type === 'extension' && event.name === 'tableSort' && event.key) {
+    const next = (event.payload?.sort as 'ascending' | 'descending' | 'other') ?? 'ascending'
+    return { ...data, state: { ...data.state, sortByKey: { ...data.state?.sortByKey, [event.key as string]: next } } }
+  }
+  return reducePatternData(tableDefinition, data, event)
+}
 
 export const entry: PatternEntry = {
   key: 'table',
   label: 'Table',
   order: 23,
   useDemoPattern: (onEvent) => {
-    const [data, setData] = useState(initialTableData)
+    const host = usePatternDataHost(initialTableData, reduceTableDemoData)
     return {
       key: 'table',
       label: 'Table',
       keyboardShortcuts: ['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End'],
       sourceNames: ['Table.tsx', 'tableData.ts', 'table/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
-      inspect: renderDataInspect(data),
-      preview: <Table data={data} onEvent={(event) => {
+      inspect: renderDataInspect(host.data),
+      preview: <Table data={host.data} onEvent={(event) => {
         onEvent(event)
-        if (event.type === 'extension' && event.name === 'tableSort' && event.key) {
-          const next = (event.payload?.sort as 'ascending' | 'descending' | 'other') ?? 'ascending'
-          setData((current) => ({ ...current, state: { ...current.state, sortByKey: { ...current.state?.sortByKey, [event.key as string]: next } } }))
-          return
-        }
-        setData((current) => reducePatternData(tableDefinition, current, event))
+        host.dispatchEvent(event)
       }} />,
-      reset: () => setData(initialTableData),
+      reset: host.reset,
     }
   },
 }

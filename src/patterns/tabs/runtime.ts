@@ -64,7 +64,13 @@ export function createTabsRuntime(input: CreateTabsRuntimeInput): TabsRuntime {
 }
 
 export function reduceTabsData(data: PatternData, event: PatternEvent): PatternData {
-  return reducePatternData(tabsDefinition, data, event)
+  const next = reducePatternData(tabsDefinition, data, event)
+  const options = ((data.state as { options?: { activationMode?: string } } | undefined)?.options ?? {}) as { activationMode?: string }
+  const activeKey = next.state?.activeKey
+  if (event.type === 'navigate' && options.activationMode === 'automatic' && activeKey) {
+    return reducePatternData(tabsDefinition, next, { type: 'select', keys: [activeKey], anchorKey: activeKey, extentKey: activeKey })
+  }
+  return next
 }
 
 function createTabsElementId(prefix: string, key: Key) {

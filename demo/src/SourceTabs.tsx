@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from 'react'
-import { usePatternAutoFocus, useTabsPattern, type PatternData, type PatternEvent } from '../../src'
+import { reduceTabsData, usePatternAutoFocus, useTabsPattern, type PatternData, type PatternEvent } from '../../src'
 
 type SourceTabKey = string
 
@@ -25,9 +25,7 @@ export function useSourceTabs<T extends SourceTabKey>({ label, tabs, value, onCh
     options: { orientation: 'horizontal', activationMode: 'automatic' },
     onEvent: (event) => {
       if (event.type === 'select') selectTab(event.keys[0], tabSet, onChange)
-    },
-    onDataChange: (nextData, event) => {
-      selectTab(resolveSelectedTab(nextData, event), tabSet, onChange)
+      if (event.type === 'navigate') selectTab(resolveSelectedTab(reduceTabsData(data, event), event), tabSet, onChange)
     },
   })
 

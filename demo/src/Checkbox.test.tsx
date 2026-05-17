@@ -15,7 +15,7 @@ function TriStateDemo() {
   const variant = checkboxVariants.triState
   const [data, setData] = useState(variant.data)
   const handleEvent = (event: PatternEvent) => setData((current) => variant.reduce(current, event))
-  return <Checkbox data={data} groupLabel={variant.groupLabel} onEvent={handleEvent} />
+  return <Checkbox data={data} onEvent={handleEvent} />
 }
 
 describe('Checkbox demo (two-state)', () => {

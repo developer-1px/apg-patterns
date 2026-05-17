@@ -13,12 +13,14 @@ const preClass = 'h-full min-h-0 overflow-auto bg-zinc-50 p-3 font-mono text-xs 
 const optionButtonClass =
   'h-7 rounded px-2 text-left text-xs text-zinc-600 hover:bg-zinc-100 aria-selected:bg-zinc-900 aria-selected:text-white dark:text-zinc-400 dark:hover:bg-zinc-900 dark:aria-selected:bg-zinc-100 dark:aria-selected:text-zinc-950'
 const rightModes = ['source', 'inspect', 'log'] as const
+const previewModes = ['preview', 'variants'] as const
 
 export function App() {
   const [patternKey, setPatternKey] = useState<PatternKey>('treeview')
   const [events, setEvents] = useState<PatternEvent[]>([])
   const [sourceName, setSourceName] = useState<SourceName>('Tree.tsx')
   const [rightMode, setRightMode] = useState<'source' | 'inspect' | 'log'>('source')
+  const [previewMode, setPreviewMode] = useState<'preview' | 'variants'>('preview')
 
   const demos = useDemoPatterns((event) => setEvents((current) => [event, ...current].slice(0, 12)))
   const activeDemo = demos.find((demo) => demo.key === patternKey) ?? demos[0]
@@ -27,6 +29,9 @@ export function App() {
   const source = sources[activeSourceName]
   const sourceTabs = useSourceTabs({ label: 'source files', tabs: sourceNames, value: activeSourceName, onChange: setSourceName })
   const rightModeTabs = useSourceTabs({ label: 'right panel', tabs: rightModes, value: rightMode, onChange: setRightMode })
+  const availablePreviewModes = activeDemo.variants ? previewModes : previewModes.slice(0, 1)
+  const activePreviewMode = activeDemo.variants ? previewMode : 'preview'
+  const previewModeTabs = useSourceTabs({ label: 'preview panel', tabs: availablePreviewModes, value: activePreviewMode, onChange: setPreviewMode })
   const eventLog = events.map((event) => JSON.stringify(event)).join('\n') || 'none'
 
   return (
@@ -36,24 +41,41 @@ export function App() {
           <h1 className={titleClass}>patterns</h1>
         </header>
         <PatternMenu value={patternKey} onChange={setPatternKey} />
-        {activeDemo.variants ? <div className="mt-6 pt-2">{activeDemo.variants}</div> : null}
       </section>
 
       <section className={`${panelClass} overflow-auto`}>
         <header className={headerClass}>
           <h2 className={titleClass}>{activeDemo.label}</h2>
-          <button type="button" className={buttonClass} onClick={activeDemo.reset}>
-            reset
-          </button>
+          <div className="flex items-center gap-1">
+            {activeDemo.variants ? (
+              <div {...previewModeTabs.getTablistProps()} className="flex items-center gap-1">
+                {availablePreviewModes.map((mode) => (
+                  <button {...previewModeTabs.getTabProps(mode)} key={mode} type="button" className={optionButtonClass}>
+                    {mode}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+            <button type="button" className={buttonClass} onClick={activeDemo.reset}>
+              reset
+            </button>
+          </div>
         </header>
-        <div className="mb-4 flex flex-wrap gap-1">
-          {activeDemo.keyboardShortcuts.map((shortcut) => (
-            <kbd key={shortcut} className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[11px] text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400">
-              {shortcut}
-            </kbd>
-          ))}
-        </div>
-        {activeDemo.preview}
+        {activePreviewMode === 'preview' ? (
+          <div {...previewModeTabs.getPanelProps()}>
+            <div className="mb-4 flex flex-wrap gap-1">
+              {activeDemo.keyboardShortcuts.map((shortcut) => (
+                <kbd key={shortcut} className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[11px] text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400">
+                  {shortcut}
+                </kbd>
+              ))}
+            </div>
+            {activeDemo.preview}
+          </div>
+        ) : null}
+        {activePreviewMode === 'variants' ? (
+          <div {...previewModeTabs.getPanelProps()}>{activeDemo.variants}</div>
+        ) : null}
       </section>
 
       <section className={`${panelClass} flex min-h-0 flex-col`}>

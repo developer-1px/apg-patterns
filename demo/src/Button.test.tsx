@@ -12,14 +12,14 @@ function ActionDemo({ onActivate }: { onActivate?: () => void }) {
     if (event.type === 'activate') onActivate?.()
     setData((current) => variant.reduce(current, event))
   }
-  return <Button data={data} onEvent={handleEvent} variant="action" />
+  return <Button data={data} onEvent={handleEvent} />
 }
 
 function ToggleDemo() {
   const variant = buttonVariants.toggle
   const [data, setData] = useState(variant.data)
   const handleEvent = (event: PatternEvent) => setData((current) => variant.reduce(current, event))
-  return <Button data={data} onEvent={handleEvent} variant="toggle" />
+  return <Button data={data} onEvent={handleEvent} />
 }
 
 describe('Button demo (action)', () => {

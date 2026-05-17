@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useVariantPatternDataHost } from '../demoHostState'
 import { renderSliderInspect } from '../inspect'
 import { Slider } from '../Slider'
 import { reduceSliderData, sliderVariantItems, sliderVariants, type SliderVariantKey } from '../sliderData'
@@ -10,24 +10,25 @@ export const entry: PatternEntry = {
   label: 'Slider',
   order: 5,
   useDemoPattern: (onEvent) => {
-    const [variant, setVariant] = useState<SliderVariantKey>('color')
-    const [data, setData] = useState(sliderVariants.color.data)
-    const options = sliderVariants[variant].options
+    const host = useVariantPatternDataHost<SliderVariantKey>(
+      'color',
+      sliderVariants.color.data,
+      (variant) => sliderVariants[variant].data,
+      (variant, data, event) => reduceSliderData(data, event, sliderVariants[variant].options),
+    )
+    const options = sliderVariants[host.variant].options
     return {
       key: 'slider',
       label: 'Slider',
       keyboardShortcuts: ['ArrowRight', 'ArrowUp', 'ArrowLeft', 'ArrowDown', 'Shift+ArrowRight', 'Shift+ArrowUp', 'Shift+ArrowLeft', 'Shift+ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'],
       sourceNames: ['Slider.tsx', 'sliderData.ts', 'slider/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
-      inspect: renderSliderInspect(data),
-      variants: <VariantListbox value={variant} items={sliderVariantItems} label="slider variants" idPrefix="slider-variant" onChange={(next) => {
-        setVariant(next)
-        setData(sliderVariants[next].data)
-      }} />,
-      preview: <Slider data={data} options={options} onEvent={(event) => {
+      inspect: renderSliderInspect(host.data),
+      variants: <VariantListbox value={host.variant} items={sliderVariantItems} label="slider variants" idPrefix="slider-variant" onChange={host.selectVariant} />,
+      preview: <Slider data={host.data} options={options} onEvent={(event) => {
         onEvent(event)
-        setData((current) => reduceSliderData(current, event, options))
+        host.dispatchEvent(event)
       }} />,
-      reset: () => setData(sliderVariants[variant].data),
+      reset: host.reset,
     }
   },
 }

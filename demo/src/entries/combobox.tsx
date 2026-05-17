@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { type PatternData } from '../../../src'
+import { useVariantPatternDataHost } from '../demoHostState'
 import { Combobox } from '../Combobox'
 import { buildComboboxData, comboboxVariants, reduceComboboxData, type ComboboxVariantKey } from '../comboboxData'
 import { renderComboboxInspect } from '../inspect'
@@ -16,33 +15,34 @@ export const entry: PatternEntry = {
   label: 'Combobox',
   order: 10,
   useDemoPattern: (onEvent) => {
-    const [variant, setVariant] = useState<ComboboxVariantKey>('listAutocomplete')
-    const [data, setData] = useState<PatternData>(buildComboboxData())
+    const host = useVariantPatternDataHost<ComboboxVariantKey>(
+      'listAutocomplete',
+      buildComboboxData(),
+      () => buildComboboxData(),
+      (_variant, data, event) => reduceComboboxData(data, event),
+    )
     return {
       key: 'combobox',
       label: 'Combobox',
       keyboardShortcuts: ['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Escape'],
       sourceNames: ['Combobox.tsx', 'comboboxData.ts', 'combobox/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
-      inspect: renderComboboxInspect(data, { autocomplete: comboboxVariants[variant].autocomplete }),
-      variants: <VariantListbox value={variant} items={comboboxVariantItems} label="combobox variants" idPrefix="combobox-variant" onChange={(next) => {
-        setVariant(next)
-        setData(buildComboboxData())
-      }} />,
+      inspect: renderComboboxInspect(host.data, { autocomplete: comboboxVariants[host.variant].autocomplete }),
+      variants: <VariantListbox value={host.variant} items={comboboxVariantItems} label="combobox variants" idPrefix="combobox-variant" onChange={host.selectVariant} />,
       preview: (
         <Combobox
-          data={data}
-          variant={variant}
+          data={host.data}
+          variant={host.variant}
           onEvent={(event) => {
             onEvent(event)
-            setData((current) => reduceComboboxData(current, event))
+            host.dispatchEvent(event)
           }}
-          onVisibleKeysChange={(keys) => setData(() => {
+          onVisibleKeysChange={(keys) => {
             const next = buildComboboxData(keys)
-            return { ...next, state: { ...next.state, expandedKeys: ['combobox'] } }
-          })}
+            host.replaceData({ ...next, state: { ...next.state, expandedKeys: ['combobox'] } })
+          }}
         />
       ),
-      reset: () => setData(buildComboboxData()),
+      reset: host.reset,
     }
   },
 }

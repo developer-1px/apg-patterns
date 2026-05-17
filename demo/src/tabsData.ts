@@ -1,8 +1,14 @@
-import { PatternDataSchema, type PatternData } from '../../src'
+import { PatternDataSchema, type PatternData, type PatternOptions } from '../../src'
 
 type TabSpec = { key: string; label: string; panelLabel: string; content: string }
 
-const buildTabsData = (tabs: readonly TabSpec[], activeKey: string, label = 'Sections'): PatternData => {
+type TabsViewOptions = PatternOptions & {
+  activationMode: 'automatic' | 'manual'
+  closeable?: boolean
+  scrollable?: boolean
+}
+
+const buildTabsData = (tabs: readonly TabSpec[], activeKey: string, label = 'Sections', options: TabsViewOptions): PatternData => {
   const items: Record<string, { label: string; content?: string }> = {}
   for (const tab of tabs) {
     items[tab.key] = { label: tab.label }
@@ -18,6 +24,7 @@ const buildTabsData = (tabs: readonly TabSpec[], activeKey: string, label = 'Sec
     state: {
       activeKey,
       selectedKeys: [activeKey],
+      options,
     },
     refs: { label },
   })
@@ -54,44 +61,39 @@ export type TabsVariantKey = 'automatic' | 'manual' | 'vertical' | 'scrollable' 
 export interface TabsVariantSpec {
   label: string
   data: PatternData
-  options: {
-    activationMode: 'automatic' | 'manual'
-    orientation: 'horizontal' | 'vertical'
-    closeable?: boolean
-    scrollable?: boolean
-  }
+  options: TabsViewOptions
   hint?: string
 }
 
 export const tabsVariants: Record<TabsVariantKey, TabsVariantSpec> = {
   automatic: {
     label: 'Automatic activation',
-    data: buildTabsData(docsTabs, 'overview', 'Documentation'),
     options: { activationMode: 'automatic', orientation: 'horizontal' },
+    data: buildTabsData(docsTabs, 'overview', 'Documentation', { activationMode: 'automatic', orientation: 'horizontal' }),
     hint: 'Arrow keys activate immediately on focus.',
   },
   manual: {
     label: 'Manual activation',
-    data: buildTabsData(docsTabs, 'overview', 'Documentation'),
     options: { activationMode: 'manual', orientation: 'horizontal' },
+    data: buildTabsData(docsTabs, 'overview', 'Documentation', { activationMode: 'manual', orientation: 'horizontal' }),
     hint: 'Arrow keys move focus only. Press Enter or Space to activate.',
   },
   vertical: {
     label: 'Vertical (automatic)',
-    data: buildTabsData(planetsTabs, 'earth', 'Planets'),
     options: { activationMode: 'automatic', orientation: 'vertical' },
+    data: buildTabsData(planetsTabs, 'earth', 'Planets', { activationMode: 'automatic', orientation: 'vertical' }),
     hint: 'Up/Down arrows navigate between tabs.',
   },
   scrollable: {
     label: 'Scrollable panels',
-    data: buildTabsData(longTabs, 'danish', 'Pastries'),
     options: { activationMode: 'automatic', orientation: 'horizontal', scrollable: true },
+    data: buildTabsData(longTabs, 'danish', 'Pastries', { activationMode: 'automatic', orientation: 'horizontal', scrollable: true }),
     hint: 'Tabpanel is keyboard-focusable and scrollable (tabIndex=0).',
   },
   closeable: {
     label: 'Closeable tabs',
-    data: buildTabsData(closeableTabs, 'inbox', 'Mailboxes'),
     options: { activationMode: 'manual', orientation: 'horizontal', closeable: true },
+    data: buildTabsData(closeableTabs, 'inbox', 'Mailboxes', { activationMode: 'manual', orientation: 'horizontal', closeable: true }),
     hint: 'Press Delete to close the focused tab.',
   },
 }

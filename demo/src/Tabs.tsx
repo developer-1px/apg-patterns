@@ -8,24 +8,20 @@ type Props = HTMLAttributes<HTMLElement>
 export function Tabs({
   data,
   onEvent,
-  onDataChange,
-  options,
-  variantLabel,
-  hint,
 }: {
   data: PatternData
   onEvent: (event: PatternEvent) => void
-  onDataChange: (data: PatternData, event: PatternEvent) => void
-  options?: PatternOptions
-  variantLabel?: string
-  hint?: string
 }) {
-  const mergedOptions = { orientation: 'horizontal' as const, activationMode: 'automatic' as const, ...options }
+  const dataOptions = ((data.state as { options?: PatternOptions } | undefined)?.options ?? {}) as PatternOptions & {
+    activationMode?: 'automatic' | 'manual'
+    closeable?: boolean
+    scrollable?: boolean
+  }
+  const mergedOptions = { orientation: 'horizontal' as const, activationMode: 'automatic' as const, ...dataOptions }
   const tabs = useTabsPattern({
     data,
     options: mergedOptions,
     onEvent,
-    onDataChange,
   })
   const panelKey = tabs.selectedPanelKey
   const orientation = mergedOptions.orientation
@@ -56,10 +52,6 @@ export function Tabs({
 
   return (
     <div className="grid gap-3">
-      {variantLabel ? (
-        <div className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-500">{variantLabel}</div>
-      ) : null}
-      {hint ? <p className="text-xs text-zinc-500 dark:text-zinc-500">{hint}</p> : null}
       <div className={containerClass}>
         <div {...(tabs.getTablistProps() as Props)} ref={tablistRef} className={tablistClass}>
           {tabs.tabs.map((key) => {

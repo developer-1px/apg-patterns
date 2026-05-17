@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from 'react'
-import { createPatternRuntime, listboxDefinition, type PatternData } from '../../src'
+import { createPatternRuntime, listboxDefinition, reducePatternData, type PatternData } from '../../src'
 import { gridVariantItems, type GridVariantKey } from './gridData'
 
 type Props = HTMLAttributes<HTMLElement>
@@ -12,9 +12,7 @@ export function GridVariantMenu({ value, onChange }: { value: GridVariantKey; on
     options: { focusStrategy: 'rovingTabIndex', selectionMode: 'single' },
     onEvent: (event) => {
       if (event.type === 'select') selectVariant(event.keys[0], onChange)
-    },
-    onDataChange: (nextData, event) => {
-      if (event.type === 'navigate') selectVariant(nextData.state?.activeKey, onChange)
+      if (event.type === 'navigate') selectVariant(reducePatternData(listboxDefinition, data, event).state?.activeKey, onChange)
     },
     keyToElementId: (key) => `grid-variant-${key}`,
   })

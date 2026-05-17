@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from 'react'
-import { createPatternRuntime, listboxDefinition, type PatternData } from '../../src'
+import { createPatternRuntime, listboxDefinition, reducePatternData, type PatternData } from '../../src'
 import { patternItems, type PatternKey } from './demoPatterns'
 
 type Props = HTMLAttributes<HTMLElement>
@@ -14,9 +14,7 @@ export function PatternMenu({ value, onChange }: { value: PatternKey; onChange: 
     options: { focusStrategy: 'rovingTabIndex', selectionMode: 'single' },
     onEvent: (event) => {
       if (event.type === 'select') selectPattern(event.keys[0], onChange)
-    },
-    onDataChange: (nextData, event) => {
-      if (event.type === 'navigate') selectPattern(nextData.state?.activeKey, onChange)
+      if (event.type === 'navigate') selectPattern(reducePatternData(listboxDefinition, data, event).state?.activeKey, onChange)
     },
     keyToElementId: (key) => `pattern-${key}`,
   })

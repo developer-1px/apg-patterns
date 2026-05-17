@@ -12,7 +12,7 @@ const linkHref = (data: typeof initialAnchorLinkData | typeof initialSpanLinkDat
 describe('Link demo (anchor)', () => {
   it('renders <a> with role=link and href', () => {
     render(
-      <Link data={initialAnchorLinkData} variant="anchor" />,
+      <Link data={initialAnchorLinkData} />,
     )
     const link = screen.getByRole('link')
     expect(link.tagName).toBe('A')
@@ -21,40 +21,35 @@ describe('Link demo (anchor)', () => {
 
   it('click emits activate with href', () => {
     const onEvent = vi.fn<(event: PatternEvent) => void>()
-    const onActivate = vi.fn<(key: string, href: string) => void>()
     render(
       <Link
         data={initialAnchorLinkData}
-        variant="anchor"
         onEvent={onEvent}
-        onActivate={onActivate}
       />,
     )
     const link = screen.getByRole('link')
     fireEvent.click(link)
     expect(onEvent).toHaveBeenCalledWith({ type: 'activate', key: 'home' })
-    expect(onActivate).toHaveBeenCalledWith('home', linkHref(initialAnchorLinkData))
   })
 
   it('Enter key emits activate', () => {
-    const onActivate = vi.fn<(key: string, href: string) => void>()
+    const onEvent = vi.fn<(event: PatternEvent) => void>()
     render(
       <Link
         data={initialAnchorLinkData}
-        variant="anchor"
-        onActivate={onActivate}
+        onEvent={onEvent}
       />,
     )
     const link = screen.getByRole('link')
     fireEvent.keyDown(link, { key: 'Enter', code: 'Enter' })
-    expect(onActivate).toHaveBeenCalledWith('home', linkHref(initialAnchorLinkData))
+    expect(onEvent).toHaveBeenCalledWith({ type: 'activate', key: 'home' })
   })
 })
 
 describe('Link demo (spanRole)', () => {
   it('renders <span role="link"> with data-href', () => {
     render(
-      <Link data={initialSpanLinkData} variant="spanRole" />,
+      <Link data={initialSpanLinkData} />,
     )
     const link = screen.getByRole('link')
     expect(link.tagName).toBe('SPAN')
@@ -63,20 +58,19 @@ describe('Link demo (spanRole)', () => {
   })
 
   it('click and Enter both emit activate with href', () => {
-    const onActivate = vi.fn<(key: string, href: string) => void>()
+    const onEvent = vi.fn<(event: PatternEvent) => void>()
     render(
       <Link
         data={initialSpanLinkData}
-        variant="spanRole"
-        onActivate={onActivate}
+        onEvent={onEvent}
       />,
     )
     const link = screen.getByRole('link')
     fireEvent.click(link)
-    expect(onActivate).toHaveBeenLastCalledWith('home', linkHref(initialSpanLinkData))
+    expect(onEvent).toHaveBeenLastCalledWith({ type: 'activate', key: 'home' })
 
     fireEvent.keyDown(link, { key: 'Enter', code: 'Enter' })
-    expect(onActivate).toHaveBeenCalledTimes(2)
-    expect(onActivate).toHaveBeenLastCalledWith('home', linkHref(initialSpanLinkData))
+    expect(onEvent).toHaveBeenCalledTimes(2)
+    expect(onEvent).toHaveBeenLastCalledWith({ type: 'activate', key: 'home' })
   })
 })

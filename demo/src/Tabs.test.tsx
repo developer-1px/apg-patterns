@@ -8,22 +8,15 @@ import { closeTabInData, tabsVariants, type TabsVariantKey } from './tabsData'
 function TabsDemo({ variant, onEvent: onEventOuter }: { variant: TabsVariantKey; onEvent?: (e: PatternEvent) => void }) {
   const spec = tabsVariants[variant]
   const [data, setData] = useState<PatternData>(spec.data)
-  const handleDataChange = (nextData: PatternData, event: PatternEvent) => {
-    if (event.type === 'extension') return
-    const activeKey = nextData.state?.activeKey
-    if (event.type === 'navigate' && activeKey && spec.options.activationMode === 'automatic') {
-      setData(reduceTabsData(nextData, { type: 'select', keys: [activeKey], anchorKey: activeKey, extentKey: activeKey }))
-      return
-    }
-    setData(nextData)
-  }
   const handleEvent = (event: PatternEvent) => {
     onEventOuter?.(event)
     if (event.type === 'extension' && event.name === 'closeTab' && event.key) {
       setData((current) => closeTabInData(current, event.key as string))
+      return
     }
+    setData((current) => reduceTabsData(current, event))
   }
-  return <Tabs data={data} options={spec.options} onEvent={handleEvent} onDataChange={handleDataChange} />
+  return <Tabs data={data} onEvent={handleEvent} />
 }
 
 describe('Tabs demo — automatic activation', () => {

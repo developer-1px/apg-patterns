@@ -24,7 +24,7 @@ export const entry: PatternEntry = {
       sourceNames: ['Link.tsx', 'linkData.ts', 'link/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
       inspect: renderDataInspect(data),
       variants: <VariantListbox value={variant} items={items} label="link variants" idPrefix="link-variant" onChange={setVariant} />,
-      preview: <Link data={data} variant={variant} onEvent={onEvent} />,
+      preview: <Link data={data} onEvent={onEvent} />,
       reset: () => setVariant('anchor'),
     }
   },

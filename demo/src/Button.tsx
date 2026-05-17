@@ -2,7 +2,6 @@ import type { HTMLAttributes, KeyboardEvent } from 'react'
 import type { KeyInput } from '@interactive-os/keyboard'
 import { createPatternRuntime, type PatternData, type PatternEvent } from '../../src'
 import { buttonDefinition } from '../../src/patterns/button/definition'
-import type { ButtonVariantKey } from './buttonData'
 
 type Props = HTMLAttributes<HTMLElement>
 
@@ -12,10 +11,9 @@ const buttonClass =
 export interface ButtonProps {
   data: PatternData
   onEvent: (event: PatternEvent) => void
-  variant?: ButtonVariantKey
 }
 
-export function Button({ data, onEvent, variant = 'action' }: ButtonProps) {
+export function Button({ data, onEvent }: ButtonProps) {
   const runtime = createPatternRuntime({
     definition: buttonDefinition,
     data,
@@ -30,6 +28,7 @@ export function Button({ data, onEvent, variant = 'action' }: ButtonProps) {
   const key = rootKeys[0]!
   const { onKeyDown: _ignore, ...props } = runtime.getPartProps('button', key) as Props
   const label = data.items[key]?.label ?? ''
+  const isToggle = data.state?.pressedByKey?.[key] !== undefined
 
   const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     const result = runtime.resolveKeyboardBinding(event as unknown as KeyInput, key)
@@ -39,7 +38,7 @@ export function Button({ data, onEvent, variant = 'action' }: ButtonProps) {
   }
   const onFocus = () => runtime.emit({ type: 'focus', key })
 
-  if (variant === 'toggle') {
+  if (isToggle) {
     return (
       <div role="button" {...props} tabIndex={0} onKeyDown={onKeyDown} onFocus={onFocus} className={buttonClass}>
         {label}

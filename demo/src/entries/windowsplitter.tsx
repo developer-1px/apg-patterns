@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { usePatternDataHost } from '../demoHostState'
 import { WindowSplitter } from '../WindowSplitter'
 import { initialWindowSplitterData, reduceWindowSplitterData, windowSplitterOptions } from '../windowsplitterData'
 import { type PatternEntry } from '../demoPatternTypes'
@@ -9,18 +9,18 @@ export const entry: PatternEntry = {
   label: 'Window Splitter',
   order: 27,
   useDemoPattern: (onEvent) => {
-    const [data, setData] = useState(initialWindowSplitterData)
+    const host = usePatternDataHost(initialWindowSplitterData, (data, event) => reduceWindowSplitterData(data, event, windowSplitterOptions))
     return {
       key: 'windowsplitter',
       label: 'Window Splitter',
       keyboardShortcuts: ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'Enter'],
       sourceNames: ['WindowSplitter.tsx', 'windowsplitterData.ts', 'windowsplitter/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
-      inspect: renderDataInspect(data),
-      preview: <WindowSplitter data={data} options={windowSplitterOptions} onEvent={(event) => {
+      inspect: renderDataInspect(host.data),
+      preview: <WindowSplitter data={host.data} options={windowSplitterOptions} onEvent={(event) => {
         onEvent(event)
-        setData((current) => reduceWindowSplitterData(current, event, windowSplitterOptions))
+        host.dispatchEvent(event)
       }} />,
-      reset: () => setData(initialWindowSplitterData),
+      reset: host.reset,
     }
   },
 }

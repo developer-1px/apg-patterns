@@ -1,6 +1,6 @@
-import { useState } from 'react'
 import { Button } from '../Button'
-import { buttonVariantItems, buttonVariants, reduceButtonData, type ButtonVariantKey } from '../buttonData'
+import { buttonVariantItems, buttonVariants, type ButtonVariantKey } from '../buttonData'
+import { useVariantPatternDataHost } from '../demoHostState'
 import { VariantListbox } from '../VariantListbox'
 import { type PatternEntry } from '../demoPatternTypes'
 import { renderDataInspect } from './_inspect'
@@ -10,23 +10,24 @@ export const entry: PatternEntry = {
   label: 'Button',
   order: 15,
   useDemoPattern: (onEvent) => {
-    const [variant, setVariant] = useState<ButtonVariantKey>('action')
-    const [data, setData] = useState(buttonVariants.action.data)
+    const host = useVariantPatternDataHost<ButtonVariantKey>(
+      'action',
+      buttonVariants.action.data,
+      (variant) => buttonVariants[variant].data,
+      (variant, data, event) => buttonVariants[variant].reduce(data, event),
+    )
     return {
       key: 'button',
       label: 'Button',
       keyboardShortcuts: ['Enter', 'Space'],
       sourceNames: ['Button.tsx', 'buttonData.ts', 'button/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
-      inspect: renderDataInspect(data),
-      variants: <VariantListbox value={variant} items={buttonVariantItems} label="button variants" idPrefix="button-variant" onChange={(next) => {
-        setVariant(next)
-        setData(buttonVariants[next].data)
-      }} />,
-      preview: <Button data={data} variant={variant} onEvent={(event) => {
+      inspect: renderDataInspect(host.data),
+      variants: <VariantListbox value={host.variant} items={buttonVariantItems} label="button variants" idPrefix="button-variant" onChange={host.selectVariant} />,
+      preview: <Button data={host.data} onEvent={(event) => {
         onEvent(event)
-        setData((current) => reduceButtonData(current, event))
+        host.dispatchEvent(event)
       }} />,
-      reset: () => setData(buttonVariants[variant].data),
+      reset: host.reset,
     }
   },
 }

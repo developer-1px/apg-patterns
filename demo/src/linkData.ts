@@ -18,7 +18,7 @@ const anchorInitial = PatternDataSchema.parse({
 
 const spanRoleInitial = PatternDataSchema.parse({
   items: {
-    home: { label: 'Open APG Link pattern', href: 'https://www.w3.org/WAI/ARIA/apg/patterns/link/' },
+    home: { label: 'Open APG Link pattern', href: 'https://www.w3.org/WAI/ARIA/apg/patterns/link/', variant: 'spanRole' },
   },
   relations: { rootKeys: ['home'] },
   state: { activeKey: 'home' },

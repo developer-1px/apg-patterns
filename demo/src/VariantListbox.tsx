@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from 'react'
-import { createPatternRuntime, listboxDefinition, type PatternData } from '../../src'
+import { createPatternRuntime, listboxDefinition, reducePatternData, type PatternData } from '../../src'
 
 type Props = HTMLAttributes<HTMLElement>
 
@@ -23,9 +23,7 @@ export function VariantListbox<T extends string>({
     options: { focusStrategy: 'rovingTabIndex', selectionMode: 'single' },
     onEvent: (event) => {
       if (event.type === 'select') selectVariant(event.keys[0], items, onChange)
-    },
-    onDataChange: (nextData, event) => {
-      if (event.type === 'navigate') selectVariant(nextData.state?.activeKey, items, onChange)
+      if (event.type === 'navigate') selectVariant(reducePatternData(listboxDefinition, data, event).state?.activeKey, items, onChange)
     },
     keyToElementId: (key) => `${idPrefix}-${key}`,
   })

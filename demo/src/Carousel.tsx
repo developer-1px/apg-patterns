@@ -5,10 +5,9 @@ import { initialCarouselData } from './carouselData'
 
 export interface CarouselProps {
   data?: PatternData
-  showDots?: boolean
 }
 
-export function Carousel({ data: initialData = initialCarouselData, showDots = true }: CarouselProps) {
+export function Carousel({ data: initialData = initialCarouselData }: CarouselProps) {
   const [data, dispatch] = useReducer(
     (current: PatternData, event: Parameters<typeof reducePatternData>[2]) =>
       reducePatternData(carouselDefinition, current, event),
@@ -31,6 +30,7 @@ export function Carousel({ data: initialData = initialCarouselData, showDots = t
   const rootProps = runtime.getPartProps('root') as HTMLAttributes<HTMLElement>
   const prevProps = runtime.getPartProps('prev', 'prev') as HTMLAttributes<HTMLButtonElement>
   const nextProps = runtime.getPartProps('next', 'next') as HTMLAttributes<HTMLButtonElement>
+  const showDots = ((data.state as { showDots?: boolean } | undefined)?.showDots ?? true) === true
 
   return (
     <div

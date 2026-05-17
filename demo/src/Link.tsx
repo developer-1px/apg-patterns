@@ -2,7 +2,6 @@ import type { AnchorHTMLAttributes, HTMLAttributes, KeyboardEvent, MouseEvent } 
 import type { KeyInput } from '@interactive-os/keyboard'
 import { createPatternRuntime, type PatternData, type PatternEvent } from '../../src'
 import { linkDefinition } from '../../src/patterns/link/definition'
-import type { LinkVariantKey } from './linkData'
 
 type Props = HTMLAttributes<HTMLElement>
 
@@ -11,25 +10,18 @@ const linkClass =
 
 export interface LinkProps {
   data: PatternData
-  variant?: LinkVariantKey
-  onActivate?: (key: string, href: string) => void
   onEvent?: (event: PatternEvent) => void
 }
 
-export function Link({ data, variant = 'anchor', onActivate, onEvent }: LinkProps) {
+export function Link({ data, onEvent }: LinkProps) {
   const rootKey = data.relations?.rootKeys?.[0] ?? null
   const href = rootKey ? String((data.items[rootKey] as { href?: unknown } | undefined)?.href ?? '#') : '#'
-
-  const emit = (event: PatternEvent) => {
-    onEvent?.(event)
-    if (event.type === 'activate' && onActivate) onActivate(event.key, href)
-  }
 
   const runtime = createPatternRuntime({
     definition: linkDefinition,
     data,
     options: {},
-    onEvent: emit,
+    onEvent: onEvent ?? (() => {}),
     keyToElementId: (key) => `link-${key}`,
   })
 
@@ -42,6 +34,7 @@ export function Link({ data, variant = 'anchor', onActivate, onEvent }: LinkProp
     rootKeyboard(event as unknown as KeyInput & { preventDefault?: () => void })
 
   const label = data.items[rootKey]?.label ?? rootKey
+  const variant = (data.items[rootKey] as { variant?: string } | undefined)?.variant ?? 'anchor'
 
   if (variant === 'spanRole') {
     return (

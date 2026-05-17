@@ -11,11 +11,9 @@ const itemClass =
 export function Checkbox({
   data,
   onEvent,
-  groupLabel,
 }: {
   data: PatternData
   onEvent: (event: PatternEvent) => void
-  groupLabel?: string
 }) {
   const runtime = createPatternRuntime({
     definition: checkboxDefinition,
@@ -71,6 +69,7 @@ export function Checkbox({
   const parent = items[0]!
   const children = items.slice(1)
   const groupId = `checkbox-group-${parent.key}-label`
+  const groupLabel = data.refs?.label
   return (
     <div className="grid gap-1">
       {groupLabel ? (
