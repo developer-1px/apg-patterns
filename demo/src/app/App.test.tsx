@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
-import { coerceRightMode, formatEvent, loadSourcePreview } from './App'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { coerceRightMode, formatEvent, isCopyableSource, loadSourcePreview } from './App'
 import { App } from './App'
 import { patternEntries } from '../shared/demoPatterns'
 import { sourceLoaders, sourceNameCollisions } from '../shared/sources'
@@ -35,6 +35,37 @@ describe('coerceRightMode', () => {
 describe('loadSourcePreview', () => {
   it('returns a readable missing-source marker instead of throwing', async () => {
     await expect(loadSourcePreview('__missing__.tsx')).resolves.toBe('missing source: __missing__.tsx')
+  })
+})
+
+describe('source copy', () => {
+  it('only treats loaded source text as copyable', () => {
+    expect(isCopyableSource('loading')).toBe(false)
+    expect(isCopyableSource('missing source: Missing.tsx')).toBe(false)
+    expect(isCopyableSource('export function Demo() {}')).toBe(true)
+  })
+
+  it('copies the loaded source text instead of transient loader text', async () => {
+    const writes: string[] = []
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: async (value: string) => { writes.push(value) } },
+    })
+    replaceHash('#pattern=accordion&panel=code&source=Accordion.tsx')
+
+    render(<App />)
+
+    const copyButton = screen.getByRole('button', { name: 'copy' })
+    expect(copyButton).toHaveProperty('disabled', true)
+    fireEvent.click(copyButton)
+    expect(writes).toEqual([])
+
+    await waitFor(() => expect(copyButton).toHaveProperty('disabled', false))
+    fireEvent.click(copyButton)
+
+    await waitFor(() => expect(writes).toHaveLength(1))
+    expect(writes[0]).toContain('export function Accordion')
+    expect(writes[0]).not.toBe('loading')
   })
 })
 

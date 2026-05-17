@@ -97,6 +97,7 @@ function ActiveDemoWorkspace({
   const sourceTabs = useSourceTabs({ label: 'source files', tabs: sourceNames, value: activeSourceName, onChange: (sourceName) => dispatch({ type: 'selectSource', sourceName }) })
   const rightModeTabs = useSourceTabs({ label: 'right panel', tabs: rightModes, value: state.rightMode, onChange: (rightMode) => dispatch({ type: 'selectRightMode', rightMode }) })
   const eventLog = state.events.map(formatEvent).join('\n') || 'none'
+  const canCopySource = isCopyableSource(source)
 
   useEffect(() => {
     writeAppHash({
@@ -136,6 +137,7 @@ function ActiveDemoWorkspace({
   }, [copyState])
 
   const copySource = () => {
+    if (!canCopySource) return
     setCopyState('copied')
     void copyText(source)
   }
@@ -190,7 +192,7 @@ function ActiveDemoWorkspace({
               <div className="grid gap-1">
                 <div className="flex min-w-0 items-start gap-2">
                   <SourceTabs tabs={sourceTabs.tabs} getTablistProps={sourceTabs.getTablistProps} getTabProps={sourceTabs.getTabProps} />
-                  <button type="button" className={`${buttonClass} w-16 shrink-0`} onClick={copySource}>
+                  <button type="button" className={`${buttonClass} w-16 shrink-0`} onClick={copySource} disabled={!canCopySource}>
                     {copyState === 'idle' ? 'copy' : copyState}
                   </button>
                 </div>
@@ -299,6 +301,10 @@ export async function loadSourcePreview(sourceName: SourceName): Promise<string>
   } catch {
     return `missing source: ${sourceName}`
   }
+}
+
+export function isCopyableSource(source: string): boolean {
+  return source.length > 0 && source !== 'loading' && !source.startsWith('missing source:')
 }
 
 export function formatEvent(event: PatternEvent): string {
