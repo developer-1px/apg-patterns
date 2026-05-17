@@ -227,6 +227,17 @@ async function runSmoke() {
     'closed right panel route did not keep the source panel closed',
   )
 
+  await verifyHashRoute('#pattern=checkbox&panel=code&source=Accordion.tsx', (text) =>
+    currentHashParam('pattern') === 'checkbox'
+    && currentHashParam('panel') === 'code'
+    && currentHashParam('source') === 'Checkbox.tsx'
+    && hasActiveDemoHeading('Checkbox')
+    && sourceFilenameIs('Checkbox.tsx')
+    && text.includes('export function Checkbox')
+    && !text.includes('missing source: Accordion.tsx'),
+    'valid pattern route with stale source did not recover to the pattern default source',
+  )
+
   await verifyHashRoute('#pattern=missing&panel=missing&source=Missing.tsx', (text) =>
     window.location.hash === '#pattern=treeview&panel=code&source=Tree.tsx'
     && hasActiveDemoHeading('Treeview')
