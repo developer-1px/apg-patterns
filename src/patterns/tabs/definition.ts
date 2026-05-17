@@ -1,4 +1,4 @@
-import { moveLinear } from '@interactive-os/keyboard-navigation'
+import { moveLinear } from '@interactive-os/collection-navigation'
 import { PatternDefinitionSchema } from '../../schema'
 import { defineNavigationTarget } from '../../patternKernel'
 

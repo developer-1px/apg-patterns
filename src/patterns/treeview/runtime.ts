@@ -1,5 +1,5 @@
 import { createTypeaheadBuffer, matchesShortcut, type KeyInput, type TypeaheadBuffer } from '@interactive-os/keyboard'
-import { findTypeaheadMatch } from '@interactive-os/keyboard-navigation'
+import { findTypeaheadMatch } from '@interactive-os/collection-navigation'
 import {
   PatternDataSchema,
   PatternEventSchema,

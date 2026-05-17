@@ -1,8 +1,8 @@
 import { useMemo, useRef } from 'react'
 import type { HTMLAttributes } from 'react'
 import { createTypeaheadBuffer } from '@interactive-os/keyboard'
-import { createTreeviewRuntime, type CreateTreeviewRuntimeInput, type TreeviewRuntime, type TreeviewSlotProps } from './treeviewRuntime'
-import { createTabsRuntime, type CreateTabsRuntimeInput, type TabsRuntime } from './tabsRuntime'
+import { createTreeviewRuntime, type CreateTreeviewRuntimeInput, type TreeviewRuntime, type TreeviewSlotProps } from './patterns/treeview/runtime'
+import { createTabsRuntime, type CreateTabsRuntimeInput, type TabsRuntime } from './patterns/tabs/runtime'
 
 export type ReactTreeviewProps = HTMLAttributes<HTMLElement>
 

@@ -1,4 +1,4 @@
-import { moveGrid } from '@interactive-os/keyboard-navigation'
+import { moveGrid } from '@interactive-os/collection-navigation'
 import { PatternDefinitionSchema } from '../../schema'
 import { defineNavigationTarget, defineVisibleOrder } from '../../patternKernel'
 import type { Key, PatternData } from '../../schema'

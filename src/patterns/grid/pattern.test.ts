@@ -10,7 +10,7 @@
  * resolver registration, not by changing treeview runtime code.
  */
 import { describe, expect, it } from 'vitest'
-import { moveGrid } from '@interactive-os/keyboard-navigation'
+import { moveGrid } from '@interactive-os/collection-navigation'
 import {
   PatternDataSchema,
   PatternDefinitionSchema,
