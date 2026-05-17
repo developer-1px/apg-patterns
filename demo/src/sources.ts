@@ -7,6 +7,7 @@ import treeviewDefinitionSource from '../../src/patterns/treeview/definition.ts?
 import treeviewRuntimeSource from '../../src/patterns/treeview/runtime.ts?raw'
 import disclosureDefinitionSource from '../../src/patterns/disclosure/definition.ts?raw'
 import disclosureRuntimeSource from '../../src/patterns/disclosure/runtime.ts?raw'
+import checkboxDefinitionSource from '../../src/patterns/checkbox/definition.ts?raw'
 import patternKernelSource from '../../src/patternKernel.ts?raw'
 import patternReducerSource from '../../src/patternReducer.ts?raw'
 import patternRuntimeSource from '../../src/patternRuntime.ts?raw'
@@ -23,9 +24,10 @@ import tabsDataSource from './tabsData.ts?raw'
 import treeSource from './Tree.tsx?raw'
 import disclosureSource from './Disclosure.tsx?raw'
 import disclosureDataSource from './disclosureData.ts?raw'
+import checkboxSource from './Checkbox.tsx?raw'
+import checkboxDataSource from './checkboxData.ts?raw'
 import demoDataSource from './demoData.ts?raw'
 import focusHookSource from './useTreeDomFocus.ts?raw'
-import type { PatternKey } from './patterns'
 
 export const sources = {
   'Tree.tsx': treeSource,
@@ -51,6 +53,9 @@ export const sources = {
   'disclosureData.ts': disclosureDataSource,
   'disclosure/definition.ts': disclosureDefinitionSource,
   'disclosure/runtime.ts': disclosureRuntimeSource,
+  'Checkbox.tsx': checkboxSource,
+  'checkboxData.ts': checkboxDataSource,
+  'checkbox/definition.ts': checkboxDefinitionSource,
   'patternRuntime.ts': patternRuntimeSource,
   'patternReducer.ts': patternReducerSource,
   'patternKernel.ts': patternKernelSource,
@@ -58,16 +63,3 @@ export const sources = {
 } as const
 
 export type SourceName = keyof typeof sources
-
-const sourceOrderByPattern = {
-  treeview: ['Tree.tsx', 'useTreeDomFocus.ts', 'react.ts', 'treeview/runtime.ts', 'treeview/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts', 'demoData.ts'],
-  listbox: ['Listbox.tsx', 'listboxData.ts', 'listbox/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
-  grid: ['Grid.tsx', 'gridData.ts', 'grid/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
-  tabs: ['Tabs.tsx', 'tabsData.ts', 'react.ts', 'tabs/runtime.ts', 'tabs/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
-  slider: ['Slider.tsx', 'sliderData.ts', 'slider/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
-  disclosure: ['Disclosure.tsx', 'disclosureData.ts', 'disclosure/runtime.ts', 'disclosure/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
-} satisfies Record<PatternKey, readonly SourceName[]>
-
-export function getSourceNames(patternKey: PatternKey): readonly SourceName[] {
-  return sourceOrderByPattern[patternKey]
-}

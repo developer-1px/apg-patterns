@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import type { HTMLAttributes } from 'react'
 import { createPatternRuntime, listboxDefinition, type PatternData } from '../../src'
-import { patternItems, type PatternKey } from './patterns'
+import { patternItems, type PatternKey } from './demoPatterns'
 
 type Props = HTMLAttributes<HTMLElement>
 

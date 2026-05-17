@@ -1,5 +1,4 @@
 import { gridRows, type PatternData, type PatternOptions } from '../../src'
-import type { PatternKey } from './patterns'
 
 export function renderAriaTree(data: PatternData, options: PatternOptions) {
   const activeKey = data.state?.activeKey
@@ -34,13 +33,6 @@ export function renderHtmlTree(data: PatternData, options: PatternOptions) {
   return lines.join('\n')
 }
 
-export function renderStaticInspect(patternKey: PatternKey) {
-  if (patternKey === 'grid') {
-    return ['grid', 'aria-label="Transactions"', '  columnheader "Date" aria-rowindex=1 aria-colindex=1', '  columnheader "Type" aria-rowindex=1 aria-colindex=2', '  columnheader "Amount" aria-rowindex=1 aria-colindex=3', '  gridcell "Deposit" tabIndex=0'].join('\n')
-  }
-  return ''
-}
-
 export function renderDisclosureInspect(data: PatternData) {
   const triggerKey = data.relations?.rootKeys?.[0]
   if (!triggerKey) return ''
@@ -53,6 +45,14 @@ export function renderDisclosureInspect(data: PatternData) {
     lines.push(`  region aria-labelledby=${JSON.stringify(triggerKey)}`)
   }
   return lines.join('\n')
+}
+
+export function renderCheckboxInspect(data: PatternData) {
+  const key = data.relations?.rootKeys?.[0]
+  if (!key) return ''
+  return `checkbox "${data.items[key]?.label ?? key}" ${attrLine({
+    'aria-checked': data.state?.checkedByKey?.[key] ?? false,
+  }, ['aria-checked'])}`
 }
 
 export function renderTabsInspect(data: PatternData) {
