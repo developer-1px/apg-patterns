@@ -42,10 +42,10 @@ export const initialImageDisclosureData: PatternData = {
 
 export const imageDisclosureContent = {
   imageUrl:
-    'https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/examples/images/welsh-springer-spaniel.jpg',
-  imageAlt: 'Welsh Springer Spaniel',
+    'https://picsum.photos/id/237/900/520',
+  imageAlt: 'Portrait of a black dog',
   description:
-    'A Welsh Springer Spaniel is a medium-sized dog with a soft, wavy red-and-white coat, long feathered ears, and a friendly, attentive expression.',
+    'A close portrait of a black dog against a dark, softly blurred background.',
 }
 
 // ── APG variant: Disclosure of Answers to FAQs ──────────────────────────────
