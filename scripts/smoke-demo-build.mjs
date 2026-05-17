@@ -304,6 +304,7 @@ async function waitForPatternRoute({ pattern, panel, source, label }) {
     && currentHashParam('panel') === panel
     && currentHashParam('source') === source
     && hasActiveDemoHeading(label)
+    && previewSurfaceIsMounted(pattern)
     && (panel === 'off' || findRightPanelTab(panel)?.getAttribute('aria-selected') === 'true')
     && (panel !== 'code' || sourceFilenameIs(source)),
   )
