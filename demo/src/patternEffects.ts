@@ -1,4 +1,4 @@
-import { useEffect, useRef, type KeyboardEvent as ReactKeyboardEvent } from 'react'
+import { useLayoutEffect, useRef, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import {
   createParentByKey,
   evaluatePredicate,
@@ -29,7 +29,7 @@ export function usePatternEffects({
 }) {
   const previousMatches = useRef<boolean[]>([])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const nextMatches: boolean[] = []
     for (const [index, effect] of (definition.effects ?? []).entries()) {
       const ctx = { data, activeKey: data.state?.activeKey ?? null, parentByKey: createParentByKey(data), keyToElementId }
@@ -38,8 +38,6 @@ export function usePatternEffects({
       if (!matches || previousMatches.current[index] === matches) continue
       if (effect.kind === 'focus' || effect.kind === 'restoreFocus') {
         const target = resolveElementTarget(effect.target, data, keyToElementId)
-        // eslint-disable-next-line no-console
-        console.log('effect', effect.kind, target?.id)
         target?.focus({ preventScroll: effect.preventScroll })
       }
     }
@@ -82,7 +80,8 @@ export function handlePatternTrapFocus({
 
 function resolveElementTarget(target: ElementTarget, data: PatternData, keyToElementId: (key: Key) => string): HTMLElement | null {
   if (target.kind === 'firstFocusable') {
-    return resolveElementTarget(target.root, data, keyToElementId)?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR) ?? null
+    const root = resolveElementTarget(target.root, data, keyToElementId)
+    return root?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR) ?? null
   }
   const key = resolveElementTargetKey(target, data)
   return key ? document.getElementById(keyToElementId(key)) : null

@@ -49,7 +49,7 @@ export function Dialog({ data: initialData = initialDialogData }: DialogProps = 
       </button>
       {open ? (
         <>
-          <div {...runtime.getPartProps('overlay', 'dialog')} className={overlayClass} data-testid="dialog-overlay" />
+          <div {...runtime.getPartProps('overlay')} className={overlayClass} data-testid="dialog-overlay" />
           <div
             {...runtime.getPartProps('dialog', 'dialog')}
             className={panelClass}
