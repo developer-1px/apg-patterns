@@ -38,6 +38,14 @@ describe('loadSourcePreview', () => {
   it('returns a readable missing-source marker instead of throwing', async () => {
     await expect(loadSourcePreview('__missing__.tsx')).resolves.toBe('missing source: __missing__.tsx')
   })
+
+  it('returns a readable failed-source marker when a registered loader throws', async () => {
+    await expect(loadSourcePreview('Broken.tsx', {
+      'Broken.tsx': async () => {
+        throw new Error('broken loader')
+      },
+    })).resolves.toBe('failed source: Broken.tsx')
+  })
 })
 
 describe('source copy', () => {

@@ -302,8 +302,10 @@ async function copyText(value: string): Promise<boolean> {
   }
 }
 
-export async function loadSourcePreview(sourceName: SourceName): Promise<string> {
-  const loadSource = sourceLoaders[sourceName]
+type SourceLoaderMap = Readonly<Record<string, (() => Promise<string>) | undefined>>
+
+export async function loadSourcePreview(sourceName: SourceName, loaders: SourceLoaderMap = sourceLoaders): Promise<string> {
+  const loadSource = loaders[sourceName]
   if (!loadSource) return `missing source: ${sourceName}`
 
   try {
