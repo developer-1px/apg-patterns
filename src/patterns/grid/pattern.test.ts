@@ -19,7 +19,7 @@ import {
   defineVisibleOrder,
   type Key,
   type PatternData,
-} from './index'
+} from '../../index'
 
 type GridAction = 'left' | 'right' | 'up' | 'down' | 'rowStart' | 'rowEnd' | 'gridStart' | 'gridEnd'
 

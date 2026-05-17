@@ -13,7 +13,7 @@ import {
   defineVisibleOrder,
   type PatternData,
   type PatternEvent,
-} from './index'
+} from '../../index'
 
 // 'flat' visibleOrder + 'linear' navigationTarget 은 kernel 기본 — 별도 등록 불필요.
 

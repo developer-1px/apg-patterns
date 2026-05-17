@@ -1,7 +1,7 @@
 import { moveGrid } from '@interactive-os/keyboard-navigation'
-import { PatternDefinitionSchema } from './schema'
-import { defineNavigationTarget, defineVisibleOrder } from './patternKernel'
-import type { Key, PatternData } from './schema'
+import { PatternDefinitionSchema } from '../../schema'
+import { defineNavigationTarget, defineVisibleOrder } from '../../patternKernel'
+import type { Key, PatternData } from '../../schema'
 
 type GridAction = 'left' | 'right' | 'up' | 'down' | 'rowStart' | 'rowEnd' | 'gridStart' | 'gridEnd'
 

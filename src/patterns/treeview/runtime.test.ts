@@ -12,7 +12,7 @@ import {
   treeviewPatternDefinition,
   type PatternData,
   type PatternEvent,
-} from './index'
+} from '../../index'
 
 const keyInput = (key: string) => ({
   key,

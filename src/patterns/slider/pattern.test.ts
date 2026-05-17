@@ -21,7 +21,7 @@ import {
   defineAriaSource,
   defineVisibleOrder,
   type PatternEvent,
-} from './index'
+} from '../../index'
 
 // ── 1. slider 커스텀 토큰 등록 (kernel 무손상) ─────────────────────
 

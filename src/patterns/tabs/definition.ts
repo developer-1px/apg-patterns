@@ -1,6 +1,6 @@
 import { moveLinear } from '@interactive-os/keyboard-navigation'
-import { PatternDefinitionSchema } from './schema'
-import { defineNavigationTarget } from './patternKernel'
+import { PatternDefinitionSchema } from '../../schema'
+import { defineNavigationTarget } from '../../patternKernel'
 
 // flatTabs 별칭은 제거 — kernel 의 'flat' 을 재사용한다 (P1 fragmentation 통합).
 

@@ -29,7 +29,7 @@ import {
   defineVisibleOrder,
   type PatternDefinition,
   type PatternEvent,
-} from './index'
+} from '../../index'
 
 // ── Token registrations ────────────────────────────────────────────
 

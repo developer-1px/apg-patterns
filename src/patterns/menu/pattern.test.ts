@@ -6,7 +6,7 @@ import {
   type PatternEvent,
   createPatternRuntime,
   defineAriaSource,
-} from './index'
+} from '../../index'
 
 // ─────────────────────────────────────────────────────────────
 // Token registrations — menubar-specific.

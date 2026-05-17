@@ -16,7 +16,7 @@ import {
   dispatchNavigationTarget,
   evaluatePredicate,
   createParentByKey,
-} from './index'
+} from '../../index'
 
 // ── 1. listbox 전용 토큰 등록 (밖) ────────────────────────────
 // 'flat' visibleOrder 와 'linear' navigationTarget 모두 kernel 기본 등록 — 별도 등록 불필요.

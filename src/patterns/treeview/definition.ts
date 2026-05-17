@@ -1,5 +1,5 @@
-import { PatternDefinitionSchema } from './schema'
-import { defineNavigationTarget, defineVisibleOrder, resolveKeyToken } from './patternKernel'
+import { PatternDefinitionSchema } from '../../schema'
+import { defineNavigationTarget, defineVisibleOrder, resolveKeyToken } from '../../patternKernel'
 import { moveLinear, visibleTreeItems } from '@interactive-os/keyboard-navigation'
 
 // 패턴 무관 'linear' navigation target — kernel 에 있어도 되지만

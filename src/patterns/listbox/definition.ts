@@ -1,4 +1,4 @@
-import { PatternDefinitionSchema } from './schema'
+import { PatternDefinitionSchema } from '../../schema'
 
 export const listboxDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'listbox',

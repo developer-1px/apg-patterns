@@ -4,9 +4,9 @@ import {
   type CreatePatternRuntimeInput,
   type PatternRuntime,
   type SlotProps,
-} from './patternKernel'
-import { PatternDataSchema, PatternEventSchema, PatternOptionsSchema, type Key, type PatternData, type PatternEvent, type PatternOptions } from './schema'
-import { tabsPatternDefinition } from './tabsDefinition'
+} from '../../patternKernel'
+import { PatternDataSchema, PatternEventSchema, PatternOptionsSchema, type Key, type PatternData, type PatternEvent, type PatternOptions } from '../../schema'
+import { tabsPatternDefinition } from './definition'
 
 export interface TabsRuntime {
   definition: typeof tabsPatternDefinition
