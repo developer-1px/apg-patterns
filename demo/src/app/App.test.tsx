@@ -102,7 +102,7 @@ describe('source copy', () => {
     await waitFor(() => expect(copyButton).toHaveProperty('disabled', false))
     fireEvent.click(copyButton)
 
-    await waitFor(() => expect(copyButton).toHaveAccessibleName('copy'))
+    await waitFor(() => expect(copyButton.getAttribute('aria-label')).toBe('copy'))
     expect(screen.queryByRole('button', { name: 'copied' })).toBeNull()
   })
 
