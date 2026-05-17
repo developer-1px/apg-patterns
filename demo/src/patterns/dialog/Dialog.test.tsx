@@ -19,6 +19,12 @@ describe('Dialog demo (modal)', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('true')
   })
 
+  it('does not move focus to the trigger before the dialog opens', () => {
+    render(<Dialog />)
+    const trigger = screen.getByRole('button', { name: /add delivery address/i })
+    expect(document.activeElement).not.toBe(trigger)
+  })
+
   it('focuses first interactive element when opened', () => {
     render(<Dialog />)
     const trigger = screen.getByRole('button', { name: /add delivery address/i })

@@ -82,7 +82,7 @@ function shouldRunEffect({
     if (!activeKey || !reason || !effect.on.reasons.some((item) => item === reason)) return false
     return effect.scope?.kind !== 'focusWithin' || containsActiveElement(effect.target, data, keyToElementId, definition.rootRole)
   }
-  return previousMatches !== matches
+  return previousMatches !== undefined && previousMatches !== matches
 }
 
 export function handlePatternTrapFocus({

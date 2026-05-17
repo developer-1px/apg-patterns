@@ -16,6 +16,12 @@ function AlertDialogDemo({ onEvent }: { onEvent?: (event: PatternEvent) => void 
 }
 
 describe('AlertDialog demo', () => {
+  it('does not move focus to the trigger before the alertdialog opens', () => {
+    render(<AlertDialogDemo />)
+    const trigger = screen.getByRole('button', { name: 'Discard draft' })
+    expect(document.activeElement).not.toBe(trigger)
+  })
+
   it('trigger click opens alertdialog with aria-modal and focuses confirm', () => {
     render(<AlertDialogDemo />)
     const trigger = screen.getByRole('button', { name: 'Discard draft' })
