@@ -282,6 +282,14 @@ describe('demo source wiring', () => {
 
     expect(exposedCollisions).toEqual([])
   })
+
+  it('does not serve ambiguous source names from the source registry', () => {
+    const servedCollisions = sourceNameCollisions
+      .map((collision) => collision.name)
+      .filter((name) => sourceLoaders[name])
+
+    expect(servedCollisions).toEqual([])
+  })
 })
 
 function DemoSourceProbe({

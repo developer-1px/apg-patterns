@@ -79,8 +79,10 @@ for (const [path, load] of Object.entries(demoDataModules)) {
   registerSource(name, path, load)
 }
 
-export const sourceLoaders: Readonly<Record<string, SourceLoader>> = collected
 export const sourceNameCollisions: readonly SourceCollision[] = Array.from(collectedPaths.entries())
   .filter(([, paths]) => paths.length > 1)
   .map(([name, paths]) => ({ name, paths }))
+for (const { name } of sourceNameCollisions) delete collected[name]
+
+export const sourceLoaders: Readonly<Record<string, SourceLoader>> = collected
 export type SourceName = string
