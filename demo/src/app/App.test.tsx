@@ -166,6 +166,23 @@ describe('App route state', () => {
     expect(screen.getByRole('tab', { name: 'events', selected: true })).toBeTruthy()
     expect(screen.getByText('0 events')).toBeTruthy()
   })
+
+  it('mounts every registered pattern from its deep link with a real source tab', async () => {
+    const routes = collectPatternRoutes()
+
+    for (const route of routes) {
+      replaceHash(routeHash(route))
+      const { unmount } = render(<App />)
+
+      expect(screen.getByRole('heading', { name: route.label })).toBeTruthy()
+      await waitFor(() => expect(currentHashParam('pattern')).toBe(route.key))
+      expect(currentHashParam('source')).toBe(route.sourceName)
+      expect(screen.getByTitle(route.sourceName)).toBeTruthy()
+      expect(screen.queryByText(`missing source: ${route.sourceName}`)).toBeNull()
+
+      unmount()
+    }
+  })
 })
 
 describe('event log', () => {
@@ -453,6 +470,40 @@ function DemoSourceProbeItem({
   return null
 }
 
+function collectPatternRoutes() {
+  const routes: { key: string; label: string; sourceName: string }[] = []
+
+  render(<PatternRouteProbe onRoute={(route) => routes.push(route)} />).unmount()
+
+  return routes
+}
+
+function PatternRouteProbe({
+  onRoute,
+}: {
+  onRoute: (route: { key: string; label: string; sourceName: string }) => void
+}) {
+  return (
+    <>
+      {patternEntries.map((entry) => (
+        <PatternRouteProbeItem key={entry.key} entry={entry} onRoute={onRoute} />
+      ))}
+    </>
+  )
+}
+
+function PatternRouteProbeItem({
+  entry,
+  onRoute,
+}: {
+  entry: (typeof patternEntries)[number]
+  onRoute: (route: { key: string; label: string; sourceName: string }) => void
+}) {
+  const demo = entry.useDemoPattern(() => undefined)
+  onRoute({ key: entry.key, label: entry.label, sourceName: demo.sourceNames[0] })
+  return null
+}
+
 function expectedHookSources(patternKey: string) {
   return Object.keys(sourceLoaders).filter((sourceName) => (
     sourceName.startsWith(`${patternKey}/`)
@@ -472,6 +523,14 @@ function duplicates(values: readonly string[]) {
 
 function replaceHash(hash: string) {
   window.history.replaceState(null, '', hash)
+}
+
+function routeHash({ key, sourceName }: { key: string; sourceName: string }) {
+  const params = new URLSearchParams()
+  params.set('pattern', key)
+  params.set('panel', 'code')
+  params.set('source', sourceName)
+  return `#${params.toString()}`
 }
 
 function currentHashParam(name: string) {
