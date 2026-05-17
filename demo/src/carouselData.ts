@@ -38,7 +38,7 @@ export const initialCarouselData: PatternData = {
   items: {
     prev: { label: 'Previous Slide' },
     next: { label: 'Next Slide' },
-    ...Object.fromEntries(carouselSlides.map((slide, index) => [slide.key, { label: `Slide ${index + 1}` }])),
+    ...Object.fromEntries(carouselSlides.map((slide, index) => [slide.key, { label: `Slide ${index + 1}`, title: slide.title, caption: slide.caption, imageUrl: slide.imageUrl }])),
   },
   relations: {
     rootKeys: carouselSlides.map((slide) => slide.key),
@@ -46,5 +46,8 @@ export const initialCarouselData: PatternData = {
   state: {
     activeKey: carouselSlides[0].key,
     selectedKeys: [carouselSlides[0].key],
+  },
+  refs: {
+    label: 'Featured photos',
   },
 }

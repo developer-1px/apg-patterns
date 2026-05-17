@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react'
-import type { AlertDialogData } from './alertdialogData'
+import type { PatternData } from '../../src'
+import { initialAlertDialogData } from './alertdialogData'
 
 export interface AlertDialogProps {
-  data: AlertDialogData
+  data?: PatternData
   onConfirm?: () => void
   onCancel?: () => void
 }
@@ -10,7 +11,7 @@ export interface AlertDialogProps {
 const titleId = 'alertdialog-title'
 const descId = 'alertdialog-desc'
 
-export function AlertDialog({ data, onConfirm, onCancel }: AlertDialogProps) {
+export function AlertDialog({ data = initialAlertDialogData, onConfirm, onCancel }: AlertDialogProps) {
   const [open, setOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const confirmRef = useRef<HTMLButtonElement>(null)
@@ -53,6 +54,7 @@ export function AlertDialog({ data, onConfirm, onCancel }: AlertDialogProps) {
       event.preventDefault()
     }
   }
+  const labelOf = (key: string) => data.items[key]?.label ?? key
 
   return (
     <div>
@@ -63,7 +65,7 @@ export function AlertDialog({ data, onConfirm, onCancel }: AlertDialogProps) {
         aria-expanded={open}
         onClick={() => setOpen(true)}
       >
-        {data.triggerLabel}
+        {labelOf('trigger')}
       </button>
       {open ? (
         <div
@@ -79,8 +81,8 @@ export function AlertDialog({ data, onConfirm, onCancel }: AlertDialogProps) {
             aria-describedby={descId}
             onKeyDown={handleKeyDown}
           >
-            <h2 id={titleId}>{data.title}</h2>
-            <p id={descId}>{data.description}</p>
+            <h2 id={titleId}>{labelOf('title')}</h2>
+            <p id={descId}>{labelOf('description')}</p>
             <div>
               <button
                 ref={confirmRef}
@@ -90,7 +92,7 @@ export function AlertDialog({ data, onConfirm, onCancel }: AlertDialogProps) {
                   close()
                 }}
               >
-                {data.confirmLabel}
+                {labelOf('confirm')}
               </button>
               <button
                 ref={cancelRef}
@@ -100,7 +102,7 @@ export function AlertDialog({ data, onConfirm, onCancel }: AlertDialogProps) {
                   close()
                 }}
               >
-                {data.cancelLabel}
+                {labelOf('cancel')}
               </button>
             </div>
           </div>

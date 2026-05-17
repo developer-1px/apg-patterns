@@ -20,6 +20,8 @@ import { moveLinear } from '@interactive-os/collection-navigation'
 defineAriaSource('refs.label', (ctx) => ctx.data.refs?.label)
 defineAriaSource('refs.labelledBy', (ctx) => ctx.data.refs?.labelledBy)
 defineAriaSource('options.orientation', (ctx) => ctx.options?.orientation)
+defineAriaSource('options.roledescription', (ctx) => (ctx.options as Record<string, unknown> | undefined)?.roledescription)
+defineAriaSource('options.slideRoledescription', (ctx) => (ctx.options as Record<string, unknown> | undefined)?.slideRoledescription)
 defineAriaSource('options.selectionMode.multiple', (ctx) => (ctx.options?.selectionMode === 'multiple' ? true : undefined))
 defineAriaSource('state.activeKey.elementId', (ctx) => (ctx.activeKey && ctx.keyToElementId ? ctx.keyToElementId(ctx.activeKey) : undefined))
 defineAriaSource('state.inactiveKey', (ctx) => (ctx.key != null && ctx.activeKey !== ctx.key ? true : undefined))

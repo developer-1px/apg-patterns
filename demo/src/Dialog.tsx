@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react'
-import { dialogContent } from './dialogData'
+import type { PatternData } from '../../src'
+import { dialogContent, initialDialogData } from './dialogData'
 
 const triggerClass =
   'inline-flex h-8 items-center rounded bg-zinc-100 px-3 text-sm text-zinc-800 outline-none hover:bg-zinc-200 focus:outline focus:outline-2 focus:outline-zinc-400 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:focus:outline-zinc-500'
@@ -26,7 +27,11 @@ function focusableIn(root: HTMLElement | null): HTMLElement[] {
   return Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
 }
 
-export function Dialog() {
+export interface DialogProps {
+  data?: PatternData
+}
+
+export function Dialog({ data = initialDialogData }: DialogProps = {}) {
   const [open, setOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement | null>(null)
   const panelRef = useRef<HTMLDivElement | null>(null)
@@ -71,6 +76,7 @@ export function Dialog() {
   const onOverlayMouseDown = (event: MouseEvent<HTMLDivElement>) => {
     if (event.target === event.currentTarget) close()
   }
+  const labelOf = (key: string) => data.items[key]?.label ?? key
 
   return (
     <div className="grid gap-3">
@@ -83,7 +89,7 @@ export function Dialog() {
         aria-controls="dialog-panel"
         onClick={() => setOpen(true)}
       >
-        {dialogContent.triggerLabel}
+        {labelOf('trigger')}
       </button>
       {open ? (
         <>
@@ -99,8 +105,8 @@ export function Dialog() {
             onKeyDown={onPanelKeyDown}
             tabIndex={-1}
           >
-            <h2 id={titleId} className="mb-1 text-base font-medium">{dialogContent.title}</h2>
-            <p id={descId} className="mb-4 text-zinc-600 dark:text-zinc-400">{dialogContent.description}</p>
+            <h2 id={titleId} className="mb-1 text-base font-medium">{labelOf('title')}</h2>
+            <p id={descId} className="mb-4 text-zinc-600 dark:text-zinc-400">{labelOf('description')}</p>
             <div className="grid gap-2">
               {dialogContent.fields.map((field) => (
                 <label key={field.id} className="grid grid-cols-[5rem_1fr] items-center gap-2">

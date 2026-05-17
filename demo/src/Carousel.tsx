@@ -1,19 +1,18 @@
 import { useReducer, type HTMLAttributes } from 'react'
-import { createPatternRuntime, reducePatternData } from '../../src'
+import { createPatternRuntime, reducePatternData, type PatternData } from '../../src'
 import { carouselDefinition } from '../../src/patterns/carousel/definition'
-import { carouselSlides, initialCarouselData, type CarouselSlide } from './carouselData'
+import { initialCarouselData } from './carouselData'
 
 export interface CarouselProps {
-  slides?: readonly CarouselSlide[]
+  data?: PatternData
   showDots?: boolean
-  label?: string
 }
 
-export function Carousel({ slides = carouselSlides, showDots = true, label = 'Featured photos' }: CarouselProps) {
+export function Carousel({ data: initialData = initialCarouselData, showDots = true }: CarouselProps) {
   const [data, dispatch] = useReducer(
-    (current: typeof initialCarouselData, event: Parameters<typeof reducePatternData>[2]) =>
+    (current: PatternData, event: Parameters<typeof reducePatternData>[2]) =>
       reducePatternData(carouselDefinition, current, event),
-    { ...initialCarouselData, refs: { label } },
+    initialData,
   )
   const runtime = createPatternRuntime({
     definition: carouselDefinition,
@@ -21,7 +20,13 @@ export function Carousel({ slides = carouselSlides, showDots = true, label = 'Fe
     options: { roledescription: 'carousel', slideRoledescription: 'slide' },
     onEvent: dispatch,
   })
-  const activeKey = data.state?.activeKey ?? slides[0]?.key
+  const slideKeys = data.relations?.rootKeys ?? []
+  const activeKey = data.state?.activeKey ?? slideKeys[0]
+  const slides = slideKeys.map((key) => ({
+    key,
+    title: String((data.items[key] as { title?: unknown } | undefined)?.title ?? data.items[key]?.label ?? key),
+    caption: String((data.items[key] as { caption?: unknown } | undefined)?.caption ?? ''),
+  }))
   const count = slides.length
   const rootProps = runtime.getPartProps('root') as HTMLAttributes<HTMLElement>
   const prevProps = runtime.getPartProps('prev', 'prev') as HTMLAttributes<HTMLButtonElement>

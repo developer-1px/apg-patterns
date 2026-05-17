@@ -1,19 +1,18 @@
 import { useReducer, type HTMLAttributes, type KeyboardEvent } from 'react'
 import type { KeyInput } from '@interactive-os/keyboard'
-import { createPatternRuntime, reducePatternData } from '../../src'
+import { createPatternRuntime, reducePatternData, type PatternData } from '../../src'
 import { tooltipDefinition } from '../../src/patterns/tooltip/definition'
 import { initialTooltipData, tooltipPanelId, tooltipTriggerId } from './tooltipData'
 
 export interface TooltipProps {
-  label?: string
-  description?: string
+  data?: PatternData
 }
 
-export function Tooltip({ label, description }: TooltipProps) {
+export function Tooltip({ data: initialData = initialTooltipData }: TooltipProps) {
   const [data, dispatch] = useReducer(
-    (current: typeof initialTooltipData, event: Parameters<typeof reducePatternData>[2]) =>
+    (current: PatternData, event: Parameters<typeof reducePatternData>[2]) =>
       reducePatternData(tooltipDefinition, current, event),
-    initialTooltipData,
+    initialData,
   )
   const runtime = createPatternRuntime({
     definition: tooltipDefinition,
@@ -22,8 +21,8 @@ export function Tooltip({ label, description }: TooltipProps) {
     onEvent: dispatch,
     keyToElementId: (key) => key,
   })
-  const triggerLabel = label ?? (initialTooltipData.items[tooltipTriggerId]?.label as string)
-  const tip = description ?? (initialTooltipData.items[tooltipPanelId]?.label as string)
+  const triggerLabel = data.items[tooltipTriggerId]?.label ?? tooltipTriggerId
+  const tip = data.items[tooltipPanelId]?.label ?? tooltipPanelId
   const open = data.state?.expandedKeys?.includes(tooltipTriggerId) ?? false
   const { onKeyDown: _dropKeyDown, ...triggerProps } = runtime.getPartProps('trigger', tooltipTriggerId) as HTMLAttributes<HTMLButtonElement>
   const tooltipProps = runtime.getPartProps('tooltip', tooltipPanelId) as HTMLAttributes<HTMLSpanElement>

@@ -1,3 +1,5 @@
+import type { PatternData } from '../../src'
+
 export type BreadcrumbItem = { key: string; label: string; href: string }
 
 export const breadcrumbItems: ReadonlyArray<BreadcrumbItem> = [
@@ -9,3 +11,18 @@ export const breadcrumbItems: ReadonlyArray<BreadcrumbItem> = [
 ]
 
 export const breadcrumbLabel = 'Breadcrumb'
+
+export const initialBreadcrumbData: PatternData = {
+  items: Object.fromEntries(
+    breadcrumbItems.map((item) => [item.key, { label: item.label, href: item.href }]),
+  ),
+  relations: {
+    rootKeys: breadcrumbItems.map((item) => item.key),
+  },
+  state: {
+    currentByKey: { [breadcrumbItems[breadcrumbItems.length - 1]!.key]: 'page' },
+  },
+  refs: {
+    label: breadcrumbLabel,
+  },
+}

@@ -1,18 +1,26 @@
 import type { MouseEvent } from 'react'
-import { breadcrumbItems, breadcrumbLabel, type BreadcrumbItem } from './breadcrumbData'
+import type { PatternData } from '../../src'
+import { initialBreadcrumbData, type BreadcrumbItem } from './breadcrumbData'
 
 export interface BreadcrumbProps {
-  items?: ReadonlyArray<BreadcrumbItem>
-  label?: string
+  data?: PatternData
   onNavigate?: (item: BreadcrumbItem) => void
 }
 
-export function Breadcrumb({ items = breadcrumbItems, label = breadcrumbLabel, onNavigate }: BreadcrumbProps) {
+export function Breadcrumb({ data = initialBreadcrumbData, onNavigate }: BreadcrumbProps) {
+  const rootKeys = data.relations?.rootKeys ?? []
+  const currentByKey = data.state?.currentByKey ?? {}
+  const items = rootKeys.map((key) => ({
+    key,
+    label: data.items[key]?.label ?? key,
+    href: String((data.items[key] as { href?: unknown } | undefined)?.href ?? '#'),
+  }))
+
   return (
-    <nav aria-label={label}>
+    <nav aria-label={data.refs?.label}>
       <ol className="flex flex-wrap items-center gap-1 text-sm">
-        {items.map((item, index) => {
-          const isLast = index === items.length - 1
+        {items.map((item) => {
+          const current = currentByKey[item.key]
           const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
             event.preventDefault()
             onNavigate?.(item)
@@ -22,12 +30,12 @@ export function Breadcrumb({ items = breadcrumbItems, label = breadcrumbLabel, o
               <a
                 href={item.href}
                 onClick={handleClick}
-                aria-current={isLast ? 'page' : undefined}
-                className={isLast ? 'font-medium text-zinc-900 dark:text-zinc-100' : 'text-blue-600 underline hover:text-blue-800 dark:text-blue-400'}
+                aria-current={current || undefined}
+                className={current ? 'font-medium text-zinc-900 dark:text-zinc-100' : 'text-blue-600 underline hover:text-blue-800 dark:text-blue-400'}
               >
                 {item.label}
               </a>
-              {isLast ? null : <span aria-hidden="true" className="text-zinc-400">/</span>}
+              {current ? null : <span aria-hidden="true" className="text-zinc-400">/</span>}
             </li>
           )
         })}
