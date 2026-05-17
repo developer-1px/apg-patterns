@@ -20,6 +20,7 @@ function useMenuDemoPattern(onEvent: EmitPatternEvent): DemoPattern {
   return {
     key: 'menuAndMenubar',
     label: 'Menu and Menubar',
+    keyboardShortcuts: ['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Space', 'Escape'],
     sourceNames: ['Menu.tsx', 'menuData.ts', 'menu/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
     inspect: renderMenuInspect(data, apgPattern, focusStrategy),
     variants: (
@@ -54,6 +55,7 @@ function useComboboxDemoPattern(onEvent: EmitPatternEvent): DemoPattern {
   return {
     key: 'combobox',
     label: 'Combobox',
+    keyboardShortcuts: ['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Escape'],
     sourceNames: ['Combobox.tsx', 'comboboxData.ts', 'combobox/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
     inspect: renderComboboxInspect(data, { autocomplete: comboboxVariants[variant].autocomplete }),
     variants: (

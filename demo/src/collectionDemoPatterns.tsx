@@ -64,6 +64,7 @@ function useTreeDemoPattern(onEvent: EmitPatternEvent): DemoPattern {
   return {
     key: 'treeview',
     label: 'Treeview',
+    keyboardShortcuts: ['ArrowDown', 'ArrowUp', 'Home', 'End', 'ArrowRight', 'ArrowLeft', 'Enter', 'Space'],
     sourceNames: ['Tree.tsx', 'TreeVariantMenu.tsx', 'treeVariants.ts', 'useTreeDomFocus.ts', 'react.ts', 'treeview/runtime.ts', 'treeview/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts', 'demoData.ts'],
     inspect: inspectMode === 'aria' ? renderAriaTree(treeData, treeOptions) : renderHtmlTree(treeData, treeOptions),
     inspectControls: (
@@ -132,6 +133,7 @@ function useListboxDemoPattern(onEvent: EmitPatternEvent): DemoPattern {
   return {
     key: 'listbox',
     label: 'Listbox',
+    keyboardShortcuts: ['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Space'],
     sourceNames: ['Listbox.tsx', 'RearrangeableListbox.tsx', 'listboxData.ts', 'listbox/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
     inspect: renderListboxInspect(data),
     variants: <VariantSelect value={variant} items={listboxVariantItems} onChange={(next) => {
@@ -149,6 +151,7 @@ function useGridDemoPattern(onEvent: EmitPatternEvent): DemoPattern {
   return {
     key: 'grid',
     label: 'Grid',
+    keyboardShortcuts: ['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End', 'Ctrl+Home', 'Ctrl+End', 'PageUp', 'PageDown', 'Enter', 'F2', 'Escape'],
     sourceNames: ['Grid.tsx', 'gridData.ts', 'grid/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
     inspect: renderGridInspect(data),
     variants: <GridVariantMenu value={variant} onChange={(next) => {

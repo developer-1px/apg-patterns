@@ -51,6 +51,7 @@ function useTabsDemoPattern(onEvent: EmitPatternEvent): DemoPattern {
   return {
     key: 'tabs',
     label: 'Tabs',
+    keyboardShortcuts: ['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Space', 'Delete'],
     sourceNames: ['Tabs.tsx', 'tabsData.ts', 'react.ts', 'tabs/runtime.ts', 'tabs/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
     inspect: renderTabsInspect(data),
     variants: <LabeledSelect label="variant" value={variant} items={tabsVariantItems} onChange={(next) => {
@@ -69,6 +70,7 @@ function useSliderDemoPattern(onEvent: EmitPatternEvent): DemoPattern {
   return {
     key: 'slider',
     label: 'Slider',
+    keyboardShortcuts: ['ArrowRight', 'ArrowUp', 'ArrowLeft', 'ArrowDown', 'Shift+ArrowRight', 'Shift+ArrowUp', 'Shift+ArrowLeft', 'Shift+ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'],
     sourceNames: ['Slider.tsx', 'sliderData.ts', 'slider/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
     inspect: renderSliderInspect(data),
     variants: <Select value={variant} items={sliderVariantItems} onChange={(next) => {
@@ -103,6 +105,7 @@ function useDisclosureDemoPattern(onEvent: EmitPatternEvent): DemoPattern {
   return {
     key: 'disclosure',
     label: 'Disclosure',
+    keyboardShortcuts: ['Enter', 'Space'],
     sourceNames: ['Disclosure.tsx', 'disclosureData.ts', 'disclosure/runtime.ts', 'disclosure/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
     inspect: renderDisclosureInspect(data),
     variants: <LabeledSelect label="variant" value={variant} items={items} onChange={(next) => {
@@ -123,6 +126,7 @@ function useCheckboxDemoPattern(onEvent: EmitPatternEvent): DemoPattern {
   return {
     key: 'checkbox',
     label: 'Checkbox',
+    keyboardShortcuts: ['Space'],
     sourceNames: ['Checkbox.tsx', 'checkboxData.ts', 'checkbox/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
     inspect: renderCheckboxInspect(data),
     variants: <Select value={variant} items={checkboxVariantItems} onChange={(next) => {
@@ -142,6 +146,7 @@ function useRadioDemoPattern(onEvent: EmitPatternEvent): DemoPattern {
   return {
     key: 'radio',
     label: 'Radio Group',
+    keyboardShortcuts: ['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp', 'Home', 'End', 'Space'],
     sourceNames: ['RadioGroup.tsx', 'radioData.ts', 'radio/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
     inspect: renderRadioInspect(data),
     preview: <RadioGroup data={data} onEvent={(event) => {

@@ -50,6 +50,13 @@ export function App() {
             reset
           </button>
         </header>
+        <div className="mb-4 flex flex-wrap gap-1">
+          {activeDemo.keyboardShortcuts.map((shortcut) => (
+            <kbd key={shortcut} className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[11px] text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400">
+              {shortcut}
+            </kbd>
+          ))}
+        </div>
         {activeDemo.preview}
       </section>
 
