@@ -138,8 +138,9 @@ function ActiveDemoWorkspace({
 
   const copySource = () => {
     if (!canCopySource) return
-    setCopyState('copied')
-    void copyText(source)
+    void copyText(source).then((copied) => {
+      if (copied) setCopyState('copied')
+    })
   }
 
   return (
@@ -286,11 +287,13 @@ export function coerceRightMode(value: string | null): AppState['rightMode'] | n
   return rightModes.includes(value as AppState['rightMode']) ? value as AppState['rightMode'] : null
 }
 
-async function copyText(value: string): Promise<void> {
+async function copyText(value: string): Promise<boolean> {
   try {
     await navigator.clipboard?.writeText(value)
+    return Boolean(navigator.clipboard)
   } catch {
     // Clipboard access can be denied in preview browsers; copying should not break the demo.
+    return false
   }
 }
 

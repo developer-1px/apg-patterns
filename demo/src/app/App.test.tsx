@@ -67,6 +67,23 @@ describe('source copy', () => {
     expect(writes[0]).toContain('export function Accordion')
     expect(writes[0]).not.toBe('loading')
   })
+
+  it('only shows copied after clipboard write succeeds', async () => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: async () => { throw new Error('denied') } },
+    })
+    replaceHash('#pattern=accordion&panel=code&source=Accordion.tsx')
+
+    render(<App />)
+
+    const copyButton = screen.getByRole('button', { name: 'copy' })
+    await waitFor(() => expect(copyButton).toHaveProperty('disabled', false))
+    fireEvent.click(copyButton)
+
+    await waitFor(() => expect(copyButton.textContent).toBe('copy'))
+    expect(screen.queryByRole('button', { name: 'copied' })).toBeNull()
+  })
 })
 
 describe('App route state', () => {
