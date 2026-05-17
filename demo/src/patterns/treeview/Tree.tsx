@@ -1,4 +1,4 @@
-import { treeviewDefinition, usePatternEffects, useTreeviewPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
+import { useTreeviewPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
 import { Icon } from '../../shared/Icon'
 
 export function Tree({
@@ -9,27 +9,23 @@ export function Tree({
   onEvent: (event: PatternEvent) => void
 }) {
   const options = (data.state?.options as PatternOptions | undefined) ?? {}
-  const tree = useTreeviewPattern({ data, options, onEvent })
-  usePatternEffects({ definition: treeviewDefinition, data, keyToElementId: tree.keyToElementId })
+  const tree = useTreeviewPattern(data, onEvent, options)
 
   return (
-    <div className="min-h-56 bg-white py-1 outline-none focus:outline focus:outline-2 focus:outline-zinc-400 dark:bg-zinc-950 dark:focus:outline-zinc-500" {...tree.getTreeProps()}>
-      {tree.items.map((item) => {
-        const hasChildren = (data.relations?.childrenByKey?.[item.key]?.length ?? 0) > 0
-        const expanded = data.state?.expandedKeys?.includes(item.key) ?? false
+    <div {...tree.rootProps} className="min-h-56 bg-white py-1 outline-none focus:outline focus:outline-2 focus:outline-zinc-400 dark:bg-zinc-950 dark:focus:outline-zinc-500">
+      {tree.renderItems.map((item) => {
         const itemData = data.items[item.key] as { label?: string; href?: string } | undefined
-        const label = itemData?.label ?? item.key
+        const label = item.label
         const href = itemData?.href
-        const indent = (data.state?.levelByKey?.[item.key] ?? 1) * 18
+        const indent = item.level * 18
 
-        const indicator = hasChildren ? (
+        const indicator = item.kind === 'branch' ? (
           <button
-            type="button"
-            {...item.slotProps.indicator}
+            {...item.toggleButtonProps}
             aria-label={`toggle ${item.key}`}
             className="grid size-6 place-items-center rounded p-0 text-xs text-zinc-500 hover:bg-zinc-100 dark:text-zinc-500 dark:hover:bg-zinc-900"
           >
-            <Icon name="chevron-right" className={expanded ? 'rotate-90' : ''} />
+            <Icon name="chevron-right" className={item.state.expanded ? 'rotate-90' : ''} />
           </button>
         ) : (
           <span className="inline-block h-6 w-6" aria-hidden="true" />
@@ -47,7 +43,7 @@ export function Tree({
             </a>
           ) : (
             <span className="inline-flex items-center gap-1">
-              <Icon name={hasChildren ? 'folder' : 'file'} className="text-zinc-500" />
+              <Icon name={item.kind === 'branch' ? 'folder' : 'file'} className="text-zinc-500" />
               {label}
             </span>
           )
@@ -55,7 +51,7 @@ export function Tree({
         return (
           <div
             key={item.key}
-            {...item.slotProps.treeitem}
+            {...item.treeitemProps}
             className="flex min-h-8 items-center gap-1.5 rounded px-1 text-sm text-zinc-800 outline-none aria-selected:bg-zinc-100 aria-selected:text-zinc-950 focus:outline focus:outline-2 focus:outline-zinc-400 dark:text-zinc-300 dark:aria-selected:bg-zinc-900 dark:aria-selected:text-zinc-50 dark:focus:outline-zinc-500"
             style={{ paddingLeft: `${indent}px` }}
           >

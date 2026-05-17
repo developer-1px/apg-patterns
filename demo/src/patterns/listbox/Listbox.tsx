@@ -1,11 +1,7 @@
-import { useRef } from 'react'
-import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
-import { createPatternRuntime, listboxDefinition, usePatternEffects, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
+import { useListboxPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
 import { ListboxContent } from './ListboxContent'
 import { ListboxOption } from './ListboxOption'
-import type { ListboxGroup, ListboxProps } from './listboxTypes'
-import { useListboxMultiSelect } from './useListboxMultiSelect'
-import { useListboxTypeahead } from './useListboxTypeahead'
+import type { ListboxGroup } from './listboxTypes'
 
 export function Listbox({
   data,
@@ -18,47 +14,21 @@ export function Listbox({
   const groups = (data.state?.groups as readonly ListboxGroup[] | undefined) ?? []
   const scrollable = data.state?.scrollable === true
   const ariaLabelledBy = typeof data.refs?.labelledBy === 'string' ? data.refs.labelledBy : undefined
-  const rootRef = useRef<HTMLDivElement>(null)
-  const runtime = createPatternRuntime({
-    definition: listboxDefinition,
-    data,
-    options: { focusStrategy: 'rovingTabIndex', selectionMode: 'single', ...options },
-    onEvent,
-    keyToElementId: (key) => `option-${key}`,
-  })
-
-  usePatternEffects({ definition: listboxDefinition, data, keyToElementId: runtime.keyToElementId })
-
+  const listbox = useListboxPattern(data, onEvent, options)
   const visibleKeys = data.relations?.rootKeys ?? []
   const selectionMode = options?.selectionMode ?? 'single'
   const isMulti = selectionMode === 'multiple'
-  const selectedKeys = data.state?.selectedKeys ?? []
-  const anchorKey = data.state?.anchorKey ?? data.state?.activeKey ?? null
-  const handleTypeahead = useListboxTypeahead({ data, visibleKeys, onEvent })
-  const multiSelect = useListboxMultiSelect({ data, visibleKeys, selectedKeys, anchorKey, isMulti, onEvent })
-
-  const rootProps = runtime.getPartProps('listbox') as ListboxProps
-  const baseKeyDown = rootProps.onKeyDown as ((e: ReactKeyboardEvent) => void) | undefined
-  const handleKeyDown = (event: ReactKeyboardEvent) => {
-    const printable = event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey && /\S/.test(event.key)
-    if (printable && event.key !== ' ') {
-      event.preventDefault()
-      handleTypeahead(event.key)
-      return
-    }
-    if (multiSelect.handleKeyDown(event)) return
-    baseKeyDown?.(event)
-  }
+  const renderItemsByKey = new Map(listbox.renderItems.map((item) => [item.key, item]))
 
   const renderOption = (key: string, posIndex?: number, setSize?: number) => {
+    const item = renderItemsByKey.get(key)
     return (
       <ListboxOption
         key={key}
         itemKey={key}
         data={data}
-        runtime={runtime}
+        optionProps={item?.optionProps}
         isMulti={isMulti}
-        onOptionClick={multiSelect.handleOptionClick}
         posIndex={posIndex}
         setSize={setSize}
       />
@@ -73,7 +43,7 @@ export function Listbox({
     .join(' ')
 
   return (
-    <div ref={rootRef} {...rootProps} onKeyDown={handleKeyDown} aria-labelledby={ariaLabelledBy} className={containerClass}>
+    <div {...listbox.rootProps} aria-labelledby={ariaLabelledBy} className={containerClass}>
       <ListboxContent data={data} groups={groups} visibleKeys={visibleKeys} renderOption={renderOption} />
     </div>
   )
