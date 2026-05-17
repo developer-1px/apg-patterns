@@ -17,12 +17,16 @@ export function Menubar({ data, onEvent }: MenuProps) {
   const rootKeys = data.relations?.rootKeys ?? []
   const typeahead = useTypeahead(data, rootKeys, onEvent)
   const rootProps = runtime.getPartProps('menubar') as Props
+  const rootRef = useRef<HTMLDivElement>(null)
 
-  usePatternAutoFocus(runtime, { enabled: Boolean(data.state?.activeKey && rootKeys.includes(data.state.activeKey)) })
+  usePatternAutoFocus(runtime, {
+    enabled: Boolean(data.state?.activeKey && rootKeys.includes(data.state.activeKey)),
+    getScopeElement: () => rootRef.current,
+  })
 
   return (
     <div className="grid gap-2">
-      <div {...rootProps} onKeyDown={(event) => handleMenubarKey(event, rootProps.onKeyDown as ((event: ReactKeyboardEvent) => void) | undefined, typeahead)} className="flex items-center gap-0.5 rounded bg-zinc-50 px-1 py-1 outline-none dark:bg-zinc-900">
+      <div ref={rootRef} {...rootProps} onKeyDown={(event) => handleMenubarKey(event, rootProps.onKeyDown as ((event: ReactKeyboardEvent) => void) | undefined, typeahead)} className="flex items-center gap-0.5 rounded bg-zinc-50 px-1 py-1 outline-none dark:bg-zinc-900">
         {rootKeys.map((key) => (
           <RootMenuItem key={key} itemKey={key} data={data} runtime={runtime} expanded={(data.state?.expandedKeys ?? []).includes(key)} />
         ))}

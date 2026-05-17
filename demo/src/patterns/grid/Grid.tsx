@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import type { HTMLAttributes, KeyboardEvent } from 'react'
 import { createPatternRuntime, gridDefinition, gridRows, usePatternAutoFocus, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
 import { Icon, type IconName } from '../../shared/Icon'
@@ -18,6 +19,7 @@ export function Grid({
   const editDraftByKey = ((data.state as { editDraftByKey?: Record<string, string> } | undefined)?.editDraftByKey ?? {}) as Record<string, string>
   const valueByKey = data.state?.valueByKey ?? {}
   const sortByKey = data.state?.sortByKey ?? {}
+  const rootRef = useRef<HTMLDivElement>(null)
 
   const runtime = createPatternRuntime({
     definition: gridDefinition,
@@ -53,7 +55,7 @@ export function Grid({
     keyToElementId: (key) => `gridcell-${key}`,
   })
 
-  usePatternAutoFocus(runtime, { suspend: Boolean(editingKey) })
+  usePatternAutoFocus(runtime, { suspend: Boolean(editingKey), getScopeElement: () => rootRef.current })
 
   const commitEdit = () => {
     if (editingKey) {
@@ -86,6 +88,7 @@ export function Grid({
 
   return (
     <div
+      ref={rootRef}
       {...rootProps}
       className="inline-grid overflow-hidden bg-white text-sm text-zinc-800 outline-none focus:outline focus:outline-2 focus:outline-zinc-400 dark:bg-zinc-950 dark:text-zinc-300 dark:focus:outline-zinc-500"
       style={{ gridTemplateColumns: `repeat(${data.relations?.columnKeys?.length ?? 1}, minmax(120px, 1fr))` }}

@@ -1,4 +1,4 @@
-import { useReducer } from 'react'
+import { useReducer, useRef } from 'react'
 import type { HTMLAttributes } from 'react'
 import { createPatternRuntime, reducePatternData, usePatternAutoFocus, type PatternData, type PatternEvent } from '../../../../src'
 import { feedDefinition } from '../../../../src/patterns/feed/definition'
@@ -17,6 +17,7 @@ export function Feed({ data: initialData = initialFeedData }: FeedProps = {}) {
   )
   const handleEvent = (event: PatternEvent) =>
     dispatch(event)
+  const rootRef = useRef<HTMLDivElement>(null)
 
   const runtime = createPatternRuntime({
     definition: feedDefinition,
@@ -26,12 +27,13 @@ export function Feed({ data: initialData = initialFeedData }: FeedProps = {}) {
     keyToElementId: (key) => `feed-article-${key}`,
   })
 
-  usePatternAutoFocus(runtime)
+  usePatternAutoFocus(runtime, { getScopeElement: () => rootRef.current })
 
   const rootProps = runtime.getRootProps() as DivProps
 
   return (
     <div
+      ref={rootRef}
       {...rootProps}
       className="grid max-w-2xl gap-3 outline-none focus:outline focus:outline-2 focus:outline-zinc-400 dark:focus:outline-zinc-500"
     >

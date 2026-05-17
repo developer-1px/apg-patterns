@@ -71,6 +71,7 @@ describe('Tabs demo — manual activation', () => {
     render(<TabsDemo variant="manual" />)
     const tabs = screen.getAllByRole('tab')
     expect(tabs[0].getAttribute('aria-selected')).toBe('true')
+    tabs[0].focus()
     fireEvent.keyDown(tabs[0], { key: 'ArrowRight', code: 'ArrowRight' })
     const after = screen.getAllByRole('tab')
     expect(after[0].getAttribute('aria-selected')).toBe('true')
@@ -83,6 +84,7 @@ describe('Tabs demo — manual activation', () => {
   it('Space activates the focused tab', () => {
     render(<TabsDemo variant="manual" />)
     const tabs = screen.getAllByRole('tab')
+    tabs[0].focus()
     fireEvent.keyDown(tabs[0], { key: 'ArrowRight', code: 'ArrowRight' })
     fireEvent.keyDown(document.activeElement ?? tabs[1], { key: ' ', code: 'Space' })
     const after = screen.getAllByRole('tab')
@@ -99,6 +101,7 @@ describe('Tabs demo — vertical', () => {
     // earth is initially active (index 2)
     const earthIdx = tabs.findIndex((t) => t.getAttribute('aria-selected') === 'true')
     expect(earthIdx).toBeGreaterThanOrEqual(0)
+    tabs[earthIdx].focus()
     fireEvent.keyDown(tabs[earthIdx], { key: 'ArrowDown', code: 'ArrowDown' })
     const afterDown = screen.getAllByRole('tab')
     expect(afterDown[earthIdx + 1].getAttribute('aria-selected')).toBe('true')

@@ -21,6 +21,7 @@ export function Listbox({
   const groups = (data.state?.groups as readonly ListboxGroup[] | undefined) ?? []
   const scrollable = data.state?.scrollable === true
   const ariaLabelledBy = typeof data.refs?.labelledBy === 'string' ? data.refs.labelledBy : undefined
+  const rootRef = useRef<HTMLDivElement>(null)
   const runtime = createPatternRuntime({
     definition: listboxDefinition,
     data,
@@ -29,7 +30,7 @@ export function Listbox({
     keyToElementId: (key) => `option-${key}`,
   })
 
-  usePatternAutoFocus(runtime)
+  usePatternAutoFocus(runtime, { getScopeElement: () => rootRef.current })
 
   // ── Type-ahead (APG: printable character search) ──
   const typeaheadRef = useRef<{ query: string; timer: number | null }>({ query: '', timer: null })
@@ -167,7 +168,7 @@ export function Listbox({
     const setSize = visibleKeys.length
     let runningIndex = 0
     return (
-      <div {...rootProps} onKeyDown={handleKeyDown} aria-labelledby={ariaLabelledBy} className={containerClass}>
+      <div ref={rootRef} {...rootProps} onKeyDown={handleKeyDown} aria-labelledby={ariaLabelledBy} className={containerClass}>
         {groups.map((group) => {
           const labelId = `group-${group.groupKey}-label`
           return (
@@ -187,7 +188,7 @@ export function Listbox({
   }
 
   return (
-    <div {...rootProps} onKeyDown={handleKeyDown} aria-labelledby={ariaLabelledBy} className={containerClass}>
+    <div ref={rootRef} {...rootProps} onKeyDown={handleKeyDown} aria-labelledby={ariaLabelledBy} className={containerClass}>
       {visibleKeys.map((key) => renderOption(key))}
     </div>
   )

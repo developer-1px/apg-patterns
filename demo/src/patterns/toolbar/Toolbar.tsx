@@ -24,12 +24,14 @@ export function Toolbar({
   const onKeyDown = runtime.getRootKeyboardHandler()
   const activeKey = data.state?.activeKey
   const previousActive = useRef<string | null | undefined>(null)
+  const rootRef = useRef<HTMLDivElement>(null)
 
-  usePatternAutoFocus(runtime, { skipInitialFocus: !previousActive.current })
+  usePatternAutoFocus(runtime, { skipInitialFocus: !previousActive.current, getScopeElement: () => rootRef.current })
   previousActive.current = activeKey
 
   return (
     <div
+      ref={rootRef}
       {...rootProps}
       onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => onKeyDown(event as unknown as KeyInput & { preventDefault?: () => void })}
       className="inline-flex gap-1 rounded border border-zinc-300 bg-zinc-50 p-1 dark:border-zinc-700 dark:bg-zinc-900"

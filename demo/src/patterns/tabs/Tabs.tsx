@@ -32,6 +32,7 @@ export function Tabs({
 
   usePatternAutoFocus(tabs, {
     skipInitialFocus: !didMountRef.current,
+    getScopeElement: () => tablistRef.current,
     keyToElementId: (key) => createTabElementId((mergedOptions as { elementIdPrefix?: string }).elementIdPrefix ?? 'tab-', key),
   })
   didMountRef.current = true

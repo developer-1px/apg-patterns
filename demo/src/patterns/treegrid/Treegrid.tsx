@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import type { HTMLAttributes } from 'react'
 import { createPatternRuntime, usePatternAutoFocus, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
 import { treegridDefinition, treegridVisibleCells, treegridVisibleRowKeys } from '../../../../src/patterns/treegrid/definition'
@@ -12,6 +13,7 @@ export function Treegrid({
   onEvent: (event: PatternEvent) => void
 }) {
   const options = ((data.state as { options?: PatternOptions } | undefined)?.options ?? {}) as PatternOptions
+  const rootRef = useRef<HTMLDivElement>(null)
   const runtime = createPatternRuntime({
     definition: treegridDefinition,
     data,
@@ -33,7 +35,7 @@ export function Treegrid({
     keyToElementId: (key) => `treegridcell-${key}`,
   })
 
-  usePatternAutoFocus(runtime)
+  usePatternAutoFocus(runtime, { getScopeElement: () => rootRef.current })
 
   const rowKeys = treegridVisibleRowKeys(data)
   const cells = treegridVisibleCells(data)
@@ -43,6 +45,7 @@ export function Treegrid({
 
   return (
     <div
+      ref={rootRef}
       {...rootProps}
       className="inline-grid bg-white text-sm text-zinc-800 outline-none focus:outline focus:outline-2 focus:outline-zinc-400 dark:bg-zinc-950 dark:text-zinc-300"
       style={{ gridTemplateColumns: `repeat(${columnKeys.length}, minmax(120px, 1fr))` }}
