@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   PatternDefinitionSchema,
   type PatternDefinition,
+  type PatternData,
   type PatternEvent,
   createPatternRuntime,
   defineAriaSource,
