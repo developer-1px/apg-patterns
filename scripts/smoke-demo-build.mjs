@@ -168,6 +168,7 @@ async function runSmoke() {
           const loaded = currentTab?.getAttribute('aria-selected') === 'true'
             && currentHashParam('source') === sourceName
             && sourceFilenameIs(sourceName)
+            && sourcePanelIsLabelledBy(currentTab)
             && sourceText !== 'loading'
             && sourceText.length > 0
             && !hasSourceLoadFailure(sourceText)
@@ -678,9 +679,20 @@ function sourceFilenameIs(sourceName) {
 }
 
 function sourcePanelText() {
+  return sourcePanelElement()?.textContent ?? ''
+}
+
+function sourcePanelElement() {
   return Array.from(document.querySelectorAll('[role="tabpanel"]'))
     .find((panel) => panel.id.startsWith('tab-source-panel-'))
-    ?.textContent ?? ''
+}
+
+function sourcePanelIsLabelledBy(tab) {
+  const panel = sourcePanelElement()
+  return Boolean(tab)
+    && Boolean(panel)
+    && tab.getAttribute('aria-controls') === panel.id
+    && panel.getAttribute('aria-labelledby') === tab.id
 }
 
 function activePreText() {
