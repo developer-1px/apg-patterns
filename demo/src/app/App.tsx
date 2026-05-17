@@ -48,6 +48,13 @@ type AppAction =
   | { type: 'toggleRightPanel' }
   | { type: 'restoreState'; state: AppState }
 
+type SourcePreviewState = {
+  name: SourceName
+  text: string
+}
+
+const sourcePreviewCache = new Map<SourceName, string>()
+
 const defaultAppState = AppStateSchema.parse({
   patternKey: defaultPatternKey,
   events: [],
@@ -93,13 +100,18 @@ function ActiveDemoWorkspace({
   const activeDemo = useDemoPattern(state.patternKey, (event) => dispatch({ type: 'recordEvent', event }))
   const sourceNames = activeDemo.sourceNames
   const activeSourceName = sourceNames.includes(state.sourceName as SourceName) ? state.sourceName as SourceName : sourceNames[0]
-  const [source, setSource] = useState('loading')
+  const [sourcePreview, setSourcePreview] = useState<SourcePreviewState>(() => ({
+    name: activeSourceName,
+    text: sourcePreviewCache.get(activeSourceName) ?? 'loading',
+  }))
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle')
   const copyRequestId = useRef(0)
   const sourceTabs = useSourceTabs({ label: 'source files', tabs: sourceNames, value: activeSourceName, onChange: (sourceName) => dispatch({ type: 'selectSource', sourceName }) })
   const rightModeTabs = useSourceTabs({ label: 'right panel', tabs: rightModes, value: state.rightMode, onChange: (rightMode) => dispatch({ type: 'selectRightMode', rightMode }) })
   const eventLog = state.events.map(formatEvent).join('\n') || 'none'
-  const canCopySource = isCopyableSource(source)
+  const source = sourcePreview.text
+  const sourceLoadedForActiveTab = sourcePreview.name === activeSourceName
+  const canCopySource = sourceLoadedForActiveTab && isCopyableSource(source)
   const previewKeyboardShortcuts = activeDemo.keyboardShortcuts.join(' ') || undefined
 
   useEffect(() => {
@@ -125,9 +137,12 @@ function ActiveDemoWorkspace({
     let cancelled = false
     copyRequestId.current += 1
     setCopyState('idle')
-    setSource('loading')
+    const cachedSource = sourcePreviewCache.get(activeSourceName)
+    if (cachedSource) setSourcePreview({ name: activeSourceName, text: cachedSource })
     loadSourcePreview(activeSourceName).then((nextSource) => {
-      if (!cancelled) setSource(nextSource)
+      if (cancelled) return
+      sourcePreviewCache.set(activeSourceName, nextSource)
+      setSourcePreview({ name: activeSourceName, text: nextSource })
     })
     return () => {
       copyRequestId.current += 1

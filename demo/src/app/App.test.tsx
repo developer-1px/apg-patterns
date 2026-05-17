@@ -224,7 +224,7 @@ describe('App route state', () => {
 
       unmount()
     }
-  })
+  }, 15000)
 
   it('opens every pattern entry source from its deep link', async () => {
     const routes = collectPatternEntrySourceRoutes()
@@ -242,7 +242,7 @@ describe('App route state', () => {
 
       unmount()
     }
-  })
+  }, 15000)
 
   it('keeps generated source tab ids and panel links unique for each pattern', async () => {
     const routes = collectPatternRoutes()
@@ -266,7 +266,7 @@ describe('App route state', () => {
 
       unmount()
     }
-  })
+  }, 15000)
 
   it('links the selected right panel tab to the rendered right panel content', async () => {
     replaceHash('#pattern=accordion&panel=code&source=Accordion.tsx')

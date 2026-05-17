@@ -74,4 +74,22 @@ describe('APG §Focus management', () => {
     const id = cb().getAttribute('aria-activedescendant')
     if (id) expect(document.getElementById(id)).toBeTruthy()
   })
+
+  it('DOM focus remains on combobox while active descendant changes', () => {
+    render(<ComboboxDemo />)
+    cb().focus()
+    fireEvent.keyDown(cb(), { key: 'ArrowDown' })
+    const firstActive = cb().getAttribute('aria-activedescendant')
+    fireEvent.keyDown(cb(), { key: 'ArrowDown' })
+    expect(document.activeElement).toBe(cb())
+    expect(cb().getAttribute('aria-activedescendant')).not.toBe(firstActive)
+  })
+
+  it('focused option in popup exposes aria-selected=true', () => {
+    render(<ComboboxDemo />)
+    fireEvent.keyDown(cb(), { key: 'ArrowDown' })
+    const id = cb().getAttribute('aria-activedescendant')
+    expect(id).toBeTruthy()
+    expect(document.getElementById(id!)?.getAttribute('aria-selected')).toBe('true')
+  })
 })
