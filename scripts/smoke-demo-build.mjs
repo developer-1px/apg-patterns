@@ -343,14 +343,22 @@ async function verifyTabsKeyboardEventLog() {
 
   try {
     await waitForPatternRoute({ pattern: 'tabs', panel: 'events', source: 'Tabs.tsx', label: 'Tabs' })
-    const overviewTab = await waitFor(() => document.querySelector('[data-demo-preview="tabs"] [role="tab"][aria-selected="true"]'))
-    overviewTab.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'ArrowRight', code: 'ArrowRight', bubbles: true, cancelable: true }))
+    const automaticVariant = Array.from(document.querySelectorAll('[role="listbox"][aria-label="tabs variants"] [role="option"]'))
+      .find((option) => option.textContent?.trim() === 'Automatic activation')
+    automaticVariant?.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
+    const tabs = await waitFor(() => {
+      const renderedTabs = Array.from(document.querySelectorAll('[data-demo-preview="tabs"] [role="tab"]'))
+      return renderedTabs.length > 1 ? renderedTabs : false
+    })
+    const selectedIndex = tabs.findIndex((tab) => tab.getAttribute('aria-selected') === 'true')
+    const sourceTab = tabs[selectedIndex < 0 ? 0 : selectedIndex]
+    const expectedTab = tabs[((selectedIndex < 0 ? 0 : selectedIndex) + 1) % tabs.length]
+
+    sourceTab.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'ArrowRight', code: 'ArrowRight', bubbles: true, cancelable: true }))
     await waitFor(() => {
-      const codeTab = Array.from(document.querySelectorAll('[data-demo-preview="tabs"] [role="tab"]'))
-        .find((tab) => tab.textContent?.trim() === 'Code')
       const text = rootText()
       const logText = activePreText()
-      return codeTab?.getAttribute('aria-selected') === 'true'
+      return expectedTab.getAttribute('aria-selected') === 'true'
         && text.includes('events')
         && logText.includes('navigate')
         && logText.includes('direction=next')
