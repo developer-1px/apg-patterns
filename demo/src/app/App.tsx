@@ -14,6 +14,11 @@ const preClass = 'h-full min-h-0 overflow-auto bg-zinc-50 p-3 font-mono text-xs 
 const optionButtonClass =
   'h-7 rounded px-2 text-left text-xs text-zinc-600 hover:bg-zinc-100 aria-selected:bg-zinc-900 aria-selected:text-white dark:text-zinc-400 dark:hover:bg-zinc-900 dark:aria-selected:bg-zinc-100 dark:aria-selected:text-zinc-950'
 const rightModes = ['source', 'inspect', 'log'] as const
+const rightModeLabels: Record<(typeof rightModes)[number], string> = {
+  source: 'code',
+  inspect: 'aria',
+  log: 'events',
+}
 
 const AppStateSchema = z.object({
   patternKey: z.string(),
@@ -37,7 +42,7 @@ const initialAppState = AppStateSchema.parse({
   events: [],
   sourceName: 'Tree.tsx',
   rightMode: 'source',
-  rightPanelOpen: false,
+  rightPanelOpen: true,
 })
 
 const reduceAppState = (state: AppState, action: AppAction): AppState => {
@@ -82,14 +87,14 @@ export function App() {
               onClick={() => dispatch({ type: 'toggleRightPanel' })}
               title={state.rightPanelOpen ? 'Hide source panel' : 'Show source panel'}
             >
-              {state.rightPanelOpen ? '< code' : 'code >'}
+              code
             </button>
           </div>
         </header>
         {activeDemo.variants ? <div className="mb-3">{activeDemo.variants}</div> : null}
         {activeDemo.keyboardShortcuts.length > 0 ? (
           <div className="mb-4">
-            <div className="mb-1 text-[10px] uppercase tracking-wide text-zinc-400 dark:text-zinc-600">Supported keys — focus preview then press</div>
+            <div className="mb-1 text-[10px] uppercase tracking-wide text-zinc-400 dark:text-zinc-600">keys</div>
             <div className="flex flex-wrap gap-1">
               {activeDemo.keyboardShortcuts.map((shortcut) => (
                 <kbd key={shortcut} className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[11px] text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400">
@@ -108,7 +113,7 @@ export function App() {
           <div {...rightModeTabs.getTablistProps()} className="flex items-center gap-1">
             {rightModes.map((mode) => (
               <button {...rightModeTabs.getTabProps(mode)} key={mode} type="button" className={optionButtonClass}>
-                {mode}
+                {rightModeLabels[mode]}
               </button>
             ))}
           </div>

@@ -1,5 +1,9 @@
-import { PatternDataSchema, type PatternData, type PatternEvent } from '../../../../src'
+import { PatternDataSchema, type PatternData, type PatternEvent, type PatternItem } from '../../../../src'
 import { accordionDefinition, reducePatternData } from '../../../../src'
+
+type AccordionItem = PatternItem & {
+  content?: string
+}
 
 export type AccordionSectionSpec = {
   key: string
@@ -11,7 +15,7 @@ export const buildAccordionData = (
   sections: readonly AccordionSectionSpec[],
   initialExpanded: readonly string[] = [],
   label = 'Sections',
-): PatternData => {
+): PatternData<AccordionItem> => {
   const items: Record<string, { label: string; content?: string }> = {}
   const controlsByKey: Record<string, string[]> = {}
   const ownerByKey: Record<string, string> = {}
@@ -61,6 +65,6 @@ const defaultSections: readonly AccordionSectionSpec[] = [
   },
 ]
 
-export const initialAccordionData: PatternData = buildAccordionData(defaultSections, [], 'Account')
+export const initialAccordionData: PatternData<AccordionItem> = buildAccordionData(defaultSections, [], 'Account')
 
 export const accordionSections = defaultSections

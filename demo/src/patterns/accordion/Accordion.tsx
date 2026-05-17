@@ -1,69 +1,45 @@
-import type { HTMLAttributes } from 'react'
 import {
-  createPatternRuntime,
-  accordionDefinition,
-  usePatternEffects,
+  useAccordionPattern,
   type PatternData,
   type PatternEvent,
+  type PatternItem,
+  type PatternOptions,
 } from '../../../../src'
-import { accordionSections } from './accordionData'
 
-type Props = HTMLAttributes<HTMLElement>
-
-const ID_PREFIX = 'accordion-'
-const keyToElementId = (key: string) =>
-  `${ID_PREFIX}${String(key).toLowerCase().replace(/[^a-z0-9_-]+/g, '-')}`
-
-export interface AccordionProps {
-  data: PatternData
-  onEvent: (event: PatternEvent) => void
+type AccordionItem = PatternItem & {
+  content?: string
 }
 
-export function Accordion({ data, onEvent }: AccordionProps) {
-  const runtime = createPatternRuntime({
-    definition: accordionDefinition,
-    data,
-    options: {},
-    onEvent,
-    keyToElementId,
-  })
+export interface AccordionProps {
+  data: PatternData<AccordionItem>
+  onEvent: (event: PatternEvent) => void
+  options?: PatternOptions
+}
 
-  const rootKeys = data.relations?.rootKeys ?? []
-  const expandedKeys = data.state?.expandedKeys ?? []
-  const activeKey = data.state?.activeKey ?? rootKeys[0]
-  const groupProps = runtime.getRootProps() as Props
-  usePatternEffects({ definition: accordionDefinition, data, keyToElementId: runtime.keyToElementId })
+export function Accordion({ data, onEvent, options }: AccordionProps) {
+  const accordion = useAccordionPattern(data, onEvent, options)
 
   return (
     <div
-      {...groupProps}
+      {...accordion.rootProps}
       className="grid max-w-xl gap-1 border border-zinc-200 rounded dark:border-zinc-800"
     >
-      {rootKeys.map((key) => {
-        const headerProps = runtime.getItemProps('header', key) as Props
-        const panelKey = data.relations?.controlsByKey?.[key]?.[0]
-        const expanded = expandedKeys.includes(key)
-        const section = accordionSections.find((s) => s.key === key)
-        const label = section?.label ?? data.items[key]?.label ?? key
-        const panelContent =
-          (panelKey ? (data.items[panelKey] as { content?: string })?.content : undefined) ??
-          section?.content ??
-          ''
+      {accordion.renderItems.map((section) => {
+        const panelContent = section.panelKey ? data.items[section.panelKey]?.content ?? '' : ''
         return (
-          <div key={key} className="border-b border-zinc-200 dark:border-zinc-800 last:border-b-0">
+          <div key={section.key} className="border-b border-zinc-200 dark:border-zinc-800 last:border-b-0">
             <h3 className="m-0">
               <button
-                type="button"
-                {...headerProps}
+                {...section.headerProps}
                 className="flex w-full items-center justify-between px-3 py-2 text-left text-sm text-zinc-800 outline-none hover:bg-zinc-100 focus:outline focus:outline-2 focus:outline-zinc-400 dark:text-zinc-200 dark:hover:bg-zinc-900 dark:focus:outline-zinc-500"
               >
-                <span>{label}</span>
-                <span aria-hidden="true">{expanded ? '−' : '+'}</span>
+                <span>{section.label}</span>
+                <span aria-hidden="true">{section.state.expanded ? '−' : '+'}</span>
               </button>
             </h3>
-            {expanded && panelKey ? (
+            {section.state.expanded && section.panelProps ? (
               <div
-                {...(runtime.getItemProps('panel', panelKey) as Props)}
+                {...section.panelProps}
                 className="px-3 py-2 text-sm text-zinc-700 dark:text-zinc-300"
               >
                 {panelContent}
