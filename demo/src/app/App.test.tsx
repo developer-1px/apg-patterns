@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { act } from 'react'
 import { coerceRightMode, formatEvent, isCopyableSource, loadSourcePreview } from './App'
 import { App } from './App'
+import { SourceTabs, useSourceTabs } from './SourceTabs'
 import { collectPatternEntries, defaultPatternKey, defaultSourceName, patternEntries, useDemoPattern, validatePatternEntries } from '../shared/demoPatterns'
 import { sourceLoaders, sourceNameCollisions } from '../shared/sources'
 import type { PatternEvent } from '../../../src'
@@ -203,6 +204,19 @@ describe('App route state', () => {
 
       unmount()
     }
+  })
+})
+
+describe('SourceTabs', () => {
+  it('keeps distinct source names distinct even when slug-style ids would collide', () => {
+    render(<SourceTabsCollisionProbe />)
+
+    const tabs = screen.getAllByRole('tab')
+    const tabIds = tabs.map((tab) => tab.id)
+    const panelIds = tabs.map((tab) => tab.getAttribute('aria-controls') ?? '')
+
+    expect(duplicates(tabIds)).toEqual([])
+    expect(duplicates(panelIds)).toEqual([])
   })
 })
 
@@ -497,6 +511,18 @@ function DemoSourceProbe({
       ))}
     </>
   )
+}
+
+function SourceTabsCollisionProbe() {
+  const tabs = ['foo/bar.ts', 'foo-2fbar.ts'] as const
+  const sourceTabs = useSourceTabs({
+    label: 'source files',
+    tabs,
+    value: tabs[0],
+    onChange: () => undefined,
+  })
+
+  return <SourceTabs tabs={sourceTabs.tabs} getTablistProps={sourceTabs.getTablistProps} getTabProps={sourceTabs.getTabProps} />
 }
 
 function DemoSourceProbeItem({

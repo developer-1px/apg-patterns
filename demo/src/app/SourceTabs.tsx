@@ -88,5 +88,6 @@ function panelKey(tab: string) {
 }
 
 function tabKey(tab: string) {
-  return `source-tab-${encodeURIComponent(tab)}`
+  const bytes = new TextEncoder().encode(tab)
+  return `source-tab-${Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('')}`
 }
