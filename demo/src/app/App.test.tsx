@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { afterEach, describe, expect, it } from 'vitest'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { act } from 'react'
 import { coerceRightMode, formatEvent, isCopyableSource, isSourceLoadFailure, loadSourcePreview } from './App'
 import { App } from './App'
@@ -7,6 +7,10 @@ import { SourceTabs, useSourceTabs } from './SourceTabs'
 import { collectPatternEntries, defaultPatternKey, defaultSourceName, patternEntries, useDemoPattern, validatePatternEntries } from '../shared/demoPatterns'
 import { sourceLoaders, sourceNameCollisions } from '../shared/sources'
 import type { PatternEvent } from '../../../src'
+
+afterEach(() => {
+  cleanup()
+})
 
 describe('formatEvent', () => {
   it('keeps emitted events scannable in the demo log', () => {

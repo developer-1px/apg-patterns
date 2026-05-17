@@ -79,15 +79,18 @@ export function useComboboxPattern(data: PatternData, onEvent: (event: PatternEv
       return Object.keys(data.items).filter((key) => key !== COMBOBOX_KEY).map((key) => {
         const optionProps = runtime.getPartProps('option', key) as ReactPatternProps
         const state = runtime.getItemState(key, 'option')
+        const active = Boolean(state.active)
+        const selected = Boolean(state.selected)
         return {
           key,
           label: data.items[key]?.label ?? key,
           state: {
-            active: Boolean(state.active),
-            selected: Boolean(state.selected),
+            active,
+            selected,
           },
           optionProps: {
             ...optionProps,
+            'aria-selected': open ? active : selected,
             onMouseDown: (event: MouseEvent<HTMLElement>) => {
               event.preventDefault()
               onEvent({ type: 'select', keys: [key], anchorKey: key, extentKey: key })
