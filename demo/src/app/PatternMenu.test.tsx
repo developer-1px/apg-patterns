@@ -23,10 +23,12 @@ describe('PatternMenu', () => {
     render(<PatternMenuDemo />)
     const listbox = screen.getByRole('listbox', { name: /APG patterns/i })
 
+    const treeviewIdx = patternItems.findIndex((p) => p.key === 'treeview')
+    const nextLabel = patternItems[treeviewIdx + 1]?.label ?? patternItems[0].label
     expect(screen.getByRole('option', { name: 'Treeview' }).getAttribute('aria-selected')).toBe('true')
     fireEvent.keyDown(listbox, { key: 'ArrowDown', code: 'ArrowDown' })
 
-    expect(screen.getByRole('option', { name: 'Listbox' }).getAttribute('aria-selected')).toBe('true')
+    expect(screen.getByRole('option', { name: nextLabel }).getAttribute('aria-selected')).toBe('true')
   })
 
   it('End jumps to the last pattern and Home returns to the first', () => {

@@ -6,7 +6,6 @@ import { renderDataInspect } from '../../shared/inspect/genericInspect'
 export const entry: PatternEntry = {
   key: 'breadcrumb',
   label: 'Breadcrumb',
-  order: 14,
   useDemoPattern: (onEvent) => {
     return {
       key: 'breadcrumb',

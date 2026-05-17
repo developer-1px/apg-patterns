@@ -13,7 +13,6 @@ const comboboxVariantItems = (Object.keys(comboboxVariants) as ComboboxVariantKe
 export const entry: PatternEntry = {
   key: 'combobox',
   label: 'Combobox',
-  order: 10,
   useDemoPattern: (onEvent) => {
     const host = useVariantPatternDataHost<ComboboxVariantKey>(
       'listAutocomplete',
@@ -27,7 +26,7 @@ export const entry: PatternEntry = {
       keyboardShortcuts: ['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Escape'],
       sourceNames: ['Combobox.tsx', 'comboboxData.ts', 'combobox/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
-      variants: <VariantListbox value={host.variant} items={comboboxVariantItems} label="combobox variants" idPrefix="combobox-variant" onChange={host.selectVariant} />,
+      variants: <VariantListbox orientation="horizontal" value={host.variant} items={comboboxVariantItems} label="combobox variants" idPrefix="combobox-variant" onChange={host.selectVariant} />,
       preview: (
         <Combobox
           data={host.data}

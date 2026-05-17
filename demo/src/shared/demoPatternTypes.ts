@@ -31,6 +31,5 @@ export const KERNEL_SOURCES = [
 export interface PatternEntry {
   key: PatternKey
   label: string
-  order?: number
   useDemoPattern: (onEvent: EmitPatternEvent) => DemoPattern
 }

@@ -9,7 +9,6 @@ import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes
 export const entry: PatternEntry = {
   key: 'menuAndMenubar',
   label: 'Menu and Menubar',
-  order: 9,
   useDemoPattern: (onEvent) => {
     const host = useVariantPatternDataHost<MenuVariantKey>(
       'editorMenubar',
@@ -26,7 +25,7 @@ export const entry: PatternEntry = {
       keyboardShortcuts: ['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Space', 'Escape'],
       sourceNames: ['Menu.tsx', 'menuData.ts', 'menu/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
-      variants: <VariantListbox value={host.variant} items={menuVariantItems} label="menu and menubar variants" idPrefix="menu-variant" onChange={host.selectVariant} />,
+      variants: <VariantListbox orientation="horizontal" value={host.variant} items={menuVariantItems} label="menu and menubar variants" idPrefix="menu-variant" onChange={host.selectVariant} />,
       preview: <Menu key={host.variant} data={data} onEvent={(event) => {
         onEvent(event)
         host.dispatchEvent(event)

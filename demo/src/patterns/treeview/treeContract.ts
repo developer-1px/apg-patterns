@@ -35,13 +35,16 @@ type NavigateDirection = Extract<PatternEvent, { type: 'navigate' }>['direction'
 
 export function reduceData(data: PatternData, event: Action): PatternData {
   if (event.type === 'reset') return initialData
-  if (event.type === 'focus') return { ...data, state: { ...data.state, activeKey: event.key } }
-  if (event.type === 'navigate') return data
+  const reason = 'meta' in event ? event.meta?.reason : undefined
+  const withReason = (next: PatternData): PatternData =>
+    reason ? { ...next, state: { ...next.state, lastEventReason: reason } } : next
+  if (event.type === 'focus') return withReason({ ...data, state: { ...data.state, activeKey: event.key } })
+  if (event.type === 'navigate') return withReason(data)
   if (event.type === 'select') {
-    return {
+    return withReason({
       ...data,
       state: { ...data.state, anchorKey: event.anchorKey, extentKey: event.extentKey, selectedKeys: [...event.keys] },
-    }
+    })
   }
   if (event.type === 'expand') {
     const expanded = new Set(data.state?.expandedKeys ?? [])
@@ -49,10 +52,10 @@ export function reduceData(data: PatternData, event: Action): PatternData {
     else expanded.delete(event.key)
     const activeKey = data.state?.activeKey
     const nextActiveKey = !event.expanded && activeKey && isDescendant(data, event.key, activeKey) ? event.key : activeKey
-    return {
+    return withReason({
       ...data,
       state: { ...data.state, activeKey: nextActiveKey ?? event.key, expandedKeys: [...expanded] },
-    }
+    })
   }
   return data
 }

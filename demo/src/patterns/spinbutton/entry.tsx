@@ -13,7 +13,6 @@ const items: readonly { key: SpinbuttonVariantKey; label: string }[] = [
 export const entry: PatternEntry = {
   key: 'spinbutton',
   label: 'Spinbutton',
-  order: 21,
   useDemoPattern: (onEvent) => {
     const host = useVariantPatternDataHost<SpinbuttonVariantKey>(
       'numeric',
@@ -27,7 +26,7 @@ export const entry: PatternEntry = {
       keyboardShortcuts: ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'],
       sourceNames: ['Spinbutton.tsx', 'spinbuttonData.ts', 'spinbutton/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
-      variants: <VariantListbox value={host.variant} items={items} label="spinbutton variants" idPrefix="spinbutton-variant" onChange={host.selectVariant} />,
+      variants: <VariantListbox orientation="horizontal" value={host.variant} items={items} label="spinbutton variants" idPrefix="spinbutton-variant" onChange={host.selectVariant} />,
       preview: <Spinbutton data={host.data} onEvent={(event) => {
         onEvent(event)
         host.dispatchEvent(event)

@@ -7,7 +7,6 @@ import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes
 export const entry: PatternEntry = {
   key: 'radio',
   label: 'Radio Group',
-  order: 8,
   useDemoPattern: (onEvent) => {
     const host = usePatternDataHost(initialRadioData, reduceRadioData)
     return {

@@ -6,7 +6,6 @@ import { renderDataInspect } from '../../shared/inspect/genericInspect'
 export const entry: PatternEntry = {
   key: 'tooltip',
   label: 'Tooltip',
-  order: 25,
   useDemoPattern: (_onEvent) => {
     return {
       key: 'tooltip',

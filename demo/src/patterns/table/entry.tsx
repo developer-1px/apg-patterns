@@ -16,7 +16,6 @@ const reduceTableDemoData = (data: PatternData, event: PatternEvent): PatternDat
 export const entry: PatternEntry = {
   key: 'table',
   label: 'Table',
-  order: 23,
   useDemoPattern: (onEvent) => {
     const host = usePatternDataHost(initialTableData, reduceTableDemoData)
     return {

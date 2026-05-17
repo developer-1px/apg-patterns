@@ -44,7 +44,6 @@ const reduceListboxDemoData = (data: PatternData, event: PatternEvent): PatternD
 export const entry: PatternEntry = {
   key: 'listbox',
   label: 'Listbox',
-  order: 2,
   useDemoPattern: (onEvent) => {
     const host = useVariantPatternDataHost<ListboxVariantKey>(
       'basic',
@@ -78,7 +77,7 @@ export const entry: PatternEntry = {
       keyboardShortcuts: ['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Space'],
       sourceNames: ['Listbox.tsx', 'RearrangeableListbox.tsx', 'listboxData.ts', 'listbox/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
-      variants: <VariantListbox value={host.variant} items={listboxVariantItems} label="listbox variants" idPrefix="listbox-variant" onChange={host.selectVariant} />,
+      variants: <VariantListbox orientation="horizontal" value={host.variant} items={listboxVariantItems} label="listbox variants" idPrefix="listbox-variant" onChange={host.selectVariant} />,
       preview,
       reset: host.reset,
     }

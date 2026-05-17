@@ -6,7 +6,6 @@ import { renderDataInspect } from '../../shared/inspect/genericInspect'
 export const entry: PatternEntry = {
   key: 'dialog',
   label: 'Dialog',
-  order: 17,
   useDemoPattern: (_onEvent) => {
     return {
       key: 'dialog',

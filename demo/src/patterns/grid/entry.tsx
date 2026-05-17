@@ -16,7 +16,6 @@ const reduceGridDemoData = (data: PatternData, event: PatternEvent): PatternData
 export const entry: PatternEntry = {
   key: 'grid',
   label: 'Grid',
-  order: 3,
   useDemoPattern: (onEvent) => {
     const host = useVariantPatternDataHost<GridVariantKey>(
       'dataTransactions',

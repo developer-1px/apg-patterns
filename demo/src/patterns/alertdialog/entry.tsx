@@ -9,7 +9,6 @@ import { renderDataInspect } from '../../shared/inspect/genericInspect'
 export const entry: PatternEntry = {
   key: 'alertdialog',
   label: 'Alert Dialog',
-  order: 13,
   useDemoPattern: (onEvent) => {
     const host = usePatternDataHost(initialAlertDialogData, (data, event) => reducePatternData(alertDialogDefinition, data, event))
     return {

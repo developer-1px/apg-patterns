@@ -7,7 +7,6 @@ import { renderDataInspect } from '../../shared/inspect/genericInspect'
 export const entry: PatternEntry = {
   key: 'switch',
   label: 'Switch',
-  order: 22,
   useDemoPattern: (onEvent) => {
     const host = usePatternDataHost(initialSwitchData, reduceSwitchData)
     return {

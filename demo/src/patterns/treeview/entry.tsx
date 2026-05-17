@@ -51,7 +51,6 @@ const reduceTreeviewDemoState = (state: TreeviewDemoState, action: TreeviewDemoA
 export const entry: PatternEntry = {
   key: 'treeview',
   label: 'Treeview',
-  order: 1,
   useDemoPattern: (onEvent) => {
     const [state, dispatch] = useReducer(reduceTreeviewDemoState, initialTreeviewDemoState)
     const treeOptions: PatternOptions = { focusStrategy: state.focusStrategy, followFocus: state.followFocus, itemClickAction: state.itemClickAction, indicatorClickAction: 'toggleExpand' }
@@ -65,8 +64,9 @@ export const entry: PatternEntry = {
       if (event.type !== 'navigate') return dispatchTree(event)
       const target = resolveTarget(event.direction, state.data)
       if (!target) return
-      dispatchTree({ type: 'focus', key: target })
-      if (state.followFocus) dispatchTree({ type: 'select', keys: [target], anchorKey: target, extentKey: target })
+      const meta = event.meta
+      dispatchTree({ type: 'focus', key: target, ...(meta ? { meta } : {}) })
+      if (state.followFocus) dispatchTree({ type: 'select', keys: [target], anchorKey: target, extentKey: target, ...(meta ? { meta } : {}) })
     }
 
     return {

@@ -7,7 +7,6 @@ import { renderDataInspect } from '../../shared/inspect/genericInspect'
 export const entry: PatternEntry = {
   key: 'accordion',
   label: 'Accordion',
-  order: 11,
   useDemoPattern: (onEvent) => {
     const host = usePatternDataHost(initialAccordionData, reduceAccordionData)
     return {

@@ -9,12 +9,14 @@ export function VariantListbox<T extends string>({
   label,
   idPrefix,
   onChange,
+  orientation = 'vertical',
 }: {
   value: T
   items: readonly { key: T; label: string }[]
   label: string
   idPrefix: string
   onChange: (value: T) => void
+  orientation?: 'horizontal' | 'vertical'
 }) {
   const data = createVariantData(value, items, label)
   const runtime = createPatternRuntime({
@@ -30,7 +32,7 @@ export function VariantListbox<T extends string>({
   const rootProps = runtime.getPartProps('listbox') as Props
 
   return (
-    <div {...rootProps} className="grid gap-1 outline-none focus:outline focus:outline-2 focus:outline-zinc-400 dark:focus:outline-zinc-500">
+    <div {...rootProps} className={`${orientation === 'horizontal' ? 'flex flex-wrap items-center gap-1' : 'grid gap-1'} outline-none focus:outline focus:outline-2 focus:outline-zinc-400 dark:focus:outline-zinc-500`}>
       {items.map((item) => (
         <button
           {...(runtime.getPartProps('option', item.key) as Props)}

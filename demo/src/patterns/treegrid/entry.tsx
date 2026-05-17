@@ -9,7 +9,6 @@ import { renderDataInspect } from '../../shared/inspect/genericInspect'
 export const entry: PatternEntry = {
   key: 'treegrid',
   label: 'Treegrid',
-  order: 26,
   useDemoPattern: (onEvent) => {
     const host = usePatternDataHost(initialTreegridData, (data, event) => reducePatternData(treegridDefinition, data, event))
     return {

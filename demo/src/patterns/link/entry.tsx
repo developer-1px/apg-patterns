@@ -13,7 +13,6 @@ const items: readonly { key: LinkVariantKey; label: string }[] = [
 export const entry: PatternEntry = {
   key: 'link',
   label: 'Link',
-  order: 19,
   useDemoPattern: (onEvent) => {
     const host = useVariantPatternDataHost<LinkVariantKey>(
       'anchor',
@@ -27,7 +26,7 @@ export const entry: PatternEntry = {
       keyboardShortcuts: ['Enter'],
       sourceNames: ['Link.tsx', 'linkData.ts', 'link/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
-      variants: <VariantListbox value={host.variant} items={items} label="link variants" idPrefix="link-variant" onChange={host.selectVariant} />,
+      variants: <VariantListbox orientation="horizontal" value={host.variant} items={items} label="link variants" idPrefix="link-variant" onChange={host.selectVariant} />,
       preview: <Link data={host.data} onEvent={onEvent} />,
       reset: () => host.selectVariant('anchor'),
     }

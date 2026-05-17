@@ -14,14 +14,13 @@ const preClass = 'h-full min-h-0 overflow-auto bg-zinc-50 p-3 font-mono text-xs 
 const optionButtonClass =
   'h-7 rounded px-2 text-left text-xs text-zinc-600 hover:bg-zinc-100 aria-selected:bg-zinc-900 aria-selected:text-white dark:text-zinc-400 dark:hover:bg-zinc-900 dark:aria-selected:bg-zinc-100 dark:aria-selected:text-zinc-950'
 const rightModes = ['source', 'inspect', 'log'] as const
-const previewModes = ['preview', 'variants'] as const
 
 const AppStateSchema = z.object({
   patternKey: z.string(),
   events: z.array(z.custom<PatternEvent>()),
   sourceName: z.string(),
   rightMode: z.enum(rightModes),
-  previewMode: z.enum(previewModes),
+  rightPanelOpen: z.boolean(),
 }).strict()
 
 type AppState = z.infer<typeof AppStateSchema>
@@ -31,22 +30,22 @@ type AppAction =
   | { type: 'recordEvent'; event: PatternEvent }
   | { type: 'selectSource'; sourceName: SourceName }
   | { type: 'selectRightMode'; rightMode: AppState['rightMode'] }
-  | { type: 'selectPreviewMode'; previewMode: AppState['previewMode'] }
+  | { type: 'toggleRightPanel' }
 
 const initialAppState = AppStateSchema.parse({
   patternKey: 'treeview',
   events: [],
   sourceName: 'Tree.tsx',
   rightMode: 'source',
-  previewMode: 'preview',
+  rightPanelOpen: false,
 })
 
 const reduceAppState = (state: AppState, action: AppAction): AppState => {
-  if (action.type === 'selectPattern') return AppStateSchema.parse({ ...state, patternKey: action.patternKey, previewMode: 'preview' })
+  if (action.type === 'selectPattern') return AppStateSchema.parse({ ...state, patternKey: action.patternKey })
   if (action.type === 'recordEvent') return AppStateSchema.parse({ ...state, events: [action.event, ...state.events].slice(0, 12) })
   if (action.type === 'selectSource') return AppStateSchema.parse({ ...state, sourceName: action.sourceName })
-  if (action.type === 'selectRightMode') return AppStateSchema.parse({ ...state, rightMode: action.rightMode })
-  return AppStateSchema.parse({ ...state, previewMode: action.previewMode })
+  if (action.type === 'selectRightMode') return AppStateSchema.parse({ ...state, rightMode: action.rightMode, rightPanelOpen: true })
+  return AppStateSchema.parse({ ...state, rightPanelOpen: !state.rightPanelOpen })
 }
 
 export function App() {
@@ -58,13 +57,10 @@ export function App() {
   const source = sources[activeSourceName]
   const sourceTabs = useSourceTabs({ label: 'source files', tabs: sourceNames, value: activeSourceName, onChange: (sourceName) => dispatch({ type: 'selectSource', sourceName }) })
   const rightModeTabs = useSourceTabs({ label: 'right panel', tabs: rightModes, value: state.rightMode, onChange: (rightMode) => dispatch({ type: 'selectRightMode', rightMode }) })
-  const availablePreviewModes = activeDemo.variants ? previewModes : previewModes.slice(0, 1)
-  const activePreviewMode = activeDemo.variants ? state.previewMode : 'preview'
-  const previewModeTabs = useSourceTabs({ label: 'preview panel', tabs: availablePreviewModes, value: activePreviewMode, onChange: (previewMode) => dispatch({ type: 'selectPreviewMode', previewMode }) })
   const eventLog = state.events.map((event) => JSON.stringify(event)).join('\n') || 'none'
 
   return (
-    <main className="grid h-screen grid-cols-1 grid-rows-[auto_minmax(0,1fr)_minmax(260px,40vh)] gap-8 bg-white px-6 py-5 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 lg:grid-cols-[180px_minmax(360px,1fr)_minmax(380px,0.9fr)] lg:grid-rows-[minmax(0,1fr)]">
+    <main className={`grid h-screen grid-cols-1 ${state.rightPanelOpen ? 'grid-rows-[auto_minmax(0,1fr)_minmax(260px,40vh)]' : 'grid-rows-[auto_minmax(0,1fr)]'} gap-8 bg-white px-6 py-5 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 ${state.rightPanelOpen ? 'lg:grid-cols-[180px_minmax(360px,1fr)_minmax(380px,0.9fr)]' : 'lg:grid-cols-[180px_minmax(360px,1fr)]'} lg:grid-rows-[minmax(0,1fr)]`}>
       <section className={`${panelClass} overflow-auto`}>
         <header className={headerClass}>
           <h1 className={titleClass}>patterns</h1>
@@ -76,37 +72,37 @@ export function App() {
         <header className={headerClass}>
           <h2 className={titleClass}>{activeDemo.label}</h2>
           <div className="flex items-center gap-1">
-            {activeDemo.variants ? (
-              <div {...previewModeTabs.getTablistProps()} className="flex items-center gap-1">
-                {availablePreviewModes.map((mode) => (
-                  <button {...previewModeTabs.getTabProps(mode)} key={mode} type="button" className={optionButtonClass}>
-                    {mode}
-                  </button>
-                ))}
-              </div>
-            ) : null}
             <button type="button" className={buttonClass} onClick={activeDemo.reset}>
               reset
             </button>
+            <button
+              type="button"
+              className={buttonClass}
+              aria-pressed={state.rightPanelOpen}
+              onClick={() => dispatch({ type: 'toggleRightPanel' })}
+              title={state.rightPanelOpen ? 'Hide source panel' : 'Show source panel'}
+            >
+              {state.rightPanelOpen ? '< code' : 'code >'}
+            </button>
           </div>
         </header>
-        {activePreviewMode === 'preview' ? (
-          <div {...previewModeTabs.getPanelProps()}>
-            <div className="mb-4 flex flex-wrap gap-1">
+        {activeDemo.variants ? <div className="mb-3">{activeDemo.variants}</div> : null}
+        {activeDemo.keyboardShortcuts.length > 0 ? (
+          <div className="mb-4">
+            <div className="mb-1 text-[10px] uppercase tracking-wide text-zinc-400 dark:text-zinc-600">Supported keys — focus preview then press</div>
+            <div className="flex flex-wrap gap-1">
               {activeDemo.keyboardShortcuts.map((shortcut) => (
                 <kbd key={shortcut} className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[11px] text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400">
                   {shortcut}
                 </kbd>
               ))}
             </div>
-            {activeDemo.preview}
           </div>
         ) : null}
-        {activePreviewMode === 'variants' ? (
-          <div {...previewModeTabs.getPanelProps()}>{activeDemo.variants}</div>
-        ) : null}
+        {activeDemo.preview}
       </section>
 
+      {state.rightPanelOpen ? (
       <section className={`${panelClass} flex min-h-0 flex-col`}>
         <header className="mb-3 grid gap-2">
           <div {...rightModeTabs.getTablistProps()} className="flex items-center gap-1">
@@ -136,6 +132,7 @@ export function App() {
         {state.rightMode === 'inspect' ? <pre className={preClass}>{activeDemo.inspect}</pre> : null}
         {state.rightMode === 'log' ? <pre className={preClass}>{eventLog}</pre> : null}
       </section>
+      ) : null}
     </main>
   )
 }

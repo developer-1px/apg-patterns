@@ -14,13 +14,7 @@ for (const [path, mod] of Object.entries(modules)) {
   collected.push(mod.entry)
 }
 
-// Stable ordering: explicit `order` first (ascending), then key alphabetical.
-collected.sort((a, b) => {
-  const ao = a.order ?? Number.POSITIVE_INFINITY
-  const bo = b.order ?? Number.POSITIVE_INFINITY
-  if (ao !== bo) return ao - bo
-  return a.key.localeCompare(b.key)
-})
+collected.sort((a, b) => a.key.localeCompare(b.key))
 
 export const patternEntries: readonly PatternEntry[] = collected
 

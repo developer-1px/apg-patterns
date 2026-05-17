@@ -8,7 +8,6 @@ import { renderDataInspect } from '../../shared/inspect/genericInspect'
 export const entry: PatternEntry = {
   key: 'button',
   label: 'Button',
-  order: 15,
   useDemoPattern: (onEvent) => {
     const host = useVariantPatternDataHost<ButtonVariantKey>(
       'action',
@@ -22,7 +21,7 @@ export const entry: PatternEntry = {
       keyboardShortcuts: ['Enter', 'Space'],
       sourceNames: ['Button.tsx', 'buttonData.ts', 'button/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
-      variants: <VariantListbox value={host.variant} items={buttonVariantItems} label="button variants" idPrefix="button-variant" onChange={host.selectVariant} />,
+      variants: <VariantListbox orientation="horizontal" value={host.variant} items={buttonVariantItems} label="button variants" idPrefix="button-variant" onChange={host.selectVariant} />,
       preview: <Button data={host.data} onEvent={(event) => {
         onEvent(event)
         host.dispatchEvent(event)

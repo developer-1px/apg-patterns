@@ -26,7 +26,6 @@ function VariantControl({ label, children }: { label: string; children: ReactNod
 export const entry: PatternEntry = {
   key: 'disclosure',
   label: 'Disclosure',
-  order: 6,
   useDemoPattern: (onEvent) => {
     const variants: Record<DisclosureVariantKey, PatternData> = {
       simple: initialDisclosureData,
@@ -56,7 +55,7 @@ export const entry: PatternEntry = {
       inspect: renderDataInspect(host.data),
       variants: (
         <VariantControl label="variant">
-          <VariantListbox value={host.variant} items={items} label="disclosure variants" idPrefix="disclosure-variant" onChange={host.selectVariant} />
+          <VariantListbox orientation="horizontal" value={host.variant} items={items} label="disclosure variants" idPrefix="disclosure-variant" onChange={host.selectVariant} />
         </VariantControl>
       ),
       preview: <Disclosure data={host.data} onEvent={(event) => {

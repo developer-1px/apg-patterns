@@ -7,7 +7,6 @@ import { renderDataInspect } from '../../shared/inspect/genericInspect'
 export const entry: PatternEntry = {
   key: 'windowsplitter',
   label: 'Window Splitter',
-  order: 27,
   useDemoPattern: (onEvent) => {
     const host = usePatternDataHost(initialWindowSplitterData, (data, event) => reduceWindowSplitterData(data, event, windowSplitterOptions))
     return {

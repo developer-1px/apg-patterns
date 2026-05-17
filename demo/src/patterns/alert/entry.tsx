@@ -17,7 +17,6 @@ const reduceAlertDemoState = (data: typeof initialAlertData, action: AlertDemoAc
 export const entry: PatternEntry = {
   key: 'alert',
   label: 'Alert',
-  order: 12,
   useDemoPattern: (onEvent) => {
     const [data, dispatch] = useReducer(reduceAlertDemoState, PatternDataSchema.parse(initialAlertData))
     return {

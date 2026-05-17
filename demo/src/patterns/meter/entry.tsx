@@ -8,7 +8,6 @@ import { renderDataInspect } from '../../shared/inspect/genericInspect'
 export const entry: PatternEntry = {
   key: 'meter',
   label: 'Meter',
-  order: 20,
   useDemoPattern: (onEvent) => {
     const host = useVariantPatternDataHost<MeterVariantKey>(
       'disk',
@@ -22,7 +21,7 @@ export const entry: PatternEntry = {
       keyboardShortcuts: [],
       sourceNames: ['Meter.tsx', 'meterData.ts', 'meter/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
-      variants: <VariantListbox value={host.variant} items={meterVariantItems} label="meter variants" idPrefix="meter-variant" onChange={host.selectVariant} />,
+      variants: <VariantListbox orientation="horizontal" value={host.variant} items={meterVariantItems} label="meter variants" idPrefix="meter-variant" onChange={host.selectVariant} />,
       preview: <Meter data={host.data} onEvent={onEvent} />,
       reset: () => host.selectVariant('disk'),
     }

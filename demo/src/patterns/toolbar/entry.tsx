@@ -7,7 +7,6 @@ import { renderDataInspect } from '../../shared/inspect/genericInspect'
 export const entry: PatternEntry = {
   key: 'toolbar',
   label: 'Toolbar',
-  order: 24,
   useDemoPattern: (onEvent) => {
     const host = usePatternDataHost(initialToolbarData, reduceToolbarData)
     return {
