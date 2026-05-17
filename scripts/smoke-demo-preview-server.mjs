@@ -138,7 +138,16 @@ async function verifyStaticSubpathServing() {
     await Promise.all(assetRefs.map(async (assetRef) => {
       const assetUrl = new URL(assetRef, `${subpathOrigin}${prefix}`)
       const response = await fetch(assetUrl)
-      if (!response.ok) failures.push(`${assetRef}: ${response.status}`)
+      if (!response.ok) {
+        failures.push(`${assetRef}: ${response.status}`)
+        return
+      }
+      if (assetRef.endsWith('.js') && !response.headers.get('content-type')?.includes('javascript')) {
+        failures.push(`${assetRef}: ${response.headers.get('content-type')}`)
+      }
+      if (assetRef.endsWith('.css') && !response.headers.get('content-type')?.includes('text/css')) {
+        failures.push(`${assetRef}: ${response.headers.get('content-type')}`)
+      }
     }))
 
     if (assetRefs.length === 0) failures.push('no relative assets')
