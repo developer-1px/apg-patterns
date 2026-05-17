@@ -1,4 +1,4 @@
-export type PatternKey = 'treeview' | 'listbox' | 'grid' | 'tabs' | 'slider'
+export type PatternKey = 'treeview' | 'listbox' | 'grid' | 'tabs' | 'slider' | 'disclosure'
 
 export const patternItems: readonly { key: PatternKey; label: string }[] = [
   { key: 'treeview', label: 'Treeview' },
@@ -6,4 +6,5 @@ export const patternItems: readonly { key: PatternKey; label: string }[] = [
   { key: 'grid', label: 'Grid' },
   { key: 'tabs', label: 'Tabs' },
   { key: 'slider', label: 'Slider' },
+  { key: 'disclosure', label: 'Disclosure' },
 ]

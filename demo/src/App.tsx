@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useReducer, useState } from 'react'
-import { reducePatternData, reduceTabsData, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
+import { reduceDisclosureData, reducePatternData, reduceTabsData, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
+import { initialDisclosureData } from './disclosureData'
+import { Disclosure } from './Disclosure'
 import { initialData, reduceData, resolveTarget } from './demoData'
 import { Grid } from './Grid'
 import { gridDefinition, listboxDefinition } from '../../src'
 import { gridVariants, type GridVariantKey } from './gridData'
 import { GridVariantMenu } from './GridVariantMenu'
-import { renderAriaTree, renderGridInspect, renderHtmlTree, renderListboxInspect, renderSliderInspect, renderStaticInspect, renderTabsInspect } from './inspect'
+import { renderAriaTree, renderDisclosureInspect, renderGridInspect, renderHtmlTree, renderListboxInspect, renderSliderInspect, renderStaticInspect, renderTabsInspect } from './inspect'
 import { Listbox } from './Listbox'
 import { initialListboxData } from './listboxData'
 import { PatternMenu } from './PatternMenu'
@@ -35,6 +37,7 @@ export function App() {
   const [gridData, setGridData] = useState(gridVariants.dataTransactions.data)
   const [tabsData, setTabsData] = useState(initialTabsData)
   const [sliderData, setSliderData] = useState(initialSliderData)
+  const [disclosureData, setDisclosureData] = useState(initialDisclosureData)
   const [listboxData, dispatchListbox] = useReducer((current: typeof initialListboxData, event: PatternEvent | { type: 'reset' }) => {
     if (event.type === 'reset') return initialListboxData
     return reducePatternData(listboxDefinition, current, event)
@@ -79,6 +82,11 @@ export function App() {
     setEvents((current) => [event, ...current].slice(0, 12))
   }
 
+  const handleDisclosureEvent = (event: PatternEvent) => {
+    setEvents((current) => [event, ...current].slice(0, 12))
+    setDisclosureData((current) => reduceDisclosureData(current, event))
+  }
+
   const handleSliderEvent = (event: PatternEvent) => {
     setEvents((current) => [event, ...current].slice(0, 12))
     setSliderData((current) => reduceSliderData(current, event, sliderOptions))
@@ -116,7 +124,9 @@ export function App() {
             ? renderTabsInspect(tabsData)
             : patternKey === 'slider'
               ? renderSliderInspect(sliderData)
-              : renderStaticInspect(patternKey)
+              : patternKey === 'disclosure'
+                ? renderDisclosureInspect(disclosureData)
+                : renderStaticInspect(patternKey)
   const eventLog = events.map((event) => JSON.stringify(event)).join('\n') || 'none'
 
   return (
@@ -171,7 +181,9 @@ export function App() {
                     ? setTabsData(initialTabsData)
                     : patternKey === 'slider'
                       ? setSliderData(initialSliderData)
-                      : dispatch({ type: 'reset' })
+                      : patternKey === 'disclosure'
+                        ? setDisclosureData(initialDisclosureData)
+                        : dispatch({ type: 'reset' })
             }
           >
             reset
@@ -182,6 +194,7 @@ export function App() {
         {patternKey === 'grid' ? <Grid data={gridData} options={{ focusStrategy: 'rovingTabIndex', selectionMode: 'single' }} onEvent={handleGridEvent} /> : null}
         {patternKey === 'tabs' ? <Tabs data={tabsData} onEvent={handleTabsEvent} onDataChange={handleTabsDataChange} /> : null}
         {patternKey === 'slider' ? <Slider data={sliderData} options={sliderOptions} onEvent={handleSliderEvent} /> : null}
+        {patternKey === 'disclosure' ? <Disclosure data={disclosureData} onEvent={handleDisclosureEvent} /> : null}
       </section>
 
       <section className={`${panelClass} flex min-h-0 flex-col`}>

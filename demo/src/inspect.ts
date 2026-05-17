@@ -41,6 +41,20 @@ export function renderStaticInspect(patternKey: PatternKey) {
   return ''
 }
 
+export function renderDisclosureInspect(data: PatternData) {
+  const triggerKey = data.relations?.rootKeys?.[0]
+  if (!triggerKey) return ''
+  const expanded = data.state?.expandedKeys?.includes(triggerKey) ?? false
+  const panelKey = data.relations?.controlsByKey?.[triggerKey]?.[0]
+  const lines = [
+    `button "${data.items[triggerKey]?.label ?? triggerKey}" aria-expanded=${expanded} aria-controls=${JSON.stringify(panelKey ?? '')}`,
+  ]
+  if (panelKey && expanded) {
+    lines.push(`  region aria-labelledby=${JSON.stringify(triggerKey)}`)
+  }
+  return lines.join('\n')
+}
+
 export function renderTabsInspect(data: PatternData) {
   const activeKey = data.state?.activeKey
   const selectedKey = data.state?.selectedKeys?.[0]
