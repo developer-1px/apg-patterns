@@ -1,6 +1,5 @@
-import { useReducer, type KeyboardEvent } from 'react'
-import type { KeyInput } from '@interactive-os/keyboard'
-import { createPatternRuntime, handlePatternTrapFocus, reducePatternData, usePatternEffects, type Key, type PatternData, type PatternEvent } from '../../../../src'
+import { useReducer } from 'react'
+import { reducePatternData, useDialogPattern, type PatternData, type PatternEvent } from '../../../../src'
 import { dialogDefinition } from '../../../../src/patterns/dialog/definition'
 import { dialogContent, initialDialogData } from './dialogData'
 
@@ -15,48 +14,30 @@ const inputClass =
 const buttonClass =
   'inline-flex h-8 items-center rounded-xl bg-zinc-100/80 px-3 text-sm font-medium text-zinc-800 shadow-sm outline-none transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.06] dark:text-zinc-200 dark:hover:bg-white/[0.08] dark:focus-visible:outline-zinc-500'
 
-const keyToElementId = (key: Key) => (key === 'dialog' ? 'dialog-panel' : `dialog-${key}`)
-
 export interface DialogProps {
   data?: PatternData
+  onEvent?: (event: PatternEvent) => void
 }
 
-export function Dialog({ data: initialData = initialDialogData }: DialogProps = {}) {
-  const [data, dispatch] = useReducer(
+export function Dialog({ data = initialDialogData, onEvent }: DialogProps = {}) {
+  const [localData, dispatch] = useReducer(
     (current: PatternData, event: PatternEvent) => reducePatternData(dialogDefinition, current, event),
-    initialData,
+    data,
   )
-  const runtime = createPatternRuntime({ definition: dialogDefinition, data, options: {}, onEvent: dispatch, keyToElementId })
-  const open = data.state?.expandedKeys?.includes('trigger') ?? false
-  const rootKeyDown = runtime.getRootKeyboardHandler()
-  usePatternEffects({ definition: dialogDefinition, data, keyToElementId })
-
-  const onPanelKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    rootKeyDown(event as unknown as KeyInput & { preventDefault?: () => void })
-    handlePatternTrapFocus({ event, definition: dialogDefinition, data, keyToElementId })
-  }
-  const labelOf = (key: string) => data.items[key]?.label ?? key
+  const isControlled = onEvent !== undefined
+  const dialog = useDialogPattern(isControlled ? data : localData, isControlled ? onEvent : dispatch)
 
   return (
     <div className="grid gap-3">
-      <button
-        {...runtime.getPartProps('trigger', 'trigger')}
-        type="button"
-        className={triggerClass}
-      >
-        {labelOf('trigger')}
+      <button {...dialog.triggerProps} type="button" className={triggerClass}>
+        {dialog.labelOf('trigger')}
       </button>
-      {open ? (
+      {dialog.open ? (
         <>
-          <div {...runtime.getPartProps('overlay')} className={overlayClass} data-testid="dialog-overlay" />
-          <div
-            {...runtime.getPartProps('dialog', 'dialog')}
-            className={panelClass}
-            onKeyDown={onPanelKeyDown}
-            tabIndex={-1}
-          >
-            <h2 {...runtime.getPartProps('title', 'title')} className="mb-1 text-base font-medium">{labelOf('title')}</h2>
-            <p {...runtime.getPartProps('description', 'description')} className="mb-4 text-zinc-600 dark:text-zinc-400">{labelOf('description')}</p>
+          <div {...dialog.overlayProps} className={overlayClass} data-testid="dialog-overlay" />
+          <div {...dialog.dialogProps} className={panelClass}>
+            <h2 {...dialog.titleProps} className="mb-1 text-base font-medium">{dialog.labelOf('title')}</h2>
+            <p {...dialog.descriptionProps} className="mb-4 text-zinc-600 dark:text-zinc-400">{dialog.labelOf('description')}</p>
             <div className="grid gap-2">
               {dialogContent.fields.map((field) => (
                 <label key={field.id} className="grid grid-cols-[5rem_1fr] items-center gap-2">
@@ -66,8 +47,8 @@ export function Dialog({ data: initialData = initialDialogData }: DialogProps = 
               ))}
             </div>
             <div className="mt-4 flex justify-end gap-2">
-              <button {...runtime.getPartProps('cancel', 'cancel')} type="button" className={buttonClass}>{labelOf('cancel')}</button>
-              <button {...runtime.getPartProps('submit', 'submit')} type="button" className={buttonClass}>{labelOf('submit')}</button>
+              <button {...dialog.cancelProps} type="button" className={buttonClass}>{dialog.labelOf('cancel')}</button>
+              <button {...dialog.submitProps} type="button" className={buttonClass}>{dialog.labelOf('submit')}</button>
             </div>
           </div>
         </>

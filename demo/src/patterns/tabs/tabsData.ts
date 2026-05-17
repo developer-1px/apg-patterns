@@ -44,16 +44,31 @@ const planetsTabs: readonly TabSpec[] = [
 ]
 
 const longTabs: readonly TabSpec[] = [
-  { key: 'danish', label: 'Danish', panelLabel: 'Danish panel', content: 'A long passage of placeholder text long enough to require scrolling within the tab panel. '.repeat(20) },
-  { key: 'cinnamon', label: 'Cinnamon Roll', panelLabel: 'Cinnamon Roll panel', content: 'Cinnamon roll panel content. '.repeat(40) },
-  { key: 'donut', label: 'Donut', panelLabel: 'Donut panel', content: 'Donut panel content. '.repeat(40) },
+  {
+    key: 'danish',
+    label: 'Danish',
+    panelLabel: 'Danish panel',
+    content: 'Laminated dough needs a cold bench, even pressure, and a rest between folds. The panel intentionally includes enough operational notes to require scrolling while still reading like real product content. Review butter temperature, fold count, proofing time, bake color, cooling rack capacity, and packaging handoff before the morning run. '.repeat(4),
+  },
+  {
+    key: 'cinnamon',
+    label: 'Cinnamon Roll',
+    panelLabel: 'Cinnamon Roll panel',
+    content: 'Cinnamon roll batches move through mixing, bulk rest, rolling, filling, proofing, baking, glazing, and holding. Keep the filling edge clean so the roll seals correctly, and stage trays by bake time so the front counter receives a steady flow instead of one large handoff. '.repeat(5),
+  },
+  {
+    key: 'donut',
+    label: 'Donut',
+    panelLabel: 'Donut panel',
+    content: 'Donut prep depends on oil temperature, rack spacing, glaze viscosity, and finish timing. Log the first batch color, adjust proofing if the crumb tightens, and keep filled varieties separated until labels are applied. '.repeat(6),
+  },
 ]
 
 const closeableTabs: readonly TabSpec[] = [
-  { key: 'inbox', label: 'Inbox', panelLabel: 'Inbox panel', content: 'Press Delete while a tab is focused to close it.' },
-  { key: 'drafts', label: 'Drafts', panelLabel: 'Drafts panel', content: 'Drafts panel content.' },
-  { key: 'sent', label: 'Sent', panelLabel: 'Sent panel', content: 'Sent panel content.' },
-  { key: 'trash', label: 'Trash', panelLabel: 'Trash panel', content: 'Trash panel content.' },
+  { key: 'inbox', label: 'Inbox', panelLabel: 'Inbox panel', content: 'New requests awaiting triage.' },
+  { key: 'drafts', label: 'Drafts', panelLabel: 'Drafts panel', content: 'Unsent updates that need review.' },
+  { key: 'sent', label: 'Sent', panelLabel: 'Sent panel', content: 'Recently delivered conversations.' },
+  { key: 'trash', label: 'Trash', panelLabel: 'Trash panel', content: 'Removed items retained for recovery.' },
 ]
 
 export type TabsVariantKey = 'automatic' | 'manual' | 'vertical' | 'scrollable' | 'closeable'
