@@ -80,6 +80,7 @@ async function runSmoke() {
   globalThis.MutationObserver = dom.window.MutationObserver
   globalThis.HTMLElement = dom.window.HTMLElement
   globalThis.HTMLIFrameElement = dom.window.HTMLIFrameElement
+  globalThis.KeyboardEvent = dom.window.KeyboardEvent
   globalThis.SVGElement = dom.window.SVGElement
   globalThis.Node = dom.window.Node
   Object.defineProperty(globalThis, 'navigator', {
@@ -188,6 +189,7 @@ async function runSmoke() {
     'events panel route did not render empty event log',
   )
 
+  await verifyTabsKeyboardEventLog()
   await verifyInteractionEventLog()
 
   await verifyHashRoute('#pattern=accordion&panel=off&source=Accordion.tsx', (text) =>
@@ -258,6 +260,33 @@ async function verifyInteractionEventLog() {
   } catch {
     patternFailures.push('accordion interaction did not record an event log entry')
   }
+}
+
+async function verifyTabsKeyboardEventLog() {
+  window.location.hash = '#pattern=tabs&panel=events&source=Tabs.tsx'
+  window.dispatchEvent(new dom.window.HashChangeEvent('hashchange'))
+
+  try {
+    const overviewTab = await waitFor(() => document.querySelector('[data-demo-preview="tabs"] [role="tab"][aria-selected="true"]'))
+    overviewTab.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'ArrowRight', code: 'ArrowRight', bubbles: true, cancelable: true }))
+    await waitFor(() => {
+      const codeTab = Array.from(document.querySelectorAll('[data-demo-preview="tabs"] [role="tab"]'))
+        .find((tab) => tab.textContent?.trim() === 'Code')
+      const text = rootText()
+      return codeTab?.getAttribute('aria-selected') === 'true'
+        && text.includes('navigate')
+        && text.includes('direction=next')
+        && text.includes('via keyboard')
+    })
+  } catch {
+    patternFailures.push(`tabs keyboard interaction did not update selection and event log: ${describePreviewTabs('tabs')} | text=${rootText().slice(0, 180)}`)
+  }
+}
+
+function describePreviewTabs(key) {
+  return Array.from(document.querySelectorAll(`[data-demo-preview="${key}"] [role="tab"]`), (tab) =>
+    `${tab.textContent?.trim()}:${tab.getAttribute('aria-selected')}`,
+  ).join(',')
 }
 
 async function verifyPatternPanelRoutes({ key, label, sourceName }) {
