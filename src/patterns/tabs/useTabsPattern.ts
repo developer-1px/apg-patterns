@@ -1,14 +1,30 @@
 import { createTabsRuntime, type CreateTabsRuntimeInput, type TabsRuntime } from './runtime'
 import type { ReactTabsProps, ReactTabsRuntime } from '../../adapters/reactTypes'
+import { usePatternEffects } from '../../adapters/reactPatternEffects'
+import type { PatternData, PatternEvent, PatternOptions } from '../../schema'
+import { tabsDefinition } from './definition'
 
-export function useTabsPattern(input: CreateTabsRuntimeInput): ReactTabsRuntime {
-  return adaptTabsRuntime(
-    createTabsRuntime({
-      data: input.data,
-      options: input.options,
-      onEvent: input.onEvent,
-    }),
-  )
+export function useTabsPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactTabsRuntime
+export function useTabsPattern(input: CreateTabsRuntimeInput): ReactTabsRuntime
+export function useTabsPattern(
+  dataOrInput: PatternData | CreateTabsRuntimeInput,
+  onEvent?: (event: PatternEvent) => void,
+  options?: PatternOptions,
+): ReactTabsRuntime {
+  const input = isTabsInput(dataOrInput)
+    ? dataOrInput
+    : {
+        data: dataOrInput,
+        onEvent: onEvent ?? (() => undefined),
+        options,
+      }
+  const runtime = createTabsRuntime(input)
+  usePatternEffects({
+    definition: tabsDefinition,
+    data: runtime.data,
+    keyToElementId: (key) => createTabElementId(runtime.options.elementIdPrefix ?? 'tab-', key),
+  })
+  return adaptTabsRuntime(runtime)
 }
 
 function adaptTabsRuntime(runtime: TabsRuntime): ReactTabsRuntime {
@@ -22,4 +38,12 @@ function adaptTabsRuntime(runtime: TabsRuntime): ReactTabsRuntime {
 
 function toReactProps(props: Record<string, unknown>): ReactTabsProps {
   return props as ReactTabsProps
+}
+
+function isTabsInput(input: PatternData | CreateTabsRuntimeInput): input is CreateTabsRuntimeInput {
+  return 'data' in input && 'onEvent' in input
+}
+
+function createTabElementId(prefix: string, key: string) {
+  return `${prefix}${key.toLowerCase().replace(/[^a-z0-9_-]+/g, '-')}`
 }

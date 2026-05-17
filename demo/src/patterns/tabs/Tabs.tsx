@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from 'react'
-import { tabsDefinition, usePatternEffects, useTabsPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
+import { useTabsPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
 import { Icon } from '../../shared/Icon'
 
 type Props = HTMLAttributes<HTMLElement>
@@ -17,21 +17,11 @@ export function Tabs({
     scrollable?: boolean
   }
   const mergedOptions = { orientation: 'horizontal' as const, activationMode: 'automatic' as const, ...dataOptions }
-  const tabs = useTabsPattern({
-    data,
-    options: mergedOptions,
-    onEvent,
-  })
+  const tabs = useTabsPattern(data, onEvent, mergedOptions)
   const panelKey = tabs.selectedPanelKey
   const orientation = mergedOptions.orientation
   const scrollable = (mergedOptions as { scrollable?: boolean }).scrollable === true
   const closeable = (mergedOptions as { closeable?: boolean }).closeable === true
-  usePatternEffects({
-    definition: tabsDefinition,
-    data,
-    keyToElementId: (key) => createTabElementId((mergedOptions as { elementIdPrefix?: string }).elementIdPrefix ?? 'tab-', key),
-  })
-
   const isVertical = orientation === 'vertical'
   const containerClass = isVertical
     ? 'grid max-w-2xl gap-4 grid-cols-[140px_minmax(0,1fr)]'
@@ -84,8 +74,4 @@ export function Tabs({
       </div>
     </div>
   )
-}
-
-function createTabElementId(prefix: string, key: string) {
-  return `${prefix}${key.toLowerCase().replace(/[^a-z0-9_-]+/g, '-')}`
 }
