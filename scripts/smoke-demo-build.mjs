@@ -79,10 +79,13 @@ const previewSurfaceSelectors = {
 
 if (!hasActiveDemoHeading('Tabs')) patternFailures.push('initial tabs route did not render Tabs workspace')
 
-for (const { key, label } of Array.from(patternListbox.querySelectorAll('[role="option"]'), (option) => ({
+const patternOptions = Array.from(patternListbox.querySelectorAll('[role="option"]'), (option) => ({
   key: option.id?.replace(/^pattern-/, ''),
   label: option.textContent?.trim(),
-})).filter((item) => item.key && item.label)) {
+})).filter((item) => item.key && item.label)
+verifyPreviewSurfaceRegistry(patternOptions.map((option) => option.key))
+
+for (const { key, label } of patternOptions) {
   const option = findPatternOption(key)
   if (!label) continue
   if (!option) {
@@ -268,6 +271,17 @@ function verifyPreviewSurface(key, label) {
   }
   if (!preview.querySelector(selector)) {
     patternFailures.push(`${label}: preview did not render expected surface: ${selector}`)
+  }
+}
+
+function verifyPreviewSurfaceRegistry(patternKeys) {
+  const patternKeySet = new Set(patternKeys)
+  const selectorKeys = Object.keys(previewSurfaceSelectors)
+  for (const key of patternKeys) {
+    if (!previewSurfaceSelectors[key]) patternFailures.push(`${key}: missing preview smoke selector`)
+  }
+  for (const key of selectorKeys) {
+    if (!patternKeySet.has(key)) patternFailures.push(`${key}: stale preview smoke selector`)
   }
 }
 
