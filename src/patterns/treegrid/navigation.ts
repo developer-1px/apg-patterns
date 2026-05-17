@@ -36,13 +36,6 @@ const cellRowKey = (data: PatternData, cellKey: Key | null | undefined): Key | n
 
 defineVisibleOrder('treegridVisibleCells', (_v, data) => visibleCells(data).flat())
 
-defineAriaSource('state.treegridRowCount', (ctx) =>
-  (ctx.data.state as { rowCount?: number } | undefined)?.rowCount ?? ctx.data.relations?.rowKeys?.length,
-)
-defineAriaSource('state.treegridColCount', (ctx) =>
-  (ctx.data.state as { colCount?: number } | undefined)?.colCount ?? ctx.data.relations?.columnKeys?.length,
-)
-defineAriaSource('state.rowLevelByKey', (ctx) => (ctx.key ? ctx.data.state?.levelByKey?.[ctx.key] : undefined))
 defineAriaSource('state.rowExpanded', (ctx) => {
   if (!ctx.key) return undefined
   const hasChildren = (ctx.data.relations?.childrenByKey?.[ctx.key]?.length ?? 0) > 0

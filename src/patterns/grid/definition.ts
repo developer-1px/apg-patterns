@@ -16,8 +16,6 @@ export const gridRows = (data: PatternData): readonly (readonly Key[])[] =>
 
 defineVisibleOrder('gridRows', (_visibleOrder, data) => gridRows(data).flat())
 
-defineAriaSource('state.rowCount', (ctx) => (ctx.data.state as { rowCount?: number } | undefined)?.rowCount ?? ctx.data.relations?.rowKeys?.length)
-defineAriaSource('state.colCount', (ctx) => (ctx.data.state as { colCount?: number } | undefined)?.colCount ?? ctx.data.relations?.columnKeys?.length)
 defineAriaSource('state.readonly', (ctx) => (ctx.data.state as { readonly?: boolean } | undefined)?.readonly || undefined)
 defineAriaSource('state.multiselectable', (ctx) =>
   ctx.options?.selectionMode === 'multiple' || (ctx.data.state as { multiselectable?: boolean } | undefined)?.multiselectable || undefined,

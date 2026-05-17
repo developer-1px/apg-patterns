@@ -115,7 +115,6 @@ export function Grid({
                 >
                   {isEditing ? (
                     <input
-                      autoFocus
                       data-edit=""
                       className="w-full bg-transparent outline-none ring-1 ring-zinc-400 px-1 dark:ring-zinc-500"
                       value={editDraftByKey[cellKey] ?? ''}

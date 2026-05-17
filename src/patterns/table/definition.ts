@@ -1,15 +1,7 @@
 import { PatternDefinitionSchema } from '../../schema'
-import { defineAriaSource, isRegisteredAriaSource } from '../../kernel/patternKernel'
 
 // Static (non-interactive) table per APG: role=table with rows containing
 // columnheader / rowheader / cell. No focus/navigation — sortable lives in grid.
-// Reuse rowCount/colCount sources if already registered (e.g. by grid).
-if (!isRegisteredAriaSource('state.rowCount')) {
-  defineAriaSource('state.rowCount', (ctx) => (ctx.data.state as { rowCount?: number } | undefined)?.rowCount ?? ctx.data.relations?.rowKeys?.length)
-}
-if (!isRegisteredAriaSource('state.colCount')) {
-  defineAriaSource('state.colCount', (ctx) => (ctx.data.state as { colCount?: number } | undefined)?.colCount ?? ctx.data.relations?.columnKeys?.length)
-}
 
 export const tableDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'table',

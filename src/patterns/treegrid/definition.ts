@@ -32,8 +32,8 @@ export const treegridDefinition = PatternDefinitionSchema.parse({
       aria: [
         { attribute: 'aria-label', from: 'refs.label' },
         { attribute: 'aria-labelledby', from: 'refs.labelledBy' },
-        { attribute: 'aria-rowcount', from: 'state.treegridRowCount' },
-        { attribute: 'aria-colcount', from: 'state.treegridColCount' },
+        { attribute: 'aria-rowcount', from: 'state.rowCount' },
+        { attribute: 'aria-colcount', from: 'state.colCount' },
         { attribute: 'aria-multiselectable', from: 'options.selectionMode.multiple' },
       ],
     },
@@ -41,7 +41,7 @@ export const treegridDefinition = PatternDefinitionSchema.parse({
       role: 'row',
       aria: [
         { attribute: 'aria-rowindex', from: 'state.rowIndexByKey' },
-        { attribute: 'aria-level', from: 'state.rowLevelByKey' },
+        { attribute: 'aria-level', from: 'state.levelByKey' },
         { attribute: 'aria-expanded', from: 'state.rowExpanded' },
         { attribute: 'aria-selected', from: 'state.selectedKeys' },
       ],

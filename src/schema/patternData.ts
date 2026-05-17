@@ -58,6 +58,10 @@ export const PatternStateSchema = z
     valueByKey: z.record(KeySchema, z.union([z.string(), z.number(), z.boolean(), z.null()])).optional(),
     rangeValueByKey: z.record(KeySchema, z.object({ min: z.number().optional(), max: z.number().optional(), now: z.number(), text: z.string().optional() }).strict()).optional(),
     typeaheadTextByKey: z.record(KeySchema, z.string()).optional(),
+    rowCount: z.number().int().nonnegative().optional(),
+    colCount: z.number().int().nonnegative().optional(),
+    editingKey: KeySchema.nullish(),
+    editDraftByKey: z.record(KeySchema, z.union([z.string(), z.number(), z.boolean(), z.null()])).optional(),
     lastEventReason: z.string().optional(),
   })
   .passthrough()

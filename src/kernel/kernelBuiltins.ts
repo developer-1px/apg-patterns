@@ -34,6 +34,10 @@ defineAriaSource('items.valuemax', (ctx) => (ctx.key ? (ctx.data.items[ctx.key] 
 defineAriaSource('items.valuetext', (ctx) => (ctx.key ? (ctx.data.items[ctx.key] as { valuetext?: string } | undefined)?.valuetext : undefined))
 defineAriaSource('options.min', (ctx) => (ctx.options as { min?: number } | undefined)?.min)
 defineAriaSource('options.max', (ctx) => (ctx.options as { max?: number } | undefined)?.max)
+defineAriaSource('options.haspopup', (ctx) => (ctx.options as { haspopup?: string } | undefined)?.haspopup ?? 'listbox')
+defineAriaSource('options.autocomplete', (ctx) => (ctx.options as { autocomplete?: string } | undefined)?.autocomplete ?? 'list')
+defineAriaSource('state.rowCount', (ctx) => (ctx.data.state as { rowCount?: number } | undefined)?.rowCount ?? ctx.data.relations?.rowKeys?.length)
+defineAriaSource('state.colCount', (ctx) => (ctx.data.state as { colCount?: number } | undefined)?.colCount ?? ctx.data.relations?.columnKeys?.length)
 defineAriaSource('relations.controlsByKey', (ctx) => {
   const controlledKey = ctx.key ? ctx.data.relations?.controlsByKey?.[ctx.key]?.[0] : undefined
   return controlledKey ? (ctx.keyToElementId?.(controlledKey) ?? controlledKey) : undefined

@@ -46,12 +46,12 @@ export type NavigationTargetKind = z.infer<typeof NavigationTargetKindSchema>
 export const AriaSourcePathSchema = z.enum([
   '$activeKey',
   '$event.expanded', '$event.extentKey', '$event.key', '$event.payload.value',
-  'combobox.autocomplete', 'combobox.haspopup', 'combobox.popupOpen',
+  'combobox.popupOpen',
   'items.href', 'items.kind', 'items.label', 'items.labelledBy',
   'items.valuemax', 'items.valuemin', 'items.valuetext',
   'literal.true',
   'menu.expandedIfHasPopup', 'menu.hasPopup',
-  'options.label', 'options.max', 'options.min', 'options.orientation',
+  'options.autocomplete', 'options.haspopup', 'options.label', 'options.max', 'options.min', 'options.orientation',
   'options.roledescription', 'options.selectionMode.multiple', 'options.slideRoledescription',
   'refs.label', 'refs.labelledBy',
   'relations.controlsByKey', 'relations.ownerByKey',
@@ -60,10 +60,9 @@ export const AriaSourcePathSchema = z.enum([
   'state.disabledKeys', 'state.expandedKeys', 'state.inactiveKey',
   'state.levelByKey', 'state.multiselectable', 'state.posInSetByKey',
   'state.pressedByKey', 'state.readonly', 'state.rowCount',
-  'state.rowExpanded', 'state.rowIndexByKey', 'state.rowLevelByKey',
+  'state.rowExpanded', 'state.rowIndexByKey',
   'state.selectedKeys', 'state.selectedKeys.radioChecked', 'state.setSizeByKey',
-  'state.sortByKey', 'state.treegridColCount', 'state.treegridRowCount',
-  'state.valueByKey',
+  'state.sortByKey', 'state.valueByKey',
 ])
 export type AriaSourcePath = z.infer<typeof AriaSourcePathSchema>
 
@@ -72,8 +71,8 @@ export const StateFieldSchema = z.enum([
   'checkedByKey', 'pressedByKey', 'currentByKey', 'invalidByKey', 'requiredKeys',
   'busyKeys', 'modalKeys', 'levelByKey', 'posInSetByKey', 'setSizeByKey',
   'rowIndexByKey', 'columnIndexByKey', 'sortByKey', 'valueByKey', 'rangeValueByKey',
-  'typeaheadTextByKey',
-  'editDraftByKey', 'editingKey',
+  'typeaheadTextByKey', 'rowCount', 'colCount',
+  'editingKey', 'editDraftByKey',
 ])
 export type StateField = z.infer<typeof StateFieldSchema>
 

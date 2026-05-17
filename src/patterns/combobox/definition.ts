@@ -30,8 +30,6 @@ const COMBOBOX_TOKEN = '$combobox'
 defineKeyToken(COMBOBOX_TOKEN, () => COMBOBOX_KEY)
 
 defineAriaSource('combobox.popupOpen', (ctx) => ctx.data.state?.expandedKeys?.includes(COMBOBOX_KEY) ?? false)
-defineAriaSource('combobox.haspopup', (ctx) => (ctx.options as Record<string, unknown>).haspopup ?? 'listbox')
-defineAriaSource('combobox.autocomplete', (ctx) => (ctx.options as Record<string, unknown>).autocomplete ?? 'list')
 
 defineVisibleOrder('comboboxOptions', (_v, data) => Object.keys(data.items).filter((k) => k !== COMBOBOX_KEY))
 
@@ -59,8 +57,8 @@ export const comboboxDefinition = PatternDefinitionSchema.parse({
       role: 'combobox',
       aria: [
         { attribute: 'aria-expanded', from: 'combobox.popupOpen' },
-        { attribute: 'aria-haspopup', from: 'combobox.haspopup' },
-        { attribute: 'aria-autocomplete', from: 'combobox.autocomplete' },
+        { attribute: 'aria-haspopup', from: 'options.haspopup' },
+        { attribute: 'aria-autocomplete', from: 'options.autocomplete' },
         { attribute: 'aria-activedescendant', from: AriaSources.state.activeKeyElementId },
         { attribute: 'aria-label', from: AriaSources.refs.label },
       ],
