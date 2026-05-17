@@ -76,6 +76,7 @@ for (const { key, label } of Array.from(patternListbox.querySelectorAll('[role="
     continue
   }
 
+  const renderedSourceByName = new Map()
   for (const sourceName of Array.from(sourceTablist.querySelectorAll('[role="tab"]'), (tab) => tab.textContent?.trim()).filter(Boolean)) {
     const tab = findSourceTab(sourceName)
     if (!sourceName) continue
@@ -86,15 +87,19 @@ for (const { key, label } of Array.from(patternListbox.querySelectorAll('[role="
     tab.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
 
     try {
-      await waitFor(() => {
+      const renderedSource = await waitFor(() => {
         const currentTab = findSourceTab(sourceName)
         const sourceText = document.querySelector('pre')?.textContent ?? ''
-        return currentTab?.getAttribute('aria-selected') === 'true'
+        const loaded = currentTab?.getAttribute('aria-selected') === 'true'
           && currentHashParam('source') === sourceName
           && sourceText !== 'loading'
           && sourceText.length > 0
           && !sourceText.startsWith('missing source:')
+        return loaded ? sourceText : false
       })
+      const duplicate = Array.from(renderedSourceByName.entries()).find(([, previousSource]) => previousSource === renderedSource)
+      if (duplicate) patternFailures.push(`${label}: source tab reused rendered code for ${duplicate[0]} and ${sourceName}`)
+      renderedSourceByName.set(sourceName, renderedSource)
     } catch {
       patternFailures.push(`${label}: source tab failed: ${sourceName}`)
     }

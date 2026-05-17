@@ -1,69 +1,37 @@
-import { useRef } from 'react'
-import type { HTMLAttributes, KeyboardEvent as ReactKeyboardEvent } from 'react'
-import { createPatternRuntime, menubarDefinition, usePatternEffects, type PatternData, type PatternEvent } from '../../../../src'
+import type { HTMLAttributes } from 'react'
+import { useMenubarPattern, type PatternData, type PatternEvent } from '../../../../src'
 import { Icon } from '../../shared/Icon'
 import type { MenuProps } from './menuTypes'
 
 type Props = HTMLAttributes<HTMLElement>
 
 export function Menubar({ data, onEvent }: MenuProps) {
-  const runtime = createPatternRuntime({
-    definition: menubarDefinition,
-    data,
-    options: { focusStrategy: 'rovingTabIndex', orientation: 'horizontal' },
-    onEvent,
-    keyToElementId: (key) => `menubar-${key}`,
-  })
+  const menubar = useMenubarPattern(data, onEvent)
   const rootKeys = data.relations?.rootKeys ?? []
-  const typeahead = useTypeahead(data, rootKeys, onEvent)
-  const rootProps = runtime.getPartProps('menubar') as Props
-
-  usePatternEffects({ definition: menubarDefinition, data, keyToElementId: runtime.keyToElementId })
 
   return (
     <div className="relative grid gap-2">
-      <div {...rootProps} onKeyDown={(event) => handleMenubarKey(event, rootProps.onKeyDown as ((event: ReactKeyboardEvent) => void) | undefined, typeahead)} className="flex items-center gap-0.5 rounded-[6px] bg-zinc-100/70 p-1 outline-none shadow-inner shadow-zinc-200/50 dark:bg-white/[0.045] dark:shadow-black/10">
-        {rootKeys.map((key) => (
-          <RootMenuItem key={key} itemKey={key} data={data} runtime={runtime} expanded={(data.state?.expandedKeys ?? []).includes(key)} onEvent={onEvent} />
+      <div {...menubar.rootProps} className="flex items-center gap-0.5 rounded-[6px] bg-zinc-100/70 p-1 outline-none shadow-inner shadow-zinc-200/50 dark:bg-white/[0.045] dark:shadow-black/10">
+        {menubar.rootItems.map((item) => (
+          <RootMenuItem key={item.key} item={item} />
         ))}
       </div>
-      {rootKeys.filter((key) => (data.state?.expandedKeys ?? []).includes(key)).map((rootKey) => (
+      {menubar.expandedRootKeys.map((rootKey) => (
         <Submenu key={rootKey} data={data} ownerKey={rootKey} rootKeys={rootKeys} onEvent={onEvent} />
       ))}
     </div>
   )
 }
 
-function RootMenuItem({ itemKey, data, runtime, expanded, onEvent }: { itemKey: string; data: PatternData; runtime: ReturnType<typeof createPatternRuntime>; expanded: boolean; onEvent: (event: PatternEvent) => void }) {
-  const itemProps = runtime.getPartProps('menuitem', itemKey) as Props
-  const children = data.relations?.childrenByKey?.[itemKey] ?? []
-  const rootKeys = data.relations?.rootKeys ?? []
+function RootMenuItem({ item }: { item: ReturnType<typeof useMenubarPattern>['rootItems'][number] }) {
   return (
     <button
       type="button"
-      id={`menubar-${itemKey}`}
-      {...itemProps}
-      onKeyDown={(event) => {
-        if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
-          event.preventDefault()
-          event.stopPropagation()
-          const target = siblingKey(rootKeys, itemKey, event.key === 'ArrowRight' ? 'next' : 'previous')
-          if (target) onEvent({ type: 'focus', key: target, meta: { reason: 'keyboard' } })
-          return
-        }
-        if ((event.key === 'ArrowDown' || event.key === 'ArrowUp') && children.length > 0) {
-          event.preventDefault()
-          event.stopPropagation()
-          onEvent({ type: 'expand', key: itemKey, expanded: true })
-          onEvent({ type: 'focus', key: event.key === 'ArrowDown' ? children[0]! : children[children.length - 1]!, meta: { reason: 'keyboard' } })
-          return
-        }
-        ;(itemProps.onKeyDown as ((event: ReactKeyboardEvent) => void) | undefined)?.(event)
-      }}
+      {...item.itemProps}
       className="h-8 rounded-[4px] px-2.5 text-sm font-medium text-zinc-800 outline-none transition hover:bg-white/70 aria-disabled:text-zinc-400 aria-expanded:bg-white aria-expanded:text-zinc-950 aria-expanded:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:text-zinc-200 dark:hover:bg-white/[0.06] dark:aria-disabled:text-zinc-600 dark:aria-expanded:bg-zinc-100 dark:aria-expanded:text-zinc-950 dark:focus-visible:outline-zinc-500"
     >
-      {data.items[itemKey]?.label}
-      {(data.relations?.childrenByKey?.[itemKey]?.length ?? 0) > 0 ? <Icon name="chevron-right" className={`ml-1 text-xs text-zinc-500 ${expanded ? 'rotate-90' : ''}`} /> : null}
+      {item.label}
+      {item.hasChildren ? <Icon name="chevron-right" className={`ml-1 text-xs text-zinc-500 ${item.expanded ? 'rotate-90' : ''}`} /> : null}
     </button>
   )
 }
@@ -161,33 +129,6 @@ function SubmenuItem({ itemKey, data, active, radioGroup, onEvent, onClose }: { 
       {item?.label ?? itemKey}
     </li>
   )
-}
-
-function useTypeahead(data: PatternData, rootKeys: readonly string[], onEvent: (event: PatternEvent) => void) {
-  const ref = useRef<{ query: string; timer: number | null }>({ query: '', timer: null })
-  return (char: string) => {
-    const state = ref.current
-    state.query += char.toLowerCase()
-    if (state.timer !== null) window.clearTimeout(state.timer)
-    state.timer = window.setTimeout(() => {
-      state.query = ''
-      state.timer = null
-    }, 500)
-    const start = data.state?.activeKey ? rootKeys.indexOf(data.state.activeKey) : -1
-    const ordered = [...rootKeys.slice(start + 1), ...rootKeys.slice(0, start + 1)]
-    const match = ordered.find((key) => (data.items[key]?.label ?? '').toLowerCase().startsWith(state.query))
-    if (match) onEvent({ type: 'focus', key: match, meta: { reason: 'typeahead' } })
-  }
-}
-
-function handleMenubarKey(event: ReactKeyboardEvent, baseKeyDown: ((event: ReactKeyboardEvent) => void) | undefined, typeahead: (char: string) => void) {
-  const printable = event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey && /\S/.test(event.key)
-  if (printable && event.key !== ' ') {
-    event.preventDefault()
-    typeahead(event.key)
-    return
-  }
-  baseKeyDown?.(event)
 }
 
 function stepKey(keys: readonly string[], activeKey: string | null | undefined, delta: 1 | -1) {
