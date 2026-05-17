@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act } from 'react'
 import { coerceRightMode, formatEvent, isCopyableSource, loadSourcePreview } from './App'
 import { App } from './App'
 import { patternEntries } from '../shared/demoPatterns'
@@ -156,8 +157,10 @@ describe('App route state', () => {
     replaceHash('#pattern=tabs&panel=code&source=Tabs.tsx')
     render(<App />)
 
-    replaceHash('#pattern=accordion&panel=events&source=Accordion.tsx')
-    window.dispatchEvent(new window.HashChangeEvent('hashchange'))
+    await act(async () => {
+      replaceHash('#pattern=accordion&panel=events&source=Accordion.tsx')
+      window.dispatchEvent(new window.HashChangeEvent('hashchange'))
+    })
 
     await waitFor(() => expect(screen.getByRole('heading', { name: 'Accordion' })).toBeTruthy())
     expect(screen.getByRole('tab', { name: 'events', selected: true })).toBeTruthy()

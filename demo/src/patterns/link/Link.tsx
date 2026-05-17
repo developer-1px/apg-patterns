@@ -1,3 +1,4 @@
+import type { MouseEvent } from 'react'
 import { useLinkPattern, type PatternData, type PatternEvent } from '../../../../src'
 
 const linkClass =
@@ -21,7 +22,10 @@ export function Link({ data, onEvent }: LinkProps) {
   }
 
   return (
-    <a {...link.linkProps} href={link.href} className={linkClass}>
+    <a {...link.linkProps} href={link.href} className={linkClass} onClick={(event: MouseEvent<HTMLAnchorElement>) => {
+      event.preventDefault()
+      link.linkProps.onClick?.(event)
+    }}>
       {link.label}
     </a>
   )

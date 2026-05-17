@@ -191,6 +191,7 @@ async function runSmoke() {
 
   await verifyTabsKeyboardEventLog()
   await verifyInteractionEventLog()
+  await verifyLinkInteractionStaysInDemo()
 
   await verifyHashRoute('#pattern=accordion&panel=off&source=Accordion.tsx', (text) =>
     currentHashParam('pattern') === 'accordion'
@@ -280,6 +281,27 @@ async function verifyTabsKeyboardEventLog() {
     })
   } catch {
     patternFailures.push(`tabs keyboard interaction did not update selection and event log: ${describePreviewTabs('tabs')} | text=${rootText().slice(0, 180)}`)
+  }
+}
+
+async function verifyLinkInteractionStaysInDemo() {
+  window.location.hash = '#pattern=link&panel=events&source=Link.tsx'
+  window.dispatchEvent(new dom.window.HashChangeEvent('hashchange'))
+
+  try {
+    const link = await waitFor(() => document.querySelector('[data-demo-preview="link"] a[role="link"]'))
+    const beforeHref = window.location.href
+    const defaultAllowed = link.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
+    await waitFor(() => {
+      const text = rootText()
+      return window.location.href === beforeHref
+        && defaultAllowed === false
+        && text.includes('1 events')
+        && text.includes('activate key=home')
+        && text.includes('via pointer')
+    })
+  } catch {
+    patternFailures.push(`link interaction did not record an event while staying in the demo: current ${window.location.href}, text=${rootText().slice(0, 180)}`)
   }
 }
 

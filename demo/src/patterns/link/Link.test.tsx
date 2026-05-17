@@ -28,7 +28,7 @@ describe('Link demo (anchor)', () => {
       />,
     )
     const link = screen.getByRole('link')
-    fireEvent.click(link)
+    expect(fireEvent.click(link)).toBe(false)
     expect(onEvent).toHaveBeenCalledWith({ type: 'activate', key: 'home' })
   })
 
