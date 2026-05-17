@@ -2,11 +2,11 @@ import { useAlertPattern, type PatternData, type PatternEvent } from '../../../.
 import type { AlertDomainEvent } from './alertData'
 
 const triggerClass =
-  'inline-flex h-8 items-center rounded bg-zinc-100 px-3 text-sm text-zinc-800 outline-none hover:bg-zinc-200 focus:outline focus:outline-2 focus:outline-zinc-400 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:focus:outline-zinc-500'
+  'inline-flex h-8 items-center rounded-xl bg-zinc-100/80 px-3 text-sm font-medium text-zinc-800 shadow-sm outline-none transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.06] dark:text-zinc-200 dark:hover:bg-white/[0.08] dark:focus-visible:outline-zinc-500'
 const dismissClass =
-  'inline-flex h-6 items-center rounded px-2 text-xs text-zinc-600 outline-none hover:bg-zinc-200 focus:outline focus:outline-2 focus:outline-zinc-400 dark:text-zinc-300 dark:hover:bg-zinc-800'
+  'inline-flex h-6 items-center rounded-lg px-2 text-xs font-medium text-amber-900/70 outline-none transition hover:bg-white/55 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 dark:text-amber-100/75 dark:hover:bg-white/[0.08]'
 const alertClass =
-  'flex items-center justify-between gap-3 rounded bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-100'
+  'flex items-center justify-between gap-3 rounded-xl bg-amber-50/90 p-3 text-sm text-amber-950 shadow-[0_12px_32px_rgba(146,64,14,0.12)] ring-1 ring-amber-900/[0.04] dark:bg-amber-500/12 dark:text-amber-100 dark:ring-amber-100/[0.06]'
 
 export interface AlertProps {
   data: PatternData

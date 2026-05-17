@@ -22,7 +22,7 @@ export const entry: PatternEntry = {
       key: 'table',
       label: 'Table',
       keyboardShortcuts: ['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End'],
-      sourceNames: ['Table.tsx', 'tableData.ts', 'table/definition.ts', ...KERNEL_SOURCES],
+      sourceNames: ['Table.tsx', 'useTablePattern.ts', 'tableData.ts', 'table/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
       preview: <Table data={host.data} onEvent={(event) => {
         onEvent(event)

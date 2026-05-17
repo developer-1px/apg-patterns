@@ -42,6 +42,7 @@ const patternFailures = []
 
 for (const option of patternListbox.querySelectorAll('[role="option"]')) {
   const label = option.textContent?.trim()
+  const key = option.id?.replace(/^pattern-/, '')
   if (!label) continue
   option.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
 
@@ -49,10 +50,14 @@ for (const option of patternListbox.querySelectorAll('[role="option"]')) {
     await waitFor(() => {
       const text = rootText()
       const sourceText = document.querySelector('pre')?.textContent ?? ''
-      return text.includes(label) && sourceText !== 'loading' && sourceText.length > 0
+      return text.includes(label)
+        && sourceText !== 'loading'
+        && sourceText.length > 0
+        && option.getAttribute('aria-selected') === 'true'
+        && (!key || window.location.hash.includes(`pattern=${key}`))
     })
   } catch {
-    patternFailures.push(`${label}: did not render source preview`)
+    patternFailures.push(`${label}: did not render selected pattern source route`)
     continue
   }
 
