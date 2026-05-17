@@ -198,6 +198,14 @@ async function runSmoke() {
     'closed right panel route did not keep the source panel closed',
   )
 
+  await verifyHashRoute('#pattern=missing&panel=missing&source=Missing.tsx', (text) =>
+    window.location.hash === '#pattern=treeview&panel=code&source=Tree.tsx'
+    && hasActiveDemoHeading('Treeview')
+    && sourceFilenameIs('Tree.tsx')
+    && !text.includes('missing source: Missing.tsx'),
+    'invalid deep link did not recover to the default demo route',
+  )
+
   if (errors.length > 0 || missingText.length > 0 || patternFailures.length > 0) {
     const details = [
       errors.length > 0 ? `runtime errors:\n${errors.join('\n')}` : null,

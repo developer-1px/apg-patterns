@@ -103,6 +103,18 @@ describe('App route state', () => {
     expect(screen.queryByText('missing source: Missing.tsx')).toBeNull()
   })
 
+  it('recovers invalid deep links to a valid pattern, panel, and source route', async () => {
+    replaceHash('#pattern=missing&panel=missing&source=Missing.tsx')
+
+    render(<App />)
+
+    expect(screen.getByRole('heading', { name: 'Treeview' })).toBeTruthy()
+    await waitFor(() => expect(window.location.hash).toBe('#pattern=treeview&panel=code&source=Tree.tsx'))
+    expect(screen.getByRole('tab', { name: 'code', selected: true })).toBeTruthy()
+    expect(screen.getByTitle('Tree.tsx')).toBeTruthy()
+    expect(screen.queryByText('missing source: Missing.tsx')).toBeNull()
+  })
+
   it('restores demo state when the hash changes after initial render', async () => {
     replaceHash('#pattern=tabs&panel=code&source=Tabs.tsx')
     render(<App />)
