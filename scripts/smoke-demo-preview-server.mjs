@@ -23,6 +23,11 @@ const server = spawn(viteBin.pathname, [
 })
 
 let serverOutput = ''
+let serverError
+server.once('error', (error) => {
+  serverError = error
+  serverOutput += `${error.stack ?? error.message}\n`
+})
 server.stdout.on('data', (chunk) => {
   serverOutput += String(chunk)
 })
@@ -36,7 +41,7 @@ try {
   await verifyServedAssets()
   console.log('demo preview server smoke passed')
 } finally {
-  server.kill()
+  await stopServer()
 }
 
 async function verifyServedIndex() {
@@ -86,6 +91,9 @@ async function verifyServedAssets() {
 async function waitForServer() {
   const deadline = Date.now() + 10_000
   while (Date.now() < deadline) {
+    if (serverError) {
+      throw new Error(`demo preview server smoke failed: server could not start\n${serverOutput}`)
+    }
     if (server.exitCode !== null) {
       throw new Error(`demo preview server smoke failed: server exited early\n${serverOutput}`)
     }
@@ -99,6 +107,22 @@ async function waitForServer() {
   }
 
   throw new Error(`demo preview server smoke failed: server did not start\n${serverOutput}`)
+}
+
+async function stopServer() {
+  if (server.exitCode !== null || server.signalCode !== null) return
+
+  server.kill('SIGTERM')
+  await new Promise((resolve) => {
+    const timer = setTimeout(() => {
+      if (server.exitCode === null && server.signalCode === null) server.kill('SIGKILL')
+      resolve()
+    }, 2_000)
+    server.once('exit', () => {
+      clearTimeout(timer)
+      resolve()
+    })
+  })
 }
 
 async function getAvailablePort() {
