@@ -6,24 +6,16 @@ export type { DemoPattern, PatternKey } from './demoPatternTypes'
 
 type CollectedPatternEntry = PatternEntry & { sourcePath: string }
 type ValidatedPatternEntry = Pick<PatternEntry, 'key' | 'label'> & { sourcePath?: string }
+type PatternEntryModule = { entry?: PatternEntry }
 
-const modules = import.meta.glob<{ entry: PatternEntry }>('../patterns/*/entry.tsx', { eager: true })
+const modules = import.meta.glob<PatternEntryModule>('../patterns/*/entry.tsx', { eager: true })
 const keyByPatternFolder: Readonly<Record<string, string>> = {
   menu: 'menuAndMenubar',
 }
 export const defaultPatternKey: PatternKey = 'treeview'
 export const defaultSourceName: SourceName = 'Tree.tsx'
 
-const collected: CollectedPatternEntry[] = []
-for (const [path, mod] of Object.entries(modules)) {
-  if (!mod.entry) {
-    if (typeof console !== 'undefined') console.warn(`[demoPatterns] ${path} has no exported \`entry\``)
-    continue
-  }
-  collected.push({ ...mod.entry, sourcePath: path })
-}
-
-collected.sort((a, b) => a.key.localeCompare(b.key))
+const collected = collectPatternEntries(modules)
 validatePatternEntries(collected, { defaultPatternKey })
 
 export const patternEntries: readonly PatternEntry[] = collected.map(({ sourcePath, ...entry }) => entry)
@@ -84,6 +76,20 @@ export function validatePatternEntries(
   if (options.defaultPatternKey && !entries.some((entry) => entry.key === options.defaultPatternKey)) {
     throw new Error(`[demoPatterns] default pattern is not registered: ${options.defaultPatternKey}`)
   }
+}
+
+export function collectPatternEntries(modulesByPath: Readonly<Record<string, PatternEntryModule>>) {
+  const missingEntries = Object.entries(modulesByPath)
+    .filter(([, mod]) => !mod.entry)
+    .map(([path]) => path)
+    .sort((a, b) => a.localeCompare(b))
+  if (missingEntries.length > 0) {
+    throw new Error(`[demoPatterns] pattern modules missing exported entry: ${missingEntries.join(', ')}`)
+  }
+
+  return Object.entries(modulesByPath)
+    .map(([sourcePath, mod]) => ({ ...mod.entry!, sourcePath }))
+    .sort((a, b) => a.key.localeCompare(b.key))
 }
 
 function duplicates(values: readonly string[]) {
