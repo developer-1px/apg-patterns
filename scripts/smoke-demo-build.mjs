@@ -294,7 +294,7 @@ async function verifyHashRoute(hash, predicate, failure) {
   try {
     await waitFor(() => predicate(rootText()))
   } catch {
-    patternFailures.push(`${failure}: expected ${hash}, current ${window.location.hash}, ${describeRouteState()}, text=${rootText().slice(0, 180)}`)
+    patternFailures.push(`${failure}: expected ${hash}, current ${window.location.hash}, ${describeRouteState()}, ${describePreviewState()}, text=${rootText().slice(0, 180)}`)
   }
 }
 
@@ -750,6 +750,15 @@ function describeRouteState() {
     `sourceTab=${selectedSourceTab ?? 'none'}`,
     `sourcePanel=${sourcePanel ? `${sourcePanel.id}/${sourcePanel.getAttribute('aria-labelledby') ?? 'unlabelled'}` : 'none'}`,
   ].join(', ')
+}
+
+function describePreviewState() {
+  const previews = Array.from(document.querySelectorAll('[data-demo-preview]'), (preview) => {
+    const key = preview.getAttribute('data-demo-preview') ?? 'unknown'
+    const hasContent = preview.firstElementChild ? 'content' : 'empty'
+    return `${key}/${hasContent}`
+  })
+  return `previews=${previews.join('|') || 'none'}`
 }
 
 function selectedTabName(tablistSelector) {
