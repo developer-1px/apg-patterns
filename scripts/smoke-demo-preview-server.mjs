@@ -39,7 +39,8 @@ server.stderr.on('data', (chunk) => {
 
 try {
   await waitForServer()
-  await verifyServedIndex()
+  await verifyServedIndex(origin)
+  await verifyServedIndex(`${origin}/#pattern=treeview&panel=code&source=Tree.tsx`)
   await verifyServedAssets()
   await verifyStaticSubpathServing()
   console.log('demo preview server smoke passed')
@@ -47,18 +48,18 @@ try {
   await stopServer()
 }
 
-async function verifyServedIndex() {
-  const response = await fetch(origin)
+async function verifyServedIndex(url) {
+  const response = await fetch(url)
   const html = await response.text()
 
   if (!response.ok) {
-    throw new Error(`demo preview server smoke failed: index returned ${response.status}`)
+    throw new Error(`demo preview server smoke failed: index returned ${response.status} for ${url}`)
   }
   if (!response.headers.get('content-type')?.includes('text/html')) {
-    throw new Error(`demo preview server smoke failed: index content-type is ${response.headers.get('content-type')}`)
+    throw new Error(`demo preview server smoke failed: index content-type is ${response.headers.get('content-type')} for ${url}`)
   }
   if (!html.includes('<div id="root"></div>')) {
-    throw new Error('demo preview server smoke failed: index did not include the app root')
+    throw new Error(`demo preview server smoke failed: index did not include the app root for ${url}`)
   }
 }
 
@@ -124,12 +125,11 @@ async function verifyStaticSubpathServing() {
   })
 
   try {
+    await verifyStaticSubpathIndex(`${subpathOrigin}${prefix}`)
+    await verifyStaticSubpathIndex(`${subpathOrigin}${prefix}#pattern=treeview&panel=code&source=Tree.tsx`)
+
     const indexResponse = await fetch(`${subpathOrigin}${prefix}`)
     const html = await indexResponse.text()
-    if (!indexResponse.ok || !html.includes('<div id="root"></div>')) {
-      throw new Error(`demo preview server smoke failed: static subpath index returned ${indexResponse.status}`)
-    }
-
     const assetRefs = Array.from(html.matchAll(/(?:src|href)="([^"]+)"/g), ([, assetRef]) => assetRef)
       .filter((assetRef) => assetRef?.startsWith('./assets/'))
     const failures = []
@@ -145,6 +145,14 @@ async function verifyStaticSubpathServing() {
     }
   } finally {
     await new Promise((resolve) => staticServer.close(resolve))
+  }
+}
+
+async function verifyStaticSubpathIndex(url) {
+  const response = await fetch(url)
+  const html = await response.text()
+  if (!response.ok || !html.includes('<div id="root"></div>')) {
+    throw new Error(`demo preview server smoke failed: static subpath index returned ${response.status} for ${url}`)
   }
 }
 
