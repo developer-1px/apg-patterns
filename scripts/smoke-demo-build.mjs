@@ -1,11 +1,14 @@
-import { readdir } from 'node:fs/promises'
+import { access, readFile, readdir } from 'node:fs/promises'
 import { JSDOM } from 'jsdom'
 
 const demoUrl = 'http://127.0.0.1/#pattern=tabs&panel=code&source=Tabs.tsx'
+const distDir = new URL('../demo/dist/', import.meta.url)
 const assetsDir = new URL('../demo/dist/assets/', import.meta.url)
 const entryFile = (await readdir(assetsDir)).find((file) => /^index-.*\.js$/.test(file))
 
 if (!entryFile) throw new Error('demo build smoke failed: missing built entry chunk')
+
+await verifyDistIndexAssets()
 
 const errors = []
 const recordError = (error) => errors.push(error instanceof Error ? error.stack ?? error.message : String(error))
@@ -214,4 +217,27 @@ function findSourceTab(sourceName) {
 
 function findPatternOption(key) {
   return document.getElementById(`pattern-${key}`)
+}
+
+async function verifyDistIndexAssets() {
+  const indexHtml = await readFile(new URL('index.html', distDir), 'utf8')
+  const assetRefs = Array.from(indexHtml.matchAll(/(?:src|href)="([^"]+)"/g), ([, assetRef]) => assetRef)
+    .filter((assetRef) => assetRef?.startsWith('/assets/'))
+
+  if (!assetRefs.includes(`/assets/${entryFile}`)) {
+    throw new Error(`demo build smoke failed: index.html does not reference ${entryFile}`)
+  }
+
+  const missingAssets = []
+  for (const assetRef of assetRefs) {
+    try {
+      await access(new URL(assetRef.replace(/^\//, ''), distDir))
+    } catch {
+      missingAssets.push(assetRef)
+    }
+  }
+
+  if (missingAssets.length > 0) {
+    throw new Error(`demo build smoke failed: index.html references missing assets: ${missingAssets.join(', ')}`)
+  }
 }
