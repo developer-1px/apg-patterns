@@ -20,7 +20,6 @@ import {
   defineAriaSource,
   defineKeyToken,
   defineNavigationTarget,
-  definePredicate,
   defineVisibleOrder,
 } from '../../index'
 
@@ -44,8 +43,6 @@ defineNavigationTarget('optionLinear', (target, ctx) => {
   if (direction === 'last') return options[options.length - 1]
   return null
 })
-
-definePredicate('isPopupOpen', (_p, ctx) => ctx.data.state?.expandedKeys?.includes(COMBOBOX_KEY) ?? false)
 
 export const comboboxDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'combobox',
@@ -98,7 +95,7 @@ export const comboboxDefinition = PatternDefinitionSchema.parse({
       cases: [
         {
           case: 'when',
-          when: { kind: 'not', predicate: { kind: 'extension', name: 'isPopupOpen' } },
+          when: { kind: 'not', predicate: { kind: 'isPopupOpen' } },
           events: [
             { type: 'expand', key: COMBOBOX_TOKEN, expanded: true },
             { type: 'navigate', direction: 'first' },
@@ -113,7 +110,7 @@ export const comboboxDefinition = PatternDefinitionSchema.parse({
       cases: [
         {
           case: 'when',
-          when: { kind: 'not', predicate: { kind: 'extension', name: 'isPopupOpen' } },
+          when: { kind: 'not', predicate: { kind: 'isPopupOpen' } },
           events: [
             { type: 'expand', key: COMBOBOX_TOKEN, expanded: true },
             { type: 'navigate', direction: 'last' },
@@ -128,7 +125,7 @@ export const comboboxDefinition = PatternDefinitionSchema.parse({
       cases: [
         {
           case: 'when',
-          when: { kind: 'extension', name: 'isPopupOpen' },
+          when: { kind: 'isPopupOpen' },
           events: [{ type: 'navigate', direction: 'first' }],
         },
       ],
@@ -139,7 +136,7 @@ export const comboboxDefinition = PatternDefinitionSchema.parse({
       cases: [
         {
           case: 'when',
-          when: { kind: 'extension', name: 'isPopupOpen' },
+          when: { kind: 'isPopupOpen' },
           events: [{ type: 'navigate', direction: 'last' }],
         },
       ],
@@ -150,7 +147,7 @@ export const comboboxDefinition = PatternDefinitionSchema.parse({
       cases: [
         {
           case: 'when',
-          when: { kind: 'extension', name: 'isPopupOpen' },
+          when: { kind: 'isPopupOpen' },
           events: [
             { type: 'select', key: KeyTokens.activeKey },
             { type: 'expand', key: COMBOBOX_TOKEN, expanded: false },

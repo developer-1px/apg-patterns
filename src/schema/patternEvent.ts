@@ -6,11 +6,13 @@ export const PatternDirectionSchema = z.enum([
   'child', 'down', 'first', 'gridEnd', 'gridStart', 'last', 'left', 'next',
   'pageDown', 'pageUp', 'parent', 'parentRow', 'previous', 'right',
   'rowEnd', 'rowStart', 'up',
+  'rowUp', 'rowDown', 'rowGridStart', 'rowGridEnd', 'rowPageDown', 'rowPageUp',
 ])
 export type PatternDirection = z.infer<typeof PatternDirectionSchema>
 
 export const PatternEventTypeSchema = z.enum([
-  'focus', 'navigate', 'select', 'expand', 'activate', 'check',
+  'focus', 'navigate', 'select', 'selectAll', 'selectColumn', 'selectRow',
+  'extendSelection', 'expand', 'expandActiveRow', 'activate', 'check',
   'press', 'value', 'typeahead', 'dismiss', 'extension',
 ])
 export type PatternEventType = z.infer<typeof PatternEventTypeSchema>
@@ -25,7 +27,12 @@ export const PatternEventSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('focus'), key: KeySchema, ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('navigate'), direction: PatternDirectionSchema, ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('select'), keys: z.array(KeySchema).readonly(), anchorKey: KeySchema.nullish(), extentKey: KeySchema.nullish(), ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('selectAll'), ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('selectColumn'), ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('selectRow'), ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('extendSelection'), direction: PatternDirectionSchema, ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('expand'), key: KeySchema, expanded: z.boolean(), ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('expandActiveRow'), expanded: z.boolean(), ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('activate'), key: KeySchema, ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('check'), key: KeySchema, checked: z.union([z.boolean(), z.literal('mixed')]), ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('press'), key: KeySchema, pressed: z.union([z.boolean(), z.literal('mixed')]).optional(), ...EventMetaFieldSchema }).strict(),
@@ -41,7 +48,12 @@ export const EventTemplateSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('focus'), key: KeyTokenSchema, ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('navigate'), direction: PatternDirectionSchema, ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('select'), key: KeyTokenSchema, ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('selectAll'), ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('selectColumn'), ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('selectRow'), ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('extendSelection'), direction: PatternDirectionSchema, ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('expand'), key: KeyTokenSchema, expanded: z.boolean().optional(), ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('expandActiveRow'), expanded: z.boolean(), ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('activate'), key: KeyTokenSchema, ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('check'), key: KeyTokenSchema, checked: z.union([z.boolean(), z.literal('mixed')]).optional(), ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('press'), key: KeyTokenSchema, pressed: z.union([z.boolean(), z.literal('mixed')]).optional(), ...EventMetaFieldSchema }).strict(),

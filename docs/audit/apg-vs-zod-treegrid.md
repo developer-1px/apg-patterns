@@ -88,7 +88,19 @@ W3C APG는 treegrid 컨테이너/row/cell 에 다음 속성을 명시한다. rep
 2. (선택) `aria-describedby` 는 enum 에는 있으나 어떤 패턴도 project 하지 않음 — 컨테이너 패턴들에서 `refs.describedBy` AriaSourcePath 와 함께 도입 검토.
 3. row-focus 모드를 표현하려면 `parts.row.focus` 가 가능해야 하는데, `PartSchema` 자체는 이미 허용. 누락은 zod 가 아니라 treegrid definition.
 
-## 6. 결론 (treegrid)
+## 6. 수렴 작업 (2026-05-18)
+
+- **zod enum 보강**: `aria-rowspan`, `aria-colspan`, `aria-owns` 를 `AriaAttributeSchema` 에 추가.
+- **`parts.rowheader` 추가**: `containedRoles` 와 정합. cell focus / cellEvents / aria-rowindex·colindex·selected 프로젝션.
+- **`aria-readonly` 프로젝션**: treegrid 컨테이너 + gridcell.
+- **Row-focus mode 도입**:
+  - schema: `VisibleOrderKindSchema` += `treegridVisibleRows`, `NavigationTargetKindSchema` += `treegridRow`/`treegridRowPage`, `PredicateSchema` += `activeKeyIsRow`, `PatternDirectionSchema` += `rowUp/rowDown/rowGridStart/rowGridEnd/rowPageDown/rowPageUp`.
+  - navigation: `treegridVisibleRows` visibleOrder + `treegridRow`/`treegridRowPage` 핸들러 등록 (`src/patterns/treegrid/navigation.ts`).
+  - kernel: `evaluatePredicate` 에 `activeKeyIsRow` 평가 (`relations.rowKeys.includes(activeKey)`).
+  - definition: `parts.row` 에 `focus: rowFocus` + `events: rowEvents` (둘 다 `focusMode==='row'` 조건), 모든 keyboard binding 의 cases 맨 앞에 `activeKeyIsRow` 분기를 prepend — Up/Down/Home/End/Ctrl+Home/Ctrl+End/Ctrl+Space/Shift+ArrowUp/Shift+ArrowDown/PageUp/PageDown 의 row-mode 변형 + ArrowRight 의 expand, ArrowLeft 의 collapse, Enter 의 expand/collapse.
+- **Mode 전환 (Right Arrow on leaf row → enter first cell, Left Arrow on first cell → row)**: APG 가 명시한 dynamic mode transition. 별도 follow-up — `state.focusMode` field + transition action 이 필요.
+
+## 7. 결론 (treegrid)
 
 - **missing-in-repo (정합 위반)**: rowheader part, aria-readonly 프로젝션, row-focus 모드, Home/End 의 row-mode 분기, Ctrl+Space 의 row-mode all-select 분기, Shift+Arrow 의 row-extent 분기.
 - **missing-in-zod**: `aria-rowspan` / `aria-colspan` / `aria-owns` enum.

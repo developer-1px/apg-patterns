@@ -1,11 +1,4 @@
-import { definePredicate, resolveKeyToken } from '../../kernel/patternKernel'
 import { PatternDefinitionSchema } from '../../schema'
-
-definePredicate('isPressed', (predicate, ctx) => {
-  if (predicate.kind !== 'extension' || predicate.name !== 'isPressed') return false
-  const key = resolveKeyToken(predicate.key ?? '$key', ctx.key, ctx.activeKey)
-  return ctx.data.state?.pressedByKey?.[key] === true
-})
 
 export const buttonDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'button',
@@ -30,12 +23,12 @@ export const buttonDefinition = PatternDefinitionSchema.parse({
       events: [
         {
           event: 'click',
-          when: { kind: 'extension', name: 'isPressed', key: '$key' },
+          when: { kind: 'isPressed', key: '$key' },
           events: [{ type: 'press', key: '$key', pressed: false }, { type: 'activate', key: '$key' }],
         },
         {
           event: 'click',
-          when: { kind: 'not', predicate: { kind: 'extension', name: 'isPressed', key: '$key' } },
+          when: { kind: 'not', predicate: { kind: 'isPressed', key: '$key' } },
           events: [{ type: 'press', key: '$key', pressed: true }, { type: 'activate', key: '$key' }],
         },
       ],
@@ -50,7 +43,7 @@ export const buttonDefinition = PatternDefinitionSchema.parse({
       shortcut: 'Enter',
       preventDefault: true,
       cases: [
-        { case: 'when', when: { kind: 'extension', name: 'isPressed', key: '$activeKey' }, events: [{ type: 'press', key: '$activeKey', pressed: false }, { type: 'activate', key: '$activeKey' }] },
+        { case: 'when', when: { kind: 'isPressed', key: '$activeKey' }, events: [{ type: 'press', key: '$activeKey', pressed: false }, { type: 'activate', key: '$activeKey' }] },
         { case: 'otherwise', events: [{ type: 'press', key: '$activeKey', pressed: true }, { type: 'activate', key: '$activeKey' }] },
       ],
     },
@@ -58,7 +51,7 @@ export const buttonDefinition = PatternDefinitionSchema.parse({
       shortcut: 'Space',
       preventDefault: true,
       cases: [
-        { case: 'when', when: { kind: 'extension', name: 'isPressed', key: '$activeKey' }, events: [{ type: 'press', key: '$activeKey', pressed: false }, { type: 'activate', key: '$activeKey' }] },
+        { case: 'when', when: { kind: 'isPressed', key: '$activeKey' }, events: [{ type: 'press', key: '$activeKey', pressed: false }, { type: 'activate', key: '$activeKey' }] },
         { case: 'otherwise', events: [{ type: 'press', key: '$activeKey', pressed: true }, { type: 'activate', key: '$activeKey' }] },
       ],
     },

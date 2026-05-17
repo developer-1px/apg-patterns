@@ -1,11 +1,4 @@
-import { definePredicate, resolveKeyToken } from '../../kernel/patternKernel'
 import { PatternDefinitionSchema } from '../../schema'
-
-definePredicate('isChecked', (predicate, ctx) => {
-  if (predicate.kind !== 'extension' || predicate.name !== 'isChecked') return false
-  const key = resolveKeyToken(predicate.key ?? '$key', ctx.key, ctx.activeKey)
-  return ctx.data.state?.checkedByKey?.[key] === true
-})
 
 export const checkboxDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'checkbox',
@@ -30,12 +23,12 @@ export const checkboxDefinition = PatternDefinitionSchema.parse({
       events: [
         {
           event: 'click',
-          when: { kind: 'extension', name: 'isChecked', key: '$key' },
+          when: { kind: 'isChecked', key: '$key' },
           events: [{ type: 'check', key: '$key', checked: false }],
         },
         {
           event: 'click',
-          when: { kind: 'not', predicate: { kind: 'extension', name: 'isChecked', key: '$key' } },
+          when: { kind: 'not', predicate: { kind: 'isChecked', key: '$key' } },
           events: [{ type: 'check', key: '$key', checked: true }],
         },
       ],
@@ -50,7 +43,7 @@ export const checkboxDefinition = PatternDefinitionSchema.parse({
       shortcut: 'Space',
       preventDefault: true,
       cases: [
-        { case: 'when', when: { kind: 'extension', name: 'isChecked', key: '$activeKey' }, events: [{ type: 'check', key: '$activeKey', checked: false }] },
+        { case: 'when', when: { kind: 'isChecked', key: '$activeKey' }, events: [{ type: 'check', key: '$activeKey', checked: false }] },
         { case: 'otherwise', events: [{ type: 'check', key: '$activeKey', checked: true }] },
       ],
     },

@@ -135,6 +135,40 @@ export function evaluatePredicate(predicate: Predicate, ctx: PatternRuntimeConte
   if (predicate.kind === 'not') return !evaluatePredicate(predicate.predicate, ctx)
   if (predicate.kind === 'all') return predicate.predicates.every((p) => evaluatePredicate(p, ctx))
   if (predicate.kind === 'any') return predicate.predicates.some((p) => evaluatePredicate(p, ctx))
+  if (predicate.kind === 'activeCellInFirstColumn') {
+    const cell = activeCellRelation(ctx.data, ctx.activeKey)
+    return Boolean(cell && cell.columnKey === ctx.data.relations?.columnKeys?.[0])
+  }
+  if (predicate.kind === 'activeRowHasChildren') {
+    const rowKey = activeCellRelation(ctx.data, ctx.activeKey)?.rowKey
+    return Boolean(rowKey && (ctx.data.relations?.childrenByKey?.[rowKey]?.length ?? 0) > 0)
+  }
+  if (predicate.kind === 'activeRowExpanded') {
+    const rowKey = activeCellRelation(ctx.data, ctx.activeKey)?.rowKey
+    return Boolean(rowKey && (ctx.data.state?.expandedKeys?.includes(rowKey) ?? false))
+  }
+  if (predicate.kind === 'activeKeyIsRow') {
+    if (!ctx.activeKey) return false
+    const rowKeys = ctx.data.relations?.rowKeys ?? []
+    return rowKeys.includes(ctx.activeKey)
+  }
+  if (predicate.kind === 'isChecked') {
+    const key = resolveKeyToken(predicate.key, ctx.key, ctx.activeKey, ctx)
+    return ctx.data.state?.checkedByKey?.[key] === true
+  }
+  if (predicate.kind === 'isPressed') {
+    const key = resolveKeyToken(predicate.key, ctx.key, ctx.activeKey, ctx)
+    return ctx.data.state?.pressedByKey?.[key] === true
+  }
+  if (predicate.kind === 'isSwitchOn') {
+    const key = resolveKeyToken(predicate.key, ctx.key, ctx.activeKey, ctx)
+    return ctx.data.state?.checkedByKey?.[key] === true
+  }
+  if (predicate.kind === 'isPopupOpen') {
+    const key = ctx.key ?? ctx.activeKey
+    if (key && (ctx.data.state?.expandedKeys?.includes(key) ?? false)) return true
+    return (ctx.data.state?.expandedKeys?.length ?? 0) > 0
+  }
   if (predicate.kind === 'extension') {
     const resolver = predicateRegistry.get(predicate.name)
     if (!resolver) throw unknownTokenError('predicate', predicate.name)
@@ -180,6 +214,11 @@ export function resolveEventTemplate(
   ctx?: PatternRuntimeContext,
 ): readonly PatternEvent[] {
   if (template.type === 'navigate') return [{ type: 'navigate', direction: template.direction }]
+  if (template.type === 'selectAll') return [{ type: 'selectAll' }]
+  if (template.type === 'selectColumn') return [{ type: 'selectColumn' }]
+  if (template.type === 'selectRow') return [{ type: 'selectRow' }]
+  if (template.type === 'extendSelection') return [{ type: 'extendSelection', direction: template.direction }]
+  if (template.type === 'expandActiveRow') return [{ type: 'expandActiveRow', expanded: template.expanded }]
   if (template.type === 'typeahead') return [{ type: 'typeahead', query: template.query }]
   if (template.type === 'dismiss') {
     const key = template.key ? resolveKeyToken(template.key, keyContext, activeKey, ctx) : undefined
@@ -209,4 +248,9 @@ export function createParentByKey(data: PatternData): ReadonlyMap<Key, Key> {
     for (const child of children) parentByKey.set(child, parent)
   }
   return parentByKey
+}
+
+function activeCellRelation(data: PatternData, activeKey: Key | null | undefined) {
+  if (!activeKey) return null
+  return data.relations?.cells?.find((cell) => cell.cellKey === activeKey) ?? null
 }

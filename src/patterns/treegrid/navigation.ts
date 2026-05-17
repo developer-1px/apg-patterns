@@ -35,6 +35,7 @@ const cellRowKey = (data: PatternData, cellKey: Key | null | undefined): Key | n
 }
 
 defineVisibleOrder('treegridVisibleCells', (_v, data) => visibleCells(data).flat())
+defineVisibleOrder('treegridVisibleRows', (_v, data) => visibleRowKeys(data))
 
 defineAriaSource('state.rowExpanded', (ctx) => {
   if (!ctx.key) return undefined
@@ -104,6 +105,44 @@ defineNavigationTarget('treegridParentRowFirstCell', (_target, ctx) => {
   const firstCol = ctx.data.relations?.columnKeys?.[0]
   if (!firstCol) return null
   return ctx.data.relations?.cells?.find((c) => c.rowKey === parent && c.columnKey === firstCol)?.cellKey ?? null
+})
+
+type TreegridRowAction = 'up' | 'down' | 'gridStart' | 'gridEnd'
+
+const activeRowKey = (ctx: { activeKey: Key | null; data: PatternData }): Key | null => {
+  if (!ctx.activeKey) return null
+  const rows = visibleRowKeys(ctx.data)
+  if (rows.includes(ctx.activeKey)) return ctx.activeKey
+  return cellRowKey(ctx.data, ctx.activeKey)
+}
+
+defineNavigationTarget('treegridRow', (target, ctx) => {
+  const action = target.action as TreegridRowAction
+  const rows = visibleRowKeys(ctx.data)
+  if (rows.length === 0) return null
+  if (action === 'gridStart') return rows[0] ?? null
+  if (action === 'gridEnd') return rows[rows.length - 1] ?? null
+  const current = activeRowKey(ctx)
+  if (!current) return rows[0] ?? null
+  const idx = rows.indexOf(current)
+  if (idx === -1) return null
+  if (action === 'up') return rows[Math.max(0, idx - 1)] ?? null
+  if (action === 'down') return rows[Math.min(rows.length - 1, idx + 1)] ?? null
+  return null
+})
+
+defineNavigationTarget('treegridRowPage', (target, ctx) => {
+  const direction = (target as { direction?: 'up' | 'down' }).direction ?? 'down'
+  const rows = visibleRowKeys(ctx.data)
+  if (rows.length === 0) return null
+  const current = activeRowKey(ctx)
+  if (!current) return rows[0] ?? null
+  const idx = rows.indexOf(current)
+  if (idx === -1) return null
+  const next = direction === 'down'
+    ? Math.min(rows.length - 1, idx + PAGE_STEP)
+    : Math.max(0, idx - PAGE_STEP)
+  return rows[next] ?? null
 })
 
 export { visibleRowKeys as treegridVisibleRowKeys, visibleCells as treegridVisibleCells }
