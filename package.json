@@ -39,6 +39,8 @@
     "build": "tsup",
     "dev": "vite --config vite.config.ts",
     "demo": "vite --config vite.config.ts",
+    "demo:build": "vite build --config vite.config.ts",
+    "demo:preview": "vite preview --config vite.config.ts --host 127.0.0.1",
     "test": "vitest run --config vitest.config.ts",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist"

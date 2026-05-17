@@ -5,59 +5,69 @@
 //   - All pattern definition/runtime files (src/patterns/<name>/*.ts)
 //   - All demo files in demo/src (*.tsx, *Data.ts, plus a few helpers)
 
-const rootModules = import.meta.glob('../../../src/*.ts', { eager: true, query: '?raw', import: 'default' }) as Record<string, string>
+type SourceLoader = () => Promise<string>
+
+const rootModules = import.meta.glob('../../../src/*.ts', { query: '?raw', import: 'default' }) as Record<string, SourceLoader>
 const layerModules = import.meta.glob([
   '../../../src/schema/*.ts',
   '../../../src/kernel/*.ts',
   '../../../src/adapters/*.ts',
-], { eager: true, query: '?raw', import: 'default' }) as Record<string, string>
-const patternModules = import.meta.glob('../../../src/patterns/*/*.ts', { eager: true, query: '?raw', import: 'default' }) as Record<string, string>
+], { query: '?raw', import: 'default' }) as Record<string, SourceLoader>
+const patternModules = import.meta.glob('../../../src/patterns/*/*.ts', { query: '?raw', import: 'default' }) as Record<string, SourceLoader>
 const demoTsxModules = import.meta.glob([
   '../patterns/*/*.tsx',
   '../app/*.tsx',
   '../shared/*.tsx',
-], { eager: true, query: '?raw', import: 'default' }) as Record<string, string>
+  '!../patterns/**/*.test.tsx',
+  '!../patterns/**/*.apg.test.tsx',
+  '!../app/**/*.test.tsx',
+  '!../shared/**/*.test.tsx',
+], { query: '?raw', import: 'default' }) as Record<string, SourceLoader>
 const demoDataModules = import.meta.glob([
   '../patterns/*/*.ts',
   '../app/*.ts',
   '../shared/*.ts',
   '../shared/inspect/*.ts',
   './*.ts',
-], { eager: true, query: '?raw', import: 'default' }) as Record<string, string>
+  '!../patterns/**/*.test.ts',
+  '!../patterns/**/*.apg.test.ts',
+  '!../app/**/*.test.ts',
+  '!../shared/**/*.test.ts',
+], { query: '?raw', import: 'default' }) as Record<string, SourceLoader>
 
-const collected: Record<string, string> = {}
+const collected: Record<string, SourceLoader> = {}
 
 // src root: keep filename only (e.g. index.ts)
-for (const [path, src] of Object.entries(rootModules)) {
+for (const [path, load] of Object.entries(rootModules)) {
   const name = path.split('/').pop()!
-  collected[name] = src
+  collected[name] = load
 }
 // schema/kernel/adapters: keep <folder>/<file>.ts to preserve concept map
-for (const [path, src] of Object.entries(layerModules)) {
+for (const [path, load] of Object.entries(layerModules)) {
   const parts = path.split('/')
   const file = parts.pop()!
   const dir = parts.pop()!
-  collected[`${dir}/${file}`] = src
+  collected[`${dir}/${file}`] = load
 }
 // patterns: keep <patternName>/<file>.ts
-for (const [path, src] of Object.entries(patternModules)) {
+for (const [path, load] of Object.entries(patternModules)) {
   const parts = path.split('/')
   const file = parts.pop()!
   const dir = parts.pop()!
-  collected[`${dir}/${file}`] = src
+  collected[`${dir}/${file}`] = load
 }
 // demo *.tsx
-for (const [path, src] of Object.entries(demoTsxModules)) {
+for (const [path, load] of Object.entries(demoTsxModules)) {
   const name = path.split('/').pop()!
   if (name.endsWith('.test.tsx')) continue
-  collected[name] = src
+  collected[name] = load
 }
 // demo *.ts (data files and helpers)
-for (const [path, src] of Object.entries(demoDataModules)) {
+for (const [path, load] of Object.entries(demoDataModules)) {
   const name = path.split('/').pop()!
   if (name.endsWith('.test.ts')) continue
-  collected[name] = src
+  collected[name] = load
 }
 
-export const sources: Readonly<Record<string, string>> = collected
+export const sourceLoaders: Readonly<Record<string, SourceLoader>> = collected
 export type SourceName = string
