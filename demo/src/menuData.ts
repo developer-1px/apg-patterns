@@ -113,10 +113,10 @@ export const menuVariantItems: ReadonlyArray<{ key: MenuVariantKey; label: strin
   { key: 'actionMenuButtonActiveDescendant', label: 'Menu Button — aria-activedescendant' },
 ]
 
-export const menuVariants: Record<MenuVariantKey, { data: PatternData; flavor: 'menubar' | 'menu-button'; focusStrategy: 'rovingTabIndex' | 'ariaActiveDescendant' }> = {
-  editorMenubar: { data: initialEditorMenubarData, flavor: 'menubar', focusStrategy: 'rovingTabIndex' },
-  navMenubar: { data: initialNavMenubarData, flavor: 'menubar', focusStrategy: 'rovingTabIndex' },
-  actionMenuButton: { data: initialActionMenuData, flavor: 'menu-button', focusStrategy: 'rovingTabIndex' },
-  actionMenuButtonFocus: { data: initialActionMenuData, flavor: 'menu-button', focusStrategy: 'rovingTabIndex' },
-  actionMenuButtonActiveDescendant: { data: initialActionMenuData, flavor: 'menu-button', focusStrategy: 'ariaActiveDescendant' },
+export const menuVariants: Record<MenuVariantKey, { data: PatternData; apgPattern: 'menubar' | 'menu-button'; focusStrategy: 'rovingTabIndex' | 'ariaActiveDescendant' }> = {
+  editorMenubar: { data: initialEditorMenubarData, apgPattern: 'menubar', focusStrategy: 'rovingTabIndex' },
+  navMenubar: { data: initialNavMenubarData, apgPattern: 'menubar', focusStrategy: 'rovingTabIndex' },
+  actionMenuButton: { data: initialActionMenuData, apgPattern: 'menu-button', focusStrategy: 'rovingTabIndex' },
+  actionMenuButtonFocus: { data: initialActionMenuData, apgPattern: 'menu-button', focusStrategy: 'rovingTabIndex' },
+  actionMenuButtonActiveDescendant: { data: initialActionMenuData, apgPattern: 'menu-button', focusStrategy: 'ariaActiveDescendant' },
 }

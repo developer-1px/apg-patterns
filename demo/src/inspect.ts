@@ -130,7 +130,7 @@ export function renderListboxInspect(data: PatternData) {
 
 export function renderComboboxInspect(
   data: PatternData,
-  variant: { autocomplete: 'none' | 'list' | 'both' },
+  comboboxOptions: { autocomplete: 'none' | 'list' | 'both' },
 ) {
   const COMBOBOX_KEY = 'combobox'
   const expanded = data.state?.expandedKeys?.includes(COMBOBOX_KEY) ?? false
@@ -142,7 +142,7 @@ export function renderComboboxInspect(
         role: 'combobox',
         'aria-expanded': expanded,
         'aria-haspopup': 'listbox',
-        'aria-autocomplete': variant.autocomplete,
+        'aria-autocomplete': comboboxOptions.autocomplete,
         'aria-controls': 'combobox-popup',
         'aria-activedescendant': activeKey ? `combobox-option-${activeKey}` : undefined,
         'aria-label': data.refs?.label,
@@ -200,10 +200,10 @@ export function renderGridInspect(data: PatternData) {
 
 export function renderMenuInspect(
   data: PatternData,
-  flavor: 'menubar' | 'menu-button',
+  apgPattern: 'menubar' | 'menu-button',
   focusStrategy: 'rovingTabIndex' | 'ariaActiveDescendant' = 'rovingTabIndex',
 ) {
-  if (flavor === 'menubar') {
+  if (apgPattern === 'menubar') {
     const activeKey = data.state?.activeKey
     const expandedKeys = data.state?.expandedKeys ?? []
     const lines = ['menubar', attrLine({ 'aria-label': data.refs?.label, 'aria-orientation': 'horizontal' }, ['aria-label', 'aria-orientation'])]

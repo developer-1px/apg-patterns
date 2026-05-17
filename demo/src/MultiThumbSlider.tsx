@@ -4,29 +4,29 @@ import { createPatternRuntime } from '../../src'
 
 type Runtime = ReturnType<typeof createPatternRuntime>
 
-export function RangeSlider({
+export function MultiThumbSlider({
   data,
   onEvent,
   runtime,
-  keydownFor,
-  optionMin,
-  optionMax,
+  getThumbKeyDownHandler,
+  min,
+  max,
 }: {
   data: PatternData
   onEvent: (event: PatternEvent) => void
   runtime: Runtime
-  keydownFor: (key: Key) => (event: KeyInput & { preventDefault?: () => void }) => void
-  optionMin: number
-  optionMax: number
+  getThumbKeyDownHandler: (key: Key) => (event: KeyInput & { preventDefault?: () => void }) => void
+  min: number
+  max: number
   step: number
 }) {
   const rootKeys = data.relations?.rootKeys ?? []
   const [minKey, maxKey] = rootKeys
-  const minValue = Number(data.state?.valueByKey?.[minKey] ?? optionMin)
-  const maxValue = Number(data.state?.valueByKey?.[maxKey] ?? optionMax)
-  const range = optionMax - optionMin || 1
-  const minPos = ((minValue - optionMin) / range) * 100
-  const maxPos = ((maxValue - optionMin) / range) * 100
+  const minValue = Number(data.state?.valueByKey?.[minKey] ?? min)
+  const maxValue = Number(data.state?.valueByKey?.[maxKey] ?? max)
+  const range = max - min || 1
+  const minPos = ((minValue - min) / range) * 100
+  const maxPos = ((maxValue - min) / range) * 100
 
   return (
     <div className="grid max-w-md gap-3">
@@ -39,21 +39,21 @@ export function RangeSlider({
           className="absolute inset-y-0 rounded bg-zinc-900 dark:bg-zinc-100"
           style={{ left: `${minPos}%`, width: `${Math.max(0, maxPos - minPos)}%` }}
         />
-        <RangeThumb data={data} thumbKey={minKey} value={minValue} position={minPos} runtime={runtime} onEvent={onEvent} keydownFor={keydownFor} />
-        <RangeThumb data={data} thumbKey={maxKey} value={maxValue} position={maxPos} runtime={runtime} onEvent={onEvent} keydownFor={keydownFor} />
+        <MultiThumbSliderThumb data={data} thumbKey={minKey} value={minValue} position={minPos} runtime={runtime} onEvent={onEvent} getThumbKeyDownHandler={getThumbKeyDownHandler} />
+        <MultiThumbSliderThumb data={data} thumbKey={maxKey} value={maxValue} position={maxPos} runtime={runtime} onEvent={onEvent} getThumbKeyDownHandler={getThumbKeyDownHandler} />
       </div>
     </div>
   )
 }
 
-function RangeThumb({
+function MultiThumbSliderThumb({
   data,
   thumbKey,
   value,
   position,
   runtime,
   onEvent,
-  keydownFor,
+  getThumbKeyDownHandler,
 }: {
   data: PatternData
   thumbKey: Key
@@ -61,7 +61,7 @@ function RangeThumb({
   position: number
   runtime: Runtime
   onEvent: (event: PatternEvent) => void
-  keydownFor: (key: Key) => (event: KeyInput & { preventDefault?: () => void }) => void
+  getThumbKeyDownHandler: (key: Key) => (event: KeyInput & { preventDefault?: () => void }) => void
 }) {
   const { onKeyDown: _drop, ...props } = runtime.getPartProps('slider', thumbKey)
   return (
@@ -70,7 +70,7 @@ function RangeThumb({
       type="button"
       onKeyDown={(event) => {
         onEvent({ type: 'focus', key: thumbKey })
-        keydownFor(thumbKey)(event as unknown as KeyInput & { preventDefault?: () => void })
+        getThumbKeyDownHandler(thumbKey)(event as unknown as KeyInput & { preventDefault?: () => void })
       }}
       onFocus={() => onEvent({ type: 'focus', key: thumbKey })}
       aria-valuenow={value}

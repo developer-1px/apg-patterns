@@ -179,11 +179,11 @@ export function reduceSliderData(
   if (event.type !== 'extension' || event.name !== 'value-change' || !event.key) return data
   const payload = (event.payload ?? {}) as { direction?: unknown; value?: unknown }
   const key = event.key as Key
-  const optionMin = Number(options.min ?? 0)
-  const optionMax = Number(options.max ?? 100)
+  const defaultMin = Number(options.min ?? 0)
+  const defaultMax = Number(options.max ?? 100)
   const step = Number(options.step ?? 1)
-  const large = Math.max(step, Math.round((optionMax - optionMin) / 10))
-  const [min, max] = itemRange(data, key, optionMin, optionMax)
+  const large = Math.max(step, Math.round((defaultMax - defaultMin) / 10))
+  const [min, max] = itemRange(data, key, defaultMin, defaultMax)
   const current = Number(data.state?.valueByKey?.[key] ?? min)
 
   let nextValue: number

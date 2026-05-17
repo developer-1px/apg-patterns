@@ -43,8 +43,8 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@interactive-os/keyboard": "file:../keyboard/packages/keyboard",
     "@interactive-os/collection-navigation": "file:../keyboard-navigation/packages/collection-navigation",
+    "@interactive-os/keyboard": "file:../keyboard/packages/keyboard",
     "zod": "^4.3.6"
   },
   "peerDependencies": {
@@ -54,6 +54,7 @@
     "@testing-library/react": "^16.3.2",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.2.3",
+    "@vitest/coverage-v8": "^4.1.6",
     "autoprefixer": "^10.4.22",
     "jsdom": "^29.1.1",
     "postcss": "^8.5.6",

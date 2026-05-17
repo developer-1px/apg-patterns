@@ -1,0 +1,379 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for src/kernelBuiltins.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../index.html">All files</a> / <a href="index.html">src</a> kernelBuiltins.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">76.92% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>80/104</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">35.45% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>39/110</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">60% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>27/45</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">93.54% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>58/62</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line medium'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">182x</span>
+<span class="cline-any cline-yes">178x</span>
+<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-yes">178x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">915x</span>
+<span class="cline-any cline-yes">871x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">836x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">892x</span>
+<span class="cline-any cline-yes">178x</span>
+<span class="cline-any cline-yes">880x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">836x</span>
+<span class="cline-any cline-yes">836x</span>
+<span class="cline-any cline-yes">836x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">848x</span>
+<span class="cline-any cline-yes">836x</span>
+<span class="cline-any cline-yes">892x</span>
+<span class="cline-any cline-yes">836x</span>
+<span class="cline-any cline-yes">880x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">1286x</span>
+<span class="cline-any cline-yes">1286x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">852x</span>
+<span class="cline-any cline-yes">852x</span>
+<span class="cline-any cline-yes">852x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">82x</span>
+<span class="cline-any cline-yes">82x</span>
+<span class="cline-any cline-yes">82x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">48x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Kernel 기본 어휘 등록 — 패턴 무관 공통 토큰의 resolver 구현.
+ *
+ * kernelVocabulary.ts 가 "string 상수 사전(autocomplete)"이라면,
+ * 이 파일은 그 상수에 대응하는 "runtime resolver 등록".
+ *
+ * 패턴별 토큰은 각 패턴 정의 파일에서 등록한다.
+ */
+import {
+  defineAriaSource,
+  defineNavigationTarget,
+  defineStateProjection,
+  definePredicate,
+  defineVisibleOrder,
+  resolveKeyToken,
+} from './patternKernel'
+import { moveLinear } from '@interactive-os/collection-navigation'
+&nbsp;
+// AriaSource — common
+defineAriaSource('refs.label', (ctx) =&gt; ctx.data.refs?.label)
+defineAriaSource('refs.labelledBy', (ctx) =&gt; ctx.data.refs?.labelledBy)
+defineAriaSource('options.orientation', (ctx) =&gt; ctx.options?.orientation)
+defineAriaSource('options.selectionMode.multiple', (ctx) =&gt; (ctx.options?.selectionMode === 'multiple' ? <span class="branch-0 cbranch-no" title="branch not covered" >true : u</span>ndefined))
+defineAriaSource('state.activeKey.elementId', (ctx) =&gt; (ctx.activeKey &amp;&amp; ctx.keyToElementId ? ctx.keyToElementId(ctx.activeKey) : <span class="branch-1 cbranch-no" title="branch not covered" >undefined))</span>
+defineAriaSource('items.label', (ctx) =&gt; (ctx.key ? ctx.data.items[ctx.key]?.label : <span class="branch-1 cbranch-no" title="branch not covered" >undefined))</span>
+defineAriaSource('items.labelledBy', (ctx) =&gt; (ctx.key ? ctx.data.items[ctx.key]?.labelledBy : <span class="branch-1 cbranch-no" title="branch not covered" >undefined))</span>
+defineAriaSource(<span class="fstat-no" title="function not covered" >'relations.controlsByKey', (c</span>tx) =&gt; {
+  const controlledKey = <span class="cstat-no" title="statement not covered" >ctx.key ? ctx.data.relations?.controlsByKey?.[ctx.key]?.[0] : undefined</span>
+<span class="cstat-no" title="statement not covered" >  return controlledKey ? (ctx.keyToElementId?.(controlledKey) ?? controlledKey) : undefined</span>
+})
+defineAriaSource(<span class="fstat-no" title="function not covered" >'relations.ownerByKey', (c</span>tx) =&gt; {
+  const ownerKey = <span class="cstat-no" title="statement not covered" >ctx.key ? ctx.data.relations?.ownerByKey?.[ctx.key] : undefined</span>
+<span class="cstat-no" title="statement not covered" >  return ownerKey ? (ctx.keyToElementId?.(ownerKey) ?? ownerKey) : undefined</span>
+})
+// aria-selected 는 ARIA spec 상 selectable 항목에서 explicit true/false 가 요구된다.
+defineAriaSource('state.selectedKeys', (ctx) =&gt; (ctx.key ? ctx.data.state?.selectedKeys?.includes(ctx.key) ?? false : <span class="branch-1 cbranch-no" title="branch not covered" >undefined))</span>
+// aria-disabled 는 omit-when-false 가 표준 — 비활성일 때만 true.
+defineAriaSource('state.disabledKeys', (ctx) =&gt; (ctx.key &amp;&amp; ctx.data.state?.disabledKeys?.includes(ctx.key)) || undefined)
+defineAriaSource('state.expandedKeys', (ctx) =&gt; (ctx.key ? ctx.data.state?.expandedKeys?.includes(ctx.key) ?? <span class="branch-1 cbranch-no" title="branch not covered" >false : <span class="branch-1 cbranch-no" title="branch not covered" >u</span>ndefined))</span>
+defineAriaSource('state.checkedByKey', (ctx) =&gt; (ctx.key ? ctx.data.state?.checkedByKey?.[ctx.key] : <span class="branch-1 cbranch-no" title="branch not covered" >undefined))</span>
+defineAriaSource(<span class="fstat-no" title="function not covered" >'state.pressedByKey', (c</span>tx) =&gt; (<span class="cstat-no" title="statement not covered" >ctx.key ? ctx.data.state?.pressedByKey?.[ctx.key] : undefined))</span>
+defineAriaSource(<span class="fstat-no" title="function not covered" >'state.currentByKey', (c</span>tx) =&gt; (<span class="cstat-no" title="statement not covered" >ctx.key ? ctx.data.state?.currentByKey?.[ctx.key] : undefined))</span>
+defineAriaSource(<span class="fstat-no" title="function not covered" >'state.invalidByKey', (c</span>tx) =&gt; (<span class="cstat-no" title="statement not covered" >ctx.key ? ctx.data.state?.invalidByKey?.[ctx.key] : undefined))</span>
+defineAriaSource(<span class="fstat-no" title="function not covered" >'state.requiredKeys', (c</span>tx) =&gt; (<span class="cstat-no" title="statement not covered" >ctx.key &amp;&amp; ctx.data.state?.requiredKeys?.includes(ctx.key)) || undefined)</span>
+defineAriaSource(<span class="fstat-no" title="function not covered" >'state.busyKeys', (c</span>tx) =&gt; (<span class="cstat-no" title="statement not covered" >ctx.key &amp;&amp; ctx.data.state?.busyKeys?.includes(ctx.key)) || undefined)</span>
+defineAriaSource(<span class="fstat-no" title="function not covered" >'state.modalKeys', (c</span>tx) =&gt; (<span class="cstat-no" title="statement not covered" >ctx.key &amp;&amp; ctx.data.state?.modalKeys?.includes(ctx.key)) || undefined)</span>
+defineAriaSource('state.levelByKey', (ctx) =&gt; (ctx.key ? ctx.data.state?.levelByKey?.[ctx.key] : <span class="branch-1 cbranch-no" title="branch not covered" >undefined))</span>
+defineAriaSource('state.posInSetByKey', (ctx) =&gt; (ctx.key ? ctx.data.state?.posInSetByKey?.[ctx.key] : <span class="branch-1 cbranch-no" title="branch not covered" >undefined))</span>
+defineAriaSource('state.setSizeByKey', (ctx) =&gt; (ctx.key ? ctx.data.state?.setSizeByKey?.[ctx.key] : <span class="branch-1 cbranch-no" title="branch not covered" >undefined))</span>
+defineAriaSource(<span class="fstat-no" title="function not covered" >'state.rowIndexByKey', (c</span>tx) =&gt; (<span class="cstat-no" title="statement not covered" >ctx.key ? ctx.data.state?.rowIndexByKey?.[ctx.key] : undefined))</span>
+defineAriaSource(<span class="fstat-no" title="function not covered" >'state.columnIndexByKey', (c</span>tx) =&gt; (<span class="cstat-no" title="statement not covered" >ctx.key ? ctx.data.state?.columnIndexByKey?.[ctx.key] : undefined))</span>
+defineAriaSource(<span class="fstat-no" title="function not covered" >'state.sortByKey', (c</span>tx) =&gt; (<span class="cstat-no" title="statement not covered" >ctx.key ? ctx.data.state?.sortByKey?.[ctx.key] : undefined))</span>
+defineAriaSource('state.valueByKey', (ctx) =&gt; (ctx.key ? ctx.data.state?.valueByKey?.[ctx.key] : <span class="branch-1 cbranch-no" title="branch not covered" >undefined))</span>
+defineAriaSource(<span class="fstat-no" title="function not covered" >'state.rangeValueByKey.min', (c</span>tx) =&gt; (<span class="cstat-no" title="statement not covered" >ctx.key ? ctx.data.state?.rangeValueByKey?.[ctx.key]?.min : undefined))</span>
+defineAriaSource(<span class="fstat-no" title="function not covered" >'state.rangeValueByKey.max', (c</span>tx) =&gt; (<span class="cstat-no" title="statement not covered" >ctx.key ? ctx.data.state?.rangeValueByKey?.[ctx.key]?.max : undefined))</span>
+defineAriaSource(<span class="fstat-no" title="function not covered" >'state.rangeValueByKey.now', (c</span>tx) =&gt; (<span class="cstat-no" title="statement not covered" >ctx.key ? ctx.data.state?.rangeValueByKey?.[ctx.key]?.now : undefined))</span>
+defineAriaSource(<span class="fstat-no" title="function not covered" >'state.rangeValueByKey.text', (c</span>tx) =&gt; (<span class="cstat-no" title="statement not covered" >ctx.key ? ctx.data.state?.rangeValueByKey?.[ctx.key]?.text : undefined))</span>
+&nbsp;
+// StateProjection — common
+defineStateProjection('state.activeKey', (ctx) =&gt; ctx.key != null &amp;&amp; ctx.activeKey === ctx.key)
+defineStateProjection('state.selectedKeys', (ctx) =&gt; (ctx.key ? ctx.data.state?.selectedKeys?.includes(ctx.key) ?? false : <span class="branch-1 cbranch-no" title="branch not covered" >false))</span>
+defineStateProjection('state.disabledKeys', (ctx) =&gt; (ctx.key ? ctx.data.state?.disabledKeys?.includes(ctx.key) ?? false : <span class="branch-1 cbranch-no" title="branch not covered" >false))</span>
+defineStateProjection('state.expandedKeys', (ctx) =&gt; (ctx.key ? ctx.data.state?.expandedKeys?.includes(ctx.key) ?? <span class="branch-1 cbranch-no" title="branch not covered" >false : <span class="branch-1 cbranch-no" title="branch not covered" >f</span>alse))</span>
+defineStateProjection('state.checkedByKey', (ctx) =&gt; (ctx.key ? ctx.data.state?.checkedByKey?.[ctx.key] : <span class="branch-1 cbranch-no" title="branch not covered" >undefined))</span>
+defineStateProjection(<span class="fstat-no" title="function not covered" >'state.pressedByKey', (c</span>tx) =&gt; (<span class="cstat-no" title="statement not covered" >ctx.key ? ctx.data.state?.pressedByKey?.[ctx.key] : undefined))</span>
+defineStateProjection(<span class="fstat-no" title="function not covered" >'state.currentByKey', (c</span>tx) =&gt; (<span class="cstat-no" title="statement not covered" >ctx.key ? ctx.data.state?.currentByKey?.[ctx.key] : undefined))</span>
+defineStateProjection(<span class="fstat-no" title="function not covered" >'state.valueByKey', (c</span>tx) =&gt; (<span class="cstat-no" title="statement not covered" >ctx.key ? ctx.data.state?.valueByKey?.[ctx.key] : undefined))</span>
+&nbsp;
+// Predicate — common leaf kinds
+definePredicate('hasActiveKey', (_p, ctx) =&gt; Boolean(ctx.activeKey))
+definePredicate('optionEquals', (p, ctx) =&gt; {
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (p.kind !== 'optionEquals') <span class="cstat-no" title="statement not covered" >return false</span>
+  return (ctx.options as Record&lt;string, unknown&gt; | undefined)?.[p.option] === p.value
+})
+definePredicate('hasChildren', (p, ctx) =&gt; {
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (p.kind !== 'hasChildren') <span class="cstat-no" title="statement not covered" >return false</span>
+  const key = resolveKeyToken(p.key, ctx.key, ctx.activeKey)
+  return (ctx.data.relations?.childrenByKey?.[key]?.length ?? <span class="branch-1 cbranch-no" title="branch not covered" >0) &gt; 0</span>
+})
+definePredicate('isExpanded', (p, ctx) =&gt; {
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (p.kind !== 'isExpanded') <span class="cstat-no" title="statement not covered" >return false</span>
+  const key = resolveKeyToken(p.key, ctx.key, ctx.activeKey)
+  return ctx.data.state?.expandedKeys?.includes(key) ?? <span class="branch-1 cbranch-no" title="branch not covered" >false</span>
+})
+definePredicate('isDisabled', (p, ctx) =&gt; {
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (p.kind !== 'isDisabled') <span class="cstat-no" title="statement not covered" >return false</span>
+  const key = resolveKeyToken(p.key, ctx.key, ctx.activeKey)
+  return ctx.data.state?.disabledKeys?.includes(key) ?? false
+})
+&nbsp;
+// VisibleOrder — kernel 기본 'flat'.
+defineVisibleOrder('flat', (_v, data) =&gt; data.relations?.rootKeys ?? <span class="branch-1 cbranch-no" title="branch not covered" >[])</span>
+&nbsp;
+// NavigationTarget — kernel 기본 linear movement over the resolved visible order.
+defineNavigationTarget('linear', (target, ctx) =&gt; {
+  const action = target.action as 'next' | 'previous' | 'first' | 'last'
+  return moveLinear(ctx.visibleKeys, ctx.activeKey, action)
+})
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-05-17T10:54:58.186Z
+            </div>
+        <script src="../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../sorter.js"></script>
+        <script src="../block-navigation.js"></script>
+    </body>
+</html>
+    

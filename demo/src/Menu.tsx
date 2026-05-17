@@ -2,7 +2,7 @@
  * Menu — visualizes 2 patterns (`menubar`, `menu-button`) across 5 W3C APG variants.
  *
  * Variants are switched by the parent (`menuVariants`); this component decides
- * which sub-renderer (Menubar vs MenuButton) to dispatch to based on `flavor`.
+ * which sub-renderer (Menubar vs MenuButton) to dispatch to based on `apgPattern`.
  *
  * Focus management:
  *   - rovingTabIndex   → element.focus() via useLayoutEffect (Menubar + 2 of 3 menu-buttons)
@@ -24,12 +24,12 @@ type Props = HTMLAttributes<HTMLElement>
 export interface MenuProps {
   data: PatternData
   onEvent: (event: PatternEvent) => void
-  flavor: 'menubar' | 'menu-button'
+  apgPattern: 'menubar' | 'menu-button'
   focusStrategy?: 'rovingTabIndex' | 'ariaActiveDescendant'
 }
 
 export function Menu(props: MenuProps) {
-  if (props.flavor === 'menubar') return <Menubar {...props} />
+  if (props.apgPattern === 'menubar') return <Menubar {...props} />
   return <MenuButton {...props} />
 }
 

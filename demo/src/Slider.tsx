@@ -1,7 +1,7 @@
 import type { HTMLAttributes, KeyboardEvent, PointerEvent } from 'react'
 import type { KeyInput } from '@interactive-os/keyboard'
 import { createPatternRuntime, sliderDefinition, type Key, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
-import { RangeSlider } from './RangeSlider'
+import { MultiThumbSlider } from './MultiThumbSlider'
 
 type Props = HTMLAttributes<HTMLElement>
 
@@ -33,15 +33,15 @@ export function Slider({
   const orientation = options.orientation === 'vertical' ? 'vertical' : 'horizontal'
   // Per-thumb handler — uses the thumb's own key as activeKey instead of reading
   // global state.activeKey (which lags behind focus events within a single event tick).
-  const onKeyDown = (key: Key) => (event: KeyInput & { preventDefault?: () => void }) => {
+  const getThumbKeyDownHandler = (key: Key) => (event: KeyInput & { preventDefault?: () => void }) => {
     const result = runtime.resolveKeyboardBinding(event, key)
     if (!result) return
     if (result.preventDefault) event.preventDefault?.()
     for (const ev of result.events) onEvent(ev)
   }
 
-  const optionMin = Number(options.min ?? 0)
-  const optionMax = Number(options.max ?? 100)
+  const min = Number(options.min ?? 0)
+  const max = Number(options.max ?? 100)
   const step = Number(options.step ?? 1)
 
   const isMultiThumb = rootKeys.length >= 2 && rootKeys.every((k) => {
@@ -51,7 +51,7 @@ export function Slider({
 
   // Multi-thumb (range) renders a shared track with two thumbs.
   if (isMultiThumb) {
-    return <RangeSlider data={data} onEvent={onEvent} runtime={runtime} keydownFor={onKeyDown} optionMin={optionMin} optionMax={optionMax} step={step} />
+    return <MultiThumbSlider data={data} onEvent={onEvent} runtime={runtime} getThumbKeyDownHandler={getThumbKeyDownHandler} min={min} max={max} step={step} />
   }
 
   const containerClass = rootKeys.length > 1 ? 'grid max-w-sm gap-5' : 'grid max-w-sm gap-3'
@@ -66,10 +66,10 @@ export function Slider({
           runtime={runtime}
           options={options}
           onEvent={onEvent}
-          onKeyDown={onKeyDown(key)}
+          onKeyDown={getThumbKeyDownHandler(key)}
           orientation={orientation}
-          min={optionMin}
-          max={optionMax}
+          min={min}
+          max={max}
           step={step}
         />
       ))}

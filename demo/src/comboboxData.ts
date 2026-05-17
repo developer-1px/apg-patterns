@@ -1,11 +1,11 @@
 import { COMBOBOX_KEY, PatternDataSchema, type PatternData, type PatternEvent } from '../../src'
 
-export type ComboboxVariantKey = 'selectOnly' | 'autocompleteList' | 'autocompleteBoth'
+export type ComboboxVariantKey = 'selectOnly' | 'listAutocomplete' | 'listWithInlineAutocomplete'
 
 export const comboboxVariants: Record<ComboboxVariantKey, { label: string; autocomplete: 'none' | 'list' | 'both'; editable: boolean }> = {
   selectOnly: { label: 'Select-Only', autocomplete: 'none', editable: false },
-  autocompleteList: { label: 'Autocomplete (List)', autocomplete: 'list', editable: true },
-  autocompleteBoth: { label: 'Autocomplete (List + Inline)', autocomplete: 'both', editable: true },
+  listAutocomplete: { label: 'List Autocomplete', autocomplete: 'list', editable: true },
+  listWithInlineAutocomplete: { label: 'List with Inline Autocomplete', autocomplete: 'both', editable: true },
 }
 
 export const FRUITS = [

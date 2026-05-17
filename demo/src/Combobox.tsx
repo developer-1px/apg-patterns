@@ -12,11 +12,11 @@ export function Combobox({
   onVisibleKeysChange,
 }: {
   data: PatternData
-  variant: 'selectOnly' | 'autocompleteList' | 'autocompleteBoth'
+  variant: 'selectOnly' | 'listAutocomplete' | 'listWithInlineAutocomplete'
   onEvent: (event: PatternEvent) => void
   onVisibleKeysChange?: (keys: readonly string[]) => void
 }) {
-  const autocomplete = variant === 'selectOnly' ? 'none' : variant === 'autocompleteList' ? 'list' : 'both'
+  const autocomplete = variant === 'selectOnly' ? 'none' : variant === 'listAutocomplete' ? 'list' : 'both'
   const editable = variant !== 'selectOnly'
   const listboxId = 'combobox-popup'
   const inputRef = useRef<HTMLInputElement>(null)
@@ -52,7 +52,7 @@ export function Combobox({
   }, [selectedKey, open, editable, data.items])
 
   useLayoutEffect(() => {
-    if (variant === 'autocompleteBoth' && inlineCompletion && inputRef.current) {
+    if (variant === 'listWithInlineAutocomplete' && inlineCompletion && inputRef.current) {
       inputRef.current.setSelectionRange(inlineCompletion.start, inlineCompletion.end)
     }
   }, [inlineCompletion, variant])
@@ -65,7 +65,7 @@ export function Combobox({
     onVisibleKeysChange?.(filtered)
     // Open popup on typing.
     if (!open) onEvent({ type: 'expand', key: COMBOBOX_KEY, expanded: true })
-    if (variant === 'autocompleteBoth' && next.length > 0) {
+    if (variant === 'listWithInlineAutocomplete' && next.length > 0) {
       const match = firstMatch(next)
       if (match) {
         const matchLabel = FRUITS.find((f) => f.key === match)?.label ?? ''
