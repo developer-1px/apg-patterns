@@ -24,7 +24,6 @@ export interface TabsRuntime {
 export interface CreateTabsRuntimeInput {
   data: unknown
   onEvent: (event: PatternEvent) => void
-  onDataChange?: (data: PatternData, event: PatternEvent) => void
   options?: unknown
 }
 
@@ -43,7 +42,6 @@ export function createTabsRuntime(input: CreateTabsRuntimeInput): TabsRuntime {
     options,
     keyToElementId: (key) => createTabsElementId(options.elementIdPrefix ?? 'tab-', key),
     onEvent: emit,
-    onDataChange: input.onDataChange,
   } satisfies CreatePatternRuntimeInput) as PatternRuntime
 
   const selectedKey = data.state?.selectedKeys?.[0] ?? data.state?.activeKey ?? runtime.visibleKeys[0] ?? null

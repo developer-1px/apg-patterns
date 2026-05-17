@@ -32,7 +32,6 @@ export interface DisclosureRuntime {
 export interface CreateDisclosureRuntimeInput {
   data: unknown
   onEvent: (event: PatternEvent) => void
-  onDataChange?: (data: PatternData, event: PatternEvent) => void
   options?: unknown
 }
 
@@ -46,7 +45,6 @@ export function createDisclosureRuntime(input: CreateDisclosureRuntimeInput): Di
     options,
     keyToElementId: (key) => createDisclosureElementId(options.elementIdPrefix ?? 'disclosure-', key),
     onEvent: emit,
-    onDataChange: input.onDataChange,
   }) as PatternRuntime
 
   const triggerKey = data.relations?.rootKeys?.[0] ?? null

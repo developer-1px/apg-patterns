@@ -251,7 +251,6 @@ export function useTabsPattern(input: CreateTabsRuntimeInput): ReactTabsRuntime 
       data: input.data,
       options: input.options,
       onEvent: input.onEvent,
-      onDataChange: input.onDataChange,
     }),
   )
 }

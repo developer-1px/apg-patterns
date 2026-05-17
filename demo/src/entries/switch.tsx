@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { usePatternDataHost } from '../demoHostState'
 import { Switch } from '../Switch'
 import { initialSwitchData, reduceSwitchData } from '../switchData'
 import { type PatternEntry } from '../demoPatternTypes'
@@ -9,18 +9,18 @@ export const entry: PatternEntry = {
   label: 'Switch',
   order: 22,
   useDemoPattern: (onEvent) => {
-    const [data, setData] = useState(initialSwitchData)
+    const host = usePatternDataHost(initialSwitchData, reduceSwitchData)
     return {
       key: 'switch',
       label: 'Switch',
       keyboardShortcuts: ['Space', 'Enter'],
       sourceNames: ['Switch.tsx', 'switchData.ts', 'switch/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
-      inspect: renderDataInspect(data),
-      preview: <Switch data={data} onEvent={(event) => {
+      inspect: renderDataInspect(host.data),
+      preview: <Switch data={host.data} onEvent={(event) => {
         onEvent(event)
-        setData((current) => reduceSwitchData(current, event))
+        host.dispatchEvent(event)
       }} />,
-      reset: () => setData(initialSwitchData),
+      reset: host.reset,
     }
   },
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { usePatternDataHost } from '../demoHostState'
 import { renderRadioInspect } from '../inspect'
 import { RadioGroup } from '../RadioGroup'
 import { initialRadioData, reduceRadioData } from '../radioData'
@@ -9,18 +9,18 @@ export const entry: PatternEntry = {
   label: 'Radio Group',
   order: 8,
   useDemoPattern: (onEvent) => {
-    const [data, setData] = useState(initialRadioData)
+    const host = usePatternDataHost(initialRadioData, reduceRadioData)
     return {
       key: 'radio',
       label: 'Radio Group',
       keyboardShortcuts: ['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp', 'Home', 'End', 'Space'],
       sourceNames: ['RadioGroup.tsx', 'radioData.ts', 'radio/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
-      inspect: renderRadioInspect(data),
-      preview: <RadioGroup data={data} onEvent={(event) => {
+      inspect: renderRadioInspect(host.data),
+      preview: <RadioGroup data={host.data} onEvent={(event) => {
         onEvent(event)
-        setData((current) => reduceRadioData(current, event))
+        host.dispatchEvent(event)
       }} />,
-      reset: () => setData(initialRadioData),
+      reset: host.reset,
     }
   },
 }

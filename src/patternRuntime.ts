@@ -9,7 +9,6 @@ import {
   createParentByKey,
   type PatternRuntimeContext,
 } from './patternKernel'
-import { reducePatternData } from './patternReducer'
 
 export type SlotProps = Record<string, unknown>
 
@@ -36,7 +35,6 @@ export interface CreatePatternRuntimeInput {
   data: PatternData
   options?: PatternOptions
   onEvent: (event: PatternEvent) => void
-  onDataChange?: (data: PatternData, event: PatternEvent) => void
   keyToElementId?: (key: Key) => string
 }
 
@@ -45,7 +43,7 @@ export function createPatternRuntime(input: CreatePatternRuntimeInput): PatternR
   const definition = PatternDefinitionSchema.parse(input.definition)
   const data = PatternDataSchema.parse(input.data)
   const options = PatternOptionsSchema.parse(input.options ?? {})
-  const { onEvent, onDataChange } = input
+  const { onEvent } = input
   const visibleKeys = resolveVisibleOrder(definition.navigation.visibleOrder, data)
   const parentByKey = createParentByKey(data)
   const keyToElementId = input.keyToElementId ?? ((k: Key) => `${k}`)
@@ -59,11 +57,8 @@ export function createPatternRuntime(input: CreatePatternRuntimeInput): PatternR
     parentByKey,
   })
 
-  const apply = (event: PatternEvent) => reducePatternData(definition, data, event)
-
   const emit = (event: PatternEvent) => {
     onEvent(event)
-    onDataChange?.(apply(event), event)
   }
 
   const resolveKeyboardBinding = (input: KeyInput, activeKey: Key) => {

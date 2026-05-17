@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { usePatternDataHost } from '../demoHostState'
 import { Accordion } from '../Accordion'
 import { initialAccordionData, reduceAccordionData } from '../accordionData'
 import { type PatternEntry } from '../demoPatternTypes'
@@ -9,18 +9,18 @@ export const entry: PatternEntry = {
   label: 'Accordion',
   order: 11,
   useDemoPattern: (onEvent) => {
-    const [data, setData] = useState(initialAccordionData)
+    const host = usePatternDataHost(initialAccordionData, reduceAccordionData)
     return {
       key: 'accordion',
       label: 'Accordion',
       keyboardShortcuts: ['Enter', 'Space', 'ArrowDown', 'ArrowUp', 'Home', 'End'],
       sourceNames: ['Accordion.tsx', 'accordionData.ts', 'accordion/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
-      inspect: renderDataInspect(data),
-      preview: <Accordion data={data} onEvent={(event) => {
+      inspect: renderDataInspect(host.data),
+      preview: <Accordion data={host.data} onEvent={(event) => {
         onEvent(event)
-        setData((current) => reduceAccordionData(current, event))
+        host.dispatchEvent(event)
       }} />,
-      reset: () => setData(initialAccordionData),
+      reset: host.reset,
     }
   },
 }
