@@ -27,7 +27,7 @@ export const entry: PatternEntry = {
       key: 'grid',
       label: 'Grid',
       keyboardShortcuts: ['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End', 'Ctrl+Home', 'Ctrl+End', 'PageUp', 'PageDown', 'Enter', 'F2', 'Escape'],
-      sourceNames: ['Grid.tsx', 'gridData.ts', 'grid/definition.ts', ...KERNEL_SOURCES],
+      sourceNames: ['Grid.tsx', 'grid/useGridPattern.ts', 'gridData.ts', 'grid/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
       variants: <GridVariantMenu value={host.variant} onChange={host.selectVariant} />,
       preview: <Grid data={host.data} onEvent={(event) => {

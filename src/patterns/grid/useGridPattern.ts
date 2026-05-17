@@ -1,4 +1,4 @@
-import type { KeyboardEvent } from 'react'
+import type { InputHTMLAttributes, KeyboardEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
@@ -15,12 +15,7 @@ export interface ReactGridCell {
   editing: boolean
   sort: 'ascending' | 'descending' | 'other' | null
   cellProps: ReactPatternProps
-  editInputProps: ReactPatternProps & {
-    value: string
-    onChange(event: { currentTarget: { value: string } }): void
-    onKeyDown(event: KeyboardEvent<HTMLInputElement>): void
-    onBlur(): void
-  }
+  editInputProps: InputHTMLAttributes<HTMLInputElement> & { 'data-edit': string }
 }
 
 export interface ReactGridRow {
@@ -191,6 +186,6 @@ function createGridCell(input: {
         }
       },
       onBlur: input.commitEdit,
-    },
+    } as ReactGridCell['editInputProps'],
   }
 }

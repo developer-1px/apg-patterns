@@ -15,7 +15,7 @@ export const entry: PatternEntry = {
       key: 'treegrid',
       label: 'Treegrid',
       keyboardShortcuts: ['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End', 'PageUp', 'PageDown'],
-      sourceNames: ['Treegrid.tsx', 'treegridData.ts', 'treegrid/definition.ts', 'treegrid/navigation.ts', ...KERNEL_SOURCES],
+      sourceNames: ['Treegrid.tsx', 'treegrid/useTreegridPattern.ts', 'treegridData.ts', 'treegrid/definition.ts', 'treegrid/navigation.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
       preview: <Treegrid data={host.data} onEvent={(event) => {
         onEvent(event)
