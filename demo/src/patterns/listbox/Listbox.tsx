@@ -36,7 +36,7 @@ export function Listbox({
   }
 
   const containerClass = [
-    'grid max-w-sm gap-0.5 bg-white py-1 outline-none focus:outline focus:outline-2 focus:outline-zinc-400 dark:bg-zinc-950 dark:focus:outline-zinc-500',
+    'grid max-w-sm gap-0.5 rounded-xl bg-white/80 p-1 shadow-sm shadow-zinc-200/70 ring-1 ring-black/[0.03] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-zinc-400 dark:bg-white/[0.04] dark:shadow-black/20 dark:ring-white/[0.05] dark:focus-visible:outline-zinc-500',
     scrollable ? 'max-h-48 overflow-y-auto' : '',
   ]
     .filter(Boolean)
