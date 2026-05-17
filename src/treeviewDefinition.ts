@@ -1,0 +1,218 @@
+import { PatternDefinitionSchema } from './schema'
+import { defineNavigationTarget, defineVisibleOrder, resolveKeyToken } from './patternKernel'
+import { moveLinear, visibleTreeItems } from '@interactive-os/keyboard-navigation'
+
+// 패턴 무관 'linear' navigation target — kernel 에 있어도 되지만
+// 사용 시점(treeview/listbox)이 공유하는 첫 패턴이므로 여기서 등록.
+defineNavigationTarget('linear', (target, ctx) => {
+  const action = target.action as 'next' | 'previous' | 'first' | 'last'
+  return moveLinear(ctx.visibleKeys, ctx.activeKey, action)
+})
+
+// 트리 특화 — child / parent
+defineNavigationTarget('firstChild', (target, ctx) => {
+  const key = resolveKeyToken(target.key ?? '$activeKey', undefined, ctx.activeKey)
+  return ctx.data.relations?.childrenByKey?.[key]?.[0] ?? null
+})
+
+defineNavigationTarget('parentKey', (target, ctx) => {
+  const key = resolveKeyToken(target.key ?? '$activeKey', undefined, ctx.activeKey)
+  return ctx.parentByKey.get(key) ?? ctx.visibleKeys[0] ?? null
+})
+
+// 트리 특화 visibleOrder
+defineVisibleOrder('treeVisibleDepthFirst', (_v, data) => {
+  const expanded = new Set(data.state?.expandedKeys ?? [])
+  return visibleTreeItems({
+    roots: data.relations?.rootKeys ?? [],
+    children: (key) => data.relations?.childrenByKey?.[key] ?? [],
+    isExpanded: (key) => expanded.has(key),
+  })
+})
+
+const activeHasChildren = { kind: 'hasChildren', key: '$activeKey' } as const
+const activeIsExpanded = { kind: 'isExpanded', key: '$activeKey' } as const
+const itemIsDisabled = { kind: 'isDisabled', key: '$key' } as const
+const itemClickSelect = { kind: 'optionEquals', option: 'itemClickAction', value: 'select' } as const
+const itemClickToggleExpand = { kind: 'optionEquals', option: 'itemClickAction', value: 'toggleExpand' } as const
+const indicatorClickToggleExpand = { kind: 'optionEquals', option: 'indicatorClickAction', value: 'toggleExpand' } as const
+const activeClickSelect = { kind: 'optionEquals', option: 'itemClickAction', value: 'select' } as const
+const activeClickToggleExpand = { kind: 'optionEquals', option: 'itemClickAction', value: 'toggleExpand' } as const
+
+export const TreeviewPatternDefinitionSchema = PatternDefinitionSchema.superRefine((value, ctx) => {
+  const containedRoles = value.containedRoles ?? []
+  if (value.apgPattern !== 'treeview') ctx.addIssue({ code: 'custom', path: ['apgPattern'], message: 'expected "treeview"' })
+  if (value.rootRole !== 'tree') ctx.addIssue({ code: 'custom', path: ['rootRole'], message: 'expected "tree"' })
+  if (containedRoles.length !== 1 || containedRoles[0] !== 'treeitem') {
+    ctx.addIssue({ code: 'custom', path: ['containedRoles'], message: 'expected ["treeitem"]' })
+  }
+  if (!value.parts.tree) ctx.addIssue({ code: 'custom', path: ['parts', 'tree'], message: 'treeview requires parts.tree' })
+  if (!value.parts.treeitem) ctx.addIssue({ code: 'custom', path: ['parts', 'treeitem'], message: 'treeview requires parts.treeitem' })
+})
+
+export const treeviewPatternDefinition = TreeviewPatternDefinitionSchema.parse({
+  apgPattern: 'treeview',
+  rootRole: 'tree',
+  containedRoles: ['treeitem'],
+  focusModel: 'rovingTabIndex',
+  parts: {
+    tree: {
+      role: 'tree',
+      keySource: 'relations.rootKeys',
+      aria: [
+        { attribute: 'aria-label', from: 'refs.label' },
+        { attribute: 'aria-labelledby', from: 'refs.labelledBy' },
+        { attribute: 'aria-multiselectable', from: 'options.selectionMode.multiple' },
+        {
+          attribute: 'aria-activedescendant',
+          from: 'state.activeKey.elementId',
+          when: { kind: 'optionEquals', option: 'focusStrategy', value: 'ariaActiveDescendant' },
+        },
+      ],
+      focus: {
+        tabIndex: {
+          when: { kind: 'optionEquals', option: 'focusStrategy', value: 'ariaActiveDescendant' },
+          value: 0,
+        },
+      },
+    },
+    treeitem: {
+      role: 'treeitem',
+      keySource: 'collectionItemKey',
+      aria: [
+        { attribute: 'aria-label', from: 'items.label' },
+        { attribute: 'aria-labelledby', from: 'items.labelledBy' },
+        { attribute: 'aria-selected', from: 'state.selectedKeys' },
+        { attribute: 'aria-disabled', from: 'state.disabledKeys' },
+        { attribute: 'aria-expanded', from: 'state.expandedKeys', when: { kind: 'hasChildren', key: '$key' } },
+        { attribute: 'aria-checked', from: 'state.checkedByKey' },
+        { attribute: 'aria-level', from: 'state.levelByKey' },
+        { attribute: 'aria-posinset', from: 'state.posInSetByKey' },
+        { attribute: 'aria-setsize', from: 'state.setSizeByKey' },
+      ],
+      focus: {
+        tabIndex: {
+          when: { kind: 'optionEquals', option: 'focusStrategy', value: 'rovingTabIndex' },
+          active: 0,
+          inactive: -1,
+        },
+      },
+      state: [
+        { name: 'active', from: 'state.activeKey' },
+        { name: 'selected', from: 'state.selectedKeys' },
+        { name: 'disabled', from: 'state.disabledKeys' },
+        { name: 'expanded', from: 'state.expandedKeys' },
+        { name: 'checked', from: 'state.checkedByKey' },
+      ],
+      events: [
+        { event: 'focus', when: { kind: 'not', predicate: itemIsDisabled }, events: [{ type: 'focus', key: '$key' }] },
+        { event: 'click', when: { kind: 'not', predicate: itemIsDisabled }, events: [{ type: 'focus', key: '$key' }] },
+        {
+          event: 'click',
+          when: { kind: 'all', predicates: [{ kind: 'not', predicate: itemIsDisabled }, itemClickSelect] },
+          events: [{ type: 'select', key: '$key' }],
+        },
+        {
+          event: 'click',
+          when: { kind: 'all', predicates: [{ kind: 'not', predicate: itemIsDisabled }, { kind: 'hasChildren', key: '$key' }, itemClickToggleExpand] },
+          events: [{ type: 'expand', key: '$key' }],
+        },
+        {
+          event: 'focus',
+          when: { kind: 'all', predicates: [{ kind: 'not', predicate: itemIsDisabled }, { kind: 'optionEquals', option: 'followFocus', value: true }] },
+          events: [{ type: 'select', key: '$key' }],
+        },
+      ],
+    },
+    indicator: {
+      role: 'presentation',
+      keySource: 'collectionItemKey',
+      events: [
+        {
+          event: 'click',
+          when: { kind: 'all', predicates: [{ kind: 'not', predicate: itemIsDisabled }, { kind: 'hasChildren', key: '$key' }, indicatorClickToggleExpand] },
+          events: [
+            { type: 'focus', key: '$key' },
+            { type: 'expand', key: '$key' },
+          ],
+        },
+      ],
+    },
+  },
+  navigation: {
+    visibleOrder: { kind: 'treeVisibleDepthFirst' },
+    targets: {
+      next: { kind: 'linear', action: 'next' },
+      previous: { kind: 'linear', action: 'previous' },
+      first: { kind: 'linear', action: 'first' },
+      last: { kind: 'linear', action: 'last' },
+      child: { kind: 'firstChild', key: '$activeKey' },
+      parent: { kind: 'parentKey', key: '$activeKey' },
+    },
+  },
+  keyboard: [
+    { shortcut: 'ArrowDown', preventDefault: true, cases: [{ case: 'when', when: { kind: 'hasActiveKey' }, events: [{ type: 'navigate', direction: 'next' }] }] },
+    { shortcut: 'ArrowUp', preventDefault: true, cases: [{ case: 'when', when: { kind: 'hasActiveKey' }, events: [{ type: 'navigate', direction: 'previous' }] }] },
+    { shortcut: 'Home', preventDefault: true, cases: [{ case: 'always', events: [{ type: 'navigate', direction: 'first' }] }] },
+    { shortcut: 'End', preventDefault: true, cases: [{ case: 'always', events: [{ type: 'navigate', direction: 'last' }] }] },
+    {
+      shortcut: 'ArrowRight',
+      preventDefault: true,
+      cases: [
+        {
+          case: 'when',
+          when: { kind: 'all', predicates: [activeHasChildren, { kind: 'not', predicate: activeIsExpanded }] },
+          events: [{ type: 'expand', key: '$activeKey', expanded: true }],
+        },
+        {
+          case: 'when',
+          when: { kind: 'all', predicates: [activeHasChildren, activeIsExpanded] },
+          events: [{ type: 'navigate', direction: 'child' }],
+        },
+        { case: 'otherwise', events: [{ type: 'navigate', direction: 'next' }] },
+      ],
+    },
+    {
+      shortcut: 'ArrowLeft',
+      preventDefault: true,
+      cases: [
+        {
+          case: 'when',
+          when: { kind: 'all', predicates: [activeHasChildren, activeIsExpanded] },
+          events: [{ type: 'expand', key: '$activeKey', expanded: false }],
+        },
+        { case: 'otherwise', events: [{ type: 'navigate', direction: 'parent' }] },
+      ],
+    },
+    {
+      shortcut: 'Enter',
+      preventDefault: true,
+      cases: [
+        { case: 'when', when: { kind: 'all', predicates: [{ kind: 'hasActiveKey' }, activeClickSelect] }, events: [{ type: 'select', key: '$activeKey' }] },
+        {
+          case: 'when',
+          when: { kind: 'all', predicates: [{ kind: 'hasActiveKey' }, activeHasChildren, activeClickToggleExpand] },
+          events: [{ type: 'expand', key: '$activeKey' }],
+        },
+        { case: 'otherwise', events: [] },
+      ],
+    },
+    {
+      shortcut: 'Space',
+      preventDefault: true,
+      cases: [
+        { case: 'when', when: { kind: 'all', predicates: [{ kind: 'hasActiveKey' }, activeClickSelect] }, events: [{ type: 'select', key: '$activeKey' }] },
+        {
+          case: 'when',
+          when: { kind: 'all', predicates: [{ kind: 'hasActiveKey' }, activeHasChildren, activeClickToggleExpand] },
+          events: [{ type: 'expand', key: '$activeKey' }],
+        },
+        { case: 'otherwise', events: [] },
+      ],
+    },
+  ],
+})
+
+export const serializableTreeviewPatternDefinition = JSON.parse(
+  JSON.stringify(treeviewPatternDefinition),
+) as typeof treeviewPatternDefinition

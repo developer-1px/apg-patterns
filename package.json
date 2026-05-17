@@ -1,0 +1,64 @@
+{
+  "name": "@interactive-os/apg-treeview-contract",
+  "version": "0.0.0",
+  "description": "Zod-validated declarative APG treeview MVP contract.",
+  "keywords": [
+    "aria",
+    "wai-aria",
+    "apg",
+    "treeview",
+    "zod",
+    "a11y"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "demo": "vite --config vite.config.ts",
+    "test": "vitest run --config vitest.config.ts",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@interactive-os/keyboard": "file:../../../keyboard/packages/keyboard",
+    "@interactive-os/keyboard-navigation": "file:../../../keyboard-navigation/packages/keyboard-navigation",
+    "zod": "^4.3.6"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.3.2",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.2.3",
+    "autoprefixer": "^10.4.22",
+    "jsdom": "^29.1.1",
+    "postcss": "^8.5.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwindcss": "^3.4.18",
+    "tsup": "^8.5.1",
+    "typescript": "~6.0.3",
+    "vite": "^8.0.13",
+    "vitest": "^4.1.5"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
