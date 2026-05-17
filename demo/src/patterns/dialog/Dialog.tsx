@@ -11,7 +11,7 @@ const overlayClass =
 const panelClass =
   'fixed left-1/2 top-1/2 z-50 w-[28rem] max-w-[90vw] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white/95 p-5 text-sm text-zinc-800 shadow-[0_24px_80px_rgba(0,0,0,0.24)] ring-1 ring-black/[0.03] outline-none backdrop-blur dark:bg-zinc-950/95 dark:text-zinc-200 dark:ring-white/[0.05]'
 const inputClass =
-  'h-8 w-full rounded-lg bg-zinc-100/70 px-2.5 text-sm outline-none ring-1 ring-black/[0.03] transition focus:bg-white focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-zinc-400 dark:bg-white/[0.06] dark:ring-white/[0.04] dark:focus:bg-white/[0.08] dark:focus:outline-zinc-500'
+  'h-8 w-full rounded-lg bg-zinc-100/70 px-2.5 text-sm outline-none ring-1 ring-black/[0.03] transition focus:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.06] dark:ring-white/[0.04] dark:focus:bg-white/[0.08] dark:focus-visible:outline-zinc-500'
 const buttonClass =
   'inline-flex h-8 items-center rounded-xl bg-zinc-100/80 px-3 text-sm font-medium text-zinc-800 shadow-sm outline-none transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.06] dark:text-zinc-200 dark:hover:bg-white/[0.08] dark:focus-visible:outline-zinc-500'
 

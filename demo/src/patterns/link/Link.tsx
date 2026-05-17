@@ -1,7 +1,7 @@
 import { useLinkPattern, type PatternData, type PatternEvent } from '../../../../src'
 
 const linkClass =
-  'inline-flex items-center text-sm text-blue-700 underline outline-none hover:text-blue-900 focus:outline focus:outline-2 focus:outline-blue-400 dark:text-blue-300 dark:hover:text-blue-100'
+  'inline-flex items-center rounded-md text-sm text-blue-700 underline underline-offset-2 outline-none transition hover:text-blue-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 dark:text-blue-300 dark:hover:text-blue-100'
 
 export interface LinkProps {
   data: PatternData

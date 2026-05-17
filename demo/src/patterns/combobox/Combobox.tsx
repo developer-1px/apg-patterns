@@ -81,7 +81,7 @@ export function Combobox({
         onChange={(e) => editable && handleInput(e.currentTarget.value)}
         onKeyDown={handleKeyDown}
         onClick={() => !open && onEvent({ type: 'expand', key: COMBOBOX_KEY, expanded: true })}
-        className="h-9 w-full rounded-xl bg-white/80 px-3 text-sm text-zinc-900 shadow-sm outline-none ring-1 ring-black/[0.03] transition placeholder:text-zinc-400 focus:bg-white focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-zinc-400 dark:bg-white/[0.06] dark:text-zinc-100 dark:ring-white/[0.04] dark:focus:bg-white/[0.08] dark:focus:outline-zinc-500"
+        className="h-9 w-full rounded-xl bg-white/80 px-3 text-sm text-zinc-900 shadow-sm outline-none ring-1 ring-black/[0.03] transition placeholder:text-zinc-400 focus:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.06] dark:text-zinc-100 dark:ring-white/[0.04] dark:focus:bg-white/[0.08] dark:focus-visible:outline-zinc-500"
       />
       {open ? (
         <div
