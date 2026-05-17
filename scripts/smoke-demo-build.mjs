@@ -201,6 +201,7 @@ async function runSmoke() {
 
   await verifyTabsKeyboardEventLog()
   await verifySourceTabKeyboardNavigation()
+  await verifyPatternSwitchResetsStaleSource()
   await verifyInteractionEventLog()
   await verifyEventLogClear()
   await verifyLinkInteractionStaysInDemo()
@@ -359,6 +360,30 @@ async function verifySourceTabKeyboardNavigation() {
     })
   } catch {
     patternFailures.push(`source tab keyboard navigation did not update the selected source route: current ${window.location.hash}, selected=${sourceTabNames().join(',')}, text=${rootText().slice(0, 180)}`)
+  }
+}
+
+async function verifyPatternSwitchResetsStaleSource() {
+  window.location.hash = '#pattern=accordion&panel=code&source=accordionData.ts'
+  window.dispatchEvent(new dom.window.HashChangeEvent('hashchange'))
+
+  try {
+    await waitForPatternRoute({ pattern: 'accordion', panel: 'code', source: 'accordionData.ts', label: 'Accordion' })
+    const checkboxOption = await waitFor(() => findPatternOption('checkbox'))
+    checkboxOption.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
+
+    await waitFor(() => {
+      const sourceText = document.querySelector('pre')?.textContent ?? ''
+      return currentHashParam('pattern') === 'checkbox'
+        && currentHashParam('panel') === 'code'
+        && currentHashParam('source') === 'Checkbox.tsx'
+        && hasActiveDemoHeading('Checkbox')
+        && sourceFilenameIs('Checkbox.tsx')
+        && sourceText.includes('export function Checkbox')
+        && !sourceText.includes('missing source: accordionData.ts')
+    })
+  } catch {
+    patternFailures.push(`pattern switch did not reset stale source state: current ${window.location.hash}, text=${rootText().slice(0, 180)}`)
   }
 }
 
