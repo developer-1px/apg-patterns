@@ -124,7 +124,7 @@ async function runSmoke() {
     try {
       await waitFor(() => {
         const currentOption = findPatternOption(key)
-        const sourceText = document.querySelector('pre')?.textContent ?? ''
+        const sourceText = sourcePanelText()
         return hasActiveDemoHeading(label)
           && sourceText !== 'loading'
           && sourceText.length > 0
@@ -162,7 +162,7 @@ async function runSmoke() {
       try {
         const renderedSource = await waitFor(() => {
           const currentTab = findSourceTab(sourceName)
-          const sourceText = document.querySelector('pre')?.textContent ?? ''
+          const sourceText = sourcePanelText()
           const loaded = currentTab?.getAttribute('aria-selected') === 'true'
             && currentHashParam('source') === sourceName
             && sourceFilenameIs(sourceName)
@@ -349,7 +349,7 @@ async function verifySourceTabKeyboardNavigation() {
 
     await waitFor(() => {
       const selectedSourceName = sourceTabNames().find((sourceName) => findSourceTab(sourceName)?.getAttribute('aria-selected') === 'true')
-      const sourceText = document.querySelector('pre')?.textContent ?? ''
+      const sourceText = sourcePanelText()
       return selectedSourceName
         && selectedSourceName !== 'Accordion.tsx'
         && currentHashParam('pattern') === 'accordion'
@@ -432,7 +432,7 @@ async function verifyPatternSwitchResetsStaleSource() {
     checkboxOption.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
 
     await waitFor(() => {
-      const sourceText = document.querySelector('pre')?.textContent ?? ''
+      const sourceText = sourcePanelText()
       return currentHashParam('pattern') === 'checkbox'
         && currentHashParam('panel') === 'code'
         && currentHashParam('source') === 'Checkbox.tsx'
@@ -478,7 +478,7 @@ async function verifyCopyLoadedSource() {
     const copyButton = await waitFor(() => {
       const button = Array.from(document.querySelectorAll('button'))
         .find((candidate) => candidate.textContent?.trim() === 'copy')
-      const sourceText = document.querySelector('pre')?.textContent ?? ''
+      const sourceText = sourcePanelText()
       const ready = button
         && !button.disabled
         && sourceFilenameIs('Accordion.tsx')
@@ -604,6 +604,12 @@ function sourceTabNames() {
 function sourceFilenameIs(sourceName) {
   return Array.from(document.querySelectorAll('[title]'))
     .some((element) => element.getAttribute('title') === sourceName && element.textContent?.trim() === sourceName)
+}
+
+function sourcePanelText() {
+  return Array.from(document.querySelectorAll('[role="tabpanel"]'))
+    .find((panel) => panel.id.startsWith('tab-source-panel-'))
+    ?.textContent ?? ''
 }
 
 function findSourceTab(sourceName) {
