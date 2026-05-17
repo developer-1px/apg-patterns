@@ -6,6 +6,10 @@
 //   - All demo files in demo/src (*.tsx, *Data.ts, plus a few helpers)
 
 type SourceLoader = () => Promise<string>
+type SourceCollision = {
+  name: string
+  paths: readonly string[]
+}
 
 const rootModules = import.meta.glob('../../../src/*.ts', { query: '?raw', import: 'default' }) as Record<string, SourceLoader>
 const layerModules = import.meta.glob([
@@ -36,38 +40,47 @@ const demoDataModules = import.meta.glob([
 ], { query: '?raw', import: 'default' }) as Record<string, SourceLoader>
 
 const collected: Record<string, SourceLoader> = {}
+const collectedPaths = new Map<string, string[]>()
+
+function registerSource(name: string, path: string, load: SourceLoader) {
+  collected[name] = load
+  collectedPaths.set(name, [...(collectedPaths.get(name) ?? []), path])
+}
 
 // src root: keep filename only (e.g. index.ts)
 for (const [path, load] of Object.entries(rootModules)) {
   const name = path.split('/').pop()!
-  collected[name] = load
+  registerSource(name, path, load)
 }
 // schema/kernel/adapters: keep <folder>/<file>.ts to preserve concept map
 for (const [path, load] of Object.entries(layerModules)) {
   const parts = path.split('/')
   const file = parts.pop()!
   const dir = parts.pop()!
-  collected[`${dir}/${file}`] = load
+  registerSource(`${dir}/${file}`, path, load)
 }
 // patterns: keep <patternName>/<file>.ts
 for (const [path, load] of Object.entries(patternModules)) {
   const parts = path.split('/')
   const file = parts.pop()!
   const dir = parts.pop()!
-  collected[`${dir}/${file}`] = load
+  registerSource(`${dir}/${file}`, path, load)
 }
 // demo *.tsx
 for (const [path, load] of Object.entries(demoTsxModules)) {
   const name = path.split('/').pop()!
   if (name.endsWith('.test.tsx')) continue
-  collected[name] = load
+  registerSource(name, path, load)
 }
 // demo *.ts (data files and helpers)
 for (const [path, load] of Object.entries(demoDataModules)) {
   const name = path.split('/').pop()!
   if (name.endsWith('.test.ts')) continue
-  collected[name] = load
+  registerSource(name, path, load)
 }
 
 export const sourceLoaders: Readonly<Record<string, SourceLoader>> = collected
+export const sourceNameCollisions: readonly SourceCollision[] = Array.from(collectedPaths.entries())
+  .filter(([, paths]) => paths.length > 1)
+  .map(([name, paths]) => ({ name, paths }))
 export type SourceName = string

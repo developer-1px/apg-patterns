@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import { coerceRightMode, formatEvent, loadSourcePreview } from './App'
 import { App } from './App'
 import { patternEntries } from '../shared/demoPatterns'
-import { sourceLoaders } from '../shared/sources'
+import { sourceLoaders, sourceNameCollisions } from '../shared/sources'
 import type { PatternEvent } from '../../../src'
 
 describe('formatEvent', () => {
@@ -120,16 +120,29 @@ describe('demo source wiring', () => {
 
     expect(missingHookSources).toEqual([])
   })
+
+  it('does not expose source tabs backed by colliding collected filenames', () => {
+    const collidingSourceNames = new Set(sourceNameCollisions.map((collision) => collision.name))
+    const exposedCollisions: string[] = []
+
+    render(<DemoSourceProbe onCollidingSource={(sourceName) => exposedCollisions.push(sourceName)} collidingSourceNames={collidingSourceNames} />)
+
+    expect(exposedCollisions).toEqual([])
+  })
 })
 
 function DemoSourceProbe({
   onMissingSource,
   onMissingHookSource = () => undefined,
   onInvalidEntry = () => undefined,
+  onCollidingSource = () => undefined,
+  collidingSourceNames = new Set(),
 }: {
   onMissingSource?: (sourceName: string) => void
   onMissingHookSource?: (sourceName: string) => void
   onInvalidEntry?: (issue: string) => void
+  onCollidingSource?: (sourceName: string) => void
+  collidingSourceNames?: ReadonlySet<string>
 }) {
   return (
     <>
@@ -140,6 +153,8 @@ function DemoSourceProbe({
           onMissingSource={onMissingSource}
           onMissingHookSource={onMissingHookSource}
           onInvalidEntry={onInvalidEntry}
+          onCollidingSource={onCollidingSource}
+          collidingSourceNames={collidingSourceNames}
         />
       ))}
     </>
@@ -151,11 +166,15 @@ function DemoSourceProbeItem({
   onMissingSource,
   onMissingHookSource,
   onInvalidEntry,
+  onCollidingSource,
+  collidingSourceNames,
 }: {
   entry: (typeof patternEntries)[number]
   onMissingSource?: (sourceName: string) => void
   onMissingHookSource: (sourceName: string) => void
   onInvalidEntry: (issue: string) => void
+  onCollidingSource: (sourceName: string) => void
+  collidingSourceNames: ReadonlySet<string>
 }) {
   const demo = entry.useDemoPattern(() => undefined)
   if (demo.key !== entry.key) onInvalidEntry(`${entry.key}: demo key ${demo.key}`)
@@ -165,6 +184,7 @@ function DemoSourceProbeItem({
   if (demo.keyboardShortcuts.some((shortcut) => shortcut.trim().length === 0)) onInvalidEntry(`${entry.key}: empty keyboard shortcut`)
   for (const sourceName of demo.sourceNames) {
     if (!sourceLoaders[sourceName]) onMissingSource?.(`${entry.key}: ${sourceName}`)
+    if (collidingSourceNames.has(sourceName)) onCollidingSource(`${entry.key}: ${sourceName}`)
   }
   for (const sourceName of expectedHookSources(entry.key)) {
     if (!demo.sourceNames.includes(sourceName)) onMissingHookSource(`${entry.key}: ${sourceName}`)
