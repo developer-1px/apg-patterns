@@ -1,10 +1,10 @@
 import {
   createPatternRuntime,
-  reducePatternData,
   type CreatePatternRuntimeInput,
   type PatternRuntime,
   type SlotProps,
-} from '../../patternKernel'
+} from '../../patternRuntime'
+import { reducePatternData } from '../../patternReducer'
 import { PatternDataSchema, PatternEventSchema, PatternOptionsSchema, type Key, type PatternData, type PatternEvent, type PatternOptions } from '../../schema'
 import { tabsPatternDefinition } from './definition'
 

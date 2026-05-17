@@ -1,5 +1,8 @@
 export * from './schema'
 export * from './patternKernel'
+export * from './patternRuntime'
+export * from './patternReducer'
+import './kernelBuiltins'
 export * from './kernelVocabulary'
 export * from './patterns/listbox/definition'
 export * from './patterns/grid/definition'

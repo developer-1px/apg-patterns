@@ -13,13 +13,12 @@ import {
 import { treeviewPatternDefinition } from './definition'
 import {
   createParentByKey,
-  createPatternRuntime,
-  type CreatePatternRuntimeInput,
   evaluatePredicate,
   resolveEventTemplate,
   dispatchNavigationTarget,
   resolveVisibleOrder,
 } from '../../patternKernel'
+import { createPatternRuntime, type CreatePatternRuntimeInput } from '../../patternRuntime'
 
 export type TreeviewSlotProps = Record<string, unknown>
 export type TreeviewRenderState = Record<'active' | 'selected' | 'disabled' | 'expanded', boolean> & {
