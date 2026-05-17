@@ -422,6 +422,25 @@ describe('demo source wiring', () => {
     expect(source).toContain('export function Tree')
   })
 
+  it('opens each pattern on a real demo component source by default', async () => {
+    const defaultSources: string[] = []
+    const invalidDefaultSources: string[] = []
+
+    render(<DemoSourceProbe onDefaultSource={(issue) => defaultSources.push(issue)} />)
+
+    await Promise.all(defaultSources.map(async (defaultSource) => {
+      const [patternKey, sourceName] = defaultSource.split(': ')
+      const componentName = sourceName?.replace(/\.tsx$/, '')
+      const source = sourceName ? await sourceLoaders[sourceName]?.() : undefined
+
+      if (!sourceName?.endsWith('.tsx') || !source?.includes(`export function ${componentName}`)) {
+        invalidDefaultSources.push(`${patternKey}: ${sourceName ?? 'none'}`)
+      }
+    }))
+
+    expect(invalidDefaultSources).toEqual([])
+  })
+
   it('connects every pattern source tab to a collected source file', () => {
     const missingSources: string[] = []
 
@@ -501,6 +520,7 @@ function DemoSourceProbe({
   onInvalidEntry = () => undefined,
   onCollidingSource = () => undefined,
   onSourceName = () => undefined,
+  onDefaultSource = () => undefined,
   collidingSourceNames = new Set(),
 }: {
   onMissingSource?: (sourceName: string) => void
@@ -508,6 +528,7 @@ function DemoSourceProbe({
   onInvalidEntry?: (issue: string) => void
   onCollidingSource?: (sourceName: string) => void
   onSourceName?: (sourceName: string) => void
+  onDefaultSource?: (sourceName: string) => void
   collidingSourceNames?: ReadonlySet<string>
 }) {
   return (
@@ -521,6 +542,7 @@ function DemoSourceProbe({
           onInvalidEntry={onInvalidEntry}
           onCollidingSource={onCollidingSource}
           onSourceName={onSourceName}
+          onDefaultSource={onDefaultSource}
           collidingSourceNames={collidingSourceNames}
         />
       ))}
@@ -547,6 +569,7 @@ function DemoSourceProbeItem({
   onInvalidEntry,
   onCollidingSource,
   onSourceName,
+  onDefaultSource,
   collidingSourceNames,
 }: {
   entry: (typeof patternEntries)[number]
@@ -555,12 +578,14 @@ function DemoSourceProbeItem({
   onInvalidEntry: (issue: string) => void
   onCollidingSource: (sourceName: string) => void
   onSourceName: (sourceName: string) => void
+  onDefaultSource: (sourceName: string) => void
   collidingSourceNames: ReadonlySet<string>
 }) {
   const demo = entry.useDemoPattern(() => undefined)
   if (demo.key !== entry.key) onInvalidEntry(`${entry.key}: demo key ${demo.key}`)
   if (demo.label !== entry.label) onInvalidEntry(`${entry.key}: demo label ${demo.label}`)
   if (demo.sourceNames.length === 0) onInvalidEntry(`${entry.key}: no source tabs`)
+  onDefaultSource(`${entry.key}: ${demo.sourceNames[0] ?? 'none'}`)
   if (entry.key === defaultPatternKey && !demo.sourceNames.includes(defaultSourceName)) onInvalidEntry(`${entry.key}: missing default source ${defaultSourceName}`)
   if (duplicates([...demo.sourceNames]).length > 0) onInvalidEntry(`${entry.key}: duplicate source tabs`)
   if (demo.keyboardShortcuts.some((shortcut) => shortcut.trim().length === 0)) onInvalidEntry(`${entry.key}: empty keyboard shortcut`)
