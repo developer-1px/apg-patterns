@@ -38,7 +38,9 @@ export function useDemoPattern(patternKey: PatternKey, onEvent: (event: PatternE
 }
 
 function getPatternEntry(patternKey: PatternKey): PatternEntry {
-  return patternEntries.find((entry) => entry.key === patternKey) ?? patternEntries[0]
+  const entry = patternEntries.find((entry) => entry.key === patternKey)
+  if (!entry) throw new Error(`[demoPatterns] unknown pattern key: ${patternKey}`)
+  return entry
 }
 
 export function validatePatternEntries(

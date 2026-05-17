@@ -3,7 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { act } from 'react'
 import { coerceRightMode, formatEvent, isCopyableSource, loadSourcePreview } from './App'
 import { App } from './App'
-import { defaultPatternKey, defaultSourceName, patternEntries, validatePatternEntries } from '../shared/demoPatterns'
+import { defaultPatternKey, defaultSourceName, patternEntries, useDemoPattern, validatePatternEntries } from '../shared/demoPatterns'
 import { sourceLoaders, sourceNameCollisions } from '../shared/sources'
 import type { PatternEvent } from '../../../src'
 
@@ -319,6 +319,10 @@ describe('demo pattern registry', () => {
     render(<DemoSourceProbe onInvalidEntry={(issue) => invalidEntries.push(issue)} />)
 
     expect(invalidEntries).toEqual([])
+  })
+
+  it('fails fast instead of falling back when internal code requests an unknown pattern', () => {
+    expect(() => useDemoPattern('__missing__', () => undefined)).toThrow('[demoPatterns] unknown pattern key: __missing__')
   })
 })
 
