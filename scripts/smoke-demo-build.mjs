@@ -1,13 +1,14 @@
 import { access, readFile, readdir } from 'node:fs/promises'
 import { JSDOM } from 'jsdom'
-import ts from 'typescript'
+import { readDemoEntryKeyboardShortcuts } from './demo-smoke/readDemoEntryKeyboardShortcuts.mjs'
+import { sourceIdentityNeedles } from './demo-smoke/sourceIdentity.mjs'
 
 const demoUrl = 'http://127.0.0.1/#pattern=tabs&panel=code&source=Tabs.tsx'
 const distDir = new URL('../demo/dist/', import.meta.url)
 const assetsDir = new URL('../demo/dist/assets/', import.meta.url)
 const demoPatternsDir = new URL('../demo/src/patterns/', import.meta.url)
 const entryFile = (await readdir(assetsDir)).find((file) => /^index-.*\.js$/.test(file))
-const expectedKeyboardShortcutsByPattern = await readDemoEntryKeyboardShortcuts()
+const expectedKeyboardShortcutsByPattern = await readDemoEntryKeyboardShortcuts(demoPatternsDir)
 
 if (!entryFile) throw new Error('demo build smoke failed: missing built entry chunk')
 
@@ -856,45 +857,6 @@ function hasSourceLoadFailure(text) {
   return text.includes('missing source:') || text.includes('failed source:')
 }
 
-function sourceIdentityNeedles(sourceName, patternKey) {
-  const entrySource = sourceName.match(/^([^/]+)\/entry\.tsx$/)
-  if (entrySource) {
-    const [, sourcePatternKey] = entrySource
-    return sourcePatternKey === (patternKey === 'menuAndMenubar' ? 'menu' : patternKey)
-      ? ['export const entry']
-      : [patternKey]
-  }
-
-  if (sourceName.endsWith('.tsx')) {
-    const componentName = sourceName.replace(/\.tsx$/, '')
-    return [`export function ${componentName}`]
-  }
-  if (sourceName.endsWith('Data.ts')) {
-    return []
-  }
-
-  const patternSource = sourceName.match(/^([^/]+)\/(.+)\.ts$/)
-  if (patternSource) {
-    const [, sourcePatternKey, fileName] = patternSource
-    if (fileName === 'definition') {
-      if (sourcePatternKey === 'menu') return ["apgPattern: 'menubar'"]
-      return [`apgPattern: '${sourcePatternKey}'`]
-    }
-    if (/^use[A-Z].*Pattern$/.test(fileName)) return [`export function ${fileName}`]
-    if (fileName === 'runtime') return []
-    if (fileName === 'navigation') return []
-  }
-
-  if (sourceName === 'kernel/patternRuntime.ts') return ['createPatternRuntime']
-  if (sourceName === 'kernel/patternReducer.ts') return ['reducePatternData']
-  if (sourceName === 'kernel/patternKernel.ts') return ['defineAriaSource']
-  if (sourceName === 'schema/index.ts') return ["export * from './patternDefinition'"]
-  if (sourceName === 'treeContract.ts') return ['initialData']
-  if (sourceName === 'treeVariants.ts') return ['treeVariants']
-
-  return [patternKey]
-}
-
 function expectedEntrySourceName(patternKey) {
   return `${patternKey === 'menuAndMenubar' ? 'menu' : patternKey}/entry.tsx`
 }
@@ -1072,53 +1034,4 @@ async function verifyDistIndexAssets() {
   if (missingAssets.length > 0) {
     throw new Error(`demo build smoke failed: index.html references missing assets: ${missingAssets.join(', ')}`)
   }
-}
-
-async function readDemoEntryKeyboardShortcuts() {
-  const entries = new Map()
-  const patternDirs = await readdir(demoPatternsDir, { withFileTypes: true })
-
-  for (const patternDir of patternDirs) {
-    if (!patternDir.isDirectory()) continue
-    const entryUrl = new URL(`${patternDir.name}/entry.tsx`, demoPatternsDir)
-    let source
-    try {
-      source = await readFile(entryUrl, 'utf8')
-    } catch {
-      continue
-    }
-
-    const sourceFile = ts.createSourceFile(entryUrl.pathname, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
-    const metadata = extractDemoEntryMetadata(sourceFile)
-    if (metadata.key && metadata.keyboardShortcuts) entries.set(metadata.key, metadata.keyboardShortcuts)
-  }
-
-  return entries
-}
-
-function extractDemoEntryMetadata(sourceFile) {
-  const metadata = { key: null, keyboardShortcuts: null }
-
-  function visit(node) {
-    if (ts.isPropertyAssignment(node)) {
-      const name = propertyNameText(node.name)
-      if (name === 'key' && ts.isStringLiteralLike(node.initializer)) {
-        metadata.key = node.initializer.text
-      }
-      if (name === 'keyboardShortcuts' && ts.isArrayLiteralExpression(node.initializer)) {
-        metadata.keyboardShortcuts = node.initializer.elements.map((element) => (
-          ts.isStringLiteralLike(element) ? element.text : null
-        ))
-      }
-    }
-    ts.forEachChild(node, visit)
-  }
-
-  visit(sourceFile)
-  return metadata
-}
-
-function propertyNameText(name) {
-  if (ts.isIdentifier(name) || ts.isStringLiteralLike(name)) return name.text
-  return null
 }
