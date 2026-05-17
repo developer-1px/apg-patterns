@@ -1,4 +1,4 @@
-import { useMemo, useReducer, useState } from 'react'
+import { useEffect, useMemo, useReducer, useState } from 'react'
 import { reducePatternData, reduceTabsData, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
 import { initialData, reduceData, resolveTarget } from './demoData'
 import { Grid } from './Grid'
@@ -11,7 +11,7 @@ import { PatternMenu } from './PatternMenu'
 import { patternItems, type PatternKey } from './patterns'
 import { Slider } from './Slider'
 import { initialSliderData, reduceSliderData, sliderOptions } from './sliderData'
-import { sources } from './sources'
+import { getSourceNames, sources, type SourceName } from './sources'
 import { SourceTabs, useSourceTabs } from './SourceTabs'
 import { Tabs } from './Tabs'
 import { initialTabsData } from './tabsData'
@@ -41,7 +41,7 @@ export function App() {
   const [followFocus, setFollowFocus] = useState(false)
   const [focusStrategy, setFocusStrategy] = useState<'rovingTabIndex' | 'ariaActiveDescendant'>('rovingTabIndex')
   const [itemClickAction, setItemClickAction] = useState<'select' | 'toggleExpand' | 'none'>('select')
-  const [sourceName, setSourceName] = useState<keyof typeof sources>('Tree React')
+  const [sourceName, setSourceName] = useState<SourceName>('Tree.tsx')
   const [inspectMode, setInspectMode] = useState<'aria' | 'html'>('aria')
   const [rightMode, setRightMode] = useState<'source' | 'inspect' | 'log'>('source')
 
@@ -92,9 +92,14 @@ export function App() {
     setGridData(gridVariants[variant].data)
   }
 
-  const source = sources[sourceName]
-  const sourceNames = Object.keys(sources) as (keyof typeof sources)[]
-  const sourceTabs = useSourceTabs({ label: 'source files', tabs: sourceNames, value: sourceName, onChange: setSourceName })
+  const sourceNames = useMemo(() => getSourceNames(patternKey), [patternKey])
+  const activeSourceName = sourceNames.includes(sourceName) ? sourceName : sourceNames[0]
+  const source = sources[activeSourceName]
+  const sourceTabs = useSourceTabs({ label: 'source files', tabs: sourceNames, value: activeSourceName, onChange: setSourceName })
+
+  useEffect(() => {
+    if (!sourceNames.includes(sourceName)) setSourceName(sourceNames[0])
+  }, [sourceName, sourceNames])
   const treeInspectText = inspectMode === 'aria' ? renderAriaTree(data, options) : renderHtmlTree(data, options)
   const activePatternLabel = patternItems.find((item) => item.key === patternKey)?.label ?? patternKey
   const activeInspectText =
