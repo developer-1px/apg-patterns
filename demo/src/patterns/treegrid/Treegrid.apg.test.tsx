@@ -425,8 +425,10 @@ describe('APG §Keyboard — PageUp', () => {
     fireEvent.keyDown(grid, { key: 'End', ctrlKey: true })
     const before = activeCellKey()
     fireEvent.keyDown(grid, { key: 'PageUp' })
-    expect(activeCellKey()).not.toBe(before)
-    expect(activeCellKey()?.endsWith(':modified')).toBe(true)
+    const after = activeCellKey()
+    expect(after).not.toBe(before)
+    // Same column (last column) — either `<row>:modified` or `h-modified`.
+    expect(after === 'h-modified' || after?.endsWith(':modified')).toBe(true)
   })
 
   it('does not move if already at first row', () => {

@@ -39,7 +39,7 @@ export type VisibleOrderKind = z.infer<typeof VisibleOrderKindSchema>
 
 export const NavigationTargetKindSchema = z.enum([
   'linear', 'linearWrap', 'firstChild', 'gridCell', 'gridPage', 'optionLinear',
-  'parentKey', 'tabsLinear', 'treegridCell', 'treegridParentRowFirstCell',
+  'parentKey', 'tabsLinear', 'treegridCell', 'treegridPage', 'treegridParentRowFirstCell',
 ])
 export type NavigationTargetKind = z.infer<typeof NavigationTargetKindSchema>
 

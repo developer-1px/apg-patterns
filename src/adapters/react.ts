@@ -80,7 +80,7 @@ function shouldRunEffect({
     const activeKey = data.state?.activeKey
     const reason = data.state?.lastEventReason
     if (!activeKey || !reason || !effect.on.reasons.some((item) => item === reason)) return false
-    return effect.scope?.kind !== 'focusWithin' || containsActiveElement(effect.target, data, keyToElementId, definition.rootRole)
+    return effect.scope?.kind !== 'focusWithin' || reason === 'keyboard' || reason === 'typeahead' || containsActiveElement(effect.target, data, keyToElementId, definition.rootRole)
   }
   return previousMatches !== undefined && previousMatches !== matches
 }

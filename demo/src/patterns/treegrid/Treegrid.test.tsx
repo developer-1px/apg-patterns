@@ -68,6 +68,8 @@ describe('Treegrid demo', () => {
     fireEvent.keyDown(grid, { key: 'ArrowRight' })
     expect(rowOf('docs')!.getAttribute('aria-expanded')).toBe('true')
     expect(cellOf('readme.md:name')).toBeTruthy()
+    expect(cellOf(treegridFirstCell('docs')).hasAttribute('data-active')).toBe(true)
+    expect(document.activeElement).toBe(cellOf(treegridFirstCell('docs')))
   })
 
   it('ArrowLeft on first cell of expanded row collapses it', () => {
