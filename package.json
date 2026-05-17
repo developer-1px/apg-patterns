@@ -13,10 +13,10 @@
   "license": "MIT",
   "type": "module",
   "sideEffects": [
-    "./src/kernelBuiltins.ts",
+    "./src/kernel/kernelBuiltins.ts",
     "./src/patterns/*/definition.ts",
     "./src/patterns/*/navigation.ts",
-    "./dist/kernelBuiltins.*",
+    "./dist/kernel/kernelBuiltins.*",
     "./dist/patterns/*/definition.*",
     "./dist/patterns/*/navigation.*"
   ],
