@@ -11,7 +11,7 @@ export const entry: PatternEntry = {
       key: 'breadcrumb',
       label: 'Breadcrumb',
       keyboardShortcuts: ['Tab', 'Enter'],
-      sourceNames: ['Breadcrumb.tsx', 'breadcrumbData.ts', 'breadcrumb/definition.ts', ...KERNEL_SOURCES],
+      sourceNames: ['Breadcrumb.tsx', 'breadcrumb/useBreadcrumbPattern.ts', 'breadcrumbData.ts', 'breadcrumb/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(initialBreadcrumbData),
       preview: <Breadcrumb data={initialBreadcrumbData} onEvent={onEvent} />,
     }

@@ -21,7 +21,7 @@ export const breadcrumbDefinition = BreadcrumbDefinitionSchema.parse({
     root: {
       role: 'navigation',
       aria: [
-        { attribute: 'aria-label', from: 'options.label' },
+        { attribute: 'aria-label', from: 'refs.label' },
       ],
     },
     list: {
@@ -30,8 +30,7 @@ export const breadcrumbDefinition = BreadcrumbDefinitionSchema.parse({
     crumb: {
       role: 'link',
       aria: [
-        { attribute: 'aria-current', from: 'state.currentKey' },
-        { attribute: 'href', from: 'items.href' },
+        { attribute: 'aria-current', from: 'state.currentByKey' },
       ],
     },
   },

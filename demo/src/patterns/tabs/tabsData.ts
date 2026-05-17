@@ -31,9 +31,9 @@ const buildTabsData = (tabs: readonly TabSpec[], activeKey: string, label = 'Sec
 }
 
 const docsTabs: readonly TabSpec[] = [
-  { key: 'overview', label: 'Overview', panelLabel: 'Overview panel', content: 'High-level summary of the pattern, including authoring practices and ARIA structure.' },
-  { key: 'code', label: 'Code', panelLabel: 'Code panel', content: 'Reference implementation snippets and integration tips.' },
-  { key: 'audit', label: 'Audit', panelLabel: 'Audit panel', content: 'Accessibility audit results and known issues.' },
+  { key: 'overview', label: 'Overview', panelLabel: 'Overview panel', content: 'Pattern status, owner notes, and the current implementation scope.' },
+  { key: 'code', label: 'Code', panelLabel: 'Code panel', content: 'Tracked source files and integration checkpoints for this pattern.' },
+  { key: 'audit', label: 'Audit', panelLabel: 'Audit panel', content: 'Recent accessibility findings, open risks, and verification status.' },
 ]
 
 const planetsTabs: readonly TabSpec[] = [

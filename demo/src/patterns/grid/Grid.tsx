@@ -13,7 +13,7 @@ export function Grid({
   return (
     <div
       {...grid.gridProps}
-      className="inline-grid overflow-hidden rounded-xl bg-white/80 text-sm text-zinc-800 shadow-sm shadow-zinc-200/70 ring-1 ring-black/[0.03] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-zinc-400 dark:bg-white/[0.04] dark:text-zinc-300 dark:shadow-black/20 dark:ring-white/[0.05] dark:focus-visible:outline-zinc-500"
+      className="inline-grid overflow-hidden rounded-xl bg-white/82 text-sm text-zinc-800 shadow-[0_12px_32px_rgba(24,24,27,0.06)] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-zinc-400 dark:bg-white/[0.045] dark:text-zinc-300 dark:shadow-black/20 dark:focus-visible:outline-zinc-500"
       style={{ gridTemplateColumns: `repeat(${grid.columnCount}, minmax(120px, 1fr))` }}
     >
       {grid.rows.map((row) => (
@@ -40,7 +40,7 @@ function GridCell({ cell }: { cell: ReactGridCell }) {
       {cell.editing ? (
         <input
           {...cell.editInputProps}
-          className="w-full rounded-md bg-white/80 px-1 outline-none ring-1 ring-black/10 dark:bg-white/[0.06] dark:ring-white/10"
+          className="w-full rounded-md bg-white/85 px-1 shadow-inner shadow-zinc-200/60 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-zinc-400 dark:bg-white/[0.07] dark:shadow-black/20 dark:focus-visible:outline-zinc-500"
         />
       ) : (
         <>{cell.value}{sortIcon ? <Icon name={sortIcon} className="ml-1 text-xs text-zinc-500" /> : null}</>

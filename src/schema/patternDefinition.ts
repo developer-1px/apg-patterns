@@ -59,7 +59,7 @@ export const AriaSourcePathSchema = z.enum([
   'refs.label', 'refs.labelledBy',
   'relations.controlsByKey', 'relations.ownerByKey',
   'state.activeKey', 'state.activeKey.elementId', 'state.checkedByKey',
-  'state.colCount', 'state.columnIndexByKey', 'state.currentKey',
+  'state.colCount', 'state.columnIndexByKey', 'state.currentByKey',
   'state.disabledKeys', 'state.expandedKeys', 'state.inactiveKey',
   'state.levelByKey', 'state.multiselectable', 'state.posInSetByKey',
   'state.pressedByKey', 'state.readonly', 'state.rowCount',

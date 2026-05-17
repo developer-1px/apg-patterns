@@ -102,6 +102,7 @@ function DemoSourceProbeItem({
   entry,
   onMissingSource,
   onMissingHookSource,
+  onInvalidEntry,
 }: {
   entry: (typeof patternEntries)[number]
   onMissingSource?: (sourceName: string) => void
