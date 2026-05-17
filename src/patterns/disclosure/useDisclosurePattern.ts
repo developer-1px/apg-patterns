@@ -1,6 +1,6 @@
 import type { KeyboardEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
+import type { Key, PatternDataWithOptions, PatternEvent, PatternOptions } from '../../schema'
 import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { disclosureDefinition } from './definition'
 
@@ -29,8 +29,8 @@ export interface ReactDisclosureRuntime {
   keyToElementId(key: Key): string
 }
 
-export function useDisclosurePattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactDisclosureRuntime {
-  const runtimeOptions = options ?? (((data.state as { options?: PatternOptions } | undefined)?.options ?? {}) as PatternOptions)
+export function useDisclosurePattern(data: PatternDataWithOptions, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactDisclosureRuntime {
+  const runtimeOptions = options ?? data.state?.options ?? {}
   const runtime = createPatternRuntime({
     definition: disclosureDefinition,
     data,

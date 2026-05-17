@@ -1,6 +1,6 @@
 import type { MouseEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
+import type { Key, PatternDataWithOptions, PatternEvent, PatternOptions } from '../../schema'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { breadcrumbDefinition } from './definition'
 
@@ -21,10 +21,10 @@ export interface ReactBreadcrumbRuntime {
   keyToElementId(key: Key): string
 }
 
-export function useBreadcrumbPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactBreadcrumbRuntime {
+export function useBreadcrumbPattern(data: PatternDataWithOptions, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactBreadcrumbRuntime {
   const runtimeOptions = {
     label: data.refs?.label,
-    ...(options ?? ((data.state as { options?: PatternOptions } | undefined)?.options ?? {})),
+    ...(options ?? data.state?.options ?? {}),
   } satisfies PatternOptions
   const runtime = createPatternRuntime({
     definition: breadcrumbDefinition,

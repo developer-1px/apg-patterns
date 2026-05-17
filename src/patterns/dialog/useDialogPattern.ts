@@ -2,7 +2,7 @@ import type { KeyboardEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import { handlePatternTrapFocus } from '../../adapters/reactPatternEffects'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
-import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
+import type { Key, PatternDataWithOptions, PatternEvent, PatternOptions } from '../../schema'
 import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { dialogDefinition } from './definition'
 
@@ -22,8 +22,8 @@ export interface ReactDialogRuntime {
   keyToElementId(key: Key): string
 }
 
-export function useDialogPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactDialogRuntime {
-  const runtimeOptions = options ?? (((data.state as { options?: PatternOptions } | undefined)?.options ?? {}) as PatternOptions)
+export function useDialogPattern(data: PatternDataWithOptions, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactDialogRuntime {
+  const runtimeOptions = options ?? data.state?.options ?? {}
   const keyToElementId = (key: Key) => key === 'dialog' ? 'dialog-panel' : `${runtimeOptions.elementIdPrefix ?? 'dialog-'}${key}`
   const runtime = createPatternRuntime({ definition: dialogDefinition, data, options: runtimeOptions, onEvent, keyToElementId })
   const rootKeyDown = runtime.getRootKeyboardHandler()

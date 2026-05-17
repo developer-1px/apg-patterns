@@ -1,6 +1,6 @@
 import type { KeyboardEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternData, PatternEvent, PatternOptions, PatternValueStepDirection } from '../../schema'
+import type { Key, PatternDataWithOptions, PatternEvent, PatternOptions, PatternValueStepDirection } from '../../schema'
 import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { windowsplitterDefinition } from './definition'
 
@@ -26,8 +26,8 @@ export interface ReactWindowSplitterRuntime {
   keyToElementId(key: Key): string
 }
 
-export function useWindowSplitterPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactWindowSplitterRuntime {
-  const runtimeOptions = options ?? (((data.state as { options?: PatternOptions } | undefined)?.options ?? {}) as PatternOptions)
+export function useWindowSplitterPattern(data: PatternDataWithOptions, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactWindowSplitterRuntime {
+  const runtimeOptions = options ?? data.state?.options ?? {}
   const runtime = createPatternRuntime({
     definition: windowsplitterDefinition,
     data,

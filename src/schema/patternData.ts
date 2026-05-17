@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { JsonValueSchema, validateJsonExtensionFields } from './jsonValue'
 import { validatePatternDataRefs } from './patternDataValidation'
+import type { PatternOptions } from './patternOptions'
 
 export const KeySchema = z.string().min(1)
 export type Key = z.infer<typeof KeySchema>
@@ -134,3 +135,9 @@ export type PatternData<
   items: Record<Key, TItem>
   state?: TState
 }
+
+export type PatternStateWithOptions = PatternState & {
+  options?: PatternOptions
+}
+
+export type PatternDataWithOptions<TItem extends PatternItem = PatternItem> = PatternData<TItem, PatternStateWithOptions>

@@ -1,7 +1,7 @@
 import type { KeyboardEvent, MouseEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import { handlePatternTrapFocus, usePatternEffects } from '../../adapters/reactPatternEffects'
-import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
+import type { Key, PatternDataWithOptions, PatternEvent, PatternOptions } from '../../schema'
 import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { alertDialogDefinition } from './definition'
 
@@ -19,8 +19,8 @@ export interface ReactAlertDialogRuntime {
   keyToElementId(key: Key): string
 }
 
-export function useAlertDialogPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactAlertDialogRuntime {
-  const runtimeOptions = options ?? (((data.state as { options?: PatternOptions } | undefined)?.options ?? {}) as PatternOptions)
+export function useAlertDialogPattern(data: PatternDataWithOptions, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactAlertDialogRuntime {
+  const runtimeOptions = options ?? data.state?.options ?? {}
   const keyToElementId = (key: Key) => `${runtimeOptions.elementIdPrefix ?? 'alertdialog-'}${key}`
   const runtime = createPatternRuntime({ definition: alertDialogDefinition, data, options: runtimeOptions, onEvent, keyToElementId })
   const rootKeyDown = runtime.getRootKeyboardHandler()

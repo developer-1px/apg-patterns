@@ -77,7 +77,7 @@ const computeDelta = (direction: unknown, step: number, large: number): number =
   return 0
 }
 
-const itemRange = (data: PatternData, key: Key, fallbackMin: number, fallbackMax: number): [number, number] => {
+const itemRange = (data: SpinbuttonDemoData, key: Key, fallbackMin: number, fallbackMax: number): [number, number] => {
   const item = data.items[key]
   return [item?.valuemin ?? fallbackMin, item?.valuemax ?? fallbackMax]
 }
