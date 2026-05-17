@@ -203,6 +203,7 @@ async function runSmoke() {
   await verifyInteractionEventLog()
   await verifyEventLogClear()
   await verifyLinkInteractionStaysInDemo()
+  await verifyTreeviewInspectControls()
   await verifyCopyLoadedSource()
 
   await verifyHashRoute('#pattern=accordion&panel=off&source=Accordion.tsx', (text) =>
@@ -366,6 +367,45 @@ async function verifyCopyLoadedSource() {
     })
   } catch {
     patternFailures.push(`source copy did not write the loaded Accordion source: writes=${clipboardWrites.length}, text=${rootText().slice(0, 180)}`)
+  }
+}
+
+async function verifyTreeviewInspectControls() {
+  window.location.hash = '#pattern=treeview&panel=state&source=Tree.tsx'
+  window.dispatchEvent(new dom.window.HashChangeEvent('hashchange'))
+
+  try {
+    const inspectModeSelect = await waitFor(() => {
+      const select = Array.from(document.querySelectorAll('select'))
+        .find((candidate) => Array.from(candidate.options).some((option) => option.value === 'html'))
+      const inspectText = document.querySelector('pre')?.textContent ?? ''
+      const ready = select
+        && currentHashParam('pattern') === 'treeview'
+        && currentHashParam('panel') === 'state'
+        && hasActiveDemoHeading('Treeview')
+        && findRightPanelTab('state')?.getAttribute('aria-selected') === 'true'
+        && inspectText.includes('treeitem')
+        && !inspectText.includes('<div role="tree"')
+      return ready ? select : false
+    })
+
+    inspectModeSelect.value = 'html'
+    inspectModeSelect.dispatchEvent(new dom.window.Event('change', { bubbles: true }))
+
+    await waitFor(() => {
+      const inspectText = document.querySelector('pre')?.textContent ?? ''
+      return inspectModeSelect.value === 'html'
+        && inspectText.includes('<div role="tree"')
+        && inspectText.includes('<button aria-label="toggle')
+        && currentHashParam('pattern') === 'treeview'
+        && currentHashParam('panel') === 'state'
+    })
+  } catch {
+    const inspectText = document.querySelector('pre')?.textContent ?? ''
+    const selectValues = Array.from(document.querySelectorAll('select'), (select) =>
+      Array.from(select.options, (option) => option.value).join('/'),
+    ).join(', ')
+    patternFailures.push(`treeview inspect controls did not switch rendered state output: selects=${selectValues}, text=${inspectText.slice(0, 180)}`)
   }
 }
 
