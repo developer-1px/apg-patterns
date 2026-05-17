@@ -205,7 +205,6 @@ function resolveTransitionValue(value: TransitionValue, event: PatternEvent, dat
   if (value.from === '$event.checked') return 'checked' in event ? event.checked : null
   if (value.from === '$event.pressed') return 'pressed' in event ? event.pressed : null
   if (value.from === '$event.value') return 'value' in event ? event.value : null
-  if (value.from === '$event.payload.value') return 'payload' in event ? event.payload?.value ?? null : null
   return null
 }
 

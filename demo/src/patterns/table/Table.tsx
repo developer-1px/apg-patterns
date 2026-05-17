@@ -24,7 +24,7 @@ export function Table({
         if (data.items[key]?.kind === 'columnheader') {
           const current = sortByKey[key]
           const next: 'ascending' | 'descending' | 'other' = current === 'ascending' ? 'descending' : 'ascending'
-          onEvent({ type: 'extension', name: 'tableSort', key, payload: { sort: next } })
+          onEvent({ type: 'sort', key, sort: next })
           return
         }
       }

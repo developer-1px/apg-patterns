@@ -41,7 +41,7 @@ export interface NavigationTargetContext {
   visibleKeys: readonly Key[]
 }
 export type NavigationTargetResolver = (
-  target: { kind: string; key?: '$key' | '$activeKey' } & Record<string, unknown>,
+  target: { kind: string; key?: string } & Record<string, unknown>,
   ctx: NavigationTargetContext,
 ) => Key | null
 
@@ -121,7 +121,7 @@ export function resolveVisibleOrder(visibleOrder: { kind: string } & Record<stri
 }
 
 export function resolveNavigationTarget(
-  target: { kind: string; key?: '$key' | '$activeKey' } & Record<string, unknown>,
+  target: { kind: string; key?: string } & Record<string, unknown>,
   ctx: NavigationTargetContext,
 ): Key | null {
   const resolver = navigationTargetRegistry.get(target.kind)
@@ -168,11 +168,6 @@ export function evaluatePredicate(predicate: Predicate, ctx: PatternRuntimeConte
     const key = ctx.key ?? ctx.activeKey
     if (key && (ctx.data.state?.expandedKeys?.includes(key) ?? false)) return true
     return (ctx.data.state?.expandedKeys?.length ?? 0) > 0
-  }
-  if (predicate.kind === 'extension') {
-    const resolver = predicateRegistry.get(predicate.name)
-    if (!resolver) throw unknownTokenError('predicate', predicate.name)
-    return resolver(predicate, ctx)
   }
   const resolver = predicateRegistry.get(predicate.kind)
   if (!resolver) throw unknownTokenError('predicate', predicate.kind)
@@ -232,9 +227,17 @@ export function resolveEventTemplate(
     const key = template.key ? resolveKeyToken(template.key, keyContext, activeKey, ctx) : undefined
     return [{ type: 'dismiss', ...(key ? { key } : {}) }]
   }
-  if (template.type === 'extension') {
+  if (template.type === 'reorder') {
     const key = template.key ? resolveKeyToken(template.key, keyContext, activeKey, ctx) : undefined
-    return [{ type: 'extension', name: template.name, ...(key ? { key } : {}), ...(template.payload ? { payload: template.payload } : {}) }]
+    return [{ type: 'reorder', ...(key ? { key } : {}), keys: template.keys }]
+  }
+  if (template.type === 'remove') {
+    const key = template.key ? resolveKeyToken(template.key, keyContext, activeKey, ctx) : undefined
+    return [{ type: 'remove', ...(key ? { key } : {}), keys: template.keys, activeKey: template.activeKey, selectedKeys: template.selectedKeys }]
+  }
+  if (template.type === 'editEnd') {
+    const key = template.key ? resolveKeyToken(template.key, keyContext, activeKey, ctx) : undefined
+    return [{ type: 'editEnd', ...(key ? { key } : {}) }]
   }
   const key = resolveKeyToken(template.key, keyContext, activeKey, ctx)
   if (template.type === 'focus') return [{ type: 'focus', key }]
@@ -250,6 +253,9 @@ export function resolveEventTemplate(
   if (template.type === 'valueStep') return [{ type: 'valueStep', key, direction: template.direction }]
   if (template.type === 'collapse') return [{ type: 'collapse', key }]
   if (template.type === 'close') return [{ type: 'close', key }]
+  if (template.type === 'sort') return [{ type: 'sort', key, sort: template.sort }]
+  if (template.type === 'editStart') return [{ type: 'editStart', key, ...(template.value !== undefined ? { value: template.value } : {}) }]
+  if (template.type === 'editDraft') return [{ type: 'editDraft', key, value: template.value }]
   return []
 }
 

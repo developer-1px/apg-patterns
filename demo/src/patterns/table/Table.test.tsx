@@ -13,11 +13,10 @@ function TableDemo({ variant }: { variant: TableVariantKey }) {
     <Table
       data={data}
       onEvent={(event: PatternEvent) => {
-        if (event.type === 'extension' && event.name === 'tableSort' && event.key) {
-          const next = (event.payload?.sort as 'ascending' | 'descending' | 'other') ?? 'ascending'
+        if (event.type === 'sort') {
           setData((current) => ({
             ...current,
-            state: { ...current.state, sortByKey: { ...current.state?.sortByKey, [event.key as string]: next } },
+            state: { ...current.state, sortByKey: { ...current.state?.sortByKey, [event.key]: event.sort } },
           }))
           return
         }

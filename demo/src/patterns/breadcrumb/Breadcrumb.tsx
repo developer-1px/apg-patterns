@@ -23,7 +23,7 @@ export function Breadcrumb({ data, onEvent }: BreadcrumbProps) {
           const current = currentByKey[item.key] as AriaAttributes['aria-current']
           const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
             event.preventDefault()
-            onEvent({ type: 'extension', name: 'breadcrumbNavigate', key: item.key, payload: item })
+            onEvent({ type: 'activate', key: item.key })
           }
           return (
             <li key={item.key} className="flex items-center gap-1">

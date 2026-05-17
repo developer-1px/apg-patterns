@@ -7,9 +7,8 @@ import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes
 import { renderDataInspect } from '../../shared/inspect/genericInspect'
 
 const reduceTableDemoData = (data: PatternData, event: PatternEvent): PatternData => {
-  if (event.type === 'extension' && event.name === 'tableSort' && event.key) {
-    const next = (event.payload?.sort as 'ascending' | 'descending' | 'other') ?? 'ascending'
-    return { ...data, state: { ...data.state, sortByKey: { ...data.state?.sortByKey, [event.key as string]: next } } }
+  if (event.type === 'sort') {
+    return { ...data, state: { ...data.state, sortByKey: { ...data.state?.sortByKey, [event.key]: event.sort } } }
   }
   return reducePatternData(tableDefinition, data, event)
 }

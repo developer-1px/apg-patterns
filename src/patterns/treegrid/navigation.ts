@@ -1,9 +1,7 @@
 import { moveGrid, visibleTreeItems } from '@interactive-os/collection-navigation'
 import {
   defineAriaSource,
-  defineKeyToken,
   defineNavigationTarget,
-  definePredicate,
   defineVisibleOrder,
 } from '../../kernel/patternKernel'
 import type { Key, PatternData } from '../../schema'
@@ -35,36 +33,12 @@ const cellRowKey = (data: PatternData, cellKey: Key | null | undefined): Key | n
 }
 
 defineVisibleOrder('treegridVisibleCells', (_v, data) => visibleCells(data).flat())
-defineVisibleOrder('treegridVisibleRows', (_v, data) => visibleRowKeys(data))
 
 defineAriaSource('state.rowExpanded', (ctx) => {
   if (!ctx.key) return undefined
   const hasChildren = (ctx.data.relations?.childrenByKey?.[ctx.key]?.length ?? 0) > 0
   if (!hasChildren) return undefined
   return ctx.data.state?.expandedKeys?.includes(ctx.key) ?? false
-})
-
-defineKeyToken('$activeRowKey', (_key, activeKey, ctx) => {
-  if (!activeKey || !ctx) return null
-  return cellRowKey(ctx.data, activeKey)
-})
-
-definePredicate('treegridActiveAtFirstColumn', (_p, ctx) => {
-  if (!ctx.activeKey) return false
-  const firstCol = ctx.data.relations?.columnKeys?.[0]
-  if (!firstCol) return false
-  const cell = ctx.data.relations?.cells?.find((c) => c.cellKey === ctx.activeKey)
-  return cell?.columnKey === firstCol
-})
-definePredicate('treegridActiveRowHasChildren', (_p, ctx) => {
-  const rowKey = cellRowKey(ctx.data, ctx.activeKey)
-  if (!rowKey) return false
-  return (ctx.data.relations?.childrenByKey?.[rowKey]?.length ?? 0) > 0
-})
-definePredicate('treegridActiveRowIsExpanded', (_p, ctx) => {
-  const rowKey = cellRowKey(ctx.data, ctx.activeKey)
-  if (!rowKey) return false
-  return ctx.data.state?.expandedKeys?.includes(rowKey) ?? false
 })
 
 defineNavigationTarget('treegridCell', (target, ctx) => {

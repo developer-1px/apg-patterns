@@ -47,7 +47,7 @@ describe('AlertDialog demo', () => {
     fireEvent.keyDown(dialog, { key: 'Escape', code: 'Escape' })
 
     expect(screen.queryByRole('alertdialog')).toBeNull()
-    expect(onEvent).toHaveBeenCalledWith({ type: 'extension', name: 'alertDialogCancel', key: 'cancel' })
+    expect(onEvent).toHaveBeenCalledWith({ type: 'activate', key: 'cancel' })
     expect(document.activeElement).toBe(trigger)
   })
 
@@ -56,7 +56,7 @@ describe('AlertDialog demo', () => {
     render(<AlertDialogDemo onEvent={onEvent} />)
     fireEvent.click(screen.getByRole('button', { name: 'Discard draft' }))
     fireEvent.click(screen.getByRole('button', { name: 'Discard' }))
-    expect(onEvent).toHaveBeenCalledWith({ type: 'extension', name: 'alertDialogConfirm', key: 'confirm' })
+    expect(onEvent).toHaveBeenCalledWith({ type: 'activate', key: 'confirm' })
     expect(screen.queryByRole('alertdialog')).toBeNull()
   })
 
@@ -65,7 +65,7 @@ describe('AlertDialog demo', () => {
     render(<AlertDialogDemo onEvent={onEvent} />)
     fireEvent.click(screen.getByRole('button', { name: 'Discard draft' }))
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
-    expect(onEvent).toHaveBeenCalledWith({ type: 'extension', name: 'alertDialogCancel', key: 'cancel' })
+    expect(onEvent).toHaveBeenCalledWith({ type: 'activate', key: 'cancel' })
     expect(screen.queryByRole('alertdialog')).toBeNull()
   })
 })

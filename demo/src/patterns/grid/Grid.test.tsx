@@ -16,9 +16,8 @@ function GridDemo({ variant }: { variant: GridVariantKey }) {
     <Grid
       data={data}
       onEvent={(event: PatternEvent) => {
-        if (event.type === 'extension' && event.name === 'gridSort' && event.key) {
-          const next = (event.payload?.sort as 'ascending' | 'descending' | 'other') ?? 'ascending'
-          setData((current) => ({ ...current, state: { ...current.state, sortByKey: { ...current.state?.sortByKey, [event.key as string]: next } } }))
+        if (event.type === 'sort') {
+          setData((current) => ({ ...current, state: { ...current.state, sortByKey: { ...current.state?.sortByKey, [event.key]: event.sort } } }))
           return
         }
         setData((current) => reducePatternData(gridDefinition, current, event))

@@ -36,6 +36,6 @@ describe('Breadcrumb demo', () => {
     const links = screen.getAllByRole('link')
     fireEvent.click(links[1]!)
     expect(onEvent).toHaveBeenCalledTimes(1)
-    expect(onEvent).toHaveBeenCalledWith({ type: 'extension', name: 'breadcrumbNavigate', key: breadcrumbItems[1]!.key, payload: breadcrumbItems[1] })
+    expect(onEvent).toHaveBeenCalledWith({ type: 'activate', key: breadcrumbItems[1]!.key })
   })
 })

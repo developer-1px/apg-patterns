@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { JsonValueSchema, type JsonValue, validateJsonExtensionFields } from './jsonValue'
+import { JsonValueSchema, validateJsonExtensionFields } from './jsonValue'
 import { KeyTokenSchema } from './patternData'
 import { EventTemplateSchema, PatternEventReasonSchema, PatternEventTypeSchema } from './patternEvent'
 
@@ -36,7 +36,6 @@ export type DomEventName = z.infer<typeof DomEventNameSchema>
 
 export const VisibleOrderKindSchema = z.enum([
   'flat', 'comboboxOptions', 'gridRows', 'treeVisibleDepthFirst', 'treegridVisibleCells',
-  'treegridVisibleRows',
 ])
 export type VisibleOrderKind = z.infer<typeof VisibleOrderKindSchema>
 
@@ -98,7 +97,6 @@ export type Predicate =
   | { kind: 'not'; predicate: Predicate }
   | { kind: 'all'; predicates: readonly Predicate[] }
   | { kind: 'any'; predicates: readonly Predicate[] }
-  | { kind: 'extension'; name: string; key?: string; args?: Record<string, JsonValue> }
 
 export const PredicateSchema: z.ZodType<Predicate> = z.lazy(() =>
   z.discriminatedUnion('kind', [
@@ -125,14 +123,6 @@ export const PredicateSchema: z.ZodType<Predicate> = z.lazy(() =>
     z.object({ kind: z.literal('not'), predicate: PredicateSchema }).strict(),
     z.object({ kind: z.literal('all'), predicates: z.array(PredicateSchema).readonly() }).strict(),
     z.object({ kind: z.literal('any'), predicates: z.array(PredicateSchema).readonly() }).strict(),
-    z
-      .object({
-        kind: z.literal('extension'),
-        name: z.string().min(1),
-        key: KeyTokenSchema.optional(),
-        args: z.record(z.string(), JsonValueSchema).optional(),
-      })
-      .strict(),
   ]),
 )
 
@@ -204,15 +194,34 @@ export const EffectSchema = z.discriminatedUnion('kind', [
 ])
 export type EffectDefinition = z.infer<typeof EffectSchema>
 
-const NavigationTargetSchema = z
-  .object({ kind: NavigationTargetKindSchema })
-  .passthrough()
-  .superRefine((value, ctx) => validateJsonExtensionFields(value, ['kind'], ctx))
+const LinearActionSchema = z.enum(['next', 'previous', 'first', 'last'])
+const GridActionSchema = z.enum(['left', 'right', 'up', 'down', 'rowStart', 'rowEnd', 'gridStart', 'gridEnd'])
+const GridPageActionSchema = z.enum(['pageUp', 'pageDown'])
+const TreegridPageDirectionSchema = z.enum(['up', 'down'])
+const NavigationTargetSchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('linear'), action: LinearActionSchema }).strict(),
+  z.object({ kind: z.literal('linearWrap'), action: z.enum(['next', 'previous']) }).strict(),
+  z.object({ kind: z.literal('firstChild'), key: KeyTokenSchema.optional() }).strict(),
+  z.object({ kind: z.literal('gridCell'), action: GridActionSchema }).strict(),
+  z.object({ kind: z.literal('gridPage'), action: GridPageActionSchema }).strict(),
+  z.object({ kind: z.literal('optionLinear'), direction: LinearActionSchema }).strict(),
+  z.object({ kind: z.literal('parentKey'), key: KeyTokenSchema }).strict(),
+  z.object({ kind: z.literal('tabsLinear'), action: LinearActionSchema }).strict(),
+  z.object({ kind: z.literal('treegridCell'), action: GridActionSchema }).strict(),
+  z.object({ kind: z.literal('treegridPage'), direction: TreegridPageDirectionSchema }).strict(),
+  z.object({ kind: z.literal('treegridParentRowFirstCell') }).strict(),
+  z.object({ kind: z.literal('treegridRow'), action: z.enum(['up', 'down', 'gridStart', 'gridEnd']) }).strict(),
+  z.object({ kind: z.literal('treegridRowPage'), direction: TreegridPageDirectionSchema }).strict(),
+])
 
-const VisibleOrderSchema = z
-  .object({ kind: VisibleOrderKindSchema })
-  .passthrough()
-  .superRefine((value, ctx) => validateJsonExtensionFields(value, ['kind'], ctx))
+const VisibleOrderSchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('flat') }).strict(),
+  z.object({ kind: z.literal('comboboxOptions') }).strict(),
+  z.object({ kind: z.literal('gridRows') }).strict(),
+  z.object({ kind: z.literal('treeVisibleDepthFirst') }).strict(),
+  z.object({ kind: z.literal('treegridVisibleCells') }).strict(),
+  z.object({ kind: z.literal('treegridVisibleRows') }).strict(),
+])
 
 export const NavigationSchema = z
   .object({
@@ -230,7 +239,6 @@ export const EventValueSourceSchema = z.enum([
   '$event.checked',
   '$event.pressed',
   '$event.value',
-  '$event.payload.value',
   '$activeKey',
 ])
 export type EventValueSource = z.infer<typeof EventValueSourceSchema>
@@ -274,9 +282,8 @@ export const PatternDefinitionSchema = z
     transitions: z.array(TransitionSchema).readonly().optional(),
     effects: z.array(EffectSchema).readonly().optional(),
   })
-  .passthrough()
+  .strict()
   .superRefine((value, ctx) => {
-    validateJsonExtensionFields(value, ['apgPattern', 'rootRole', 'containedRoles', 'focusModel', 'parts', 'navigation', 'keyboard', 'transitions', 'effects'], ctx)
     const rootParts = Object.entries(value.parts).filter(([, part]) => part.role === value.rootRole)
     if (rootParts.length === 0) {
       ctx.addIssue({

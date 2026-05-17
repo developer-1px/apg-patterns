@@ -159,23 +159,20 @@ export const gridDefinition = PatternDefinitionSchema.parse({
   ],
   transitions: [
     {
-      on: 'extension',
-      name: 'gridEditStart',
+      on: 'editStart',
       actions: [
         { kind: 'set', field: 'editingKey', value: { from: '$event.key' } },
-        { kind: 'setRecordValue', field: 'editDraftByKey', key: { from: '$event.key' }, value: { from: '$event.payload.value' } },
+        { kind: 'setRecordValue', field: 'editDraftByKey', key: { from: '$event.key' }, value: { from: '$event.value' } },
       ],
     },
     {
-      on: 'extension',
-      name: 'gridEditDraft',
+      on: 'editDraft',
       actions: [
-        { kind: 'setRecordValue', field: 'editDraftByKey', key: { from: '$event.key' }, value: { from: '$event.payload.value' } },
+        { kind: 'setRecordValue', field: 'editDraftByKey', key: { from: '$event.key' }, value: { from: '$event.value' } },
       ],
     },
     {
-      on: 'extension',
-      name: 'gridEditEnd',
+      on: 'editEnd',
       actions: [{ kind: 'set', field: 'editingKey', value: { literal: null } }],
     },
   ],

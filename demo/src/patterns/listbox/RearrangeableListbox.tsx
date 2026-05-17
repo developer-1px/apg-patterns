@@ -25,7 +25,7 @@ export function RearrangeableListbox({
     const target = idx + delta
     if (idx === -1 || target < 0 || target >= next.length) return
     ;[next[idx], next[target]] = [next[target]!, next[idx]!]
-    onEvent({ type: 'extension', name: 'listboxMove', key: activeKey, payload: { rootKeys: next } })
+    onEvent({ type: 'reorder', key: activeKey, keys: next })
   }
 
   const removeActive = () => {
@@ -35,7 +35,7 @@ export function RearrangeableListbox({
     const nextKeys = rootKeys.filter((k) => k !== activeKey)
     const nextActive = nextKeys[Math.min(idx, nextKeys.length - 1)] ?? null
     const nextSelected = selectedKeys.filter((k) => k !== activeKey)
-    onEvent({ type: 'extension', name: 'listboxRemove', key: activeKey, payload: { rootKeys: nextKeys, activeKey: nextActive, selectedKeys: nextSelected } })
+    onEvent({ type: 'remove', key: activeKey, keys: nextKeys, activeKey: nextActive, selectedKeys: nextSelected })
   }
 
   // Alt+ArrowUp/Down 키 처리 — Listbox 외부 wrapper 에서 capture.

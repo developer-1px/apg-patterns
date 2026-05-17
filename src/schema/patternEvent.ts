@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { JsonValueSchema } from './jsonValue'
 import { KeySchema, KeyTokenSchema } from './patternData'
 
 export const PatternDirectionSchema = z.enum([
@@ -19,7 +18,7 @@ export const PatternEventTypeSchema = z.enum([
   'focus', 'navigate', 'select', 'selectAll', 'selectColumn', 'selectRow',
   'extendSelection', 'expand', 'expandActiveRow', 'activate', 'check',
   'press', 'value', 'valueStep', 'collapse', 'close', 'inputValue', 'commitValue',
-  'typeahead', 'dismiss', 'extension',
+  'typeahead', 'dismiss', 'sort', 'editStart', 'editDraft', 'editEnd', 'reorder', 'remove',
 ])
 export type PatternEventType = z.infer<typeof PatternEventTypeSchema>
 
@@ -50,7 +49,12 @@ export const PatternEventSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('commitValue'), key: KeySchema.optional(), value: z.string(), ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('typeahead'), query: z.string(), ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('dismiss'), key: KeySchema.optional(), ...EventMetaFieldSchema }).strict(),
-  z.object({ type: z.literal('extension'), name: z.string().min(1), key: KeySchema.optional(), payload: z.record(z.string(), JsonValueSchema).optional(), ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('sort'), key: KeySchema, sort: z.enum(['ascending', 'descending', 'other']), ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('editStart'), key: KeySchema, value: z.union([z.string(), z.number(), z.boolean(), z.null()]).optional(), ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('editDraft'), key: KeySchema, value: z.union([z.string(), z.number(), z.boolean(), z.null()]), ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('editEnd'), key: KeySchema.optional(), ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('reorder'), key: KeySchema.optional(), keys: z.array(KeySchema).readonly(), ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('remove'), key: KeySchema.optional(), keys: z.array(KeySchema).readonly().optional(), activeKey: KeySchema.nullish(), selectedKeys: z.array(KeySchema).readonly().optional(), ...EventMetaFieldSchema }).strict(),
 ])
 
 export type PatternEvent = z.infer<typeof PatternEventSchema>
@@ -76,14 +80,11 @@ export const EventTemplateSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('commitValue'), key: KeyTokenSchema.optional(), value: z.string().optional(), ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('typeahead'), query: z.string(), ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('dismiss'), key: KeyTokenSchema.optional(), ...EventMetaFieldSchema }).strict(),
-  z
-    .object({
-      type: z.literal('extension'),
-      name: z.string().min(1),
-      key: KeyTokenSchema.optional(),
-      payload: z.record(z.string(), JsonValueSchema).optional(),
-      ...EventMetaFieldSchema,
-    })
-    .strict(),
+  z.object({ type: z.literal('sort'), key: KeyTokenSchema, sort: z.enum(['ascending', 'descending', 'other']), ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('editStart'), key: KeyTokenSchema, value: z.union([z.string(), z.number(), z.boolean(), z.null()]).optional(), ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('editDraft'), key: KeyTokenSchema, value: z.union([z.string(), z.number(), z.boolean(), z.null()]), ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('editEnd'), key: KeyTokenSchema.optional(), ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('reorder'), key: KeyTokenSchema.optional(), keys: z.array(KeySchema).readonly(), ...EventMetaFieldSchema }).strict(),
+  z.object({ type: z.literal('remove'), key: KeyTokenSchema.optional(), keys: z.array(KeySchema).readonly().optional(), activeKey: KeySchema.nullish(), selectedKeys: z.array(KeySchema).readonly().optional(), ...EventMetaFieldSchema }).strict(),
 ])
 export type EventTemplate = z.infer<typeof EventTemplateSchema>

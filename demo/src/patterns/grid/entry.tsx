@@ -7,9 +7,8 @@ import { renderDataInspect } from '../../shared/inspect/index'
 import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
 
 const reduceGridDemoData = (data: PatternData, event: PatternEvent): PatternData => {
-  if (event.type === 'extension' && event.name === 'gridSort' && event.key) {
-    const next = (event.payload?.sort as 'ascending' | 'descending' | 'other') ?? 'ascending'
-    return { ...data, state: { ...data.state, sortByKey: { ...data.state?.sortByKey, [event.key as string]: next } } }
+  if (event.type === 'sort') {
+    return { ...data, state: { ...data.state, sortByKey: { ...data.state?.sortByKey, [event.key]: event.sort } } }
   }
   return reducePatternData(gridDefinition, data, event)
 }

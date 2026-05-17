@@ -33,21 +33,20 @@ export function Grid({
         if (isHeader) {
           const current = sortByKey[key]
           const next: 'ascending' | 'descending' | 'other' = current === 'ascending' ? 'descending' : 'ascending'
-          onEvent({ type: 'extension', name: 'gridSort', key, payload: { sort: next } })
+          onEvent({ type: 'sort', key, sort: next })
           return
         }
         if (editableKeys.includes(key)) {
           onEvent({
-            type: 'extension',
-            name: 'gridEditStart',
+            type: 'editStart',
             key,
-            payload: { value: String(valueByKey[key] ?? data.items[key]?.label ?? '') },
+            value: String(valueByKey[key] ?? data.items[key]?.label ?? ''),
           })
           return
         }
       }
       if (event.type === 'dismiss') {
-        onEvent({ type: 'extension', name: 'gridEditEnd' })
+        onEvent({ type: 'editEnd', key: editingKey ?? undefined })
         return
       }
       onEvent(event)
@@ -60,10 +59,10 @@ export function Grid({
   const commitEdit = () => {
     if (editingKey) {
       onEvent({ type: 'value', key: editingKey, value: editDraftByKey[editingKey] ?? '' })
-      onEvent({ type: 'extension', name: 'gridEditEnd' })
+      onEvent({ type: 'editEnd', key: editingKey })
     }
   }
-  const cancelEdit = () => onEvent({ type: 'extension', name: 'gridEditEnd' })
+  const cancelEdit = () => onEvent({ type: 'editEnd', key: editingKey ?? undefined })
 
   const handleEditKeydown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
@@ -119,7 +118,7 @@ export function Grid({
                       className="w-full bg-transparent outline-none ring-1 ring-zinc-400 px-1 dark:ring-zinc-500"
                       value={editDraftByKey[cellKey] ?? ''}
                       onChange={(event) =>
-                        onEvent({ type: 'extension', name: 'gridEditDraft', key: cellKey, payload: { value: event.currentTarget.value } })
+                        onEvent({ type: 'editDraft', key: cellKey, value: event.currentTarget.value })
                       }
                       onKeyDown={handleEditKeydown}
                       onBlur={commitEdit}

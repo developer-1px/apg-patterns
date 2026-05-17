@@ -92,7 +92,3 @@ export const accordionDefinition = AccordionDefinitionSchema.parse({
     },
   ],
 })
-
-export const serializableAccordionDefinition = JSON.parse(
-  JSON.stringify(accordionDefinition),
-) as typeof accordionDefinition

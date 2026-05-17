@@ -18,7 +18,7 @@ export function AlertDialog({ data, onEvent }: AlertDialogProps) {
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Escape') {
-      onEvent({ type: 'extension', name: 'alertDialogCancel', key: 'cancel' })
+      onEvent({ type: 'activate', key: 'cancel' })
     }
     rootKeyDown(event as unknown as KeyInput & { preventDefault?: () => void })
     handlePatternTrapFocus({ event, definition: alertDialogDefinition, data, keyToElementId })
@@ -60,7 +60,7 @@ export function AlertDialog({ data, onEvent }: AlertDialogProps) {
                 type="button"
                 onClick={(event) => {
                   confirmProps.onClick?.(event)
-                  onEvent({ type: 'extension', name: 'alertDialogConfirm', key: 'confirm' })
+                  onEvent({ type: 'activate', key: 'confirm' })
                 }}
               >
                 {labelOf('confirm')}
@@ -70,7 +70,7 @@ export function AlertDialog({ data, onEvent }: AlertDialogProps) {
                 type="button"
                 onClick={(event) => {
                   cancelProps.onClick?.(event)
-                  onEvent({ type: 'extension', name: 'alertDialogCancel', key: 'cancel' })
+                  onEvent({ type: 'activate', key: 'cancel' })
                 }}
               >
                 {labelOf('cancel')}

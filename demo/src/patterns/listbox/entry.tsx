@@ -32,15 +32,11 @@ const initialByVariant: Record<ListboxVariantKey, PatternData> = {
 }
 
 const reduceListboxDemoData = (data: PatternData, event: PatternEvent): PatternData => {
-  if (event.type === 'extension' && event.name === 'listboxMove') {
-    const rootKeys = Array.isArray(event.payload?.rootKeys) ? event.payload.rootKeys.filter((key): key is string => typeof key === 'string') : data.relations?.rootKeys ?? []
-    return { ...data, relations: { ...data.relations, rootKeys } }
+  if (event.type === 'reorder') {
+    return { ...data, relations: { ...data.relations, rootKeys: [...event.keys] } }
   }
-  if (event.type === 'extension' && event.name === 'listboxRemove') {
-    const rootKeys = Array.isArray(event.payload?.rootKeys) ? event.payload.rootKeys.filter((key): key is string => typeof key === 'string') : data.relations?.rootKeys ?? []
-    const selectedKeys = Array.isArray(event.payload?.selectedKeys) ? event.payload.selectedKeys.filter((key): key is string => typeof key === 'string') : []
-    const activeKey = typeof event.payload?.activeKey === 'string' ? event.payload.activeKey : null
-    return { ...data, relations: { ...data.relations, rootKeys }, state: { ...data.state, activeKey, selectedKeys } }
+  if (event.type === 'remove') {
+    return { ...data, relations: { ...data.relations, rootKeys: [...(event.keys ?? data.relations?.rootKeys ?? [])] }, state: { ...data.state, activeKey: event.activeKey, selectedKeys: [...(event.selectedKeys ?? [])] } }
   }
   return reducePatternData(listboxDefinition, data, event)
 }
