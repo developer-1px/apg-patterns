@@ -199,6 +199,20 @@ describe('event log', () => {
     expect(screen.getByText('0 events')).toBeTruthy()
     expect(screen.getByText('none')).toBeTruthy()
   })
+
+  it('resets stale source state when switching patterns', async () => {
+    replaceHash('#pattern=accordion&panel=code&source=accordionData.ts')
+
+    render(<App />)
+
+    await waitFor(() => expect(currentHashParam('source')).toBe('accordionData.ts'))
+    fireEvent.click(screen.getByRole('option', { name: 'Checkbox' }))
+
+    await waitFor(() => expect(currentHashParam('pattern')).toBe('checkbox'))
+    expect(currentHashParam('source')).toBe('Checkbox.tsx')
+    expect(screen.getByTitle('Checkbox.tsx')).toBeTruthy()
+    expect(screen.queryByText('missing source: accordionData.ts')).toBeNull()
+  })
 })
 
 describe('demo pattern registry', () => {

@@ -56,7 +56,7 @@ const defaultAppState = AppStateSchema.parse({
 })
 
 const reduceAppState = (state: AppState, action: AppAction): AppState => {
-  if (action.type === 'selectPattern') return AppStateSchema.parse({ ...state, patternKey: action.patternKey, events: [] })
+  if (action.type === 'selectPattern') return AppStateSchema.parse({ ...state, patternKey: action.patternKey, events: [], sourceName: '' })
   if (action.type === 'recordEvent') return AppStateSchema.parse({ ...state, events: [action.event, ...state.events].slice(0, 12) })
   if (action.type === 'clearEvents') return AppStateSchema.parse({ ...state, events: [] })
   if (action.type === 'selectSource') return AppStateSchema.parse({ ...state, sourceName: action.sourceName })
