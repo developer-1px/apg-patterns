@@ -323,6 +323,12 @@ describe('demo pattern registry', () => {
 })
 
 describe('demo source wiring', () => {
+  it('loads the default source as real source text', async () => {
+    const source = await sourceLoaders[defaultSourceName]?.()
+
+    expect(source).toContain('export function Tree')
+  })
+
   it('connects every pattern source tab to a collected source file', () => {
     const missingSources: string[] = []
 
