@@ -958,6 +958,15 @@ async function verifyDistIndexAssets() {
   const assetRefs = Array.from(indexHtml.matchAll(/(?:src|href)="([^"]+)"/g), ([, assetRef]) => assetRef)
     .filter((assetRef) => assetRef?.replace(/^\.\//, '').startsWith('assets/'))
 
+  if (!indexHtml.includes('<div id="root"></div>')) {
+    throw new Error('demo build smoke failed: index.html does not include the app root')
+  }
+  if (indexHtml.includes('/src/app/main.tsx')) {
+    throw new Error('demo build smoke failed: index.html still references the dev entry')
+  }
+  if (assetRefs.length === 0) {
+    throw new Error('demo build smoke failed: index.html has no built asset references')
+  }
   if (!assetRefs.includes(`./assets/${entryFile}`)) {
     throw new Error(`demo build smoke failed: index.html does not reference ${entryFile}`)
   }
