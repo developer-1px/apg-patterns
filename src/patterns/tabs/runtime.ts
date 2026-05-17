@@ -25,6 +25,7 @@ export interface CreateTabsRuntimeInput {
   data: unknown
   onEvent: (event: PatternEvent) => void
   options?: unknown
+  runtime?: PatternRuntime
 }
 
 const defaultOptions = {
@@ -36,7 +37,7 @@ export function createTabsRuntime(input: CreateTabsRuntimeInput): TabsRuntime {
   const data = PatternDataSchema.parse(input.data)
   const options = { ...defaultOptions, ...PatternOptionsSchema.parse(input.options ?? {}) }
   const emit = (event: PatternEvent) => input.onEvent(PatternEventSchema.parse(event))
-  const runtime = createPatternRuntime({
+  const runtime = input.runtime ?? createPatternRuntime({
     definition: tabsDefinition,
     data,
     options,
@@ -59,7 +60,7 @@ export function createTabsRuntime(input: CreateTabsRuntimeInput): TabsRuntime {
     getTablistProps: () => runtime.getPartProps('tablist'),
     getTabProps: (key) => runtime.getPartProps('tab', key),
     getTabPanelProps: (key) => runtime.getPartProps('tabpanel', key),
-    emit,
+    emit: runtime.emit,
   }
 }
 

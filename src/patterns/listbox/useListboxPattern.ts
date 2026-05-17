@@ -1,9 +1,8 @@
 import { useRef } from 'react'
 import { createTypeaheadBuffer } from '@interactive-os/keyboard'
 import { listboxDefinition } from './definition'
-import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import { usePatternEffects, useRovingFocusEventHandler } from '../../adapters/reactPatternEffects'
+import { useReactPatternRuntime } from '../../adapters/reactPatternEffects'
 import type { ReactListboxRuntime } from '../../adapters/reactTypes'
 import { createListboxRenderItem } from './createListboxRenderItem'
 import { createListboxRootProps } from './createListboxRootProps'
@@ -11,17 +10,13 @@ import { createListboxRootProps } from './createListboxRootProps'
 export function useListboxPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactListboxRuntime {
   const typeaheadBufferRef = useRef(createTypeaheadBuffer())
   const mergedOptions: PatternOptions = { focusStrategy: 'rovingTabIndex', selectionMode: 'single', ...options }
-  const keyToElementId = (key: Key) => `${mergedOptions.elementIdPrefix ?? 'option-'}${key}`
-  const handleEvent = useRovingFocusEventHandler({ definition: listboxDefinition, data, options: mergedOptions, keyToElementId, onEvent })
-  const runtime = createPatternRuntime({
+  const runtime = useReactPatternRuntime({
     definition: listboxDefinition,
     data,
     options: mergedOptions,
-    onEvent: handleEvent,
-    keyToElementId,
+    onEvent,
+    keyToElementId: (key) => `${mergedOptions.elementIdPrefix ?? 'option-'}${key}`,
   })
-
-  usePatternEffects({ definition: listboxDefinition, data: runtime.data, keyToElementId: runtime.keyToElementId })
 
   const rootProps = createListboxRootProps(runtime, typeaheadBufferRef.current)
   return {

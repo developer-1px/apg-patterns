@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef } from 'react'
 import type { ElementTarget, Key, PatternData, PatternDefinition, PatternEvent, PatternOptions } from '../schema'
 import { reducePatternData } from '../kernel/patternReducer'
 import { createParentByKey, evaluatePredicate, resolveKeyToken } from '../kernel/patternKernel'
+import { createPatternRuntime, type CreatePatternRuntimeInput, type PatternRuntime } from '../kernel/patternRuntime'
 
 const FOCUSABLE_SELECTOR = [
   'a[href]',
@@ -35,6 +36,20 @@ export function usePatternEffects({
     }
     previousMatches.current = nextMatches
   }, [data, definition, keyToElementId])
+}
+
+export function useReactPatternRuntime(input: CreatePatternRuntimeInput): PatternRuntime {
+  const keyToElementId = input.keyToElementId ?? ((key: Key) => `${key}`)
+  const onEvent = useRovingFocusEventHandler({
+    definition: input.definition,
+    data: input.data,
+    options: input.options ?? {},
+    keyToElementId,
+    onEvent: input.onEvent,
+  })
+  const runtime = createPatternRuntime({ ...input, onEvent, keyToElementId })
+  usePatternEffects({ definition: runtime.definition, data: runtime.data, keyToElementId: runtime.keyToElementId })
+  return runtime
 }
 
 export function useRovingFocusEventHandler({
