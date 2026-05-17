@@ -213,6 +213,7 @@ describe('App route state', () => {
       expect(currentHashParam('source')).toBe(route.sourceName)
       expect(screen.getByTitle(route.sourceName)).toBeTruthy()
       expect(screen.queryByText(`missing source: ${route.sourceName}`)).toBeNull()
+      expect(document.querySelector(`[data-demo-preview="${route.key}"]`)?.getAttribute('aria-keyshortcuts')).toBe(route.keyboardShortcuts.join(' ') || null)
       await expectActiveSourceText(route.sourceName)
 
       unmount()
@@ -660,7 +661,7 @@ function DemoSourceProbeItem({
 }
 
 function collectPatternRoutes() {
-  const routes: { key: string; label: string; sourceName: string }[] = []
+  const routes: { key: string; label: string; sourceName: string; keyboardShortcuts: readonly string[] }[] = []
 
   render(<PatternRouteProbe onRoute={(route) => routes.push(route)} />).unmount()
 
@@ -670,7 +671,7 @@ function collectPatternRoutes() {
 function PatternRouteProbe({
   onRoute,
 }: {
-  onRoute: (route: { key: string; label: string; sourceName: string }) => void
+  onRoute: (route: { key: string; label: string; sourceName: string; keyboardShortcuts: readonly string[] }) => void
 }) {
   return (
     <>
@@ -686,10 +687,10 @@ function PatternRouteProbeItem({
   onRoute,
 }: {
   entry: (typeof patternEntries)[number]
-  onRoute: (route: { key: string; label: string; sourceName: string }) => void
+  onRoute: (route: { key: string; label: string; sourceName: string; keyboardShortcuts: readonly string[] }) => void
 }) {
   const demo = entry.useDemoPattern(() => undefined)
-  onRoute({ key: entry.key, label: entry.label, sourceName: demo.sourceNames[0] })
+  onRoute({ key: entry.key, label: entry.label, sourceName: demo.sourceNames[0], keyboardShortcuts: demo.keyboardShortcuts })
   return null
 }
 

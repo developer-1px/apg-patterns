@@ -99,6 +99,7 @@ function ActiveDemoWorkspace({
   const rightModeTabs = useSourceTabs({ label: 'right panel', tabs: rightModes, value: state.rightMode, onChange: (rightMode) => dispatch({ type: 'selectRightMode', rightMode }) })
   const eventLog = state.events.map(formatEvent).join('\n') || 'none'
   const canCopySource = isCopyableSource(source)
+  const previewKeyboardShortcuts = activeDemo.keyboardShortcuts.join(' ') || undefined
 
   useEffect(() => {
     writeAppHash({
@@ -180,7 +181,7 @@ function ActiveDemoWorkspace({
             </div>
           </div>
         ) : null}
-        <div data-demo-preview={activeDemo.key}>
+        <div data-demo-preview={activeDemo.key} aria-keyshortcuts={previewKeyboardShortcuts}>
           {activeDemo.preview}
         </div>
       </section>
