@@ -1,4 +1,7 @@
-import { useState, type KeyboardEvent } from 'react'
+import { useReducer, type HTMLAttributes, type KeyboardEvent } from 'react'
+import type { KeyInput } from '@interactive-os/keyboard'
+import { createPatternRuntime, reducePatternData } from '../../src'
+import { tooltipDefinition } from '../../src/patterns/tooltip/definition'
 import { initialTooltipData, tooltipPanelId, tooltipTriggerId } from './tooltipData'
 
 export interface TooltipProps {
@@ -7,33 +10,40 @@ export interface TooltipProps {
 }
 
 export function Tooltip({ label, description }: TooltipProps) {
-  const [open, setOpen] = useState(false)
+  const [data, dispatch] = useReducer(
+    (current: typeof initialTooltipData, event: Parameters<typeof reducePatternData>[2]) =>
+      reducePatternData(tooltipDefinition, current, event),
+    initialTooltipData,
+  )
+  const runtime = createPatternRuntime({
+    definition: tooltipDefinition,
+    data,
+    options: {},
+    onEvent: dispatch,
+    keyToElementId: (key) => key,
+  })
   const triggerLabel = label ?? (initialTooltipData.items[tooltipTriggerId]?.label as string)
   const tip = description ?? (initialTooltipData.items[tooltipPanelId]?.label as string)
+  const open = data.state?.expandedKeys?.includes(tooltipTriggerId) ?? false
+  const { onKeyDown: _dropKeyDown, ...triggerProps } = runtime.getPartProps('trigger', tooltipTriggerId) as HTMLAttributes<HTMLButtonElement>
+  const tooltipProps = runtime.getPartProps('tooltip', tooltipPanelId) as HTMLAttributes<HTMLSpanElement>
+  const rootKeyDown = runtime.getRootKeyboardHandler()
 
   const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
-    if (event.key === 'Escape') {
-      event.preventDefault()
-      setOpen(false)
-    }
+    rootKeyDown(event as unknown as KeyInput & { preventDefault?: () => void })
   }
 
   return (
     <>
       <button
+        {...triggerProps}
         type="button"
-        id={tooltipTriggerId}
-        aria-describedby={tooltipPanelId}
-        onFocus={() => setOpen(true)}
-        onBlur={() => setOpen(false)}
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
         onKeyDown={onKeyDown}
       >
         {triggerLabel}
       </button>
       {open ? (
-        <span id={tooltipPanelId} role="tooltip">
+        <span {...tooltipProps}>
           {tip}
         </span>
       ) : null}

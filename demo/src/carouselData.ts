@@ -35,9 +35,11 @@ export const carouselSlides: readonly CarouselSlide[] = [
 ]
 
 export const initialCarouselData: PatternData = {
-  items: Object.fromEntries(
-    carouselSlides.map((slide) => [slide.key, { label: slide.title }]),
-  ),
+  items: {
+    prev: { label: 'Previous Slide' },
+    next: { label: 'Next Slide' },
+    ...Object.fromEntries(carouselSlides.map((slide, index) => [slide.key, { label: `Slide ${index + 1}` }])),
+  },
   relations: {
     rootKeys: carouselSlides.map((slide) => slide.key),
   },

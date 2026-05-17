@@ -22,6 +22,7 @@ defineAriaSource('refs.labelledBy', (ctx) => ctx.data.refs?.labelledBy)
 defineAriaSource('options.orientation', (ctx) => ctx.options?.orientation)
 defineAriaSource('options.selectionMode.multiple', (ctx) => (ctx.options?.selectionMode === 'multiple' ? true : undefined))
 defineAriaSource('state.activeKey.elementId', (ctx) => (ctx.activeKey && ctx.keyToElementId ? ctx.keyToElementId(ctx.activeKey) : undefined))
+defineAriaSource('state.inactiveKey', (ctx) => (ctx.key != null && ctx.activeKey !== ctx.key ? true : undefined))
 defineAriaSource('items.label', (ctx) => (ctx.key ? ctx.data.items[ctx.key]?.label : undefined))
 defineAriaSource('items.labelledBy', (ctx) => (ctx.key ? ctx.data.items[ctx.key]?.labelledBy : undefined))
 defineAriaSource('relations.controlsByKey', (ctx) => {
@@ -95,4 +96,12 @@ defineVisibleOrder('flat', (_v, data) => data.relations?.rootKeys ?? [])
 defineNavigationTarget('linear', (target, ctx) => {
   const action = target.action as 'next' | 'previous' | 'first' | 'last'
   return moveLinear(ctx.visibleKeys, ctx.activeKey, action)
+})
+defineNavigationTarget('linearWrap', (target, ctx) => {
+  if (ctx.visibleKeys.length === 0) return null
+  const index = ctx.visibleKeys.indexOf(ctx.activeKey)
+  const action = target.action as 'next' | 'previous'
+  if (action === 'next') return ctx.visibleKeys[(index + 1 + ctx.visibleKeys.length) % ctx.visibleKeys.length] ?? null
+  if (action === 'previous') return ctx.visibleKeys[(index - 1 + ctx.visibleKeys.length) % ctx.visibleKeys.length] ?? null
+  return null
 })

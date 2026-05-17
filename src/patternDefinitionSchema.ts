@@ -93,6 +93,46 @@ export const NavigationSchema = z
   })
   .strict()
 
+export const EventValueSourceSchema = z.enum([
+  '$event.key',
+  '$event.keys',
+  '$event.anchorKey',
+  '$event.extentKey',
+  '$event.expanded',
+  '$event.open',
+  '$event.checked',
+  '$event.pressed',
+  '$event.value',
+  '$activeKey',
+])
+export type EventValueSource = z.infer<typeof EventValueSourceSchema>
+
+export const TransitionValueSchema = z.union([
+  z.object({ from: EventValueSourceSchema }).strict(),
+  z.object({ literal: JsonValueSchema }).strict(),
+])
+export type TransitionValue = z.infer<typeof TransitionValueSchema>
+
+export const StateActionSchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('set'), field: z.string().min(1), value: TransitionValueSchema }).strict(),
+  z.object({ kind: z.literal('add'), field: z.string().min(1), value: TransitionValueSchema }).strict(),
+  z.object({ kind: z.literal('remove'), field: z.string().min(1), value: TransitionValueSchema }).strict(),
+  z.object({ kind: z.literal('setMembership'), field: z.string().min(1), value: TransitionValueSchema, present: TransitionValueSchema }).strict(),
+  z.object({ kind: z.literal('toggleInSet'), field: z.string().min(1), value: TransitionValueSchema }).strict(),
+  z.object({ kind: z.literal('replaceSet'), field: z.string().min(1), values: z.array(TransitionValueSchema).readonly() }).strict(),
+])
+export type StateAction = z.infer<typeof StateActionSchema>
+
+export const TransitionSchema = z
+  .object({
+    on: z.string().min(1),
+    name: z.string().min(1).optional(),
+    when: PredicateSchema.optional(),
+    actions: z.array(StateActionSchema).readonly(),
+  })
+  .strict()
+export type Transition = z.infer<typeof TransitionSchema>
+
 export const PatternDefinitionSchema = z
   .object({
     apgPattern: z.string().min(1),
@@ -102,10 +142,11 @@ export const PatternDefinitionSchema = z
     parts: z.record(z.string().min(1), PartSchema),
     navigation: NavigationSchema,
     keyboard: z.array(KeyboardBindingSchema).readonly(),
+    transitions: z.array(TransitionSchema).readonly().optional(),
   })
   .passthrough()
   .superRefine((value, ctx) => {
-    validateJsonExtensionFields(value, ['apgPattern', 'rootRole', 'containedRoles', 'focusModel', 'parts', 'navigation', 'keyboard'], ctx)
+    validateJsonExtensionFields(value, ['apgPattern', 'rootRole', 'containedRoles', 'focusModel', 'parts', 'navigation', 'keyboard', 'transitions'], ctx)
     const rootParts = Object.entries(value.parts).filter(([, part]) => part.role === value.rootRole)
     if (rootParts.length === 0) {
       ctx.addIssue({

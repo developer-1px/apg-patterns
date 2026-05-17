@@ -29,7 +29,7 @@ export const carouselDefinition = CarouselDefinitionSchema.parse({
       aria: [
         { attribute: 'aria-roledescription', from: 'options.slideRoledescription' },
         { attribute: 'aria-labelledby', from: 'relations.ownerByKey' },
-        { attribute: 'aria-hidden', from: 'state.activeKey' },
+        { attribute: 'aria-hidden', from: 'state.inactiveKey' },
       ],
     },
     prev: {
@@ -64,9 +64,21 @@ export const carouselDefinition = CarouselDefinitionSchema.parse({
   },
   navigation: {
     visibleOrder: { kind: 'flat' },
-    targets: {},
+    targets: {
+      previous: { kind: 'linearWrap', action: 'previous' },
+      next: { kind: 'linearWrap', action: 'next' },
+    },
   },
   keyboard: [],
+  transitions: [
+    {
+      on: 'select',
+      actions: [
+        { kind: 'set', field: 'activeKey', value: { from: '$event.extentKey' } },
+        { kind: 'replaceSet', field: 'selectedKeys', values: [{ from: '$event.extentKey' }] },
+      ],
+    },
+  ],
 })
 
 export const serializableCarouselDefinition = JSON.parse(
