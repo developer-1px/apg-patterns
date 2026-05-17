@@ -309,12 +309,16 @@ export async function loadSourcePreview(sourceName: SourceName): Promise<string>
   try {
     return await loadSource()
   } catch {
-    return `missing source: ${sourceName}`
+    return `failed source: ${sourceName}`
   }
 }
 
 export function isCopyableSource(source: string): boolean {
-  return source.length > 0 && source !== 'loading' && !source.startsWith('missing source:')
+  return source.length > 0 && source !== 'loading' && !isSourceLoadFailure(source)
+}
+
+export function isSourceLoadFailure(source: string): boolean {
+  return source.startsWith('missing source:') || source.startsWith('failed source:')
 }
 
 export function formatEvent(event: PatternEvent): string {

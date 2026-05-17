@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { act } from 'react'
-import { coerceRightMode, formatEvent, isCopyableSource, loadSourcePreview } from './App'
+import { coerceRightMode, formatEvent, isCopyableSource, isSourceLoadFailure, loadSourcePreview } from './App'
 import { App } from './App'
 import { SourceTabs, useSourceTabs } from './SourceTabs'
 import { collectPatternEntries, defaultPatternKey, defaultSourceName, patternEntries, useDemoPattern, validatePatternEntries } from '../shared/demoPatterns'
@@ -44,7 +44,14 @@ describe('source copy', () => {
   it('only treats loaded source text as copyable', () => {
     expect(isCopyableSource('loading')).toBe(false)
     expect(isCopyableSource('missing source: Missing.tsx')).toBe(false)
+    expect(isCopyableSource('failed source: Broken.tsx')).toBe(false)
     expect(isCopyableSource('export function Demo() {}')).toBe(true)
+  })
+
+  it('classifies source load failures by prefix', () => {
+    expect(isSourceLoadFailure('missing source: Missing.tsx')).toBe(true)
+    expect(isSourceLoadFailure('failed source: Broken.tsx')).toBe(true)
+    expect(isSourceLoadFailure('export function Demo() {}')).toBe(false)
   })
 
   it('copies the loaded source text instead of transient loader text', async () => {

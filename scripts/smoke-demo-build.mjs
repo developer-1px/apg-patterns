@@ -137,7 +137,7 @@ async function runSmoke() {
       continue
     }
 
-    if (rootText().includes('missing source:')) patternFailures.push(`${label}: missing source marker rendered`)
+    if (hasSourceLoadFailure(rootText())) patternFailures.push(`${label}: source load failure marker rendered`)
     verifyPreviewSurface(key, label)
     await verifyVariantControls(key, label)
 
@@ -168,7 +168,7 @@ async function runSmoke() {
             && sourceFilenameIs(sourceName)
             && sourceText !== 'loading'
             && sourceText.length > 0
-            && !sourceText.startsWith('missing source:')
+            && !hasSourceLoadFailure(sourceText)
           return loaded ? sourceText : false
         })
         const duplicate = Array.from(renderedSourceByName.entries()).find(([, previousSource]) => previousSource === renderedSource)
@@ -363,7 +363,7 @@ async function verifySourceTabKeyboardNavigation() {
         && sourceFilenameIs(selectedSourceName)
         && sourceText !== 'loading'
         && sourceText.length > 0
-        && !sourceText.startsWith('missing source:')
+        && !hasSourceLoadFailure(sourceText)
     })
   } catch {
     patternFailures.push(`source tab keyboard navigation did not update the selected source route: current ${window.location.hash}, selected=${sourceTabNames().join(',')}, text=${rootText().slice(0, 180)}`)
@@ -444,7 +444,7 @@ async function verifyPatternSwitchResetsStaleSource() {
         && hasActiveDemoHeading('Checkbox')
         && sourceFilenameIs('Checkbox.tsx')
         && sourceText.includes('export function Checkbox')
-        && !sourceText.includes('missing source: accordionData.ts')
+        && !hasSourceLoadFailure(sourceText)
     })
   } catch {
     patternFailures.push(`pattern switch did not reset stale source state: current ${window.location.hash}, text=${rootText().slice(0, 180)}`)
@@ -615,6 +615,10 @@ function sourcePanelText() {
   return Array.from(document.querySelectorAll('[role="tabpanel"]'))
     .find((panel) => panel.id.startsWith('tab-source-panel-'))
     ?.textContent ?? ''
+}
+
+function hasSourceLoadFailure(text) {
+  return text.includes('missing source:') || text.includes('failed source:')
 }
 
 function sourceIdentityNeedles(sourceName, patternKey) {
