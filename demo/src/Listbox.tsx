@@ -13,20 +13,14 @@ export interface ListboxGroup {
 export function Listbox({
   data,
   onEvent,
-  options,
-  groups,
-  scrollable,
-  ariaLabelledBy,
 }: {
   data: PatternData
   onEvent: (event: PatternEvent) => void
-  options?: PatternOptions
-  /** APG grouped variant — renders role="group" wrappers around options. */
-  groups?: readonly ListboxGroup[]
-  /** APG scrollable variant — caps height + overflow-y. */
-  scrollable?: boolean
-  ariaLabelledBy?: string
 }) {
+  const options = (data.state?.options as PatternOptions | undefined) ?? {}
+  const groups = (data.state?.groups as readonly ListboxGroup[] | undefined) ?? []
+  const scrollable = data.state?.scrollable === true
+  const ariaLabelledBy = typeof data.refs?.labelledBy === 'string' ? data.refs.labelledBy : undefined
   const runtime = createPatternRuntime({
     definition: listboxDefinition,
     data,
@@ -144,7 +138,6 @@ export function Listbox({
   const renderOption = (key: string, posIndex?: number, setSize?: number) => {
     const optionProps = runtime.getPartProps('option', key) as Props
     const state = runtime.getItemState(key, 'option')
-    // 멀티셀렉트일 때 runtime 의 기본 onClick(단일 select) 를 가로채 우리 핸들러로 대체.
     const onClickOverride = isMulti
       ? (event: ReactMouseEvent) => handleOptionClick(event, key)
       : (optionProps.onClick as ((event: ReactMouseEvent) => void) | undefined)

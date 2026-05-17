@@ -7,14 +7,14 @@ export const entry: PatternEntry = {
   key: 'breadcrumb',
   label: 'Breadcrumb',
   order: 14,
-  useDemoPattern: (_onEvent) => {
+  useDemoPattern: (onEvent) => {
     return {
       key: 'breadcrumb',
       label: 'Breadcrumb',
       keyboardShortcuts: ['Tab', 'Enter'],
       sourceNames: ['Breadcrumb.tsx', 'breadcrumbData.ts', 'breadcrumb/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
       inspect: renderDataInspect(initialBreadcrumbData),
-      preview: <Breadcrumb />,
+      preview: <Breadcrumb data={initialBreadcrumbData} onEvent={onEvent} />,
       reset: () => {},
     }
   },

@@ -31,6 +31,20 @@ const initialByVariant: Record<ListboxVariantKey, PatternData> = {
   rearrangeableMulti: initialRearrangeableListboxData,
 }
 
+const reduceListboxDemoData = (data: PatternData, event: PatternEvent): PatternData => {
+  if (event.type === 'extension' && event.name === 'listboxMove') {
+    const rootKeys = Array.isArray(event.payload?.rootKeys) ? event.payload.rootKeys.filter((key): key is string => typeof key === 'string') : data.relations?.rootKeys ?? []
+    return { ...data, relations: { ...data.relations, rootKeys } }
+  }
+  if (event.type === 'extension' && event.name === 'listboxRemove') {
+    const rootKeys = Array.isArray(event.payload?.rootKeys) ? event.payload.rootKeys.filter((key): key is string => typeof key === 'string') : data.relations?.rootKeys ?? []
+    const selectedKeys = Array.isArray(event.payload?.selectedKeys) ? event.payload.selectedKeys.filter((key): key is string => typeof key === 'string') : []
+    const activeKey = typeof event.payload?.activeKey === 'string' ? event.payload.activeKey : null
+    return { ...data, relations: { ...data.relations, rootKeys }, state: { ...data.state, activeKey, selectedKeys } }
+  }
+  return reducePatternData(listboxDefinition, data, event)
+}
+
 export const entry: PatternEntry = {
   key: 'listbox',
   label: 'Listbox',
@@ -40,7 +54,7 @@ export const entry: PatternEntry = {
       'basic',
       initialListboxData,
       (variant) => initialByVariant[variant],
-      (_variant, data, event) => reducePatternData(listboxDefinition, data, event),
+      (_variant, data, event) => reduceListboxDemoData(data, event),
     )
     const options: PatternOptions = host.variant === 'rearrangeableMulti'
       ? { focusStrategy: 'rovingTabIndex', selectionMode: 'multiple' }
@@ -49,13 +63,18 @@ export const entry: PatternEntry = {
       onEvent(event)
       host.dispatchEvent(event)
     }
-    const preview = host.variant === 'scrollable'
-      ? <Listbox data={host.data} options={options} scrollable onEvent={handleEvent} />
-      : host.variant === 'grouped'
-        ? <Listbox data={host.data} options={options} groups={groupedListboxStructure} onEvent={handleEvent} />
-        : host.variant === 'rearrangeable' || host.variant === 'rearrangeableMulti'
-          ? <RearrangeableListbox data={host.data} options={options} onChange={host.replaceData} onEvent={handleEvent} />
-          : <Listbox data={host.data} options={options} onEvent={handleEvent} />
+    const state = {
+      ...host.data.state,
+      options,
+      scrollable: host.variant === 'scrollable',
+    }
+    const data: PatternData = {
+      ...host.data,
+      state: host.variant === 'grouped' ? { ...state, groups: groupedListboxStructure } : state,
+    }
+    const preview = host.variant === 'rearrangeable' || host.variant === 'rearrangeableMulti'
+      ? <RearrangeableListbox data={data} onEvent={handleEvent} />
+      : <Listbox data={data} onEvent={handleEvent} />
 
     return {
       key: 'listbox',

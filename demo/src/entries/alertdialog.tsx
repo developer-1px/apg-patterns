@@ -1,21 +1,28 @@
+import { reducePatternData } from '../../../src'
 import { AlertDialog } from '../AlertDialog'
 import { initialAlertDialogData } from '../alertdialogData'
 import { type PatternEntry } from '../demoPatternTypes'
+import { usePatternDataHost } from '../demoHostState'
+import { alertDialogDefinition } from '../../../src/patterns/alertdialog/definition'
 import { renderDataInspect } from './_inspect'
 
 export const entry: PatternEntry = {
   key: 'alertdialog',
   label: 'Alert Dialog',
   order: 13,
-  useDemoPattern: (_onEvent) => {
+  useDemoPattern: (onEvent) => {
+    const host = usePatternDataHost(initialAlertDialogData, (data, event) => reducePatternData(alertDialogDefinition, data, event))
     return {
       key: 'alertdialog',
       label: 'Alert Dialog',
       keyboardShortcuts: ['Tab', 'Shift+Tab', 'Escape', 'Enter', 'Space'],
       sourceNames: ['AlertDialog.tsx', 'alertdialogData.ts', 'alertdialog/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
-      inspect: renderDataInspect(initialAlertDialogData),
-      preview: <AlertDialog />,
-      reset: () => {},
+      inspect: renderDataInspect(host.data),
+      preview: <AlertDialog data={host.data} onEvent={(event) => {
+        onEvent(event)
+        host.dispatchEvent(event)
+      }} />,
+      reset: host.reset,
     }
   },
 }

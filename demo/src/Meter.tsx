@@ -6,19 +6,17 @@ type Props = HTMLAttributes<HTMLElement>
 
 export function Meter({
   data,
-  options: providedOptions,
   onEvent,
 }: {
   data: PatternData
-  options?: PatternOptions
-  onEvent?: (event: PatternEvent) => void
+  onEvent: (event: PatternEvent) => void
 }) {
-  const options = providedOptions ?? (((data.state as { options?: PatternOptions } | undefined)?.options ?? {}) as PatternOptions)
+  const options = (((data.state as { options?: PatternOptions } | undefined)?.options ?? {}) as PatternOptions)
   const runtime = createPatternRuntime({
     definition: meterDefinition,
     data,
     options,
-    onEvent: onEvent ?? (() => {}),
+    onEvent,
     keyToElementId: (key) => `meter-${key}`,
   })
   const rootKeys = data.relations?.rootKeys ?? []

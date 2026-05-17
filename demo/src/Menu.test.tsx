@@ -20,15 +20,16 @@ function MenuDemo({
 }) {
   const v = menuVariants[variant]
   const definition = v.apgPattern === 'menubar' ? menubarDefinition : menuButtonDefinition
-  const [data, setData] = useState<PatternData>(v.data)
+  const [data, setData] = useState<PatternData>({ ...v.data, state: { ...v.data.state, apgPattern: v.apgPattern, focusStrategy: v.focusStrategy } })
   return (
     <Menu
       data={data}
-      apgPattern={v.apgPattern}
-      focusStrategy={v.focusStrategy}
       onEvent={(event) => {
         onEvent?.(event)
-        setData((current) => reducePatternData(definition, current, event))
+        setData((current) => {
+          const next = reducePatternData(definition, current, event)
+          return { ...next, state: { ...next.state, apgPattern: v.apgPattern, focusStrategy: v.focusStrategy } }
+        })
       }}
     />
   )

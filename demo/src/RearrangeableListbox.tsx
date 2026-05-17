@@ -1,5 +1,5 @@
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
-import { type PatternData, type PatternEvent, type PatternOptions } from '../../src'
+import { type PatternData, type PatternEvent } from '../../src'
 import { Listbox } from './Listbox'
 
 /**
@@ -9,14 +9,10 @@ import { Listbox } from './Listbox'
  */
 export function RearrangeableListbox({
   data,
-  onChange,
   onEvent,
-  options,
 }: {
   data: PatternData
-  onChange: (next: PatternData) => void
   onEvent: (event: PatternEvent) => void
-  options?: PatternOptions
 }) {
   const rootKeys = data.relations?.rootKeys ?? []
   const activeKey = data.state?.activeKey ?? rootKeys[0] ?? null
@@ -29,10 +25,7 @@ export function RearrangeableListbox({
     const target = idx + delta
     if (idx === -1 || target < 0 || target >= next.length) return
     ;[next[idx], next[target]] = [next[target]!, next[idx]!]
-    onChange({
-      ...data,
-      relations: { ...data.relations, rootKeys: next },
-    })
+    onEvent({ type: 'extension', name: 'listboxMove', key: activeKey, payload: { rootKeys: next } })
   }
 
   const removeActive = () => {
@@ -42,11 +35,7 @@ export function RearrangeableListbox({
     const nextKeys = rootKeys.filter((k) => k !== activeKey)
     const nextActive = nextKeys[Math.min(idx, nextKeys.length - 1)] ?? null
     const nextSelected = selectedKeys.filter((k) => k !== activeKey)
-    onChange({
-      ...data,
-      relations: { ...data.relations, rootKeys: nextKeys },
-      state: { ...data.state, activeKey: nextActive, selectedKeys: nextSelected },
-    })
+    onEvent({ type: 'extension', name: 'listboxRemove', key: activeKey, payload: { rootKeys: nextKeys, activeKey: nextActive, selectedKeys: nextSelected } })
   }
 
   // Alt+ArrowUp/Down 키 처리 — Listbox 외부 wrapper 에서 capture.
@@ -86,7 +75,7 @@ export function RearrangeableListbox({
           Remove
         </button>
       </div>
-      <Listbox data={data} onEvent={onEvent} options={options} />
+      <Listbox data={data} onEvent={onEvent} />
     </div>
   )
 }

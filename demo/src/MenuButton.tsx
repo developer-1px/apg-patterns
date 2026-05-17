@@ -5,7 +5,8 @@ import type { MenuProps } from './menuTypes'
 
 type Props = HTMLAttributes<HTMLElement>
 
-export function MenuButton({ data, onEvent, focusStrategy = 'rovingTabIndex' }: MenuProps) {
+export function MenuButton({ data, onEvent }: MenuProps) {
+  const focusStrategy = data.state?.focusStrategy === 'ariaActiveDescendant' ? 'ariaActiveDescendant' : 'rovingTabIndex'
   const runtime = createPatternRuntime({
     definition: menuButtonDefinition,
     data,

@@ -19,6 +19,7 @@ export const entry: PatternEntry = {
     )
     const apgPattern = menuVariants[host.variant].apgPattern
     const focusStrategy = menuVariants[host.variant].focusStrategy
+    const data = { ...host.data, state: { ...host.data.state, apgPattern, focusStrategy } }
     return {
       key: 'menuAndMenubar',
       label: 'Menu and Menubar',
@@ -26,7 +27,7 @@ export const entry: PatternEntry = {
       sourceNames: ['Menu.tsx', 'menuData.ts', 'menu/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
       inspect: renderMenuInspect(host.data, apgPattern, focusStrategy),
       variants: <VariantListbox value={host.variant} items={menuVariantItems} label="menu and menubar variants" idPrefix="menu-variant" onChange={host.selectVariant} />,
-      preview: <Menu key={host.variant} data={host.data} apgPattern={apgPattern} focusStrategy={focusStrategy} onEvent={(event) => {
+      preview: <Menu key={host.variant} data={data} onEvent={(event) => {
         onEvent(event)
         host.dispatchEvent(event)
       }} />,

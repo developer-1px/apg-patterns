@@ -1,14 +1,13 @@
 import type { MouseEvent } from 'react'
 import type { AriaAttributes } from 'react'
-import type { PatternData } from '../../src'
-import { initialBreadcrumbData, type BreadcrumbItem } from './breadcrumbData'
+import type { PatternData, PatternEvent } from '../../src'
 
 export interface BreadcrumbProps {
-  data?: PatternData
-  onNavigate?: (item: BreadcrumbItem) => void
+  data: PatternData
+  onEvent: (event: PatternEvent) => void
 }
 
-export function Breadcrumb({ data = initialBreadcrumbData, onNavigate }: BreadcrumbProps) {
+export function Breadcrumb({ data, onEvent }: BreadcrumbProps) {
   const rootKeys = data.relations?.rootKeys ?? []
   const currentByKey = data.state?.currentByKey ?? {}
   const items = rootKeys.map((key) => ({
@@ -24,7 +23,7 @@ export function Breadcrumb({ data = initialBreadcrumbData, onNavigate }: Breadcr
           const current = currentByKey[item.key] as AriaAttributes['aria-current']
           const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
             event.preventDefault()
-            onNavigate?.(item)
+            onEvent({ type: 'extension', name: 'breadcrumbNavigate', key: item.key, payload: item })
           }
           return (
             <li key={item.key} className="flex items-center gap-1">

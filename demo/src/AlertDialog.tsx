@@ -1,30 +1,24 @@
-import { useReducer, type HTMLAttributes, type KeyboardEvent, type MouseEvent } from 'react'
+import { type HTMLAttributes, type KeyboardEvent, type MouseEvent } from 'react'
 import type { KeyInput } from '@interactive-os/keyboard'
-import { createPatternRuntime, handlePatternTrapFocus, reducePatternData, usePatternEffects, type Key, type PatternData, type PatternEvent } from '../../src'
+import { createPatternRuntime, handlePatternTrapFocus, usePatternEffects, type Key, type PatternData, type PatternEvent } from '../../src'
 import { alertDialogDefinition } from '../../src/patterns/alertdialog/definition'
-import { initialAlertDialogData } from './alertdialogData'
 
 export interface AlertDialogProps {
-  data?: PatternData
-  onConfirm?: () => void
-  onCancel?: () => void
+  data: PatternData
+  onEvent: (event: PatternEvent) => void
 }
 
 const keyToElementId = (key: Key) => `alertdialog-${key}`
 
-export function AlertDialog({ data: initialData = initialAlertDialogData, onConfirm, onCancel }: AlertDialogProps) {
-  const [data, dispatch] = useReducer(
-    (current: PatternData, event: PatternEvent) => reducePatternData(alertDialogDefinition, current, event),
-    initialData,
-  )
-  const runtime = createPatternRuntime({ definition: alertDialogDefinition, data, options: {}, onEvent: dispatch, keyToElementId })
+export function AlertDialog({ data, onEvent }: AlertDialogProps) {
+  const runtime = createPatternRuntime({ definition: alertDialogDefinition, data, options: {}, onEvent, keyToElementId })
   const open = data.state?.expandedKeys?.includes('trigger') ?? false
   const rootKeyDown = runtime.getRootKeyboardHandler()
   usePatternEffects({ definition: alertDialogDefinition, data, keyToElementId })
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Escape') {
-      onCancel?.()
+      onEvent({ type: 'extension', name: 'alertDialogCancel', key: 'cancel' })
     }
     rootKeyDown(event as unknown as KeyInput & { preventDefault?: () => void })
     handlePatternTrapFocus({ event, definition: alertDialogDefinition, data, keyToElementId })
@@ -66,7 +60,7 @@ export function AlertDialog({ data: initialData = initialAlertDialogData, onConf
                 type="button"
                 onClick={(event) => {
                   confirmProps.onClick?.(event)
-                  onConfirm?.()
+                  onEvent({ type: 'extension', name: 'alertDialogConfirm', key: 'confirm' })
                 }}
               >
                 {labelOf('confirm')}
@@ -76,7 +70,7 @@ export function AlertDialog({ data: initialData = initialAlertDialogData, onConf
                 type="button"
                 onClick={(event) => {
                   cancelProps.onClick?.(event)
-                  onCancel?.()
+                  onEvent({ type: 'extension', name: 'alertDialogCancel', key: 'cancel' })
                 }}
               >
                 {labelOf('cancel')}

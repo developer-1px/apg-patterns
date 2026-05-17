@@ -5,7 +5,7 @@ import { initialMeterData, meterVariants } from './meterData'
 
 describe('Meter demo — back-compat (single disk meter)', () => {
   it('renders role=meter with aria-valuemin/max/now/valuetext', () => {
-    render(<Meter data={initialMeterData} />)
+    render(<Meter data={initialMeterData} onEvent={() => {}} />)
     const meter = screen.getByRole('meter')
     expect(meter.getAttribute('aria-valuemin')).toBe('0')
     expect(meter.getAttribute('aria-valuemax')).toBe('100')
@@ -14,7 +14,7 @@ describe('Meter demo — back-compat (single disk meter)', () => {
   })
 
   it('exposes the label', () => {
-    render(<Meter data={initialMeterData} />)
+    render(<Meter data={initialMeterData} onEvent={() => {}} />)
     expect(screen.getByText('Disk usage')).toBeTruthy()
   })
 })
@@ -22,7 +22,7 @@ describe('Meter demo — back-compat (single disk meter)', () => {
 describe('Meter demo — variant: Battery', () => {
   it('renders battery level meter', () => {
     const v = meterVariants.battery
-    render(<Meter data={v.data} />)
+    render(<Meter data={v.data} onEvent={() => {}} />)
     const meter = screen.getByRole('meter')
     expect(meter.getAttribute('aria-valuenow')).toBe('35')
     expect(meter.getAttribute('aria-valuetext')).toBe('35%')
@@ -34,7 +34,7 @@ describe('Meter demo — variant: Battery', () => {
 describe('Meter demo — variant: CPU (per-item range override)', () => {
   it('uses item valuemin/valuemax over options', () => {
     const v = meterVariants.cpu
-    render(<Meter data={v.data} />)
+    render(<Meter data={v.data} onEvent={() => {}} />)
     const meter = screen.getByRole('meter')
     expect(meter.getAttribute('aria-valuemin')).toBe('0')
     expect(meter.getAttribute('aria-valuemax')).toBe('100')
@@ -45,7 +45,7 @@ describe('Meter demo — variant: CPU (per-item range override)', () => {
 describe('Meter demo — variant: Storage', () => {
   it('renders custom valuetext with options-driven max', () => {
     const v = meterVariants.storage
-    render(<Meter data={v.data} />)
+    render(<Meter data={v.data} onEvent={() => {}} />)
     const meter = screen.getByRole('meter')
     expect(meter.getAttribute('aria-valuemin')).toBe('0')
     expect(meter.getAttribute('aria-valuemax')).toBe('256')
@@ -56,7 +56,7 @@ describe('Meter demo — variant: Storage', () => {
 
 describe('Meter demo — no keyboard interaction', () => {
   it('does not expose a tabIndex (read-only display)', () => {
-    render(<Meter data={initialMeterData} />)
+    render(<Meter data={initialMeterData} onEvent={() => {}} />)
     const meter = screen.getByRole('meter')
     expect(meter.getAttribute('tabindex')).toBeNull()
   })

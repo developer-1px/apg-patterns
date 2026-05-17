@@ -5,14 +5,12 @@ import { spinbuttonDefinition } from '../../src/patterns/spinbutton/definition'
 
 export function Spinbutton({
   data,
-  options: providedOptions,
   onEvent,
 }: {
   data: PatternData
-  options?: PatternOptions
   onEvent: (event: PatternEvent) => void
 }) {
-  const options = providedOptions ?? (((data.state as { options?: PatternOptions } | undefined)?.options ?? {}) as PatternOptions)
+  const options = (((data.state as { options?: PatternOptions } | undefined)?.options ?? {}) as PatternOptions)
   const runtime = createPatternRuntime({
     definition: spinbuttonDefinition,
     data,
