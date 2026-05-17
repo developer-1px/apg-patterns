@@ -3,7 +3,8 @@ import { reducePatternData, reduceTabsData, type PatternData, type PatternEvent,
 import { initialData, reduceData, resolveTarget } from './demoData'
 import { Grid } from './Grid'
 import { gridDefinition, listboxDefinition } from '../../src'
-import { gridVariantItems, gridVariants, type GridVariantKey } from './gridData'
+import { gridVariants, type GridVariantKey } from './gridData'
+import { GridVariantMenu } from './GridVariantMenu'
 import { renderAriaTree, renderGridInspect, renderHtmlTree, renderListboxInspect, renderSliderInspect, renderStaticInspect, renderTabsInspect } from './inspect'
 import { Listbox } from './Listbox'
 import { initialListboxData } from './listboxData'
@@ -25,6 +26,7 @@ const selectClass = 'h-7 rounded bg-zinc-50 px-2 text-xs text-zinc-700 outline-n
 const preClass = 'h-full min-h-0 overflow-auto bg-zinc-50 p-3 font-mono text-xs leading-relaxed text-zinc-700 dark:bg-zinc-900/70 dark:text-zinc-300'
 const optionButtonClass =
   'h-7 rounded px-2 text-left text-xs text-zinc-600 hover:bg-zinc-100 aria-selected:bg-zinc-900 aria-selected:text-white dark:text-zinc-400 dark:hover:bg-zinc-900 dark:aria-selected:bg-zinc-100 dark:aria-selected:text-zinc-950'
+const rightModes = ['source', 'inspect', 'log'] as const
 
 export function App() {
   const [patternKey, setPatternKey] = useState<PatternKey>('treeview')
@@ -96,6 +98,7 @@ export function App() {
   const activeSourceName = sourceNames.includes(sourceName) ? sourceName : sourceNames[0]
   const source = sources[activeSourceName]
   const sourceTabs = useSourceTabs({ label: 'source files', tabs: sourceNames, value: activeSourceName, onChange: setSourceName })
+  const rightModeTabs = useSourceTabs({ label: 'right panel', tabs: rightModes, value: rightMode, onChange: setRightMode })
 
   useEffect(() => {
     if (!sourceNames.includes(sourceName)) setSourceName(sourceNames[0])
@@ -148,15 +151,7 @@ export function App() {
               </label>
             </div>
           ) : null}
-          {patternKey === 'grid' ? (
-            <div className="grid gap-1" role="listbox" aria-label="grid variants">
-              {gridVariantItems.map((variant) => (
-                <button key={variant.key} type="button" role="option" aria-selected={gridVariant === variant.key} className={optionButtonClass} onClick={() => selectGridVariant(variant.key)}>
-                  {variant.label}
-                </button>
-              ))}
-            </div>
-          ) : null}
+          {patternKey === 'grid' ? <GridVariantMenu value={gridVariant} onChange={selectGridVariant} /> : null}
           {patternKey === 'listbox' ? <p className="text-xs text-zinc-500 dark:text-zinc-500">single selection</p> : null}
         </div>
       </section>
@@ -191,9 +186,9 @@ export function App() {
 
       <section className={`${panelClass} flex min-h-0 flex-col`}>
         <header className="mb-3 grid gap-2">
-          <div className="flex items-center gap-1" role="tablist" aria-label="right panel">
-            {(['source', 'inspect', 'log'] as const).map((mode) => (
-              <button key={mode} type="button" role="tab" aria-selected={rightMode === mode} className={optionButtonClass} onClick={() => setRightMode(mode)}>
+          <div {...rightModeTabs.getTablistProps()} className="flex items-center gap-1">
+            {rightModes.map((mode) => (
+              <button {...rightModeTabs.getTabProps(mode)} key={mode} type="button" className={optionButtonClass}>
                 {mode}
               </button>
             ))}
