@@ -1,6 +1,9 @@
-import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react'
-import type { PatternData } from '../../src'
+import { useReducer, type KeyboardEvent } from 'react'
+import type { KeyInput } from '@interactive-os/keyboard'
+import { createPatternRuntime, reducePatternData, type Key, type PatternData, type PatternEvent } from '../../src'
+import { dialogDefinition } from '../../src/patterns/dialog/definition'
 import { dialogContent, initialDialogData } from './dialogData'
+import { handlePatternTrapFocus, usePatternEffects } from './patternEffects'
 
 const triggerClass =
   'inline-flex h-8 items-center rounded bg-zinc-100 px-3 text-sm text-zinc-800 outline-none hover:bg-zinc-200 focus:outline focus:outline-2 focus:outline-zinc-400 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:focus:outline-zinc-500'
@@ -13,100 +16,48 @@ const inputClass =
 const buttonClass =
   'inline-flex h-8 items-center rounded bg-zinc-100 px-3 text-sm text-zinc-800 outline-none hover:bg-zinc-200 focus:outline focus:outline-2 focus:outline-zinc-400 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800'
 
-const FOCUSABLE_SELECTOR = [
-  'a[href]',
-  'button:not([disabled])',
-  'input:not([disabled]):not([type="hidden"])',
-  'select:not([disabled])',
-  'textarea:not([disabled])',
-  '[tabindex]:not([tabindex="-1"])',
-].join(',')
-
-function focusableIn(root: HTMLElement | null): HTMLElement[] {
-  if (!root) return []
-  return Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
-}
+const keyToElementId = (key: Key) => (key === 'dialog' ? 'dialog-panel' : `dialog-${key}`)
 
 export interface DialogProps {
   data?: PatternData
 }
 
-export function Dialog({ data = initialDialogData }: DialogProps = {}) {
-  const [open, setOpen] = useState(false)
-  const triggerRef = useRef<HTMLButtonElement | null>(null)
-  const panelRef = useRef<HTMLDivElement | null>(null)
-  const titleId = 'dialog-title'
-  const descId = 'dialog-description'
-
-  const close = () => setOpen(false)
-
-  useEffect(() => {
-    if (open) {
-      const first = focusableIn(panelRef.current)[0]
-      first?.focus()
-      return
-    }
-    triggerRef.current?.focus()
-  }, [open])
+export function Dialog({ data: initialData = initialDialogData }: DialogProps = {}) {
+  const [data, dispatch] = useReducer(
+    (current: PatternData, event: PatternEvent) => reducePatternData(dialogDefinition, current, event),
+    initialData,
+  )
+  const runtime = createPatternRuntime({ definition: dialogDefinition, data, options: {}, onEvent: dispatch, keyToElementId })
+  const open = data.state?.expandedKeys?.includes('trigger') ?? false
+  const rootKeyDown = runtime.getRootKeyboardHandler()
+  usePatternEffects({ definition: dialogDefinition, data, keyToElementId })
 
   const onPanelKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Escape') {
-      event.preventDefault()
-      close()
-      return
-    }
-    if (event.key !== 'Tab') return
-    const items = focusableIn(panelRef.current)
-    if (items.length === 0) {
-      event.preventDefault()
-      return
-    }
-    const first = items[0]!
-    const last = items[items.length - 1]!
-    const active = document.activeElement as HTMLElement | null
-    if (event.shiftKey && active === first) {
-      event.preventDefault()
-      last.focus()
-    } else if (!event.shiftKey && active === last) {
-      event.preventDefault()
-      first.focus()
-    }
-  }
-
-  const onOverlayMouseDown = (event: MouseEvent<HTMLDivElement>) => {
-    if (event.target === event.currentTarget) close()
+    rootKeyDown(event as unknown as KeyInput & { preventDefault?: () => void })
+    handlePatternTrapFocus({ event, definition: dialogDefinition, data, keyToElementId })
   }
   const labelOf = (key: string) => data.items[key]?.label ?? key
 
   return (
     <div className="grid gap-3">
       <button
-        ref={triggerRef}
+        {...runtime.getPartProps('trigger', 'trigger')}
         type="button"
         className={triggerClass}
-        aria-haspopup="dialog"
-        aria-expanded={open}
-        aria-controls="dialog-panel"
-        onClick={() => setOpen(true)}
       >
         {labelOf('trigger')}
       </button>
       {open ? (
         <>
-          <div className={overlayClass} data-testid="dialog-overlay" onMouseDown={onOverlayMouseDown} />
+          <div {...runtime.getPartProps('overlay', 'dialog')} className={overlayClass} data-testid="dialog-overlay" />
           <div
-            ref={panelRef}
-            id="dialog-panel"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby={titleId}
-            aria-describedby={descId}
+            {...runtime.getPartProps('dialog', 'dialog')}
             className={panelClass}
             onKeyDown={onPanelKeyDown}
             tabIndex={-1}
           >
-            <h2 id={titleId} className="mb-1 text-base font-medium">{labelOf('title')}</h2>
-            <p id={descId} className="mb-4 text-zinc-600 dark:text-zinc-400">{labelOf('description')}</p>
+            <h2 {...runtime.getPartProps('title', 'title')} className="mb-1 text-base font-medium">{labelOf('title')}</h2>
+            <p {...runtime.getPartProps('description', 'description')} className="mb-4 text-zinc-600 dark:text-zinc-400">{labelOf('description')}</p>
             <div className="grid gap-2">
               {dialogContent.fields.map((field) => (
                 <label key={field.id} className="grid grid-cols-[5rem_1fr] items-center gap-2">
@@ -116,8 +67,8 @@ export function Dialog({ data = initialDialogData }: DialogProps = {}) {
               ))}
             </div>
             <div className="mt-4 flex justify-end gap-2">
-              <button type="button" className={buttonClass} onClick={close}>{dialogContent.cancelLabel}</button>
-              <button type="button" className={buttonClass} onClick={close}>{dialogContent.submitLabel}</button>
+              <button {...runtime.getPartProps('cancel', 'cancel')} type="button" className={buttonClass}>{labelOf('cancel')}</button>
+              <button {...runtime.getPartProps('submit', 'submit')} type="button" className={buttonClass}>{labelOf('submit')}</button>
             </div>
           </div>
         </>

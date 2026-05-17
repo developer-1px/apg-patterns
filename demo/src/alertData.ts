@@ -19,8 +19,6 @@ export const initialAlertData: PatternData = {
   },
 }
 
-export const initialAlertMessage = ''
-
 // Custom event: 'spawn' (a non-pattern domain event) carries the message text.
 // Pattern reducer handles expand; alertData reducer additionally tracks message text.
 export type AlertSpawnEvent = { type: 'spawn'; key: string; message: string }

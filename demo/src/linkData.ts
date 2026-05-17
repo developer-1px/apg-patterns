@@ -6,7 +6,6 @@ export interface LinkVariant {
   key: LinkVariantKey
   label: string
   data: PatternData
-  href: string
 }
 
 const anchorInitial = PatternDataSchema.parse({
@@ -30,13 +29,11 @@ export const linkVariants: Record<LinkVariantKey, LinkVariant> = {
     key: 'anchor',
     label: 'Anchor <a href>',
     data: anchorInitial,
-    href: 'https://www.w3.org/WAI/ARIA/apg/',
   },
   spanRole: {
     key: 'spanRole',
     label: 'Span role="link"',
     data: spanRoleInitial,
-    href: 'https://www.w3.org/WAI/ARIA/apg/patterns/link/',
   },
 }
 

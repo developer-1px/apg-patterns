@@ -1,4 +1,4 @@
-import { useEffect, type KeyboardEvent as ReactKeyboardEvent } from 'react'
+import { useEffect, useRef, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import {
   createParentByKey,
   evaluatePredicate,
@@ -27,14 +27,21 @@ export function usePatternEffects({
   data: PatternData
   keyToElementId: (key: Key) => string
 }) {
+  const previousMatches = useRef<boolean[]>([])
+
   useEffect(() => {
-    for (const effect of definition.effects ?? []) {
+    const nextMatches: boolean[] = []
+    for (const [index, effect] of (definition.effects ?? []).entries()) {
       const ctx = { data, activeKey: data.state?.activeKey ?? null, parentByKey: createParentByKey(data), keyToElementId }
-      if (!evaluatePredicate(effect.when, ctx)) continue
+      const matches = evaluatePredicate(effect.when, ctx)
+      nextMatches[index] = matches
+      if (!matches || previousMatches.current[index] === matches) continue
       if (effect.kind === 'focus' || effect.kind === 'restoreFocus') {
-        resolveElementTarget(effect.target, data, keyToElementId)?.focus({ preventScroll: effect.preventScroll })
+        const target = resolveElementTarget(effect.target, data, keyToElementId)
+        target?.focus({ preventScroll: effect.preventScroll })
       }
     }
+    previousMatches.current = nextMatches
   }, [data, definition, keyToElementId])
 }
 

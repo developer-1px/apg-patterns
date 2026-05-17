@@ -79,17 +79,17 @@ definePredicate('optionEquals', (p, ctx) => {
 })
 definePredicate('hasChildren', (p, ctx) => {
   if (p.kind !== 'hasChildren') return false
-  const key = resolveKeyToken(p.key, ctx.key, ctx.activeKey)
+  const key = resolveKeyToken(p.key, ctx.key, ctx.activeKey, ctx)
   return (ctx.data.relations?.childrenByKey?.[key]?.length ?? 0) > 0
 })
 definePredicate('isExpanded', (p, ctx) => {
   if (p.kind !== 'isExpanded') return false
-  const key = resolveKeyToken(p.key, ctx.key, ctx.activeKey)
+  const key = resolveKeyToken(p.key, ctx.key, ctx.activeKey, ctx)
   return ctx.data.state?.expandedKeys?.includes(key) ?? false
 })
 definePredicate('isDisabled', (p, ctx) => {
   if (p.kind !== 'isDisabled') return false
-  const key = resolveKeyToken(p.key, ctx.key, ctx.activeKey)
+  const key = resolveKeyToken(p.key, ctx.key, ctx.activeKey, ctx)
   return ctx.data.state?.disabledKeys?.includes(key) ?? false
 })
 

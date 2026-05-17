@@ -1,89 +1,40 @@
-import gridDefinitionSource from '../../src/patterns/grid/definition.ts?raw'
-import listboxDefinitionSource from '../../src/patterns/listbox/definition.ts?raw'
-import sliderDefinitionSource from '../../src/patterns/slider/definition.ts?raw'
-import tabsDefinitionSource from '../../src/patterns/tabs/definition.ts?raw'
-import tabsRuntimeSource from '../../src/patterns/tabs/runtime.ts?raw'
-import treeviewDefinitionSource from '../../src/patterns/treeview/definition.ts?raw'
-import treeviewRuntimeSource from '../../src/patterns/treeview/runtime.ts?raw'
-import disclosureDefinitionSource from '../../src/patterns/disclosure/definition.ts?raw'
-import disclosureRuntimeSource from '../../src/patterns/disclosure/runtime.ts?raw'
-import checkboxDefinitionSource from '../../src/patterns/checkbox/definition.ts?raw'
-import radioDefinitionSource from '../../src/patterns/radio/definition.ts?raw'
-import menuDefinitionSource from '../../src/patterns/menu/definition.ts?raw'
-import comboboxDefinitionSource from '../../src/patterns/combobox/definition.ts?raw'
-import patternKernelSource from '../../src/patternKernel.ts?raw'
-import patternReducerSource from '../../src/patternReducer.ts?raw'
-import patternRuntimeSource from '../../src/patternRuntime.ts?raw'
-import reactSource from '../../src/react.ts?raw'
-import schemaSource from '../../src/schema.ts?raw'
-import gridSource from './Grid.tsx?raw'
-import gridDataSource from './gridData.ts?raw'
-import listboxSource from './Listbox.tsx?raw'
-import rearrangeableListboxSource from './RearrangeableListbox.tsx?raw'
-import listboxDataSource from './listboxData.ts?raw'
-import sliderSource from './Slider.tsx?raw'
-import sliderDataSource from './sliderData.ts?raw'
-import tabsSource from './Tabs.tsx?raw'
-import tabsDataSource from './tabsData.ts?raw'
-import treeSource from './Tree.tsx?raw'
-import treeVariantsSource from './treeVariants.ts?raw'
-import treeVariantMenuSource from './TreeVariantMenu.tsx?raw'
-import disclosureSource from './Disclosure.tsx?raw'
-import disclosureDataSource from './disclosureData.ts?raw'
-import checkboxSource from './Checkbox.tsx?raw'
-import checkboxDataSource from './checkboxData.ts?raw'
-import radioSource from './RadioGroup.tsx?raw'
-import radioDataSource from './radioData.ts?raw'
-import menuSource from './Menu.tsx?raw'
-import menuDataSource from './menuData.ts?raw'
-import comboboxSource from './Combobox.tsx?raw'
-import comboboxDataSource from './comboboxData.ts?raw'
-import demoDataSource from './demoData.ts?raw'
-import focusHookSource from './useTreeDomFocus.ts?raw'
+// Auto-collected source files for the source viewer.
+// Uses Vite's import.meta.glob to gather raw text contents of:
+//   - All pattern kernel files (src/*.ts at the top level)
+//   - All pattern definition/runtime files (src/patterns/<name>/*.ts)
+//   - All demo files in demo/src (*.tsx, *Data.ts, plus a few helpers)
 
-export const sources = {
-  'Tree.tsx': treeSource,
-  'TreeVariantMenu.tsx': treeVariantMenuSource,
-  'treeVariants.ts': treeVariantsSource,
-  'useTreeDomFocus.ts': focusHookSource,
-  'demoData.ts': demoDataSource,
-  'Listbox.tsx': listboxSource,
-  'RearrangeableListbox.tsx': rearrangeableListboxSource,
-  'listboxData.ts': listboxDataSource,
-  'Grid.tsx': gridSource,
-  'gridData.ts': gridDataSource,
-  'Tabs.tsx': tabsSource,
-  'tabsData.ts': tabsDataSource,
-  'Slider.tsx': sliderSource,
-  'sliderData.ts': sliderDataSource,
-  'react.ts': reactSource,
-  'treeview/runtime.ts': treeviewRuntimeSource,
-  'treeview/definition.ts': treeviewDefinitionSource,
-  'tabs/runtime.ts': tabsRuntimeSource,
-  'tabs/definition.ts': tabsDefinitionSource,
-  'listbox/definition.ts': listboxDefinitionSource,
-  'grid/definition.ts': gridDefinitionSource,
-  'slider/definition.ts': sliderDefinitionSource,
-  'Disclosure.tsx': disclosureSource,
-  'disclosureData.ts': disclosureDataSource,
-  'disclosure/definition.ts': disclosureDefinitionSource,
-  'disclosure/runtime.ts': disclosureRuntimeSource,
-  'Checkbox.tsx': checkboxSource,
-  'checkboxData.ts': checkboxDataSource,
-  'checkbox/definition.ts': checkboxDefinitionSource,
-  'RadioGroup.tsx': radioSource,
-  'radioData.ts': radioDataSource,
-  'radio/definition.ts': radioDefinitionSource,
-  'Menu.tsx': menuSource,
-  'menuData.ts': menuDataSource,
-  'menu/definition.ts': menuDefinitionSource,
-  'Combobox.tsx': comboboxSource,
-  'comboboxData.ts': comboboxDataSource,
-  'combobox/definition.ts': comboboxDefinitionSource,
-  'patternRuntime.ts': patternRuntimeSource,
-  'patternReducer.ts': patternReducerSource,
-  'patternKernel.ts': patternKernelSource,
-  'schema.ts': schemaSource,
-} as const
+const kernelModules = import.meta.glob('../../src/*.ts', { eager: true, query: '?raw', import: 'default' }) as Record<string, string>
+const patternModules = import.meta.glob('../../src/patterns/*/*.ts', { eager: true, query: '?raw', import: 'default' }) as Record<string, string>
+const demoTsxModules = import.meta.glob('./*.tsx', { eager: true, query: '?raw', import: 'default' }) as Record<string, string>
+const demoDataModules = import.meta.glob('./*.ts', { eager: true, query: '?raw', import: 'default' }) as Record<string, string>
 
-export type SourceName = keyof typeof sources
+const collected: Record<string, string> = {}
+
+// kernel: keep top-level filename only (e.g. patternKernel.ts)
+for (const [path, src] of Object.entries(kernelModules)) {
+  const name = path.split('/').pop()!
+  collected[name] = src
+}
+// patterns: keep <patternName>/<file>.ts
+for (const [path, src] of Object.entries(patternModules)) {
+  const parts = path.split('/')
+  const file = parts.pop()!
+  const dir = parts.pop()!
+  collected[`${dir}/${file}`] = src
+}
+// demo *.tsx
+for (const [path, src] of Object.entries(demoTsxModules)) {
+  const name = path.split('/').pop()!
+  if (name.endsWith('.test.tsx')) continue
+  collected[name] = src
+}
+// demo *.ts (data files and helpers)
+for (const [path, src] of Object.entries(demoDataModules)) {
+  const name = path.split('/').pop()!
+  if (name.endsWith('.test.ts')) continue
+  collected[name] = src
+}
+
+export const sources: Readonly<Record<string, string>> = collected
+export type SourceName = string

@@ -31,8 +31,6 @@ export function Alert({ data, onEvent }: AlertProps) {
   const visible = (data.state?.expandedKeys ?? []).includes(alertKey)
   const message = String((data.items[alertKey] as { message?: unknown } | undefined)?.message ?? '')
 
-  const { onKeyDown: rootKeyDown } = {} as Props
-  void rootKeyDown
   const onKeyDown = runtime.getRootKeyboardHandler()
 
   const alertProps = runtime.getPartProps('alert', alertKey) as Props

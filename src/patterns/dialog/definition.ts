@@ -5,6 +5,8 @@ export const DialogDefinitionSchema = PatternDefinitionSchema.superRefine((value
   if (value.rootRole !== 'dialog') ctx.addIssue({ code: 'custom', path: ['rootRole'], message: 'expected "dialog"' })
   if (!value.parts.dialog) ctx.addIssue({ code: 'custom', path: ['parts', 'dialog'], message: 'dialog requires parts.dialog' })
   if (!value.parts.trigger) ctx.addIssue({ code: 'custom', path: ['parts', 'trigger'], message: 'dialog requires parts.trigger' })
+  if (!value.parts.cancel) ctx.addIssue({ code: 'custom', path: ['parts', 'cancel'], message: 'dialog requires parts.cancel' })
+  if (!value.parts.submit) ctx.addIssue({ code: 'custom', path: ['parts', 'submit'], message: 'dialog requires parts.submit' })
 })
 
 export const dialogDefinition = DialogDefinitionSchema.parse({
@@ -31,12 +33,25 @@ export const dialogDefinition = DialogDefinitionSchema.parse({
       aria: [
         { attribute: 'aria-modal', from: 'literal.true' },
         { attribute: 'aria-labelledby', from: 'relations.ownerByKey' },
-        { attribute: 'aria-describedby', from: 'items.label' },
+        { attribute: 'aria-describedby', from: 'relations.controlsByKey' },
       ],
     },
-    overlay: { role: 'presentation' },
+    overlay: {
+      role: 'presentation',
+      events: [{ event: 'mousedown', events: [{ type: 'expand', key: '$triggerKey', expanded: false }] }],
+    },
     title: { role: 'heading' },
     description: { role: 'paragraph' },
+    cancel: {
+      role: 'button',
+      keySource: 'items',
+      events: [{ event: 'click', events: [{ type: 'expand', key: '$triggerKey', expanded: false }] }],
+    },
+    submit: {
+      role: 'button',
+      keySource: 'items',
+      events: [{ event: 'click', events: [{ type: 'expand', key: '$triggerKey', expanded: false }] }],
+    },
   },
   navigation: {
     visibleOrder: { kind: 'flat' },

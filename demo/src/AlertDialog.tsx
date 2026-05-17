@@ -1,6 +1,9 @@
-import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react'
-import type { PatternData } from '../../src'
+import { useReducer, type HTMLAttributes, type KeyboardEvent, type MouseEvent } from 'react'
+import type { KeyInput } from '@interactive-os/keyboard'
+import { createPatternRuntime, reducePatternData, type Key, type PatternData, type PatternEvent } from '../../src'
+import { alertDialogDefinition } from '../../src/patterns/alertdialog/definition'
 import { initialAlertDialogData } from './alertdialogData'
+import { handlePatternTrapFocus, usePatternEffects } from './patternEffects'
 
 export interface AlertDialogProps {
   data?: PatternData
@@ -8,44 +11,24 @@ export interface AlertDialogProps {
   onCancel?: () => void
 }
 
-const titleId = 'alertdialog-title'
-const descId = 'alertdialog-desc'
+const keyToElementId = (key: Key) => `alertdialog-${key}`
 
-export function AlertDialog({ data = initialAlertDialogData, onConfirm, onCancel }: AlertDialogProps) {
-  const [open, setOpen] = useState(false)
-  const triggerRef = useRef<HTMLButtonElement>(null)
-  const confirmRef = useRef<HTMLButtonElement>(null)
-  const cancelRef = useRef<HTMLButtonElement>(null)
-  const panelRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (open) confirmRef.current?.focus()
-    else triggerRef.current?.focus()
-  }, [open])
-
-  const close = () => setOpen(false)
+export function AlertDialog({ data: initialData = initialAlertDialogData, onConfirm, onCancel }: AlertDialogProps) {
+  const [data, dispatch] = useReducer(
+    (current: PatternData, event: PatternEvent) => reducePatternData(alertDialogDefinition, current, event),
+    initialData,
+  )
+  const runtime = createPatternRuntime({ definition: alertDialogDefinition, data, options: {}, onEvent: dispatch, keyToElementId })
+  const open = data.state?.expandedKeys?.includes('trigger') ?? false
+  const rootKeyDown = runtime.getRootKeyboardHandler()
+  usePatternEffects({ definition: alertDialogDefinition, data, keyToElementId })
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Escape') {
-      event.preventDefault()
       onCancel?.()
-      close()
-      return
     }
-    if (event.key === 'Tab') {
-      const focusables = [confirmRef.current, cancelRef.current].filter(Boolean) as HTMLButtonElement[]
-      if (focusables.length === 0) return
-      const first = focusables[0]!
-      const last = focusables[focusables.length - 1]!
-      const active = document.activeElement as HTMLElement | null
-      if (event.shiftKey && active === first) {
-        event.preventDefault()
-        last.focus()
-      } else if (!event.shiftKey && active === last) {
-        event.preventDefault()
-        first.focus()
-      }
-    }
+    rootKeyDown(event as unknown as KeyInput & { preventDefault?: () => void })
+    handlePatternTrapFocus({ event, definition: alertDialogDefinition, data, keyToElementId })
   }
 
   const stopOverlay = (event: MouseEvent) => {
@@ -55,15 +38,14 @@ export function AlertDialog({ data = initialAlertDialogData, onConfirm, onCancel
     }
   }
   const labelOf = (key: string) => data.items[key]?.label ?? key
+  const confirmProps = runtime.getPartProps('confirm', 'confirm') as HTMLAttributes<HTMLButtonElement>
+  const cancelProps = runtime.getPartProps('cancel', 'cancel') as HTMLAttributes<HTMLButtonElement>
 
   return (
     <div>
       <button
-        ref={triggerRef}
+        {...runtime.getPartProps('trigger', 'trigger')}
         type="button"
-        aria-haspopup="dialog"
-        aria-expanded={open}
-        onClick={() => setOpen(true)}
       >
         {labelOf('trigger')}
       </button>
@@ -74,32 +56,28 @@ export function AlertDialog({ data = initialAlertDialogData, onConfirm, onCancel
           style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)' }}
         >
           <div
-            ref={panelRef}
-            role="alertdialog"
-            aria-modal="true"
-            aria-labelledby={titleId}
-            aria-describedby={descId}
+            {...runtime.getPartProps('dialog', 'dialog')}
             onKeyDown={handleKeyDown}
           >
-            <h2 id={titleId}>{labelOf('title')}</h2>
-            <p id={descId}>{labelOf('description')}</p>
+            <h2 id={keyToElementId('title')}>{labelOf('title')}</h2>
+            <p id={keyToElementId('description')}>{labelOf('description')}</p>
             <div>
               <button
-                ref={confirmRef}
+                {...confirmProps}
                 type="button"
-                onClick={() => {
+                onClick={(event) => {
+                  confirmProps.onClick?.(event)
                   onConfirm?.()
-                  close()
                 }}
               >
                 {labelOf('confirm')}
               </button>
               <button
-                ref={cancelRef}
+                {...cancelProps}
                 type="button"
-                onClick={() => {
+                onClick={(event) => {
+                  cancelProps.onClick?.(event)
                   onCancel?.()
-                  close()
                 }}
               >
                 {labelOf('cancel')}

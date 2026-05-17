@@ -4,7 +4,7 @@ import type { SourceName } from './sources'
 
 export const selectClass = 'h-7 rounded bg-zinc-50 px-2 text-xs text-zinc-700 outline-none focus:bg-white focus:outline focus:outline-2 focus:outline-zinc-400 dark:bg-zinc-900 dark:text-zinc-300 dark:focus:bg-zinc-950'
 
-export type PatternKey = 'treeview' | 'listbox' | 'grid' | 'tabs' | 'slider' | 'disclosure' | 'checkbox' | 'radio' | 'menuAndMenubar' | 'combobox'
+export type PatternKey = string
 
 export interface DemoPattern {
   key: PatternKey
@@ -19,3 +19,10 @@ export interface DemoPattern {
 }
 
 export type EmitPatternEvent = (event: PatternEvent) => void
+
+export interface PatternEntry {
+  key: PatternKey
+  label: string
+  order?: number
+  useDemoPattern: (onEvent: EmitPatternEvent) => DemoPattern
+}

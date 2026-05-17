@@ -11,15 +11,14 @@ const linkClass =
 
 export interface LinkProps {
   data: PatternData
-  href?: string
   variant?: LinkVariantKey
   onActivate?: (key: string, href: string) => void
   onEvent?: (event: PatternEvent) => void
 }
 
-export function Link({ data, href: hrefProp, variant = 'anchor', onActivate, onEvent }: LinkProps) {
+export function Link({ data, variant = 'anchor', onActivate, onEvent }: LinkProps) {
   const rootKey = data.relations?.rootKeys?.[0] ?? null
-  const href = rootKey ? String((data.items[rootKey] as { href?: unknown } | undefined)?.href ?? hrefProp ?? '#') : hrefProp ?? '#'
+  const href = rootKey ? String((data.items[rootKey] as { href?: unknown } | undefined)?.href ?? '#') : '#'
 
   const emit = (event: PatternEvent) => {
     onEvent?.(event)

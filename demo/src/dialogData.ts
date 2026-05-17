@@ -6,10 +6,12 @@ export const initialDialogData: PatternData = {
     dialog: { label: 'Add Delivery Address' },
     title: { label: 'Add Delivery Address' },
     description: { label: 'Provide an address where you would like your order delivered.' },
+    cancel: { label: 'Cancel' },
+    submit: { label: 'Add' },
   },
   relations: {
     rootKeys: ['trigger'],
-    controlsByKey: { trigger: ['dialog'] },
+    controlsByKey: { trigger: ['dialog'], dialog: ['description'] },
     ownerByKey: { dialog: 'title' },
   },
   state: {

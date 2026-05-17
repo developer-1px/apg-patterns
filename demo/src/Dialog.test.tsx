@@ -58,7 +58,6 @@ describe('Dialog demo (modal)', () => {
     fireEvent.click(trigger)
 
     const dialog = screen.getByRole('dialog')
-    const cancel = screen.getByRole('button', { name: 'Cancel' })
     const add = screen.getByRole('button', { name: 'Add' })
     const firstInput = document.getElementById('dialog-street') as HTMLInputElement
 
@@ -69,6 +68,5 @@ describe('Dialog demo (modal)', () => {
     firstInput.focus()
     fireEvent.keyDown(dialog, { key: 'Tab', code: 'Tab', shiftKey: true })
     expect(document.activeElement).toBe(add)
-    void cancel
   })
 })

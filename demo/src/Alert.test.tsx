@@ -4,14 +4,12 @@ import { describe, expect, it } from 'vitest'
 import { Alert } from './Alert'
 import {
   initialAlertData,
-  initialAlertMessage,
   reduceAlertState,
   type AlertDomainEvent,
   type AlertReducerState,
 } from './alertData'
 
 function AlertDemo() {
-  void initialAlertMessage
   const [state, setState] = useState<AlertReducerState>({ data: initialAlertData })
   const handleEvent = (event: AlertDomainEvent) => setState((current) => reduceAlertState(current, event))
   return <Alert data={state.data} onEvent={handleEvent} />

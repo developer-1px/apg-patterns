@@ -153,6 +153,7 @@ const domEventHandlerPropRegistry = new Map<string, string>([
   ['blur', 'onBlur'],
   ['click', 'onClick'],
   ['dblclick', 'onDoubleClick'],
+  ['mousedown', 'onMouseDown'],
   ['keydown', 'onKeyDown'],
   ['keyup', 'onKeyUp'],
   ['input', 'onInput'],
@@ -186,7 +187,7 @@ function resolvePartEventBindings(
         if (binding.when && !evaluatePredicate(binding.when, ctx)) continue
         const active = ctx.activeKey ?? ctx.key
         if (!active) continue
-        for (const event of binding.events.flatMap((t) => resolveEventTemplate(t, active, ctx.data, ctx.key))) emit(event)
+        for (const event of binding.events.flatMap((t) => resolveEventTemplate(t, active, ctx.data, ctx.key, ctx))) emit(event)
       }
     }
   }
