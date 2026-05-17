@@ -231,6 +231,7 @@ describe('App route state', () => {
 
       expect(screen.getByRole('heading', { name: route.label })).toBeTruthy()
       await waitFor(() => expect(currentHashParam('pattern')).toBe(route.key))
+      expect(window.location.hash).toContain(`source=${encodeURIComponent(route.sourceName)}`)
       expect(currentHashParam('source')).toBe(route.sourceName)
       expect(screen.getByTitle(route.sourceName)).toBeTruthy()
       await expectActiveSourceText(route.sourceName)
