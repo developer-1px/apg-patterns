@@ -103,7 +103,3 @@ export const tabsDefinition = TabsDefinitionSchema.parse({
     },
   ],
 })
-
-export const serializableTabsDefinition = JSON.parse(
-  JSON.stringify(tabsDefinition),
-) as typeof tabsDefinition

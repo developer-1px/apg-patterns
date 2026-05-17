@@ -104,7 +104,3 @@ export const alertDialogDefinition = AlertDialogDefinitionSchema.parse({
     },
   ],
 })
-
-export const serializableAlertDialogDefinition = JSON.parse(
-  JSON.stringify(alertDialogDefinition),
-) as typeof alertDialogDefinition

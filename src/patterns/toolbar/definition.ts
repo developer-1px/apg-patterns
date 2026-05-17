@@ -71,7 +71,3 @@ export const toolbarDefinition = ToolbarDefinitionSchema.parse({
     { shortcut: 'End', preventDefault: true, cases: [{ case: 'always', events: [{ type: 'navigate', direction: 'last' }] }] },
   ],
 })
-
-export const serializableToolbarDefinition = JSON.parse(
-  JSON.stringify(toolbarDefinition),
-) as typeof toolbarDefinition

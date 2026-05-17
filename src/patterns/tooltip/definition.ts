@@ -64,7 +64,3 @@ export const tooltipDefinition = TooltipDefinitionSchema.parse({
     },
   ],
 })
-
-export const serializableTooltipDefinition = JSON.parse(
-  JSON.stringify(tooltipDefinition),
-) as typeof tooltipDefinition

@@ -53,7 +53,3 @@ export const alertDefinition = AlertDefinitionSchema.parse({
     },
   ],
 })
-
-export const serializableAlertDefinition = JSON.parse(
-  JSON.stringify(alertDefinition),
-) as typeof alertDefinition

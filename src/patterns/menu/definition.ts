@@ -196,11 +196,3 @@ export const menuButtonDefinition = PatternDefinitionSchema.parse({
     { shortcut: 'Escape', preventDefault: true, cases: [{ case: 'always', events: [{ type: 'dismiss' }] }] },
   ],
 })
-
-export const serializableMenubarDefinition = JSON.parse(
-  JSON.stringify(menubarDefinition),
-) as typeof menubarDefinition
-
-export const serializableMenuButtonDefinition = JSON.parse(
-  JSON.stringify(menuButtonDefinition),
-) as typeof menuButtonDefinition

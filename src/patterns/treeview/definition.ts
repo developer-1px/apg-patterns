@@ -181,7 +181,3 @@ export const treeviewDefinition = TreeviewDefinitionSchema.parse({
     },
   ],
 })
-
-export const serializableTreeviewDefinition = JSON.parse(
-  JSON.stringify(treeviewDefinition),
-) as typeof treeviewDefinition

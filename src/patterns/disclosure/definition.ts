@@ -70,7 +70,3 @@ export const disclosureDefinition = DisclosureDefinitionSchema.parse({
     },
   ],
 })
-
-export const serializableDisclosureDefinition = JSON.parse(
-  JSON.stringify(disclosureDefinition),
-) as typeof disclosureDefinition

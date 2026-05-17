@@ -41,7 +41,3 @@ export const breadcrumbDefinition = BreadcrumbDefinitionSchema.parse({
   },
   keyboard: [],
 })
-
-export const serializableBreadcrumbDefinition = JSON.parse(
-  JSON.stringify(breadcrumbDefinition),
-) as typeof breadcrumbDefinition

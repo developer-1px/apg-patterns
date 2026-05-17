@@ -44,7 +44,3 @@ export const linkDefinition = LinkDefinitionSchema.parse({
     },
   ],
 })
-
-export const serializableLinkDefinition = JSON.parse(
-  JSON.stringify(linkDefinition),
-) as typeof linkDefinition

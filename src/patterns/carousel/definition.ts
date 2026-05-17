@@ -74,7 +74,3 @@ export const carouselDefinition = CarouselDefinitionSchema.parse({
     },
   ],
 })
-
-export const serializableCarouselDefinition = JSON.parse(
-  JSON.stringify(carouselDefinition),
-) as typeof carouselDefinition

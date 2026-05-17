@@ -96,7 +96,3 @@ export const dialogDefinition = DialogDefinitionSchema.parse({
     },
   ],
 })
-
-export const serializableDialogDefinition = JSON.parse(
-  JSON.stringify(dialogDefinition),
-) as typeof dialogDefinition
