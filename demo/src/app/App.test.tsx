@@ -179,6 +179,7 @@ describe('App route state', () => {
       expect(currentHashParam('source')).toBe(route.sourceName)
       expect(screen.getByTitle(route.sourceName)).toBeTruthy()
       expect(screen.queryByText(`missing source: ${route.sourceName}`)).toBeNull()
+      await expectActiveSourceText(route.sourceName)
 
       unmount()
     }
@@ -531,6 +532,21 @@ function routeHash({ key, sourceName }: { key: string; sourceName: string }) {
   params.set('panel', 'code')
   params.set('source', sourceName)
   return `#${params.toString()}`
+}
+
+async function expectActiveSourceText(sourceName: string) {
+  const expectedSource = await sourceLoaders[sourceName]?.()
+  if (!expectedSource) throw new Error(`missing source loader for ${sourceName}`)
+
+  await waitFor(() => {
+    expect(getSourcePanel().textContent).toBe(expectedSource)
+  })
+}
+
+function getSourcePanel() {
+  const sourcePanel = screen.getAllByRole('tabpanel').find((panel) => panel.id.startsWith('tab-source-panel-'))
+  if (!sourcePanel) throw new Error('missing source panel')
+  return sourcePanel
 }
 
 function currentHashParam(name: string) {
