@@ -89,7 +89,7 @@ export function Grid({
     <div
       ref={rootRef}
       {...rootProps}
-      className="inline-grid overflow-hidden bg-white text-sm text-zinc-800 outline-none focus:outline focus:outline-2 focus:outline-zinc-400 dark:bg-zinc-950 dark:text-zinc-300 dark:focus:outline-zinc-500"
+      className="inline-grid overflow-hidden rounded-xl bg-white/80 text-sm text-zinc-800 shadow-sm shadow-zinc-200/70 ring-1 ring-black/[0.03] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-zinc-400 dark:bg-white/[0.04] dark:text-zinc-300 dark:shadow-black/20 dark:ring-white/[0.05] dark:focus-visible:outline-zinc-500"
       style={{ gridTemplateColumns: `repeat(${data.relations?.columnKeys?.length ?? 1}, minmax(120px, 1fr))` }}
     >
       {(data.relations?.rowKeys ?? []).map((rowKey, rowIndex) => {
@@ -110,12 +110,12 @@ export function Grid({
                   {...cellProps}
                   data-active={state.active ? '' : undefined}
                   data-editable={isEditable ? '' : undefined}
-                  className="min-h-9 px-2 py-2 outline-none aria-selected:bg-zinc-100 aria-selected:text-zinc-950 data-active:bg-zinc-50 focus:outline focus:outline-2 focus:outline-zinc-400 dark:aria-selected:bg-zinc-900 dark:aria-selected:text-zinc-50 dark:data-active:bg-zinc-900 dark:focus:outline-zinc-500"
+                  className="min-h-9 px-2 py-2 outline-none aria-selected:bg-zinc-100/90 aria-selected:text-zinc-950 data-active:bg-white/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-zinc-400 dark:aria-selected:bg-white/[0.08] dark:aria-selected:text-zinc-50 dark:data-active:bg-white/[0.05] dark:focus-visible:outline-zinc-500"
                 >
                   {isEditing ? (
                     <input
                       data-edit=""
-                      className="w-full bg-transparent outline-none ring-1 ring-zinc-400 px-1 dark:ring-zinc-500"
+                      className="w-full rounded-md bg-white/80 px-1 outline-none ring-1 ring-black/10 dark:bg-white/[0.06] dark:ring-white/10"
                       value={editDraftByKey[cellKey] ?? ''}
                       onChange={(event) =>
                         onEvent({ type: 'editDraft', key: cellKey, value: event.currentTarget.value })

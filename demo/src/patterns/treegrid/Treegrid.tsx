@@ -31,7 +31,7 @@ export function Treegrid({
   return (
     <div
       {...rootProps}
-      className="inline-grid bg-white text-sm text-zinc-800 outline-none focus:outline focus:outline-2 focus:outline-zinc-400 dark:bg-zinc-950 dark:text-zinc-300"
+      className="inline-grid overflow-hidden rounded-xl bg-white/80 text-sm text-zinc-800 shadow-sm shadow-zinc-200/70 ring-1 ring-black/[0.03] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-zinc-400 dark:bg-white/[0.04] dark:text-zinc-300 dark:shadow-black/20 dark:ring-white/[0.05] dark:focus-visible:outline-zinc-500"
       style={{ gridTemplateColumns: `repeat(${columnKeys.length}, minmax(120px, 1fr))` }}
     >
       {rowKeys.map((rowKey, rowIndex) => {
@@ -51,7 +51,7 @@ export function Treegrid({
                   key={cellKey}
                   {...cellProps}
                   data-active={state.active ? '' : undefined}
-                  className="min-h-8 px-2 py-1 outline-none aria-selected:bg-zinc-100 data-active:bg-zinc-50 focus:outline focus:outline-2 focus:outline-zinc-400 dark:aria-selected:bg-zinc-900 dark:data-active:bg-zinc-900"
+                  className="min-h-8 px-2 py-1 outline-none aria-selected:bg-zinc-100/90 data-active:bg-white/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-zinc-400 dark:aria-selected:bg-white/[0.08] dark:data-active:bg-white/[0.05] dark:focus-visible:outline-zinc-500"
                   style={indent ? { paddingLeft: `${8 + indent}px` } : undefined}
                 >
                   {displayValue}
