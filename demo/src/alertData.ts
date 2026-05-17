@@ -6,7 +6,7 @@ import { alertDefinition } from '../../src/patterns/alert/definition'
 // Visibility is encoded in state.expandedKeys (true iff 'alert' ∈ expandedKeys).
 export const initialAlertData: PatternData = {
   items: {
-    alert: { label: 'Status alert' },
+    alert: { label: 'Status alert', message: '' },
     dismiss: { label: 'Dismiss alert' },
   },
   relations: {
@@ -28,7 +28,6 @@ export type AlertDomainEvent = PatternEvent | AlertSpawnEvent
 
 export interface AlertReducerState {
   data: PatternData
-  message: string
 }
 
 export function reduceAlertState(state: AlertReducerState, event: AlertDomainEvent): AlertReducerState {
@@ -38,19 +37,19 @@ export function reduceAlertState(state: AlertReducerState, event: AlertDomainEve
     return {
       data: {
         ...state.data,
+        items: {
+          ...state.data.items,
+          [event.key]: { ...state.data.items[event.key], message: event.message },
+        },
         state: { ...state.data.state, activeKey: event.key, expandedKeys: [...expanded] },
       },
-      message: event.message,
     }
   }
   if (event.type === 'dismiss') {
     const targetKey = event.key ?? state.data.state?.activeKey
     if (!targetKey) return state
     const expanded = (state.data.state?.expandedKeys ?? []).filter((k) => k !== targetKey)
-    return {
-      ...state,
-      data: { ...state.data, state: { ...state.data.state, expandedKeys: expanded } },
-    }
+    return { data: { ...state.data, state: { ...state.data.state, expandedKeys: expanded } } }
   }
-  return { ...state, data: reducePatternData(alertDefinition, state.data, event) }
+  return { data: reducePatternData(alertDefinition, state.data, event) }
 }

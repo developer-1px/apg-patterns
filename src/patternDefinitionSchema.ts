@@ -76,6 +76,20 @@ export const PartSchema = z
   })
   .strict()
 
+export const ElementTargetSchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('key'), key: KeyTokenSchema }).strict(),
+  z.object({ kind: z.literal('controlledBy'), key: KeyTokenSchema }).strict(),
+  z.object({ kind: z.literal('firstFocusable'), root: z.object({ kind: z.literal('controlledBy'), key: KeyTokenSchema }).strict() }).strict(),
+])
+export type ElementTarget = z.infer<typeof ElementTargetSchema>
+
+export const EffectSchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('focus'), when: PredicateSchema, target: ElementTargetSchema, preventScroll: z.boolean().optional() }).strict(),
+  z.object({ kind: z.literal('restoreFocus'), when: PredicateSchema, target: ElementTargetSchema, preventScroll: z.boolean().optional() }).strict(),
+  z.object({ kind: z.literal('trapFocus'), when: PredicateSchema, root: ElementTargetSchema }).strict(),
+])
+export type EffectDefinition = z.infer<typeof EffectSchema>
+
 const NavigationTargetSchema = z
   .object({ kind: z.string().min(1) })
   .passthrough()
@@ -143,10 +157,11 @@ export const PatternDefinitionSchema = z
     navigation: NavigationSchema,
     keyboard: z.array(KeyboardBindingSchema).readonly(),
     transitions: z.array(TransitionSchema).readonly().optional(),
+    effects: z.array(EffectSchema).readonly().optional(),
   })
   .passthrough()
   .superRefine((value, ctx) => {
-    validateJsonExtensionFields(value, ['apgPattern', 'rootRole', 'containedRoles', 'focusModel', 'parts', 'navigation', 'keyboard', 'transitions'], ctx)
+    validateJsonExtensionFields(value, ['apgPattern', 'rootRole', 'containedRoles', 'focusModel', 'parts', 'navigation', 'keyboard', 'transitions', 'effects'], ctx)
     const rootParts = Object.entries(value.parts).filter(([, part]) => part.role === value.rootRole)
     if (rootParts.length === 0) {
       ctx.addIssue({

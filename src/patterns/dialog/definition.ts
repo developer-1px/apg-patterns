@@ -29,7 +29,7 @@ export const dialogDefinition = DialogDefinitionSchema.parse({
       role: 'dialog',
       keySource: 'items',
       aria: [
-        { attribute: 'aria-modal', from: 'items.label' },
+        { attribute: 'aria-modal', from: 'literal.true' },
         { attribute: 'aria-labelledby', from: 'relations.ownerByKey' },
         { attribute: 'aria-describedby', from: 'items.label' },
       ],
@@ -47,8 +47,41 @@ export const dialogDefinition = DialogDefinitionSchema.parse({
       shortcut: 'Escape',
       preventDefault: true,
       cases: [
-        { case: 'always', events: [{ type: 'expand', key: '$activeKey', expanded: false }] },
+        { case: 'always', events: [{ type: 'expand', key: '$triggerKey', expanded: false }] },
       ],
+    },
+  ],
+  transitions: [
+    {
+      on: 'expand',
+      actions: [
+        { kind: 'set', field: 'activeKey', value: { from: '$event.key' } },
+        {
+          kind: 'setMembership',
+          field: 'expandedKeys',
+          value: { from: '$event.key' },
+          present: { from: '$event.expanded' },
+        },
+      ],
+    },
+  ],
+  effects: [
+    {
+      kind: 'focus',
+      when: { kind: 'isExpanded', key: '$triggerKey' },
+      target: { kind: 'firstFocusable', root: { kind: 'controlledBy', key: '$triggerKey' } },
+      preventScroll: true,
+    },
+    {
+      kind: 'restoreFocus',
+      when: { kind: 'not', predicate: { kind: 'isExpanded', key: '$triggerKey' } },
+      target: { kind: 'key', key: '$triggerKey' },
+      preventScroll: true,
+    },
+    {
+      kind: 'trapFocus',
+      when: { kind: 'isExpanded', key: '$triggerKey' },
+      root: { kind: 'controlledBy', key: '$triggerKey' },
     },
   ],
 })

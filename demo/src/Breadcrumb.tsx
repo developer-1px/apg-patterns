@@ -1,4 +1,5 @@
 import type { MouseEvent } from 'react'
+import type { AriaAttributes } from 'react'
 import type { PatternData } from '../../src'
 import { initialBreadcrumbData, type BreadcrumbItem } from './breadcrumbData'
 
@@ -20,7 +21,7 @@ export function Breadcrumb({ data = initialBreadcrumbData, onNavigate }: Breadcr
     <nav aria-label={data.refs?.label}>
       <ol className="flex flex-wrap items-center gap-1 text-sm">
         {items.map((item) => {
-          const current = currentByKey[item.key]
+          const current = currentByKey[item.key] as AriaAttributes['aria-current']
           const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
             event.preventDefault()
             onNavigate?.(item)

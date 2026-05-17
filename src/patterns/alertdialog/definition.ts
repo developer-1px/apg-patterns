@@ -46,7 +46,7 @@ export const alertDialogDefinition = AlertDialogDefinitionSchema.parse({
       events: [
         {
           event: 'click',
-          events: [{ type: 'expand', key: '$key', expanded: false }],
+          events: [{ type: 'expand', key: '$triggerKey', expanded: false }],
         },
       ],
     },
@@ -56,7 +56,7 @@ export const alertDialogDefinition = AlertDialogDefinitionSchema.parse({
       events: [
         {
           event: 'click',
-          events: [{ type: 'expand', key: '$key', expanded: false }],
+          events: [{ type: 'expand', key: '$triggerKey', expanded: false }],
         },
       ],
     },
@@ -70,8 +70,41 @@ export const alertDialogDefinition = AlertDialogDefinitionSchema.parse({
       shortcut: 'Escape',
       preventDefault: true,
       cases: [
-        { case: 'always', events: [{ type: 'expand', key: '$activeKey', expanded: false }] },
+        { case: 'always', events: [{ type: 'expand', key: '$triggerKey', expanded: false }] },
       ],
+    },
+  ],
+  transitions: [
+    {
+      on: 'expand',
+      actions: [
+        { kind: 'set', field: 'activeKey', value: { from: '$event.key' } },
+        {
+          kind: 'setMembership',
+          field: 'expandedKeys',
+          value: { from: '$event.key' },
+          present: { from: '$event.expanded' },
+        },
+      ],
+    },
+  ],
+  effects: [
+    {
+      kind: 'focus',
+      when: { kind: 'isExpanded', key: '$triggerKey' },
+      target: { kind: 'key', key: '$initialFocusKey' },
+      preventScroll: true,
+    },
+    {
+      kind: 'restoreFocus',
+      when: { kind: 'not', predicate: { kind: 'isExpanded', key: '$triggerKey' } },
+      target: { kind: 'key', key: '$triggerKey' },
+      preventScroll: true,
+    },
+    {
+      kind: 'trapFocus',
+      when: { kind: 'isExpanded', key: '$triggerKey' },
+      root: { kind: 'controlledBy', key: '$triggerKey' },
     },
   ],
 })

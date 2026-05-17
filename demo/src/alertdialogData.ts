@@ -23,4 +23,7 @@ export const initialAlertDialogData: PatternData = {
     activeKey: 'trigger',
     expandedKeys: [],
   },
+  refs: {
+    initialFocusKey: 'confirm',
+  },
 }

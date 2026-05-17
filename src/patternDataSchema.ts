@@ -95,6 +95,7 @@ export const PatternRefsSchema = z
   .object({
     label: z.string().optional(),
     labelledBy: IdRefListSchema.optional(),
+    initialFocusKey: KeySchema.optional(),
     domainIdByKey: z.record(KeySchema, z.string()).optional(),
     pointerByKey: z.record(KeySchema, z.string()).optional(),
   })

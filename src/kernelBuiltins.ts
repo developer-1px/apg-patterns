@@ -13,12 +13,14 @@ import {
   definePredicate,
   defineVisibleOrder,
   resolveKeyToken,
+  defineKeyToken,
 } from './patternKernel'
 import { moveLinear } from '@interactive-os/collection-navigation'
 
 // AriaSource — common
 defineAriaSource('refs.label', (ctx) => ctx.data.refs?.label)
 defineAriaSource('refs.labelledBy', (ctx) => ctx.data.refs?.labelledBy)
+defineAriaSource('literal.true', () => true)
 defineAriaSource('options.orientation', (ctx) => ctx.options?.orientation)
 defineAriaSource('options.roledescription', (ctx) => (ctx.options as Record<string, unknown> | undefined)?.roledescription)
 defineAriaSource('options.slideRoledescription', (ctx) => (ctx.options as Record<string, unknown> | undefined)?.slideRoledescription)
@@ -107,3 +109,6 @@ defineNavigationTarget('linearWrap', (target, ctx) => {
   if (action === 'previous') return ctx.visibleKeys[(index - 1 + ctx.visibleKeys.length) % ctx.visibleKeys.length] ?? null
   return null
 })
+
+defineKeyToken('$triggerKey', (_key, _activeKey, ctx) => ctx?.data.relations?.rootKeys?.[0] ?? null)
+defineKeyToken('$initialFocusKey', (_key, _activeKey, ctx) => ctx?.data.refs?.initialFocusKey ?? null)

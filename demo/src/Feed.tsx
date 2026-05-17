@@ -6,8 +6,12 @@ import { feedArticles, initialFeedData } from './feedData'
 
 type DivProps = HTMLAttributes<HTMLElement>
 
-export function Feed({ initialData }: { initialData?: PatternData } = {}) {
-  const [data, setData] = useState<PatternData>(initialData ?? initialFeedData)
+export interface FeedProps {
+  data?: PatternData
+}
+
+export function Feed({ data: initialData = initialFeedData }: FeedProps = {}) {
+  const [data, setData] = useState<PatternData>(initialData)
   const handleEvent = (event: PatternEvent) =>
     setData((current) => reducePatternData(feedDefinition, current, event))
 

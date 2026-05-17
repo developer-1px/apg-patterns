@@ -15,11 +15,10 @@ const alertClass =
 
 export interface AlertProps {
   data: PatternData
-  message: string
   onEvent: (event: AlertDomainEvent) => void
 }
 
-export function Alert({ data, message, onEvent }: AlertProps) {
+export function Alert({ data, onEvent }: AlertProps) {
   const runtime = createPatternRuntime({
     definition: alertDefinition,
     data,
@@ -30,6 +29,7 @@ export function Alert({ data, message, onEvent }: AlertProps) {
 
   const alertKey = data.relations?.rootKeys?.[0] ?? 'alert'
   const visible = (data.state?.expandedKeys ?? []).includes(alertKey)
+  const message = String((data.items[alertKey] as { message?: unknown } | undefined)?.message ?? '')
 
   const { onKeyDown: rootKeyDown } = {} as Props
   void rootKeyDown
