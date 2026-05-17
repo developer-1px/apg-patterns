@@ -200,6 +200,7 @@ async function runSmoke() {
   )
 
   await verifyTabsKeyboardEventLog()
+  await verifySourceTabKeyboardNavigation()
   await verifyInteractionEventLog()
   await verifyEventLogClear()
   await verifyLinkInteractionStaysInDemo()
@@ -260,11 +261,23 @@ async function verifyHashRoute(hash, predicate, failure) {
   }
 }
 
+async function waitForPatternRoute({ pattern, panel, source, label }) {
+  await waitFor(() =>
+    currentHashParam('pattern') === pattern
+    && currentHashParam('panel') === panel
+    && currentHashParam('source') === source
+    && hasActiveDemoHeading(label)
+    && (panel === 'off' || findRightPanelTab(panel)?.getAttribute('aria-selected') === 'true')
+    && (panel !== 'code' || sourceFilenameIs(source)),
+  )
+}
+
 async function verifyInteractionEventLog() {
   window.location.hash = '#pattern=accordion&panel=events&source=Accordion.tsx'
   window.dispatchEvent(new dom.window.HashChangeEvent('hashchange'))
 
   try {
+    await waitForPatternRoute({ pattern: 'accordion', panel: 'events', source: 'Accordion.tsx', label: 'Accordion' })
     const accordionButton = await waitFor(() => document.querySelector('button[aria-expanded]'))
     accordionButton.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
     await waitFor(() => {
@@ -281,6 +294,7 @@ async function verifyEventLogClear() {
   window.dispatchEvent(new dom.window.HashChangeEvent('hashchange'))
 
   try {
+    await waitForPatternRoute({ pattern: 'accordion', panel: 'events', source: 'Accordion.tsx', label: 'Accordion' })
     const accordionButton = await waitFor(() => document.querySelector('button[aria-expanded]'))
     accordionButton.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
     await waitFor(() => rootText().includes('1 events') && rootText().includes('expand'))
@@ -303,6 +317,7 @@ async function verifyTabsKeyboardEventLog() {
   window.dispatchEvent(new dom.window.HashChangeEvent('hashchange'))
 
   try {
+    await waitForPatternRoute({ pattern: 'tabs', panel: 'events', source: 'Tabs.tsx', label: 'Tabs' })
     const overviewTab = await waitFor(() => document.querySelector('[data-demo-preview="tabs"] [role="tab"][aria-selected="true"]'))
     overviewTab.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'ArrowRight', code: 'ArrowRight', bubbles: true, cancelable: true }))
     await waitFor(() => {
@@ -319,11 +334,40 @@ async function verifyTabsKeyboardEventLog() {
   }
 }
 
+async function verifySourceTabKeyboardNavigation() {
+  window.location.hash = '#pattern=accordion&panel=code&source=Accordion.tsx'
+  window.dispatchEvent(new dom.window.HashChangeEvent('hashchange'))
+
+  try {
+    await waitForPatternRoute({ pattern: 'accordion', panel: 'code', source: 'Accordion.tsx', label: 'Accordion' })
+    const sourceTablist = await waitFor(() => document.querySelector('[role="tablist"][aria-label="source files"]'))
+    const selectedTab = await waitFor(() => sourceTablist.querySelector('[role="tab"][aria-selected="true"]'))
+    selectedTab.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'ArrowRight', code: 'ArrowRight', bubbles: true, cancelable: true }))
+
+    await waitFor(() => {
+      const selectedSourceName = sourceTabNames().find((sourceName) => findSourceTab(sourceName)?.getAttribute('aria-selected') === 'true')
+      const sourceText = document.querySelector('pre')?.textContent ?? ''
+      return selectedSourceName
+        && selectedSourceName !== 'Accordion.tsx'
+        && currentHashParam('pattern') === 'accordion'
+        && currentHashParam('panel') === 'code'
+        && currentHashParam('source') === selectedSourceName
+        && sourceFilenameIs(selectedSourceName)
+        && sourceText !== 'loading'
+        && sourceText.length > 0
+        && !sourceText.startsWith('missing source:')
+    })
+  } catch {
+    patternFailures.push(`source tab keyboard navigation did not update the selected source route: current ${window.location.hash}, selected=${sourceTabNames().join(',')}, text=${rootText().slice(0, 180)}`)
+  }
+}
+
 async function verifyLinkInteractionStaysInDemo() {
   window.location.hash = '#pattern=link&panel=events&source=Link.tsx'
   window.dispatchEvent(new dom.window.HashChangeEvent('hashchange'))
 
   try {
+    await waitForPatternRoute({ pattern: 'link', panel: 'events', source: 'Link.tsx', label: 'Link' })
     const link = await waitFor(() => document.querySelector('[data-demo-preview="link"] a[role="link"]'))
     const beforeHref = window.location.href
     const defaultAllowed = link.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
@@ -346,6 +390,7 @@ async function verifyCopyLoadedSource() {
   clipboardWrites = []
 
   try {
+    await waitForPatternRoute({ pattern: 'accordion', panel: 'code', source: 'Accordion.tsx', label: 'Accordion' })
     const copyButton = await waitFor(() => {
       const button = Array.from(document.querySelectorAll('button'))
         .find((candidate) => candidate.textContent?.trim() === 'copy')
@@ -375,6 +420,7 @@ async function verifyTreeviewInspectControls() {
   window.dispatchEvent(new dom.window.HashChangeEvent('hashchange'))
 
   try {
+    await waitForPatternRoute({ pattern: 'treeview', panel: 'state', source: 'Tree.tsx', label: 'Treeview' })
     const inspectModeSelect = await waitFor(() => {
       const select = Array.from(document.querySelectorAll('select'))
         .find((candidate) => Array.from(candidate.options).some((option) => option.value === 'html'))
