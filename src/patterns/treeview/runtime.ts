@@ -17,8 +17,8 @@ import {
   resolveEventTemplate,
   resolveNavigationTarget,
   resolveVisibleOrder,
-} from '../../patternKernel'
-import { createPatternRuntime, type CreatePatternRuntimeInput } from '../../patternRuntime'
+} from '../../kernel/patternKernel'
+import { createPatternRuntime, type CreatePatternRuntimeInput } from '../../kernel/patternRuntime'
 
 export type TreeviewSlotProps = Record<string, unknown>
 export type TreeviewRenderState = Record<'active' | 'selected' | 'disabled' | 'expanded', boolean> & {
@@ -178,7 +178,7 @@ export function resolveTreeKeyboardBinding(
 }
 
 // 호환용 re-export — 기존 import 경로 유지
-export { resolveEventTemplate, evaluatePredicate, createParentByKey } from '../../patternKernel'
+export { resolveEventTemplate, evaluatePredicate, createParentByKey } from '../../kernel/patternKernel'
 
 export function resolveTreeviewNavigationTarget(
   direction: Extract<PatternEvent, { type: 'navigate' }>,

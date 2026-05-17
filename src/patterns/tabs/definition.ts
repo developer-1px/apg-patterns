@@ -1,6 +1,6 @@
 import { moveLinear } from '@interactive-os/collection-navigation'
 import { PatternDefinitionSchema } from '../../schema'
-import { defineNavigationTarget } from '../../patternKernel'
+import { defineNavigationTarget } from '../../kernel/patternKernel'
 
 // flatTabs 별칭은 제거 — kernel 의 'flat' 을 재사용한다 (P1 fragmentation 통합).
 

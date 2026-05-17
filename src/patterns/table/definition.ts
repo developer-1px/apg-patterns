@@ -1,5 +1,5 @@
 import { PatternDefinitionSchema } from '../../schema'
-import { defineAriaSource, isRegisteredAriaSource } from '../../patternKernel'
+import { defineAriaSource, isRegisteredAriaSource } from '../../kernel/patternKernel'
 
 // Static (non-interactive) table per APG: role=table with rows containing
 // columnheader / rowheader / cell. No focus/navigation — sortable lives in grid.

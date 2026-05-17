@@ -1,5 +1,0 @@
-export * from './basicInspect'
-export * from './collectionInspect'
-export * from './comboboxInspect'
-export * from './menuInspect'
-export * from './treeInspect'

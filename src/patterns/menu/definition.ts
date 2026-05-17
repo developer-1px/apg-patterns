@@ -8,7 +8,7 @@
  * Kernel 비변경 원칙 — 'menu.hasPopup' / 'menu.expandedIfHasPopup' AriaSource 만 본 파일에서 등록.
  */
 import { PatternDefinitionSchema } from '../../schema'
-import { defineAriaSource } from '../../patternKernel'
+import { defineAriaSource } from '../../kernel/patternKernel'
 
 // ─────────────────────────────────────────────────────────────
 // Menu-specific AriaSource registrations

@@ -1,4 +1,4 @@
-import { defineAriaSource, defineStateProjection } from '../../patternKernel'
+import { defineAriaSource, defineStateProjection } from '../../kernel/patternKernel'
 import { PatternDefinitionSchema } from '../../schema'
 
 defineAriaSource('state.selectedKeys.radioChecked', (ctx) => (ctx.key ? ctx.data.state?.selectedKeys?.includes(ctx.key) ?? false : undefined))

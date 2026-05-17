@@ -1,4 +1,4 @@
-import { definePredicate, resolveKeyToken } from '../../patternKernel'
+import { definePredicate, resolveKeyToken } from '../../kernel/patternKernel'
 import { PatternDefinitionSchema } from '../../schema'
 
 definePredicate('isChecked', (predicate, ctx) => {

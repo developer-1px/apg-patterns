@@ -1,6 +1,6 @@
 import { moveGrid } from '@interactive-os/collection-navigation'
 import { PatternDefinitionSchema } from '../../schema'
-import { defineAriaSource, defineNavigationTarget, defineVisibleOrder } from '../../patternKernel'
+import { defineAriaSource, defineNavigationTarget, defineVisibleOrder } from '../../kernel/patternKernel'
 import type { Key, PatternData } from '../../schema'
 
 type GridAction = 'left' | 'right' | 'up' | 'down' | 'rowStart' | 'rowEnd' | 'gridStart' | 'gridEnd'

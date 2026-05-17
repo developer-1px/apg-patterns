@@ -3,8 +3,8 @@ import {
   type CreatePatternRuntimeInput,
   type PatternRuntime,
   type SlotProps,
-} from '../../patternRuntime'
-import { reducePatternData } from '../../patternReducer'
+} from '../../kernel/patternRuntime'
+import { reducePatternData } from '../../kernel/patternReducer'
 import {
   PatternDataSchema,
   PatternEventSchema,

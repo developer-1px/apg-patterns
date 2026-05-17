@@ -1,4 +1,4 @@
-import { defineAriaSource } from '../../patternKernel'
+import { defineAriaSource } from '../../kernel/patternKernel'
 import { PatternDefinitionSchema } from '../../schema'
 
 defineAriaSource('options.min', (ctx) => ctx.options?.min)

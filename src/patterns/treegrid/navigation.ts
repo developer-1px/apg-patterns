@@ -5,7 +5,7 @@ import {
   defineNavigationTarget,
   definePredicate,
   defineVisibleOrder,
-} from '../../patternKernel'
+} from '../../kernel/patternKernel'
 import type { Key, PatternData } from '../../schema'
 
 type TreegridAction = 'left' | 'right' | 'up' | 'down' | 'rowStart' | 'rowEnd' | 'gridStart' | 'gridEnd'

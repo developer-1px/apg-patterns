@@ -1,5 +1,5 @@
 import { visibleTreeItems } from '@interactive-os/collection-navigation'
-import { defineNavigationTarget, defineVisibleOrder, resolveKeyToken } from '../../patternKernel'
+import { defineNavigationTarget, defineVisibleOrder, resolveKeyToken } from '../../kernel/patternKernel'
 
 defineNavigationTarget('firstChild', (target, ctx) => {
   const key = resolveKeyToken(target.key ?? '$activeKey', undefined, ctx.activeKey)

@@ -1,4 +1,4 @@
-import { defineAriaSource } from '../../patternKernel'
+import { defineAriaSource } from '../../kernel/patternKernel'
 import { PatternDefinitionSchema } from '../../schema'
 
 // Meter is a read-only graphical display of a value within a known range.
