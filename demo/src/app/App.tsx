@@ -131,9 +131,11 @@ function ActiveDemoWorkspace({
         <header className={headerClass}>
           <h2 className={titleClass}>{activeDemo.label}</h2>
           <div className="flex items-center gap-1">
-            <button type="button" className={buttonClass} onClick={activeDemo.reset}>
-              reset
-            </button>
+            {activeDemo.reset ? (
+              <button type="button" className={buttonClass} onClick={activeDemo.reset}>
+                reset
+              </button>
+            ) : null}
             <button
               type="button"
               className={`${buttonClass} aria-pressed:bg-zinc-900 aria-pressed:text-white dark:aria-pressed:bg-zinc-100 dark:aria-pressed:text-zinc-950`}
