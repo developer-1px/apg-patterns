@@ -2,7 +2,7 @@ import { useEffect, useReducer, useState } from 'react'
 import { z } from 'zod'
 import type { PatternEvent } from '../../../src'
 import { PatternMenu } from './PatternMenu'
-import { patternItems, type PatternKey, useDemoPatterns } from '../shared/demoPatterns'
+import { patternItems, type PatternKey, useDemoPattern } from '../shared/demoPatterns'
 import { sourceLoaders, type SourceName } from '../shared/sources'
 import { SourceTabs, useSourceTabs } from './SourceTabs'
 
@@ -64,8 +64,29 @@ const reduceAppState = (state: AppState, action: AppAction): AppState => {
 
 export function App() {
   const [state, dispatch] = useReducer(reduceAppState, defaultAppState, readInitialAppState)
-  const demos = useDemoPatterns((event) => dispatch({ type: 'recordEvent', event }))
-  const activeDemo = demos.find((demo) => demo.key === state.patternKey) ?? demos[0]
+
+  return (
+    <main className={`grid h-dvh grid-cols-1 ${state.rightPanelOpen ? 'grid-rows-[minmax(80px,14dvh)_minmax(280px,1fr)_minmax(260px,34dvh)]' : 'grid-rows-[minmax(80px,16dvh)_minmax(0,1fr)]'} gap-4 bg-white px-4 py-4 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 ${state.rightPanelOpen ? 'lg:grid-cols-[180px_minmax(360px,1fr)_minmax(380px,0.9fr)]' : 'lg:grid-cols-[180px_minmax(360px,1fr)]'} lg:grid-rows-[minmax(0,1fr)] lg:gap-8 lg:px-6 lg:py-5`}>
+      <section className={`${panelClass} overflow-auto`}>
+        <header className={headerClass}>
+          <h1 className={titleClass}>patterns</h1>
+        </header>
+        <PatternMenu value={state.patternKey} onChange={(patternKey) => dispatch({ type: 'selectPattern', patternKey })} />
+      </section>
+
+      <ActiveDemoWorkspace key={state.patternKey} state={state} dispatch={dispatch} />
+    </main>
+  )
+}
+
+function ActiveDemoWorkspace({
+  state,
+  dispatch,
+}: {
+  state: AppState
+  dispatch: (action: AppAction) => void
+}) {
+  const activeDemo = useDemoPattern(state.patternKey, (event) => dispatch({ type: 'recordEvent', event }))
   const sourceNames = activeDemo.sourceNames
   const activeSourceName = sourceNames.includes(state.sourceName as SourceName) ? state.sourceName as SourceName : sourceNames[0]
   const [source, setSource] = useState('loading')
@@ -104,14 +125,7 @@ export function App() {
   }, [activeSourceName])
 
   return (
-    <main className={`grid h-dvh grid-cols-1 ${state.rightPanelOpen ? 'grid-rows-[minmax(80px,14dvh)_minmax(280px,1fr)_minmax(260px,34dvh)]' : 'grid-rows-[minmax(80px,16dvh)_minmax(0,1fr)]'} gap-4 bg-white px-4 py-4 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 ${state.rightPanelOpen ? 'lg:grid-cols-[180px_minmax(360px,1fr)_minmax(380px,0.9fr)]' : 'lg:grid-cols-[180px_minmax(360px,1fr)]'} lg:grid-rows-[minmax(0,1fr)] lg:gap-8 lg:px-6 lg:py-5`}>
-      <section className={`${panelClass} overflow-auto`}>
-        <header className={headerClass}>
-          <h1 className={titleClass}>patterns</h1>
-        </header>
-        <PatternMenu value={state.patternKey} onChange={(patternKey) => dispatch({ type: 'selectPattern', patternKey })} />
-      </section>
-
+    <>
       <section className={`${panelClass} overflow-auto`}>
         <header className={headerClass}>
           <h2 className={titleClass}>{activeDemo.label}</h2>
@@ -190,7 +204,7 @@ export function App() {
         {state.rightMode === 'log' ? <pre className={preClass}>{eventLog}</pre> : null}
       </section>
       ) : null}
-    </main>
+    </>
   )
 }
 

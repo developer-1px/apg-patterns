@@ -23,6 +23,10 @@ export const patternItems: readonly { key: PatternKey; label: string }[] = colle
   label: e.label,
 }))
 
-export function useDemoPatterns(onEvent: (event: PatternEvent) => void): readonly DemoPattern[] {
-  return patternEntries.map((entry) => entry.useDemoPattern(onEvent))
+export function useDemoPattern(patternKey: PatternKey, onEvent: (event: PatternEvent) => void): DemoPattern {
+  return getPatternEntry(patternKey).useDemoPattern(onEvent)
+}
+
+function getPatternEntry(patternKey: PatternKey): PatternEntry {
+  return patternEntries.find((entry) => entry.key === patternKey) ?? patternEntries[0]
 }
