@@ -25,7 +25,7 @@ export function Checkbox({
       >
         <span
           aria-hidden="true"
-          className="grid size-4 place-items-center rounded bg-white text-xs text-zinc-900 shadow-sm ring-1 ring-black/10 dark:bg-white/[0.06] dark:text-zinc-100 dark:ring-white/10"
+          className="grid size-4 place-items-center rounded bg-white text-xs text-zinc-900 shadow-[inset_0_1px_2px_rgba(24,24,27,0.08),0_2px_8px_rgba(24,24,27,0.08)] dark:bg-white/[0.07] dark:text-zinc-100 dark:shadow-black/20"
         >
           {checked === 'mixed' ? <Icon name="minus" /> : null}
           {checked === true ? <Icon name="x" /> : null}

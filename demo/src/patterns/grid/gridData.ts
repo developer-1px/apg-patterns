@@ -134,9 +134,9 @@ export const gridVariants = {
       activeKey: 'e11',
       rows: [
         [header('hFirst', 'First name'), header('hLast', 'Last name'), header('hEmail', 'Email')],
-        [editCell('e11', 'Ada'), editCell('e12', 'Lovelace'), editCell('e13', 'ada@example.com')],
-        [editCell('e21', 'Grace'), editCell('e22', 'Hopper'), editCell('e23', 'grace@example.com')],
-        [editCell('e31', 'Katherine'), editCell('e32', 'Johnson'), editCell('e33', 'katherine@example.com')],
+        [editCell('e11', 'Ada'), editCell('e12', 'Lovelace'), editCell('e13', 'ada.ops')],
+        [editCell('e21', 'Grace'), editCell('e22', 'Hopper'), editCell('e23', 'grace.platform')],
+        [editCell('e31', 'Katherine'), editCell('e32', 'Johnson'), editCell('e33', 'katherine.research')],
       ],
     }),
   },

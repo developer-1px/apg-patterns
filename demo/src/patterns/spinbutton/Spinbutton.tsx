@@ -47,7 +47,7 @@ function SpinField({
           <div
             {...item.spinbuttonProps}
             data-testid={`spinbutton-${item.key}`}
-            className="min-w-[2.75rem] rounded-lg bg-white/75 px-2.5 py-1 text-center shadow-sm outline-none ring-1 ring-black/[0.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.06] dark:ring-white/[0.04] dark:focus-visible:outline-zinc-500"
+            className="min-w-[2.75rem] rounded-lg bg-white/80 px-2.5 py-1 text-center shadow-[0_6px_18px_rgba(24,24,27,0.06)] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.065] dark:shadow-black/20 dark:focus-visible:outline-zinc-500"
           >
             {item.value}
           </div>
