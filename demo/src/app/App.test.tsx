@@ -127,6 +127,17 @@ describe('source copy', () => {
     await waitFor(() => expect(currentHashParam('source')).toBe('accordionData.ts'))
     expect(screen.queryByRole('button', { name: 'copied' })).toBeNull()
   })
+
+  it('does not render stale source text after switching source tabs', async () => {
+    replaceHash('#pattern=accordion&panel=code&source=Accordion.tsx')
+
+    render(<App />)
+
+    await waitFor(() => expect(getSourcePanel().textContent).toContain('export function Accordion'))
+    fireEvent.click(screen.getByRole('tab', { name: 'accordionData.ts' }))
+
+    expect(getSourcePanel().textContent).toBe('loading')
+  })
 })
 
 describe('App route state', () => {

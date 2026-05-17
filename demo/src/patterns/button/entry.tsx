@@ -1,9 +1,32 @@
 import { Button } from './Button'
 import { buttonVariantItems, buttonVariants, type ButtonVariantKey } from './buttonData'
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
-import { VariantListbox } from '../../shared/VariantListbox'
 import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
 import { renderDataInspect } from '../../shared/inspect/genericInspect'
+import { renderUiNode, type UiNode } from '../../shared/uiSchema'
+
+const buttonDemoView = {
+  kind: 'stack',
+  children: [
+    {
+      kind: 'listbox',
+      orientation: 'horizontal',
+      value: '$state.variant',
+      items: '$model.variantItems',
+      label: 'button variants',
+      idPrefix: 'button-variant',
+      onChange: '$actions.selectVariant',
+    },
+    {
+      kind: 'component',
+      component: 'Button',
+      props: {
+        data: '$state.data',
+        onEvent: '$actions.dispatchEvent',
+      },
+    },
+  ],
+} as const satisfies UiNode
 
 export const entry: PatternEntry = {
   key: 'button',
@@ -21,11 +44,27 @@ export const entry: PatternEntry = {
       keyboardShortcuts: ['Enter', 'Space'],
       sourceNames: ['Button.tsx', 'button/entry.tsx', 'buttonData.ts', 'button/useButtonPattern.ts', 'button/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
-      variants: <VariantListbox orientation="horizontal" value={host.variant} items={buttonVariantItems} label="button variants" idPrefix="button-variant" onChange={host.selectVariant} />,
-      preview: <Button data={host.data} onEvent={(event) => {
-        onEvent(event)
-        host.dispatchEvent(event)
-      }} />,
+      preview: renderUiNode(buttonDemoView, {
+        values: {
+          state: {
+            variant: host.variant,
+            data: host.data,
+          },
+          model: {
+            variantItems: buttonVariantItems,
+          },
+        },
+        actions: {
+          selectVariant: host.selectVariant,
+          dispatchEvent: (event) => {
+            onEvent(event)
+            host.dispatchEvent(event)
+          },
+        },
+        components: {
+          Button,
+        },
+      }),
     }
   },
 }

@@ -1,7 +1,9 @@
-import { access, readFile, readdir } from 'node:fs/promises'
+import { readdir } from 'node:fs/promises'
 import { JSDOM } from 'jsdom'
+import { previewSurfaceSelectors } from './demo-smoke/previewSurfaceSelectors.mjs'
 import { readDemoEntryKeyboardShortcuts } from './demo-smoke/readDemoEntryKeyboardShortcuts.mjs'
 import { sourceIdentityNeedles } from './demo-smoke/sourceIdentity.mjs'
+import { verifyDistIndexAssets } from './demo-smoke/verifyDistIndexAssets.mjs'
 
 const demoUrl = 'http://127.0.0.1/#pattern=tabs&panel=code&source=Tabs.tsx'
 const distDir = new URL('../demo/dist/', import.meta.url)
@@ -12,7 +14,7 @@ const expectedKeyboardShortcutsByPattern = await readDemoEntryKeyboardShortcuts(
 
 if (!entryFile) throw new Error('demo build smoke failed: missing built entry chunk')
 
-await verifyDistIndexAssets()
+await verifyDistIndexAssets({ distDir, entryFile })
 
 const errors = []
 const recordError = (error) => errors.push(error instanceof Error ? error.stack ?? error.message : String(error))
@@ -33,36 +35,6 @@ let dom
 let root
 let clipboardWrites = []
 const patternFailures = []
-const previewSurfaceSelectors = {
-  accordion: '[role="group"]',
-  alert: 'button',
-  alertdialog: 'button',
-  breadcrumb: 'nav,[role="navigation"]',
-  button: 'button',
-  carousel: '[role="region"][aria-roledescription="carousel"]',
-  checkbox: '[role="checkbox"]',
-  combobox: '[role="combobox"]',
-  dialog: 'button',
-  disclosure: 'button',
-  feed: '[role="feed"]',
-  grid: '[role="grid"]',
-  link: 'a,[role="link"]',
-  listbox: '[role="listbox"]',
-  menuAndMenubar: '[role="menubar"],button',
-  meter: '[role="meter"]',
-  radio: '[role="radiogroup"]',
-  slider: '[role="slider"]',
-  spinbutton: '[role="spinbutton"]',
-  switch: '[role="switch"]',
-  table: '[role="table"],table',
-  tabs: '[role="tablist"]',
-  toolbar: '[role="toolbar"]',
-  tooltip: 'button',
-  treegrid: '[role="treegrid"]',
-  treeview: '[role="tree"]',
-  windowsplitter: '[role="separator"]',
-}
-
 try {
   await runSmoke()
 } finally {
@@ -998,40 +970,4 @@ function duplicates(values) {
     seen.add(value)
   }
   return [...duplicateValues]
-}
-
-async function verifyDistIndexAssets() {
-  const indexHtml = await readFile(new URL('index.html', distDir), 'utf8')
-  const assetRefs = Array.from(indexHtml.matchAll(/(?:src|href)="([^"]+)"/g), ([, assetRef]) => assetRef)
-    .filter((assetRef) => assetRef?.replace(/^\.\//, '').startsWith('assets/'))
-
-  if (!indexHtml.includes('<div id="root"></div>')) {
-    throw new Error('demo build smoke failed: index.html does not include the app root')
-  }
-  if (indexHtml.includes('/src/app/main.tsx')) {
-    throw new Error('demo build smoke failed: index.html still references the dev entry')
-  }
-  if (assetRefs.length === 0) {
-    throw new Error('demo build smoke failed: index.html has no built asset references')
-  }
-  if (!assetRefs.includes(`./assets/${entryFile}`)) {
-    throw new Error(`demo build smoke failed: index.html does not reference ${entryFile}`)
-  }
-
-  const missingAssets = []
-  for (const assetRef of assetRefs) {
-    if (!assetRef.startsWith('./assets/')) {
-      missingAssets.push(`${assetRef} (not relative)`)
-      continue
-    }
-    try {
-      await access(new URL(assetRef.replace(/^\.\//, ''), distDir))
-    } catch {
-      missingAssets.push(assetRef)
-    }
-  }
-
-  if (missingAssets.length > 0) {
-    throw new Error(`demo build smoke failed: index.html references missing assets: ${missingAssets.join(', ')}`)
-  }
 }

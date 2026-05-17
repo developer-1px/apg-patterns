@@ -63,7 +63,8 @@ function ActiveDemoWorkspace({
   const eventLog = state.events.map(formatEvent).join('\n') || 'none'
   const source = sourcePreview.text
   const sourceLoadedForActiveTab = sourcePreview.name === activeSourceName
-  const canCopySource = sourceLoadedForActiveTab && isCopyableSource(source)
+  const displayedSource = sourceLoadedForActiveTab ? source : 'loading'
+  const canCopySource = isCopyableSource(displayedSource)
   const previewKeyboardShortcuts = activeDemo.keyboardShortcuts.join(' ') || undefined
 
   useEffect(() => {
@@ -112,7 +113,7 @@ function ActiveDemoWorkspace({
     if (!canCopySource) return
     const requestId = copyRequestId.current + 1
     copyRequestId.current = requestId
-    void copyText(source).then((copied) => {
+    void copyText(displayedSource).then((copied) => {
       if (copied && copyRequestId.current === requestId) setCopyState('copied')
     })
   }
@@ -198,7 +199,7 @@ function ActiveDemoWorkspace({
                   <Icon name={copyState === 'idle' ? 'copy' : 'check'} className="size-4" />
                 </button>
                 <pre {...sourceTabs.getPanelProps()} className={`${sourcePreClass} select-text cursor-text`}>
-                  {source}
+                  {displayedSource}
                 </pre>
               </div>
             ) : null}
