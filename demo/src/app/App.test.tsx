@@ -265,6 +265,18 @@ describe('demo pattern registry', () => {
     ])).toThrow('[demoPatterns] invalid pattern entries: invalid key menu-and-menubar')
   })
 
+  it('fails fast when a pattern entry key does not match its folder', () => {
+    expect(() => validatePatternEntries([
+      { key: 'wrongAccordion', label: 'Accordion', sourcePath: '../patterns/accordion/entry.tsx' },
+    ])).toThrow('[demoPatterns] pattern folder/key mismatch: wrongAccordion: expected key accordion for ../patterns/accordion/entry.tsx')
+  })
+
+  it('allows explicit folder/key aliases for combined APG patterns', () => {
+    expect(() => validatePatternEntries([
+      { key: 'menuAndMenubar', label: 'Menu and Menubar', sourcePath: '../patterns/menu/entry.tsx' },
+    ])).not.toThrow()
+  })
+
   it('fails fast on duplicate pattern keys', () => {
     expect(() => validatePatternEntries([
       { key: 'accordion', label: 'Accordion' },
