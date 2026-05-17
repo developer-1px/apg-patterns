@@ -162,4 +162,26 @@ export const gridDefinition = PatternDefinitionSchema.parse({
     { shortcut: 'F2', preventDefault: true, cases: [{ case: 'always', events: [{ type: 'activate', key: '$activeKey' }] }] },
     { shortcut: 'Escape', preventDefault: false, cases: [{ case: 'always', events: [{ type: 'dismiss', key: '$activeKey' }] }] },
   ],
+  transitions: [
+    {
+      on: 'extension',
+      name: 'gridEditStart',
+      actions: [
+        { kind: 'set', field: 'editingKey', value: { from: '$event.key' } },
+        { kind: 'setRecordValue', field: 'editDraftByKey', key: { from: '$event.key' }, value: { from: '$event.payload.value' } },
+      ],
+    },
+    {
+      on: 'extension',
+      name: 'gridEditDraft',
+      actions: [
+        { kind: 'setRecordValue', field: 'editDraftByKey', key: { from: '$event.key' }, value: { from: '$event.payload.value' } },
+      ],
+    },
+    {
+      on: 'extension',
+      name: 'gridEditEnd',
+      actions: [{ kind: 'set', field: 'editingKey', value: { literal: null } }],
+    },
+  ],
 })

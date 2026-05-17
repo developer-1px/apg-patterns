@@ -117,6 +117,7 @@ export const EventValueSourceSchema = z.enum([
   '$event.checked',
   '$event.pressed',
   '$event.value',
+  '$event.payload.value',
   '$activeKey',
 ])
 export type EventValueSource = z.infer<typeof EventValueSourceSchema>
@@ -132,6 +133,7 @@ export const StateActionSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('add'), field: z.string().min(1), value: TransitionValueSchema }).strict(),
   z.object({ kind: z.literal('remove'), field: z.string().min(1), value: TransitionValueSchema }).strict(),
   z.object({ kind: z.literal('setMembership'), field: z.string().min(1), value: TransitionValueSchema, present: TransitionValueSchema }).strict(),
+  z.object({ kind: z.literal('setRecordValue'), field: z.string().min(1), key: TransitionValueSchema, value: TransitionValueSchema }).strict(),
   z.object({ kind: z.literal('toggleInSet'), field: z.string().min(1), value: TransitionValueSchema }).strict(),
   z.object({ kind: z.literal('replaceSet'), field: z.string().min(1), values: z.array(TransitionValueSchema).readonly() }).strict(),
 ])

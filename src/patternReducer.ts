@@ -106,6 +106,13 @@ function applyStateAction(data: PatternData, event: PatternEvent, action: StateA
     return { ...data, state: { ...state, [action.field]: values } }
   }
 
+  if (action.kind === 'setRecordValue') {
+    const key = resolveTransitionValue(action.key, event, data)
+    if (!isKey(key)) return data
+    const record = isRecord(current) ? current : {}
+    return { ...data, state: { ...state, [action.field]: { ...record, [key]: resolveTransitionValue(action.value, event, data) } } }
+  }
+
   const value = resolveTransitionValue(action.value, event, data)
   if (!isKey(value)) return data
   const set = new Set(Array.isArray(current) ? current.filter(isKey) : [])
@@ -136,9 +143,14 @@ function resolveTransitionValue(value: TransitionValue, event: PatternEvent, dat
   if (value.from === '$event.checked') return 'checked' in event ? event.checked : null
   if (value.from === '$event.pressed') return 'pressed' in event ? event.pressed : null
   if (value.from === '$event.value') return 'value' in event ? event.value : null
+  if (value.from === '$event.payload.value') return 'payload' in event ? event.payload?.value ?? null : null
   return null
 }
 
 function isKey(value: unknown): value is Key {
   return typeof value === 'string' && value.length > 0
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
