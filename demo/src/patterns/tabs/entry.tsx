@@ -37,7 +37,7 @@ export const entry: PatternEntry = {
       key: 'tabs',
       label: 'Tabs',
       keyboardShortcuts: ['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Space', 'Delete'],
-      sourceNames: ['Tabs.tsx', 'tabsData.ts', 'react.ts', 'tabs/runtime.ts', 'tabs/definition.ts', ...KERNEL_SOURCES],
+      sourceNames: ['Tabs.tsx', 'tabsData.ts', 'useTabsPattern.ts', 'tabs/runtime.ts', 'tabs/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
       variants: (
         <VariantControl label="variant">
