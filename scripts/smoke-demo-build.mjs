@@ -347,20 +347,30 @@ async function verifyTabsKeyboardEventLog() {
 
   try {
     await waitForPatternRoute({ pattern: 'tabs', panel: 'events', source: 'Tabs.tsx', label: 'Tabs' })
+    const automaticVariant = await waitFor(() => {
+      const options = Array.from(document.querySelectorAll('[role="listbox"][aria-label="tabs variants"] [role="option"]'))
+      return options.find((option) => option.textContent?.trim() === 'Automatic activation') ?? false
+    })
+    automaticVariant.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
+    await waitFor(() => automaticVariant.getAttribute('aria-selected') === 'true')
+
     const tabs = await waitFor(() => {
       const renderedTabs = Array.from(document.querySelectorAll('[data-demo-preview="tabs"] [role="tab"]'))
       return renderedTabs.length > 1 ? renderedTabs : false
     })
     const selectedIndex = tabs.findIndex((tab) => tab.getAttribute('aria-selected') === 'true')
     const sourceTab = tabs[selectedIndex < 0 ? 0 : selectedIndex]
-    const expectedTab = tabs[((selectedIndex < 0 ? 0 : selectedIndex) + 1) % tabs.length]
+    const expectedLabel = tabs[((selectedIndex < 0 ? 0 : selectedIndex) + 1) % tabs.length].textContent?.trim()
 
     sourceTab.focus()
     sourceTab.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'ArrowRight', code: 'ArrowRight', bubbles: true, cancelable: true }))
     await waitFor(() => {
       const text = rootText()
       const logText = activePreText()
-      return expectedTab.getAttribute('aria-selected') === 'true'
+      const selectedLabel = Array.from(document.querySelectorAll('[data-demo-preview="tabs"] [role="tab"]'))
+        .find((tab) => tab.getAttribute('aria-selected') === 'true')
+        ?.textContent?.trim()
+      return selectedLabel === expectedLabel
         && text.includes('events')
         && logText.includes('navigate')
         && logText.includes('direction=next')

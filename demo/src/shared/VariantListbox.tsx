@@ -78,5 +78,6 @@ function selectVariant<T extends string>(
   items: readonly { key: T; label: string }[],
   onChange: (value: T) => void,
 ) {
-  if (items.some((item) => item.key === key)) onChange(key as T)
+  const item = items.find((candidate) => candidate.key === key)
+  if (item) onChange(item.key)
 }

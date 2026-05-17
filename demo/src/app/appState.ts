@@ -85,6 +85,14 @@ function coercePatternKey(value: string | null): PatternKey | null {
 
 export function coerceRightMode(value: string | null): AppState['rightMode'] | null {
   if (!value || value === 'off') return null
-  if (value in rightModesByLabel) return rightModesByLabel[value as keyof typeof rightModesByLabel]
-  return rightModes.includes(value as AppState['rightMode']) ? value as AppState['rightMode'] : null
+  if (isRightModeLabel(value)) return rightModesByLabel[value]
+  return isRightMode(value) ? value : null
+}
+
+function isRightModeLabel(value: string): value is keyof typeof rightModesByLabel {
+  return value in rightModesByLabel
+}
+
+function isRightMode(value: string): value is AppState['rightMode'] {
+  return rightModes.some((mode) => mode === value)
 }

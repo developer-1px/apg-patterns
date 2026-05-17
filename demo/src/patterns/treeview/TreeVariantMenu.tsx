@@ -38,5 +38,9 @@ function createTreeVariantData(value: TreeVariantKey): PatternData {
 }
 
 function selectVariant(key: string | null | undefined, onChange: (value: TreeVariantKey) => void) {
-  if (treeVariantItems.some((variant) => variant.key === key)) onChange(key as TreeVariantKey)
+  if (isTreeVariantKey(key)) onChange(key)
+}
+
+function isTreeVariantKey(key: string | null | undefined): key is TreeVariantKey {
+  return typeof key === 'string' && treeVariantItems.some((variant) => variant.key === key)
 }

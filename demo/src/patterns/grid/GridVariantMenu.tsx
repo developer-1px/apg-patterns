@@ -43,5 +43,9 @@ function createGridVariantData(value: GridVariantKey): PatternData {
 }
 
 function selectVariant(key: string | null | undefined, onChange: (value: GridVariantKey) => void) {
-  if (gridVariantItems.some((variant) => variant.key === key)) onChange(key as GridVariantKey)
+  if (isGridVariantKey(key)) onChange(key)
+}
+
+function isGridVariantKey(key: string | null | undefined): key is GridVariantKey {
+  return typeof key === 'string' && gridVariantItems.some((variant) => variant.key === key)
 }

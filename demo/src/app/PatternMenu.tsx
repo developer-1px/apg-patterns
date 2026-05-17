@@ -55,5 +55,5 @@ function createPatternMenuData(value: PatternKey): PatternData {
 }
 
 function selectPattern(key: string | null | undefined, onChange: (value: PatternKey) => void) {
-  if (patternItems.some((item) => item.key === key)) onChange(key as PatternKey)
+  if (typeof key === 'string' && patternItems.some((item) => item.key === key)) onChange(key)
 }
