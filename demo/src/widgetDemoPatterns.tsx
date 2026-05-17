@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import type { ReactNode } from 'react'
 import { reduceDisclosureData, reduceTabsData, type PatternData, type PatternEvent } from '../../src'
 import { Checkbox } from './Checkbox'
 import { checkboxVariantItems, checkboxVariants, type CheckboxVariantKey } from './checkboxData'
@@ -18,7 +19,8 @@ import { Slider } from './Slider'
 import { reduceSliderData, sliderVariantItems, sliderVariants, type SliderVariantKey } from './sliderData'
 import { Tabs } from './Tabs'
 import { closeTabInData, initialTabsVariant, tabsVariantItems, tabsVariants, type TabsVariantKey } from './tabsData'
-import { type DemoPattern, type EmitPatternEvent, selectClass } from './demoPatternTypes'
+import { type DemoPattern, type EmitPatternEvent } from './demoPatternTypes'
+import { VariantListbox } from './VariantListbox'
 
 export function useWidgetDemoPatterns(onEvent: EmitPatternEvent): readonly DemoPattern[] {
   return [
@@ -54,10 +56,14 @@ function useTabsDemoPattern(onEvent: EmitPatternEvent): DemoPattern {
     keyboardShortcuts: ['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Space', 'Delete'],
     sourceNames: ['Tabs.tsx', 'tabsData.ts', 'react.ts', 'tabs/runtime.ts', 'tabs/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
     inspect: renderTabsInspect(data),
-    variants: <LabeledSelect label="variant" value={variant} items={tabsVariantItems} onChange={(next) => {
-      setVariant(next)
-      setData(tabsVariants[next].data)
-    }} />,
+    variants: (
+      <VariantControl label="variant">
+        <VariantListbox value={variant} items={tabsVariantItems} label="tabs variants" idPrefix="tabs-variant" onChange={(next) => {
+          setVariant(next)
+          setData(tabsVariants[next].data)
+        }} />
+      </VariantControl>
+    ),
     preview: <Tabs data={data} options={active.options} variantLabel={active.label} hint={active.hint} onEvent={handleEvent} onDataChange={handleDataChange} />,
     reset: () => setData(active.data),
   }
@@ -73,7 +79,7 @@ function useSliderDemoPattern(onEvent: EmitPatternEvent): DemoPattern {
     keyboardShortcuts: ['ArrowRight', 'ArrowUp', 'ArrowLeft', 'ArrowDown', 'Shift+ArrowRight', 'Shift+ArrowUp', 'Shift+ArrowLeft', 'Shift+ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'],
     sourceNames: ['Slider.tsx', 'sliderData.ts', 'slider/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
     inspect: renderSliderInspect(data),
-    variants: <Select value={variant} items={sliderVariantItems} onChange={(next) => {
+    variants: <VariantListbox value={variant} items={sliderVariantItems} label="slider variants" idPrefix="slider-variant" onChange={(next) => {
       setVariant(next)
       setData(sliderVariants[next].data)
     }} />,
@@ -108,10 +114,14 @@ function useDisclosureDemoPattern(onEvent: EmitPatternEvent): DemoPattern {
     keyboardShortcuts: ['Enter', 'Space'],
     sourceNames: ['Disclosure.tsx', 'disclosureData.ts', 'disclosure/runtime.ts', 'disclosure/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
     inspect: renderDisclosureInspect(data),
-    variants: <LabeledSelect label="variant" value={variant} items={items} onChange={(next) => {
-      setVariant(next)
-      setData(variants[next])
-    }} />,
+    variants: (
+      <VariantControl label="variant">
+        <VariantListbox value={variant} items={items} label="disclosure variants" idPrefix="disclosure-variant" onChange={(next) => {
+          setVariant(next)
+          setData(variants[next])
+        }} />
+      </VariantControl>
+    ),
     preview: <Disclosure data={data} variant={variant} onEvent={(event) => {
       onEvent(event)
       setData((current) => reduceDisclosureData(current, event))
@@ -129,7 +139,7 @@ function useCheckboxDemoPattern(onEvent: EmitPatternEvent): DemoPattern {
     keyboardShortcuts: ['Space'],
     sourceNames: ['Checkbox.tsx', 'checkboxData.ts', 'checkbox/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
     inspect: renderCheckboxInspect(data),
-    variants: <Select value={variant} items={checkboxVariantItems} onChange={(next) => {
+    variants: <VariantListbox value={variant} items={checkboxVariantItems} label="checkbox variants" idPrefix="checkbox-variant" onChange={(next) => {
       setVariant(next)
       setData(checkboxVariants[next].data)
     }} />,
@@ -157,19 +167,11 @@ function useRadioDemoPattern(onEvent: EmitPatternEvent): DemoPattern {
   }
 }
 
-function LabeledSelect<T extends string>({ label, value, items, onChange }: { label: string; value: T; items: readonly { key: T; label: string }[]; onChange: (value: T) => void }) {
+function VariantControl({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <label className="grid gap-1 text-xs text-zinc-600 dark:text-zinc-400">
-      {label}
-      <Select value={value} items={items} onChange={onChange} />
-    </label>
-  )
-}
-
-function Select<T extends string>({ value, items, onChange }: { value: T; items: readonly { key: T; label: string }[]; onChange: (value: T) => void }) {
-  return (
-    <select className={selectClass} value={value} onChange={(event) => onChange(event.currentTarget.value as T)}>
-      {items.map((variant) => <option key={variant.key} value={variant.key}>{variant.label}</option>)}
-    </select>
+    <div className="grid gap-1 text-xs text-zinc-600 dark:text-zinc-400">
+      <span>{label}</span>
+      {children}
+    </div>
   )
 }

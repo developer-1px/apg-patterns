@@ -52,7 +52,10 @@ export function Tree({
               {label}
             </a>
           ) : (
-            <span>{itemKind === 'folder' && hasChildren ? `📁 ${label}` : itemKind === 'folder' ? `📄 ${label}` : label}</span>
+            <span className="inline-flex items-center gap-1">
+              {itemKind === 'folder' ? <Icon name={hasChildren ? 'folder' : 'file'} className="text-zinc-500" /> : null}
+              {label}
+            </span>
           )
 
         return (

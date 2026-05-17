@@ -1,6 +1,7 @@
 import { useCallback, useLayoutEffect, useMemo, useRef } from 'react'
 import type { HTMLAttributes, KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { createPatternRuntime, menubarDefinition, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
+import { Icon } from './Icon'
 import type { MenuProps } from './menuTypes'
 
 type Props = HTMLAttributes<HTMLElement>
@@ -44,7 +45,7 @@ function RootMenuItem({ itemKey, data, runtime, expanded }: { itemKey: string; d
       className="h-7 rounded px-2 text-sm text-zinc-800 outline-none aria-disabled:text-zinc-400 aria-expanded:bg-white aria-expanded:text-zinc-950 focus:outline focus:outline-2 focus:outline-zinc-400 dark:text-zinc-200 dark:aria-disabled:text-zinc-600 dark:aria-expanded:bg-zinc-950 dark:aria-expanded:text-zinc-50 dark:focus:outline-zinc-500"
     >
       {data.items[itemKey]?.label}
-      {(data.relations?.childrenByKey?.[itemKey]?.length ?? 0) > 0 ? <span aria-hidden="true" className="ml-1 text-xs text-zinc-500">{expanded ? '▾' : '▸'}</span> : null}
+      {(data.relations?.childrenByKey?.[itemKey]?.length ?? 0) > 0 ? <Icon name="chevron-right" className={`ml-1 text-xs text-zinc-500 ${expanded ? 'rotate-90' : ''}`} /> : null}
     </button>
   )
 }
@@ -83,7 +84,10 @@ function SubmenuItem({ itemKey, data, radioGroup, onEvent, onClose }: { itemKey:
         activate()
       }
     }} className="cursor-default rounded px-2 py-1 text-zinc-800 outline-none hover:bg-zinc-100 aria-disabled:text-zinc-400 dark:text-zinc-200 dark:hover:bg-zinc-900 dark:aria-disabled:text-zinc-600">
-      <span className="mr-2 inline-block w-4 text-xs text-zinc-500">{role === 'menuitemcheckbox' ? (checked ? '☑' : '☐') : role === 'menuitemradio' ? (checked ? '●' : '○') : ''}</span>
+      <span className="mr-2 inline-grid w-4 place-items-center text-xs text-zinc-500">
+        {role === 'menuitemcheckbox' ? <Icon name={checked ? 'square-check' : 'square'} /> : null}
+        {role === 'menuitemradio' ? <Icon name="circle-dot" className={checked ? '' : 'opacity-0'} /> : null}
+      </span>
       {item?.label ?? itemKey}
     </li>
   )

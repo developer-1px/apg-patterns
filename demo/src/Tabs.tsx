@@ -1,6 +1,7 @@
-import { useLayoutEffect } from 'react'
+import { useLayoutEffect, useRef } from 'react'
 import type { HTMLAttributes } from 'react'
 import { useTabsPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
+import { Icon } from './Icon'
 
 type Props = HTMLAttributes<HTMLElement>
 
@@ -30,10 +31,17 @@ export function Tabs({
   const orientation = mergedOptions.orientation
   const scrollable = (mergedOptions as { scrollable?: boolean }).scrollable === true
   const closeable = (mergedOptions as { closeable?: boolean }).closeable === true
+  const tablistRef = useRef<HTMLDivElement>(null)
+  const didMountRef = useRef(false)
 
   const activeKey = data.state?.activeKey
   useLayoutEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true
+      return
+    }
     if (!activeKey) return
+    if (!tablistRef.current?.contains(document.activeElement)) return
     const prefix = (mergedOptions as { elementIdPrefix?: string }).elementIdPrefix ?? 'tab-'
     const id = `${prefix}${activeKey.toLowerCase().replace(/[^a-z0-9_-]+/g, '-')}`
     document.getElementById(id)?.focus({ preventScroll: true })
@@ -60,7 +68,7 @@ export function Tabs({
       ) : null}
       {hint ? <p className="text-xs text-zinc-500 dark:text-zinc-500">{hint}</p> : null}
       <div className={containerClass}>
-        <div {...(tabs.getTablistProps() as Props)} className={tablistClass}>
+        <div {...(tabs.getTablistProps() as Props)} ref={tablistRef} className={tablistClass}>
           {tabs.tabs.map((key) => {
             const tabProps = tabs.getTabProps(key) as Props
             return (
@@ -77,9 +85,9 @@ export function Tabs({
                       event.stopPropagation()
                       onEvent({ type: 'extension', name: 'closeTab', key })
                     }}
-                    className="ml-1 h-5 w-5 rounded text-xs text-zinc-500 hover:bg-zinc-200 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                    className="ml-1 grid size-5 place-items-center rounded text-xs text-zinc-500 hover:bg-zinc-200 dark:text-zinc-400 dark:hover:bg-zinc-800"
                   >
-                    ×
+                    <Icon name="x" />
                   </button>
                 ) : null}
               </span>

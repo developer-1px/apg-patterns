@@ -1,6 +1,7 @@
 import { useLayoutEffect, useMemo, useRef } from 'react'
 import type { HTMLAttributes, KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { createPatternRuntime, menuButtonDefinition, type PatternOptions } from '../../src'
+import { Icon } from './Icon'
 import type { MenuProps } from './menuTypes'
 
 type Props = HTMLAttributes<HTMLElement>
@@ -42,7 +43,7 @@ export function MenuButton({ data, onEvent, focusStrategy = 'rovingTabIndex' }: 
         }
       }} className="inline-flex h-8 items-center justify-between rounded bg-zinc-100 px-3 text-sm text-zinc-800 outline-none hover:bg-zinc-200 focus:outline focus:outline-2 focus:outline-zinc-400 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:focus:outline-zinc-500">
         <span>{data.items[triggerKey]?.label ?? 'Menu'}</span>
-        <span aria-hidden="true" className="ml-3 text-xs text-zinc-500">{expanded ? '▾' : '▸'}</span>
+        <Icon name="chevron-right" className={`ml-3 text-xs text-zinc-500 ${expanded ? 'rotate-90' : ''}`} />
       </button>
       {expanded ? (
         <ul ref={menuContainerRef} {...menuProps} tabIndex={focusStrategy === 'ariaActiveDescendant' ? 0 : -1} onKeyDown={(event: ReactKeyboardEvent) => {

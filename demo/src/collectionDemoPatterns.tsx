@@ -18,6 +18,7 @@ import { Tree } from './Tree'
 import { treeVariants, type TreeVariantKey } from './treeVariants'
 import { TreeVariantMenu } from './TreeVariantMenu'
 import { type DemoPattern, type EmitPatternEvent, selectClass } from './demoPatternTypes'
+import { VariantListbox } from './VariantListbox'
 
 export type ListboxVariantKey = 'basic' | 'scrollable' | 'grouped' | 'rearrangeable' | 'rearrangeableMulti'
 
@@ -136,7 +137,7 @@ function useListboxDemoPattern(onEvent: EmitPatternEvent): DemoPattern {
     keyboardShortcuts: ['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Space'],
     sourceNames: ['Listbox.tsx', 'RearrangeableListbox.tsx', 'listboxData.ts', 'listbox/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
     inspect: renderListboxInspect(data),
-    variants: <VariantSelect value={variant} items={listboxVariantItems} onChange={(next) => {
+    variants: <VariantListbox value={variant} items={listboxVariantItems} label="listbox variants" idPrefix="listbox-variant" onChange={(next) => {
       setVariant(next)
       setData(initialByVariant[next])
     }} />,
@@ -169,12 +170,4 @@ function useGridDemoPattern(onEvent: EmitPatternEvent): DemoPattern {
     }} />,
     reset: () => setData(gridVariants[variant].data),
   }
-}
-
-function VariantSelect<T extends string>({ value, items, onChange }: { value: T; items: readonly { key: T; label: string }[]; onChange: (value: T) => void }) {
-  return (
-    <select className={selectClass} value={value} onChange={(event) => onChange(event.currentTarget.value as T)}>
-      {items.map((variant) => <option key={variant.key} value={variant.key}>{variant.label}</option>)}
-    </select>
-  )
 }

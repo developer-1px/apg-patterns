@@ -1,6 +1,7 @@
 import { useLayoutEffect, useMemo, useState } from 'react'
 import type { HTMLAttributes, KeyboardEvent } from 'react'
 import { createPatternRuntime, gridDefinition, gridRows, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
+import { Icon, type IconName } from './Icon'
 
 type Props = HTMLAttributes<HTMLElement>
 
@@ -103,7 +104,7 @@ export function Grid({
               const isEditing = editingKey === cellKey
               const isEditable = editableKeys.includes(cellKey)
               const displayValue = valueByKey[cellKey] !== undefined ? String(valueByKey[cellKey]) : data.items[cellKey]?.label
-              const sortMarker = part === 'columnheader' && sortByKey[cellKey] ? (sortByKey[cellKey] === 'ascending' ? ' ▲' : ' ▼') : ''
+              const sortIcon: IconName | null = part === 'columnheader' && sortByKey[cellKey] ? (sortByKey[cellKey] === 'ascending' ? 'arrow-up' : 'arrow-down') : null
               return (
                 <div
                   key={cellKey}
@@ -123,7 +124,7 @@ export function Grid({
                       onBlur={commitEdit}
                     />
                   ) : (
-                    <>{displayValue}{sortMarker}</>
+                    <>{displayValue}{sortIcon ? <Icon name={sortIcon} className="ml-1 text-xs text-zinc-500" /> : null}</>
                   )}
                 </div>
               )

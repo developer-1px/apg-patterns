@@ -2,6 +2,7 @@ import type { HTMLAttributes, KeyboardEvent } from 'react'
 import { useRef } from 'react'
 import { createPatternRuntime, disclosureDefinition, type PatternData, type PatternEvent } from '../../src'
 import { navMenuContent, navMenuTopLinksContent } from './disclosureData'
+import { Icon } from './Icon'
 
 type Props = HTMLAttributes<HTMLElement>
 
@@ -164,7 +165,7 @@ function TopGroup({
     <li className="relative">
       <button type="button" {...trigger} data-nav-button={entry.key} data-nav-key={entry.key} onClick={onToggle} onKeyDown={onButtonKey} className={buttonClass}>
         <span>{entry.label}</span>
-        <span aria-hidden="true" className="ml-2 text-xs text-zinc-500 dark:text-zinc-400">{expanded ? '▾' : '▸'}</span>
+        <Icon name="chevron-right" className={`ml-2 text-xs text-zinc-500 dark:text-zinc-400 ${expanded ? 'rotate-90' : ''}`} />
       </button>
       {expanded ? (
         <ul {...panel} data-nav-panel={entry.key} className={`${panelClass} absolute left-0 top-9 z-10 grid min-w-[12rem] gap-0.5`}>

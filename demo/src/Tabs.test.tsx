@@ -27,6 +27,12 @@ function TabsDemo({ variant, onEvent: onEventOuter }: { variant: TabsVariantKey;
 }
 
 describe('Tabs demo — automatic activation', () => {
+  it('does not autofocus the active tab on mount', () => {
+    render(<TabsDemo variant="automatic" />)
+    const selected = screen.getByRole('tab', { selected: true })
+    expect(document.activeElement).not.toBe(selected)
+  })
+
   it('ArrowRight moves focus and immediately activates next tab', () => {
     render(<TabsDemo variant="automatic" />)
     const tabs = screen.getAllByRole('tab')

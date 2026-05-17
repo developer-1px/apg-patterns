@@ -1,5 +1,4 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
-import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 
 // jsdom lacks CSS.escape; Listbox uses it inside a useLayoutEffect.
@@ -9,46 +8,7 @@ if (typeof (globalThis as { CSS?: { escape?: (s: string) => string } }).CSS === 
   ;(globalThis as { CSS: { escape: (s: string) => string } }).CSS.escape = (s: string) => s
 }
 
-import { listboxDefinition, reducePatternData, type PatternData, type PatternEvent, type PatternOptions } from '../../src'
-import { Listbox } from './Listbox'
-import {
-  groupedListboxStructure,
-  initialGroupedListboxData,
-  initialListboxData,
-  initialRearrangeableListboxData,
-  initialScrollableListboxData,
-} from './listboxData'
-import { RearrangeableListbox } from './RearrangeableListbox'
-
-type Variant = 'basic' | 'scrollable' | 'grouped' | 'rearrangeable' | 'rearrangeableMulti'
-
-const initialByVariant: Record<Variant, PatternData> = {
-  basic: initialListboxData,
-  scrollable: initialScrollableListboxData,
-  grouped: initialGroupedListboxData,
-  rearrangeable: initialRearrangeableListboxData,
-  rearrangeableMulti: initialRearrangeableListboxData,
-}
-
-function ListboxDemo({ variant = 'basic' }: { variant?: Variant }) {
-  const [data, setData] = useState<PatternData>(initialByVariant[variant])
-  const options: PatternOptions = variant === 'rearrangeableMulti'
-    ? { focusStrategy: 'rovingTabIndex', selectionMode: 'multiple' }
-    : { focusStrategy: 'rovingTabIndex', selectionMode: 'single' }
-  const handleEvent = (event: PatternEvent) => {
-    setData((current) => reducePatternData(listboxDefinition, current, event))
-  }
-  if (variant === 'scrollable') {
-    return <Listbox data={data} options={options} scrollable onEvent={handleEvent} />
-  }
-  if (variant === 'grouped') {
-    return <Listbox data={data} options={options} groups={groupedListboxStructure} onEvent={handleEvent} />
-  }
-  if (variant === 'rearrangeable' || variant === 'rearrangeableMulti') {
-    return <RearrangeableListbox data={data} options={options} onChange={setData} onEvent={handleEvent} />
-  }
-  return <Listbox data={data} options={options} onEvent={handleEvent} />
-}
+import { ListboxDemo } from './ListboxTestHost'
 
 const activeOption = () => document.querySelector('[role="option"][data-active]') as HTMLElement | null
 

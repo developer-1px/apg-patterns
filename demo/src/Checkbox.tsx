@@ -2,6 +2,7 @@ import type { HTMLAttributes, KeyboardEvent } from 'react'
 import { useMemo } from 'react'
 import type { KeyInput } from '@interactive-os/keyboard'
 import { checkboxDefinition, createPatternRuntime, type PatternData, type PatternEvent } from '../../src'
+import { Icon } from './Icon'
 
 type Props = HTMLAttributes<HTMLElement>
 
@@ -49,7 +50,6 @@ export function Checkbox({
 
   const renderItem = ({ key, props, state }: (typeof items)[number]) => {
     const checked = state.checked
-    const mark = checked === 'mixed' ? '–' : checked === true ? 'x' : ''
     return (
       <div
         key={key}
@@ -63,7 +63,8 @@ export function Checkbox({
           aria-hidden="true"
           className="grid size-4 place-items-center rounded border border-zinc-400 text-xs text-zinc-900 dark:border-zinc-600 dark:text-zinc-100"
         >
-          {mark}
+          {checked === 'mixed' ? <Icon name="minus" /> : null}
+          {checked === true ? <Icon name="x" /> : null}
         </span>
         <span>{data.items[key]?.label}</span>
       </div>

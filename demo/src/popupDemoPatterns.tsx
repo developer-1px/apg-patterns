@@ -5,7 +5,8 @@ import { buildComboboxData, comboboxVariants, reduceComboboxData, type ComboboxV
 import { renderComboboxInspect, renderMenuInspect } from './inspect'
 import { Menu } from './Menu'
 import { menuVariantItems, menuVariants, type MenuVariantKey } from './menuData'
-import { type DemoPattern, type EmitPatternEvent, selectClass } from './demoPatternTypes'
+import { type DemoPattern, type EmitPatternEvent } from './demoPatternTypes'
+import { VariantListbox } from './VariantListbox'
 
 export function usePopupDemoPatterns(onEvent: EmitPatternEvent): readonly DemoPattern[] {
   return [useMenuDemoPattern(onEvent), useComboboxDemoPattern(onEvent)]
@@ -23,25 +24,11 @@ function useMenuDemoPattern(onEvent: EmitPatternEvent): DemoPattern {
     keyboardShortcuts: ['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Space', 'Escape'],
     sourceNames: ['Menu.tsx', 'menuData.ts', 'menu/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
     inspect: renderMenuInspect(data, apgPattern, focusStrategy),
-    variants: (
-      <div className="grid gap-1">
-        {menuVariantItems.map((item) => (
-          <button
-            key={item.key}
-            type="button"
-            onClick={() => {
-              setVariant(item.key)
-              setData(menuVariants[item.key].data)
-            }}
-            aria-pressed={variant === item.key}
-            className="h-7 rounded px-2 text-left text-xs text-zinc-600 hover:bg-zinc-100 aria-pressed:bg-zinc-900 aria-pressed:text-white dark:text-zinc-400 dark:hover:bg-zinc-900 dark:aria-pressed:bg-zinc-100 dark:aria-pressed:text-zinc-950"
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
-    ),
-    preview: <Menu key={variant} data={data} flavor={apgPattern} focusStrategy={focusStrategy} onEvent={(event) => {
+    variants: <VariantListbox value={variant} items={menuVariantItems} label="menu and menubar variants" idPrefix="menu-variant" onChange={(next) => {
+      setVariant(next)
+      setData(menuVariants[next].data)
+    }} />,
+    preview: <Menu key={variant} data={data} apgPattern={apgPattern} focusStrategy={focusStrategy} onEvent={(event) => {
       onEvent(event)
       setData((current) => reducePatternData(definition, current, event))
     }} />,
@@ -58,21 +45,10 @@ function useComboboxDemoPattern(onEvent: EmitPatternEvent): DemoPattern {
     keyboardShortcuts: ['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Escape'],
     sourceNames: ['Combobox.tsx', 'comboboxData.ts', 'combobox/definition.ts', 'patternRuntime.ts', 'patternReducer.ts', 'patternKernel.ts', 'schema.ts'],
     inspect: renderComboboxInspect(data, { autocomplete: comboboxVariants[variant].autocomplete }),
-    variants: (
-      <select
-        className={selectClass}
-        value={variant}
-        onChange={(event) => {
-          const next = event.currentTarget.value as ComboboxVariantKey
-          setVariant(next)
-          setData(buildComboboxData())
-        }}
-      >
-        {(Object.keys(comboboxVariants) as ComboboxVariantKey[]).map((key) => (
-          <option key={key} value={key}>{comboboxVariants[key].label}</option>
-        ))}
-      </select>
-    ),
+    variants: <VariantListbox value={variant} items={comboboxVariantItems} label="combobox variants" idPrefix="combobox-variant" onChange={(next) => {
+      setVariant(next)
+      setData(buildComboboxData())
+    }} />,
     preview: (
       <Combobox
         data={data}
@@ -90,3 +66,8 @@ function useComboboxDemoPattern(onEvent: EmitPatternEvent): DemoPattern {
     reset: () => setData(buildComboboxData()),
   }
 }
+
+const comboboxVariantItems = (Object.keys(comboboxVariants) as ComboboxVariantKey[]).map((key) => ({
+  key,
+  label: comboboxVariants[key].label,
+}))

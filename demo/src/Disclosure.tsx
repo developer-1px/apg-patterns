@@ -2,6 +2,7 @@ import type { HTMLAttributes, KeyboardEvent } from 'react'
 import type { KeyInput } from '@interactive-os/keyboard'
 import { createDisclosureRuntime, createPatternRuntime, disclosureDefinition, type PatternData, type PatternEvent } from '../../src'
 import { disclosurePanelText, faqDisclosureContent, imageDisclosureContent, type DisclosureVariantKey } from './disclosureData'
+import { Icon } from './Icon'
 import { NavMenuDisclosure, NavMenuTopLinksDisclosure } from './NavMenuDisclosure'
 
 type Props = HTMLAttributes<HTMLElement>
@@ -108,5 +109,5 @@ function useTriggerRuntime(data: PatternData, onEvent: (event: PatternEvent) => 
 }
 
 function Chevron({ expanded }: { expanded: boolean }) {
-  return <span aria-hidden="true" className="ml-3 text-xs text-zinc-500 dark:text-zinc-400">{expanded ? '▾' : '▸'}</span>
+  return <Icon name="chevron-right" className={`ml-3 text-xs text-zinc-500 dark:text-zinc-400 ${expanded ? 'rotate-90' : ''}`} />
 }
