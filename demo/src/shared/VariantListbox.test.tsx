@@ -14,6 +14,11 @@ function VariantListboxDemo() {
   return <VariantListbox value={value} items={items} label="variants" idPrefix="variant" onChange={setValue} />
 }
 
+function HorizontalVariantListboxDemo() {
+  const [value, setValue] = useState<(typeof items)[number]['key']>('one')
+  return <VariantListbox orientation="horizontal" value={value} items={items} label="variants" idPrefix="variant" onChange={setValue} />
+}
+
 describe('VariantListbox', () => {
   it('uses listbox roles for variants', () => {
     render(<VariantListboxDemo />)
@@ -28,6 +33,17 @@ describe('VariantListbox', () => {
     fireEvent.keyDown(screen.getByRole('listbox', { name: 'variants' }), { key: 'ArrowDown', code: 'ArrowDown' })
 
     expect(screen.getByRole('option', { name: 'Two' }).getAttribute('aria-selected')).toBe('true')
+  })
+
+  it('ArrowRight and ArrowLeft change the selected horizontal variant', () => {
+    render(<HorizontalVariantListboxDemo />)
+
+    const listbox = screen.getByRole('listbox', { name: 'variants' })
+    fireEvent.keyDown(listbox, { key: 'ArrowRight', code: 'ArrowRight' })
+    expect(screen.getByRole('option', { name: 'Two' }).getAttribute('aria-selected')).toBe('true')
+
+    fireEvent.keyDown(listbox, { key: 'ArrowLeft', code: 'ArrowLeft' })
+    expect(screen.getByRole('option', { name: 'One' }).getAttribute('aria-selected')).toBe('true')
   })
 
   it('click changes the selected variant', () => {

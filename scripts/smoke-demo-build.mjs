@@ -1,10 +1,13 @@
 import { access, readFile, readdir } from 'node:fs/promises'
 import { JSDOM } from 'jsdom'
+import ts from 'typescript'
 
 const demoUrl = 'http://127.0.0.1/#pattern=tabs&panel=code&source=Tabs.tsx'
 const distDir = new URL('../demo/dist/', import.meta.url)
 const assetsDir = new URL('../demo/dist/assets/', import.meta.url)
+const demoPatternsDir = new URL('../demo/src/patterns/', import.meta.url)
 const entryFile = (await readdir(assetsDir)).find((file) => /^index-.*\.js$/.test(file))
+const expectedKeyboardShortcutsByPattern = await readDemoEntryKeyboardShortcuts()
 
 if (!entryFile) throw new Error('demo build smoke failed: missing built entry chunk')
 
@@ -140,6 +143,7 @@ async function runSmoke() {
 
     if (hasSourceLoadFailure(rootText())) patternFailures.push(`${label}: source load failure marker rendered`)
     verifyPreviewSurface(key, label)
+    verifyPreviewKeyboardShortcuts(key, label)
     await verifyVariantControls(key, label)
 
     const sourceTablist = document.querySelector('[role="tablist"][aria-label="source files"]')
@@ -942,6 +946,21 @@ function verifyPreviewSurface(key, label) {
   }
 }
 
+function verifyPreviewKeyboardShortcuts(key, label) {
+  const expectedShortcuts = expectedKeyboardShortcutsByPattern.get(key)
+  if (!expectedShortcuts) {
+    patternFailures.push(`${label}: missing demo entry keyboard shortcut metadata`)
+    return
+  }
+
+  const preview = document.querySelector(`[data-demo-preview="${key}"]`)
+  const expectedValue = expectedShortcuts.join(' ') || null
+  const actualValue = preview?.getAttribute('aria-keyshortcuts')
+  if (actualValue !== expectedValue) {
+    patternFailures.push(`${label}: preview aria-keyshortcuts mismatch: expected=${expectedValue ?? 'none'}, actual=${actualValue ?? 'none'}`)
+  }
+}
+
 function previewSurfaceIsMounted(key) {
   const selector = previewSurfaceSelectors[key]
   const previews = Array.from(document.querySelectorAll('[data-demo-preview]'))
@@ -981,9 +1000,13 @@ function verifyPreviewSurfaceRegistry(patternKeys) {
   const selectorKeys = Object.keys(previewSurfaceSelectors)
   for (const key of patternKeys) {
     if (!previewSurfaceSelectors[key]) patternFailures.push(`${key}: missing preview smoke selector`)
+    if (!expectedKeyboardShortcutsByPattern.has(key)) patternFailures.push(`${key}: missing keyboard shortcut metadata smoke fixture`)
   }
   for (const key of selectorKeys) {
     if (!patternKeySet.has(key)) patternFailures.push(`${key}: stale preview smoke selector`)
+  }
+  for (const key of expectedKeyboardShortcutsByPattern.keys()) {
+    if (!patternKeySet.has(key)) patternFailures.push(`${key}: stale keyboard shortcut metadata smoke fixture`)
   }
 }
 
@@ -1031,4 +1054,53 @@ async function verifyDistIndexAssets() {
   if (missingAssets.length > 0) {
     throw new Error(`demo build smoke failed: index.html references missing assets: ${missingAssets.join(', ')}`)
   }
+}
+
+async function readDemoEntryKeyboardShortcuts() {
+  const entries = new Map()
+  const patternDirs = await readdir(demoPatternsDir, { withFileTypes: true })
+
+  for (const patternDir of patternDirs) {
+    if (!patternDir.isDirectory()) continue
+    const entryUrl = new URL(`${patternDir.name}/entry.tsx`, demoPatternsDir)
+    let source
+    try {
+      source = await readFile(entryUrl, 'utf8')
+    } catch {
+      continue
+    }
+
+    const sourceFile = ts.createSourceFile(entryUrl.pathname, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
+    const metadata = extractDemoEntryMetadata(sourceFile)
+    if (metadata.key && metadata.keyboardShortcuts) entries.set(metadata.key, metadata.keyboardShortcuts)
+  }
+
+  return entries
+}
+
+function extractDemoEntryMetadata(sourceFile) {
+  const metadata = { key: null, keyboardShortcuts: null }
+
+  function visit(node) {
+    if (ts.isPropertyAssignment(node)) {
+      const name = propertyNameText(node.name)
+      if (name === 'key' && ts.isStringLiteralLike(node.initializer)) {
+        metadata.key = node.initializer.text
+      }
+      if (name === 'keyboardShortcuts' && ts.isArrayLiteralExpression(node.initializer)) {
+        metadata.keyboardShortcuts = node.initializer.elements.map((element) => (
+          ts.isStringLiteralLike(element) ? element.text : null
+        ))
+      }
+    }
+    ts.forEachChild(node, visit)
+  }
+
+  visit(sourceFile)
+  return metadata
+}
+
+function propertyNameText(name) {
+  if (ts.isIdentifier(name) || ts.isStringLiteralLike(name)) return name.text
+  return null
 }

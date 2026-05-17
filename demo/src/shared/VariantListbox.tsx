@@ -30,9 +30,24 @@ export function VariantListbox<T extends string>({
     keyToElementId: (key) => `${idPrefix}-${key}`,
   })
   const rootProps = runtime.getPartProps('listbox') as Props
+  const handleKeyDown = rootProps.onKeyDown
 
   return (
-    <div {...rootProps} className={`${orientation === 'horizontal' ? 'flex flex-wrap items-center gap-1' : 'grid gap-1'} outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:focus-visible:outline-zinc-500`}>
+    <div
+      {...rootProps}
+      onKeyDown={(event) => {
+        if (orientation === 'horizontal' && (event.key === 'ArrowRight' || event.key === 'ArrowLeft')) {
+          handleKeyDown?.({
+            ...event,
+            key: event.key === 'ArrowRight' ? 'ArrowDown' : 'ArrowUp',
+            code: event.code === 'ArrowRight' ? 'ArrowDown' : 'ArrowUp',
+          })
+          return
+        }
+        handleKeyDown?.(event)
+      }}
+      className={`${orientation === 'horizontal' ? 'flex flex-wrap items-center gap-1' : 'grid gap-1'} outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:focus-visible:outline-zinc-500`}
+    >
       {items.map((item) => (
         <button
           {...(runtime.getPartProps('option', item.key) as Props)}
