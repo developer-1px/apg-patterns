@@ -1,6 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
+
+// jsdom lacks the CSS object Grid.tsx uses for CSS.escape; polyfill minimally.
+if (typeof globalThis.CSS === 'undefined') {
+  ;(globalThis as { CSS?: { escape: (value: string) => string } }).CSS = { escape: (value: string) => value }
+}
 import { gridDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../src'
 import { Grid } from './Grid'
 import { gridVariants, type GridVariantKey } from './gridData'
