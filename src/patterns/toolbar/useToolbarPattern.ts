@@ -1,6 +1,6 @@
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import type { ReactPatternProps, ReactRenderItemState } from '../../adapters/reactBaseTypes'
+import { reactKeyInput, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
 import { useReactPatternRuntime } from '../../adapters/reactPatternEffects'
 import { toolbarDefinition } from './definition'
 
@@ -44,7 +44,7 @@ export function useToolbarPattern(data: PatternData, onEvent: (event: PatternEve
   return {
     rootProps: {
       ...rootProps,
-      onKeyDown: (event) => onKeyDown(event),
+      onKeyDown: (event) => onKeyDown(reactKeyInput(event)),
     },
     get renderItems() {
       return runtime.visibleKeys.map((key) => createToolbarRenderItem(runtime, key))

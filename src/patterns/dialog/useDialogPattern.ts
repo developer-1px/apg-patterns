@@ -3,7 +3,7 @@ import { createPatternRuntime } from '../../kernel/patternRuntime'
 import { handlePatternTrapFocus } from '../../adapters/reactPatternEffects'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { dialogDefinition } from './definition'
 
 export interface ReactDialogRuntime {
@@ -42,7 +42,7 @@ export function useDialogPattern(data: PatternData, onEvent: (event: PatternEven
       return {
         ...(runtime.getPartProps('dialog', 'dialog') as ReactPatternProps),
         onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
-          rootKeyDown(event)
+          rootKeyDown(reactKeyInput(event))
           handlePatternTrapFocus({ event, definition: dialogDefinition, data, keyToElementId })
         },
         tabIndex: -1,

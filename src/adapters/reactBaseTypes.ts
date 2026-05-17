@@ -11,7 +11,7 @@ export function reactKeyInput(event: KeyboardEvent<HTMLElement>): KeyInput & { p
     shiftKey: event.shiftKey,
     altKey: event.altKey,
     metaKey: event.metaKey,
-    isComposing: event.isComposing,
+    isComposing: event.nativeEvent.isComposing,
     repeat: event.repeat,
     location: event.location,
     keyCode: event.keyCode,

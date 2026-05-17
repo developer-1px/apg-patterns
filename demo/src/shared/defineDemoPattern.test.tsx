@@ -57,6 +57,46 @@ describe('defineDemoPattern', () => {
     expect(screen.getByRole('button', { name: 'Rendered' })).toBeTruthy()
   })
 
+  it('renders declared controls outside the preview node', () => {
+    const entry = defineDemoPattern({
+      definition: {
+        ...definition,
+        controls: {
+          kind: 'listbox',
+          label: 'variants',
+          idPrefix: 'variant',
+          items: '$model.items',
+          value: '$state.value',
+          onChange: '$actions.selectValue',
+        },
+      },
+      useRuntime: () => ({
+        inspect: 'state',
+        context: {
+          values: {
+            state: { label: 'Rendered', value: 'one' },
+            model: { items: [{ key: 'one', label: 'One' }] },
+          },
+          actions: { selectValue: () => undefined },
+          components: {
+            Preview: ({ label }) => <button type="button">{label}</button>,
+          },
+        },
+      }),
+    })
+
+    const demo = entry.useDemoPattern(() => undefined)
+    render(
+      <>
+        {demo.variants}
+        <div data-preview>{demo.preview}</div>
+      </>,
+    )
+
+    expect(screen.getByRole('listbox', { name: 'variants' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Rendered' }).closest('[data-preview]')).toBeTruthy()
+  })
+
   it('rejects invalid definitions before an entry is created', () => {
     expect(() =>
       defineDemoPattern({

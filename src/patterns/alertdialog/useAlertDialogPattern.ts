@@ -2,7 +2,7 @@ import type { KeyboardEvent, MouseEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import { handlePatternTrapFocus, usePatternEffects } from '../../adapters/reactPatternEffects'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { alertDialogDefinition } from './definition'
 
 export interface ReactAlertDialogRuntime {
@@ -43,7 +43,7 @@ export function useAlertDialogPattern(data: PatternData, onEvent: (event: Patter
         ...(runtime.getPartProps('dialog', 'dialog') as ReactPatternProps),
         onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
           if (event.key === 'Escape') onEvent({ type: 'activate', key: 'cancel' })
-          rootKeyDown(event)
+          rootKeyDown(reactKeyInput(event))
           handlePatternTrapFocus({ event, definition: alertDialogDefinition, data, keyToElementId })
         },
       } as ReactPatternProps

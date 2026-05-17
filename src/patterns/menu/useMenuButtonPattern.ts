@@ -2,7 +2,7 @@ import type { KeyboardEvent, MouseEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
-import type { ReactPatternProps, ReactRenderItemState } from '../../adapters/reactBaseTypes'
+import { reactKeyInput, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
 import { menuButtonDefinition } from './definition'
 
 export interface ReactMenuButtonItem {
@@ -107,7 +107,7 @@ export function useMenuButtonPattern(data: PatternData, onEvent: (event: Pattern
             onEvent({ type: 'focus', key: nextKey, meta: { reason: 'keyboard' } })
             return
           }
-          rootKeyDown(event)
+          rootKeyDown(reactKeyInput(event))
         },
       }
     },

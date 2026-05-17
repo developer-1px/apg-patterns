@@ -1,7 +1,7 @@
 import type { KeyboardEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { linkDefinition } from './definition'
 
 export interface ReactLinkRuntime {
@@ -40,7 +40,7 @@ export function useLinkPattern(data: PatternData, onEvent: (event: PatternEvent)
       const { onKeyDown: _onKeyDown, ...props } = runtime.getPartProps('link', key) as ReactPatternProps
       return {
         ...props,
-        onKeyDown: (event: KeyboardEvent<HTMLElement>) => rootKeyboard(event),
+        onKeyDown: (event: KeyboardEvent<HTMLElement>) => rootKeyboard(reactKeyInput(event)),
       }
     },
     key,

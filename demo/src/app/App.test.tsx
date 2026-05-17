@@ -298,6 +298,24 @@ describe('App route state', () => {
     expect(rightPanel?.getAttribute('aria-labelledby')).toBe(selectedRightPanelTab?.id)
     expect(rightPanel?.textContent).toContain('Accordion.tsx')
   })
+
+  it('shows the Button aria-pressed variant in the preview after keyboard variant selection', async () => {
+    replaceHash('#pattern=button&panel=code&source=Button.tsx')
+
+    render(<App />)
+
+    await waitFor(() => expect(currentHashParam('pattern')).toBe('button'))
+    const variantListbox = screen.getByRole('listbox', { name: 'button variants' })
+    fireEvent.keyDown(variantListbox, { key: 'ArrowRight', code: 'ArrowRight' })
+
+    await waitFor(() => {
+      const preview = document.querySelector('[data-demo-preview="button"]')
+      const button = preview?.querySelector('button')
+      expect(screen.getByRole('option', { name: 'Toggle (aria-pressed)', selected: true })).toBeTruthy()
+      expect(button?.textContent).toBe('Mute')
+      expect(button?.getAttribute('aria-pressed')).toBe('false')
+    })
+  })
 })
 
 describe('SourceTabs', () => {

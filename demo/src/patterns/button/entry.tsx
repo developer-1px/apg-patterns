@@ -16,27 +16,22 @@ const buttonDemoDefinition = {
     hooks: ['button/useButtonPattern.ts'],
     definition: 'button/definition.ts',
   },
+  controls: {
+    kind: 'listbox',
+    orientation: 'horizontal',
+    value: '$state.variant',
+    items: '$model.variantItems',
+    label: 'button variants',
+    idPrefix: 'button-variant',
+    onChange: '$actions.selectVariant',
+  },
   view: {
-    kind: 'stack',
-    children: [
-      {
-        kind: 'listbox',
-        orientation: 'horizontal',
-        value: '$state.variant',
-        items: '$model.variantItems',
-        label: 'button variants',
-        idPrefix: 'button-variant',
-        onChange: '$actions.selectVariant',
-      },
-      {
-        kind: 'component',
-        component: 'Button',
-        props: {
-          data: '$state.data',
-          onEvent: '$actions.dispatchEvent',
-        },
-      },
-    ],
+    kind: 'component',
+    component: 'Button',
+    props: {
+      data: '$state.data',
+      onEvent: '$actions.dispatchEvent',
+    },
   },
 } as const satisfies DemoPatternDefinition
 
