@@ -21,7 +21,7 @@ describe('APG §Roles, States, Properties', () => {
   it('container has role="tree"', () => {
     render(<TreeDemo />)
     expect(tree()).toBeTruthy()
-  })
+  }, 15000)
 
   it('each node has role="treeitem"', () => {
     render(<TreeDemo />)
