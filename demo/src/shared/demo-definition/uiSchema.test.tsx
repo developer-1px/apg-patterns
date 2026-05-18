@@ -1,7 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { renderUiNode, type UiNode, type UiRenderContext } from './uiSchema'
+import { renderUiNode } from './renderUiNode'
+import type { UiNode, UiRenderContext } from './uiSchema'
 
 const view = {
   kind: 'stack',

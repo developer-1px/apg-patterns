@@ -9,7 +9,8 @@ import {
   sourceNamesFromDefinition,
   type DemoPatternDefinition,
 } from './demoPatternDefinition'
-import { renderUiNode, type UiRenderContext } from './uiSchema'
+import { renderUiNode } from './renderUiNode'
+import type { UiRenderContext } from './uiSchema'
 
 interface DemoRuntime {
   context: UiRenderContext
