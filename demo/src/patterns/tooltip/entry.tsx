@@ -1,19 +1,37 @@
 import { Tooltip } from './Tooltip'
 import { initialTooltipData } from './tooltipData'
-import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
+import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 import { renderDataInspect } from '../../shared/inspect/genericInspect'
 
-export const entry: PatternEntry = {
+const tooltipDemoDefinition = {
   key: 'tooltip',
   label: 'Tooltip',
-  useDemoPattern: (_onEvent) => {
+  keyboardShortcuts: ['Escape'],
+  sources: {
+    main: 'Tooltip.tsx',
+    entry: 'tooltip/entry.tsx',
+    data: ['tooltipData.ts'],
+    hooks: ['tooltip/useTooltipPattern.ts'],
+    definition: 'tooltip/definition.ts',
+  },
+  view: {
+    kind: 'component',
+    component: 'Tooltip',
+  },
+} as const satisfies DemoPatternDefinition
+
+export const entry = defineDemoPattern({
+  definition: tooltipDemoDefinition,
+  useRuntime: () => {
     return {
-      key: 'tooltip',
-      label: 'Tooltip',
-      keyboardShortcuts: ['Escape'],
-      sourceNames: ['Tooltip.tsx', 'tooltip/entry.tsx', 'tooltipData.ts', 'tooltip/useTooltipPattern.ts', 'tooltip/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(initialTooltipData),
-      preview: <Tooltip />,
+      context: {
+        values: {},
+        actions: {},
+        components: {
+          Tooltip,
+        },
+      },
     }
   },
-}
+})
