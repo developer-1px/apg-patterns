@@ -11,6 +11,7 @@ const listboxDemoDefinition = {
     data: ['RearrangeableListbox.tsx', 'listboxData.ts'],
     hooks: ['listbox/useListboxPattern.ts'],
     definition: 'listbox/definition.ts',
+    extra: ['listbox/createListboxRenderItem.ts', 'listbox/createListboxRootProps.ts', 'listbox/handleListboxMultiSelect.ts', 'listbox/resolveListboxTypeaheadTarget.ts'],
   },
   controls: {
     kind: 'listbox',

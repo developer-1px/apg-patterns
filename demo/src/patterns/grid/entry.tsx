@@ -22,6 +22,7 @@ const gridDemoDefinition = {
     hooks: ['grid/useGridPattern.ts'],
     data: ['gridData.ts'],
     definition: 'grid/definition.ts',
+    extra: ['grid/gridCell.ts'],
   },
   controls: {
     kind: 'listbox',

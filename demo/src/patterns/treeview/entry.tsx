@@ -26,7 +26,7 @@ const treeviewDemoDefinition = {
     entry: 'treeview/entry.tsx',
     data: ['treeVariants.ts'],
     hooks: ['treeview/useTreeviewPattern.ts'],
-    runtime: ['treeview/runtime.ts'],
+    runtime: ['treeview/runtime.ts', 'treeview/navigation.ts', 'treeview/typeahead.ts', 'treeview/keyboardBinding.ts', 'treeview/adaptTreeviewProps.ts', 'treeview/adaptTreeviewRuntime.ts', 'treeview/createTreeviewRenderItems.ts'],
     definition: 'treeview/definition.ts',
     extra: ['treeContract.ts'],
   },

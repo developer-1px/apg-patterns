@@ -1,8 +1,8 @@
 import { useLayoutEffect, useRef } from 'react'
-import type { HTMLAttributes, InputHTMLAttributes, KeyboardEvent, MouseEvent } from 'react'
+import type { HTMLAttributes, InputHTMLAttributes, KeyboardEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions, PatternState } from '../../schema'
-import type { ReactPatternProps, ReactRenderItemState } from '../../adapters/reactBaseTypes'
+import { createComboboxOption, type ReactComboboxOption } from './comboboxOption'
 import { COMBOBOX_KEY, comboboxDefinition } from './definition'
 
 type ComboboxVariant = 'selectOnly' | 'listAutocomplete' | 'listWithInlineAutocomplete'
@@ -15,12 +15,7 @@ interface ComboboxState extends PatternState {
 
 type ComboboxData = PatternData<PatternItem, ComboboxState>
 
-export interface ReactComboboxOption {
-  key: Key
-  label: string
-  state: Pick<ReactRenderItemState, 'active' | 'selected'>
-  optionProps: ReactPatternProps
-}
+export type { ReactComboboxOption } from './comboboxOption'
 
 export interface ReactComboboxRuntime {
   inputProps: InputHTMLAttributes<HTMLInputElement>
@@ -91,30 +86,9 @@ export function useComboboxPattern(data: ComboboxData, onEvent: (event: PatternE
     },
     listboxProps: runtime.getPartProps('listbox') as HTMLAttributes<HTMLElement>,
     get options() {
-      return Object.keys(data.items).filter((key) => key !== COMBOBOX_KEY).map((key) => {
-        const optionProps = runtime.getPartProps('option', key) as ReactPatternProps
-        const state = runtime.getItemState(key, 'option')
-        const active = Boolean(state.active)
-        const selected = Boolean(state.selected)
-        return {
-          key,
-          label: data.items[key]?.label ?? key,
-          state: {
-            active,
-            selected,
-          },
-          optionProps: {
-            ...optionProps,
-            'aria-selected': open ? active : selected,
-            onMouseDown: (event: MouseEvent<HTMLElement>) => {
-              event.preventDefault()
-              onEvent({ type: 'select', keys: [key], anchorKey: key, extentKey: key })
-              onEvent({ type: 'expand', key: COMBOBOX_KEY, expanded: false })
-              if (editable) onEvent({ type: 'commitValue', key, value: data.items[key]?.label ?? '' })
-            },
-          },
-        }
-      })
+      return Object.keys(data.items)
+        .filter((key) => key !== COMBOBOX_KEY)
+        .map((key) => createComboboxOption({ runtime, data, key, open, editable, onEvent }))
     },
     open,
     editable,

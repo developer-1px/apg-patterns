@@ -16,6 +16,7 @@ const menuDemoDefinition = {
     hooks: ['menu/useMenuButtonPattern.ts', 'menu/useMenubarPattern.ts'],
     data: ['menuData.ts'],
     definition: 'menu/definition.ts',
+    extra: ['menu/menuButtonItem.ts', 'menu/menuButtonKeyboard.ts'],
   },
   controls: {
     kind: 'listbox',

@@ -15,6 +15,7 @@ const sliderDemoDefinition = {
     hooks: ['slider/useSliderPattern.ts'],
     data: ['sliderData.ts'],
     definition: 'slider/definition.ts',
+    extra: ['slider/contract.ts'],
   },
   controls: {
     kind: 'listbox',

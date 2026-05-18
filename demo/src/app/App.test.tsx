@@ -683,6 +683,14 @@ describe('demo source wiring', () => {
     expect(missingDefinitionSources).toEqual([])
   })
 
+  it('exposes each non-type pattern implementation helper source from its demo source tabs', () => {
+    const missingImplementationSources: string[] = []
+
+    render(<DemoSourceProbe onMissingImplementationSource={(sourceName) => missingImplementationSources.push(sourceName)} />)
+
+    expect(missingImplementationSources).toEqual([])
+  })
+
   it('does not expose source tabs backed by colliding collected filenames', () => {
     const collidingSourceNames = new Set(sourceNameCollisions.map((collision) => collision.name))
     const exposedCollisions: string[] = []
@@ -745,6 +753,7 @@ function DemoSourceProbe({
   onMissingHookSource = () => undefined,
   onMissingEntrySource = () => undefined,
   onMissingDefinitionSource = () => undefined,
+  onMissingImplementationSource = () => undefined,
   onInvalidEntry = () => undefined,
   onCollidingSource = () => undefined,
   onSourceName = () => undefined,
@@ -755,6 +764,7 @@ function DemoSourceProbe({
   onMissingHookSource?: (sourceName: string) => void
   onMissingEntrySource?: (sourceName: string) => void
   onMissingDefinitionSource?: (sourceName: string) => void
+  onMissingImplementationSource?: (sourceName: string) => void
   onInvalidEntry?: (issue: string) => void
   onCollidingSource?: (sourceName: string) => void
   onSourceName?: (sourceName: string) => void
@@ -771,6 +781,7 @@ function DemoSourceProbe({
           onMissingHookSource={onMissingHookSource}
           onMissingEntrySource={onMissingEntrySource}
           onMissingDefinitionSource={onMissingDefinitionSource}
+          onMissingImplementationSource={onMissingImplementationSource}
           onInvalidEntry={onInvalidEntry}
           onCollidingSource={onCollidingSource}
           onSourceName={onSourceName}
@@ -813,6 +824,7 @@ function DemoSourceProbeItem({
   onMissingHookSource,
   onMissingEntrySource,
   onMissingDefinitionSource,
+  onMissingImplementationSource,
   onInvalidEntry,
   onCollidingSource,
   onSourceName,
@@ -824,6 +836,7 @@ function DemoSourceProbeItem({
   onMissingHookSource: (sourceName: string) => void
   onMissingEntrySource: (sourceName: string) => void
   onMissingDefinitionSource: (sourceName: string) => void
+  onMissingImplementationSource: (sourceName: string) => void
   onInvalidEntry: (issue: string) => void
   onCollidingSource: (sourceName: string) => void
   onSourceName: (sourceName: string) => void
@@ -855,6 +868,9 @@ function DemoSourceProbeItem({
   if (!demo.sourceNames.includes(entrySource)) onMissingEntrySource(`${entry.key}: ${entrySource}`)
   const definitionSource = expectedDefinitionSource(entry.key)
   if (!demo.sourceNames.includes(definitionSource)) onMissingDefinitionSource(`${entry.key}: ${definitionSource}`)
+  for (const sourceName of expectedImplementationSources(entry.key)) {
+    if (!demo.sourceNames.includes(sourceName)) onMissingImplementationSource(`${entry.key}: ${sourceName}`)
+  }
   return null
 }
 
@@ -913,6 +929,16 @@ function expectedEntrySource(patternKey: string) {
 
 function expectedDefinitionSource(patternKey: string) {
   return `${patternKey === 'menuAndMenubar' ? 'menu' : patternKey}/definition.ts`
+}
+
+function expectedImplementationSources(patternKey: string) {
+  const sourcePrefix = `${patternKey === 'menuAndMenubar' ? 'menu' : patternKey}/`
+  return Object.keys(sourceLoaders).filter((sourceName) => (
+    sourceName.startsWith(sourcePrefix)
+    && !/\/definition\.ts$/.test(sourceName)
+    && !/\/use[A-Z].*Pattern\.ts$/.test(sourceName)
+    && !/\/reactTypes\.ts$/.test(sourceName)
+  ))
 }
 
 const validShortcutModifiers = new Set(['Alt', 'Ctrl', 'Meta', 'Shift'])
