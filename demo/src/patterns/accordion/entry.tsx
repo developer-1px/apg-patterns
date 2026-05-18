@@ -12,7 +12,7 @@ const accordionDemoDefinition = {
     data: ['accordionData.ts'],
     hooks: ['accordion/useAccordionPattern.ts'],
     definition: 'accordion/definition.ts',
-    extra: ['accordion/keyboard.ts', 'accordion/parts.ts', 'accordion/react.ts'],
+    extra: ['accordion/accordionRenderItem.ts', 'accordion/keyboard.ts', 'accordion/parts.ts', 'accordion/react.ts'],
   },
   view: {
     kind: 'component',

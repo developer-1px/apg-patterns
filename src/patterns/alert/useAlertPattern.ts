@@ -1,7 +1,7 @@
-import type { KeyboardEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
-import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { createAlertRootProps } from './alertProps'
 import { alertDefinition } from './definition'
 
 interface AlertItem extends PatternItem {
@@ -36,16 +36,10 @@ export function useAlertPattern(data: AlertData, onEvent: (event: PatternEvent) 
     keyToElementId: (key) => `${options?.elementIdPrefix ?? 'alert-'}${String(key).toLowerCase().replace(/[^a-z0-9_-]+/g, '-')}`,
   })
   const key = data.relations?.rootKeys?.[0] ?? null
-  const rootKeyDown = runtime.getRootKeyboardHandler()
 
   return {
     get rootProps() {
-      if (!key) return {}
-      return {
-        ...(runtime.getPartProps('alert', key) as ReactPatternProps),
-        onKeyDown: (event: KeyboardEvent<HTMLElement>) => rootKeyDown(reactKeyInput(event)),
-        tabIndex: -1,
-      }
+      return createAlertRootProps(runtime, key)
     },
     get dismissProps() {
       return runtime.getItemProps('dismiss', 'dismiss') as ReactPatternProps
