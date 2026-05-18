@@ -51,3 +51,24 @@ export const initialCarouselData: PatternData = {
     label: 'Featured photos',
   },
 }
+
+export type CarouselVariantKey = 'previousNext' | 'tablist'
+
+export const carouselVariants: Record<CarouselVariantKey, { label: string; data: PatternData }> = {
+  previousNext: {
+    label: 'Previous/Next',
+    data: {
+      ...initialCarouselData,
+      state: { ...initialCarouselData.state, showDots: false },
+    },
+  },
+  tablist: {
+    label: 'Tabbed picker',
+    data: {
+      ...initialCarouselData,
+      state: { ...initialCarouselData.state, showDots: true },
+    },
+  },
+}
+
+export const carouselVariantItems = Object.entries(carouselVariants).map(([key, value]) => ({ key: key as CarouselVariantKey, label: value.label }))

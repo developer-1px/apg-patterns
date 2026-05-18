@@ -16,6 +16,7 @@ export function defineVariantDemoPattern<Variant extends string>({
   componentName,
   component,
   eventAction = 'dispatchEvent',
+  getStateValues,
 }: {
   definition: DemoPatternDefinition
   initialVariant: Variant
@@ -26,6 +27,7 @@ export function defineVariantDemoPattern<Variant extends string>({
   componentName: string
   component: React.ComponentType<any>
   eventAction?: string
+  getStateValues?: (variant: Variant, data: PatternData) => Record<string, unknown>
 }): PatternEntry {
   return defineDemoPattern({
     definition,
@@ -42,6 +44,7 @@ export function defineVariantDemoPattern<Variant extends string>({
             state: {
               variant: host.variant,
               data: host.data,
+              ...(getStateValues?.(host.variant, host.data) ?? {}),
             },
             model: { variantItems },
           },

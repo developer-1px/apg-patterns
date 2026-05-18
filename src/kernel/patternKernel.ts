@@ -12,8 +12,9 @@
  * reducer 는 patternReducer.ts 로 분리되어 있다.
  */
 import type { KeyInput } from '@interactive-os/keyboard'
-import type { Key, PatternData, PatternOptions, Predicate } from '../schema'
+import type { Key, PatternData, PatternOptions } from '../schema'
 import { defineKeyToken, hasKeyToken, resolveKeyToken } from './keyTokenRegistry'
+import { evaluatePredicate } from './predicateEvaluation'
 import {
   ariaSourceRegistry,
   defineAriaSource,
@@ -23,10 +24,10 @@ import {
   defineVisibleOrder,
   isRegisteredAriaSource,
   isRegisteredNavigationTarget,
+  isRegisteredPredicate,
   isRegisteredStateProjection,
   isRegisteredVisibleOrder,
   navigationTargetRegistry,
-  predicateRegistry,
   stateProjectionRegistry,
   visibleOrderRegistry,
   type AriaSourceResolver,
@@ -46,11 +47,13 @@ export {
   defineVisibleOrder,
   isRegisteredAriaSource,
   isRegisteredNavigationTarget,
+  isRegisteredPredicate,
   isRegisteredStateProjection,
   isRegisteredVisibleOrder,
   defineKeyToken,
   hasKeyToken,
   resolveKeyToken,
+  evaluatePredicate,
 }
 export type {
   AriaSourceResolver,
@@ -112,18 +115,7 @@ export function resolveNavigationTarget(
   return resolver(target, ctx)
 }
 
-export function evaluatePredicate(predicate: Predicate, ctx: PatternRuntimeContext): boolean {
-  // 핵심 결합자(not/all/any/always)는 kernel 자체가 안다 — 패턴 무관 조합기.
-  if (predicate.kind === 'always') return true
-  if (predicate.kind === 'not') return !evaluatePredicate(predicate.predicate, ctx)
-  if (predicate.kind === 'all') return predicate.predicates.every((p) => evaluatePredicate(p, ctx))
-  if (predicate.kind === 'any') return predicate.predicates.some((p) => evaluatePredicate(p, ctx))
-  const resolver = predicateRegistry.get(predicate.kind)
-  if (!resolver) throw unknownTokenError('predicate', predicate.kind)
-  return resolver(predicate, ctx)
-}
-
 export const hasAriaSource = isRegisteredAriaSource
 export const hasNavigationTarget = isRegisteredNavigationTarget
-export const hasPredicate = (kind: string) => predicateRegistry.has(kind)
+export const hasPredicate = (kind: string) => isRegisteredPredicate(kind)
 export const hasVisibleOrder = isRegisteredVisibleOrder

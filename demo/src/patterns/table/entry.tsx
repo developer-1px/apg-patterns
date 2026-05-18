@@ -1,8 +1,8 @@
 import { reducePatternData, type PatternData, type PatternEvent } from '../../../../src'
 import { tableDefinition } from '../../../../src/patterns/table/definition'
 import { Table } from './Table'
-import { initialTableData } from './tableData'
-import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { initialTableData, tableVariants, type TableVariantKey } from './tableData'
+import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 
 const reduceTableDemoData = (data: PatternData, event: PatternEvent): PatternData => {
   if (event.type === 'sort') {
@@ -22,6 +22,15 @@ const tableDemoDefinition = {
     data: ['tableData.ts'],
     definition: 'table/definition.ts',
   },
+  controls: {
+    kind: 'listbox',
+    orientation: 'horizontal',
+    value: '$state.variant',
+    items: '$model.variantItems',
+    label: 'table variants',
+    idPrefix: 'table-variant',
+    onChange: '$actions.selectVariant',
+  },
   view: {
     kind: 'component',
     component: 'Table',
@@ -32,10 +41,13 @@ const tableDemoDefinition = {
   },
 } as const satisfies DemoPatternDefinition
 
-export const entry = defineStateDemoPattern({
+export const entry = defineVariantDemoPattern<TableVariantKey>({
   definition: tableDemoDefinition,
+  initialVariant: 'basic',
   initialData: initialTableData,
-  reduce: reduceTableDemoData,
+  dataByVariant: (variant) => tableVariants[variant].data,
+  reduce: (_variant, data, event) => reduceTableDemoData(data, event),
+  variantItems: Object.entries(tableVariants).map(([key, value]) => ({ key: key as TableVariantKey, label: value.label })),
   componentName: 'Table',
   component: Table,
 })

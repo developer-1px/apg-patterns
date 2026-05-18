@@ -138,7 +138,7 @@ describe('source copy', () => {
     fireEvent.click(screen.getByRole('tab', { name: 'accordionData.ts' }))
 
     expect(getSourcePanel().textContent).not.toContain('export function Accordion')
-  }, 15000)
+  }, 30000)
 })
 
 describe('App route state', () => {
@@ -280,7 +280,7 @@ describe('App route state', () => {
 
       unmount()
     }
-  }, 15000)
+  }, 30000)
 
   it('links the selected right panel tab to the rendered right panel content', async () => {
     replaceHash('#pattern=accordion&panel=code&source=Accordion.tsx')

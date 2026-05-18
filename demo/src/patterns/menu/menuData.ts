@@ -7,6 +7,7 @@ export type MenuVariantKey =
   | 'actionMenuButton'
   | 'actionMenuButtonFocus'
   | 'actionMenuButtonActiveDescendant'
+  | 'linkMenuButton'
 
 // ── Variant 1: Editor Menubar (APG: examples/menubar-editor) ────────────────
 // File / Edit / View — each with submenu children.
@@ -105,12 +106,34 @@ export const initialActionMenuData: PatternData = PatternDataSchema.parse({
   state: { activeKey: 'actAction', expandedKeys: [] },
 })
 
+export const initialLinkMenuData: PatternData = PatternDataSchema.parse({
+  items: {
+    trigger: { label: 'Links' },
+    menu: { label: 'Links menu' },
+    linkHome: { label: 'Home' },
+    linkAbout: { label: 'About' },
+    linkAdmissions: { label: 'Admissions' },
+    linkAcademics: { label: 'Academics' },
+  },
+  relations: {
+    rootKeys: ['trigger'],
+    controlsByKey: { trigger: ['menu'] },
+    ownerByKey: { menu: 'trigger' },
+    childrenByKey: {
+      trigger: ['menu'],
+      menu: ['linkHome', 'linkAbout', 'linkAdmissions', 'linkAcademics'],
+    },
+  },
+  state: { activeKey: 'linkHome', expandedKeys: [] },
+})
+
 export const menuVariantItems: ReadonlyArray<{ key: MenuVariantKey; label: string }> = [
   { key: 'editorMenubar', label: 'Menubar (Editor)' },
   { key: 'navMenubar', label: 'Menubar (Navigation)' },
   { key: 'actionMenuButton', label: 'Menu Button (Actions)' },
   { key: 'actionMenuButtonFocus', label: 'Menu Button — element.focus()' },
   { key: 'actionMenuButtonActiveDescendant', label: 'Menu Button — aria-activedescendant' },
+  { key: 'linkMenuButton', label: 'Menu Button (Links)' },
 ]
 
 export const menuVariants: Record<MenuVariantKey, { data: PatternData; apgPattern: 'menubar' | 'menu-button'; focusStrategy: 'rovingTabIndex' | 'ariaActiveDescendant' }> = {
@@ -119,4 +142,5 @@ export const menuVariants: Record<MenuVariantKey, { data: PatternData; apgPatter
   actionMenuButton: { data: initialActionMenuData, apgPattern: 'menu-button', focusStrategy: 'rovingTabIndex' },
   actionMenuButtonFocus: { data: initialActionMenuData, apgPattern: 'menu-button', focusStrategy: 'rovingTabIndex' },
   actionMenuButtonActiveDescendant: { data: initialActionMenuData, apgPattern: 'menu-button', focusStrategy: 'ariaActiveDescendant' },
+  linkMenuButton: { data: initialLinkMenuData, apgPattern: 'menu-button', focusStrategy: 'rovingTabIndex' },
 }

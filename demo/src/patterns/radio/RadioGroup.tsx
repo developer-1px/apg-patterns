@@ -1,14 +1,16 @@
-import { useRadioGroupPattern, type PatternData, type PatternEvent } from '../../../../src'
+import { useRadioGroupPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
 import { cx, ds } from '../../shared/designSystem'
 
 export function RadioGroup({
   data,
   onEvent,
+  options,
 }: {
   data: PatternData
   onEvent: (event: PatternEvent) => void
+  options?: PatternOptions
 }) {
-  const radio = useRadioGroupPattern(data, onEvent)
+  const radio = useRadioGroupPattern(data, onEvent, options)
 
   return (
     <div

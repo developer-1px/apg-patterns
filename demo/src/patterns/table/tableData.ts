@@ -72,6 +72,18 @@ export const tableVariants = {
       ],
     }),
   },
+  sortable: {
+    label: 'Sortable planets',
+    data: tableData({
+      label: 'Sortable planets',
+      rows: [
+        [header('hName', 'Name', 'ascending'), header('hType', 'Type'), header('hDistance', 'Distance')],
+        [rowHead('mercuryName', 'Mercury'), cell('mercuryType', 'Terrestrial'), cell('mercuryDistance', '57.9')],
+        [rowHead('venusName', 'Venus'), cell('venusType', 'Terrestrial'), cell('venusDistance', '108.2')],
+        [rowHead('earthName', 'Earth'), cell('earthType', 'Terrestrial'), cell('earthDistance', '149.6')],
+      ],
+    }),
+  },
 } as const
 
 export type TableVariantKey = keyof typeof tableVariants

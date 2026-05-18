@@ -52,5 +52,6 @@ export const defineNavigationTarget = (kind: string, resolve: NavigationTargetRe
 
 export const isRegisteredAriaSource = (name: string) => ariaSourceRegistry.has(name)
 export const isRegisteredStateProjection = (from: string) => stateProjectionRegistry.has(from)
+export const isRegisteredPredicate = (kind: string) => predicateRegistry.has(kind)
 export const isRegisteredVisibleOrder = (kind: string) => visibleOrderRegistry.has(kind)
 export const isRegisteredNavigationTarget = (kind: string) => navigationTargetRegistry.has(kind)

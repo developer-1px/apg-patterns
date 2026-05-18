@@ -1,8 +1,8 @@
 import { reducePatternData } from '../../../../src'
 import { carouselDefinition } from '../../../../src/patterns/carousel/definition'
 import { Carousel } from './Carousel'
-import { initialCarouselData } from './carouselData'
-import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { carouselVariantItems, carouselVariants, initialCarouselData, type CarouselVariantKey } from './carouselData'
+import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 
 const carouselDemoDefinition = {
   key: 'carousel',
@@ -15,6 +15,15 @@ const carouselDemoDefinition = {
     data: ['carouselData.ts'],
     definition: 'carousel/definition.ts',
   },
+  controls: {
+    kind: 'listbox',
+    orientation: 'horizontal',
+    value: '$state.variant',
+    items: '$model.variantItems',
+    label: 'carousel variants',
+    idPrefix: 'carousel-variant',
+    onChange: '$actions.selectVariant',
+  },
   view: {
     kind: 'component',
     component: 'Carousel',
@@ -25,10 +34,13 @@ const carouselDemoDefinition = {
   },
 } as const satisfies DemoPatternDefinition
 
-export const entry = defineStateDemoPattern({
+export const entry = defineVariantDemoPattern<CarouselVariantKey>({
   definition: carouselDemoDefinition,
+  initialVariant: 'previousNext',
   initialData: initialCarouselData,
-  reduce: (data, event) => reducePatternData(carouselDefinition, data, event),
+  dataByVariant: (variant) => carouselVariants[variant].data,
+  reduce: (_variant, data, event) => reducePatternData(carouselDefinition, data, event),
+  variantItems: carouselVariantItems,
   componentName: 'Carousel',
   component: Carousel,
 })

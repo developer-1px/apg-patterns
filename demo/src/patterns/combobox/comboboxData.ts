@@ -1,11 +1,20 @@
 import { COMBOBOX_KEY, PatternDataSchema, type PatternData, type PatternEvent } from '../../../../src'
 
-export type ComboboxVariantKey = 'selectOnly' | 'listAutocomplete' | 'listWithInlineAutocomplete'
+export type ComboboxVariantKey =
+  | 'selectOnly'
+  | 'listNoAutocomplete'
+  | 'listAutocomplete'
+  | 'listWithInlineAutocomplete'
+  | 'datepicker'
+  | 'gridPopup'
 
 export const comboboxVariants: Record<ComboboxVariantKey, { label: string; autocomplete: 'none' | 'list' | 'both'; editable: boolean }> = {
   selectOnly: { label: 'Select-Only', autocomplete: 'none', editable: false },
+  listNoAutocomplete: { label: 'Editable without Autocomplete', autocomplete: 'none', editable: true },
   listAutocomplete: { label: 'List Autocomplete', autocomplete: 'list', editable: true },
   listWithInlineAutocomplete: { label: 'List with Inline Autocomplete', autocomplete: 'both', editable: true },
+  datepicker: { label: 'Date Picker Combobox', autocomplete: 'none', editable: true },
+  gridPopup: { label: 'Grid Popup Combobox', autocomplete: 'list', editable: true },
 }
 
 export const FRUITS = [
@@ -27,18 +36,22 @@ export function buildComboboxData(
   visibleKeys: readonly string[] = FRUITS.map((f) => f.key),
   variant: ComboboxVariantKey = 'listAutocomplete',
 ): PatternData {
-  const items: PatternData['items'] = { [COMBOBOX_KEY]: { label: 'Fruit' } }
-  for (const f of FRUITS) items[f.key] = { label: f.label }
+  const sourceItems = variant === 'datepicker' ? DATES : variant === 'gridPopup' ? PEOPLE : FRUITS
+  const label = variant === 'datepicker' ? 'Date' : variant === 'gridPopup' ? 'Recipient' : 'Fruit'
+  const keys = visibleKeys.length === FRUITS.length && sourceItems !== FRUITS ? sourceItems.map((item) => item.key) : visibleKeys
+  const items: PatternData['items'] = { [COMBOBOX_KEY]: { label } }
+  for (const item of sourceItems) items[item.key] = { label: item.label }
   // Only the keys that pass the current filter are exposed as options (visible in popup).
   // We keep all items in the registry so reducers can still resolve labels, but the
   // pattern's `comboboxOptions` visibleOrder iterates Object.keys(items) excluding
   // the synthetic combobox key — so we trim items to the visible subset.
   const filteredItems: PatternData['items'] = { [COMBOBOX_KEY]: { label: 'Fruit' } }
-  for (const k of visibleKeys) if (items[k]) filteredItems[k] = items[k]
+  filteredItems[COMBOBOX_KEY] = { label }
+  for (const k of keys) if (items[k]) filteredItems[k] = items[k]
   return PatternDataSchema.parse({
     items: filteredItems,
     state: { activeKey: null, expandedKeys: [], selectedKeys: [], query: '', inlineCompletion: null, variant },
-    refs: { label: 'Fruit' },
+    refs: { label },
   })
 }
 
@@ -127,3 +140,17 @@ export function firstMatch(query: string): string | null {
   const f = FRUITS.find((f) => f.label.toLowerCase().startsWith(q))
   return f?.key ?? null
 }
+
+const DATES = [
+  { key: 'date-2026-05-18', label: 'May 18, 2026' },
+  { key: 'date-2026-05-19', label: 'May 19, 2026' },
+  { key: 'date-2026-05-20', label: 'May 20, 2026' },
+  { key: 'date-2026-05-21', label: 'May 21, 2026' },
+] as const
+
+const PEOPLE = [
+  { key: 'person-ada', label: 'Ada Lovelace, Engineering' },
+  { key: 'person-grace', label: 'Grace Hopper, Platform' },
+  { key: 'person-katherine', label: 'Katherine Johnson, Research' },
+  { key: 'person-dorothy', label: 'Dorothy Vaughan, Operations' },
+] as const

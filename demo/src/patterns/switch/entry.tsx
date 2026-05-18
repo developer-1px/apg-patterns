@@ -1,6 +1,6 @@
 import { Switch } from './Switch'
-import { initialSwitchData, reduceSwitchData } from './switchData'
-import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { initialSwitchData, reduceSwitchData, switchVariantItems, switchVariants, type SwitchVariantKey } from './switchData'
+import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 
 const switchDemoDefinition = {
   key: 'switch',
@@ -13,6 +13,15 @@ const switchDemoDefinition = {
     hooks: ['switch/useSwitchPattern.ts'],
     definition: 'switch/definition.ts',
   },
+  controls: {
+    kind: 'listbox',
+    orientation: 'horizontal',
+    value: '$state.variant',
+    items: '$model.variantItems',
+    label: 'switch variants',
+    idPrefix: 'switch-variant',
+    onChange: '$actions.selectVariant',
+  },
   view: {
     kind: 'component',
     component: 'Switch',
@@ -23,10 +32,13 @@ const switchDemoDefinition = {
   },
 } as const satisfies DemoPatternDefinition
 
-export const entry = defineStateDemoPattern({
+export const entry = defineVariantDemoPattern<SwitchVariantKey>({
   definition: switchDemoDefinition,
+  initialVariant: 'switch',
   initialData: initialSwitchData,
-  reduce: reduceSwitchData,
+  dataByVariant: (variant) => switchVariants[variant].data,
+  reduce: (_variant, data, event) => reduceSwitchData(data, event),
+  variantItems: switchVariantItems,
   componentName: 'Switch',
   component: Switch,
 })
