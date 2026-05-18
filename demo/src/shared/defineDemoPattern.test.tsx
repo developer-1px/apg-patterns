@@ -1,6 +1,7 @@
-import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
-import { defineDemoPattern, type DemoPatternDefinition } from './defineDemoPattern'
+import { fireEvent, render, screen } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
+import { defineDemoPattern, defineStateDemoPattern, defineVariantDemoPattern, type DemoPatternDefinition } from './defineDemoPattern'
+import type { PatternData, PatternEvent } from '../../../src'
 
 const definition = {
   key: 'example',
@@ -38,12 +39,17 @@ describe('defineDemoPattern', () => {
       }),
     })
 
-    const demo = entry.useDemoPattern(() => undefined)
-    render(<>{demo.preview}</>)
+    let renderedDemo: ReturnType<typeof entry.useDemoPattern> | undefined
+    function Harness() {
+      const demo = entry.useDemoPattern(() => undefined)
+      renderedDemo = demo
+      return <>{demo.preview}</>
+    }
+    render(<Harness />)
 
     expect(entry.key).toBe('example')
-    expect(demo.keyboardShortcuts).toEqual(['Enter'])
-    expect(demo.sourceNames).toEqual([
+    expect(renderedDemo?.keyboardShortcuts).toEqual(['Enter'])
+    expect(renderedDemo?.sourceNames).toEqual([
       'Example.tsx',
       'example/entry.tsx',
       'exampleData.ts',
@@ -134,5 +140,108 @@ describe('defineDemoPattern', () => {
         },
       }),
     ).toThrow('[defineDemoPattern] duplicate example sources: Example.tsx')
+  })
+
+  it('builds a state-backed demo runtime from a schema definition', () => {
+    const initialData: PatternData = {
+      items: { root: { label: 'Off' } },
+      relations: { rootKeys: ['root'] },
+      state: { activeKey: 'root' },
+    }
+    const dataDefinition = {
+      ...definition,
+      view: {
+        kind: 'component',
+        component: 'Preview',
+        props: {
+          data: '$state.data',
+          onEvent: '$actions.dispatchEvent',
+        },
+      },
+    } as const satisfies DemoPatternDefinition
+    const entry = defineStateDemoPattern({
+      definition: dataDefinition,
+      initialData,
+      reduce: (data) => ({ ...data, items: { root: { label: 'On' } } }),
+      componentName: 'Preview',
+      component: ({ data, onEvent }: { data: PatternData; onEvent: (event: PatternEvent) => void }) => (
+        <button type="button" onClick={() => onEvent({ type: 'press', key: 'root' })}>{data.items.root?.label}</button>
+      ),
+    })
+    const onEvent = vi.fn()
+
+    function Harness() {
+      const demo = entry.useDemoPattern(onEvent)
+      return (
+        <>
+          <output data-testid="inspect">{demo.inspect}</output>
+          {demo.preview}
+        </>
+      )
+    }
+    render(<Harness />)
+
+    expect(screen.getByRole('button', { name: 'Off' })).toBeTruthy()
+    expect(screen.getByTestId('inspect').textContent).toContain('items')
+    fireEvent.click(screen.getByRole('button', { name: 'Off' }))
+    expect(onEvent).toHaveBeenCalledWith({ type: 'press', key: 'root' })
+    expect(screen.getByRole('button', { name: 'On' })).toBeTruthy()
+  })
+
+  it('builds a variant-backed demo runtime with declared controls', () => {
+    const initialData: PatternData = {
+      items: { root: { label: 'Action' } },
+      relations: { rootKeys: ['root'] },
+      state: { activeKey: 'root' },
+    }
+    const variantDefinition = {
+      ...definition,
+      view: {
+        kind: 'component',
+        component: 'Preview',
+        props: {
+          data: '$state.data',
+        },
+      },
+      controls: {
+        kind: 'listbox',
+        label: 'variants',
+        idPrefix: 'variant',
+        items: '$model.variantItems',
+        value: '$state.variant',
+        onChange: '$actions.selectVariant',
+      },
+    } as const satisfies DemoPatternDefinition
+
+    const entry = defineVariantDemoPattern({
+      definition: variantDefinition,
+      initialVariant: 'action',
+      initialData,
+      dataByVariant: (variant: 'action' | 'toggle') => ({
+        ...initialData,
+        items: { root: { label: variant === 'toggle' ? 'Toggle' : 'Action' } },
+      }),
+      reduce: (_variant, data) => data,
+      variantItems: [
+        { key: 'action', label: 'Action' },
+        { key: 'toggle', label: 'Toggle' },
+      ],
+      componentName: 'Preview',
+      component: ({ data }: { data: PatternData }) => <button type="button">{data.items.root?.label}</button>,
+    })
+
+    function Harness() {
+      const demo = entry.useDemoPattern(() => undefined)
+      return (
+        <>
+          {demo.variants}
+          {demo.preview}
+        </>
+      )
+    }
+    render(<Harness />)
+
+    expect(screen.getByRole('listbox', { name: 'variants' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Action' })).toBeTruthy()
   })
 })

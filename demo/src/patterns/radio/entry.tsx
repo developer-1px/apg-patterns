@@ -1,9 +1,6 @@
-import { usePatternDataHost } from '../../shared/demoHostState'
-import { renderDataInspect } from '../../shared/inspect/index'
 import { RadioGroup } from './RadioGroup'
 import { initialRadioData, reduceRadioData } from './radioData'
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
-import type { PatternEvent } from '../../../../src'
+import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 
 const radioDemoDefinition = {
   key: 'radio',
@@ -26,28 +23,10 @@ const radioDemoDefinition = {
   },
 } as const satisfies DemoPatternDefinition
 
-export const entry = defineDemoPattern({
+export const entry = defineStateDemoPattern({
   definition: radioDemoDefinition,
-  useRuntime: (onEvent) => {
-    const host = usePatternDataHost(initialRadioData, reduceRadioData)
-    return {
-      inspect: renderDataInspect(host.data),
-      context: {
-        values: {
-          state: {
-            data: host.data,
-          },
-        },
-        actions: {
-          dispatchEvent: (event: PatternEvent) => {
-            onEvent(event)
-            host.dispatchEvent(event)
-          },
-        },
-        components: {
-          RadioGroup,
-        },
-      },
-    }
-  },
+  initialData: initialRadioData,
+  reduce: reduceRadioData,
+  componentName: 'RadioGroup',
+  component: RadioGroup,
 })

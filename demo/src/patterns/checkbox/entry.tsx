@@ -1,9 +1,6 @@
 import { Checkbox } from './Checkbox'
 import { checkboxVariantItems, checkboxVariants, type CheckboxVariantKey } from './checkboxData'
-import { useVariantPatternDataHost } from '../../shared/demoHostState'
-import { renderDataInspect } from '../../shared/inspect/index'
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
-import type { PatternEvent } from '../../../../src'
+import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 
 const checkboxDemoDefinition = {
   key: 'checkbox',
@@ -35,38 +32,13 @@ const checkboxDemoDefinition = {
   },
 } as const satisfies DemoPatternDefinition
 
-export const entry = defineDemoPattern({
+export const entry = defineVariantDemoPattern<CheckboxVariantKey>({
   definition: checkboxDemoDefinition,
-  useRuntime: (onEvent) => {
-    const host = useVariantPatternDataHost<CheckboxVariantKey>(
-      'twoState',
-      checkboxVariants.twoState.data,
-      (variant) => checkboxVariants[variant].data,
-      (variant, data, event) => checkboxVariants[variant].reduce(data, event),
-    )
-    return {
-      inspect: renderDataInspect(host.data),
-      context: {
-        values: {
-          state: {
-            variant: host.variant,
-            data: host.data,
-          },
-          model: {
-            variantItems: checkboxVariantItems,
-          },
-        },
-        actions: {
-          selectVariant: host.selectVariant,
-          dispatchEvent: (event: PatternEvent) => {
-            onEvent(event)
-            host.dispatchEvent(event)
-          },
-        },
-        components: {
-          Checkbox,
-        },
-      },
-    }
-  },
+  initialVariant: 'twoState',
+  initialData: checkboxVariants.twoState.data,
+  dataByVariant: (variant) => checkboxVariants[variant].data,
+  reduce: (variant, data, event) => checkboxVariants[variant].reduce(data, event),
+  variantItems: checkboxVariantItems,
+  componentName: 'Checkbox',
+  component: Checkbox,
 })
