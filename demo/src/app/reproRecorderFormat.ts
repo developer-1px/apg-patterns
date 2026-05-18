@@ -99,6 +99,7 @@ export function formatTimelineAsText(meta: ReproMeta, timeline: ReproEvent[]): s
 function formatStandalone(event: ReproEvent): string {
   if (event.ch === 'state') return `[${event.seq}] ${event.time} -> ${event.command}: ${formatDiffs(event.diff)}${event.context ? ` (${event.context})` : ''}`
   if (event.ch === 'route') return `[${event.seq}] ${event.time} route ${event.method}: ${event.from} -> ${event.to}`
+  if (event.ch === 'input') return `[${event.seq}] ${event.time} ${event.type} -> ${event.target}`
   return `[${event.seq}] ${event.time} ${event.level}: ${event.message}`
 }
 

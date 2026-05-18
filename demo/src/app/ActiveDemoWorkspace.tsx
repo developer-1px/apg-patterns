@@ -19,7 +19,17 @@ export function ActiveDemoWorkspace({
   state: AppState
   dispatch: (action: AppAction) => void
 }) {
-  const activeDemo = useDemoPattern(state.patternKey, (event) => dispatch({ type: 'recordEvent', event }))
+  const activeDemo = useDemoPattern(state.patternKey, (event) => {
+    window.dispatchEvent(new CustomEvent('apg-pattern-event', {
+      detail: {
+        event,
+        patternKey: state.patternKey,
+        sourceName: state.sourceName,
+        rightMode: state.rightMode,
+      },
+    }))
+    dispatch({ type: 'recordEvent', event })
+  })
   const sourceNames = activeDemo.sourceNames
   const activeSourceName = sourceNames.includes(state.sourceName as SourceName) ? state.sourceName as SourceName : sourceNames[0]
   const previewKeyboardShortcuts = activeDemo.keyboardShortcuts.join(' ') || undefined

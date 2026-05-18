@@ -1,10 +1,13 @@
 import { z } from 'zod'
 import { validateJsonExtensionFields } from './jsonValue'
-import { KeyTokenSchema } from './patternData'
-import { EventTemplateSchema, PatternEventReasonSchema } from './patternEvent'
+import { EventTemplateSchema } from './patternEvent'
+import { EffectSchema } from './patternEffects'
+import { NavigationSchema } from './patternNavigation'
 import { PredicateSchema } from './patternPredicate'
 import { TransitionSchema } from './patternTransition'
 import { ReactFacadeSchema } from './reactFacade'
+export * from './patternEffects'
+export * from './patternNavigation'
 export * from './patternPredicate'
 export * from './patternTransition'
 export * from './reactFacade'
@@ -39,18 +42,6 @@ export const DomEventNameSchema = z.enum([
   'mousedown', 'mouseenter', 'mouseleave', 'pointerdown', 'pointermove', 'pointerup',
 ])
 export type DomEventName = z.infer<typeof DomEventNameSchema>
-
-export const VisibleOrderKindSchema = z.enum([
-  'flat', 'comboboxOptions', 'gridRows', 'treeVisibleDepthFirst', 'treegridVisibleCells',
-])
-export type VisibleOrderKind = z.infer<typeof VisibleOrderKindSchema>
-
-export const NavigationTargetKindSchema = z.enum([
-  'linear', 'linearWrap', 'firstChild', 'gridCell', 'gridPage', 'optionLinear',
-  'parentKey', 'tabsLinear', 'treegridCell', 'treegridPage', 'treegridParentRowFirstCell',
-  'treegridRow', 'treegridRowPage',
-])
-export type NavigationTargetKind = z.infer<typeof NavigationTargetKindSchema>
 
 export const AriaSourcePathSchema = z.enum([
   '$activeKey',
@@ -104,78 +95,6 @@ export const PartSchema = z
     focus: FocusProjectionSchema.optional(),
     state: z.array(StateProjectionSchema).readonly().optional(),
     events: z.array(PartEventBindingSchema).readonly().optional(),
-  })
-  .strict()
-
-export const ElementTargetSchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('key'), key: KeyTokenSchema }).strict(),
-  z.object({ kind: z.literal('controlledBy'), key: KeyTokenSchema }).strict(),
-  z.object({ kind: z.literal('firstFocusable'), root: z.object({ kind: z.literal('controlledBy'), key: KeyTokenSchema }).strict() }).strict(),
-])
-export type ElementTarget = z.infer<typeof ElementTargetSchema>
-
-export const FocusEffectTriggerSchema = z.object({
-  state: z.literal('activeKey'),
-  reasons: z.array(PatternEventReasonSchema).readonly(),
-}).strict()
-
-export const FocusEffectScopeSchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('focusWithin') }).strict(),
-  z.object({ kind: z.literal('always') }).strict(),
-])
-
-export const FocusEffectTargetSchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('activeKeyElement') }).strict(),
-  ...ElementTargetSchema.options,
-])
-
-export const EffectSchema = z.discriminatedUnion('kind', [
-  z.object({
-    kind: z.literal('focus'),
-    when: PredicateSchema.optional(),
-    on: FocusEffectTriggerSchema.optional(),
-    scope: FocusEffectScopeSchema.optional(),
-    target: FocusEffectTargetSchema,
-    preventScroll: z.boolean().optional(),
-  }).strict(),
-  z.object({ kind: z.literal('restoreFocus'), when: PredicateSchema, target: ElementTargetSchema, preventScroll: z.boolean().optional() }).strict(),
-  z.object({ kind: z.literal('trapFocus'), when: PredicateSchema, root: ElementTargetSchema }).strict(),
-])
-export type EffectDefinition = z.infer<typeof EffectSchema>
-
-const LinearActionSchema = z.enum(['next', 'previous', 'first', 'last'])
-const GridActionSchema = z.enum(['left', 'right', 'up', 'down', 'rowStart', 'rowEnd', 'gridStart', 'gridEnd'])
-const GridPageActionSchema = z.enum(['pageUp', 'pageDown'])
-const TreegridPageDirectionSchema = z.enum(['up', 'down'])
-const NavigationTargetSchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('linear'), action: LinearActionSchema }).strict(),
-  z.object({ kind: z.literal('linearWrap'), action: z.enum(['next', 'previous']) }).strict(),
-  z.object({ kind: z.literal('firstChild'), key: KeyTokenSchema.optional() }).strict(),
-  z.object({ kind: z.literal('gridCell'), action: GridActionSchema }).strict(),
-  z.object({ kind: z.literal('gridPage'), action: GridPageActionSchema }).strict(),
-  z.object({ kind: z.literal('optionLinear'), direction: LinearActionSchema }).strict(),
-  z.object({ kind: z.literal('parentKey'), key: KeyTokenSchema }).strict(),
-  z.object({ kind: z.literal('tabsLinear'), action: LinearActionSchema }).strict(),
-  z.object({ kind: z.literal('treegridCell'), action: GridActionSchema }).strict(),
-  z.object({ kind: z.literal('treegridPage'), direction: TreegridPageDirectionSchema }).strict(),
-  z.object({ kind: z.literal('treegridParentRowFirstCell') }).strict(),
-  z.object({ kind: z.literal('treegridRow'), action: z.enum(['up', 'down', 'gridStart', 'gridEnd']) }).strict(),
-  z.object({ kind: z.literal('treegridRowPage'), direction: TreegridPageDirectionSchema }).strict(),
-])
-
-const VisibleOrderSchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('flat') }).strict(),
-  z.object({ kind: z.literal('comboboxOptions') }).strict(),
-  z.object({ kind: z.literal('gridRows') }).strict(),
-  z.object({ kind: z.literal('treeVisibleDepthFirst') }).strict(),
-  z.object({ kind: z.literal('treegridVisibleCells') }).strict(),
-  z.object({ kind: z.literal('treegridVisibleRows') }).strict(),
-])
-
-export const NavigationSchema = z
-  .object({
-    visibleOrder: VisibleOrderSchema,
-    targets: z.record(z.string().min(1), NavigationTargetSchema),
   })
   .strict()
 

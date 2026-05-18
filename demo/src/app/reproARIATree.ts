@@ -144,7 +144,12 @@ export function findRoleContainer(el: Element | null): Element | null {
 }
 
 export function serializeARIATree(container: Element, activeEl: Element | null): string {
-  const serialized = serializeARIANode(container, 0, activeEl, getActiveDescendant(activeEl))
+  const activeDescendant = getActiveDescendant(activeEl)
+  const serialized = serializeARIANode(container, 0, activeEl, activeDescendant)
+    || Array.from(container.children)
+      .map((child) => serializeARIANode(child, 0, activeEl, activeDescendant))
+      .filter(Boolean)
+      .join('\n')
   return serialized || '(no ARIA nodes)'
 }
 

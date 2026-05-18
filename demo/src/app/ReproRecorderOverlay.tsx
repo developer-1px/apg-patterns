@@ -1,18 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import {
-  formatTimelineAsText,
-  type ReproEvent,
-  type ReproMeta,
-} from './reproRecorderFormat'
-import { findRoleContainer, serializeARIATree } from './reproARIATree'
-
-type RecorderState = {
-  active: boolean
-  startedAt: number
-  startedAtIso: string
-  seq: number
-  entries: ReproEvent[]
-}
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { createReproRecorder } from './createReproRecorder'
 
 const buttonStyle = {
   position: 'fixed',
@@ -63,73 +50,38 @@ function shortcutMatches(event: KeyboardEvent): boolean {
 }
 
 export function ReproRecorderOverlay() {
-  const recorderRef = useRef<RecorderState>({ active: false, startedAt: 0, startedAtIso: '', seq: 0, entries: [] })
+  const recorder = useMemo(() => createReproRecorder(), [])
+  const timerRef = useRef<ReturnType<typeof setInterval>>(undefined)
+  const startTimeRef = useRef(0)
   const [recording, setRecording] = useState(false)
-  const [summary, setSummary] = useState('REC ready. Shortcut: Cmd/Ctrl+Shift+\\ or Alt+Shift+R')
+  const [summary, setSummary] = useState('REC ready. Cmd/Ctrl+Shift+\\ or Alt+Shift+R')
 
   const stop = useCallback(() => {
-    const recorder = recorderRef.current
-    recorder.active = false
+    const data = recorder.stop()
+    clearInterval(timerRef.current)
     setRecording(false)
-    const meta: ReproMeta = {
-      url: window.location.href,
-      startedAt: recorder.startedAtIso,
-      duration: performance.now() - recorder.startedAt,
-      eventCount: recorder.entries.length,
-    }
-    const text = formatTimelineAsText(meta, recorder.entries)
-    setSummary(text)
-    console.log(text)
-    void navigator.clipboard?.writeText(text).catch(() => undefined)
-  }, [])
+    setSummary(data.text)
+    console.log(data.text)
+    void navigator.clipboard?.writeText(data.text).catch(() => undefined)
+  }, [recorder])
 
   const start = useCallback(() => {
-    recorderRef.current = { active: true, startedAt: performance.now(), startedAtIso: new Date().toISOString(), seq: 0, entries: [] }
+    recorder.start()
+    startTimeRef.current = Date.now()
+    clearInterval(timerRef.current)
+    timerRef.current = setInterval(() => {
+      setSummary(`REC recording... ${Math.floor((Date.now() - startTimeRef.current) / 1000)}s`)
+    }, 1000)
     setSummary('REC recording...')
     setRecording(true)
-  }, [])
+  }, [recorder])
 
   const toggle = useCallback(() => {
-    if (recorderRef.current.active) stop()
+    if (recorder.isActive) stop()
     else start()
-  }, [start, stop])
+  }, [recorder, start, stop])
 
   useEffect(() => {
-    const record = (event: KeyboardEvent | MouseEvent | FocusEvent) => {
-      const recorder = recorderRef.current
-      if (!recorder.active) return
-      if (event instanceof KeyboardEvent && shortcutMatches(event)) return
-
-      const seq = ++recorder.seq
-      const startedAt = recorder.startedAt
-      const target = event.target
-      const key = event instanceof KeyboardEvent ? event.key : undefined
-      window.requestAnimationFrame(() => {
-        const activeElement = document.activeElement instanceof Element ? document.activeElement : null
-        const targetElement = target instanceof Element ? target : null
-        const container = findRoleContainer(targetElement)
-        const entry: ReproEvent = {
-          seq,
-          time: `+${Math.round(performance.now() - startedAt)}ms`,
-          ch: 'input',
-          type: event.type === 'focusin' ? 'focus' : event.type,
-          ...(key ? { key } : {}),
-          target: describeElement(target),
-          source: container ? describeElement(container) : null,
-          focus: describeElement(activeElement),
-          prevented: event.defaultPrevented,
-          ariaTree: container ? serializeARIATree(container, activeElement) : '(no ARIA nodes)',
-        }
-        recorder.entries.push(entry)
-        setSummary(formatTimelineAsText({
-          url: window.location.href,
-          startedAt: recorder.startedAtIso,
-          duration: performance.now() - recorder.startedAt,
-          eventCount: recorder.entries.length,
-        }, recorder.entries.slice(-3)))
-      })
-    }
-
     const onShortcut = (event: KeyboardEvent) => {
       if (!shortcutMatches(event)) return
       event.preventDefault()
@@ -138,16 +90,12 @@ export function ReproRecorderOverlay() {
     }
 
     window.addEventListener('keydown', onShortcut, true)
-    window.addEventListener('keydown', record, true)
-    window.addEventListener('click', record, true)
-    window.addEventListener('focusin', record, true)
     return () => {
       window.removeEventListener('keydown', onShortcut, true)
-      window.removeEventListener('keydown', record, true)
-      window.removeEventListener('click', record, true)
-      window.removeEventListener('focusin', record, true)
+      clearInterval(timerRef.current)
+      if (recorder.isActive) recorder.stop()
     }
-  }, [toggle])
+  }, [recorder, toggle])
 
   return (
     <>
@@ -157,15 +105,4 @@ export function ReproRecorderOverlay() {
       <div style={panelStyle}>{summary}</div>
     </>
   )
-}
-
-function describeElement(element: EventTarget | Element | null): string {
-  if (!(element instanceof Element)) return 'null'
-  const tag = element.tagName.toLowerCase()
-  const role = element.getAttribute('role')
-  const id = element.id ? `#${element.id}` : ''
-  const label = element.getAttribute('aria-label')
-  const text = element.textContent?.trim().replace(/\s+/g, ' ').slice(0, 48)
-  const name = label ?? text
-  return `${tag}${id}${role ? `[role=${role}]` : ''}${name ? ` "${name}"` : ''}`
 }
