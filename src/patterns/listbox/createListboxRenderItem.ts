@@ -1,10 +1,10 @@
 import type { Key, PatternData } from '../../schema'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
-import type { ReactListboxRenderItem, ReactPatternProps, ReactRenderItemState } from '../../adapters/reactTypes'
+import { reactProps, type ReactListboxRenderItem, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactTypes'
 import { handleListboxMultiClick } from './handleListboxMultiSelect'
 
 export function createListboxRenderItem(runtime: PatternRuntime, key: Key): ReactListboxRenderItem {
-  const optionProps = toReactProps(runtime.getPartProps('option', key))
+  const optionProps = reactProps(runtime.getPartProps('option', key))
   return {
     kind: 'option',
     key,
@@ -41,8 +41,4 @@ function getItemState(runtime: PatternRuntime, key: Key, part: string): ReactRen
     selected: Boolean(state.selected),
     disabled: Boolean(state.disabled),
   }
-}
-
-function toReactProps(props: Record<string, unknown>): ReactPatternProps {
-  return props as ReactPatternProps
 }

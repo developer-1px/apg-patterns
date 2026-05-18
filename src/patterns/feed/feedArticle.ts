@@ -1,6 +1,6 @@
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key } from '../../schema'
-import type { ReactPatternProps, ReactRenderItemState } from '../../adapters/reactBaseTypes'
+import { reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
 
 export interface ReactFeedArticle {
   key: Key
@@ -15,6 +15,6 @@ export function createFeedArticle(runtime: PatternRuntime, key: Key): ReactFeedA
     key,
     label: runtime.data.items[key]?.label ?? key,
     state: { active: Boolean(state.active) },
-    articleProps: runtime.getItemProps('article', key) as ReactPatternProps,
+    articleProps: reactProps(runtime.getItemProps('article', key)),
   }
 }

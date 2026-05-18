@@ -1,7 +1,7 @@
 import type { InputHTMLAttributes } from 'react'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent } from '../../schema'
-import type { ReactPatternProps, ReactRenderItemState } from '../../adapters/reactBaseTypes'
+import { reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
 
 export interface ReactGridCell {
   key: Key
@@ -45,7 +45,7 @@ export function createGridCell(input: {
     editable: input.editableKeys.includes(input.key),
     editing: input.editingKey === input.key,
     sort: part === 'columnheader' ? input.sortByKey[input.key] ?? null : null,
-    cellProps: input.runtime.getPartProps(part, input.key) as ReactPatternProps,
+    cellProps: reactProps(input.runtime.getPartProps(part, input.key)),
     editInputProps: {
       'data-edit': '',
       value: String(input.editDraftByKey[input.key] ?? ''),

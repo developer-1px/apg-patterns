@@ -3,6 +3,10 @@ import type { KeyInput } from '@interactive-os/keyboard'
 
 export type ReactPatternProps = HTMLAttributes<HTMLElement>
 
+export function reactProps<TProps extends ReactPatternProps = ReactPatternProps>(props: Record<string, unknown>): TProps {
+  return props as TProps
+}
+
 export function reactKeyInput(event: KeyboardEvent<HTMLElement>): KeyInput & { preventDefault: () => void } {
   return {
     key: event.key,

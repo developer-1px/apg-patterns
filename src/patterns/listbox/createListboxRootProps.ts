@@ -1,11 +1,11 @@
 import { createTypeaheadBuffer } from '@interactive-os/keyboard'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
-import type { ReactPatternProps } from '../../adapters/reactTypes'
+import { reactProps, type ReactPatternProps } from '../../adapters/reactTypes'
 import { handleListboxMultiKeyDown } from './handleListboxMultiSelect'
 import { resolveListboxTypeaheadTarget } from './resolveListboxTypeaheadTarget'
 
 export function createListboxRootProps(runtime: PatternRuntime, typeahead: ReturnType<typeof createTypeaheadBuffer>): ReactPatternProps {
-  const props = toReactProps(runtime.getPartProps('listbox'))
+  const props = reactProps(runtime.getPartProps('listbox'))
   const baseKeyDown = props.onKeyDown
   return {
     ...props,
@@ -21,8 +21,4 @@ export function createListboxRootProps(runtime: PatternRuntime, typeahead: Retur
       baseKeyDown?.(event)
     },
   }
-}
-
-function toReactProps(props: Record<string, unknown>): ReactPatternProps {
-  return props as ReactPatternProps
 }
