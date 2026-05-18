@@ -28,21 +28,29 @@ export const KERNEL_SIDE_EFFECT_SOURCES = [
   'kernel/kernelPredicates.ts',
 ] as const satisfies readonly SourceName[]
 
-export const KERNEL_SOURCES = [
+export const KERNEL_IMPLEMENTATION_SOURCES = [
   'kernel/patternRuntime.ts',
   'kernel/runtimeKeyboard.ts',
   'kernel/domEventBindings.ts',
+  'kernel/domEventRegistry.ts',
   'kernel/slotProps.ts',
   'kernel/patternReducer.ts',
+  'kernel/patternTransitions.ts',
+  'kernel/transitionValue.ts',
   'kernel/patternKernel.ts',
   'kernel/keyTokenRegistry.ts',
   'kernel/kernelRegistries.ts',
-  ...KERNEL_SIDE_EFFECT_SOURCES,
   'kernel/patternEventTemplate.ts',
   'kernel/patternRelations.ts',
   'schema/index.ts',
+  'schema/eventTemplate.ts',
   'schema/patternDefinition.ts',
   'schema/patternDefinitionVocabulary.ts',
+] as const satisfies readonly SourceName[]
+
+export const KERNEL_SOURCES = [
+  ...KERNEL_IMPLEMENTATION_SOURCES,
+  ...KERNEL_SIDE_EFFECT_SOURCES,
 ] as const satisfies readonly SourceName[]
 
 export interface PatternEntry {

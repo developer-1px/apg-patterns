@@ -1,33 +1,9 @@
 import type { PatternEvent, PatternEventReason, PartEventBinding } from '../schema'
 import { evaluatePredicate, resolveEventTemplate, type PatternRuntimeContext } from './patternKernel'
 import type { SlotProps } from './patternRuntime'
+import { defineDomEvent, defineDomEventHandlerProp, getDomEventDescriptor } from './domEventRegistry'
 
-type DomEventDescriptor = {
-  handlerProp: string
-  reason?: PatternEventReason
-}
-
-const domEventRegistry = new Map<string, DomEventDescriptor>([
-  ['focus', { handlerProp: 'onFocus', reason: 'focus' }],
-  ['blur', { handlerProp: 'onBlur', reason: 'external' }],
-  ['click', { handlerProp: 'onClick', reason: 'pointer' }],
-  ['dblclick', { handlerProp: 'onDoubleClick', reason: 'pointer' }],
-  ['mousedown', { handlerProp: 'onMouseDown', reason: 'pointer' }],
-  ['keydown', { handlerProp: 'onKeyDown', reason: 'keyboard' }],
-  ['keyup', { handlerProp: 'onKeyUp', reason: 'keyboard' }],
-  ['input', { handlerProp: 'onInput', reason: 'keyboard' }],
-  ['change', { handlerProp: 'onChange', reason: 'external' }],
-  ['pointerdown', { handlerProp: 'onPointerDown', reason: 'pointer' }],
-  ['pointerup', { handlerProp: 'onPointerUp', reason: 'pointer' }],
-  ['pointermove', { handlerProp: 'onPointerMove', reason: 'pointer' }],
-  ['mouseenter', { handlerProp: 'onMouseEnter', reason: 'external' }],
-  ['mouseleave', { handlerProp: 'onMouseLeave', reason: 'external' }],
-])
-
-export const defineDomEvent = (eventName: string, descriptor: DomEventDescriptor) =>
-  void domEventRegistry.set(eventName, descriptor)
-export const defineDomEventHandlerProp = (eventName: string, handlerProp: string) =>
-  defineDomEvent(eventName, { handlerProp })
+export { defineDomEvent, defineDomEventHandlerProp }
 
 export function resolvePartEventBindings(
   bindings: readonly PartEventBinding[],
@@ -42,7 +18,7 @@ export function resolvePartEventBindings(
   }
   const out: SlotProps = {}
   for (const [eventName, eventBindings] of byEvent) {
-    const descriptor = domEventRegistry.get(eventName)
+    const descriptor = getDomEventDescriptor(eventName)
     if (!descriptor) throw new Error(`[apg-pattern] unknown domEvent token: "${eventName}" — register via defineDomEvent()`)
     out[descriptor.handlerProp] = () => {
       for (const binding of eventBindings) {
