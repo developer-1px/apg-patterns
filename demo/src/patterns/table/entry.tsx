@@ -21,7 +21,7 @@ const tableDemoDefinition = {
     hooks: ['table/useTablePattern.ts'],
     data: ['tableData.ts'],
     definition: 'table/definition.ts',
-    extra: ['table/tableRow.ts'],
+    extra: ['table/parts.ts', 'table/tableRow.ts'],
   },
   controls: {
     kind: 'listbox',
