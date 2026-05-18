@@ -1,7 +1,32 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
+import { useMeterPattern, type PatternData } from '../../../../src'
 import { Meter } from './Meter'
 import { initialMeterData, meterVariants } from './meterData'
+
+function MeterRuntimeEdgeDemo({ data }: { data: PatternData }) {
+  const meter = useMeterPattern(data, () => undefined, { elementIdPrefix: 'edge-meter-' })
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => {
+          const item = meter.renderItems[0]
+          document.getElementById('meter-runtime-output')!.textContent = [
+            meter.rootProps.role ?? 'none',
+            item?.key ?? 'none',
+            meter.state.valueByKey[item?.key ?? 'missing'] ?? 'missing',
+            meter.ids.forKey(item?.key ?? 'missing'),
+            meter.keyToElementId(item?.key ?? 'missing'),
+          ].join('|')
+        }}
+      >
+        Read meter runtime
+      </button>
+      <output id="meter-runtime-output" />
+    </div>
+  )
+}
 
 describe('Meter demo — back-compat (single disk meter)', () => {
   it('renders role=meter with aria-valuemin/max/now/valuetext', () => {
@@ -59,5 +84,13 @@ describe('Meter demo — no keyboard interaction', () => {
     render(<Meter data={initialMeterData} onEvent={() => {}} />)
     const meter = screen.getByRole('meter')
     expect(meter.getAttribute('tabindex')).toBeNull()
+  })
+
+  it('exposes meter runtime getters from pointer input', () => {
+    render(<MeterRuntimeEdgeDemo data={initialMeterData} />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Read meter runtime' }))
+
+    expect(screen.getByText('none|disk|72|edge-meter-disk|edge-meter-disk')).toBeTruthy()
   })
 })

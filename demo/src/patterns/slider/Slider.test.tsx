@@ -61,6 +61,9 @@ describe('Slider demo — back-compat (single thumb volume)', () => {
   it('updates value from keyboard events', () => {
     render(<SliderDemo />)
 
+    fireEvent.keyDown(screen.getByRole('slider'), { key: 'F13', code: 'F13' })
+    expect(screen.getByRole('slider').getAttribute('aria-valuenow')).toBe('50')
+
     fireEvent.keyDown(screen.getByRole('slider'), { key: 'ArrowRight', code: 'ArrowRight' })
 
     expect(screen.getByRole('slider').getAttribute('aria-valuenow')).toBe('55')
@@ -112,6 +115,19 @@ describe('Slider demo — back-compat (single thumb volume)', () => {
     const slider = screen.getByRole('slider')
     fireEvent.keyDown(slider, { key: 'ArrowRight', code: 'ArrowRight', shiftKey: true })
     expect(slider.getAttribute('aria-valuenow')).toBe('60')
+  })
+
+  it('handles a zero range slider without moving its position', () => {
+    const zeroRangeData = PatternDataSchema.parse({
+      items: { fixed: { label: 'Fixed', valuemin: 5, valuemax: 5 } },
+      relations: { rootKeys: ['fixed'] },
+      state: { activeKey: 'fixed', valueByKey: { fixed: 5 } },
+    })
+    render(<Slider data={zeroRangeData} onEvent={() => undefined} />)
+
+    const slider = screen.getByRole('slider')
+    expect(slider.getAttribute('aria-valuenow')).toBe('5')
+    expect(screen.getByTestId('slider-track-fixed').firstElementChild?.getAttribute('style')).toContain('width: 0%')
   })
 })
 

@@ -10,6 +10,11 @@ import {
 		  defineVisibleOrder,
 		  evaluatePredicate,
 		  hasKeyToken,
+		  isRegisteredAriaSource,
+		  isRegisteredNavigationTarget,
+		  isRegisteredPredicate,
+		  isRegisteredStateProjection,
+		  isRegisteredVisibleOrder,
 		  reducePatternData,
 		  resolveAriaSource,
 		  resolveKeyToken,
@@ -21,6 +26,7 @@ import {
 	  type Predicate,
 		} from '../index'
 import { predicateRegistry } from '../kernel/kernelRegistries'
+import { createDialogElementId, isDialogOpen, labelDialogItem } from '../patterns/dialog/dialogRuntimeKeys'
 import { treegridDefinition } from '../patterns/treegrid/definition'
 import { treeviewDefinition } from '../patterns/treeview/definition'
 
@@ -473,6 +479,85 @@ function KernelResolverHost() {
       <button
         type="button"
         onClick={() => {
+          const comboData: PatternData = {
+            items: { combobox: { label: 'Combo' }, alpha: { label: 'Alpha' }, beta: { label: 'Beta' } },
+            relations: { rootKeys: ['combobox', 'alpha', 'beta'] },
+            state: { activeKey: 'combobox', expandedKeys: [] },
+          }
+          const visible = resolveVisibleOrder({ kind: 'comboboxOptions' }, comboData)
+          setResult([
+            resolveAriaSource('combobox.popupOpen', { data: comboData, activeKey: 'combobox', key: 'combobox' }),
+            visible.join(','),
+            resolveNavigationTarget({ kind: 'optionLinear', direction: 'next' }, { activeKey: 'combobox', data: comboData, parentByKey, visibleKeys: visible }),
+            resolveNavigationTarget({ kind: 'optionLinear', direction: 'previous' }, { activeKey: 'alpha', data: comboData, parentByKey, visibleKeys: visible }),
+            resolveNavigationTarget({ kind: 'optionLinear', direction: 'first' }, { activeKey: 'beta', data: comboData, parentByKey, visibleKeys: visible }),
+            resolveNavigationTarget({ kind: 'optionLinear', direction: 'last' }, { activeKey: 'alpha', data: comboData, parentByKey, visibleKeys: visible }),
+            resolveNavigationTarget({ kind: 'optionLinear', direction: 'unknown' }, { activeKey: 'alpha', data: comboData, parentByKey, visibleKeys: visible }),
+            resolveNavigationTarget({ kind: 'optionLinear', direction: 'next' }, { activeKey: 'alpha', data: comboData, parentByKey, visibleKeys: [] }),
+          ].map(String).join('|'))
+        }}
+      >
+        Resolve combobox navigation edges
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          const gridData: PatternData = {
+            items: { r1: { label: 'Row 1' }, c1: { label: 'Col 1' }, a: { label: 'A' } },
+            relations: { rowKeys: ['r1'], columnKeys: ['c1'], cells: [{ rowKey: 'r1', columnKey: 'c1', cellKey: 'a' }] },
+            state: { activeKey: 'missing' },
+          }
+          const values: string[] = [
+            String(resolveVisibleOrder({ kind: 'gridRows' }, { ...gridData, relations: {} })),
+            String(resolveNavigationTarget({ kind: 'gridPage', action: 'pageUp' }, { activeKey: 'missing', data: gridData, parentByKey, visibleKeys: [] })),
+          ]
+          for (const action of [
+            () => resolveNavigationTarget({ kind: 'gridCell', action: 'sideways' }, { activeKey: 'a', data: gridData, parentByKey, visibleKeys: ['a'] }),
+            () => resolveNavigationTarget({ kind: 'gridPage', action: 'sideways' }, { activeKey: 'a', data: gridData, parentByKey, visibleKeys: ['a'] }),
+          ]) {
+            try {
+              action()
+            } catch (error) {
+              values.push((error as Error).message)
+            }
+          }
+          setResult(values.join('|'))
+        }}
+      >
+        Resolve grid navigation edges
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          const keyToDefaultId = createDialogElementId({})
+          const keyToCustomId = createDialogElementId({ elementIdPrefix: 'custom-' })
+          setResult([
+            keyToDefaultId('trigger'),
+            keyToCustomId('trigger'),
+            String(isDialogOpen({ items: {}, state: {} })),
+            String(labelDialogItem({ items: {}, state: {} }, 'fallback')),
+          ].join('|'))
+        }}
+      >
+        Resolve dialog runtime keys
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          setResult([
+            isRegisteredAriaSource('state.activeKey.elementId'),
+            isRegisteredStateProjection('state.activeKey'),
+            isRegisteredPredicate('isChecked'),
+            isRegisteredVisibleOrder('flat'),
+            isRegisteredNavigationTarget('firstChild'),
+          ].join('|'))
+        }}
+      >
+        Check registry status
+      </button>
+      <button
+        type="button"
+        onClick={() => {
           const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
           const first = () => 'first'
           const second = () => 'second'
@@ -536,6 +621,18 @@ describe('kernel resolver coverage from pointer input', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Resolve registry misses' }))
     expect(screen.getByText('child|parent|parent||[apg-pattern] unknown ariaSource token: "missing.source" — register via defineAriaSource()|[apg-pattern] unknown stateProjection token: "missing.projection" — register via defineStateProjection()|[apg-pattern] unknown visibleOrder token: "missingVisible" — register via defineVisibleOrder()|[apg-pattern] unknown navigationTarget token: "missingTarget" — register via defineNavigationTarget()')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Resolve combobox navigation edges' }))
+    expect(screen.getByText('false|alpha,beta|alpha|alpha|alpha|beta|null|null')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Resolve grid navigation edges' }))
+    expect(screen.getByText('|null|Unsupported grid action: sideways|Unsupported grid page action: sideways')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Resolve dialog runtime keys' }))
+    expect(screen.getByText('dialog-trigger|custom-trigger|false|fallback')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Check registry status' }))
+    expect(screen.getByText('true|true|true|true|true')).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Define duplicate registries' }))
     expect(screen.getByText('5')).toBeTruthy()

@@ -6,6 +6,7 @@ import { createAlertActions } from '../patterns/alert/alertActions'
 import { createButtonRootProps } from '../patterns/button/buttonRootProps'
 import { createCheckboxActions } from '../patterns/checkbox/checkboxActions'
 import { createGridEditInputProps } from '../patterns/grid/gridEditInputProps'
+import { createMenuButtonTriggerProps } from '../patterns/menu/menuButtonTriggerProps'
 import { getMenuButtonRuntimeState } from '../patterns/menu/menuButtonRuntimeState'
 import { createRadioGroupActions } from '../patterns/radio/radioGroupActions'
 import { getSliderRuntimeState, isMultiThumbSlider } from '../patterns/slider/sliderRuntimeState'
@@ -97,6 +98,34 @@ function HelperHost() {
       <button
         type="button"
         onClick={() => {
+          const events: PatternEvent[] = []
+          const runtime = {
+            getPartProps: () => ({ role: 'button', onKeyDown: () => events.push({ type: 'activate', key: 'fallback' }) }),
+            keyToElementId: (key: string) => `menu-button-${key}`,
+          }
+          const empty = createMenuButtonTriggerProps({ runtime: runtime as never, triggerKey: null, itemKeys: [], expanded: false, onEvent: (event) => events.push(event) })
+          const closed = createMenuButtonTriggerProps({ runtime: runtime as never, triggerKey: 'trigger', itemKeys: [], expanded: false, onEvent: (event) => events.push(event) })
+          const open = createMenuButtonTriggerProps({ runtime: runtime as never, triggerKey: 'trigger', itemKeys: ['first'], expanded: true, onEvent: (event) => events.push(event) })
+          const eventBase = {
+            altKey: false,
+            ctrlKey: false,
+            metaKey: false,
+            shiftKey: false,
+            repeat: false,
+            location: 0,
+            nativeEvent: { isComposing: false },
+            preventDefault: () => undefined,
+          }
+          closed.onKeyDown?.({ ...eventBase, key: 'ArrowUp', code: 'ArrowUp' } as never)
+          open.onKeyDown?.({ ...eventBase, key: 'Escape', code: 'Escape' } as never)
+          setResult(`${Object.keys(empty).length}|${closed.id}|${events.map((event) => `${event.type}:${'key' in event ? event.key ?? '' : ''}`).join('|')}`)
+        }}
+      >
+        Run menu trigger props
+      </button>
+      <button
+        type="button"
+        onClick={() => {
           const empty = getMenuButtonRuntimeState({ items: {}, relations: {}, state: {} })
           setResult([
             empty.triggerKey ?? 'null',
@@ -173,6 +202,9 @@ describe('action and prop helper coverage from pointer input', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Run button props' }))
     expect(screen.getByText('0|focus|activate')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Run menu trigger props' }))
+    expect(screen.getByText('0|menu-button-trigger|expand:trigger|activate:fallback')).toBeTruthy()
 
     const input = screen.getByRole('textbox', { name: 'Edit value' })
     fireEvent.change(input, { target: { value: 'draft' } })
