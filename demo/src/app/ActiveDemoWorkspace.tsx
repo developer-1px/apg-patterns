@@ -20,7 +20,7 @@ export function ActiveDemoWorkspace({
   dispatch: (action: AppAction) => void
 }) {
   const activeDemo = useDemoPattern(state.patternKey, (event) => {
-    window.dispatchEvent(new CustomEvent('apg-pattern-event', {
+    window.dispatchEvent(new window.CustomEvent('apg-pattern-event', {
       detail: {
         event,
         patternKey: state.patternKey,

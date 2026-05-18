@@ -1,14 +1,13 @@
-import { matchesShortcut, type KeyInput } from '@interactive-os/keyboard'
+import type { KeyInput } from '@interactive-os/keyboard'
 import { PatternDataSchema, PatternDefinitionSchema, PatternOptionsSchema, type Key, type PatternData, type PatternEvent, type PatternOptions, type PatternDefinition } from '../schema'
 import {
   resolveStateProjection,
   resolveVisibleOrder,
-  evaluatePredicate,
-  resolveEventTemplate,
   createParentByKey,
   type PatternRuntimeContext,
 } from './patternKernel'
-import { resolvePartEventBindings, withDefaultReason } from './domEventBindings'
+import { resolvePartEventBindings } from './domEventBindings'
+import { createRootKeyboardHandler, resolveRuntimeKeyboardBinding } from './runtimeKeyboard'
 import { compactProps, resolveAriaProjections, resolveFocusProjection } from './slotProps'
 export { defineDomEvent, defineDomEventHandlerProp } from './domEventBindings'
 
@@ -63,30 +62,9 @@ export function createPatternRuntime<TData extends PatternData = PatternData>(in
     onEvent(event)
   }
 
-  const resolveKeyboardBinding = (input: KeyInput, activeKey: Key) => {
-    for (const binding of definition.keyboard) {
-      if (!matchesShortcut(input, binding.shortcut)) continue
-      for (const item of binding.cases) {
-        const ctx = { data, options, activeKey, parentByKey }
-        const matches = item.case === 'otherwise' || item.case === 'always' || evaluatePredicate(item.when, ctx)
-        if (!matches) continue
-        return {
-          preventDefault: binding.preventDefault ?? false,
-          events: item.events.flatMap((t) => resolveEventTemplate(t, activeKey, data, undefined, ctx)),
-        }
-      }
-    }
-    return null
-  }
+  const resolveKeyboardBinding = (input: KeyInput, activeKey: Key) => resolveRuntimeKeyboardBinding({ definition, data, options, parentByKey, input, activeKey })
 
-  const getRootKeyboardHandler = () => (event: KeyInput & { preventDefault?: () => void }) => {
-    const active = data.state?.activeKey ?? visibleKeys[0]
-    if (!active) return
-    const result = resolveKeyboardBinding(event, active)
-    if (!result) return
-    if (result.preventDefault) event.preventDefault?.()
-    for (const next of result.events) emit(withDefaultReason(next, 'keyboard'))
-  }
+  const getRootKeyboardHandler = () => createRootKeyboardHandler({ data, visibleKeys, emit, resolveKeyboardBinding })
 
   const getPartProps = (partName: string, key?: Key): SlotProps => {
     const part = definition.parts[partName]

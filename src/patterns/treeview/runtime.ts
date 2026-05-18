@@ -18,7 +18,8 @@ import {
 import { createPatternRuntime, type CreatePatternRuntimeInput } from '../../kernel/patternRuntime'
 import { resolveTreeKeyboardBinding, type ResolvedKeyboardBinding } from './keyboardBinding'
 import { createTreeviewRenderItems, type TreeviewRenderItem, type TreeviewSlotProps } from './renderItem'
-import { resolveTreeviewVisibleKeys, resolveTypeaheadTarget } from './typeahead'
+import { createTreeProps } from './treeProps'
+import { resolveTreeviewVisibleKeys } from './typeahead'
 
 export type { TreeviewRenderState } from './renderState'
 export type { TreeviewRenderItem, TreeviewSlotProps } from './renderItem'
@@ -69,24 +70,7 @@ export function createTreeviewRuntime(input: CreateTreeviewRuntimeInput): Treevi
     onEvent: emit,
   } satisfies CreatePatternRuntimeInput)
 
-  const getTreeProps = (): TreeviewSlotProps => {
-    const props = runtime.getPartProps('tree')
-    return {
-      ...props,
-      onKeyDown: (event: KeyInput & { preventDefault?: () => void }) => {
-        const active = data.state?.activeKey ?? runtime.visibleKeys[0]
-        if (!active) return
-        const typeaheadQuery = options.typeaheadEnabled === false ? null : typeahead.feed(event)
-        const typeaheadTarget = resolveTypeaheadTarget(typeaheadQuery, data, options)
-        if (typeaheadTarget) {
-          event.preventDefault?.()
-          emit({ type: 'focus', key: typeaheadTarget, meta: { reason: 'typeahead' } })
-          return
-        }
-        runtime.getRootKeyboardHandler()(event)
-      },
-    }
-  }
+  const getTreeProps = (): TreeviewSlotProps => createTreeProps({ runtime, data, options, typeahead, emit })
 
   const getTreeItemProps = (key: Key): TreeviewSlotProps => {
     return runtime.getPartProps('treeitem', key)
