@@ -8,6 +8,10 @@ if (typeof (globalThis as { CSS?: { escape?: (s: string) => string } }).CSS === 
   ;(globalThis as { CSS: { escape: (s: string) => string } }).CSS.escape = (s: string) => s
 }
 
+if (typeof Element.prototype.scrollIntoView !== 'function') {
+  Element.prototype.scrollIntoView = () => {}
+}
+
 import { ListboxDemo } from './ListboxTestHost'
 
 const activeOption = () => document.querySelector('[role="option"][data-active]') as HTMLElement | null
@@ -97,6 +101,25 @@ describe('Listbox demo — scrollable', () => {
 
     const selected = screen.getAllByRole('option').filter((option) => option.getAttribute('aria-selected') === 'true')
     expect(selected.map((option) => option.textContent)).toEqual(['Albatross'])
+  })
+
+  it('keyboard navigation scrolls the active option into view', () => {
+    const calls: ScrollIntoViewOptions[] = []
+    const original = HTMLElement.prototype.scrollIntoView
+    HTMLElement.prototype.scrollIntoView = function scrollIntoView(options?: boolean | ScrollIntoViewOptions) {
+      if (typeof options === 'object') calls.push(options)
+    }
+    try {
+      render(<ListboxDemo variant="scrollable" />)
+      const listbox = screen.getByRole('listbox')
+
+      fireEvent.keyDown(listbox, { key: 'End', code: 'End' })
+
+      expect(activeOption()?.textContent).toBe('Emu')
+      expect(calls).toContainEqual({ block: 'nearest' })
+    } finally {
+      HTMLElement.prototype.scrollIntoView = original
+    }
   })
 })
 

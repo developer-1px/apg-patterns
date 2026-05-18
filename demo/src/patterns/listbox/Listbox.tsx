@@ -30,6 +30,7 @@ export function Listbox({
     const root = rootRef.current
     const active = document.getElementById(listbox.ids.forKey(activeKey))
     if (!root || !active || !root.contains(active)) return
+    if (typeof active.scrollIntoView !== 'function') return
     active.scrollIntoView({ block: 'nearest' })
   }, [activeKey, listbox.ids, scrollable])
 
