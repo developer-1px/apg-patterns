@@ -5,6 +5,7 @@ import {
   assertUnique,
   assertSourceRoles,
   DemoPatternDefinitionSchema,
+  explicitSourceNamesFromDefinition,
   sourceNamesFromDefinition,
   type DemoPatternDefinition,
 } from './demoPatternDefinition'
@@ -27,8 +28,8 @@ export function defineDemoPattern({
   const parsed = DemoPatternDefinitionSchema.parse(definition) as DemoPatternDefinition
   assertUnique(`${parsed.key} keyboardShortcuts`, parsed.keyboardShortcuts)
   assertSourceRoles(`${parsed.key} sources`, parsed.sources)
+  assertUnique(`${parsed.key} sources`, explicitSourceNamesFromDefinition(parsed.sources))
   const sourceNames = sourceNamesFromDefinition(parsed.sources)
-  assertUnique(`${parsed.key} sources`, sourceNames)
   return {
     key: parsed.key,
     label: parsed.label,

@@ -164,6 +164,38 @@ describe('defineDemoPattern', () => {
     ).toThrow('[defineDemoPattern] duplicate example sources: Example.tsx')
   })
 
+  it('adds collected implementation sources for the declared pattern entry', () => {
+    const entry = defineDemoPattern({
+      definition: {
+        ...definition,
+        key: 'button',
+        sources: {
+          main: 'Button.tsx',
+          entry: 'button/entry.tsx',
+          data: ['buttonData.ts'],
+          hooks: ['button/useButtonPattern.ts'],
+          definition: 'button/definition.ts',
+        },
+      },
+      useRuntime: () => ({
+        inspect: 'state',
+        context: {
+          values: { state: { label: 'Rendered' } },
+          actions: {},
+          components: {
+            Preview: ({ label }) => <button type="button">{label}</button>,
+          },
+        },
+      }),
+    })
+
+    const demo = entry.useDemoPattern(() => undefined)
+
+    expect(demo.sourceNames).toContain('button/buttonActions.ts')
+    expect(demo.sourceNames).toContain('button/keyboard.ts')
+    expect(demo.sourceNames.filter((sourceName) => sourceName === 'button/useButtonPattern.ts')).toHaveLength(1)
+  })
+
   it.each([
     ['main', { main: 'example/Example.tsx' }, 'invalid example sources main: example/Example.tsx'],
     ['entry', { entry: 'entry.tsx' }, 'invalid example sources entry: entry.tsx'],

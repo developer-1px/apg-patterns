@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { KERNEL_SOURCES } from '../demoPatternTypes'
+import { sourceLoaders } from '../sources'
 import { UiNodeSchema, type UiNode } from './uiSchema'
 
 const SourceNameSchema = z.string().min(1)
@@ -31,6 +32,13 @@ export type DemoPatternDefinition = Omit<z.infer<typeof DemoPatternDefinitionSch
 
 export function sourceNamesFromDefinition(sources: DemoPatternDefinition['sources']) {
   return [
+    ...explicitSourceNamesFromDefinition(sources),
+    ...autoCollectedPatternSources(sources),
+  ]
+}
+
+export function explicitSourceNamesFromDefinition(sources: DemoPatternDefinition['sources']) {
+  return [
     sources.main,
     sources.entry,
     ...(sources.data ?? []),
@@ -59,6 +67,17 @@ export function assertUnique(label: string, values: readonly string[]) {
 
 function assertSourceName(label: string, value: string, pattern: RegExp) {
   if (!pattern.test(value)) throw new Error(`[defineDemoPattern] invalid ${label}: ${value}`)
+}
+
+function autoCollectedPatternSources(sources: DemoPatternDefinition['sources']) {
+  const prefix = sources.entry.replace(/entry\.tsx$/, '')
+  const explicitSources = new Set(explicitSourceNamesFromDefinition(sources))
+
+  return Object.keys(sourceLoaders).filter((sourceName) => (
+    sourceName.startsWith(prefix)
+    && !explicitSources.has(sourceName)
+    && !/\/reactTypes\.ts$/.test(sourceName)
+  ))
 }
 
 function duplicateValues(values: readonly string[]) {
