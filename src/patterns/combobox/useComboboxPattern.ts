@@ -1,7 +1,8 @@
 import { useLayoutEffect, useRef } from 'react'
-import type { HTMLAttributes, InputHTMLAttributes, KeyboardEvent } from 'react'
+import type { HTMLAttributes, InputHTMLAttributes } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions, PatternState } from '../../schema'
+import { createComboboxInputProps } from './comboboxInputProps'
 import { createComboboxOption, type ReactComboboxOption } from './comboboxOption'
 import { COMBOBOX_KEY, comboboxDefinition } from './definition'
 
@@ -56,34 +57,8 @@ export function useComboboxPattern(data: ComboboxData, onEvent: (event: PatternE
     activeOption.scrollIntoView({ block: 'nearest' })
   }, [activeKey, open, runtime])
 
-  const handleSelectOnlyTypeahead = (key: string) => {
-    if (!/^[\w]$/.test(key)) return false
-    onEvent({ type: 'typeahead', query: key.toLowerCase() })
-    return true
-  }
-
   return {
-    inputProps: {
-      ...rootProps,
-      type: 'text',
-      readOnly: !editable,
-      value: displayValue,
-      placeholder: editable ? 'Search fruit' : 'Select fruit',
-      'aria-controls': listboxId,
-      onChange: (event) => {
-        if (editable) onEvent({ type: 'inputValue', key: COMBOBOX_KEY, value: event.currentTarget.value, inline: variant === 'listWithInlineAutocomplete' })
-      },
-      onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => {
-        if (variant === 'selectOnly' && event.key.length === 1 && handleSelectOnlyTypeahead(event.key)) {
-          event.preventDefault()
-          return
-        }
-        rootProps.onKeyDown?.(event)
-      },
-      onClick: () => {
-        if (!open) onEvent({ type: 'expand', key: COMBOBOX_KEY, expanded: true })
-      },
-    },
+    inputProps: createComboboxInputProps({ rootProps, editable, displayValue, listboxId, open, variant, onEvent }),
     listboxProps: runtime.getPartProps('listbox') as HTMLAttributes<HTMLElement>,
     get options() {
       return Object.keys(data.items)

@@ -18,6 +18,8 @@ export function sourceIdentityNeedles(sourceName, patternKey) {
   const patternSource = sourceName.match(/^([^/]+)\/(.+)\.ts$/)
   if (patternSource) {
     const [, sourcePatternKey, fileName] = patternSource
+    if (sourcePatternKey === 'kernel' && fileName === 'kernelNavigationTargets') return ['defineNavigationTarget']
+    if (sourcePatternKey === 'kernel' && fileName === 'kernelPredicates') return ['definePredicate']
     if (fileName === 'definition') {
       if (sourcePatternKey === 'menu') return ['menuButtonDefinition', 'menubarDefinition']
       return [`apgPattern: '${sourcePatternKey}'`]
@@ -32,6 +34,8 @@ export function sourceIdentityNeedles(sourceName, patternKey) {
   if (sourceName === 'kernel/patternRuntime.ts') return ['createPatternRuntime']
   if (sourceName === 'kernel/patternReducer.ts') return ['reducePatternData']
   if (sourceName === 'kernel/patternKernel.ts') return ['defineAriaSource']
+  if (sourceName === 'kernel/kernelNavigationTargets.ts') return ['defineNavigationTarget']
+  if (sourceName === 'kernel/kernelPredicates.ts') return ['definePredicate']
   if (sourceName === 'schema/index.ts') return ["export * from './patternDefinition'"]
   if (sourceName === 'treeContract.ts') return ['initialData']
   if (sourceName === 'treeVariants.ts') return ['treeVariants']

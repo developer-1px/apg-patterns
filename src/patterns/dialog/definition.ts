@@ -1,4 +1,8 @@
 import { PatternDefinitionSchema } from '../../schema'
+import { dialogEffects } from './effects'
+import { dialogKeyboard } from './keyboard'
+import { dialogParts } from './parts'
+import { dialogTransitions } from './transitions'
 
 export const DialogDefinitionSchema = PatternDefinitionSchema.superRefine((value, ctx) => {
   if (value.apgPattern !== 'dialog') ctx.addIssue({ code: 'custom', path: ['apgPattern'], message: 'expected "dialog"' })
@@ -14,85 +18,12 @@ export const dialogDefinition = DialogDefinitionSchema.parse({
   rootRole: 'dialog',
   containedRoles: ['button'],
   focusModel: 'focusTrap',
-  parts: {
-    trigger: {
-      role: 'button',
-      aria: [
-        { attribute: 'aria-haspopup', from: 'items.kind' },
-        { attribute: 'aria-expanded', from: 'state.expandedKeys' },
-        { attribute: 'aria-controls', from: 'relations.controlsByKey' },
-      ],
-      events: [
-        { event: 'click', events: [{ type: 'expand', key: '$key', expanded: true }] },
-      ],
-    },
-    dialog: {
-      role: 'dialog',
-      aria: [
-        { attribute: 'aria-modal', from: 'literal.true' },
-        { attribute: 'aria-labelledby', from: 'relations.ownerByKey' },
-        { attribute: 'aria-describedby', from: 'relations.controlsByKey' },
-      ],
-    },
-    overlay: {
-      role: 'presentation',
-      events: [{ event: 'mousedown', events: [{ type: 'expand', key: '$triggerKey', expanded: false }] }],
-    },
-    title: { role: 'heading' },
-    description: { role: 'paragraph' },
-    cancel: {
-      role: 'button',
-      events: [{ event: 'click', events: [{ type: 'expand', key: '$triggerKey', expanded: false }] }],
-    },
-    submit: {
-      role: 'button',
-      events: [{ event: 'click', events: [{ type: 'expand', key: '$triggerKey', expanded: false }] }],
-    },
-  },
+  parts: dialogParts,
   navigation: {
     visibleOrder: { kind: 'flat' },
     targets: {},
   },
-  keyboard: [
-    {
-      shortcut: 'Escape',
-      preventDefault: true,
-      cases: [
-        { case: 'always', events: [{ type: 'expand', key: '$triggerKey', expanded: false }] },
-      ],
-    },
-  ],
-  transitions: [
-    {
-      on: 'expand',
-      actions: [
-        { kind: 'set', field: 'activeKey', value: { from: '$event.key' } },
-        {
-          kind: 'setMembership',
-          field: 'expandedKeys',
-          value: { from: '$event.key' },
-          present: { from: '$event.expanded' },
-        },
-      ],
-    },
-  ],
-  effects: [
-    {
-      kind: 'focus',
-      when: { kind: 'isExpanded', key: '$triggerKey' },
-      target: { kind: 'firstFocusable', root: { kind: 'controlledBy', key: '$triggerKey' } },
-      preventScroll: true,
-    },
-    {
-      kind: 'restoreFocus',
-      when: { kind: 'not', predicate: { kind: 'isExpanded', key: '$triggerKey' } },
-      target: { kind: 'key', key: '$triggerKey' },
-      preventScroll: true,
-    },
-    {
-      kind: 'trapFocus',
-      when: { kind: 'isExpanded', key: '$triggerKey' },
-      root: { kind: 'controlledBy', key: '$triggerKey' },
-    },
-  ],
+  keyboard: dialogKeyboard,
+  transitions: dialogTransitions,
+  effects: dialogEffects,
 })

@@ -21,6 +21,13 @@ export interface DemoPattern {
 export type EmitPatternEvent = (event: PatternEvent) => void
 
 /** Kernel source keys included in every pattern's sourceNames list. */
+export const KERNEL_SIDE_EFFECT_SOURCES = [
+  'kernel/kernelAriaSources.ts',
+  'kernel/kernelBuiltins.ts',
+  'kernel/kernelNavigationTargets.ts',
+  'kernel/kernelPredicates.ts',
+] as const satisfies readonly SourceName[]
+
 export const KERNEL_SOURCES = [
   'kernel/patternRuntime.ts',
   'kernel/runtimeKeyboard.ts',
@@ -30,6 +37,7 @@ export const KERNEL_SOURCES = [
   'kernel/patternKernel.ts',
   'kernel/keyTokenRegistry.ts',
   'kernel/kernelRegistries.ts',
+  ...KERNEL_SIDE_EFFECT_SOURCES,
   'kernel/patternEventTemplate.ts',
   'kernel/patternRelations.ts',
   'schema/index.ts',

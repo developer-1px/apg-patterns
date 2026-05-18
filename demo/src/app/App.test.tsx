@@ -7,7 +7,7 @@ import { formatEvent } from './eventLog'
 import { isCopyableSource, isSourceLoadFailure, loadSourcePreview } from './sourcePreview'
 import { SourceTabs, useSourceTabs } from './SourceTabs'
 import { collectPatternEntries, defaultPatternKey, defaultSourceName, patternEntries, useDemoPattern, validatePatternEntries } from '../shared/demoPatterns'
-import { KERNEL_SOURCES } from '../shared/demoPatternTypes'
+import { KERNEL_SIDE_EFFECT_SOURCES, KERNEL_SOURCES } from '../shared/demoPatternTypes'
 import { sourceLoaders, sourceNameCollisions } from '../shared/sources'
 import type { PatternEvent } from '../../../src'
 
@@ -763,6 +763,12 @@ describe('demo source wiring', () => {
     const missingKernelSources = KERNEL_SOURCES.filter((sourceName) => !sourceLoaders[sourceName])
 
     expect(missingKernelSources).toEqual([])
+  })
+
+  it('exposes kernel side-effect registration sources from shared source tabs', () => {
+    const missingSideEffectSources = KERNEL_SIDE_EFFECT_SOURCES.filter((sourceName) => !KERNEL_SOURCES.includes(sourceName))
+
+    expect(missingSideEffectSources).toEqual([])
   })
 })
 
