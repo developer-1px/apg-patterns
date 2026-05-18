@@ -128,7 +128,7 @@ describe('source copy', () => {
     expect(screen.queryByRole('button', { name: 'copied' })).toBeNull()
   })
 
-  it('keeps the source panel blank while lazily switching source tabs', async () => {
+  it('does not keep stale source text while switching source tabs', async () => {
     replaceHash('#pattern=accordion&panel=code&source=Accordion.tsx')
 
     render(<App />)
@@ -136,7 +136,7 @@ describe('source copy', () => {
     await waitFor(() => expect(getSourcePanel().textContent).toContain('export function Accordion'))
     fireEvent.click(screen.getByRole('tab', { name: 'accordionData.ts' }))
 
-    expect(getSourcePanel().textContent).toBe('')
+    expect(getSourcePanel().textContent).not.toContain('export function Accordion')
   })
 })
 

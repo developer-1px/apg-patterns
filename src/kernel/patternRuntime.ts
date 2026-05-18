@@ -1,7 +1,6 @@
 import { matchesShortcut, type KeyInput } from '@interactive-os/keyboard'
-import { PatternDataSchema, PatternDefinitionSchema, PatternOptionsSchema, type Key, type PatternData, type PatternEvent, type PatternOptions, type PatternDefinition, type AriaProjection, type FocusProjection } from '../schema'
+import { PatternDataSchema, PatternDefinitionSchema, PatternOptionsSchema, type Key, type PatternData, type PatternEvent, type PatternOptions, type PatternDefinition } from '../schema'
 import {
-  resolveAriaSource,
   resolveStateProjection,
   resolveVisibleOrder,
   evaluatePredicate,
@@ -10,6 +9,7 @@ import {
   type PatternRuntimeContext,
 } from './patternKernel'
 import { resolvePartEventBindings, withDefaultReason } from './domEventBindings'
+import { compactProps, resolveAriaProjections, resolveFocusProjection } from './slotProps'
 export { defineDomEvent, defineDomEventHandlerProp } from './domEventBindings'
 
 export type SlotProps = Record<string, unknown>
@@ -124,26 +124,4 @@ export function createPatternRuntime<TData extends PatternData = PatternData>(in
   const getItemProps = (partName: string, key: Key): SlotProps => getPartProps(partName, key)
 
   return { definition, data, options, visibleKeys, getRootProps, getItemProps, getPartProps, getRootKeyboardHandler, resolveKeyboardBinding, getItemState, keyToElementId, emit }
-}
-
-function resolveAriaProjections(projections: readonly AriaProjection[], ctx: PatternRuntimeContext): SlotProps {
-  const out: SlotProps = {}
-  for (const projection of projections) {
-    if (projection.when && !evaluatePredicate(projection.when, ctx)) continue
-    const value = resolveAriaSource(projection.from, ctx)
-    // undefined 만 suppress — false 는 그대로 emit (ARIA 명시적 "false" 의무).
-    if (value !== undefined) out[projection.attribute] = value
-  }
-  return out
-}
-
-function resolveFocusProjection(focus: FocusProjection | undefined, ctx: PatternRuntimeContext): SlotProps {
-  if (!focus?.tabIndex || !evaluatePredicate(focus.tabIndex.when, ctx)) return {}
-  const active = ctx.key != null && ctx.activeKey === ctx.key
-  const value = focus.tabIndex.value ?? (active ? focus.tabIndex.active : focus.tabIndex.inactive)
-  return value === undefined ? {} : { tabIndex: value }
-}
-
-function compactProps(props: SlotProps): SlotProps {
-  return Object.fromEntries(Object.entries(props).filter(([, value]) => value !== undefined))
 }
