@@ -1,24 +1,32 @@
-import { usePatternDataHost } from '../../shared/demoHostState'
 import { Toolbar } from './Toolbar'
 import { initialToolbarData, reduceToolbarData } from './toolbarData'
-import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
-import { renderDataInspect } from '../../shared/inspect/genericInspect'
+import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 
-export const entry: PatternEntry = {
+const toolbarDemoDefinition = {
   key: 'toolbar',
   label: 'Toolbar',
-  useDemoPattern: (onEvent) => {
-    const host = usePatternDataHost(initialToolbarData, reduceToolbarData)
-    return {
-      key: 'toolbar',
-      label: 'Toolbar',
-      keyboardShortcuts: ['ArrowRight', 'ArrowLeft', 'Home', 'End', 'Enter', 'Space'],
-      sourceNames: ['Toolbar.tsx', 'toolbar/entry.tsx', 'toolbarData.ts', 'toolbar/useToolbarPattern.ts', 'toolbar/definition.ts', ...KERNEL_SOURCES],
-      inspect: renderDataInspect(host.data),
-      preview: <Toolbar data={host.data} onEvent={(event) => {
-        onEvent(event)
-        host.dispatchEvent(event)
-      }} />,
-    }
+  keyboardShortcuts: ['ArrowRight', 'ArrowLeft', 'Home', 'End', 'Enter', 'Space'],
+  sources: {
+    main: 'Toolbar.tsx',
+    entry: 'toolbar/entry.tsx',
+    data: ['toolbarData.ts'],
+    hooks: ['toolbar/useToolbarPattern.ts'],
+    definition: 'toolbar/definition.ts',
   },
-}
+  view: {
+    kind: 'component',
+    component: 'Toolbar',
+    props: {
+      data: '$state.data',
+      onEvent: '$actions.dispatchEvent',
+    },
+  },
+} as const satisfies DemoPatternDefinition
+
+export const entry = defineStateDemoPattern({
+  definition: toolbarDemoDefinition,
+  initialData: initialToolbarData,
+  reduce: reduceToolbarData,
+  componentName: 'Toolbar',
+  component: Toolbar,
+})

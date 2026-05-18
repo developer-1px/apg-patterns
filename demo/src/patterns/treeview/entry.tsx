@@ -6,8 +6,8 @@ import { reduceData, resolveTarget } from './treeContract'
 import { renderAriaTree, renderHtmlTree } from './inspect'
 import { Tree } from './Tree'
 import { treeVariantItems, treeVariants, type TreeVariantKey } from './treeVariants'
-import { type PatternEntry, selectClass, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
-import { VariantListbox } from '../../shared/VariantListbox'
+import { selectClass } from '../../shared/demoPatternTypes'
+import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 
 const treeVariantKeys = ['fileDirectoryComputed', 'fileDirectoryDeclared', 'navigation'] as const
 const focusStrategies = ['rovingTabIndex', 'ariaActiveDescendant'] as const
@@ -42,6 +42,68 @@ const initialTreeviewDemoState = TreeviewDemoStateSchema.parse({
   inspectMode: 'aria',
 })
 
+const treeviewDemoDefinition = {
+  key: 'treeview',
+  label: 'Treeview',
+  keyboardShortcuts: ['ArrowDown', 'ArrowUp', 'Home', 'End', 'ArrowRight', 'ArrowLeft', 'Enter', 'Space'],
+  sources: {
+    main: 'Tree.tsx',
+    entry: 'treeview/entry.tsx',
+    data: ['treeVariants.ts'],
+    hooks: ['treeview/useTreeviewPattern.ts'],
+    runtime: ['treeview/runtime.ts'],
+    definition: 'treeview/definition.ts',
+    extra: ['treeContract.ts'],
+  },
+  controls: {
+    kind: 'stack',
+    gap: 'md',
+    children: [
+      {
+        kind: 'listbox',
+        value: '$state.variant',
+        items: '$model.variantItems',
+        label: 'tree variants',
+        idPrefix: 'tree-variant',
+        onChange: '$actions.selectVariant',
+      },
+      {
+        kind: 'component',
+        component: 'FollowFocusControl',
+        props: {
+          value: '$state.followFocus',
+          onChange: '$actions.setFollowFocus',
+        },
+      },
+      {
+        kind: 'component',
+        component: 'ItemClickActionControl',
+        props: {
+          value: '$state.itemClickAction',
+          onChange: '$actions.setItemClickAction',
+        },
+      },
+      {
+        kind: 'component',
+        component: 'FocusStrategyControl',
+        props: {
+          value: '$state.focusStrategy',
+          onChange: '$actions.setFocusStrategy',
+        },
+      },
+    ],
+  },
+  view: {
+    kind: 'component',
+    component: 'Tree',
+    props: {
+      data: '$state.data',
+      onEvent: '$actions.dispatchEvent',
+      options: '$state.options',
+    },
+  },
+} as const satisfies DemoPatternDefinition
+
 const reduceTreeviewDemoState = (state: TreeviewDemoState, action: TreeviewDemoAction): TreeviewDemoState => {
   if (action.type === 'selectVariant') return TreeviewDemoStateSchema.parse({ ...state, variant: action.variant, data: treeVariants[action.variant].data })
   if (action.type === 'setFollowFocus') return TreeviewDemoStateSchema.parse({ ...state, followFocus: action.value })
@@ -51,10 +113,9 @@ const reduceTreeviewDemoState = (state: TreeviewDemoState, action: TreeviewDemoA
   return TreeviewDemoStateSchema.parse({ ...state, data: reduceData(state.data, action.event) })
 }
 
-export const entry: PatternEntry = {
-  key: 'treeview',
-  label: 'Treeview',
-  useDemoPattern: (onEvent) => {
+export const entry = defineDemoPattern({
+  definition: treeviewDemoDefinition,
+  useRuntime: (onEvent) => {
     const [state, dispatch] = useReducer(reduceTreeviewDemoState, initialTreeviewDemoState)
     const treeOptions: PatternOptions = { focusStrategy: state.focusStrategy, followFocus: state.followFocus, itemClickAction: state.itemClickAction, indicatorClickAction: 'toggleExpand' }
     const dispatchTree = (event: PatternEvent) => dispatch({ type: 'patternEvent', event })
@@ -69,10 +130,6 @@ export const entry: PatternEntry = {
     }
 
     return {
-      key: 'treeview',
-      label: 'Treeview',
-      keyboardShortcuts: ['ArrowDown', 'ArrowUp', 'Home', 'End', 'ArrowRight', 'ArrowLeft', 'Enter', 'Space'],
-      sourceNames: ['Tree.tsx', 'treeview/entry.tsx', 'treeVariants.ts', 'treeview/useTreeviewPattern.ts', 'treeview/runtime.ts', 'treeview/definition.ts', ...KERNEL_SOURCES, 'treeContract.ts'],
       inspect: state.inspectMode === 'aria' ? renderAriaTree(state.data, treeOptions) : renderHtmlTree(state.data, treeOptions),
       inspectControls: (
         <select className={selectClass} value={state.inspectMode} onChange={(event) => dispatch({ type: 'setInspectMode', value: parseInspectMode(event.currentTarget.value) })}>
@@ -80,38 +137,87 @@ export const entry: PatternEntry = {
           <option value="html">html</option>
         </select>
       ),
-      variants: (
-        <div className="grid gap-3 text-xs text-zinc-600 dark:text-zinc-400">
-          <VariantListbox value={state.variant} items={treeVariantItems} label="tree variants" idPrefix="tree-variant" onChange={(variant) => dispatch({ type: 'selectVariant', variant })} />
-          <label className="inline-flex items-center gap-2">
-            <input
-              type="checkbox"
-              className="size-4 rounded bg-white text-zinc-900 accent-zinc-900 shadow-sm outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.08] dark:accent-zinc-100 dark:focus-visible:outline-zinc-500"
-              checked={state.followFocus}
-              onChange={(event) => dispatch({ type: 'setFollowFocus', value: event.currentTarget.checked })}
-            />
-            followFocus
-          </label>
-          <label className="grid gap-1">
-            itemClickAction
-            <select className={selectClass} value={state.itemClickAction} onChange={(event) => dispatch({ type: 'setItemClickAction', value: parseItemClickAction(event.currentTarget.value) })}>
-              <option value="select">select</option>
-              <option value="toggleExpand">toggleExpand</option>
-              <option value="none">none</option>
-            </select>
-          </label>
-          <label className="grid gap-1">
-            focusStrategy
-            <select className={selectClass} value={state.focusStrategy} onChange={(event) => dispatch({ type: 'setFocusStrategy', value: parseFocusStrategy(event.currentTarget.value) })}>
-              <option value="rovingTabIndex">rovingTabIndex</option>
-              <option value="ariaActiveDescendant">ariaActiveDescendant</option>
-            </select>
-          </label>
-        </div>
-      ),
-      preview: <Tree data={state.data} onEvent={handleTreeEvent} options={treeOptions} />,
+      context: {
+        values: {
+          state: {
+            variant: state.variant,
+            data: state.data,
+            options: treeOptions,
+            followFocus: state.followFocus,
+            itemClickAction: state.itemClickAction,
+            focusStrategy: state.focusStrategy,
+          },
+          model: {
+            variantItems: treeVariantItems,
+          },
+        },
+        actions: {
+          selectVariant: (variant: TreeVariantKey) => dispatch({ type: 'selectVariant', variant }),
+          setFollowFocus: (value: boolean) => dispatch({ type: 'setFollowFocus', value }),
+          setItemClickAction: (value: TreeviewDemoState['itemClickAction']) => dispatch({ type: 'setItemClickAction', value }),
+          setFocusStrategy: (value: TreeviewDemoState['focusStrategy']) => dispatch({ type: 'setFocusStrategy', value }),
+          dispatchEvent: handleTreeEvent,
+        },
+        components: {
+          Tree,
+          FollowFocusControl,
+          ItemClickActionControl,
+          FocusStrategyControl,
+        },
+      },
     }
   },
+})
+
+function FollowFocusControl({ value, onChange }: { value: boolean; onChange: (value: boolean) => void }) {
+  return (
+    <label className="inline-flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-400">
+      <input
+        type="checkbox"
+        className="size-4 rounded bg-white text-zinc-900 accent-zinc-900 shadow-sm outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.08] dark:accent-zinc-100 dark:focus-visible:outline-zinc-500"
+        checked={value}
+        onChange={(event) => onChange(event.currentTarget.checked)}
+      />
+      followFocus
+    </label>
+  )
+}
+
+function ItemClickActionControl({
+  value,
+  onChange,
+}: {
+  value: TreeviewDemoState['itemClickAction']
+  onChange: (value: TreeviewDemoState['itemClickAction']) => void
+}) {
+  return (
+    <label className="grid gap-1 text-xs text-zinc-600 dark:text-zinc-400">
+      itemClickAction
+      <select className={selectClass} value={value} onChange={(event) => onChange(parseItemClickAction(event.currentTarget.value))}>
+        <option value="select">select</option>
+        <option value="toggleExpand">toggleExpand</option>
+        <option value="none">none</option>
+      </select>
+    </label>
+  )
+}
+
+function FocusStrategyControl({
+  value,
+  onChange,
+}: {
+  value: TreeviewDemoState['focusStrategy']
+  onChange: (value: TreeviewDemoState['focusStrategy']) => void
+}) {
+  return (
+    <label className="grid gap-1 text-xs text-zinc-600 dark:text-zinc-400">
+      focusStrategy
+      <select className={selectClass} value={value} onChange={(event) => onChange(parseFocusStrategy(event.currentTarget.value))}>
+        <option value="rovingTabIndex">rovingTabIndex</option>
+        <option value="ariaActiveDescendant">ariaActiveDescendant</option>
+      </select>
+    </label>
+  )
 }
 
 function parseInspectMode(value: string): TreeviewDemoState['inspectMode'] {
