@@ -1,5 +1,6 @@
 import type { HTMLAttributes } from 'react'
 import { useMenubarPattern, type PatternData, type PatternEvent } from '../../../../src'
+import { cx, ds } from '../../shared/designSystem'
 import { Icon } from '../../shared/Icon'
 import type { MenuProps } from './menuTypes'
 
@@ -28,7 +29,7 @@ function RootMenuItem({ item }: { item: ReturnType<typeof useMenubarPattern>['ro
     <button
       type="button"
       {...item.itemProps}
-      className="h-8 rounded-[4px] px-2.5 text-sm font-medium text-zinc-800 outline-none transition hover:bg-white/70 aria-disabled:text-zinc-400 aria-expanded:bg-white aria-expanded:text-zinc-950 aria-expanded:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:text-zinc-200 dark:hover:bg-white/[0.06] dark:aria-disabled:text-zinc-600 dark:aria-expanded:bg-zinc-100 dark:aria-expanded:text-zinc-950 dark:focus-visible:outline-zinc-500"
+      className={cx(ds.option, ds.expandable, 'h-8 rounded-[4px] px-2.5 text-sm')}
     >
       {item.label}
       {item.hasChildren ? <Icon name="chevron-right" className={`ml-1 text-xs text-zinc-500 ${item.expanded ? 'rotate-90' : ''}`} /> : null}
@@ -121,7 +122,7 @@ function SubmenuItem({ itemKey, data, active, radioGroup, onEvent, onClose }: { 
         event.preventDefault()
         activate()
       }
-    }} className="cursor-default rounded-[4px] px-2.5 py-1.5 text-zinc-800 outline-none transition hover:bg-zinc-100/80 aria-disabled:text-zinc-400 data-[active]:bg-zinc-100/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:text-zinc-200 dark:hover:bg-white/[0.06] dark:aria-disabled:text-zinc-600 dark:data-[active]:bg-white/[0.07] dark:focus-visible:outline-zinc-500">
+    }} className={cx(ds.listOption, ds.checkable, 'cursor-default rounded-[4px]')}>
       <span className="mr-2 inline-grid w-4 place-items-center text-xs text-zinc-500">
         {role === 'menuitemcheckbox' ? <Icon name={checked ? 'square-check' : 'square'} /> : null}
         {role === 'menuitemradio' ? <Icon name="circle-dot" className={checked ? '' : 'opacity-0'} /> : null}
