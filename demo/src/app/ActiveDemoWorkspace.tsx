@@ -1,11 +1,12 @@
-import { useEffect, useReducer, useRef, useState } from 'react'
+import { useEffect } from 'react'
 import { useDemoPattern } from '../shared/demoPatterns'
-import { Icon, type IconName } from '../shared/Icon'
+import { Icon } from '../shared/Icon'
 import type { SourceName } from '../shared/sources'
 import { SourceTabs, useSourceTabs } from './SourceTabs'
 import { defaultAppState, readInitialAppState, rightModeLabels, rightModes, type AppAction, type AppState, writeAppHash } from './appState'
 import { formatEvent } from './eventLog'
-import { isCopyableSource, loadSourcePreview } from './sourcePreview'
+import { ShortcutIndicator } from './ShortcutIndicator'
+import { useSourcePreviewState } from './useSourcePreviewState'
 import { VariantRouteProvider } from '../shared/variantRoute'
 import { cx, ds } from '../shared/designSystem'
 
@@ -17,13 +18,6 @@ const preClass = ds.dataBlock
 const sourcePreClass = ds.codeBlock
 const optionButtonClass = cx('inline-flex h-8 items-center', ds.option)
 
-type SourcePreviewState = {
-  name: SourceName
-  text: string
-}
-
-const sourcePreviewCache = new Map<SourceName, string>()
-
 export function ActiveDemoWorkspace({
   state,
   dispatch,
@@ -34,19 +28,10 @@ export function ActiveDemoWorkspace({
   const activeDemo = useDemoPattern(state.patternKey, (event) => dispatch({ type: 'recordEvent', event }))
   const sourceNames = activeDemo.sourceNames
   const activeSourceName = sourceNames.includes(state.sourceName as SourceName) ? state.sourceName as SourceName : sourceNames[0]
-  const [sourcePreview, setSourcePreview] = useState<SourcePreviewState>(() => ({
-    name: activeSourceName,
-    text: sourcePreviewCache.get(activeSourceName) ?? 'loading',
-  }))
-  const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle')
-  const copyRequestId = useRef(0)
   const sourceTabs = useSourceTabs({ label: 'source files', tabs: sourceNames, value: activeSourceName, onChange: (sourceName) => dispatch({ type: 'selectSource', sourceName }) })
   const rightModeTabs = useSourceTabs({ label: 'right panel', tabs: rightModes, value: state.rightMode, onChange: (rightMode) => dispatch({ type: 'selectRightMode', rightMode }) })
   const eventLog = state.events.map(formatEvent).join('\n') || 'none'
-  const source = sourcePreview.text
-  const sourceLoadedForActiveTab = sourcePreview.name === activeSourceName
-  const displayedSource = sourceLoadedForActiveTab ? source : 'loading'
-  const canCopySource = isCopyableSource(displayedSource)
+  const { canCopySource, copySource, copyState, displayedSource } = useSourcePreviewState(activeSourceName)
   const previewKeyboardShortcuts = activeDemo.keyboardShortcuts.join(' ') || undefined
 
   useEffect(() => {
@@ -67,38 +52,6 @@ export function ActiveDemoWorkspace({
     window.addEventListener('hashchange', restoreFromHash)
     return () => window.removeEventListener('hashchange', restoreFromHash)
   }, [])
-
-  useEffect(() => {
-    let cancelled = false
-    copyRequestId.current += 1
-    setCopyState('idle')
-    const cachedSource = sourcePreviewCache.get(activeSourceName)
-    if (cachedSource) setSourcePreview({ name: activeSourceName, text: cachedSource })
-    loadSourcePreview(activeSourceName).then((nextSource) => {
-      if (cancelled) return
-      sourcePreviewCache.set(activeSourceName, nextSource)
-      setSourcePreview({ name: activeSourceName, text: nextSource })
-    })
-    return () => {
-      copyRequestId.current += 1
-      cancelled = true
-    }
-  }, [activeSourceName])
-
-  useEffect(() => {
-    if (copyState === 'idle') return
-    const timer = window.setTimeout(() => setCopyState('idle'), 1200)
-    return () => window.clearTimeout(timer)
-  }, [copyState])
-
-  const copySource = () => {
-    if (!canCopySource) return
-    const requestId = copyRequestId.current + 1
-    copyRequestId.current = requestId
-    void copyText(displayedSource).then((copied) => {
-      if (copied && copyRequestId.current === requestId) setCopyState('copied')
-    })
-  }
 
   return (
     <VariantRouteProvider patternKey={activeDemo.key}>
@@ -192,36 +145,4 @@ export function ActiveDemoWorkspace({
       ) : null}
     </VariantRouteProvider>
   )
-}
-
-const shortcutIconByToken: Partial<Record<string, IconName>> = {
-  ArrowDown: 'arrow-down',
-  ArrowLeft: 'arrow-left',
-  ArrowRight: 'arrow-right',
-  ArrowUp: 'arrow-up',
-}
-
-function ShortcutIndicator({ shortcut }: { shortcut: string }) {
-  return (
-    <>
-      {shortcut.split('+').map((token, index) => {
-        const icon = shortcutIconByToken[token]
-        return (
-          <span key={`${shortcut}-${token}-${index}`} className="inline-flex items-center gap-1">
-            {index > 0 ? <Icon name="plus" className="text-[9px] text-zinc-400 dark:text-zinc-600" /> : null}
-            {icon ? <Icon name={icon} className="text-xs" /> : <span>{token}</span>}
-          </span>
-        )
-      })}
-    </>
-  )
-}
-
-async function copyText(value: string): Promise<boolean> {
-  try {
-    await navigator.clipboard?.writeText(value)
-    return Boolean(navigator.clipboard)
-  } catch {
-    return false
-  }
 }

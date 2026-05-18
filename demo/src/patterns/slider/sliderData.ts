@@ -1,16 +1,4 @@
-import { PatternDataSchema, type Key, type PatternData, type PatternEvent, type PatternItem, type PatternOptions, type PatternState } from '../../../../src'
-
-interface SliderDemoItem extends PatternItem {
-  valuemin?: number
-  valuemax?: number
-  valuetext?: string
-}
-
-interface SliderDemoState extends PatternState {
-  options?: PatternOptions
-}
-
-type SliderDemoData = PatternData<SliderDemoItem, SliderDemoState>
+import { sliderContract, type Key, type PatternEvent, type SliderData, type SliderOptions } from '../../../../src'
 
 // ── Variant definitions ─────────────────────────────────────────────
 //
@@ -41,8 +29,8 @@ const ratingLabel = (n: number) => ratingLabels[Math.max(0, Math.min(ratingLabel
 const tempLabel = (n: number) => `${n} degrees Celsius`
 
 // ── Color (3 thumbs, independent) ────────────────────────────────
-const colorData = (): SliderDemoData =>
-  PatternDataSchema.parse({
+const colorData = (): SliderData =>
+  sliderContract.parseData({
     items: {
       red: { label: 'Red color value' },
       green: { label: 'Green color value' },
@@ -56,32 +44,32 @@ const colorData = (): SliderDemoData =>
   })
 
 // ── Temperature (vertical, single thumb, valuetext) ──────────────
-const temperatureData = (): SliderDemoData =>
-  PatternDataSchema.parse({
+const temperatureData = (): SliderData =>
+  sliderContract.parseData({
     items: { temp: { label: 'Thermostat', valuetext: tempLabel(21) } },
     relations: { rootKeys: ['temp'] },
     state: { activeKey: 'temp', valueByKey: { temp: 21 } },
   })
 
 // ── Rating (single thumb, valuetext from label table) ────────────
-const ratingData = (): SliderDemoData =>
-  PatternDataSchema.parse({
+const ratingData = (): SliderData =>
+  sliderContract.parseData({
     items: { rating: { label: 'Rate your experience', valuetext: ratingLabel(5) } },
     relations: { rootKeys: ['rating'] },
     state: { activeKey: 'rating', valueByKey: { rating: 5 } },
   })
 
 // ── Seek (media position with mm:ss valuetext) ───────────────────
-const seekData = (): SliderDemoData =>
-  PatternDataSchema.parse({
+const seekData = (): SliderData =>
+  sliderContract.parseData({
     items: { seek: { label: 'Playback position', valuetext: formatTime(45) } },
     relations: { rootKeys: ['seek'] },
     state: { activeKey: 'seek', valueByKey: { seek: 45 } },
   })
 
 // ── Range (two thumbs with mutual constraint) ────────────────────
-const rangeData = (): SliderDemoData =>
-  PatternDataSchema.parse({
+const rangeData = (): SliderData =>
+  sliderContract.parseData({
     items: {
       min: { label: 'Minimum price', valuemin: 0, valuemax: 200 },
       max: { label: 'Maximum price', valuemin: 200, valuemax: 500 },
@@ -96,11 +84,11 @@ const rangeData = (): SliderDemoData =>
 export interface SliderVariant {
   key: SliderVariantKey
   label: string
-  data: SliderDemoData
-  options: PatternOptions
+  data: SliderData
+  options: SliderOptions
 }
 
-const withOptions = (data: SliderDemoData, options: PatternOptions): SliderDemoData => ({
+const withOptions = (data: SliderData, options: SliderOptions): SliderData => ({
   ...data,
   state: { ...data.state, options },
 })
@@ -141,12 +129,12 @@ export const sliderVariants: Record<SliderVariantKey, SliderVariant> = {
 export const sliderVariantItems = Object.values(sliderVariants).map((v) => ({ key: v.key, label: v.label }))
 
 // Back-compat exports — test suite uses these (single-thumb volume slider).
-export const initialSliderData: SliderDemoData = PatternDataSchema.parse({
+export const initialSliderData: SliderData = sliderContract.parseData({
   items: { volume: { label: 'Volume' } },
   relations: { rootKeys: ['volume'] },
   state: { activeKey: 'volume', valueByKey: { volume: 50 }, options: { focusStrategy: 'rovingTabIndex', min: 0, max: 100, step: 5, orientation: 'horizontal' } },
 })
-export const sliderOptions: PatternOptions = {
+export const sliderOptions: SliderOptions = {
   focusStrategy: 'rovingTabIndex',
   min: 0,
   max: 100,
@@ -170,12 +158,12 @@ const computeDelta = (direction: unknown, step: number, large: number): number =
   return 0
 }
 
-const itemRange = (data: SliderDemoData, key: Key, fallbackMin: number, fallbackMax: number): [number, number] => {
+const itemRange = (data: SliderData, key: Key, fallbackMin: number, fallbackMax: number): [number, number] => {
   const item = data.items[key]
   return [item?.valuemin ?? fallbackMin, item?.valuemax ?? fallbackMax]
 }
 
-const valuetextFor = (data: SliderDemoData, key: Key, next: number): string | undefined => {
+const valuetextFor = (data: SliderData, key: Key, next: number): string | undefined => {
   // Heuristic: if item already had a valuetext, refresh it using its shape.
   const item = data.items[key]
   if (!item?.valuetext) return undefined
@@ -186,10 +174,10 @@ const valuetextFor = (data: SliderDemoData, key: Key, next: number): string | un
 }
 
 export function reduceSliderData(
-  data: SliderDemoData,
+  data: SliderData,
   event: PatternEvent,
-  options: PatternOptions = sliderOptions,
-): SliderDemoData {
+  options: SliderOptions = sliderOptions,
+): SliderData {
   if (event.type === 'focus' && event.key) {
     return { ...data, state: { ...data.state, activeKey: event.key } }
   }

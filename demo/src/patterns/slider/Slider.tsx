@@ -1,4 +1,4 @@
-import { useSliderPattern, type PatternData, type PatternEvent, type PatternOptions, type ReactSliderRenderItem } from '../../../../src'
+import { useSliderPattern, type PatternEvent, type ReactSliderRenderItem, type SliderData, type SliderOptions } from '../../../../src'
 import { MultiThumbSlider } from './MultiThumbSlider'
 
 const thumbColorClass: Record<string, string> = {
@@ -12,9 +12,9 @@ export function Slider({
   onEvent,
   options,
 }: {
-  data: PatternData
+  data: SliderData
   onEvent: (event: PatternEvent) => void
-  options?: PatternOptions
+  options?: SliderOptions
 }) {
   const slider = useSliderPattern(data, onEvent, options)
   if (slider.renderItems.length === 0) return null

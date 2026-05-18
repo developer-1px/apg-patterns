@@ -1,20 +1,8 @@
 import type { KeyboardEvent, PointerEvent } from 'react'
 import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions, PatternState } from '../../schema'
+import type { Key, PatternEvent } from '../../schema'
 import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
-import { sliderDefinition } from './definition'
-
-interface SliderItem extends PatternItem {
-  valuemin?: number
-  valuemax?: number
-  valuetext?: string
-}
-
-interface SliderState extends PatternState {
-  options?: PatternOptions
-}
-
-type SliderData = PatternData<SliderItem, SliderState>
+import { sliderContract, type SliderData, type SliderOptions } from './contract'
 
 export interface ReactSliderRenderItem {
   key: Key
@@ -44,11 +32,12 @@ export interface ReactSliderRuntime {
   keyToElementId(key: Key): string
 }
 
-export function useSliderPattern(data: SliderData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactSliderRuntime {
-  const runtimeOptions = options ?? data.state?.options ?? {}
+export function useSliderPattern(data: SliderData, onEvent: (event: PatternEvent) => void, options?: SliderOptions): ReactSliderRuntime {
+  const parsedData = sliderContract.parseData(data)
+  const runtimeOptions = sliderContract.parseOptions(options ?? parsedData.state?.options)
   const runtime = createPatternRuntime({
-    definition: sliderDefinition,
-    data,
+    definition: sliderContract.definition,
+    data: parsedData,
     options: runtimeOptions,
     onEvent,
     keyToElementId: (key) => `${runtimeOptions.elementIdPrefix ?? 'slider-'}${key}`,

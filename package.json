@@ -13,10 +13,16 @@
   "license": "MIT",
   "type": "module",
   "sideEffects": [
+    "./src/kernel/kernelAriaSources.ts",
     "./src/kernel/kernelBuiltins.ts",
+    "./src/kernel/kernelNavigationTargets.ts",
+    "./src/kernel/kernelPredicates.ts",
     "./src/patterns/*/definition.ts",
     "./src/patterns/*/navigation.ts",
+    "./dist/kernel/kernelAriaSources.*",
     "./dist/kernel/kernelBuiltins.*",
+    "./dist/kernel/kernelNavigationTargets.*",
+    "./dist/kernel/kernelPredicates.*",
     "./dist/patterns/*/definition.*",
     "./dist/patterns/*/navigation.*"
   ],
