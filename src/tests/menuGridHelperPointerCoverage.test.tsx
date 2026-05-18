@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import '../kernel/kernelBuiltins'
 import { resolveAriaSource, type PatternData, type PatternEvent } from '../index'
 import { createGridEditActions, createGridRuntimeEventHandler } from '../patterns/grid/gridRuntimeEvents'
+import { createMenubarItem } from '../patterns/menu/menubarItem'
 import { resolveMenuButtonKey } from '../patterns/menu/menuButtonKeyboard'
 import '../patterns/menu/menuAriaSources'
 
@@ -54,6 +55,29 @@ function MenuGridHelperHost() {
         type="button"
         onClick={() => {
           const events: PatternEvent[] = []
+          const runtime = {
+            getPartProps: () => ({ role: 'menuitem', onKeyDown: () => events.push({ type: 'activate', key: 'fallback' }) }),
+            keyToElementId: (key: string) => `menubar-${key}`,
+          }
+          const noRootKeys = createMenubarItem({ runtime: runtime as never, data: menuData, key: 'file', rootKeys: [], onEvent: (event) => events.push(event) })
+          const missingKey = createMenubarItem({ runtime: runtime as never, data: menuData, key: 'missing', rootKeys: ['file'], onEvent: (event) => events.push(event) })
+          const fallback = createMenubarItem({ runtime: runtime as never, data: menuData, key: 'edit', rootKeys: ['file', 'edit'], onEvent: (event) => events.push(event) })
+          const eventBase = {
+            preventDefault: () => undefined,
+            stopPropagation: () => undefined,
+          }
+          noRootKeys.itemProps.onKeyDown?.({ ...eventBase, key: 'ArrowRight' } as never)
+          missingKey.itemProps.onKeyDown?.({ ...eventBase, key: 'ArrowLeft' } as never)
+          fallback.itemProps.onKeyDown?.({ ...eventBase, key: 'Escape' } as never)
+          setResult(events.map((event) => `${event.type}:${'key' in event ? event.key ?? '' : ''}`).join('|'))
+        }}
+      >
+        Run menubar item helpers
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          const events: PatternEvent[] = []
           const handle = createGridRuntimeEventHandler({
             data: { items: { name: { label: 'Name' }, value: { label: 'Value' } }, relations: {}, state: {} },
             editableKeys: ['value'],
@@ -86,6 +110,9 @@ describe('menu and grid helper coverage from pointer input', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Resolve menu aria' }))
     expect(screen.getByText('undefined|undefined|undefined|undefined|undefined')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Run menubar item helpers' }))
+    expect(screen.getByText('activate:fallback')).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Run grid helpers' }))
     expect(screen.getByText('editStart:value|editEnd:|editEnd:')).toBeTruthy()
