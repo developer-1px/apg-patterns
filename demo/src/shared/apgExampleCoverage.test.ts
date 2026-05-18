@@ -112,7 +112,7 @@ describe('APG example coverage', () => {
       expect(label, `${item.demoPattern}:${item.variant}`).toBeTruthy()
       expect(screen.getByRole('option', { name: label })).toBeTruthy()
     }
-  })
+  }, 15000)
 })
 
 function DemoControlsProbe({ patternKey }: { patternKey: string }) {

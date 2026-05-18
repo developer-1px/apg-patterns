@@ -1,17 +1,9 @@
-import type { KeyboardEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternDataWithOptions, PatternEvent, PatternOptions } from '../../schema'
-import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { disclosureDefinition } from './definition'
-
-export interface ReactDisclosureItem {
-  key: Key
-  label: string
-  panelKey: Key | null
-  expanded: boolean
-  triggerProps: ReactPatternProps
-  panelProps: ReactPatternProps | null
-}
+import { createDisclosureElementId, createDisclosureItems, createDisclosureTriggerProps, type ReactDisclosureItem } from './disclosureItem'
+export type { ReactDisclosureItem } from './disclosureItem'
 
 export interface ReactDisclosureRuntime {
   triggerKey: Key | null
@@ -47,23 +39,13 @@ export function useDisclosurePattern(data: PatternDataWithOptions, onEvent: (eve
     panelKey,
     expanded: triggerKey ? expandedKeys.includes(triggerKey) : false,
     get triggerProps() {
-      return triggerKey ? createTriggerProps(runtime, triggerKey) : {}
+      return triggerKey ? createDisclosureTriggerProps(runtime, triggerKey) : {}
     },
     get panelProps() {
       return panelKey ? runtime.getItemProps('panel', panelKey) as ReactPatternProps : {}
     },
     get items() {
-      return (data.relations?.rootKeys ?? []).map((key) => {
-        const nextPanelKey = data.relations?.controlsByKey?.[key]?.[0] ?? null
-        return {
-          key,
-          label: data.items[key]?.label ?? key,
-          panelKey: nextPanelKey,
-          expanded: expandedKeys.includes(key),
-          triggerProps: createTriggerProps(runtime, key),
-          panelProps: nextPanelKey ? runtime.getItemProps('panel', nextPanelKey) as ReactPatternProps : null,
-        }
-      })
+      return createDisclosureItems({ runtime, data, expandedKeys })
     },
     state: { expandedKeys },
     get ids() {
@@ -71,17 +53,4 @@ export function useDisclosurePattern(data: PatternDataWithOptions, onEvent: (eve
     },
     keyToElementId: runtime.keyToElementId,
   }
-}
-
-function createTriggerProps(runtime: ReturnType<typeof createPatternRuntime>, key: Key): ReactPatternProps {
-  const { onKeyDown: _onKeyDown, ...props } = runtime.getItemProps('trigger', key) as ReactPatternProps
-  const rootKeyDown = runtime.getRootKeyboardHandler()
-  return {
-    ...props,
-    onKeyDown: (event: KeyboardEvent<HTMLElement>) => rootKeyDown(reactKeyInput(event)),
-  }
-}
-
-function createDisclosureElementId(prefix: string, key: Key) {
-  return `${prefix}${key.toLowerCase().replace(/[^a-z0-9_-]+/g, '-')}`
 }

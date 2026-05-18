@@ -1,4 +1,6 @@
 import { PatternDefinitionSchema } from '../../schema'
+import { carouselParts } from './parts'
+import { carouselTransitions } from './transitions'
 
 export const CarouselDefinitionSchema = PatternDefinitionSchema.superRefine((value, ctx) => {
   if (value.apgPattern !== 'carousel') ctx.addIssue({ code: 'custom', path: ['apgPattern'], message: 'expected "carousel"' })
@@ -14,48 +16,7 @@ export const carouselDefinition = CarouselDefinitionSchema.parse({
   rootRole: 'region',
   containedRoles: ['group', 'button'],
   focusModel: 'rovingTabIndex',
-  parts: {
-    root: {
-      role: 'region',
-      aria: [
-        { attribute: 'aria-roledescription', from: 'options.roledescription' },
-        { attribute: 'aria-label', from: 'refs.label' },
-      ],
-    },
-    slide: {
-      role: 'group',
-      aria: [
-        { attribute: 'aria-roledescription', from: 'options.slideRoledescription' },
-        { attribute: 'aria-labelledby', from: 'relations.ownerByKey' },
-        { attribute: 'aria-hidden', from: 'state.inactiveKey' },
-      ],
-    },
-    prev: {
-      role: 'button',
-      aria: [{ attribute: 'aria-label', from: 'items.label' }],
-      events: [{ event: 'click', events: [{ type: 'navigate', direction: 'previous' }] }],
-    },
-    next: {
-      role: 'button',
-      aria: [{ attribute: 'aria-label', from: 'items.label' }],
-      events: [{ event: 'click', events: [{ type: 'navigate', direction: 'next' }] }],
-    },
-    playPause: {
-      role: 'button',
-      aria: [
-        { attribute: 'aria-label', from: 'items.label' },
-        { attribute: 'aria-pressed', from: 'state.expandedKeys' },
-      ],
-    },
-    picker: {
-      role: 'button',
-      aria: [
-        { attribute: 'aria-label', from: 'items.label' },
-        { attribute: 'aria-pressed', from: 'state.selectedKeys' },
-      ],
-      events: [{ event: 'click', events: [{ type: 'select', key: '$key' }] }],
-    },
-  },
+  parts: carouselParts,
   navigation: {
     visibleOrder: { kind: 'flat' },
     targets: {
@@ -64,13 +25,5 @@ export const carouselDefinition = CarouselDefinitionSchema.parse({
     },
   },
   keyboard: [],
-  transitions: [
-    {
-      on: 'select',
-      actions: [
-        { kind: 'set', field: 'activeKey', value: { from: '$event.extentKey' } },
-        { kind: 'replaceSet', field: 'selectedKeys', values: [{ from: '$event.extentKey' }] },
-      ],
-    },
-  ],
+  transitions: carouselTransitions,
 })

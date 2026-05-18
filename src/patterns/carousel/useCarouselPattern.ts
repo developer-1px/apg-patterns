@@ -1,6 +1,7 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions, PatternStateWithOptions } from '../../schema'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { createCarouselSlides, type ReactCarouselSlide } from './carouselSlide'
 import { carouselDefinition } from './definition'
 
 interface CarouselItem extends PatternItem {
@@ -15,16 +16,7 @@ interface CarouselState extends PatternStateWithOptions {
 
 type CarouselData = PatternData<CarouselItem, CarouselState>
 
-export interface ReactCarouselSlide {
-  key: Key
-  title: string
-  caption: string
-  imageUrl: string | null
-  active: boolean
-  index: number
-  slideProps: ReactPatternProps
-  pickerProps: ReactPatternProps
-}
+export type { ReactCarouselSlide } from './carouselSlide'
 
 export interface ReactCarouselRuntime {
   rootProps: ReactPatternProps
@@ -66,19 +58,7 @@ export function useCarouselPattern(data: CarouselData, onEvent: (event: PatternE
       return runtime.getPartProps('next', 'next') as ReactPatternProps
     },
     get slides() {
-      return slideKeys.map((key, index) => {
-        const item = data.items[key]
-        return {
-          key,
-          title: String(item?.title ?? data.items[key]?.label ?? key),
-          caption: String(item?.caption ?? ''),
-          imageUrl: typeof item?.imageUrl === 'string' ? item.imageUrl : null,
-          active: key === activeKey,
-          index,
-          slideProps: runtime.getPartProps('slide', key) as ReactPatternProps,
-          pickerProps: runtime.getPartProps('picker', key) as ReactPatternProps,
-        }
-      })
+      return createCarouselSlides({ runtime, data, slideKeys, activeKey })
     },
     activeKey,
     showDots: (data.state?.showDots ?? true) === true,

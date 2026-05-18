@@ -1,0 +1,48 @@
+import type { KeyboardEvent } from 'react'
+import { createPatternRuntime } from '../../kernel/patternRuntime'
+import type { Key, PatternDataWithOptions } from '../../schema'
+import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+
+export interface ReactDisclosureItem {
+  key: Key
+  label: string
+  panelKey: Key | null
+  expanded: boolean
+  triggerProps: ReactPatternProps
+  panelProps: ReactPatternProps | null
+}
+
+export function createDisclosureItems({
+  runtime,
+  data,
+  expandedKeys,
+}: {
+  runtime: ReturnType<typeof createPatternRuntime>
+  data: PatternDataWithOptions
+  expandedKeys: readonly Key[]
+}): readonly ReactDisclosureItem[] {
+  return (data.relations?.rootKeys ?? []).map((key) => {
+    const panelKey = data.relations?.controlsByKey?.[key]?.[0] ?? null
+    return {
+      key,
+      label: data.items[key]?.label ?? key,
+      panelKey,
+      expanded: expandedKeys.includes(key),
+      triggerProps: createDisclosureTriggerProps(runtime, key),
+      panelProps: panelKey ? runtime.getItemProps('panel', panelKey) as ReactPatternProps : null,
+    }
+  })
+}
+
+export function createDisclosureTriggerProps(runtime: ReturnType<typeof createPatternRuntime>, key: Key): ReactPatternProps {
+  const { onKeyDown: _onKeyDown, ...props } = runtime.getItemProps('trigger', key) as ReactPatternProps
+  const rootKeyDown = runtime.getRootKeyboardHandler()
+  return {
+    ...props,
+    onKeyDown: (event: KeyboardEvent<HTMLElement>) => rootKeyDown(reactKeyInput(event)),
+  }
+}
+
+export function createDisclosureElementId(prefix: string, key: Key) {
+  return `${prefix}${key.toLowerCase().replace(/[^a-z0-9_-]+/g, '-')}`
+}
