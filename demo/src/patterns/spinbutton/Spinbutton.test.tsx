@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import { PatternDataSchema, type PatternEvent } from '../../../../src'
 import { Spinbutton } from './Spinbutton'
-import { initialSpinbuttonData, reduceSpinbuttonData, spinbuttonOptions, spinbuttonVariants } from './spinbuttonData'
+import { formatTime, initialSpinbuttonData, reduceSpinbuttonData, spinbuttonOptions, spinbuttonVariants } from './spinbuttonData'
 
 function SpinbuttonDemo({ onEvent, variant }: { onEvent?: (event: PatternEvent) => void; variant?: keyof typeof spinbuttonVariants }) {
   const init = variant ? spinbuttonVariants[variant] : { data: initialSpinbuttonData, options: spinbuttonOptions }
@@ -39,12 +39,16 @@ function SpinbuttonReducerEdgesDemo() {
       <button type="button" onClick={() => apply({ type: 'valueStep', key: 'hours', direction: 'decrementLarge' })}>Large decrement</button>
       <button type="button" onClick={() => apply({ type: 'valueStep', key: 'hours', direction: 'unknown' })}>Unknown step</button>
       <button type="button" onClick={() => apply({ type: 'valueStep', key: 'hours', direction: 'incrementLarge' })}>Large increment</button>
+      <button type="button" onClick={() => apply({ type: 'value', key: 'hours', value: 1 })}>Singular hour</button>
       <button type="button" onClick={() => applyFallback({ type: 'valueStep', key: 'loose', direction: 'increment' })}>Fallback range</button>
       <button type="button" onClick={() => apply({ type: 'dismiss' })}>Ignored event</button>
+      <button type="button" onClick={() => apply({ type: 'value', key: 'minutes', value: 1 })}>Singular minute</button>
       <output data-testid="spin-active">{String(data.state?.activeKey ?? '')}</output>
       <output data-testid="spin-hours">{String(data.state?.valueByKey?.hours ?? '')}</output>
       <output data-testid="spin-loose">{String(data.state?.valueByKey?.loose ?? '')}</output>
       <output data-testid="spin-hour-text">{String(data.items.hours?.valuetext ?? '')}</output>
+      <output data-testid="spin-minute-text">{String(data.items.minutes?.valuetext ?? '')}</output>
+      <output data-testid="spin-time">{formatTime(3, 4)}</output>
     </div>
   )
 }
@@ -192,6 +196,13 @@ describe('Spinbutton — time picker variant', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Large increment' }))
     expect(screen.getByTestId('spin-hours').textContent).toBe('9')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Singular hour' }))
+    expect(screen.getByTestId('spin-hour-text').textContent).toBe('1 hour')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Singular minute' }))
+    expect(screen.getByTestId('spin-minute-text').textContent).toBe('1 minute')
+    expect(screen.getByTestId('spin-time').textContent).toBe('03:04')
 
     fireEvent.click(screen.getByRole('button', { name: 'Fallback range' }))
     expect(screen.getByTestId('spin-loose').textContent).toBe('1')

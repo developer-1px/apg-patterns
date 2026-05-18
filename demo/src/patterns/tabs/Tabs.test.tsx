@@ -19,6 +19,19 @@ function TabsDemo({ variant, onEvent: onEventOuter }: { variant: TabsVariantKey;
   return <Tabs data={data} onEvent={handleEvent} />
 }
 
+function TabsReducerEdgesDemo() {
+  const [data, setData] = useState<PatternData>(tabsVariants.closeable.data)
+  return (
+    <div>
+      <button type="button" onClick={() => setData((current) => closeTabInData({ ...current, relations: { ...current.relations, rootKeys: ['inbox'] } }, 'inbox'))}>Close sole tab</button>
+      <button type="button" onClick={() => setData((current) => closeTabInData(current, 'missing'))}>Close missing tab</button>
+      <button type="button" onClick={() => setData((current) => closeTabInData({ ...current, relations: { ...current.relations, controlsByKey: {} } }, 'inbox'))}>Close without panel</button>
+      <output data-testid="tabs-root-keys">{data.relations?.rootKeys?.join(',')}</output>
+      <output data-testid="tabs-selected">{data.state?.selectedKeys?.join(',')}</output>
+    </div>
+  )
+}
+
 describe('Tabs demo — automatic activation', () => {
   it('does not autofocus the active tab on mount', () => {
     render(<TabsDemo variant="automatic" />)
@@ -145,5 +158,19 @@ describe('Tabs demo — closeable', () => {
     act(() => { fireEvent.click(closeBtn) })
     expect(screen.getAllByRole('tab')).toHaveLength(initialCount - 1)
     expect(screen.queryByRole('tab', { name: 'Drafts' })).toBeNull()
+  })
+
+  it('covers closeTabInData edge cases from pointer controls', () => {
+    render(<TabsReducerEdgesDemo />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close sole tab' }))
+    expect(screen.getByTestId('tabs-root-keys').textContent).toBe('inbox')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close missing tab' }))
+    expect(screen.getByTestId('tabs-root-keys').textContent).toBe('inbox')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close without panel' }))
+    expect(screen.getByTestId('tabs-root-keys').textContent).toBe('inbox')
+    expect(screen.getByTestId('tabs-selected').textContent).toBe('inbox')
   })
 })
