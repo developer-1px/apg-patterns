@@ -1,5 +1,4 @@
-import { createTypeaheadBuffer, matchesShortcut, type KeyInput, type TypeaheadBuffer } from '@interactive-os/keyboard'
-import { findTypeaheadMatch } from '@interactive-os/collection-navigation'
+import { createTypeaheadBuffer, type KeyInput, type TypeaheadBuffer } from '@interactive-os/keyboard'
 import {
   PatternDataSchema,
   PatternEventSchema,
@@ -13,12 +12,12 @@ import {
 import { treeviewDefinition } from './definition'
 import {
   createParentByKey,
-  evaluatePredicate,
   resolveEventTemplate,
   resolveNavigationTarget,
-  resolveVisibleOrder,
 } from '../../kernel/patternKernel'
 import { createPatternRuntime, type CreatePatternRuntimeInput } from '../../kernel/patternRuntime'
+import { resolveTreeKeyboardBinding, type ResolvedKeyboardBinding } from './keyboardBinding'
+import { resolveTreeviewVisibleKeys, resolveTypeaheadTarget } from './typeahead'
 
 export type TreeviewSlotProps = Record<string, unknown>
 export type TreeviewRenderState = Record<'active' | 'selected' | 'disabled' | 'expanded', boolean> & {
@@ -113,7 +112,7 @@ export function createTreeviewRuntime(input: CreateTreeviewRuntimeInput): Treevi
     data,
     options,
     get items() {
-      return getVisibleKeys(data).map((key) => ({
+      return resolveTreeviewVisibleKeys(data).map((key) => ({
         key,
         state: getTreeItemState(data, key),
         slotProps: { treeitem: getTreeItemProps(key), indicator: getIndicatorProps(key) },
@@ -141,10 +140,6 @@ function withNonEnumerableMeta(event: PatternEvent): PatternEvent {
   return next
 }
 
-function getVisibleKeys(data: PatternData): readonly Key[] {
-  return resolveVisibleOrder(treeviewDefinition.navigation.visibleOrder, data)
-}
-
 export function getTreeItemState(data: PatternData, key: Key): TreeviewRenderState {
   const runtime = createPatternRuntime({
     definition: treeviewDefinition,
@@ -162,32 +157,14 @@ export function getTreeItemState(data: PatternData, key: Key): TreeviewRenderSta
   return out
 }
 
-export interface ResolvedKeyboardBinding {
-  preventDefault: boolean
-  events: readonly PatternEvent[]
-}
-
-export function resolveTreeKeyboardBinding(
+export function resolveTreeviewKeyboardBinding(
   input: KeyInput,
   activeKey: Key,
   data: PatternData,
   options: PatternOptions = defaultOptions,
   keyboard: readonly KeyboardBinding[] = treeviewDefinition.keyboard,
 ): ResolvedKeyboardBinding | null {
-  for (const binding of keyboard) {
-    if (!matchesShortcut(input, binding.shortcut)) continue
-    for (const item of binding.cases) {
-      if (item.case === 'otherwise' || item.case === 'always' || evaluatePredicate(item.when, { data, options, activeKey })) {
-        return {
-          preventDefault: binding.preventDefault ?? false,
-          events: item.events.flatMap((template) => resolveEventTemplate(template, activeKey, data)),
-        }
-      }
-    }
-    continue
-  }
-
-  return null
+  return resolveTreeKeyboardBinding({ input, activeKey, data, options, keyboard })
 }
 
 // 호환용 re-export — 기존 import 경로 유지
@@ -205,19 +182,7 @@ export function resolveTreeviewNavigationTarget(
     activeKey,
     data,
     parentByKey,
-    visibleKeys: getVisibleKeys(data),
+    visibleKeys: resolveTreeviewVisibleKeys(data),
   })
 }
-
-export function resolveTypeaheadTarget(query: string | null, data: PatternData, options: PatternOptions = defaultOptions): Key | null {
-  if (options.typeaheadEnabled === false) return null
-  if (!query) return null
-
-  return findTypeaheadMatch(
-    getVisibleKeys(data).map((key) => ({
-      item: key,
-      label: data.state?.typeaheadTextByKey?.[key] ?? data.items[key]?.textValue ?? data.items[key]?.label ?? key,
-    })),
-    query,
-  )
-}
+export { resolveTypeaheadTarget, resolveTreeviewVisibleKeys } from './typeahead'
