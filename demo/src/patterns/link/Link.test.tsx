@@ -1,12 +1,34 @@
 import { fireEvent, render, screen } from '@testing-library/react'
+import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import type { PatternEvent } from '../../../../src'
+import { useLinkPattern, type PatternData, type PatternEvent } from '../../../../src'
 import { Link } from './Link'
 import { initialAnchorLinkData, initialSpanLinkData } from './linkData'
 
 const linkHref = (data: typeof initialAnchorLinkData | typeof initialSpanLinkData) => {
   const key = data.relations?.rootKeys?.[0]!
   return String((data.items[key] as { href?: unknown }).href)
+}
+
+function LinkActionsDemo({ empty = false }: { empty?: boolean }) {
+  const [events, setEvents] = useState(0)
+  const data: PatternData = empty ? { items: {}, relations: { rootKeys: [] }, state: {} } : initialAnchorLinkData
+  const link = useLinkPattern(data, (event) => {
+    if (event.type === 'activate') setEvents((current) => current + 1)
+  })
+
+  return (
+    <div>
+      <button type="button" onClick={() => link.actions.activate()}>Activate action</button>
+      <output data-testid="link-key">{String(link.key ?? '')}</output>
+      <output data-testid="link-label">{link.label}</output>
+      <output data-testid="link-href">{link.href}</output>
+      <output data-testid="link-variant">{link.variant}</output>
+      <output data-testid="link-active">{String(link.state.active)}</output>
+      <output data-testid="link-events">{String(events)}</output>
+      <output data-testid="link-id">{empty ? '' : link.ids.forKey('home')}</output>
+    </div>
+  )
 }
 
 describe('Link demo (anchor)', () => {
@@ -64,6 +86,32 @@ describe('Link demo (anchor)', () => {
     expect(link.getAttribute('aria-disabled')).toBe('true')
     fireEvent.click(link)
     expect(onEvent).toHaveBeenCalledWith({ type: 'activate', key: 'home' })
+  })
+
+  it('imperative action emits activate from pointer control', () => {
+    render(<LinkActionsDemo />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Activate action' }))
+
+    expect(screen.getByTestId('link-key').textContent).toBe('home')
+    expect(screen.getByTestId('link-label').textContent).toBe('WAI-ARIA Authoring Practices')
+    expect(screen.getByTestId('link-href').textContent).toBe('https://www.w3.org/WAI/ARIA/apg/')
+    expect(screen.getByTestId('link-variant').textContent).toBe('anchor')
+    expect(screen.getByTestId('link-active').textContent).toBe('true')
+    expect(screen.getByTestId('link-events').textContent).toBe('1')
+    expect(screen.getByTestId('link-id').textContent).toContain('link-home')
+  })
+
+  it('imperative action is harmless without a root key', () => {
+    render(<LinkActionsDemo empty />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Activate action' }))
+
+    expect(screen.getByTestId('link-key').textContent).toBe('')
+    expect(screen.getByTestId('link-label').textContent).toBe('')
+    expect(screen.getByTestId('link-href').textContent).toBe('#')
+    expect(screen.getByTestId('link-variant').textContent).toBe('anchor')
+    expect(screen.getByTestId('link-events').textContent).toBe('0')
   })
 })
 

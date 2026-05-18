@@ -229,6 +229,42 @@ describe('createReproRecorder', () => {
     expect(recording.text).toContain('region "Help"')
     expect(recording.text).toContain('button "Hint"')
   })
+
+  it('formats standalone state, route, and console entries before input', async () => {
+    document.body.innerHTML = `
+      <div data-demo-preview="button">
+        <button id="action">Action</button>
+      </div>
+    `
+    const action = document.getElementById('action') as HTMLButtonElement
+    vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    const recorder = createReproRecorder()
+
+    recorder.start()
+    window.dispatchEvent(new CustomEvent('apg-pattern-event', {
+      detail: {
+        event: { type: 'sort', key: 'action', sort: 'ascending' },
+        patternKey: 'button',
+        rightMode: 'log',
+      },
+    }))
+    history.pushState(null, '', '#standalone')
+    console.error('standalone error')
+
+    fireEvent.click(action)
+    window.dispatchEvent(new CustomEvent('apg-pattern-event', {
+      detail: { event: { type: 'editStart', key: 'action' } },
+    }))
+    await nextFrame()
+
+    const recording = recorder.stop()
+
+    expect(recording.text).toContain('sort: no diff (button / events)')
+    expect(recording.text).toContain('route pushState:')
+    expect(recording.text).toContain('error: standalone error')
+    expect(recording.text).toContain('click -> button#action "Action"')
+    expect(recording.text).toContain('-> editStart: no diff')
+  })
 })
 
 function nextFrame(): Promise<void> {
