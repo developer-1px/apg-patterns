@@ -20,7 +20,6 @@ const spinbuttonDemoDefinition = {
     hooks: ['spinbutton/useSpinbuttonPattern.ts'],
     data: ['spinbuttonData.ts'],
     definition: 'spinbutton/definition.ts',
-    extra: ['spinbutton/keyboard.ts', 'spinbutton/parts.ts', 'spinbutton/spinbuttonActions.ts', 'spinbutton/spinbuttonProps.ts', 'spinbutton/spinbuttonRenderItem.ts', 'spinbutton/spinbuttonRuntimeState.ts'],
   },
   controls: {
     kind: 'listbox',

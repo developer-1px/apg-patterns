@@ -22,7 +22,6 @@ const alertDemoDefinition = {
     data: ['alertData.ts'],
     hooks: ['alert/useAlertPattern.ts'],
     definition: 'alert/definition.ts',
-    extra: ['alert/alertActions.ts', 'alert/alertProps.ts', 'alert/alertRuntimeState.ts', 'alert/keyboard.ts', 'alert/parts.ts'],
   },
   view: {
     kind: 'component',

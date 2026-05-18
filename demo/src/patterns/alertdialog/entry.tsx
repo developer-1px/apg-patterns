@@ -14,13 +14,6 @@ const alertDialogDemoDefinition = {
     data: ['alertdialogData.ts'],
     hooks: ['alertdialog/useAlertDialogPattern.ts'],
     definition: 'alertdialog/definition.ts',
-    extra: [
-      'alertdialog/alertDialogProps.ts',
-      'alertdialog/effects.ts',
-      'alertdialog/keyboard.ts',
-      'alertdialog/parts.ts',
-      'alertdialog/transitions.ts',
-    ],
   },
   view: {
     kind: 'component',

@@ -26,9 +26,8 @@ const treeviewDemoDefinition = {
     entry: 'treeview/entry.tsx',
     data: ['treeVariants.ts'],
     hooks: ['treeview/useTreeviewPattern.ts'],
-    runtime: ['treeview/runtime.ts', 'treeview/defaultOptions.ts', 'treeview/navigation.ts', 'treeview/typeahead.ts', 'treeview/keyboard.ts', 'treeview/keyboardBinding.ts', 'treeview/adaptTreeviewProps.ts', 'treeview/adaptTreeviewRuntime.ts', 'treeview/createTreeviewRenderItems.ts', 'treeview/renderItem.ts', 'treeview/treeProps.ts', 'treeview/react.ts', 'treeview/treeviewReactActions.ts', 'treeview/treeviewReactState.ts', 'treeview/runtimeCompatibility.ts', 'treeview/parts.ts', 'treeview/eventMeta.ts'],
     definition: 'treeview/definition.ts',
-    extra: ['treeContract.ts', 'treeview/inspect.ts', 'treeview/renderState.ts'],
+    extra: ['treeContract.ts'],
   },
   controls: {
     kind: 'stack',

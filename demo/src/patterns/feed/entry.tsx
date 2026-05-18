@@ -14,7 +14,6 @@ const feedDemoDefinition = {
     hooks: ['feed/useFeedPattern.ts'],
     data: ['feedData.ts'],
     definition: 'feed/definition.ts',
-    extra: ['feed/effects.ts', 'feed/feedArticle.ts', 'feed/keyboard.ts', 'feed/parts.ts'],
   },
   view: {
     kind: 'component',

@@ -14,7 +14,6 @@ const carouselDemoDefinition = {
     hooks: ['carousel/useCarouselPattern.ts'],
     data: ['carouselData.ts'],
     definition: 'carousel/definition.ts',
-    extra: ['carousel/carouselRuntimeState.ts', 'carousel/carouselSlide.ts', 'carousel/parts.ts', 'carousel/transitions.ts'],
   },
   controls: {
     kind: 'listbox',

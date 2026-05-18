@@ -12,7 +12,6 @@ const windowSplitterDemoDefinition = {
     hooks: ['windowsplitter/useWindowSplitterPattern.ts'],
     data: ['windowsplitterData.ts'],
     definition: 'windowsplitter/definition.ts',
-    extra: ['windowsplitter/keyboard.ts', 'windowsplitter/parts.ts', 'windowsplitter/windowSplitterActions.ts', 'windowsplitter/windowSplitterSeparatorProps.ts', 'windowsplitter/windowSplitterState.ts'],
   },
   view: {
     kind: 'component',
