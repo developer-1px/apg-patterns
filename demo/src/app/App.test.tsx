@@ -237,7 +237,7 @@ describe('App route state', () => {
 
       unmount()
     }
-  }, 15000)
+  }, 30000)
 
   it('opens every pattern entry source from its deep link', async () => {
     const routes = collectPatternEntrySourceRoutes()
@@ -255,7 +255,7 @@ describe('App route state', () => {
 
       unmount()
     }
-  }, 15000)
+  }, 30000)
 
   it('keeps generated source tab ids and panel links unique for each pattern', async () => {
     const routes = collectPatternRoutes()

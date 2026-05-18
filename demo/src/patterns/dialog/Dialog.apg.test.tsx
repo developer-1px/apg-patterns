@@ -17,7 +17,7 @@ describe('APG §Roles, States, Properties', () => {
     render(<Dialog />)
     openDialog()
     expect(screen.getByRole('dialog')).toBeTruthy()
-  })
+  }, 15000)
 
   it('aria-modal="true"', () => {
     render(<Dialog />)

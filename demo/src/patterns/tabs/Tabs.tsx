@@ -1,5 +1,6 @@
 import type { HTMLAttributes } from 'react'
 import { useTabsPattern, type PatternData, type PatternEvent, type PatternItem, type PatternOptions, type PatternStateWithOptions } from '../../../../src'
+import { cx, ds } from '../../shared/designSystem'
 import { Icon } from '../../shared/Icon'
 
 type Props = HTMLAttributes<HTMLElement>
@@ -40,10 +41,10 @@ export function Tabs({
     ? 'flex flex-col gap-1 rounded-xl bg-zinc-100/70 p-1 dark:bg-white/[0.045]'
     : 'flex gap-1 overflow-x-auto rounded-xl bg-zinc-100/70 p-1 dark:bg-white/[0.045]'
   const tabClass = isVertical
-    ? 'h-8 rounded-lg px-3 text-left text-sm font-medium text-zinc-600 outline-none transition hover:bg-white/70 aria-selected:bg-white aria-selected:text-zinc-950 aria-selected:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 data-[focus-visible]:outline data-[focus-visible]:outline-2 data-[focus-visible]:outline-offset-2 data-[focus-visible]:outline-zinc-400 dark:text-zinc-400 dark:hover:bg-white/[0.06] dark:aria-selected:bg-zinc-100 dark:aria-selected:text-zinc-950 dark:focus-visible:outline-zinc-500 dark:data-[focus-visible]:outline-zinc-500'
-    : 'h-8 shrink-0 rounded-lg px-3 text-sm font-medium text-zinc-600 outline-none transition hover:bg-white/70 aria-selected:bg-white aria-selected:text-zinc-950 aria-selected:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 data-[focus-visible]:outline data-[focus-visible]:outline-2 data-[focus-visible]:outline-offset-2 data-[focus-visible]:outline-zinc-400 dark:text-zinc-400 dark:hover:bg-white/[0.06] dark:aria-selected:bg-zinc-100 dark:aria-selected:text-zinc-950 dark:focus-visible:outline-zinc-500 dark:data-[focus-visible]:outline-zinc-500'
+    ? cx(ds.option, 'h-8 px-3 text-sm')
+    : cx(ds.option, 'h-8 shrink-0 px-3 text-sm')
   const panelClass = scrollable
-    ? 'max-h-48 overflow-auto rounded-xl bg-zinc-100/70 p-3 text-sm leading-relaxed text-zinc-700 shadow-inner shadow-zinc-200/50 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.045] dark:text-zinc-300 dark:shadow-black/10 dark:focus-visible:outline-zinc-500'
+    ? cx('max-h-48 overflow-auto rounded-xl bg-zinc-100/70 p-3 text-sm leading-relaxed text-zinc-700 shadow-inner shadow-zinc-200/50 dark:bg-white/[0.045] dark:text-zinc-300 dark:shadow-black/10', ds.focusRing)
     : 'min-h-32 rounded-xl bg-zinc-100/70 p-3 text-sm leading-relaxed text-zinc-700 shadow-inner shadow-zinc-200/50 outline-none dark:bg-white/[0.045] dark:text-zinc-300 dark:shadow-black/10'
 
   return (
@@ -66,7 +67,7 @@ export function Tabs({
                       event.stopPropagation()
                       onEvent({ type: 'close', key })
                     }}
-                    className="ml-1 grid size-5 place-items-center rounded-lg text-xs text-zinc-500 transition hover:bg-white/70 dark:text-zinc-400 dark:hover:bg-white/[0.06]"
+                    className={cx(ds.iconButton, 'ml-1 size-5 bg-transparent shadow-none')}
                   >
                     <Icon name="x" />
                   </button>

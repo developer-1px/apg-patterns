@@ -2,6 +2,14 @@
 
 @config "../../tailwind.config.ts";
 
+@custom-variant ui-focus (&:focus-visible, &[data-focus-visible]);
+@custom-variant ui-active (&:active, &[data-active]);
+@custom-variant ui-selected (&[aria-selected="true"], &[data-selected]);
+@custom-variant ui-checked (&[aria-checked="true"], &[data-checked]);
+@custom-variant ui-pressed (&[aria-pressed="true"], &[data-pressed]);
+@custom-variant ui-expanded (&[aria-expanded="true"], &[data-expanded]);
+@custom-variant ui-disabled (&:disabled, &[aria-disabled="true"], &[data-disabled]);
+
 @layer base {
   html {
     color-scheme: light dark;
