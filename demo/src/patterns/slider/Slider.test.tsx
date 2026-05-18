@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import type { PatternEvent } from '../../../../src'
+import { PatternDataSchema, type PatternEvent } from '../../../../src'
 import { Slider } from './Slider'
 import { initialSliderData, reduceSliderData, sliderOptions, sliderVariants } from './sliderData'
 
@@ -16,6 +16,13 @@ function SliderDemo({ onEvent, variant }: { onEvent?: (event: PatternEvent) => v
 }
 
 describe('Slider demo — back-compat (single thumb volume)', () => {
+  it('renders nothing when no slider thumb is present', () => {
+    const emptyData = PatternDataSchema.parse({ items: {}, relations: { rootKeys: [] }, state: {} })
+    render(<Slider data={emptyData} onEvent={() => undefined} />)
+
+    expect(screen.queryByRole('slider')).toBeNull()
+  })
+
   it('updates value from keyboard events', () => {
     render(<SliderDemo />)
 
@@ -34,6 +41,16 @@ describe('Slider demo — back-compat (single thumb volume)', () => {
 
     expect(screen.getByRole('slider').getAttribute('aria-valuenow')).toBe('75')
     expect(screen.getByText('75')).toBeTruthy()
+  })
+
+  it('ignores horizontal pointer move unless dragging', () => {
+    render(<SliderDemo />)
+    const track = screen.getByRole('slider').querySelector('.relative') as HTMLElement
+    track.getBoundingClientRect = () => ({ x: 0, y: 0, left: 0, top: 0, right: 200, bottom: 8, width: 200, height: 8, toJSON: () => ({}) })
+
+    fireEvent.pointerMove(track, { clientX: 180, buttons: 0, pointerId: 1 })
+
+    expect(screen.getByRole('slider').getAttribute('aria-valuenow')).toBe('50')
   })
 
   it('Home/End jump to min/max', () => {
@@ -92,6 +109,22 @@ describe('Slider demo — variant: Vertical Temperature', () => {
     fireEvent.keyDown(slider, { key: 'ArrowUp', code: 'ArrowUp' })
     expect(slider.getAttribute('aria-valuenow')).toBe('22')
     expect(slider.getAttribute('aria-valuetext')).toContain('22')
+  })
+
+  it('updates vertical value from pointer drag only while pressed', () => {
+    render(<SliderDemo variant="temperature" />)
+    const slider = screen.getByRole('slider')
+    const track = screen.getByTestId('slider-track-temp')
+    track.getBoundingClientRect = () => ({ x: 0, y: 0, left: 0, top: 0, right: 8, bottom: 200, width: 8, height: 200, toJSON: () => ({}) })
+
+    fireEvent.pointerMove(track, { clientY: 20, buttons: 0, pointerId: 1 })
+    expect(slider.getAttribute('aria-valuenow')).toBe('21')
+
+    fireEvent.pointerDown(track, { clientY: 50, pointerId: 1 })
+    expect(Number(slider.getAttribute('aria-valuenow'))).toBeGreaterThan(20)
+
+    fireEvent.pointerMove(track, { clientY: 150, buttons: 1, pointerId: 1 })
+    expect(Number(slider.getAttribute('aria-valuenow'))).toBeLessThan(20)
   })
 })
 

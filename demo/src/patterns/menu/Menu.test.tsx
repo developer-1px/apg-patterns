@@ -86,6 +86,28 @@ describe('Menu — editorMenubar', () => {
     expect(file.getAttribute('aria-expanded')).toBe('false')
   })
 
+  it('submenu Home/End and horizontal arrows move within and across open submenus', () => {
+    render(<MenuDemo variant="editorMenubar" />)
+    const [file] = screen.getAllByRole('menuitem')
+
+    fireEvent.keyDown(file!, { key: 'ArrowDown' })
+    const menu = screen.getByRole('menu')
+
+    fireEvent.keyDown(menu, { key: 'End' })
+    expect(screen.getByRole('menuitem', { name: 'Close' }).getAttribute('tabindex')).toBe('0')
+
+    fireEvent.keyDown(menu, { key: 'Home' })
+    expect(screen.getByRole('menuitem', { name: 'New' }).getAttribute('tabindex')).toBe('0')
+
+    fireEvent.keyDown(menu, { key: 'ArrowRight' })
+    expect(screen.getByRole('menuitem', { name: 'Edit' }).getAttribute('aria-expanded')).toBe('true')
+    expect(screen.getByRole('menuitem', { name: 'Undo' }).getAttribute('tabindex')).toBe('0')
+
+    fireEvent.keyDown(screen.getByRole('menu'), { key: 'ArrowLeft' })
+    expect(screen.getByRole('menuitem', { name: 'File' }).getAttribute('aria-expanded')).toBe('true')
+    expect(screen.getByRole('menuitem', { name: 'New' }).getAttribute('tabindex')).toBe('0')
+  })
+
   it('first-character typeahead jumps to matching root', () => {
     render(<MenuDemo variant="editorMenubar" />)
     const [file, , view] = screen.getAllByRole('menuitem')

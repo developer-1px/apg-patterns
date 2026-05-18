@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
+import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { createPatternRuntime, type PatternData, type PatternDefinition, type PatternEvent } from '../index'
+import { createPatternRuntime, reducePatternData, type PatternData, type PatternDefinition, type PatternEvent } from '../index'
 
 const data = {
   items: {
@@ -83,6 +84,13 @@ const definition = {
         { attribute: 'aria-hidden', from: 'state.inactiveKey' },
       ],
     },
+    optionFromOptions: {
+      role: 'option',
+      aria: [
+        { attribute: 'aria-label', from: 'options.label' },
+        { attribute: 'aria-roledescription', from: 'options.slideRoledescription' },
+      ],
+    },
   },
   navigation: {
     visibleOrder: { kind: 'flat' },
@@ -132,7 +140,9 @@ function TemplateHost({ onEvent }: { onEvent: (event: PatternEvent) => void }) {
     data,
     options: {
       orientation: 'vertical',
+      label: 'Runtime label',
       roledescription: 'template',
+      slideRoledescription: 'slide',
       selectionMode: 'multiple',
     },
     onEvent,
@@ -146,6 +156,7 @@ function TemplateHost({ onEvent }: { onEvent: (event: PatternEvent) => void }) {
           {data.items[key]?.label}
         </div>
       ))}
+      <div data-testid="option-from-options" {...runtime.getItemProps('optionFromOptions', 'a')} />
     </div>
   )
 }
@@ -159,6 +170,8 @@ describe('event templates through keyboard input', () => {
 
     expect(host.getAttribute('aria-activedescendant')).toBe('template-a')
     expect(host.getAttribute('aria-multiselectable')).toBe('true')
+    expect(screen.getByTestId('option-from-options').getAttribute('aria-label')).toBe('Runtime label')
+    expect(screen.getByTestId('option-from-options').getAttribute('aria-roledescription')).toBe('slide')
     expect(alpha.getAttribute('aria-controls')).toBe('template-b')
     expect(alpha.getAttribute('aria-owns')).toBe('template-b')
     expect(alpha.getAttribute('aria-valuetext')).toBe('five')
@@ -207,4 +220,97 @@ describe('event templates through keyboard input', () => {
     expect(events.find((event) => event.type === 'inputValue' && event.inline === true)).toBeTruthy()
     expect(events.find((event) => event.type === 'remove' && event.key === 'a')).toBeTruthy()
   })
+
+  it('applies declarative transitions from keyboard input events', () => {
+    render(<TransitionHost />)
+    const host = screen.getByTestId('transition-host')
+    const alpha = () => screen.getByRole('option', { name: 'Alpha' })
+
+    fireEvent.keyDown(host, { key: 's' })
+    expect(alpha().getAttribute('aria-selected')).toBe('true')
+
+    fireEvent.keyDown(host, { key: 'a' })
+    expect(alpha().getAttribute('aria-expanded')).toBe('true')
+
+    fireEvent.keyDown(host, { key: 'r' })
+    expect(alpha().getAttribute('aria-expanded')).toBe('false')
+
+    fireEvent.keyDown(host, { key: 't' })
+    expect(alpha().getAttribute('aria-disabled')).toBe('true')
+    fireEvent.keyDown(host, { key: 't' })
+    expect(alpha().getAttribute('aria-disabled')).toBeNull()
+
+    fireEvent.keyDown(host, { key: 'c' })
+    expect(alpha().getAttribute('aria-checked')).toBe('true')
+
+    fireEvent.keyDown(host, { key: 'n' })
+    expect(screen.getByTestId('transition-active').textContent).toBe('Alpha')
+  })
 })
+
+const transitionData = {
+  items: {
+    a: { label: 'Alpha' },
+    b: { label: 'Beta' },
+  },
+  relations: { rootKeys: ['a', 'b'] },
+  state: { activeKey: 'a', selectedKeys: [], expandedKeys: [], disabledKeys: [], checkedByKey: {} },
+} satisfies PatternData
+
+const transitionDefinition = {
+  apgPattern: 'transition-host',
+  rootRole: 'listbox',
+  containedRoles: ['option'],
+  parts: {
+    root: { role: 'listbox' },
+    option: {
+      role: 'option',
+      aria: [
+        { attribute: 'aria-label', from: 'items.label' },
+        { attribute: 'aria-selected', from: 'state.selectedKeys' },
+        { attribute: 'aria-expanded', from: 'state.expandedKeys' },
+        { attribute: 'aria-disabled', from: 'state.disabledKeys' },
+        { attribute: 'aria-checked', from: 'state.checkedByKey' },
+      ],
+    },
+  },
+  navigation: { visibleOrder: { kind: 'flat' }, targets: {} },
+  keyboard: [
+    { shortcut: 's', cases: [{ case: 'always', events: [{ type: 'select', key: '$activeKey' }] }] },
+    { shortcut: 'a', cases: [{ case: 'always', events: [{ type: 'expand', key: '$activeKey', expanded: true }] }] },
+    { shortcut: 'r', cases: [{ case: 'always', events: [{ type: 'collapse', key: '$activeKey' }] }] },
+    { shortcut: 't', cases: [{ case: 'always', events: [{ type: 'press', key: '$activeKey' }] }] },
+    { shortcut: 'c', cases: [{ case: 'always', events: [{ type: 'check', key: '$activeKey', checked: true }] }] },
+    { shortcut: 'n', cases: [{ case: 'always', events: [{ type: 'activate', key: '$activeKey' }] }] },
+  ],
+  transitions: [
+    { on: 'select', actions: [{ kind: 'replaceSet', field: 'selectedKeys', values: [{ from: '$activeKey' }] }] },
+    { on: 'expand', actions: [{ kind: 'setMembership', field: 'expandedKeys', value: { from: '$event.key' }, present: { from: '$event.expanded' } }] },
+    { on: 'collapse', actions: [{ kind: 'remove', field: 'expandedKeys', value: { from: '$event.key' } }] },
+    { on: 'press', actions: [{ kind: 'toggleInSet', field: 'disabledKeys', value: { from: '$event.key' } }] },
+    { on: 'check', actions: [{ kind: 'setRecordValue', field: 'checkedByKey', key: { from: '$event.key' }, value: { from: '$event.checked' } }] },
+    { on: 'activate', actions: [{ kind: 'set', field: 'activeKey', value: { from: '$event.key' } }] },
+  ],
+} satisfies PatternDefinition
+
+function TransitionHost() {
+  const [current, setCurrent] = useState<PatternData>(transitionData)
+  const runtime = createPatternRuntime({
+    definition: transitionDefinition,
+    data: current,
+    onEvent: (event) => setCurrent((data) => reducePatternData(transitionDefinition, data, event)),
+  })
+
+  return (
+    <div>
+      <div data-testid="transition-host" {...runtime.getRootProps()}>
+        {runtime.visibleKeys.map((key) => (
+          <div key={key} {...runtime.getItemProps('option', key)}>
+            {current.items[key]?.label}
+          </div>
+        ))}
+      </div>
+      <output data-testid="transition-active">{current.items[current.state?.activeKey ?? '']?.label}</output>
+    </div>
+  )
+}

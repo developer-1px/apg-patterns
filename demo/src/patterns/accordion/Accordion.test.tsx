@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import type { PatternData, PatternEvent } from '../../../../src'
+import { useAccordionPattern, type PatternData, type PatternEvent } from '../../../../src'
 import { Accordion } from './Accordion'
 import { initialAccordionData, reduceAccordionData } from './accordionData'
 
@@ -9,6 +9,26 @@ function AccordionDemo({ initial = initialAccordionData }: { initial?: PatternDa
   const [data, setData] = useState(initial)
   const handleEvent = (event: PatternEvent) => setData((current) => reduceAccordionData(current, event))
   return <Accordion data={data} onEvent={handleEvent} />
+}
+
+function AccordionActionsDemo() {
+  const [data, setData] = useState(initialAccordionData)
+  const accordion = useAccordionPattern(data, (event) => setData((current) => reduceAccordionData(current, event)))
+  const [first, second] = accordion.renderItems
+
+  return (
+    <div {...accordion.rootProps}>
+      <button {...first!.headerProps}>{first!.label}</button>
+      <button {...second!.headerProps}>{second!.label}</button>
+      <button type="button" onClick={() => accordion.actions.focus(second!.key)}>Focus second</button>
+      <button type="button" onClick={() => accordion.actions.expand(first!.key)}>Expand first</button>
+      <button type="button" onClick={() => accordion.actions.toggle(first!.key)}>Toggle first</button>
+      <button type="button" onClick={() => accordion.actions.collapse(first!.key)}>Collapse first</button>
+      <output>{accordion.state.activeKey}</output>
+      <output>{accordion.state.expandedKeys.join(',')}</output>
+      <output>{accordion.state.disabledKeys.join(',')}</output>
+    </div>
+  )
 }
 
 describe('Accordion demo', () => {
@@ -110,5 +130,22 @@ describe('Accordion demo', () => {
     act(() => { fireEvent.keyDown(first!, { key: 'ArrowDown', code: 'ArrowDown' }) })
     expect(second!.getAttribute('tabindex')).toBe('0')
     expect(first!.getAttribute('tabindex')).toBe('-1')
+  })
+
+  it('imperative actions update accordion state from pointer controls', () => {
+    render(<AccordionActionsDemo />)
+    const controls = screen.getAllByRole('button')
+
+    fireEvent.click(controls[2]!)
+    expect(screen.getByText('billing')).toBeTruthy()
+
+    fireEvent.click(controls[3]!)
+    expect(screen.getByText('personal')).toBeTruthy()
+
+    fireEvent.click(controls[4]!)
+    expect(screen.queryByText('personal')).toBeNull()
+
+    fireEvent.click(controls[5]!)
+    expect(screen.queryByText('personal')).toBeNull()
   })
 })
