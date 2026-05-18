@@ -22,6 +22,28 @@ function NavigationTreeDemo() {
   return <Tree data={data} onEvent={handleEvent} />
 }
 
+function TreeReducerEdgesDemo() {
+  const [data, setData] = useState<PatternData>({ ...initialData, state: { ...initialData.state, activeKey: null } } as PatternData)
+  const apply = (event: PatternEvent) => setData((current) => reduceData(current, event))
+  const target = (direction: Extract<PatternEvent, { type: 'navigate' }>['direction']) => resolveTarget(direction, data)
+
+  return (
+    <div>
+      <button type="button" onClick={() => apply({ type: 'navigate', direction: 'next', meta: { reason: 'keyboard' } })}>Reduce navigate</button>
+      <button type="button" onClick={() => apply({ type: 'select', keys: ['demo'], anchorKey: 'docs', extentKey: 'demo', meta: { reason: 'pointer' } })}>Reduce select</button>
+      <button type="button" onClick={() => apply({ type: 'dismiss' })}>Reduce ignored</button>
+      <button type="button" onClick={() => setData((current) => ({ ...current, state: { ...current.state, activeKey: 'runtime' } }))}>Set runtime active</button>
+      <button type="button" onClick={() => apply({ type: 'expand', key: 'docs', expanded: false, meta: { reason: 'keyboard' } })}>Collapse docs</button>
+      <output data-testid="tree-active">{String(data.state?.activeKey ?? '')}</output>
+      <output data-testid="tree-selected">{data.state?.selectedKeys?.join(',') ?? ''}</output>
+      <output data-testid="tree-reason">{String(data.state?.lastEventReason ?? '')}</output>
+      <output data-testid="tree-first-target">{String(target('first'))}</output>
+      <output data-testid="tree-parent-target">{String(target('parent'))}</output>
+      <output data-testid="tree-unknown-target">{String(target('rowStart'))}</output>
+    </div>
+  )
+}
+
 const tree = () => screen.getByRole('tree')
 const treeitem = (name: string) => screen.getByRole('treeitem', { name })
 
@@ -166,5 +188,28 @@ describe('APG §Activation', () => {
     render(<NavigationTreeDemo />)
 
     expect(fireEvent.click(screen.getByRole('link', { name: 'Getting Started' }))).toBe(true)
+  })
+
+  it('covers tree contract reducer edge cases from pointer controls', () => {
+    render(<TreeReducerEdgesDemo />)
+
+    expect(screen.getByTestId('tree-first-target').textContent).toBe('docs')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Reduce navigate' }))
+    expect(screen.getByTestId('tree-reason').textContent).toBe('keyboard')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Reduce select' }))
+    expect(screen.getByTestId('tree-selected').textContent).toBe('demo')
+    expect(screen.getByTestId('tree-reason').textContent).toBe('pointer')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Set runtime active' }))
+    expect(screen.getByTestId('tree-parent-target').textContent).toBe('docs')
+    expect(screen.getByTestId('tree-unknown-target').textContent).toBe('undefined')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Collapse docs' }))
+    expect(screen.getByTestId('tree-active').textContent).toBe('docs')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Reduce ignored' }))
+    expect(screen.getByTestId('tree-active').textContent).toBe('docs')
   })
 })

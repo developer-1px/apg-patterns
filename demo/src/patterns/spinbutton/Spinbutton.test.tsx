@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import type { PatternEvent } from '../../../../src'
+import { PatternDataSchema, type PatternEvent } from '../../../../src'
 import { Spinbutton } from './Spinbutton'
 import { initialSpinbuttonData, reduceSpinbuttonData, spinbuttonOptions, spinbuttonVariants } from './spinbuttonData'
 
@@ -15,7 +15,32 @@ function SpinbuttonDemo({ onEvent, variant }: { onEvent?: (event: PatternEvent) 
   return <Spinbutton data={data} onEvent={handleEvent} />
 }
 
+function SpinbuttonReducerEdgesDemo() {
+  const [data, setData] = useState(spinbuttonVariants.time.data)
+  const apply = (event: PatternEvent) => setData((current) => reduceSpinbuttonData(current, event, spinbuttonVariants.time.options))
+
+  return (
+    <div>
+      <button type="button" onClick={() => apply({ type: 'focus', key: 'minutes' })}>Focus minutes</button>
+      <button type="button" onClick={() => apply({ type: 'value', key: 'hours', value: 'ignored' })}>String value</button>
+      <button type="button" onClick={() => apply({ type: 'valueStep', key: 'hours', direction: 'decrementLarge' })}>Large decrement</button>
+      <button type="button" onClick={() => apply({ type: 'dismiss' })}>Ignored event</button>
+      <output data-testid="spin-active">{String(data.state?.activeKey ?? '')}</output>
+      <output data-testid="spin-hours">{String(data.state?.valueByKey?.hours ?? '')}</output>
+      <output data-testid="spin-hour-text">{String(data.items.hours?.valuetext ?? '')}</output>
+    </div>
+  )
+}
+
 describe('Spinbutton — numeric variant', () => {
+  it('renders nothing when no spinbutton item is present', () => {
+    const emptyData = PatternDataSchema.parse({ items: {}, relations: { rootKeys: [] }, state: {} })
+
+    render(<Spinbutton data={emptyData} onEvent={() => undefined} />)
+
+    expect(screen.queryByRole('spinbutton')).toBeNull()
+  })
+
   it('renders with role=spinbutton and aria-valuenow', () => {
     render(<SpinbuttonDemo />)
     const sb = screen.getByRole('spinbutton')
@@ -130,5 +155,22 @@ describe('Spinbutton — time picker variant', () => {
     const [hours] = screen.getAllByRole('spinbutton')
     fireEvent.keyDown(hours, { key: 'Home', code: 'Home' })
     expect(hours.getAttribute('aria-valuenow')).toBe('0')
+  })
+
+  it('covers reducer edge cases from pointer controls', () => {
+    render(<SpinbuttonReducerEdgesDemo />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Focus minutes' }))
+    expect(screen.getByTestId('spin-active').textContent).toBe('minutes')
+
+    fireEvent.click(screen.getByRole('button', { name: 'String value' }))
+    expect(screen.getByTestId('spin-hours').textContent).toBe('9')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Large decrement' }))
+    expect(screen.getByTestId('spin-hours').textContent).toBe('3')
+    expect(screen.getByTestId('spin-hour-text').textContent).toBe('3 hours')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Ignored event' }))
+    expect(screen.getByTestId('spin-hours').textContent).toBe('3')
   })
 })

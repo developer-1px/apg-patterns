@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import { comboboxDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src'
 import { Combobox } from './Combobox'
-import { buildComboboxData, FRUITS, reduceComboboxData } from './comboboxData'
+import { buildComboboxData, filterFruits, firstMatch, FRUITS, reduceComboboxData } from './comboboxData'
 
 type Variant = 'selectOnly' | 'listAutocomplete' | 'listWithInlineAutocomplete' | 'datepicker' | 'gridPopup'
 
@@ -20,6 +20,25 @@ function KernelComboboxDemo({ activeKey }: { activeKey?: string | null }) {
   })
   const handleEvent = (event: PatternEvent) => setData((current) => reducePatternData(comboboxDefinition, current, event))
   return <Combobox data={data} onEvent={handleEvent} />
+}
+
+function ComboboxReducerEdgesDemo() {
+  const [data, setData] = useState<PatternData>(() => buildComboboxData(['apple'], 'selectOnly'))
+  const apply = (event: PatternEvent) => setData((current) => reduceComboboxData(current, event))
+
+  return (
+    <div>
+      <button type="button" onClick={() => apply({ type: 'focus', key: 'apple' })}>Focus apple</button>
+      <button type="button" onClick={() => apply({ type: 'navigate', direction: 'previous' })}>Previous</button>
+      <button type="button" onClick={() => apply({ type: 'typeahead', query: 'zz' })}>No match typeahead</button>
+      <button type="button" onClick={() => apply({ type: 'inputValue', value: '' })}>Empty input</button>
+      <button type="button" onClick={() => apply({ type: 'dismiss' })}>Ignored event</button>
+      <output data-testid="combobox-active">{String(data.state?.activeKey ?? '')}</output>
+      <output data-testid="combobox-query">{String(data.state?.query ?? '')}</output>
+      <output data-testid="combobox-filter">{filterFruits('').join(',')}</output>
+      <output data-testid="combobox-first-match">{String(firstMatch(FRUITS, ''))}</output>
+    </div>
+  )
 }
 
 describe('Combobox demo — selectOnly', () => {
@@ -139,6 +158,26 @@ describe('Combobox demo — selectOnly', () => {
 
     fireEvent.keyDown(input, { key: 'Home', code: 'Home' })
     expect(input.getAttribute('aria-activedescendant')).toBe(options[0].getAttribute('id'))
+  })
+
+  it('covers reducer edge cases from pointer controls', () => {
+    render(<ComboboxReducerEdgesDemo />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Focus apple' }))
+    expect(screen.getByTestId('combobox-active').textContent).toBe('apple')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Previous' }))
+    expect(screen.getByTestId('combobox-active').textContent).toBe('apple')
+
+    fireEvent.click(screen.getByRole('button', { name: 'No match typeahead' }))
+    expect(screen.getByTestId('combobox-active').textContent).toBe('apple')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Empty input' }))
+    expect(screen.getByTestId('combobox-query').textContent).toBe('')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Ignored event' }))
+    expect(screen.getByTestId('combobox-filter').textContent).toContain('apple')
+    expect(screen.getByTestId('combobox-first-match').textContent).toBe('null')
   })
 })
 

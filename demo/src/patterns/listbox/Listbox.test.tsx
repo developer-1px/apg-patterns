@@ -1,5 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
+import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
+import { listboxDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src'
 
 // jsdom lacks CSS.escape; Listbox uses it inside a useLayoutEffect.
 if (typeof (globalThis as { CSS?: { escape?: (s: string) => string } }).CSS === 'undefined') {
@@ -13,8 +15,20 @@ if (typeof Element.prototype.scrollIntoView !== 'function') {
 }
 
 import { ListboxDemo } from './ListboxTestHost'
+import { Listbox } from './Listbox'
 
 const activeOption = () => document.querySelector('[role="option"][data-active]') as HTMLElement | null
+
+function MultiEdgeListboxDemo({ empty = false }: { empty?: boolean }) {
+  const [data, setData] = useState<PatternData>({
+    items: empty ? {} : { a: { label: 'Alpha' }, b: { label: 'Beta' } },
+    relations: { rootKeys: empty ? [] : ['a', 'b'] },
+    state: { activeKey: null, selectedKeys: [] },
+    refs: { label: 'Multi edge' },
+  })
+  const handleEvent = (event: PatternEvent) => setData((current) => reducePatternData(listboxDefinition, current, event))
+  return <Listbox data={data} onEvent={handleEvent} options={{ focusStrategy: 'rovingTabIndex', selectionMode: 'multiple' }} />
+}
 
 describe('Listbox demo — basic', () => {
   it('exposes aria-label on root listbox', () => {
@@ -288,5 +302,25 @@ describe('Listbox demo — rearrangeable (multi)', () => {
     fireEvent.keyDown(listbox, { key: 'a', ctrlKey: true })
     const any = screen.getAllByRole('option').some((o) => o.getAttribute('aria-selected') === 'true')
     expect(any).toBe(false)
+  })
+
+  it('multi-select keyboard shortcuts are harmless without an active or target option', () => {
+    render(<MultiEdgeListboxDemo />)
+    const listbox = screen.getByRole('listbox')
+
+    fireEvent.keyDown(listbox, { key: 'ArrowDown', shiftKey: true })
+    expect(screen.getAllByRole('option').every((option) => option.getAttribute('aria-selected') === 'false')).toBe(true)
+
+    fireEvent.keyDown(listbox, { key: 'Home', ctrlKey: true, shiftKey: true })
+    expect(screen.getAllByRole('option').every((option) => option.getAttribute('aria-selected') === 'false')).toBe(true)
+  })
+
+  it('multi-select Ctrl+A handles an empty listbox', () => {
+    render(<MultiEdgeListboxDemo empty />)
+    const listbox = screen.getByRole('listbox')
+
+    fireEvent.keyDown(listbox, { key: 'a', ctrlKey: true })
+
+    expect(screen.queryAllByRole('option')).toEqual([])
   })
 })
