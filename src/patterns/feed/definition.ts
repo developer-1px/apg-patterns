@@ -1,4 +1,7 @@
 import { PatternDefinitionSchema } from '../../schema'
+import { feedEffects } from './effects'
+import { feedKeyboard } from './keyboard'
+import { feedParts } from './parts'
 
 // APG Feed pattern — role="feed" container with role="article" children.
 // Keyboard model (per APG https://www.w3.org/WAI/ARIA/apg/patterns/feed/):
@@ -11,33 +14,8 @@ export const feedDefinition = PatternDefinitionSchema.parse({
   rootRole: 'feed',
   containedRoles: ['article'],
   focusModel: 'rovingTabIndex',
-  effects: [{ kind: 'focus', on: { state: 'activeKey', reasons: ['keyboard'] }, scope: { kind: 'focusWithin' }, target: { kind: 'activeKeyElement' }, preventScroll: true }],
-  parts: {
-    feed: {
-      role: 'feed',
-      aria: [
-        { attribute: 'aria-label', from: 'refs.label' },
-        { attribute: 'aria-labelledby', from: 'refs.labelledBy' },
-      ],
-    },
-    article: {
-      role: 'article',
-      aria: [
-        { attribute: 'aria-posinset', from: 'state.posInSetByKey' },
-        { attribute: 'aria-setsize', from: 'state.setSizeByKey' },
-        { attribute: 'aria-labelledby', from: 'items.labelledBy' },
-      ],
-      focus: {
-        tabIndex: { when: { kind: 'always' }, active: 0, inactive: -1 },
-      },
-      state: [
-        { name: 'active', from: 'state.activeKey' },
-      ],
-      events: [
-        { event: 'focus', events: [{ type: 'focus', key: '$key' }] },
-      ],
-    },
-  },
+  effects: feedEffects,
+  parts: feedParts,
   navigation: {
     visibleOrder: { kind: 'flat' },
     targets: {
@@ -47,10 +25,5 @@ export const feedDefinition = PatternDefinitionSchema.parse({
       last: { kind: 'linear', action: 'last' },
     },
   },
-  keyboard: [
-    { shortcut: 'PageDown', preventDefault: true, cases: [{ case: 'when', when: { kind: 'hasActiveKey' }, events: [{ type: 'navigate', direction: 'next' }] }] },
-    { shortcut: 'PageUp', preventDefault: true, cases: [{ case: 'when', when: { kind: 'hasActiveKey' }, events: [{ type: 'navigate', direction: 'previous' }] }] },
-    { shortcut: 'Control+Home', preventDefault: true, cases: [{ case: 'always', events: [{ type: 'navigate', direction: 'first' }] }] },
-    { shortcut: 'Control+End', preventDefault: true, cases: [{ case: 'always', events: [{ type: 'navigate', direction: 'last' }] }] },
-  ],
+  keyboard: feedKeyboard,
 })
