@@ -119,6 +119,18 @@ describe('Listbox demo — grouped', () => {
     expect(activeOption()?.textContent).toBe('Oats')
   })
 
+  it('keyboard-focused option carries both active and focus-visible styling hooks', () => {
+    render(<ListboxDemo variant="grouped" />)
+    const listbox = screen.getByRole('listbox')
+
+    fireEvent.keyDown(listbox, { key: 'ArrowDown', code: 'ArrowDown' })
+
+    const broccoli = screen.getByRole('option', { name: 'Broccoli' })
+    expect(broccoli.hasAttribute('data-active')).toBe(true)
+    expect(broccoli.hasAttribute('data-focus-visible')).toBe(true)
+    expect(document.activeElement).toBe(broccoli)
+  })
+
   it('first group contains its option children', () => {
     render(<ListboxDemo variant="grouped" />)
     const firstGroup = screen.getAllByRole('group')[0]!
