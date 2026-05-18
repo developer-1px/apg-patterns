@@ -87,6 +87,21 @@ export function collectPatternEntries(modulesByPath: Readonly<Record<string, Pat
     throw new Error(`[demoPatterns] pattern modules missing exported entry: ${missingEntries.join(', ')}`)
   }
 
+  const invalidEntries = Object.entries(modulesByPath)
+    .flatMap(([path, mod]) => {
+      const entry = mod.entry
+      if (!entry) return []
+      const issues = []
+      if (typeof entry.key !== 'string') issues.push('key')
+      if (typeof entry.label !== 'string') issues.push('label')
+      if (typeof entry.useDemoPattern !== 'function') issues.push('useDemoPattern')
+      return issues.length > 0 ? [`${path}: invalid ${issues.join(', ')}`] : []
+    })
+    .sort((a, b) => a.localeCompare(b))
+  if (invalidEntries.length > 0) {
+    throw new Error(`[demoPatterns] pattern modules exported invalid entry: ${invalidEntries.join('; ')}`)
+  }
+
   return Object.entries(modulesByPath)
     .map(([sourcePath, mod]) => ({ ...mod.entry!, sourcePath }))
     .sort((a, b) => a.key.localeCompare(b.key))

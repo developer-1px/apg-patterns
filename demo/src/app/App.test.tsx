@@ -525,6 +525,17 @@ describe('demo pattern registry', () => {
     })).toThrow('[demoPatterns] pattern modules missing exported entry: ../patterns/missing/entry.tsx')
   })
 
+  it('fails fast when a collected pattern module exports a malformed entry', () => {
+    expect(() => collectPatternEntries({
+      '../patterns/accordion/entry.tsx': {
+        entry: { key: 'accordion', label: 'Accordion' } as never,
+      },
+      '../patterns/treeview/entry.tsx': {
+        entry: { key: 1, label: null, useDemoPattern: 'missing' } as never,
+      },
+    })).toThrow('[demoPatterns] pattern modules exported invalid entry: ../patterns/accordion/entry.tsx: invalid useDemoPattern; ../patterns/treeview/entry.tsx: invalid key, label, useDemoPattern')
+  })
+
   it('keeps collected pattern modules sorted by key for stable menus', () => {
     const entries = collectPatternEntries({
       '../patterns/treeview/entry.tsx': {

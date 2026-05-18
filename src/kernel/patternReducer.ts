@@ -1,7 +1,7 @@
 import type { Key, PatternData, PatternEvent, PatternDefinition } from '../schema'
-import { findCellPosition, rectangleKeys, stepCell, visibleCellRows } from './cellSelection'
 import { resolveVisibleOrder, resolveNavigationTarget, createParentByKey } from './patternKernel'
 import { reduceDeclarativeTransitions } from './patternTransitions'
+import { reduceExtendSelectionEvent, reduceSelectAllEvent, reduceSelectColumnEvent, reduceSelectRowEvent, withSelection } from './selectionEvents'
 
 export function reducePatternData(definition: PatternDefinition, data: PatternData, event: PatternEvent): PatternData {
   const declarative = reduceDeclarativeTransitions(definition, data, event)
@@ -42,43 +42,19 @@ export function reducePatternData(definition: PatternDefinition, data: PatternDa
   }
 
   if (event.type === 'selectAll') {
-    const rows = visibleCellRows(definition, data)
-    const keys = rows.flat()
-    return keys.length > 0
-      ? withLastEventReason(withSelection(data, keys, keys[0]!, keys[keys.length - 1]!), event)
-      : withLastEventReason(data, event)
+    return withLastEventReason(reduceSelectAllEvent(definition, data), event)
   }
 
   if (event.type === 'selectColumn') {
-    const rows = visibleCellRows(definition, data)
-    const activeKey = data.state?.activeKey
-    const position = findCellPosition(rows, activeKey)
-    if (!position) return withLastEventReason(data, event)
-    const keys = rows.map((row) => row[position.column]).filter(isKey)
-    return keys.length > 0
-      ? withLastEventReason(withSelection(data, keys, keys[0]!, keys[keys.length - 1]!), event)
-      : withLastEventReason(data, event)
+    return withLastEventReason(reduceSelectColumnEvent(definition, data), event)
   }
 
   if (event.type === 'selectRow') {
-    const rows = visibleCellRows(definition, data)
-    const activeKey = data.state?.activeKey
-    const position = findCellPosition(rows, activeKey)
-    if (!position) return withLastEventReason(data, event)
-    const keys = [...(rows[position.row] ?? [])]
-    return keys.length > 0
-      ? withLastEventReason(withSelection(data, keys, keys[0]!, keys[keys.length - 1]!), event)
-      : withLastEventReason(data, event)
+    return withLastEventReason(reduceSelectRowEvent(definition, data), event)
   }
 
   if (event.type === 'extendSelection') {
-    const rows = visibleCellRows(definition, data)
-    const activeKey = data.state?.activeKey
-    if (!activeKey) return withLastEventReason(data, event)
-    const anchorKey = data.state?.anchorKey ?? activeKey
-    const extentKey = stepCell(rows, activeKey, event.direction)
-    const keys = rectangleKeys(rows, anchorKey, extentKey)
-    return withLastEventReason(withSelection(data, keys, anchorKey, extentKey), event)
+    return withLastEventReason(reduceExtendSelectionEvent(definition, data, event), event)
   }
 
   if (event.type === 'expand') {
@@ -121,24 +97,7 @@ function withActiveKey(data: PatternData, activeKey: Key): PatternData {
   return { ...data, state: { ...data.state, activeKey } }
 }
 
-function withSelection(data: PatternData, keys: readonly Key[], anchorKey: Key | null, extentKey: Key | null): PatternData {
-  return {
-    ...data,
-    state: {
-      ...data.state,
-      activeKey: extentKey ?? anchorKey ?? keys[0] ?? data.state?.activeKey,
-      selectedKeys: [...keys],
-      anchorKey,
-      extentKey,
-    },
-  }
-}
-
 function withLastEventReason(data: PatternData, event: PatternEvent): PatternData {
   if (!event.meta?.reason) return data
   return { ...data, state: { ...data.state, lastEventReason: event.meta.reason } }
-}
-
-function isKey(value: unknown): value is Key {
-  return typeof value === 'string' && value.length > 0
 }
