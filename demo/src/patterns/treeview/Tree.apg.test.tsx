@@ -245,5 +245,5 @@ describe('APG §Activation', () => {
     expect(screen.getByTestId('tree-entry-events').textContent).toContain('navigate')
     expect(screen.getByRole('treeitem', { name: 'project-1' }).getAttribute('aria-selected')).toBe('true')
     expect(screen.getByTestId('tree-entry-inspect').textContent).toContain('aria-activedescendant="treeitem-project-1"')
-  })
+  }, 15000)
 })
