@@ -1,5 +1,6 @@
 export * from './patternData'
 export * from './patternEvent'
+export * from './eventTemplate'
 export * from './patternOptions'
 export * from './patternDefinition'
 export * from './patternContract'

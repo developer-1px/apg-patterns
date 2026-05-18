@@ -4,7 +4,6 @@ import {
   type PatternRuntime,
   type SlotProps,
 } from '../../kernel/patternRuntime'
-import { reducePatternData } from '../../kernel/patternReducer'
 import {
   PatternDataSchema,
   PatternEventSchema,
@@ -15,6 +14,7 @@ import {
   type PatternOptions,
 } from '../../schema'
 import { disclosureDefinition } from './definition'
+export { reduceDisclosureData } from './disclosureReducer'
 
 export interface DisclosureRuntime {
   definition: typeof disclosureDefinition
@@ -63,10 +63,6 @@ export function createDisclosureRuntime(input: CreateDisclosureRuntimeInput): Di
     getRootKeyboardHandler: () => runtime.getRootKeyboardHandler(),
     emit,
   }
-}
-
-export function reduceDisclosureData(data: PatternData, event: PatternEvent): PatternData {
-  return reducePatternData(disclosureDefinition, data, event)
 }
 
 function createDisclosureElementId(prefix: string, key: Key) {

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { EventTemplateSchema } from './patternEvent'
+import { EventTemplateSchema } from './eventTemplate'
 import { EffectSchema } from './patternEffects'
 import { NavigationSchema } from './patternNavigation'
 import { PredicateSchema } from './patternPredicate'

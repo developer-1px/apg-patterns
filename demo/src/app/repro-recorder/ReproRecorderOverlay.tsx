@@ -7,7 +7,9 @@ const buttonStyle = {
   right: 8,
   zIndex: 99999,
   height: 28,
-  border: '1px solid rgba(24,24,27,0.18)',
+  borderWidth: 1,
+  borderStyle: 'solid',
+  borderColor: 'rgba(24,24,27,0.18)',
   borderRadius: 6,
   padding: '0 10px',
   background: 'rgba(24,24,27,0.88)',
@@ -56,14 +58,27 @@ export function ReproRecorderOverlay() {
   const [recording, setRecording] = useState(false)
   const [summary, setSummary] = useState('REC ready. Cmd/Ctrl+Shift+\\ or Alt+Shift+R')
 
+  const copyRecording = useCallback(async (text: string) => {
+    if (!navigator.clipboard?.writeText) {
+      setSummary(`${text}\n\nClipboard unavailable.`)
+      return
+    }
+
+    try {
+      await navigator.clipboard.writeText(text)
+      setSummary(`${text}\n\nCopied to clipboard.`)
+    } catch {
+      setSummary(`${text}\n\nClipboard copy failed.`)
+    }
+  }, [])
+
   const stop = useCallback(() => {
     const data = recorder.stop()
     clearInterval(timerRef.current)
     setRecording(false)
     setSummary(data.text)
-    console.log(data.text)
-    void navigator.clipboard?.writeText(data.text).catch(() => undefined)
-  }, [recorder])
+    void copyRecording(data.text)
+  }, [copyRecording, recorder])
 
   const start = useCallback(() => {
     recorder.start()

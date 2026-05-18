@@ -4,9 +4,9 @@ import {
   type PatternRuntime,
   type SlotProps,
 } from '../../kernel/patternRuntime'
-import { reducePatternData } from '../../kernel/patternReducer'
-import { PatternDataSchema, PatternEventSchema, PatternOptionsSchema, type Key, type PatternData, type PatternDataWithOptions, type PatternEvent, type PatternOptions } from '../../schema'
+import { PatternDataSchema, PatternEventSchema, PatternOptionsSchema, type Key, type PatternData, type PatternEvent, type PatternOptions } from '../../schema'
 import { tabsDefinition } from './definition'
+export { reduceTabsData } from './tabsReducer'
 
 export interface TabsRuntime {
   definition: typeof tabsDefinition
@@ -62,16 +62,6 @@ export function createTabsRuntime(input: CreateTabsRuntimeInput): TabsRuntime {
     getTabPanelProps: (key) => runtime.getPartProps('tabpanel', key),
     emit: runtime.emit,
   }
-}
-
-export function reduceTabsData(data: PatternDataWithOptions, event: PatternEvent): PatternData {
-  const next = reducePatternData(tabsDefinition, data, event)
-  const options = data.state?.options ?? {}
-  const activeKey = next.state?.activeKey
-  if (event.type === 'navigate' && options.activationMode === 'automatic' && activeKey) {
-    return reducePatternData(tabsDefinition, next, { type: 'select', keys: [activeKey], anchorKey: activeKey, extentKey: activeKey })
-  }
-  return next
 }
 
 function createTabsElementId(prefix: string, key: Key) {
