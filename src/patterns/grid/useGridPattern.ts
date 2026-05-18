@@ -2,8 +2,8 @@ import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions, PatternStateWithOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
-import { createGridCell, type ReactGridCell } from './gridCell'
-import { gridDefinition, gridRows } from './definition'
+import { gridDefinition } from './definition'
+import { createGridRows, type ReactGridRow } from './gridRow'
 
 interface GridState extends PatternStateWithOptions {
   multiselectable?: boolean
@@ -14,11 +14,8 @@ interface GridState extends PatternStateWithOptions {
 
 type GridData = PatternData<PatternItem, GridState>
 
-export interface ReactGridRow {
-  key: Key
-  rowProps: ReactPatternProps
-  cells: readonly ReactGridCell[]
-}
+export type { ReactGridCell } from './gridCell'
+export type { ReactGridRow } from './gridRow'
 
 export interface ReactGridRuntime {
   gridProps: ReactPatternProps
@@ -91,26 +88,7 @@ export function useGridPattern(data: GridData, onEvent: (event: PatternEvent) =>
       return runtime.getPartProps('grid') as ReactPatternProps
     },
     get rows() {
-      return gridRows(data).map((cellKeys, rowIndex) => {
-        const rowKey = data.relations?.rowKeys?.[rowIndex] ?? `row-${rowIndex}`
-        return {
-          key: rowKey,
-          rowProps: runtime.getPartProps('row', rowKey) as ReactPatternProps,
-          cells: cellKeys.map((cellKey) => createGridCell({
-            runtime,
-            data,
-            key: cellKey,
-            editableKeys,
-            editingKey,
-            editDraftByKey,
-            valueByKey,
-            sortByKey,
-            commitEdit,
-            cancelEdit,
-            onEvent,
-          })),
-        }
-      })
+      return createGridRows({ runtime, data, editableKeys, editingKey, editDraftByKey, valueByKey, sortByKey, commitEdit, cancelEdit, onEvent })
     },
     columnCount: data.relations?.columnKeys?.length ?? 1,
     state: {
