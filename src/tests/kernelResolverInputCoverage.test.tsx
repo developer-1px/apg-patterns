@@ -201,6 +201,92 @@ function KernelResolverHost() {
       <button
         type="button"
         onClick={() => {
+          const data: PatternData = {
+            items: {
+              parent: { label: 'Parent', href: '#parent', labelledBy: 'parent-label', valuemin: 1, valuemax: 9, valuetext: 'five' },
+            },
+            relations: {
+              rootKeys: ['parent'],
+              controlsByKey: { parent: ['child'] },
+              ownerByKey: { parent: 'owner' },
+              rowKeys: ['parent'],
+              columnKeys: ['name'],
+            },
+            state: {
+              activeKey: 'parent',
+              selectedKeys: [],
+              disabledKeys: [],
+              expandedKeys: [],
+              checkedByKey: {},
+              pressedByKey: {},
+              currentByKey: {},
+              invalidByKey: {},
+              requiredKeys: [],
+              busyKeys: [],
+              modalKeys: [],
+              levelByKey: {},
+              posInSetByKey: {},
+              setSizeByKey: {},
+              rowIndexByKey: {},
+              columnIndexByKey: {},
+              sortByKey: {},
+              valueByKey: {},
+              rangeValueByKey: {},
+            },
+          }
+          const ctx = {
+            data,
+            options: { haspopup: 'menu', autocomplete: 'both' },
+            activeKey: null,
+            key: 'parent',
+            parentByKey,
+          }
+          setResult([
+            resolveAriaSource('state.activeKey.elementId', ctx),
+            resolveAriaSource('state.inactiveKey', ctx),
+            resolveAriaSource('items.href', ctx),
+            resolveAriaSource('items.label', ctx),
+            resolveAriaSource('items.labelledBy', ctx),
+            resolveAriaSource('items.valuemin', ctx),
+            resolveAriaSource('items.valuemax', ctx),
+            resolveAriaSource('items.valuetext', ctx),
+            resolveAriaSource('options.haspopup', ctx),
+            resolveAriaSource('options.autocomplete', ctx),
+            resolveAriaSource('state.rowCount', ctx),
+            resolveAriaSource('state.colCount', ctx),
+            resolveAriaSource('relations.controlsByKey', ctx),
+            resolveAriaSource('relations.ownerByKey', ctx),
+            resolveAriaSource('state.selectedKeys', ctx),
+            resolveAriaSource('state.disabledKeys', ctx),
+            resolveAriaSource('state.expandedKeys', ctx),
+            resolveAriaSource('state.readonly', ctx),
+            resolveAriaSource('state.checkedByKey', ctx),
+            resolveAriaSource('state.pressedByKey', ctx),
+            resolveAriaSource('state.currentByKey', ctx),
+            resolveAriaSource('state.currentByKey', { ...ctx, key: undefined }),
+            resolveAriaSource('state.invalidByKey', ctx),
+            resolveAriaSource('state.requiredKeys', ctx),
+            resolveAriaSource('state.busyKeys', ctx),
+            resolveAriaSource('state.modalKeys', ctx),
+            resolveAriaSource('state.levelByKey', ctx),
+            resolveAriaSource('state.posInSetByKey', ctx),
+            resolveAriaSource('state.setSizeByKey', ctx),
+            resolveAriaSource('state.rowIndexByKey', ctx),
+            resolveAriaSource('state.columnIndexByKey', ctx),
+            resolveAriaSource('state.sortByKey', ctx),
+            resolveAriaSource('state.valueByKey', ctx),
+            resolveAriaSource('state.rangeValueByKey.min', ctx),
+            resolveAriaSource('state.rangeValueByKey.max', ctx),
+            resolveAriaSource('state.rangeValueByKey.now', ctx),
+            resolveAriaSource('state.rangeValueByKey.text', ctx),
+          ].map(String).join('|'))
+        }}
+      >
+        Resolve aria source fallbacks
+      </button>
+      <button
+        type="button"
+        onClick={() => {
           const emptyRows: PatternData = { ...treegridData, relations: { ...treegridData.relations, rootKeys: [], rowKeys: [] } }
           const collapsedRows: PatternData = { ...treegridData, state: { activeKey: null, expandedKeys: [] } }
           const hiddenCellRows: PatternData = { ...treegridData, state: { activeKey: 'childName', expandedKeys: [] } }
@@ -367,6 +453,9 @@ describe('kernel resolver coverage from pointer input', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Resolve aria source edges' }))
     expect(screen.getByText('page|true|true|true|true|1|10|5|Half|||listbox|list||')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Resolve aria source fallbacks' }))
+    expect(screen.getByText('undefined|true|#parent|Parent|parent-label|1|9|five|menu|both|1|1|child|owner|false|undefined|false|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined')).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Resolve treegrid row edges' }))
     expect(screen.getByText('parent|child|parent|child|parent|null|null|parent|null|null|parent|null')).toBeTruthy()

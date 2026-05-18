@@ -18,15 +18,32 @@ function SpinbuttonDemo({ onEvent, variant }: { onEvent?: (event: PatternEvent) 
 function SpinbuttonReducerEdgesDemo() {
   const [data, setData] = useState(spinbuttonVariants.time.data)
   const apply = (event: PatternEvent) => setData((current) => reduceSpinbuttonData(current, event, spinbuttonVariants.time.options))
+  const applyFallback = (event: PatternEvent) =>
+    setData(() =>
+      reduceSpinbuttonData(
+        {
+          ...initialSpinbuttonData,
+          items: { loose: { label: 'Loose value' } },
+          relations: { rootKeys: ['loose'] },
+          state: { activeKey: 'loose', valueByKey: {} },
+        },
+        event,
+        { focusStrategy: 'rovingTabIndex' },
+      ),
+    )
 
   return (
     <div>
       <button type="button" onClick={() => apply({ type: 'focus', key: 'minutes' })}>Focus minutes</button>
       <button type="button" onClick={() => apply({ type: 'value', key: 'hours', value: 'ignored' })}>String value</button>
       <button type="button" onClick={() => apply({ type: 'valueStep', key: 'hours', direction: 'decrementLarge' })}>Large decrement</button>
+      <button type="button" onClick={() => apply({ type: 'valueStep', key: 'hours', direction: 'unknown' })}>Unknown step</button>
+      <button type="button" onClick={() => apply({ type: 'valueStep', key: 'hours', direction: 'incrementLarge' })}>Large increment</button>
+      <button type="button" onClick={() => applyFallback({ type: 'valueStep', key: 'loose', direction: 'increment' })}>Fallback range</button>
       <button type="button" onClick={() => apply({ type: 'dismiss' })}>Ignored event</button>
       <output data-testid="spin-active">{String(data.state?.activeKey ?? '')}</output>
       <output data-testid="spin-hours">{String(data.state?.valueByKey?.hours ?? '')}</output>
+      <output data-testid="spin-loose">{String(data.state?.valueByKey?.loose ?? '')}</output>
       <output data-testid="spin-hour-text">{String(data.items.hours?.valuetext ?? '')}</output>
     </div>
   )
@@ -170,7 +187,16 @@ describe('Spinbutton — time picker variant', () => {
     expect(screen.getByTestId('spin-hours').textContent).toBe('3')
     expect(screen.getByTestId('spin-hour-text').textContent).toBe('3 hours')
 
-    fireEvent.click(screen.getByRole('button', { name: 'Ignored event' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Unknown step' }))
     expect(screen.getByTestId('spin-hours').textContent).toBe('3')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Large increment' }))
+    expect(screen.getByTestId('spin-hours').textContent).toBe('9')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Fallback range' }))
+    expect(screen.getByTestId('spin-loose').textContent).toBe('1')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Ignored event' }))
+    expect(screen.getByTestId('spin-loose').textContent).toBe('1')
   })
 })

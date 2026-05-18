@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import {
   menubarDefinition,
@@ -10,6 +10,7 @@ import {
 } from '../../../../src'
 import { Menu } from './Menu'
 import { menuVariants } from './menuData'
+import { useMenubarSubmenuKeyboard } from './useMenubarSubmenuKeyboard'
 
 function MenuDemo({
   variant,
@@ -32,6 +33,55 @@ function MenuDemo({
         })
       }}
     />
+  )
+}
+
+function MenubarSubmenuKeyboardEdges() {
+  const menuRef = useRef<HTMLDivElement>(null)
+  const orphanRef = useRef<HTMLDivElement>(null)
+  const [events, setEvents] = useState<string[]>([])
+  const [closed, setClosed] = useState(0)
+  const [activeKey, setActiveKey] = useState<string | null>(null)
+  const handler = useMenubarSubmenuKeyboard({
+    data: {
+      items: {
+        solo: { label: 'Solo' },
+        sibling: { label: 'Sibling' },
+        child: { label: 'Child' },
+      },
+      relations: { rootKeys: ['solo', 'sibling'], childrenByKey: { sibling: ['child'] } },
+      state: {},
+    },
+    ownerKey: 'solo',
+    rootKeys: ['solo', 'sibling'],
+    children: [],
+    activeKey,
+    onEvent: (event) => {
+      setEvents((current) => [...current, `${event.type}:${event.key ?? ''}`])
+      if (event.type === 'focus') setActiveKey(event.key ?? null)
+    },
+    close: () => setClosed((current) => current + 1),
+  })
+  const orphanHandler = useMenubarSubmenuKeyboard({
+    data: { items: { orphan: { label: 'Orphan' } }, relations: { rootKeys: ['orphan'] }, state: {} },
+    ownerKey: 'missing',
+    rootKeys: ['orphan'],
+    children: ['orphan'],
+    activeKey: undefined,
+    onEvent: (event) => setEvents((current) => [...current, `orphan:${event.type}:${event.key ?? ''}`]),
+    close: () => setClosed((current) => current + 1),
+  })
+
+  return (
+    <div>
+      <div ref={menuRef} role="menu" tabIndex={-1} onKeyDown={handler}>Submenu</div>
+      <div ref={orphanRef} role="menu" tabIndex={-1} aria-label="Orphan submenu" onKeyDown={orphanHandler}>Orphan submenu</div>
+      <button type="button" onClick={() => menuRef.current && fireEvent.keyDown(menuRef.current, { key: 'ArrowDown' })}>Empty next</button>
+      <button type="button" onClick={() => menuRef.current && fireEvent.keyDown(menuRef.current, { key: 'ArrowRight' })}>Open next sibling</button>
+      <button type="button" onClick={() => orphanRef.current && fireEvent.keyDown(orphanRef.current, { key: 'ArrowLeft' })}>Missing sibling</button>
+      <output data-testid="submenu-events">{events.join('|')}</output>
+      <output data-testid="submenu-closed">{String(closed)}</output>
+    </div>
   )
 }
 
@@ -143,6 +193,20 @@ describe('Menu — editorMenubar', () => {
 
     expect(light.getAttribute('aria-checked')).toBe('true')
     expect(dark.getAttribute('aria-checked')).toBe('false')
+  })
+
+  it('covers submenu keyboard guard branches through pointer-triggered keys', () => {
+    render(<MenubarSubmenuKeyboardEdges />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Empty next' }))
+    expect(screen.getByTestId('submenu-events').textContent).toBe('')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open next sibling' }))
+    expect(screen.getByTestId('submenu-events').textContent).toBe('focus:sibling|expand:sibling|focus:child')
+    expect(screen.getByTestId('submenu-closed').textContent).toBe('1')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Missing sibling' }))
+    expect(screen.getByTestId('submenu-closed').textContent).toBe('1')
   })
 })
 

@@ -79,6 +79,18 @@ describe('Disclosure demo (image)', () => {
 })
 
 describe('Disclosure demo (faq)', () => {
+  it('falls back to simple disclosure when no variant is present', () => {
+    const data: PatternData = {
+      items: { details: { label: 'More details' } },
+      relations: { rootKeys: ['details'] },
+      state: {},
+    }
+
+    render(<Disclosure data={data} onEvent={() => undefined} />)
+
+    expect(screen.getByRole('button', { name: /More details/ }).getAttribute('aria-expanded')).toBe('false')
+  })
+
   it('renders 4 independent triggers with aria-controls', () => {
     render(<DisclosureDemo variant="faq" initial={initialFaqDisclosureData} />)
     const triggers = screen.getAllByRole('button')
@@ -114,6 +126,22 @@ describe('Disclosure demo (faq)', () => {
     fireEvent.click(first!)
     const panelId = first!.getAttribute('aria-controls')!
     expect(document.getElementById(panelId)).toBeTruthy()
+  })
+
+  it('ignores unrelated FAQ key presses and skips unknown FAQ rows', () => {
+    const data: PatternData = {
+      ...initialFaqDisclosureData,
+      items: { ...initialFaqDisclosureData.items, unknown: { label: 'Unknown row' } },
+      relations: { ...initialFaqDisclosureData.relations, rootKeys: [...(initialFaqDisclosureData.relations?.rootKeys ?? []), 'unknown'] },
+    }
+
+    render(<DisclosureDemo variant="faq" initial={data} />)
+    const [first] = screen.getAllByRole('button')
+
+    fireEvent.keyDown(first!, { key: 'ArrowDown', code: 'ArrowDown' })
+
+    expect(first!.getAttribute('aria-expanded')).toBe('false')
+    expect(screen.queryByText('Unknown row')).toBeNull()
   })
 })
 

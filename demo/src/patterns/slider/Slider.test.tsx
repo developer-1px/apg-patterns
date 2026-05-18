@@ -15,6 +15,41 @@ function SliderDemo({ onEvent, variant }: { onEvent?: (event: PatternEvent) => v
   return <Slider data={data} onEvent={handleEvent} />
 }
 
+function SliderReducerEdgesDemo() {
+  const [data, setData] = useState(sliderVariants.range.data)
+  const apply = (event: PatternEvent) => setData((current) => reduceSliderData(current, event, sliderVariants.range.options))
+  const applyTemperature = (event: PatternEvent) =>
+    setData((current) => reduceSliderData(sliderVariants.temperature.data, event, sliderVariants.temperature.options))
+  const applyFallback = (event: PatternEvent) =>
+    setData((current) =>
+      reduceSliderData(
+        {
+          ...initialSliderData,
+          items: { loose: { label: 'Loose value' } },
+          relations: { rootKeys: ['loose'] },
+          state: { activeKey: 'loose', valueByKey: {} },
+        },
+        event,
+        { focusStrategy: 'rovingTabIndex' },
+      ),
+    )
+
+  return (
+    <div>
+      <button type="button" onClick={() => apply({ type: 'value', key: 'max', value: 390 })}>Move max down</button>
+      <button type="button" onClick={() => apply({ type: 'valueStep', key: 'min', direction: 'unknown' })}>Unknown step</button>
+      <button type="button" onClick={() => applyTemperature({ type: 'value', key: 'temp', value: 'ignored' })}>String temperature</button>
+      <button type="button" onClick={() => applyFallback({ type: 'valueStep', key: 'loose', direction: 'increment' })}>Fallback range</button>
+      <output data-testid="slider-active">{String(data.state?.activeKey ?? '')}</output>
+      <output data-testid="slider-min">{String(data.state?.valueByKey?.min ?? '')}</output>
+      <output data-testid="slider-max">{String(data.state?.valueByKey?.max ?? '')}</output>
+      <output data-testid="slider-temp">{String(data.state?.valueByKey?.temp ?? '')}</output>
+      <output data-testid="slider-loose">{String(data.state?.valueByKey?.loose ?? '')}</output>
+      <output data-testid="slider-min-max">{String(data.items.min?.valuemax ?? '')}</output>
+    </div>
+  )
+}
+
 describe('Slider demo — back-compat (single thumb volume)', () => {
   it('renders nothing when no slider thumb is present', () => {
     const emptyData = PatternDataSchema.parse({ items: {}, relations: { rootKeys: [] }, state: {} })
@@ -179,5 +214,23 @@ describe('Slider demo — variant: Multi-Thumb Range', () => {
     const [min, max] = screen.getAllByRole('slider')
     expect(within(min).getByText(/Minimum price/i)).toBeTruthy()
     expect(within(max).getByText(/Maximum price/i)).toBeTruthy()
+  })
+
+  it('covers reducer edge cases from pointer controls', () => {
+    render(<SliderReducerEdgesDemo />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Move max down' }))
+    expect(screen.getByTestId('slider-max').textContent).toBe('390')
+    expect(screen.getByTestId('slider-min-max').textContent).toBe('390')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Unknown step' }))
+    expect(screen.getByTestId('slider-min').textContent).toBe('200')
+
+    fireEvent.click(screen.getByRole('button', { name: 'String temperature' }))
+    expect(screen.getByTestId('slider-active').textContent).toBe('temp')
+    expect(screen.getByTestId('slider-temp').textContent).toBe('21')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Fallback range' }))
+    expect(screen.getByTestId('slider-loose').textContent).toBe('1')
   })
 })
