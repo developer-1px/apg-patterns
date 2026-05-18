@@ -1,7 +1,9 @@
 import { toolbarDefinition } from '../../../../src/patterns/toolbar/definition'
 import { PatternDataSchema, reducePatternData, type PatternData, type PatternEvent } from '../../../../src'
 
-export const initialToolbarData = PatternDataSchema.parse({
+export type ToolbarVariantKey = 'toolbar' | 'help'
+
+const formattingToolbarData = PatternDataSchema.parse({
   items: {
     bold: { label: 'Bold' },
     italic: { label: 'Italic' },
@@ -24,6 +26,37 @@ export const initialToolbarData = PatternDataSchema.parse({
     label: 'Text formatting',
   },
 })
+
+const helpToolbarData = PatternDataSchema.parse({
+  items: {
+    back: { label: 'Back' },
+    contents: { label: 'Contents' },
+    index: { label: 'Index' },
+    search: { label: 'Search' },
+    next: { label: 'Next' },
+  },
+  relations: {
+    rootKeys: ['back', 'contents', 'index', 'search', 'next'],
+    childrenByKey: {
+      back: [], contents: [], index: [], search: [], next: [],
+    },
+  },
+  state: {
+    activeKey: 'contents',
+    selectedKeys: ['contents'],
+  },
+  refs: {
+    label: 'Help',
+  },
+})
+
+export const toolbarVariants: Record<ToolbarVariantKey, { label: string; data: PatternData }> = {
+  toolbar: { label: 'Formatting', data: formattingToolbarData },
+  help: { label: 'Help', data: helpToolbarData },
+}
+
+export const toolbarVariantItems = Object.entries(toolbarVariants).map(([key, value]) => ({ key: key as ToolbarVariantKey, label: value.label }))
+export const initialToolbarData = toolbarVariants.toolbar.data
 
 export function reduceToolbarData(data: PatternData, event: PatternEvent): PatternData {
   return reducePatternData(toolbarDefinition, data, event)

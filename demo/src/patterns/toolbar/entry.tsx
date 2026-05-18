@@ -1,6 +1,6 @@
 import { Toolbar } from './Toolbar'
-import { initialToolbarData, reduceToolbarData } from './toolbarData'
-import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { initialToolbarData, reduceToolbarData, toolbarVariantItems, toolbarVariants, type ToolbarVariantKey } from './toolbarData'
+import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 
 const toolbarDemoDefinition = {
   key: 'toolbar',
@@ -13,6 +13,15 @@ const toolbarDemoDefinition = {
     hooks: ['toolbar/useToolbarPattern.ts'],
     definition: 'toolbar/definition.ts',
   },
+  controls: {
+    kind: 'listbox',
+    orientation: 'horizontal',
+    value: '$state.variant',
+    items: '$model.variantItems',
+    label: 'toolbar variants',
+    idPrefix: 'toolbar-variant',
+    onChange: '$actions.selectVariant',
+  },
   view: {
     kind: 'component',
     component: 'Toolbar',
@@ -23,10 +32,13 @@ const toolbarDemoDefinition = {
   },
 } as const satisfies DemoPatternDefinition
 
-export const entry = defineStateDemoPattern({
+export const entry = defineVariantDemoPattern<ToolbarVariantKey>({
   definition: toolbarDemoDefinition,
+  initialVariant: 'toolbar',
   initialData: initialToolbarData,
-  reduce: reduceToolbarData,
+  dataByVariant: (variant) => toolbarVariants[variant].data,
+  reduce: (_variant, data, event) => reduceToolbarData(data, event),
+  variantItems: toolbarVariantItems,
   componentName: 'Toolbar',
   component: Toolbar,
 })

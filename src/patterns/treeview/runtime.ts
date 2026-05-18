@@ -1,25 +1,17 @@
-import { createTypeaheadBuffer, type KeyInput, type TypeaheadBuffer } from '@interactive-os/keyboard'
+import { createTypeaheadBuffer, type TypeaheadBuffer } from '@interactive-os/keyboard'
 import {
   PatternDataSchema,
   PatternEventSchema,
   PatternOptionsSchema,
   type Key,
-  type KeyboardBinding,
   type PatternData,
   type PatternEvent,
   type PatternOptions,
 } from '../../schema'
 import { treeviewDefinition } from './definition'
-import {
-  createParentByKey,
-  resolveEventTemplate,
-  resolveNavigationTarget,
-} from '../../kernel/patternKernel'
 import { createPatternRuntime, type CreatePatternRuntimeInput } from '../../kernel/patternRuntime'
-import { resolveTreeKeyboardBinding, type ResolvedKeyboardBinding } from './keyboardBinding'
 import { createTreeviewRenderItems, type TreeviewRenderItem, type TreeviewSlotProps } from './renderItem'
 import { createTreeProps } from './treeProps'
-import { resolveTreeviewVisibleKeys } from './typeahead'
 
 export type { TreeviewRenderState } from './renderState'
 export type { TreeviewRenderItem, TreeviewSlotProps } from './renderItem'
@@ -111,33 +103,8 @@ function withNonEnumerableMeta(event: PatternEvent): PatternEvent {
 }
 
 export { getTreeItemState } from './renderState'
-
-export function resolveTreeviewKeyboardBinding(
-  input: KeyInput,
-  activeKey: Key,
-  data: PatternData,
-  options: PatternOptions = defaultOptions,
-  keyboard: readonly KeyboardBinding[] = treeviewDefinition.keyboard,
-): ResolvedKeyboardBinding | null {
-  return resolveTreeKeyboardBinding({ input, activeKey, data, options, keyboard })
-}
+export { resolveTreeviewKeyboardBinding, resolveTreeviewNavigationTarget } from './runtimeCompatibility'
 
 // 호환용 re-export — 기존 import 경로 유지
 export { resolveEventTemplate, evaluatePredicate, createParentByKey } from '../../kernel/patternKernel'
-
-export function resolveTreeviewNavigationTarget(
-  direction: Extract<PatternEvent, { type: 'navigate' }>,
-  activeKey: Key,
-  data: PatternData,
-  parentByKey: ReadonlyMap<Key, Key> = createParentByKey(data),
-): Key | null {
-  const target = treeviewDefinition.navigation.targets[direction.direction]
-  if (!target) return null
-  return resolveNavigationTarget(target, {
-    activeKey,
-    data,
-    parentByKey,
-    visibleKeys: resolveTreeviewVisibleKeys(data),
-  })
-}
 export { resolveTypeaheadTarget, resolveTreeviewVisibleKeys } from './typeahead'

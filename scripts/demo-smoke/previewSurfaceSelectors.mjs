@@ -11,6 +11,7 @@ export const previewSurfaceSelectors = {
   disclosure: 'button',
   feed: '[role="feed"]',
   grid: '[role="grid"]',
+  landmarks: 'header,main,nav,[role="navigation"],[role="region"],[role="search"]',
   link: 'a,[role="link"]',
   listbox: '[role="listbox"]',
   menuAndMenubar: '[role="menubar"],button',

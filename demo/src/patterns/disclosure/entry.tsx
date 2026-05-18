@@ -20,7 +20,7 @@ const variants: Record<DisclosureVariantKey, PatternData> = {
   navMenuTopLinks: initialNavMenuTopLinksDisclosureData,
 }
 
-const items: readonly { key: DisclosureVariantKey; label: string }[] = [
+export const disclosureVariantItems: readonly { key: DisclosureVariantKey; label: string }[] = [
   { key: 'simple', label: 'simple' },
   { key: 'image', label: 'image description' },
   { key: 'faq', label: 'FAQ' },
@@ -74,7 +74,7 @@ export const entry = defineDemoPattern({
       context: {
         values: {
           state: { variant: host.variant, data: host.data },
-          model: { variantItems: items },
+          model: { variantItems: disclosureVariantItems },
         },
         actions: {
           selectVariant: host.selectVariant,

@@ -1,8 +1,8 @@
 import { reducePatternData } from '../../../../src'
 import { dialogDefinition } from '../../../../src/patterns/dialog/definition'
 import { Dialog } from './Dialog'
-import { initialDialogData } from './dialogData'
-import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { dialogVariantItems, dialogVariants, initialDialogData, type DialogVariantKey } from './dialogData'
+import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 
 const dialogDemoDefinition = {
   key: 'dialog',
@@ -15,6 +15,15 @@ const dialogDemoDefinition = {
     hooks: ['dialog/useDialogPattern.ts'],
     definition: 'dialog/definition.ts',
   },
+  controls: {
+    kind: 'listbox',
+    orientation: 'horizontal',
+    value: '$state.variant',
+    items: '$model.variantItems',
+    label: 'dialog variants',
+    idPrefix: 'dialog-variant',
+    onChange: '$actions.selectVariant',
+  },
   view: {
     kind: 'component',
     component: 'Dialog',
@@ -25,10 +34,13 @@ const dialogDemoDefinition = {
   },
 } as const satisfies DemoPatternDefinition
 
-export const entry = defineStateDemoPattern({
+export const entry = defineVariantDemoPattern<DialogVariantKey>({
   definition: dialogDemoDefinition,
+  initialVariant: 'dialog',
   initialData: initialDialogData,
-  reduce: (data, event) => reducePatternData(dialogDefinition, data, event),
+  dataByVariant: (variant) => dialogVariants[variant].data,
+  reduce: (_variant, data, event) => reducePatternData(dialogDefinition, data, event),
+  variantItems: dialogVariantItems,
   componentName: 'Dialog',
   component: Dialog,
 })

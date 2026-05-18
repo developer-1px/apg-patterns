@@ -5,7 +5,7 @@ import { renderDataInspect } from '../../shared/inspect/genericInspect'
 import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 import type { PatternEvent } from '../../../../src'
 
-const items: readonly { key: SpinbuttonVariantKey; label: string }[] = [
+export const spinbuttonVariantItems: readonly { key: SpinbuttonVariantKey; label: string }[] = [
   { key: 'numeric', label: 'Numeric' },
   { key: 'time', label: 'Time' },
 ]
@@ -56,7 +56,7 @@ export const entry = defineDemoPattern({
       context: {
         values: {
           state: { variant: host.variant, data: host.data, options: spinbuttonVariants[host.variant].options },
-          model: { variantItems: items },
+          model: { variantItems: spinbuttonVariantItems },
         },
         actions: {
           selectVariant: host.selectVariant,
