@@ -1,24 +1,53 @@
 import { usePatternDataHost } from '../../shared/demoHostState'
 import { Switch } from './Switch'
 import { initialSwitchData, reduceSwitchData } from './switchData'
-import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
+import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 import { renderDataInspect } from '../../shared/inspect/genericInspect'
+import type { PatternEvent } from '../../../../src'
 
-export const entry: PatternEntry = {
+const switchDemoDefinition = {
   key: 'switch',
   label: 'Switch',
-  useDemoPattern: (onEvent) => {
+  keyboardShortcuts: ['Space', 'Enter'],
+  sources: {
+    main: 'Switch.tsx',
+    entry: 'switch/entry.tsx',
+    data: ['switchData.ts'],
+    hooks: ['switch/useSwitchPattern.ts'],
+    definition: 'switch/definition.ts',
+  },
+  view: {
+    kind: 'component',
+    component: 'Switch',
+    props: {
+      data: '$state.data',
+      onEvent: '$actions.dispatchEvent',
+    },
+  },
+} as const satisfies DemoPatternDefinition
+
+export const entry = defineDemoPattern({
+  definition: switchDemoDefinition,
+  useRuntime: (onEvent) => {
     const host = usePatternDataHost(initialSwitchData, reduceSwitchData)
     return {
-      key: 'switch',
-      label: 'Switch',
-      keyboardShortcuts: ['Space', 'Enter'],
-      sourceNames: ['Switch.tsx', 'switch/entry.tsx', 'switchData.ts', 'switch/useSwitchPattern.ts', 'switch/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
-      preview: <Switch data={host.data} onEvent={(event) => {
-        onEvent(event)
-        host.dispatchEvent(event)
-      }} />,
+      context: {
+        values: {
+          state: {
+            data: host.data,
+          },
+        },
+        actions: {
+          dispatchEvent: (event: PatternEvent) => {
+            onEvent(event)
+            host.dispatchEvent(event)
+          },
+        },
+        components: {
+          Switch,
+        },
+      },
     }
   },
-}
+})
