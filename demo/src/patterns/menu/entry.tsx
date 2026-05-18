@@ -18,6 +18,7 @@ const menuDemoDefinition = {
     definition: 'menu/definition.ts',
     extra: [
       'menu/menuAriaSources.ts',
+      'menu/menuButtonActions.ts',
       'menu/menuButtonDefinition.ts',
       'menu/menuButtonDefinitionKeyboard.ts',
       'menu/menuButtonEffects.ts',
@@ -31,6 +32,7 @@ const menuDemoDefinition = {
       'menu/menubarKeyboard.ts',
       'menu/menubarParts.ts',
       'menu/menubarRootProps.ts',
+      'menu/useMenuButtonActiveDescendantFocus.ts',
       'menu/useMenubarTypeahead.ts',
       'menu/inspect.ts',
     ],

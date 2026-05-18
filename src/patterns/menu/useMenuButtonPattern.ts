@@ -1,11 +1,12 @@
-import { useLayoutEffect } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { menuButtonDefinition } from './definition'
+import { createMenuButtonActions } from './menuButtonActions'
 import { createMenuButtonItem, type ReactMenuButtonItem } from './menuButtonItem'
 import { createMenuButtonMenuProps, createMenuButtonTriggerProps } from './menuButtonProps'
+import { useMenuButtonActiveDescendantFocus } from './useMenuButtonActiveDescendantFocus'
 
 export interface ReactMenuButtonRuntime {
   triggerKey: Key | null
@@ -37,24 +38,9 @@ export function useMenuButtonPattern(data: PatternData, onEvent: (event: Pattern
   const itemKeys = menuKey ? data.relations?.childrenByKey?.[menuKey] ?? [] : []
 
   usePatternEffects({ definition: menuButtonDefinition, data: runtime.data, keyToElementId: runtime.keyToElementId })
-  useLayoutEffect(() => {
-    if (focusStrategy !== 'ariaActiveDescendant' || !expanded || !menuKey) return
-    const reason = data.state?.lastEventReason
-    if (reason !== 'open' && reason !== 'keyboard' && reason !== 'typeahead') return
-    document.getElementById(runtime.keyToElementId(menuKey))?.focus({ preventScroll: true })
-  }, [data.state?.activeKey, data.state?.lastEventReason, expanded, focusStrategy, menuKey, runtime])
+  useMenuButtonActiveDescendantFocus({ data, expanded, focusStrategy, menuKey, runtime })
 
-  const closeAndFocusTrigger = () => {
-    if (!triggerKey) return
-    onEvent({ type: 'expand', key: triggerKey, expanded: false })
-    document.getElementById(runtime.keyToElementId(triggerKey))?.focus({ preventScroll: true })
-  }
-  const activateActiveItem = () => {
-    const activeKey = data.state?.activeKey && itemKeys.includes(data.state.activeKey) ? data.state.activeKey : itemKeys[0]
-    if (!activeKey) return
-    onEvent({ type: 'activate', key: activeKey })
-    closeAndFocusTrigger()
-  }
+  const { closeAndFocusTrigger, activateActiveItem } = createMenuButtonActions({ data, itemKeys, triggerKey, runtime, onEvent })
 
   return {
     triggerKey,

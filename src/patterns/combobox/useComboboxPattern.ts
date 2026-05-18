@@ -1,10 +1,11 @@
-import { useLayoutEffect, useRef } from 'react'
 import type { HTMLAttributes, InputHTMLAttributes } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions, PatternState } from '../../schema'
 import { createComboboxInputProps } from './comboboxInputProps'
 import { createComboboxOption, type ReactComboboxOption } from './comboboxOption'
 import { COMBOBOX_KEY, comboboxDefinition } from './definition'
+import { useComboboxActiveOptionScroll } from './useComboboxActiveOptionScroll'
+import { useComboboxInlineCompletionInputRef } from './useComboboxInlineCompletionInputRef'
 
 type ComboboxVariant = 'selectOnly' | 'listAutocomplete' | 'listWithInlineAutocomplete'
 
@@ -33,7 +34,6 @@ export function useComboboxPattern(data: ComboboxData, onEvent: (event: PatternE
   const autocomplete = variant === 'selectOnly' ? 'none' : variant === 'listAutocomplete' ? 'list' : 'both'
   const editable = variant !== 'selectOnly'
   const listboxId = options?.listboxId ? String(options.listboxId) : 'combobox-popup'
-  const inputRef = useRef<HTMLInputElement>(null)
   const query = data.state?.query ?? ''
   const inlineCompletion = data.state?.inlineCompletion ?? null
   const runtime = createPatternRuntime({
@@ -49,13 +49,9 @@ export function useComboboxPattern(data: ComboboxData, onEvent: (event: PatternE
   const selectedLabel = selectedKey ? data.items[selectedKey]?.label ?? '' : ''
   const displayValue = editable ? (selectedKey && !open ? selectedLabel : query) : selectedLabel
   const activeKey = data.state?.activeKey
+  const setInputRef = useComboboxInlineCompletionInputRef({ inlineCompletion, variant })
 
-  useLayoutEffect(() => {
-    if (!open || !activeKey || activeKey === COMBOBOX_KEY) return
-    const activeOption = document.getElementById(runtime.keyToElementId(activeKey))
-    if (typeof activeOption?.scrollIntoView !== 'function') return
-    activeOption.scrollIntoView({ block: 'nearest' })
-  }, [activeKey, open, runtime])
+  useComboboxActiveOptionScroll({ activeKey, open, runtime })
 
   return {
     inputProps: createComboboxInputProps({ rootProps, editable, displayValue, listboxId, open, variant, onEvent }),
@@ -68,11 +64,6 @@ export function useComboboxPattern(data: ComboboxData, onEvent: (event: PatternE
     open,
     editable,
     listboxId,
-    setInputRef: (node) => {
-      inputRef.current = node
-      if (variant === 'listWithInlineAutocomplete' && inlineCompletion && node) {
-        node.setSelectionRange(inlineCompletion.start, inlineCompletion.end)
-      }
-    },
+    setInputRef,
   }
 }
