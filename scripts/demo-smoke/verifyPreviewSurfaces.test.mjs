@@ -58,7 +58,7 @@ describe('verifyPreviewSurface', () => {
 describe('verifyPreviewKeyboardShortcuts', () => {
   it('checks rendered aria-keyshortcuts against entry metadata', () => {
     const patternFailures = []
-    document.body.innerHTML = '<div data-demo-preview="button" aria-keyshortcuts="Enter Space"><button type="button">Save</button></div>'
+    document.body.innerHTML = '<div data-demo-preview="button" aria-keyshortcuts="Enter Space" tabindex="0"><button type="button">Save</button></div>'
 
     verifyPreviewKeyboardShortcuts({
       key: 'button',
@@ -72,7 +72,7 @@ describe('verifyPreviewKeyboardShortcuts', () => {
 
   it('reports shortcut drift between rendered preview and metadata', () => {
     const patternFailures = []
-    document.body.innerHTML = '<div data-demo-preview="button" aria-keyshortcuts="Enter"><button type="button">Save</button></div>'
+    document.body.innerHTML = '<div data-demo-preview="button" aria-keyshortcuts="Enter" tabindex="0"><button type="button">Save</button></div>'
 
     verifyPreviewKeyboardShortcuts({
       key: 'button',
@@ -83,6 +83,22 @@ describe('verifyPreviewKeyboardShortcuts', () => {
 
     expect(patternFailures).toEqual([
       'Button: preview aria-keyshortcuts mismatch: expected=Enter Space, actual=Enter',
+    ])
+  })
+
+  it('reports shortcuts that are not reachable through normal keyboard focus', () => {
+    const patternFailures = []
+    document.body.innerHTML = '<div data-demo-preview="button" aria-keyshortcuts="Enter Space" tabindex="-1"><button type="button">Save</button></div>'
+
+    verifyPreviewKeyboardShortcuts({
+      key: 'button',
+      label: 'Button',
+      expectedKeyboardShortcutsByPattern: new Map([['button', ['Enter', 'Space']]]),
+      patternFailures,
+    })
+
+    expect(patternFailures).toEqual([
+      'Button: preview aria-keyshortcuts are not keyboard-discoverable',
     ])
   })
 })

@@ -56,6 +56,9 @@ export function verifyPreviewKeyboardShortcuts({ key, label, expectedKeyboardSho
   if (actualValue !== expectedValue) {
     patternFailures.push(`${label}: preview aria-keyshortcuts mismatch: expected=${expectedValue ?? 'none'}, actual=${actualValue ?? 'none'}`)
   }
+  if (expectedValue && preview?.getAttribute('tabindex') !== '0') {
+    patternFailures.push(`${label}: preview aria-keyshortcuts are not keyboard-discoverable`)
+  }
 }
 
 export function previewSurfaceIsMounted(key) {

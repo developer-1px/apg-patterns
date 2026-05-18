@@ -233,7 +233,12 @@ describe('App route state', () => {
       expect(currentHashParam('source')).toBe(route.sourceName)
       expect(screen.getByTitle(route.sourceName)).toBeTruthy()
       expect(screen.queryByText(`missing source: ${route.sourceName}`)).toBeNull()
-      expect(document.querySelector(`[data-demo-preview="${route.key}"]`)?.getAttribute('aria-keyshortcuts')).toBe(route.keyboardShortcuts.join(' ') || null)
+      const preview = document.querySelector(`[data-demo-preview="${route.key}"]`)
+      expect(preview?.getAttribute('aria-keyshortcuts')).toBe(route.keyboardShortcuts.join(' ') || null)
+      if (route.keyboardShortcuts.length > 0) {
+        expect(preview?.getAttribute('tabindex')).toBe('0')
+        expect(preview?.getAttribute('aria-label')).toBe(`${route.label} preview keyboard shortcuts`)
+      }
       await expectActiveSourceText(route.sourceName)
 
       unmount()

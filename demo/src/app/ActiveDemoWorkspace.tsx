@@ -85,7 +85,12 @@ export function ActiveDemoWorkspace({
             </div>
           </div>
         ) : null}
-        <div data-demo-preview={activeDemo.key} aria-keyshortcuts={previewKeyboardShortcuts} tabIndex={previewKeyboardShortcuts ? -1 : undefined}>
+        <div
+          data-demo-preview={activeDemo.key}
+          aria-label={previewKeyboardShortcuts ? `${activeDemo.label} preview keyboard shortcuts` : undefined}
+          aria-keyshortcuts={previewKeyboardShortcuts}
+          tabIndex={previewKeyboardShortcuts ? 0 : undefined}
+        >
           {activeDemo.preview}
         </div>
       </section>
