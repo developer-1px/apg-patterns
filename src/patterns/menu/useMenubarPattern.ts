@@ -1,10 +1,10 @@
-import type { KeyboardEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { menubarDefinition } from './definition'
 import { createMenubarItem, type ReactMenubarItem } from './menubarItem'
+import { createMenubarRootProps } from './menubarRootProps'
 import { useMenubarTypeahead } from './useMenubarTypeahead'
 
 export type { ReactMenubarItem } from './menubarItem'
@@ -37,10 +37,7 @@ export function useMenubarPattern(data: PatternData, onEvent: (event: PatternEve
   return {
     get rootProps() {
       const props = runtime.getPartProps('menubar') as ReactPatternProps
-      return {
-        ...props,
-        onKeyDown: (event: KeyboardEvent<HTMLElement>) => handleMenubarKey(event, props.onKeyDown as ((event: KeyboardEvent<HTMLElement>) => void) | undefined, typeahead),
-      }
+      return createMenubarRootProps(props, typeahead)
     },
     get rootItems() {
       return rootKeys.map((key) => createMenubarItem({ runtime, data, key, rootKeys, onEvent }))
@@ -51,14 +48,4 @@ export function useMenubarPattern(data: PatternData, onEvent: (event: PatternEve
     },
     keyToElementId: runtime.keyToElementId,
   }
-}
-
-function handleMenubarKey(event: KeyboardEvent<HTMLElement>, baseKeyDown: ((event: KeyboardEvent<HTMLElement>) => void) | undefined, typeahead: (char: string) => void) {
-  const printable = event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey && /\S/.test(event.key)
-  if (printable && event.key !== ' ') {
-    event.preventDefault()
-    typeahead(event.key)
-    return
-  }
-  baseKeyDown?.(event)
 }
