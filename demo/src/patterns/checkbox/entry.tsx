@@ -12,7 +12,7 @@ const checkboxDemoDefinition = {
     data: ['checkboxData.ts'],
     hooks: ['checkbox/useCheckboxPattern.ts'],
     definition: 'checkbox/definition.ts',
-    extra: ['checkbox/checkboxRenderItem.ts', 'checkbox/inspect.ts'],
+    extra: ['checkbox/checkboxRenderItem.ts', 'checkbox/keyboard.ts', 'checkbox/parts.ts', 'checkbox/inspect.ts'],
   },
   controls: {
     kind: 'listbox',

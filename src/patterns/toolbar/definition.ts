@@ -1,4 +1,7 @@
 import { PatternDefinitionSchema } from '../../schema'
+import { toolbarEffects } from './effects'
+import { toolbarKeyboard } from './keyboard'
+import { toolbarParts } from './parts'
 
 // APG Toolbar pattern
 // https://www.w3.org/WAI/ARIA/apg/patterns/toolbar/
@@ -20,39 +23,8 @@ export const toolbarDefinition = ToolbarDefinitionSchema.parse({
   rootRole: 'toolbar',
   containedRoles: ['button'],
   focusModel: 'rovingTabIndex',
-  effects: [{ kind: 'focus', on: { state: 'activeKey', reasons: ['keyboard'] }, scope: { kind: 'focusWithin' }, target: { kind: 'activeKeyElement' }, preventScroll: true }],
-  parts: {
-    toolbar: {
-      role: 'toolbar',
-      aria: [
-        { attribute: 'aria-label', from: 'refs.label' },
-        { attribute: 'aria-orientation', from: 'options.orientation' },
-      ],
-    },
-    item: {
-      role: 'button',
-      aria: [
-        { attribute: 'aria-pressed', from: 'state.selectedKeys' },
-        { attribute: 'aria-disabled', from: 'state.disabledKeys' },
-      ],
-      focus: {
-        tabIndex: {
-          when: { kind: 'always' },
-          active: 0,
-          inactive: -1,
-        },
-      },
-      state: [
-        { name: 'active', from: 'state.activeKey' },
-        { name: 'pressed', from: 'state.selectedKeys' },
-        { name: 'disabled', from: 'state.disabledKeys' },
-      ],
-      events: [
-        { event: 'focus', when: { kind: 'not', predicate: { kind: 'isDisabled', key: '$key' } }, events: [{ type: 'focus', key: '$key' }] },
-        { event: 'click', when: { kind: 'not', predicate: { kind: 'isDisabled', key: '$key' } }, events: [{ type: 'focus', key: '$key' }, { type: 'select', key: '$key' }] },
-      ],
-    },
-  },
+  effects: toolbarEffects,
+  parts: toolbarParts,
   navigation: {
     visibleOrder: { kind: 'flat' },
     targets: {
@@ -62,12 +34,5 @@ export const toolbarDefinition = ToolbarDefinitionSchema.parse({
       last: { kind: 'linear', action: 'last' },
     },
   },
-  keyboard: [
-    { shortcut: 'ArrowRight', preventDefault: true, cases: [{ case: 'when', when: { kind: 'optionEquals', option: 'orientation', value: 'horizontal' }, events: [{ type: 'navigate', direction: 'next' }] }] },
-    { shortcut: 'ArrowLeft', preventDefault: true, cases: [{ case: 'when', when: { kind: 'optionEquals', option: 'orientation', value: 'horizontal' }, events: [{ type: 'navigate', direction: 'previous' }] }] },
-    { shortcut: 'ArrowDown', preventDefault: true, cases: [{ case: 'when', when: { kind: 'optionEquals', option: 'orientation', value: 'vertical' }, events: [{ type: 'navigate', direction: 'next' }] }] },
-    { shortcut: 'ArrowUp', preventDefault: true, cases: [{ case: 'when', when: { kind: 'optionEquals', option: 'orientation', value: 'vertical' }, events: [{ type: 'navigate', direction: 'previous' }] }] },
-    { shortcut: 'Home', preventDefault: true, cases: [{ case: 'always', events: [{ type: 'navigate', direction: 'first' }] }] },
-    { shortcut: 'End', preventDefault: true, cases: [{ case: 'always', events: [{ type: 'navigate', direction: 'last' }] }] },
-  ],
+  keyboard: toolbarKeyboard,
 })
