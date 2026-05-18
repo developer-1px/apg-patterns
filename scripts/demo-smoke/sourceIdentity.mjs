@@ -25,6 +25,7 @@ export function sourceIdentityNeedles(sourceName, patternKey) {
     if (/^use[A-Z].*Pattern$/.test(fileName)) return [`export function ${fileName}`]
     if (fileName === 'runtime') return []
     if (fileName === 'navigation') return []
+    return ['export ']
   }
 
   if (sourceName === 'kernel/patternRuntime.ts') return ['createPatternRuntime']
