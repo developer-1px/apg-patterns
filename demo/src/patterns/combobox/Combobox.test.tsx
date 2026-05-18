@@ -58,6 +58,20 @@ describe('Combobox demo — selectOnly', () => {
     expect(input.getAttribute('aria-activedescendant')).toBe(options[0].getAttribute('id'))
   })
 
+  it('Arrow keys clamp at popup boundaries', () => {
+    render(<ComboboxDemo variant="selectOnly" />)
+    const input = screen.getByRole('combobox')
+    fireEvent.keyDown(input, { key: 'ArrowDown' })
+    const options = screen.getAllByRole('option')
+
+    fireEvent.keyDown(input, { key: 'ArrowUp' })
+    expect(input.getAttribute('aria-activedescendant')).toBe(options[0].getAttribute('id'))
+
+    fireEvent.keyDown(input, { key: 'End' })
+    fireEvent.keyDown(input, { key: 'ArrowDown' })
+    expect(input.getAttribute('aria-activedescendant')).toBe(options[options.length - 1].getAttribute('id'))
+  })
+
   it('Enter selects active option and closes popup', () => {
     render(<ComboboxDemo variant="selectOnly" />)
     const input = screen.getByRole('combobox') as HTMLInputElement

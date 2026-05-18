@@ -80,4 +80,23 @@ describe('Button demo (toggle, aria-pressed)', () => {
     fireEvent.keyDown(btn, { key: ' ', code: 'Space' })
     expect(btn.getAttribute('aria-pressed')).toBe('true')
   })
+
+  it('exposes disabled state while still receiving pointer input in the demo host', () => {
+    const variant = buttonVariants.toggle
+    const data = {
+      ...variant.data,
+      state: {
+        ...variant.data.state,
+        disabledKeys: ['mute'],
+      },
+    }
+    const events: PatternEvent[] = []
+
+    render(<Button data={data} onEvent={(event) => events.push(event)} />)
+
+    const btn = screen.getByRole('button')
+    expect(btn.getAttribute('aria-disabled')).toBe('true')
+    fireEvent.click(btn)
+    expect(events.length).toBeGreaterThan(0)
+  })
 })

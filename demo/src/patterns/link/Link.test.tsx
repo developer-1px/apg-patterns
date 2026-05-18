@@ -44,6 +44,27 @@ describe('Link demo (anchor)', () => {
     fireEvent.keyDown(link, { key: 'Enter', code: 'Enter' })
     expect(onEvent).toHaveBeenCalledWith({ type: 'activate', key: 'home' })
   })
+
+  it('exposes disabled state from pattern data while preserving mouse activation wiring', () => {
+    const onEvent = vi.fn<(event: PatternEvent) => void>()
+    render(
+      <Link
+        data={{
+          ...initialAnchorLinkData,
+          state: {
+            ...initialAnchorLinkData.state,
+            disabledKeys: ['home'],
+          },
+        }}
+        onEvent={onEvent}
+      />,
+    )
+
+    const link = screen.getByRole('link')
+    expect(link.getAttribute('aria-disabled')).toBe('true')
+    fireEvent.click(link)
+    expect(onEvent).toHaveBeenCalledWith({ type: 'activate', key: 'home' })
+  })
 })
 
 describe('Link demo (spanRole)', () => {

@@ -59,6 +59,36 @@ describe('Spinbutton — numeric variant', () => {
     fireEvent.click(screen.getByRole('button', { name: /decrement/i }))
     expect(sb.getAttribute('aria-valuenow')).toBe('5')
   })
+
+  it('uses item-level value range and labelledby when provided', () => {
+    const data = {
+      ...initialSpinbuttonData,
+      items: {
+        ...initialSpinbuttonData.items,
+        count: {
+          ...initialSpinbuttonData.items.count,
+          labelledBy: 'quantity-label',
+          valuemin: 2,
+          valuemax: 8,
+          valuetext: 'five items',
+        },
+      },
+    }
+
+    render(
+      <>
+        <span id="quantity-label">Quantity label</span>
+        <Spinbutton data={data} onEvent={() => undefined} />
+      </>,
+    )
+
+    const sb = screen.getByRole('spinbutton')
+    expect(sb.getAttribute('aria-labelledby')).toBe('quantity-label')
+    expect(sb.getAttribute('aria-valuemin')).toBe('2')
+    expect(sb.getAttribute('aria-valuemax')).toBe('8')
+    expect(sb.getAttribute('aria-valuetext')).toBe('five items')
+    fireEvent.keyDown(sb, { key: 'ArrowUp', code: 'ArrowUp' })
+  })
 })
 
 describe('Spinbutton — time picker variant', () => {
