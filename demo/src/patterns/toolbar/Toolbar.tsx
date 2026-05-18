@@ -1,4 +1,5 @@
 import { useToolbarPattern, type PatternData, type PatternEvent } from '../../../../src'
+import { ds } from '../../shared/designSystem'
 
 export function Toolbar({
   data,
@@ -20,7 +21,7 @@ export function Toolbar({
             type="button"
             {...item.itemProps}
             key={item.key}
-            className="inline-flex h-8 items-center rounded-lg px-2.5 text-sm font-medium text-zinc-700 outline-none transition hover:bg-white/75 hover:text-zinc-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 data-[focus-visible]:outline data-[focus-visible]:outline-2 data-[focus-visible]:outline-offset-2 data-[focus-visible]:outline-zinc-400 dark:text-zinc-300 dark:hover:bg-white/[0.06] dark:hover:text-zinc-50 dark:focus-visible:outline-zinc-500 dark:data-[focus-visible]:outline-zinc-500"
+            className={ds.textButton}
           >
             {item.label}
           </button>

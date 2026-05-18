@@ -1,4 +1,5 @@
 import { useTreegridPattern, type PatternData, type PatternEvent } from '../../../../src'
+import { cx, ds } from '../../shared/designSystem'
 
 export function Treegrid({
   data,
@@ -12,7 +13,7 @@ export function Treegrid({
   return (
     <div
       {...treegrid.treegridProps}
-      className="inline-grid overflow-hidden rounded-xl bg-white/82 text-sm text-zinc-800 shadow-[0_12px_32px_rgba(24,24,27,0.06)] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-zinc-400 dark:bg-white/[0.045] dark:text-zinc-300 dark:shadow-black/20 dark:focus-visible:outline-zinc-500"
+      className={cx('inline-grid overflow-hidden rounded-xl bg-white/82 text-sm text-zinc-800 shadow-[0_12px_32px_rgba(24,24,27,0.06)] dark:bg-white/[0.045] dark:text-zinc-300 dark:shadow-black/20', ds.focusRing)}
       style={{ gridTemplateColumns: `repeat(${treegrid.columnCount}, minmax(120px, 1fr))` }}
     >
       {treegrid.rows.map((row) => (
@@ -22,7 +23,7 @@ export function Treegrid({
               key={cell.key}
               {...cell.cellProps}
               data-active={cell.state.active ? '' : undefined}
-              className="min-h-8 px-2 py-1 outline-none aria-selected:bg-zinc-100/90 data-[active]:bg-white/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-zinc-400 dark:aria-selected:bg-white/[0.08] dark:data-[active]:bg-white/[0.05] dark:focus-visible:outline-zinc-500"
+              className={cx(ds.listOption, 'min-h-8 rounded-none px-2 py-1')}
               style={cell.indent ? { paddingLeft: `${8 + cell.indent}px` } : undefined}
             >
               {cell.value}

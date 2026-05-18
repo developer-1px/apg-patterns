@@ -1,4 +1,5 @@
 import { useComboboxPattern, type PatternData, type PatternEvent } from '../../../../src'
+import { cx, ds } from '../../shared/designSystem'
 
 export function Combobox({
   data,
@@ -14,7 +15,7 @@ export function Combobox({
       <input
         ref={combobox.setInputRef}
         {...combobox.inputProps}
-        className="h-9 w-full rounded-xl bg-white/85 px-3 text-sm text-zinc-900 shadow-[0_8px_24px_rgba(24,24,27,0.06)] outline-none transition placeholder:text-zinc-400 focus:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 data-[focus-visible]:outline data-[focus-visible]:outline-2 data-[focus-visible]:outline-offset-2 data-[focus-visible]:outline-zinc-400 dark:bg-white/[0.065] dark:text-zinc-100 dark:shadow-black/20 dark:focus:bg-white/[0.09] dark:focus-visible:outline-zinc-500 dark:data-[focus-visible]:outline-zinc-500"
+        className={cx(ds.field, 'h-9 rounded-xl bg-white/85 text-zinc-900 shadow-[0_8px_24px_rgba(24,24,27,0.06)] placeholder:text-zinc-400 dark:bg-white/[0.065] dark:text-zinc-100')}
       />
       {combobox.open ? (
         <div
@@ -30,7 +31,7 @@ export function Combobox({
                 key={option.key}
                 {...option.optionProps}
                 data-active={option.state.active ? '' : undefined}
-                className="cursor-pointer rounded-md px-2.5 py-1.5 text-sm text-zinc-800 outline-none transition aria-selected:bg-zinc-900 aria-selected:font-medium aria-selected:text-white aria-selected:shadow-sm data-[active]:bg-zinc-900 data-[active]:font-medium data-[active]:text-white data-[active]:shadow-sm data-[focus-visible]:outline data-[focus-visible]:outline-2 data-[focus-visible]:outline-offset-2 data-[focus-visible]:outline-zinc-400 dark:text-zinc-200 dark:aria-selected:bg-zinc-100 dark:aria-selected:text-zinc-950 dark:data-[active]:bg-zinc-100 dark:data-[active]:text-zinc-950 dark:data-[focus-visible]:outline-zinc-500"
+                className={cx(ds.listOption, 'cursor-pointer rounded-md ui-active:bg-zinc-900 ui-active:font-medium ui-active:text-white ui-active:shadow-sm ui-selected:bg-zinc-900 ui-selected:font-medium ui-selected:text-white dark:ui-active:bg-zinc-100 dark:ui-active:text-zinc-950 dark:ui-selected:bg-zinc-100 dark:ui-selected:text-zinc-950')}
               >
                 {option.label}
               </div>
