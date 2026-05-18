@@ -1,5 +1,5 @@
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { useReactPatternRuntime } from '../../adapters/reactPatternEffects'
 import { radioGroupDefinition } from './definition'
 import { createRadioRenderItem, type ReactRadioRenderItem } from './radioRenderItem'
@@ -32,7 +32,7 @@ export function useRadioGroupPattern(data: PatternData, onEvent: (event: Pattern
     onEvent,
     keyToElementId: (key) => `${mergedOptions.elementIdPrefix ?? 'radio-'}${key}`,
   })
-  const rootProps = runtime.getPartProps('radiogroup') as ReactPatternProps
+  const rootProps = reactProps(runtime.getPartProps('radiogroup'))
   const onKeyDown = runtime.getRootKeyboardHandler()
 
   return {

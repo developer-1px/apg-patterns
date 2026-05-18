@@ -1,6 +1,6 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternDataWithOptions, PatternEvent, PatternItem, PatternOptions, PatternStateWithOptions } from '../../schema'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { createBreadcrumbItems, type ReactBreadcrumbItem } from './breadcrumbItem'
 import { breadcrumbDefinition } from './definition'
 
@@ -37,10 +37,10 @@ export function useBreadcrumbPattern(data: BreadcrumbData, onEvent: (event: Patt
 
   return {
     get rootProps() {
-      return runtime.getPartProps('root') as ReactPatternProps
+      return reactProps(runtime.getPartProps('root'))
     },
     get listProps() {
-      return runtime.getPartProps('list') as ReactPatternProps
+      return reactProps(runtime.getPartProps('list'))
     },
     get items() {
       return createBreadcrumbItems({ runtime, data, onEvent })

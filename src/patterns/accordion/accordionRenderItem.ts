@@ -1,6 +1,7 @@
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData } from '../../schema'
-import type { ReactAccordionRenderItem, ReactPatternProps } from '../../adapters/reactTypes'
+import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import type { ReactAccordionRenderItem } from '../../adapters/reactTypes'
 
 export function createAccordionRenderItem(runtime: PatternRuntime, key: Key): ReactAccordionRenderItem {
   const panelKey = runtime.data.relations?.controlsByKey?.[key]?.[0] ?? null
@@ -16,10 +17,10 @@ export function createAccordionRenderItem(runtime: PatternRuntime, key: Key): Re
       expanded: Boolean(state.expanded),
       disabled: runtime.data.state?.disabledKeys?.includes(key) ?? false,
     },
-    headerProps: {
+    headerProps: reactProps({
       type: 'button',
       ...toReactProps(runtime.getItemProps('header', key)),
-    } as ReactPatternProps,
+    }),
     panelProps: panelKey ? toReactProps(runtime.getItemProps('panel', panelKey)) : null,
   }
 }
@@ -33,5 +34,5 @@ function getTextValue(data: PatternData, key: Key): string {
 }
 
 export function toReactProps(props: Record<string, unknown>): ReactPatternProps {
-  return props as ReactPatternProps
+  return reactProps(props)
 }

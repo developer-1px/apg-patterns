@@ -1,7 +1,7 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
 import type { Key, PatternDataWithOptions, PatternEvent, PatternOptions } from '../../schema'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { dialogDefinition } from './definition'
 import { createDialogProps } from './dialogProps'
 
@@ -31,25 +31,25 @@ export function useDialogPattern(data: PatternDataWithOptions, onEvent: (event: 
   return {
     open: data.state?.expandedKeys?.includes('trigger') ?? false,
     get triggerProps() {
-      return runtime.getPartProps('trigger', 'trigger') as ReactPatternProps
+      return reactProps(runtime.getPartProps('trigger', 'trigger'))
     },
     get overlayProps() {
-      return runtime.getPartProps('overlay') as ReactPatternProps
+      return reactProps(runtime.getPartProps('overlay'))
     },
     get dialogProps() {
       return createDialogProps({ runtime, data, keyToElementId })
     },
     get titleProps() {
-      return runtime.getPartProps('title', 'title') as ReactPatternProps
+      return reactProps(runtime.getPartProps('title', 'title'))
     },
     get descriptionProps() {
-      return runtime.getPartProps('description', 'description') as ReactPatternProps
+      return reactProps(runtime.getPartProps('description', 'description'))
     },
     get cancelProps() {
-      return runtime.getPartProps('cancel', 'cancel') as ReactPatternProps
+      return reactProps(runtime.getPartProps('cancel', 'cancel'))
     },
     get submitProps() {
-      return runtime.getPartProps('submit', 'submit') as ReactPatternProps
+      return reactProps(runtime.getPartProps('submit', 'submit'))
     },
     labelOf: (key) => data.items[key]?.label ?? key,
     get ids() {

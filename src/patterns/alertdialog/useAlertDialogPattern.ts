@@ -1,7 +1,7 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
 import type { Key, PatternDataWithOptions, PatternEvent, PatternOptions } from '../../schema'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { alertDialogOverlayProps, createAlertDialogActionProps, createAlertDialogDialogProps } from './alertDialogProps'
 import { alertDialogDefinition } from './definition'
 
@@ -29,7 +29,7 @@ export function useAlertDialogPattern(data: PatternDataWithOptions, onEvent: (ev
   return {
     open: data.state?.expandedKeys?.includes('trigger') ?? false,
     get triggerProps() {
-      return runtime.getPartProps('trigger', 'trigger') as ReactPatternProps
+      return reactProps(runtime.getPartProps('trigger', 'trigger'))
     },
     overlayProps: alertDialogOverlayProps,
     get dialogProps() {

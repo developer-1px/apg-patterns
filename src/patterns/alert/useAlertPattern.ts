@@ -1,6 +1,6 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { createAlertRootProps } from './alertProps'
 import { alertDefinition } from './definition'
 
@@ -42,7 +42,7 @@ export function useAlertPattern(data: AlertData, onEvent: (event: PatternEvent) 
       return createAlertRootProps(runtime, key)
     },
     get dismissProps() {
-      return runtime.getItemProps('dismiss', 'dismiss') as ReactPatternProps
+      return reactProps(runtime.getItemProps('dismiss', 'dismiss'))
     },
     key,
     get message() {

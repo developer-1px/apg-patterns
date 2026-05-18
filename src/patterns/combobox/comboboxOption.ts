@@ -1,7 +1,7 @@
 import type { MouseEvent } from 'react'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent } from '../../schema'
-import type { ReactPatternProps, ReactRenderItemState } from '../../adapters/reactBaseTypes'
+import { reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
 import { COMBOBOX_KEY } from './definition'
 
 export interface ReactComboboxOption {
@@ -26,7 +26,7 @@ export function createComboboxOption({
   editable: boolean
   onEvent: (event: PatternEvent) => void
 }): ReactComboboxOption {
-  const optionProps = runtime.getPartProps('option', key) as ReactPatternProps
+  const optionProps = reactProps(runtime.getPartProps('option', key))
   const state = runtime.getItemState(key, 'option')
   const active = Boolean(state.active)
   const selected = Boolean(state.selected)

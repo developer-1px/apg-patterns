@@ -1,6 +1,6 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternDataWithOptions, PatternEvent, PatternOptions } from '../../schema'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { tableDefinition } from './definition'
 import { createTableRows, type ReactTableRow } from './tableRow'
 export type { ReactTableCell, ReactTableRow } from './tableRow'
@@ -37,7 +37,7 @@ export function useTablePattern(data: PatternDataWithOptions, onEvent: (event: P
 
   return {
     get tableProps() {
-      return runtime.getPartProps('table') as ReactPatternProps
+      return reactProps(runtime.getPartProps('table'))
     },
     headerRow: rows[0] ?? null,
     bodyRows: rows.slice(1),
