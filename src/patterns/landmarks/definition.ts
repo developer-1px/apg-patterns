@@ -1,4 +1,5 @@
 import { PatternDefinitionSchema } from '../../schema'
+import { landmarksParts } from './parts'
 
 export const LandmarksDefinitionSchema = PatternDefinitionSchema.superRefine((value, ctx) => {
   if (value.apgPattern !== 'landmarks') ctx.addIssue({ code: 'custom', path: ['apgPattern'], message: 'expected "landmarks"' })
@@ -17,29 +18,7 @@ export const landmarksDefinition = LandmarksDefinitionSchema.parse({
     'region',
     'search',
   ],
-  parts: {
-    root: { role: 'document' },
-    banner: { role: 'banner' },
-    complementary: { role: 'complementary' },
-    contentinfo: { role: 'contentinfo' },
-    form: {
-      role: 'form',
-      aria: [{ attribute: 'aria-label', from: 'items.$key.label' }],
-    },
-    main: { role: 'main' },
-    navigation: {
-      role: 'navigation',
-      aria: [{ attribute: 'aria-label', from: 'items.$key.label' }],
-    },
-    region: {
-      role: 'region',
-      aria: [{ attribute: 'aria-label', from: 'items.$key.label' }],
-    },
-    search: {
-      role: 'search',
-      aria: [{ attribute: 'aria-label', from: 'items.$key.label' }],
-    },
-  },
+  parts: landmarksParts,
   navigation: {
     visibleOrder: { kind: 'flat' },
     targets: {},

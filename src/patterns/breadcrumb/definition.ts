@@ -1,4 +1,5 @@
 import { PatternDefinitionSchema } from '../../schema'
+import { breadcrumbParts } from './parts'
 
 // APG Breadcrumb pattern
 // https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/
@@ -17,23 +18,7 @@ export const breadcrumbDefinition = BreadcrumbDefinitionSchema.parse({
   apgPattern: 'breadcrumb',
   rootRole: 'navigation',
   containedRoles: ['list', 'listitem', 'link'],
-  parts: {
-    root: {
-      role: 'navigation',
-      aria: [
-        { attribute: 'aria-label', from: 'refs.label' },
-      ],
-    },
-    list: {
-      role: 'list',
-    },
-    crumb: {
-      role: 'link',
-      aria: [
-        { attribute: 'aria-current', from: 'state.currentByKey' },
-      ],
-    },
-  },
+  parts: breadcrumbParts,
   navigation: {
     visibleOrder: { kind: 'flat' },
     targets: {},
