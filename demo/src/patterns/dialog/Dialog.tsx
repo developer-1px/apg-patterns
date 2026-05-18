@@ -1,18 +1,16 @@
 import { useReducer } from 'react'
 import { reducePatternData, useDialogPattern, type PatternData, type PatternEvent } from '../../../../src'
 import { dialogDefinition } from '../../../../src/patterns/dialog/definition'
+import { ds } from '../../shared/designSystem'
 import { dialogContent, initialDialogData } from './dialogData'
 
-const triggerClass =
-  'inline-flex h-8 items-center rounded-xl bg-zinc-100/80 px-3 text-sm font-medium text-zinc-800 shadow-sm outline-none transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.06] dark:text-zinc-200 dark:hover:bg-white/[0.08] dark:focus-visible:outline-zinc-500'
+const triggerClass = ds.button
 const overlayClass =
   'fixed inset-0 z-40 bg-black/45 backdrop-blur-sm'
 const panelClass =
   'fixed left-1/2 top-1/2 z-50 w-[28rem] max-w-[90vw] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white/96 p-5 text-sm text-zinc-800 shadow-[0_28px_88px_rgba(0,0,0,0.26)] outline-none backdrop-blur dark:bg-zinc-950/96 dark:text-zinc-200'
-const inputClass =
-  'h-8 w-full rounded-lg bg-zinc-100/75 px-2.5 text-sm shadow-inner shadow-zinc-200/40 outline-none transition focus:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.06] dark:shadow-black/20 dark:focus:bg-white/[0.08] dark:focus-visible:outline-zinc-500'
-const buttonClass =
-  'inline-flex h-8 items-center rounded-xl bg-zinc-100/80 px-3 text-sm font-medium text-zinc-800 shadow-sm outline-none transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.06] dark:text-zinc-200 dark:hover:bg-white/[0.08] dark:focus-visible:outline-zinc-500'
+const inputClass = ds.field
+const buttonClass = ds.button
 
 export interface DialogProps {
   data?: PatternData

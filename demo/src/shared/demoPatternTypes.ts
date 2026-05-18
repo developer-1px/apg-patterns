@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react'
 import type { PatternEvent } from '../../../src'
+import { ds } from './designSystem'
 import type { SourceName } from './sources'
 
-export const selectClass = 'h-8 rounded-lg bg-white/70 px-2.5 text-xs font-medium text-zinc-700 shadow-sm outline-none transition focus:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.06] dark:text-zinc-300 dark:focus:bg-white/[0.08] dark:focus-visible:outline-zinc-500'
+export const selectClass = ds.field
 
 export type PatternKey = string
 

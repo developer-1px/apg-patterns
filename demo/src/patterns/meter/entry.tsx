@@ -1,14 +1,43 @@
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { Meter } from './Meter'
 import { meterVariantItems, meterVariants, type MeterVariantKey } from './meterData'
-import { VariantListbox } from '../../shared/VariantListbox'
-import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
+import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 import { renderDataInspect } from '../../shared/inspect/genericInspect'
 
-export const entry: PatternEntry = {
+const meterDemoDefinition = {
   key: 'meter',
   label: 'Meter',
-  useDemoPattern: (onEvent) => {
+  keyboardShortcuts: [],
+  sources: {
+    main: 'Meter.tsx',
+    entry: 'meter/entry.tsx',
+    data: ['meterData.ts'],
+    hooks: ['meter/useMeterPattern.ts'],
+    definition: 'meter/definition.ts',
+  },
+  controls: {
+    kind: 'listbox',
+    orientation: 'horizontal',
+    value: '$state.variant',
+    items: '$model.variantItems',
+    label: 'meter variants',
+    idPrefix: 'meter-variant',
+    onChange: '$actions.selectVariant',
+  },
+  view: {
+    kind: 'component',
+    component: 'Meter',
+    props: {
+      data: '$state.data',
+      onEvent: '$actions.emitEvent',
+      options: '$state.options',
+    },
+  },
+} as const satisfies DemoPatternDefinition
+
+export const entry = defineDemoPattern({
+  definition: meterDemoDefinition,
+  useRuntime: (onEvent) => {
     const host = useVariantPatternDataHost<MeterVariantKey>(
       'disk',
       meterVariants.disk.data,
@@ -16,13 +45,26 @@ export const entry: PatternEntry = {
       (_variant, data) => data,
     )
     return {
-      key: 'meter',
-      label: 'Meter',
-      keyboardShortcuts: [],
-      sourceNames: ['Meter.tsx', 'meter/entry.tsx', 'meter/useMeterPattern.ts', 'meterData.ts', 'meter/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
-      variants: <VariantListbox orientation="horizontal" value={host.variant} items={meterVariantItems} label="meter variants" idPrefix="meter-variant" onChange={host.selectVariant} />,
-      preview: <Meter data={host.data} onEvent={onEvent} options={meterVariants[host.variant].options} />,
+      context: {
+        values: {
+          state: {
+            variant: host.variant,
+            data: host.data,
+            options: meterVariants[host.variant].options,
+          },
+          model: {
+            variantItems: meterVariantItems,
+          },
+        },
+        actions: {
+          selectVariant: host.selectVariant,
+          emitEvent: onEvent,
+        },
+        components: {
+          Meter,
+        },
+      },
     }
   },
-}
+})

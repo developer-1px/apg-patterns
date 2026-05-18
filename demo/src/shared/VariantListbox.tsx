@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import type { HTMLAttributes } from 'react'
 import { listboxDefinition, reducePatternData, useListboxPattern, type PatternData } from '../../../src'
+import { cx, ds } from './designSystem'
 import { readVariantRoute, useVariantRoutePattern, writeVariantRoute } from './variantRoute'
 
 type Props = HTMLAttributes<HTMLElement>
@@ -55,14 +56,14 @@ export function VariantListbox<T extends string>({
         }
         handleKeyDown?.(event)
       }}
-      className={`${orientation === 'horizontal' ? 'flex flex-wrap items-center gap-1' : 'grid gap-1'} outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:focus-visible:outline-zinc-500`}
+      className={cx(orientation === 'horizontal' ? 'flex flex-wrap items-center gap-1' : 'grid gap-1', ds.focusRing)}
     >
       {listbox.renderItems.map((item) => (
         <button
           {...(item.optionProps as Props)}
           key={item.key}
           type="button"
-          className="min-h-8 rounded-lg px-2.5 text-left text-xs font-medium text-zinc-600 outline-none transition hover:bg-white/70 hover:text-zinc-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 aria-selected:bg-white aria-selected:text-zinc-950 aria-selected:shadow-sm dark:text-zinc-400 dark:hover:bg-white/[0.06] dark:hover:text-zinc-100 dark:focus-visible:outline-zinc-500 dark:aria-selected:bg-zinc-100 dark:aria-selected:text-zinc-950"
+          className={ds.option}
         >
           {item.label}
         </button>
