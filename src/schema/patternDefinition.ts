@@ -1,8 +1,12 @@
 import { z } from 'zod'
-import { JsonValueSchema, validateJsonExtensionFields } from './jsonValue'
+import { validateJsonExtensionFields } from './jsonValue'
 import { KeyTokenSchema } from './patternData'
-import { EventTemplateSchema, PatternEventReasonSchema, PatternEventTypeSchema } from './patternEvent'
+import { EventTemplateSchema, PatternEventReasonSchema } from './patternEvent'
+import { PredicateSchema } from './patternPredicate'
+import { TransitionSchema } from './patternTransition'
 import { ReactFacadeSchema } from './reactFacade'
+export * from './patternPredicate'
+export * from './patternTransition'
 export * from './reactFacade'
 
 export const AriaRoleSchema = z.enum([
@@ -70,63 +74,6 @@ export const AriaSourcePathSchema = z.enum([
   'state.sortByKey', 'state.valueByKey',
 ])
 export type AriaSourcePath = z.infer<typeof AriaSourcePathSchema>
-
-export const StateFieldSchema = z.enum([
-  'activeKey', 'anchorKey', 'extentKey', 'selectedKeys', 'expandedKeys', 'disabledKeys',
-  'checkedByKey', 'pressedByKey', 'currentByKey', 'invalidByKey', 'requiredKeys',
-  'busyKeys', 'modalKeys', 'levelByKey', 'posInSetByKey', 'setSizeByKey',
-  'rowIndexByKey', 'columnIndexByKey', 'sortByKey', 'valueByKey', 'rangeValueByKey',
-  'typeaheadTextByKey', 'rowCount', 'colCount',
-  'editingKey', 'editDraftByKey',
-])
-export type StateField = z.infer<typeof StateFieldSchema>
-
-export type Predicate =
-  | { kind: 'always' }
-  | { kind: 'hasActiveKey' }
-  | { kind: 'activeCellInFirstColumn' }
-  | { kind: 'activeRowExpanded' }
-  | { kind: 'activeRowHasChildren' }
-  | { kind: 'activeKeyIsRow' }
-  | { kind: 'isChecked'; key: string }
-  | { kind: 'isPressed'; key: string }
-  | { kind: 'isSwitchOn'; key: string }
-  | { kind: 'isPopupOpen' }
-  | { kind: 'hasChildren'; key: string }
-  | { kind: 'isExpanded'; key: string }
-  | { kind: 'isDisabled'; key: string }
-  | { kind: 'optionEquals'; option: string; value: string | boolean }
-  | { kind: 'not'; predicate: Predicate }
-  | { kind: 'all'; predicates: readonly Predicate[] }
-  | { kind: 'any'; predicates: readonly Predicate[] }
-
-export const PredicateSchema: z.ZodType<Predicate> = z.lazy(() =>
-  z.discriminatedUnion('kind', [
-    z.object({ kind: z.literal('always') }).strict(),
-    z.object({ kind: z.literal('hasActiveKey') }).strict(),
-    z.object({ kind: z.literal('activeCellInFirstColumn') }).strict(),
-    z.object({ kind: z.literal('activeRowExpanded') }).strict(),
-    z.object({ kind: z.literal('activeRowHasChildren') }).strict(),
-    z.object({ kind: z.literal('activeKeyIsRow') }).strict(),
-    z.object({ kind: z.literal('isChecked'), key: KeyTokenSchema }).strict(),
-    z.object({ kind: z.literal('isPressed'), key: KeyTokenSchema }).strict(),
-    z.object({ kind: z.literal('isSwitchOn'), key: KeyTokenSchema }).strict(),
-    z.object({ kind: z.literal('isPopupOpen') }).strict(),
-    z.object({ kind: z.literal('hasChildren'), key: KeyTokenSchema }).strict(),
-    z.object({ kind: z.literal('isExpanded'), key: KeyTokenSchema }).strict(),
-    z.object({ kind: z.literal('isDisabled'), key: KeyTokenSchema }).strict(),
-    z
-      .object({
-        kind: z.literal('optionEquals'),
-        option: z.string().min(1),
-        value: z.union([z.string(), z.boolean()]),
-      })
-      .strict(),
-    z.object({ kind: z.literal('not'), predicate: PredicateSchema }).strict(),
-    z.object({ kind: z.literal('all'), predicates: z.array(PredicateSchema).readonly() }).strict(),
-    z.object({ kind: z.literal('any'), predicates: z.array(PredicateSchema).readonly() }).strict(),
-  ]),
-)
 
 export const KeyboardCaseSchema = z.discriminatedUnion('case', [
   z.object({ case: z.literal('when'), when: PredicateSchema, events: z.array(EventTemplateSchema).readonly() }).strict(),
@@ -231,46 +178,6 @@ export const NavigationSchema = z
     targets: z.record(z.string().min(1), NavigationTargetSchema),
   })
   .strict()
-
-export const EventValueSourceSchema = z.enum([
-  '$event.key',
-  '$event.keys',
-  '$event.anchorKey',
-  '$event.extentKey',
-  '$event.expanded',
-  '$event.checked',
-  '$event.pressed',
-  '$event.value',
-  '$activeKey',
-])
-export type EventValueSource = z.infer<typeof EventValueSourceSchema>
-
-export const TransitionValueSchema = z.union([
-  z.object({ from: EventValueSourceSchema }).strict(),
-  z.object({ literal: JsonValueSchema }).strict(),
-])
-export type TransitionValue = z.infer<typeof TransitionValueSchema>
-
-export const StateActionSchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('set'), field: StateFieldSchema, value: TransitionValueSchema }).strict(),
-  z.object({ kind: z.literal('add'), field: StateFieldSchema, value: TransitionValueSchema }).strict(),
-  z.object({ kind: z.literal('remove'), field: StateFieldSchema, value: TransitionValueSchema }).strict(),
-  z.object({ kind: z.literal('setMembership'), field: StateFieldSchema, value: TransitionValueSchema, present: TransitionValueSchema }).strict(),
-  z.object({ kind: z.literal('setRecordValue'), field: StateFieldSchema, key: TransitionValueSchema, value: TransitionValueSchema }).strict(),
-  z.object({ kind: z.literal('toggleInSet'), field: StateFieldSchema, value: TransitionValueSchema }).strict(),
-  z.object({ kind: z.literal('replaceSet'), field: StateFieldSchema, values: z.array(TransitionValueSchema).readonly() }).strict(),
-])
-export type StateAction = z.infer<typeof StateActionSchema>
-
-export const TransitionSchema = z
-  .object({
-    on: PatternEventTypeSchema,
-    name: z.string().min(1).optional(),
-    when: PredicateSchema.optional(),
-    actions: z.array(StateActionSchema).readonly(),
-  })
-  .strict()
-export type Transition = z.infer<typeof TransitionSchema>
 
 export const PatternDefinitionSchema = z
   .object({
