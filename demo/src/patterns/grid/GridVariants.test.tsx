@@ -12,7 +12,7 @@ function GridEntryDemo() {
   )
 }
 
-describe('Grid variant menu', () => {
+describe('Grid variants', () => {
   it('selects a grid variant and replaces the preview data', () => {
     render(<GridEntryDemo />)
 

@@ -5,9 +5,9 @@ import type { PatternData, PatternEvent, PatternOptions } from '../../../../src'
 import { reduceData, resolveTarget } from './treeContract'
 import { renderAriaTree, renderHtmlTree } from './inspect'
 import { Tree } from './Tree'
-import { treeVariants, type TreeVariantKey } from './treeVariants'
-import { TreeVariantMenu } from './TreeVariantMenu'
+import { treeVariantItems, treeVariants, type TreeVariantKey } from './treeVariants'
 import { type PatternEntry, selectClass, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
+import { VariantListbox } from '../../shared/VariantListbox'
 
 const treeVariantKeys = ['fileDirectoryComputed', 'fileDirectoryDeclared', 'navigation'] as const
 const focusStrategies = ['rovingTabIndex', 'ariaActiveDescendant'] as const
@@ -72,7 +72,7 @@ export const entry: PatternEntry = {
       key: 'treeview',
       label: 'Treeview',
       keyboardShortcuts: ['ArrowDown', 'ArrowUp', 'Home', 'End', 'ArrowRight', 'ArrowLeft', 'Enter', 'Space'],
-      sourceNames: ['Tree.tsx', 'treeview/entry.tsx', 'TreeVariantMenu.tsx', 'treeVariants.ts', 'treeview/useTreeviewPattern.ts', 'treeview/runtime.ts', 'treeview/definition.ts', ...KERNEL_SOURCES, 'treeContract.ts'],
+      sourceNames: ['Tree.tsx', 'treeview/entry.tsx', 'treeVariants.ts', 'treeview/useTreeviewPattern.ts', 'treeview/runtime.ts', 'treeview/definition.ts', ...KERNEL_SOURCES, 'treeContract.ts'],
       inspect: state.inspectMode === 'aria' ? renderAriaTree(state.data, treeOptions) : renderHtmlTree(state.data, treeOptions),
       inspectControls: (
         <select className={selectClass} value={state.inspectMode} onChange={(event) => dispatch({ type: 'setInspectMode', value: parseInspectMode(event.currentTarget.value) })}>
@@ -82,7 +82,7 @@ export const entry: PatternEntry = {
       ),
       variants: (
         <div className="grid gap-3 text-xs text-zinc-600 dark:text-zinc-400">
-          <TreeVariantMenu value={state.variant} onChange={(variant) => dispatch({ type: 'selectVariant', variant })} />
+          <VariantListbox value={state.variant} items={treeVariantItems} label="tree variants" idPrefix="tree-variant" onChange={(variant) => dispatch({ type: 'selectVariant', variant })} />
           <label className="inline-flex items-center gap-2">
             <input
               type="checkbox"
