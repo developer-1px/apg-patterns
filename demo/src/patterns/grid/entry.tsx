@@ -24,6 +24,7 @@ const gridDemoDefinition = {
     definition: 'grid/definition.ts',
     extra: [
       'grid/gridCell.ts',
+      'grid/gridEditInputProps.ts',
       'grid/gridRow.ts',
       'grid/gridRuntimeEvents.ts',
       'grid/ariaSources.ts',
