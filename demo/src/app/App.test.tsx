@@ -56,7 +56,7 @@ describe('loadSourcePreview', () => {
 
 describe('source copy', () => {
   it('only treats loaded source text as copyable', () => {
-    expect(isCopyableSource('loading')).toBe(false)
+    expect(isCopyableSource('')).toBe(false)
     expect(isCopyableSource('missing source: Missing.tsx')).toBe(false)
     expect(isCopyableSource('failed source: Broken.tsx')).toBe(false)
     expect(isCopyableSource('export function Demo() {}')).toBe(true)
@@ -88,7 +88,7 @@ describe('source copy', () => {
 
     await waitFor(() => expect(writes).toHaveLength(1))
     expect(writes[0]).toContain('export function Accordion')
-    expect(writes[0]).not.toBe('loading')
+    expect(writes[0]).not.toBe('')
   })
 
   it('only shows copied after clipboard write succeeds', async () => {
@@ -128,7 +128,7 @@ describe('source copy', () => {
     expect(screen.queryByRole('button', { name: 'copied' })).toBeNull()
   })
 
-  it('does not render stale source text after switching source tabs', async () => {
+  it('keeps the source panel blank while lazily switching source tabs', async () => {
     replaceHash('#pattern=accordion&panel=code&source=Accordion.tsx')
 
     render(<App />)
@@ -136,7 +136,7 @@ describe('source copy', () => {
     await waitFor(() => expect(getSourcePanel().textContent).toContain('export function Accordion'))
     fireEvent.click(screen.getByRole('tab', { name: 'accordionData.ts' }))
 
-    expect(getSourcePanel().textContent).toBe('loading')
+    expect(getSourcePanel().textContent).toBe('')
   })
 })
 

@@ -28,7 +28,7 @@ const treeviewDemoDefinition = {
     hooks: ['treeview/useTreeviewPattern.ts'],
     runtime: ['treeview/runtime.ts', 'treeview/navigation.ts', 'treeview/typeahead.ts', 'treeview/keyboardBinding.ts', 'treeview/adaptTreeviewProps.ts', 'treeview/adaptTreeviewRuntime.ts', 'treeview/createTreeviewRenderItems.ts'],
     definition: 'treeview/definition.ts',
-    extra: ['treeContract.ts'],
+    extra: ['treeContract.ts', 'treeview/inspect.ts', 'treeview/renderState.ts'],
   },
   controls: {
     kind: 'stack',

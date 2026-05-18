@@ -20,6 +20,7 @@ const comboboxDemoDefinition = {
     hooks: ['combobox/useComboboxPattern.ts'],
     data: ['comboboxData.ts'],
     definition: 'combobox/definition.ts',
+    extra: ['combobox/comboboxOption.ts', 'combobox/inspect.ts'],
   },
   controls: {
     kind: 'listbox',

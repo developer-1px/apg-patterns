@@ -8,17 +8,18 @@ type SourcePreviewState = {
 }
 
 const sourcePreviewCache = new Map<SourceName, string>()
+const pendingSourceText = ''
 
 export function useSourcePreviewState(activeSourceName: SourceName) {
   const [sourcePreview, setSourcePreview] = useState<SourcePreviewState>(() => ({
     name: activeSourceName,
-    text: sourcePreviewCache.get(activeSourceName) ?? 'loading',
+    text: sourcePreviewCache.get(activeSourceName) ?? pendingSourceText,
   }))
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle')
   const copyRequestId = useRef(0)
   const source = sourcePreview.text
   const sourceLoadedForActiveTab = sourcePreview.name === activeSourceName
-  const displayedSource = sourceLoadedForActiveTab ? source : 'loading'
+  const displayedSource = sourceLoadedForActiveTab ? source : pendingSourceText
   const canCopySource = isCopyableSource(displayedSource)
 
   useEffect(() => {

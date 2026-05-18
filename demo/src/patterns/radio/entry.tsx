@@ -12,6 +12,7 @@ const radioDemoDefinition = {
     data: ['radioData.ts'],
     hooks: ['radio/useRadioGroupPattern.ts'],
     definition: 'radio/definition.ts',
+    extra: ['radio/inspect.ts'],
   },
   view: {
     kind: 'component',

@@ -17,12 +17,11 @@ import {
 } from '../../kernel/patternKernel'
 import { createPatternRuntime, type CreatePatternRuntimeInput } from '../../kernel/patternRuntime'
 import { resolveTreeKeyboardBinding, type ResolvedKeyboardBinding } from './keyboardBinding'
+import { getTreeItemState, type TreeviewRenderState } from './renderState'
 import { resolveTreeviewVisibleKeys, resolveTypeaheadTarget } from './typeahead'
 
 export type TreeviewSlotProps = Record<string, unknown>
-export type TreeviewRenderState = Record<'active' | 'selected' | 'disabled' | 'expanded', boolean> & {
-  checked?: boolean | 'mixed'
-}
+export type { TreeviewRenderState } from './renderState'
 
 export interface TreeviewRenderItem {
   key: Key
@@ -140,22 +139,7 @@ function withNonEnumerableMeta(event: PatternEvent): PatternEvent {
   return next
 }
 
-export function getTreeItemState(data: PatternData, key: Key): TreeviewRenderState {
-  const runtime = createPatternRuntime({
-    definition: treeviewDefinition,
-    data: PatternDataSchema.parse(data),
-    options: defaultOptions,
-    onEvent: () => undefined,
-  })
-  const state = runtime.getItemState(key, 'treeitem')
-  const out: TreeviewRenderState = { active: false, selected: false, disabled: false, expanded: false }
-  out.active = Boolean(state.active)
-  out.selected = Boolean(state.selected)
-  out.disabled = Boolean(state.disabled)
-  out.expanded = Boolean(state.expanded)
-  if (state.checked !== undefined) out.checked = state.checked as boolean | 'mixed'
-  return out
-}
+export { getTreeItemState } from './renderState'
 
 export function resolveTreeviewKeyboardBinding(
   input: KeyInput,

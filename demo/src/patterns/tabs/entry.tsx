@@ -16,6 +16,7 @@ const tabsDemoDefinition = {
     hooks: ['tabs/useTabsPattern.ts'],
     runtime: ['tabs/runtime.ts'],
     definition: 'tabs/definition.ts',
+    extra: ['tabs/inspect.ts'],
   },
   controls: {
     kind: 'listbox',

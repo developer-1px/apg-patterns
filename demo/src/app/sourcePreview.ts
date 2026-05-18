@@ -14,7 +14,7 @@ export async function loadSourcePreview(sourceName: SourceName, loaders: SourceL
 }
 
 export function isCopyableSource(source: string): boolean {
-  return source.length > 0 && source !== 'loading' && !isSourceLoadFailure(source)
+  return source.length > 0 && !isSourceLoadFailure(source)
 }
 
 export function isSourceLoadFailure(source: string): boolean {
