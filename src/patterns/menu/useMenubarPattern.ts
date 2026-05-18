@@ -6,6 +6,7 @@ import { menubarDefinition } from './definition'
 import { createMenubarItem, type ReactMenubarItem } from './menubarItem'
 import { createMenubarRootProps } from './menubarRootProps'
 import { useMenubarTypeahead } from './useMenubarTypeahead'
+import { usePatternElementId } from '../../adapters/reactDomIds'
 
 export type { ReactMenubarItem } from './menubarItem'
 
@@ -21,12 +22,13 @@ export interface ReactMenubarRuntime {
 
 export function useMenubarPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactMenubarRuntime {
   const runtimeOptions = { focusStrategy: 'rovingTabIndex', orientation: 'horizontal', ...(options ?? {}) } satisfies PatternOptions
+  const keyToElementId = usePatternElementId(runtimeOptions, 'menubar-')
   const runtime = createPatternRuntime({
     definition: menubarDefinition,
     data,
     options: runtimeOptions,
     onEvent,
-    keyToElementId: (key) => `${runtimeOptions.elementIdPrefix ?? 'menubar-'}${key}`,
+    keyToElementId,
   })
   const rootKeys = data.relations?.rootKeys ?? []
   const typeahead = useMenubarTypeahead(data, rootKeys, onEvent)

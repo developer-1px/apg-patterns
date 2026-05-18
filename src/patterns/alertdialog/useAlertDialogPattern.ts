@@ -4,6 +4,7 @@ import type { Key, PatternDataWithOptions, PatternEvent, PatternOptions } from '
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { alertDialogOverlayProps, createAlertDialogActionProps, createAlertDialogDialogProps } from './alertDialogProps'
 import { alertDialogDefinition } from './definition'
+import { usePatternElementId } from '../../adapters/reactDomIds'
 
 export interface ReactAlertDialogRuntime {
   open: boolean
@@ -21,7 +22,7 @@ export interface ReactAlertDialogRuntime {
 
 export function useAlertDialogPattern(data: PatternDataWithOptions, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactAlertDialogRuntime {
   const runtimeOptions = options ?? data.state?.options ?? {}
-  const keyToElementId = (key: Key) => `${runtimeOptions.elementIdPrefix ?? 'alertdialog-'}${key}`
+  const keyToElementId = usePatternElementId(runtimeOptions, 'alertdialog-')
   const runtime = createPatternRuntime({ definition: alertDialogDefinition, data, options: runtimeOptions, onEvent, keyToElementId })
 
   usePatternEffects({ definition: alertDialogDefinition, data: runtime.data, keyToElementId })

@@ -5,6 +5,7 @@ import { createSpinbuttonActions, type ReactSpinbuttonActions } from './spinbutt
 import { createSpinbuttonRenderItem, type ReactSpinbuttonRenderItem, type SpinbuttonData } from './spinbuttonRenderItem'
 import { getSpinbuttonRuntimeState, type SpinbuttonRuntimeState } from './spinbuttonRuntimeState'
 import { spinbuttonDefinition } from './definition'
+import { usePatternElementId } from '../../adapters/reactDomIds'
 
 export type { ReactSpinbuttonRenderItem } from './spinbuttonRenderItem'
 
@@ -21,12 +22,13 @@ export interface ReactSpinbuttonRuntime {
 
 export function useSpinbuttonPattern(data: SpinbuttonData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactSpinbuttonRuntime {
   const runtimeOptions = options ?? data.state?.options ?? {}
+  const keyToElementId = usePatternElementId(runtimeOptions, 'spinbutton-')
   const runtime = createPatternRuntime({
     definition: spinbuttonDefinition,
     data,
     options: runtimeOptions,
     onEvent,
-    keyToElementId: (key) => `${runtimeOptions.elementIdPrefix ?? 'spinbutton-'}${key}`,
+    keyToElementId,
   })
 
   return {

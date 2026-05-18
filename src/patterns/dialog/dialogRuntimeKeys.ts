@@ -1,7 +1,8 @@
 import type { Key, PatternDataWithOptions, PatternOptions } from '../../schema'
+import { createElementId } from '../../kernel/domIds'
 
 export function createDialogElementId(options: PatternOptions): (key: Key) => string {
-  return (key) => key === 'dialog' ? 'dialog-panel' : `${options.elementIdPrefix ?? 'dialog-'}${key}`
+  return (key) => createElementId(options.elementIdPrefix ?? 'dialog-', key)
 }
 
 export function isDialogOpen(data: PatternDataWithOptions): boolean {

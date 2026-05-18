@@ -3,6 +3,7 @@ import type { Key, PatternData, PatternDataWithOptions, PatternEvent, PatternIte
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { createBreadcrumbItems, type ReactBreadcrumbItem } from './breadcrumbItem'
 import { breadcrumbDefinition } from './definition'
+import { usePatternElementId } from '../../adapters/reactDomIds'
 
 interface BreadcrumbItem extends PatternItem {
   href?: unknown
@@ -27,12 +28,13 @@ export function useBreadcrumbPattern(data: BreadcrumbData, onEvent: (event: Patt
     label: data.refs?.label,
     ...(options ?? data.state?.options ?? {}),
   } satisfies PatternOptions
+  const keyToElementId = usePatternElementId(runtimeOptions, 'breadcrumb-')
   const runtime = createPatternRuntime({
     definition: breadcrumbDefinition,
     data,
     options: runtimeOptions,
     onEvent,
-    keyToElementId: (key) => `${runtimeOptions.elementIdPrefix ?? 'breadcrumb-'}${key}`,
+    keyToElementId,
   })
 
   return {

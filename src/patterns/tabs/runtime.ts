@@ -6,6 +6,7 @@ import {
 } from '../../kernel/patternRuntime'
 import { PatternDataSchema, PatternEventSchema, PatternOptionsSchema, type Key, type PatternData, type PatternEvent, type PatternOptions } from '../../schema'
 import { tabsDefinition } from './definition'
+import { createElementId } from '../../kernel/domIds'
 export { reduceTabsData } from './tabsReducer'
 
 export interface TabsRuntime {
@@ -65,5 +66,5 @@ export function createTabsRuntime(input: CreateTabsRuntimeInput): TabsRuntime {
 }
 
 function createTabsElementId(prefix: string, key: Key) {
-  return `${prefix}${key.toLowerCase().replace(/[^a-z0-9_-]+/g, '-')}`
+  return createElementId(prefix, key)
 }

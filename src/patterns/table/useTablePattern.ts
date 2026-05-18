@@ -3,6 +3,7 @@ import type { Key, PatternDataWithOptions, PatternEvent, PatternOptions } from '
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { tableDefinition } from './definition'
 import { createTableRows, type ReactTableRow } from './tableRow'
+import { usePatternElementId } from '../../adapters/reactDomIds'
 export type { ReactTableCell, ReactTableRow } from './tableRow'
 
 export interface ReactTableRuntime {
@@ -18,6 +19,7 @@ export interface ReactTableRuntime {
 
 export function useTablePattern(data: PatternDataWithOptions, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactTableRuntime {
   const runtimeOptions = options ?? data.state?.options ?? {}
+  const keyToElementId = usePatternElementId(runtimeOptions, 'tablecell-')
   const sortByKey = data.state?.sortByKey ?? {}
   const runtime = createPatternRuntime({
     definition: tableDefinition,
@@ -31,7 +33,7 @@ export function useTablePattern(data: PatternDataWithOptions, onEvent: (event: P
       }
       onEvent(event)
     },
-    keyToElementId: (key) => `${runtimeOptions.elementIdPrefix ?? 'tablecell-'}${key}`,
+    keyToElementId,
   })
   const rows = createTableRows(runtime)
 

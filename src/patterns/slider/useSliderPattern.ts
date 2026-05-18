@@ -4,6 +4,7 @@ import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { sliderContract, type SliderData, type SliderOptions } from './contract'
 import { createSliderRenderItem, type ReactSliderRenderItem } from './sliderRenderItem'
 import { getSliderRuntimeState, isMultiThumbSlider } from './sliderRuntimeState'
+import { usePatternElementId } from '../../adapters/reactDomIds'
 export type { ReactSliderRenderItem } from './sliderRenderItem'
 
 export interface ReactSliderRuntime {
@@ -24,12 +25,13 @@ export interface ReactSliderRuntime {
 export function useSliderPattern(data: SliderData, onEvent: (event: PatternEvent) => void, options?: SliderOptions): ReactSliderRuntime {
   const parsedData = sliderContract.parseData(data)
   const runtimeOptions = sliderContract.parseOptions(options ?? parsedData.state?.options)
+  const keyToElementId = usePatternElementId(runtimeOptions, 'slider-')
   const runtime = createPatternRuntime({
     definition: sliderContract.definition,
     data: parsedData,
     options: runtimeOptions,
     onEvent,
-    keyToElementId: (key) => `${runtimeOptions.elementIdPrefix ?? 'slider-'}${key}`,
+    keyToElementId,
   })
   const orientation = runtimeOptions.orientation === 'vertical' ? 'vertical' : 'horizontal'
 

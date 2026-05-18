@@ -39,7 +39,7 @@ export function Checkbox({
 
   const parent = items[0]!
   const children = items.slice(1)
-  const groupId = `checkbox-group-${parent.key}-label`
+  const groupId = checkbox.ids.forKey(`${parent.key}-group-label`)
   const groupLabel = data.refs?.label
   return (
     <div className="grid gap-1">

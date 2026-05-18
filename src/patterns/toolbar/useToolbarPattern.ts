@@ -6,6 +6,7 @@ import { createToolbarActions } from './toolbarActions'
 import { createToolbarRenderItem, type ReactToolbarRenderItem } from './toolbarRenderItem'
 import { createToolbarRootProps } from './toolbarRootProps'
 import { getToolbarRuntimeState } from './toolbarRuntimeState'
+import { usePatternElementId } from '../../adapters/reactDomIds'
 export type { ReactToolbarRenderItem } from './toolbarRenderItem'
 
 export interface ReactToolbarRuntime {
@@ -28,12 +29,13 @@ export interface ReactToolbarRuntime {
 
 export function useToolbarPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactToolbarRuntime {
   const mergedOptions: PatternOptions = { focusStrategy: 'rovingTabIndex', orientation: 'horizontal', ...options }
+  const keyToElementId = usePatternElementId(mergedOptions, 'toolbar-item-')
   const runtime = useReactPatternRuntime({
     definition: toolbarDefinition,
     data,
     options: mergedOptions,
     onEvent,
-    keyToElementId: (key) => `${mergedOptions.elementIdPrefix ?? 'toolbar-item-'}${key}`,
+    keyToElementId,
   })
 
   return {

@@ -9,6 +9,7 @@ import { resolveRuntimePartProps } from './runtimePartProps'
 import { resolveRuntimeItemState } from './runtimeItemState'
 import { createRootKeyboardHandler } from './rootKeyboardHandler'
 import { resolveRuntimeKeyboardBinding } from './runtimeKeyboard'
+import { createElementId } from './domIds'
 export { defineDomEvent, defineDomEventHandlerProp } from './domEventBindings'
 
 export type SlotProps = Record<string, unknown>
@@ -47,7 +48,7 @@ export function createPatternRuntime<TData extends PatternData = PatternData>(in
   const { onEvent } = input
   const visibleKeys = resolveVisibleOrder(definition.navigation.visibleOrder, data)
   const parentByKey = createParentByKey(data)
-  const keyToElementId = input.keyToElementId ?? ((k: Key) => `${k}`)
+  const keyToElementId = input.keyToElementId ?? ((k: Key) => createElementId('apg-', k))
 
   const context = (key?: Key): PatternRuntimeContext => ({
     data,

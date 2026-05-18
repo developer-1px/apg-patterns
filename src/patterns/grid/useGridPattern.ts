@@ -6,6 +6,7 @@ import { gridDefinition } from './definition'
 import { getGridRuntimeState, type GridData } from './gridRuntimeState'
 import { createGridEditActions, createGridRuntimeEventHandler } from './gridRuntimeEvents'
 import { createGridRows, type ReactGridRow } from './gridRow'
+import { usePatternElementId } from '../../adapters/reactDomIds'
 
 export type { ReactGridCell } from './gridCell'
 export type { ReactGridRow } from './gridRow'
@@ -30,13 +31,14 @@ export interface ReactGridRuntime {
 
 export function useGridPattern(data: GridData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactGridRuntime {
   const { runtimeOptions, editableKeys, editingKey, editDraftByKey, valueByKey, sortByKey } = getGridRuntimeState(data, options)
+  const keyToElementId = usePatternElementId(runtimeOptions, 'gridcell-')
 
   const runtime = createPatternRuntime({
     definition: gridDefinition,
     data,
     options: runtimeOptions,
     onEvent: createGridRuntimeEventHandler({ data, editableKeys, editingKey, valueByKey, sortByKey, onEvent }),
-    keyToElementId: (key) => `${runtimeOptions.elementIdPrefix ?? 'gridcell-'}${key}`,
+    keyToElementId,
   })
 
   usePatternEffects({ definition: gridDefinition, data: runtime.data, keyToElementId: runtime.keyToElementId })

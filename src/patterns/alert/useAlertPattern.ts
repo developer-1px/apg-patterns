@@ -5,6 +5,7 @@ import { createAlertActions } from './alertActions'
 import { createAlertRootProps } from './alertProps'
 import { getAlertMessage, getAlertRuntimeState } from './alertRuntimeState'
 import { alertDefinition } from './definition'
+import { usePatternElementId } from '../../adapters/reactDomIds'
 
 interface AlertItem extends PatternItem {
   message?: unknown
@@ -30,12 +31,13 @@ export interface ReactAlertRuntime {
 }
 
 export function useAlertPattern(data: AlertData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactAlertRuntime {
+  const keyToElementId = usePatternElementId(options, 'alert-')
   const runtime = createPatternRuntime({
     definition: alertDefinition,
     data,
     options: options ?? {},
     onEvent,
-    keyToElementId: (key) => `${options?.elementIdPrefix ?? 'alert-'}${String(key).toLowerCase().replace(/[^a-z0-9_-]+/g, '-')}`,
+    keyToElementId,
   })
   const key = data.relations?.rootKeys?.[0] ?? null
 

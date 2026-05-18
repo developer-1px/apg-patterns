@@ -8,6 +8,7 @@ import { createMenuButtonItem, type ReactMenuButtonItem } from './menuButtonItem
 import { createMenuButtonMenuProps, createMenuButtonTriggerProps } from './menuButtonProps'
 import { getMenuButtonRuntimeState } from './menuButtonRuntimeState'
 import { useMenuButtonActiveDescendantFocus } from './useMenuButtonActiveDescendantFocus'
+import { usePatternElementId } from '../../adapters/reactDomIds'
 
 export interface ReactMenuButtonRuntime {
   triggerKey: Key | null
@@ -25,12 +26,13 @@ export interface ReactMenuButtonRuntime {
 
 export function useMenuButtonPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactMenuButtonRuntime {
   const { focusStrategy, runtimeOptions, triggerKey, menuKey, expanded, itemKeys } = getMenuButtonRuntimeState(data, options)
+  const keyToElementId = usePatternElementId(runtimeOptions, 'mb-')
   const runtime = createPatternRuntime({
     definition: menuButtonDefinition,
     data,
     options: runtimeOptions,
     onEvent,
-    keyToElementId: (key) => `${runtimeOptions.elementIdPrefix ?? 'mb-'}${key}`,
+    keyToElementId,
   })
 
   usePatternEffects({ definition: menuButtonDefinition, data: runtime.data, keyToElementId: runtime.keyToElementId })

@@ -5,6 +5,7 @@ import { createSwitchActions } from './switchActions'
 import { switchDefinition } from './definition'
 import { createSwitchRenderItem, type ReactSwitchRenderItem } from './switchRenderItem'
 import { getSwitchRuntimeState } from './switchRuntimeState'
+import { usePatternElementId } from '../../adapters/reactDomIds'
 export type { ReactSwitchRenderItem } from './switchRenderItem'
 
 export interface ReactSwitchRuntime {
@@ -26,12 +27,13 @@ export interface ReactSwitchRuntime {
 }
 
 export function useSwitchPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactSwitchRuntime {
+  const keyToElementId = usePatternElementId(options, 'switch-')
   const runtime = createPatternRuntime({
     definition: switchDefinition,
     data,
     options: options ?? {},
     onEvent,
-    keyToElementId: (key) => `${options?.elementIdPrefix ?? 'switch-'}${key}`,
+    keyToElementId,
   })
 
   return {

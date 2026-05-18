@@ -5,16 +5,19 @@ import type { PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
 import type { ReactTreeviewRuntime } from '../../adapters/reactTypes'
 import { adaptTreeviewRuntime } from './adaptTreeviewRuntime'
+import { usePatternElementId } from '../../adapters/reactDomIds'
 
 export function useTreeviewPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactTreeviewRuntime
 export function useTreeviewPattern(input: CreateTreeviewRuntimeInput): ReactTreeviewRuntime
 export function useTreeviewPattern(inputOrData: CreateTreeviewRuntimeInput | PatternData, onEvent?: (event: PatternEvent) => void, options?: PatternOptions): ReactTreeviewRuntime {
   const input = normalizePatternInput(inputOrData, onEvent, options)
   const typeaheadBufferRef = useRef(createTypeaheadBuffer())
+  const keyToElementId = usePatternElementId(input.options as PatternOptions | undefined, 'treeitem-')
 
   const runtime = createTreeviewRuntime({
     data: input.data,
     options: input.options,
+    keyToElementId,
     typeaheadBuffer: input.typeaheadBuffer ?? typeaheadBufferRef.current,
     onEvent: input.onEvent,
   })

@@ -5,6 +5,7 @@ import { linkDefinition } from './definition'
 import { createLinkActions } from './linkActions'
 import { createLinkProps } from './linkProps'
 import { getLinkRuntimeState } from './linkRuntimeState'
+import { usePatternElementId } from '../../adapters/reactDomIds'
 
 interface LinkItem extends PatternItem {
   href?: unknown
@@ -33,12 +34,13 @@ export interface ReactLinkRuntime {
 }
 
 export function useLinkPattern(data: LinkData, onEvent: (event: PatternEvent) => void = () => undefined, options?: PatternOptions): ReactLinkRuntime {
+  const keyToElementId = usePatternElementId(options, 'link-')
   const runtime = createPatternRuntime({
     definition: linkDefinition,
     data,
     options: options ?? {},
     onEvent,
-    keyToElementId: (key) => `${options?.elementIdPrefix ?? 'link-'}${key}`,
+    keyToElementId,
   })
   const key = data.relations?.rootKeys?.[0] ?? null
 

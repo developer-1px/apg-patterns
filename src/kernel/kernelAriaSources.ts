@@ -23,8 +23,9 @@ defineAriaSource('options.autocomplete', (ctx) => (ctx.options as { autocomplete
 defineAriaSource('state.rowCount', (ctx) => (ctx.data.state as { rowCount?: number } | undefined)?.rowCount ?? ctx.data.relations?.rowKeys?.length)
 defineAriaSource('state.colCount', (ctx) => (ctx.data.state as { colCount?: number } | undefined)?.colCount ?? ctx.data.relations?.columnKeys?.length)
 defineAriaSource('relations.controlsByKey', (ctx) => {
-  const controlledKey = ctx.key ? ctx.data.relations?.controlsByKey?.[ctx.key]?.[0] : undefined
-  return controlledKey ? (ctx.keyToElementId?.(controlledKey) ?? controlledKey) : undefined
+  const controlledKeys = ctx.key ? ctx.data.relations?.controlsByKey?.[ctx.key] : undefined
+  if (!controlledKeys?.length) return undefined
+  return controlledKeys.map((key) => ctx.keyToElementId?.(key) ?? key).join(' ')
 })
 defineAriaSource('relations.ownerByKey', (ctx) => {
   const ownerKey = ctx.key ? ctx.data.relations?.ownerByKey?.[ctx.key] : undefined

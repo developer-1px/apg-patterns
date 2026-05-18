@@ -4,17 +4,19 @@ import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schem
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
 import type { ReactAccordionRuntime } from '../../adapters/reactTypes'
 import { createAccordionRenderItem, toReactProps } from './accordionRenderItem'
+import { usePatternElementId } from '../../adapters/reactDomIds'
 
 const DEFAULT_ID_PREFIX = 'accordion-'
 
 export function useAccordionPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactAccordionRuntime {
-  const mergedOptions: PatternOptions = { elementIdPrefix: DEFAULT_ID_PREFIX, ...options }
+  const mergedOptions: PatternOptions = { ...options }
+  const keyToElementId = usePatternElementId(mergedOptions, DEFAULT_ID_PREFIX)
   const runtime = createPatternRuntime({
     definition: accordionDefinition,
     data,
     options: mergedOptions,
     onEvent,
-    keyToElementId: (key) => `${mergedOptions.elementIdPrefix ?? DEFAULT_ID_PREFIX}${String(key).toLowerCase().replace(/[^a-z0-9_-]+/g, '-')}`,
+    keyToElementId,
   })
 
   usePatternEffects({ definition: accordionDefinition, data: runtime.data, keyToElementId: runtime.keyToElementId })

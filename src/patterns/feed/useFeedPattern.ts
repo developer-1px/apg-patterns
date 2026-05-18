@@ -4,6 +4,7 @@ import { usePatternEffects } from '../../adapters/reactPatternEffects'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { feedDefinition } from './definition'
 import { createFeedArticle, type ReactFeedArticle } from './feedArticle'
+import { usePatternElementId } from '../../adapters/reactDomIds'
 export type { ReactFeedArticle } from './feedArticle'
 
 export interface ReactFeedRuntime {
@@ -17,12 +18,13 @@ export interface ReactFeedRuntime {
 
 export function useFeedPattern(data: PatternDataWithOptions, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactFeedRuntime {
   const runtimeOptions = options ?? data.state?.options ?? {}
+  const keyToElementId = usePatternElementId(runtimeOptions, 'feed-article-')
   const runtime = createPatternRuntime({
     definition: feedDefinition,
     data,
     options: runtimeOptions,
     onEvent,
-    keyToElementId: (key) => `${runtimeOptions.elementIdPrefix ?? 'feed-article-'}${key}`,
+    keyToElementId,
   })
 
   usePatternEffects({ definition: feedDefinition, data: runtime.data, keyToElementId: runtime.keyToElementId })

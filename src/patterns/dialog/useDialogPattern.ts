@@ -4,7 +4,8 @@ import type { Key, PatternDataWithOptions, PatternEvent, PatternOptions } from '
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { dialogDefinition } from './definition'
 import { createDialogProps } from './dialogProps'
-import { createDialogElementId, isDialogOpen, labelDialogItem } from './dialogRuntimeKeys'
+import { isDialogOpen, labelDialogItem } from './dialogRuntimeKeys'
+import { usePatternElementId } from '../../adapters/reactDomIds'
 
 export interface ReactDialogRuntime {
   open: boolean
@@ -24,7 +25,7 @@ export interface ReactDialogRuntime {
 
 export function useDialogPattern(data: PatternDataWithOptions, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactDialogRuntime {
   const runtimeOptions = options ?? data.state?.options ?? {}
-  const keyToElementId = createDialogElementId(runtimeOptions)
+  const keyToElementId = usePatternElementId(runtimeOptions, 'dialog-')
   const runtime = createPatternRuntime({ definition: dialogDefinition, data, options: runtimeOptions, onEvent, keyToElementId })
 
   usePatternEffects({ definition: dialogDefinition, data: runtime.data, keyToElementId })

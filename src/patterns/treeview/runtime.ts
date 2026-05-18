@@ -14,6 +14,7 @@ import { withNonEnumerableMeta } from './eventMeta'
 import { createPatternRuntime, type CreatePatternRuntimeInput } from '../../kernel/patternRuntime'
 import { createTreeviewRenderItems, type TreeviewRenderItem, type TreeviewSlotProps } from './renderItem'
 import { createTreeProps } from './treeProps'
+import { createElementId } from '../../kernel/domIds'
 
 export type { TreeviewRenderState } from './renderState'
 export type { TreeviewRenderItem, TreeviewSlotProps } from './renderItem'
@@ -38,13 +39,14 @@ export interface CreateTreeviewRuntimeInput {
   onEvent: (event: PatternEvent) => void
   options?: unknown
   typeaheadBuffer?: TypeaheadBuffer
+  keyToElementId?: (key: Key) => string
 }
 
 export function createTreeviewRuntime(input: CreateTreeviewRuntimeInput): TreeviewRuntime {
   const data = PatternDataSchema.parse(input.data)
   const options = { ...treeviewDefaultOptions, ...PatternOptionsSchema.parse(input.options ?? {}) }
   const emit = (event: PatternEvent) => input.onEvent(withNonEnumerableMeta(PatternEventSchema.parse(event)))
-  const keyToElementId = (key: Key) => `${options.elementIdPrefix ?? treeviewDefaultOptions.elementIdPrefix}${key}`
+  const keyToElementId = input.keyToElementId ?? ((key: Key) => createElementId(options.elementIdPrefix ?? treeviewDefaultOptions.elementIdPrefix, key))
   const typeahead = input.typeaheadBuffer ?? createTypeaheadBuffer()
   const runtime = createPatternRuntime({
     definition: treeviewDefinition,

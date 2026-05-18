@@ -5,6 +5,7 @@ import { tooltipDefinition } from './definition'
 import { createTooltipActions } from './tooltipActions'
 import { getTooltipLabel, getTooltipRuntimeState } from './tooltipRuntimeState'
 import { createTooltipTriggerProps } from './tooltipTriggerProps'
+import { usePatternElementId } from '../../adapters/reactDomIds'
 
 export interface ReactTooltipRuntime {
   triggerProps: ReactPatternProps
@@ -27,12 +28,13 @@ export interface ReactTooltipRuntime {
 }
 
 export function useTooltipPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactTooltipRuntime {
+  const keyToElementId = usePatternElementId(options, 'tooltip-')
   const runtime = createPatternRuntime({
     definition: tooltipDefinition,
     data,
     options: options ?? {},
     onEvent,
-    keyToElementId: (key) => `${key}`,
+    keyToElementId,
   })
   const triggerKey = data.relations?.rootKeys?.[0] ?? null
   const tooltipKey = triggerKey ? data.relations?.controlsByKey?.[triggerKey]?.[0] ?? null : null

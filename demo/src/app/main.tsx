@@ -5,7 +5,10 @@ import { App } from './App'
 import { ReproRecorderOverlay } from './repro-recorder'
 import '../style.css'
 
-createRoot(document.getElementById('root')!).render(
+const rootElement = document.getElementById('root')
+if (!rootElement) throw new Error('[demo] missing #root element')
+
+createRoot(rootElement).render(
   <StrictMode>
     <App />
     <ReproRecorderOverlay />

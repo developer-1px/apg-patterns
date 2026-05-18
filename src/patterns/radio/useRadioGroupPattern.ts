@@ -6,6 +6,7 @@ import { createRadioGroupActions } from './radioGroupActions'
 import { createRadioRenderItem, type ReactRadioRenderItem } from './radioRenderItem'
 import { createRadioGroupRootProps } from './radioGroupRootProps'
 import { getRadioGroupRuntimeState } from './radioGroupRuntimeState'
+import { usePatternElementId } from '../../adapters/reactDomIds'
 export type { ReactRadioRenderItem } from './radioRenderItem'
 
 export interface ReactRadioGroupRuntime {
@@ -28,12 +29,13 @@ export interface ReactRadioGroupRuntime {
 
 export function useRadioGroupPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactRadioGroupRuntime {
   const mergedOptions: PatternOptions = { focusStrategy: 'rovingTabIndex', ...options }
+  const keyToElementId = usePatternElementId(mergedOptions, 'radio-')
   const runtime = useReactPatternRuntime({
     definition: radioGroupDefinition,
     data,
     options: mergedOptions,
     onEvent,
-    keyToElementId: (key) => `${mergedOptions.elementIdPrefix ?? 'radio-'}${key}`,
+    keyToElementId,
   })
 
   return {

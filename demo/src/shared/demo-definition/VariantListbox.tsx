@@ -28,6 +28,7 @@ export function VariantListbox<T extends string>({
     if (!variant || variant === value) return
     const item = items.find((candidate) => candidate.key === variant)
     if (item) onChange(item.key)
+    else writeVariantRoute(routePattern, value)
   }, [items, onChange, routePattern, value])
 
   const data = createVariantData(value, items, label)

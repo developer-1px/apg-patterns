@@ -5,6 +5,7 @@ import { createCheckboxActions } from './checkboxActions'
 import { createCheckboxRenderItem, type ReactCheckboxRenderItem } from './checkboxRenderItem'
 import { getCheckboxRuntimeState } from './checkboxRuntimeState'
 import { checkboxDefinition } from './definition'
+import { usePatternElementId } from '../../adapters/reactDomIds'
 export type { ReactCheckboxRenderItem } from './checkboxRenderItem'
 
 export interface ReactCheckboxRuntime {
@@ -26,12 +27,13 @@ export interface ReactCheckboxRuntime {
 }
 
 export function useCheckboxPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactCheckboxRuntime {
+  const keyToElementId = usePatternElementId(options, 'checkbox-')
   const runtime = createPatternRuntime({
     definition: checkboxDefinition,
     data,
     options: options ?? {},
     onEvent,
-    keyToElementId: (key) => `${options?.elementIdPrefix ?? 'checkbox-'}${key}`,
+    keyToElementId,
   })
 
   return {

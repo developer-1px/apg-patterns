@@ -60,7 +60,16 @@ export function readInitialAppState(fallback: AppState): AppState {
   const rightMode = coerceRightMode(params.get('panel')) ?? fallback.rightMode
   const sourceName = params.get('source') || fallback.sourceName
   const rightPanelOpen = params.get('panel') === 'off' ? false : fallback.rightPanelOpen
-  return AppStateSchema.parse({ ...fallback, patternKey, sourceName, rightMode, rightPanelOpen })
+  const state = AppStateSchema.parse({ ...fallback, patternKey, sourceName, rightMode, rightPanelOpen })
+  const canonical = new URLSearchParams()
+  canonical.set('pattern', state.patternKey)
+  canonical.set('panel', state.rightPanelOpen ? rightModeLabels[state.rightMode] : 'off')
+  canonical.set('source', state.sourceName)
+  const variant = params.get('variant')
+  if (variant && params.get('pattern') === state.patternKey) canonical.set('variant', variant)
+  const canonicalHash = `#${canonical.toString()}`
+  if (window.location.hash !== canonicalHash) window.history.replaceState(null, '', canonicalHash)
+  return state
 }
 
 export function writeAppHash({

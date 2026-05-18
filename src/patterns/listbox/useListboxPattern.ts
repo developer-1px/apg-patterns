@@ -6,16 +6,18 @@ import { useReactPatternRuntime } from '../../adapters/reactPatternEffects'
 import type { ReactListboxRuntime } from '../../adapters/reactTypes'
 import { createListboxRenderItem } from './createListboxRenderItem'
 import { createListboxRootProps } from './createListboxRootProps'
+import { usePatternElementId } from '../../adapters/reactDomIds'
 
 export function useListboxPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactListboxRuntime {
   const typeaheadBufferRef = useRef(createTypeaheadBuffer())
   const mergedOptions: PatternOptions = { focusStrategy: 'rovingTabIndex', selectionMode: 'single', ...options }
+  const keyToElementId = usePatternElementId(mergedOptions, 'option-')
   const runtime = useReactPatternRuntime({
     definition: listboxDefinition,
     data,
     options: mergedOptions,
     onEvent,
-    keyToElementId: (key) => `${mergedOptions.elementIdPrefix ?? 'option-'}${key}`,
+    keyToElementId,
   })
 
   const rootProps = createListboxRootProps(runtime, typeaheadBufferRef.current)

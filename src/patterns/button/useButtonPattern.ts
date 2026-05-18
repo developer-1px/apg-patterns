@@ -5,6 +5,7 @@ import { createButtonActions } from './buttonActions'
 import { createButtonRootProps } from './buttonRootProps'
 import { getButtonRuntimeState } from './buttonRuntimeState'
 import { buttonDefinition } from './definition'
+import { usePatternElementId } from '../../adapters/reactDomIds'
 
 export interface ReactButtonRuntime {
   rootProps: ReactPatternProps
@@ -27,12 +28,13 @@ export interface ReactButtonRuntime {
 }
 
 export function useButtonPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactButtonRuntime {
+  const keyToElementId = usePatternElementId(options, 'button-')
   const runtime = createPatternRuntime({
     definition: buttonDefinition,
     data,
     options: options ?? {},
     onEvent,
-    keyToElementId: (key) => `${options?.elementIdPrefix ?? 'button-'}${key}`,
+    keyToElementId,
   })
   const key = data.relations?.rootKeys?.[0] ?? null
 

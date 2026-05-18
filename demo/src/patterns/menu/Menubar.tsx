@@ -19,7 +19,7 @@ export function Menubar({ data, onEvent }: MenuProps) {
         ))}
       </div>
       {menubar.expandedRootKeys.map((rootKey) => (
-        <Submenu key={rootKey} data={data} ownerKey={rootKey} rootKeys={rootKeys} onEvent={onEvent} />
+        <Submenu key={rootKey} data={data} ids={menubar.ids} ownerKey={rootKey} rootKeys={rootKeys} onEvent={onEvent} />
       ))}
     </div>
   )
@@ -38,7 +38,7 @@ function RootMenuItem({ item }: { item: ReturnType<typeof useMenubarPattern>['ro
   )
 }
 
-function Submenu({ data, ownerKey, rootKeys, onEvent }: { data: PatternData; ownerKey: string; rootKeys: readonly string[]; onEvent: (event: PatternEvent) => void }) {
+function Submenu({ data, ids, ownerKey, rootKeys, onEvent }: { data: PatternData; ids: ReturnType<typeof useMenubarPattern>['ids']; ownerKey: string; rootKeys: readonly string[]; onEvent: (event: PatternEvent) => void }) {
   const children = data.relations?.childrenByKey?.[ownerKey] ?? []
   const radioGroup = children.filter((key) => (data.items[key] as { kind?: string } | undefined)?.kind === 'menuitemradio')
   const activeKey = children.includes(data.state?.activeKey ?? '') ? data.state?.activeKey : children[0]
@@ -46,13 +46,13 @@ function Submenu({ data, ownerKey, rootKeys, onEvent }: { data: PatternData; own
   const onSubmenuKeyDown = useMenubarSubmenuKeyboard({ data, ownerKey, rootKeys, children, activeKey, onEvent, close })
   const popupLeft = `${rootKeys.indexOf(ownerKey) * 4.25}rem`
   return (
-    <ul role="menu" aria-labelledby={`menubar-${ownerKey}`} style={{ left: popupLeft }} className="absolute top-10 z-10 grid w-56 gap-0.5 rounded-[6px] bg-white/96 p-1 text-sm shadow-[0_20px_56px_rgba(24,24,27,0.15)] outline-none backdrop-blur dark:bg-zinc-950/96 dark:shadow-black/35" onKeyDown={onSubmenuKeyDown}>
-      {children.map((key) => <SubmenuItem key={key} itemKey={key} data={data} active={key === activeKey} radioGroup={radioGroup} onEvent={onEvent} onClose={close} />)}
+    <ul role="menu" aria-labelledby={ids.forKey(ownerKey)} style={{ left: popupLeft }} className="absolute top-10 z-10 grid w-56 gap-0.5 rounded-[6px] bg-white/96 p-1 text-sm shadow-[0_20px_56px_rgba(24,24,27,0.15)] outline-none backdrop-blur dark:bg-zinc-950/96 dark:shadow-black/35" onKeyDown={onSubmenuKeyDown}>
+      {children.map((key) => <SubmenuItem key={key} ids={ids} itemKey={key} data={data} active={key === activeKey} radioGroup={radioGroup} onEvent={onEvent} onClose={close} />)}
     </ul>
   )
 }
 
-function SubmenuItem({ itemKey, data, active, radioGroup, onEvent, onClose }: { itemKey: string; data: PatternData; active: boolean; radioGroup: readonly string[]; onEvent: (event: PatternEvent) => void; onClose: () => void }) {
+function SubmenuItem({ itemKey, ids, data, active, radioGroup, onEvent, onClose }: { itemKey: string; ids: ReturnType<typeof useMenubarPattern>['ids']; data: PatternData; active: boolean; radioGroup: readonly string[]; onEvent: (event: PatternEvent) => void; onClose: () => void }) {
   const item = data.items[itemKey] as { label?: string; kind?: string } | undefined
   const role = item?.kind === 'menuitemcheckbox' ? 'menuitemcheckbox' : item?.kind === 'menuitemradio' ? 'menuitemradio' : 'menuitem'
   const checked = data.state?.checkedByKey?.[itemKey]
@@ -65,7 +65,7 @@ function SubmenuItem({ itemKey, data, active, radioGroup, onEvent, onClose }: { 
     onClose()
   }
   return (
-    <li id={`menubar-${itemKey}`} role={role} tabIndex={active ? 0 : -1} data-active={active ? '' : undefined} aria-disabled={disabled || undefined} aria-checked={role === 'menuitemcheckbox' || role === 'menuitemradio' ? Boolean(checked) : undefined} onFocus={() => onEvent({ type: 'focus', key: itemKey })} onClick={activate} onKeyDown={(event) => {
+    <li id={ids.forKey(itemKey)} role={role} tabIndex={active ? 0 : -1} data-active={active ? '' : undefined} aria-disabled={disabled || undefined} aria-checked={role === 'menuitemcheckbox' || role === 'menuitemradio' ? Boolean(checked) : undefined} onFocus={() => onEvent({ type: 'focus', key: itemKey })} onClick={activate} onKeyDown={(event) => {
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault()
         activate()
