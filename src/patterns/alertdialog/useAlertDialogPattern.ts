@@ -1,8 +1,8 @@
-import type { KeyboardEvent, MouseEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
-import { handlePatternTrapFocus, usePatternEffects } from '../../adapters/reactPatternEffects'
+import { usePatternEffects } from '../../adapters/reactPatternEffects'
 import type { Key, PatternDataWithOptions, PatternEvent, PatternOptions } from '../../schema'
-import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { alertDialogOverlayProps, createAlertDialogActionProps, createAlertDialogDialogProps } from './alertDialogProps'
 import { alertDialogDefinition } from './definition'
 
 export interface ReactAlertDialogRuntime {
@@ -23,7 +23,6 @@ export function useAlertDialogPattern(data: PatternDataWithOptions, onEvent: (ev
   const runtimeOptions = options ?? data.state?.options ?? {}
   const keyToElementId = (key: Key) => `${runtimeOptions.elementIdPrefix ?? 'alertdialog-'}${key}`
   const runtime = createPatternRuntime({ definition: alertDialogDefinition, data, options: runtimeOptions, onEvent, keyToElementId })
-  const rootKeyDown = runtime.getRootKeyboardHandler()
 
   usePatternEffects({ definition: alertDialogDefinition, data: runtime.data, keyToElementId })
 
@@ -32,41 +31,15 @@ export function useAlertDialogPattern(data: PatternDataWithOptions, onEvent: (ev
     get triggerProps() {
       return runtime.getPartProps('trigger', 'trigger') as ReactPatternProps
     },
-    overlayProps: {
-      'data-testid': 'alertdialog-overlay',
-      onClick: (event: MouseEvent<HTMLElement>) => {
-        if (event.target === event.currentTarget) event.preventDefault()
-      },
-    } as ReactPatternProps,
+    overlayProps: alertDialogOverlayProps,
     get dialogProps() {
-      return {
-        ...(runtime.getPartProps('dialog', 'dialog') as ReactPatternProps),
-        onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
-          if (event.key === 'Escape') onEvent({ type: 'activate', key: 'cancel' })
-          rootKeyDown(reactKeyInput(event))
-          handlePatternTrapFocus({ event, definition: alertDialogDefinition, data, keyToElementId })
-        },
-      } as ReactPatternProps
+      return createAlertDialogDialogProps({ runtime, data, onEvent, keyToElementId })
     },
     get confirmProps() {
-      const props = runtime.getPartProps('confirm', 'confirm') as ReactPatternProps
-      return {
-        ...props,
-        onClick: (event: MouseEvent<HTMLElement>) => {
-          props.onClick?.(event)
-          onEvent({ type: 'activate', key: 'confirm' })
-        },
-      }
+      return createAlertDialogActionProps({ runtime, part: 'confirm', onEvent })
     },
     get cancelProps() {
-      const props = runtime.getPartProps('cancel', 'cancel') as ReactPatternProps
-      return {
-        ...props,
-        onClick: (event: MouseEvent<HTMLElement>) => {
-          props.onClick?.(event)
-          onEvent({ type: 'activate', key: 'cancel' })
-        },
-      }
+      return createAlertDialogActionProps({ runtime, part: 'cancel', onEvent })
     },
     labelOf: (key) => data.items[key]?.label ?? key,
     get ids() {
