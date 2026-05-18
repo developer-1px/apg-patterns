@@ -27,16 +27,20 @@ describe('createReproRecorder', () => {
         event: { type: 'expand', key: 'personal', expanded: true, meta: { reason: 'pointer' } },
         patternKey: 'accordion',
         sourceName: 'Accordion.tsx',
-        rightMode: 'events',
+        rightMode: 'source',
       },
     }))
+    button.dispatchEvent(new KeyboardEvent('keydown', { key: 'Shift', bubbles: true }))
+    button.dispatchEvent(new KeyboardEvent('keydown', { key: 'Meta', metaKey: true, shiftKey: true, bubbles: true }))
     await nextFrame()
 
     const recording = recorder.stop()
 
     expect(recording.text).toContain('- button "Personal Information" [expanded=false')
     expect(recording.text).toContain('+ - button "Personal Information" [expanded')
-    expect(recording.text).toContain('expand: personal.expanded=true (accordion / Accordion.tsx / events)')
+    expect(recording.text).toContain('expand: personal.expanded=true (accordion / Accordion.tsx / code)')
+    expect(recording.text).not.toContain('Shift+Shift')
+    expect(recording.text).not.toContain('Mod+Shift+Meta')
   })
 })
 

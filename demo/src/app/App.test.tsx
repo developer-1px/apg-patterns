@@ -7,6 +7,7 @@ import { formatEvent } from './eventLog'
 import { isCopyableSource, isSourceLoadFailure, loadSourcePreview } from './sourcePreview'
 import { SourceTabs, useSourceTabs } from './SourceTabs'
 import { collectPatternEntries, defaultPatternKey, defaultSourceName, patternEntries, useDemoPattern, validatePatternEntries } from '../shared/demoPatterns'
+import { KERNEL_SOURCES } from '../shared/demoPatternTypes'
 import { sourceLoaders, sourceNameCollisions } from '../shared/sources'
 import type { PatternEvent } from '../../../src'
 
@@ -756,6 +757,12 @@ describe('demo source wiring', () => {
     }))
 
     expect(failedSources).toEqual([])
+  })
+
+  it('keeps shared kernel source tabs backed by collected source files', () => {
+    const missingKernelSources = KERNEL_SOURCES.filter((sourceName) => !sourceLoaders[sourceName])
+
+    expect(missingKernelSources).toEqual([])
   })
 })
 

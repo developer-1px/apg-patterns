@@ -23,8 +23,10 @@ export type EmitPatternEvent = (event: PatternEvent) => void
 /** Kernel source keys included in every pattern's sourceNames list. */
 export const KERNEL_SOURCES = [
   'kernel/patternRuntime.ts',
+  'kernel/runtimeKeyboard.ts',
   'kernel/patternReducer.ts',
   'kernel/patternKernel.ts',
+  'kernel/keyTokenRegistry.ts',
   'schema/index.ts',
 ] as const satisfies readonly SourceName[]
 

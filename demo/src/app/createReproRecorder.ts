@@ -88,6 +88,10 @@ function shortcutMatches(event: KeyboardEvent): boolean {
   return modShiftSlash || altShiftR
 }
 
+function isModifierOnlyKey(event: KeyboardEvent): boolean {
+  return event.key === 'Shift' || event.key === 'Meta' || event.key === 'Control' || event.key === 'Alt'
+}
+
 function patternEventDiff(event: PatternEvent): string[] {
   if (event.type === 'focus') return [`activeKey=${event.key}`]
   if (event.type === 'navigate') return [`direction=${event.direction}`]
@@ -107,7 +111,8 @@ function patternEventDiff(event: PatternEvent): string[] {
 }
 
 function contextFromDetail(detail: PatternEventDetail): string | undefined {
-  const context = [detail.patternKey, detail.sourceName, detail.rightMode].filter(Boolean).join(' / ')
+  const rightModeLabel = detail.rightMode === 'source' ? 'code' : detail.rightMode === 'log' ? 'events' : detail.rightMode
+  const context = [detail.patternKey, detail.sourceName, rightModeLabel].filter(Boolean).join(' / ')
   return context || undefined
 }
 
@@ -172,6 +177,7 @@ export function createReproRecorder() {
   function onKeydown(event: KeyboardEvent) {
     if (!active) return
     if (shortcutMatches(event)) return
+    if (isModifierOnlyKey(event)) return
     const key = `${event.ctrlKey || event.metaKey ? 'Mod+' : ''}${event.shiftKey ? 'Shift+' : ''}${event.altKey ? 'Alt+' : ''}${event.key === ' ' ? 'Space' : event.key}`
     pushInputEntry('keydown', event.target as Element, event.defaultPrevented, key)
   }

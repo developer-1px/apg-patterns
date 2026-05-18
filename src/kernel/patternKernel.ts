@@ -13,6 +13,7 @@
  */
 import type { KeyInput } from '@interactive-os/keyboard'
 import type { Key, PatternData, PatternOptions, Predicate } from '../schema'
+import { defineKeyToken, hasKeyToken, resolveKeyToken } from './keyTokenRegistry'
 import {
   ariaSourceRegistry,
   defineAriaSource,
@@ -47,6 +48,9 @@ export {
   isRegisteredNavigationTarget,
   isRegisteredStateProjection,
   isRegisteredVisibleOrder,
+  defineKeyToken,
+  hasKeyToken,
+  resolveKeyToken,
 }
 export type {
   AriaSourceResolver,
@@ -119,25 +123,7 @@ export function evaluatePredicate(predicate: Predicate, ctx: PatternRuntimeConte
   return resolver(predicate, ctx)
 }
 
-// KeyToken registry — '$key'/'$activeKey' 는 기본 등록, 패턴별($anchorKey 등)은 defineKeyToken 으로 확장.
-type KeyTokenResolver = (key: Key | undefined | null, activeKey: Key | undefined | null, ctx?: PatternRuntimeContext) => Key | null | undefined
-const keyTokenRegistry = new Map<string, KeyTokenResolver>([
-  ['$key', (key) => key ?? null],
-  ['$activeKey', (_key, activeKey) => activeKey ?? null],
-  ['$anchorKey', (_key, _activeKey, ctx) => ctx?.data.state?.anchorKey ?? null],
-  ['$extentKey', (_key, _activeKey, ctx) => ctx?.data.state?.extentKey ?? null],
-])
-export const defineKeyToken = (token: string, resolve: KeyTokenResolver) => void keyTokenRegistry.set(token, resolve)
 export const hasAriaSource = isRegisteredAriaSource
-export const hasKeyToken = (token: string) => keyTokenRegistry.has(token)
 export const hasNavigationTarget = isRegisteredNavigationTarget
 export const hasPredicate = (kind: string) => predicateRegistry.has(kind)
 export const hasVisibleOrder = isRegisteredVisibleOrder
-
-export function resolveKeyToken(token: string, key: Key | undefined | null, activeKey: Key | undefined | null, ctx?: PatternRuntimeContext): Key {
-  const resolver = keyTokenRegistry.get(token)
-  if (!resolver) throw unknownTokenError('keyToken', token)
-  const resolved = resolver(key, activeKey, ctx)
-  if (!resolved) throw new Error(`Cannot resolve key token: ${token}`)
-  return resolved
-}
