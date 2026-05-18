@@ -23,10 +23,12 @@ const iconUrlByName = {
 
 export type IconName = keyof typeof iconUrlByName
 
-export function Icon({ name, className }: { name: IconName; className?: string }) {
+export function Icon({ name, className, label }: { name: IconName; className?: string; label?: string }) {
   return (
     <span
-      aria-hidden="true"
+      aria-hidden={label ? undefined : 'true'}
+      aria-label={label}
+      role={label ? 'img' : undefined}
       className={['demo-icon', className].filter(Boolean).join(' ')}
       style={{ '--icon-url': `url("${iconUrlByName[name]}")` } as CSSProperties}
     />

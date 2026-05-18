@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import { reduceTabsData, type PatternData, type PatternEvent } from '../../../../src'
@@ -31,7 +31,7 @@ describe('Tabs demo — automatic activation', () => {
     const tabs = screen.getAllByRole('tab')
     expect(tabs[0].getAttribute('aria-selected')).toBe('true')
     tabs[0].focus()
-    fireEvent.keyDown(tabs[0], { key: 'ArrowRight', code: 'ArrowRight' })
+    act(() => { fireEvent.keyDown(tabs[0], { key: 'ArrowRight', code: 'ArrowRight' }) })
     const tabsAfter = screen.getAllByRole('tab')
     expect(tabsAfter[1].getAttribute('aria-selected')).toBe('true')
     expect(tabsAfter[0].getAttribute('aria-selected')).toBe('false')
@@ -45,7 +45,7 @@ describe('Tabs demo — automatic activation', () => {
   it('click on a tab activates it', () => {
     render(<TabsDemo variant="automatic" />)
     const tabs = screen.getAllByRole('tab')
-    fireEvent.click(tabs[2])
+    act(() => { fireEvent.click(tabs[2]) })
     const tabsAfter = screen.getAllByRole('tab')
     expect(tabsAfter[2].getAttribute('aria-selected')).toBe('true')
   })
@@ -53,10 +53,10 @@ describe('Tabs demo — automatic activation', () => {
   it('Home/End jump to first/last tab', () => {
     render(<TabsDemo variant="automatic" />)
     let tabs = screen.getAllByRole('tab')
-    fireEvent.keyDown(tabs[0], { key: 'End', code: 'End' })
+    act(() => { fireEvent.keyDown(tabs[0], { key: 'End', code: 'End' }) })
     tabs = screen.getAllByRole('tab')
     expect(tabs[tabs.length - 1].getAttribute('aria-selected')).toBe('true')
-    fireEvent.keyDown(tabs[tabs.length - 1], { key: 'Home', code: 'Home' })
+    act(() => { fireEvent.keyDown(tabs[tabs.length - 1], { key: 'Home', code: 'Home' }) })
     tabs = screen.getAllByRole('tab')
     expect(tabs[0].getAttribute('aria-selected')).toBe('true')
   })
@@ -74,11 +74,11 @@ describe('Tabs demo — manual activation', () => {
     const tabs = screen.getAllByRole('tab')
     expect(tabs[0].getAttribute('aria-selected')).toBe('true')
     tabs[0].focus()
-    fireEvent.keyDown(tabs[0], { key: 'ArrowRight', code: 'ArrowRight' })
+    act(() => { fireEvent.keyDown(tabs[0], { key: 'ArrowRight', code: 'ArrowRight' }) })
     const after = screen.getAllByRole('tab')
     expect(after[0].getAttribute('aria-selected')).toBe('true')
     expect(after[1].getAttribute('aria-selected')).toBe('false')
-    fireEvent.keyDown(document.activeElement ?? after[1], { key: 'Enter', code: 'Enter' })
+    act(() => { fireEvent.keyDown(document.activeElement ?? after[1], { key: 'Enter', code: 'Enter' }) })
     const activated = screen.getAllByRole('tab')
     expect(activated[1].getAttribute('aria-selected')).toBe('true')
   })
@@ -87,8 +87,8 @@ describe('Tabs demo — manual activation', () => {
     render(<TabsDemo variant="manual" />)
     const tabs = screen.getAllByRole('tab')
     tabs[0].focus()
-    fireEvent.keyDown(tabs[0], { key: 'ArrowRight', code: 'ArrowRight' })
-    fireEvent.keyDown(document.activeElement ?? tabs[1], { key: ' ', code: 'Space' })
+    act(() => { fireEvent.keyDown(tabs[0], { key: 'ArrowRight', code: 'ArrowRight' }) })
+    act(() => { fireEvent.keyDown(document.activeElement ?? tabs[1], { key: ' ', code: 'Space' }) })
     const after = screen.getAllByRole('tab')
     expect(after[1].getAttribute('aria-selected')).toBe('true')
   })
@@ -104,10 +104,10 @@ describe('Tabs demo — vertical', () => {
     const earthIdx = tabs.findIndex((t) => t.getAttribute('aria-selected') === 'true')
     expect(earthIdx).toBeGreaterThanOrEqual(0)
     tabs[earthIdx].focus()
-    fireEvent.keyDown(tabs[earthIdx], { key: 'ArrowDown', code: 'ArrowDown' })
+    act(() => { fireEvent.keyDown(tabs[earthIdx], { key: 'ArrowDown', code: 'ArrowDown' }) })
     const afterDown = screen.getAllByRole('tab')
     expect(afterDown[earthIdx + 1].getAttribute('aria-selected')).toBe('true')
-    fireEvent.keyDown(document.activeElement ?? afterDown[earthIdx + 1], { key: 'ArrowUp', code: 'ArrowUp' })
+    act(() => { fireEvent.keyDown(document.activeElement ?? afterDown[earthIdx + 1], { key: 'ArrowUp', code: 'ArrowUp' }) })
     const afterUp = screen.getAllByRole('tab')
     expect(afterUp[earthIdx].getAttribute('aria-selected')).toBe('true')
   })
@@ -129,7 +129,7 @@ describe('Tabs demo — closeable', () => {
     const initialCount = tabsBefore.length
     const firstLabel = tabsBefore[0].textContent
     const tablist = screen.getByRole('tablist')
-    fireEvent.keyDown(tablist, { key: 'Delete', code: 'Delete' })
+    act(() => { fireEvent.keyDown(tablist, { key: 'Delete', code: 'Delete' }) })
     const tabsAfter = screen.getAllByRole('tab')
     expect(tabsAfter).toHaveLength(initialCount - 1)
     expect(tabsAfter[0].textContent).not.toBe(firstLabel)
@@ -142,7 +142,7 @@ describe('Tabs demo — closeable', () => {
     render(<TabsDemo variant="closeable" />)
     const initialCount = screen.getAllByRole('tab').length
     const closeBtn = screen.getByRole('button', { name: /Close Drafts/i })
-    fireEvent.click(closeBtn)
+    act(() => { fireEvent.click(closeBtn) })
     expect(screen.getAllByRole('tab')).toHaveLength(initialCount - 1)
     expect(screen.queryByRole('tab', { name: 'Drafts' })).toBeNull()
   })

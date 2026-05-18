@@ -62,9 +62,7 @@ describe('useTreeviewPattern', () => {
     fireEvent.click(screen.getByRole('button', { name: 'toggle a' }))
 
     expect(events).toEqual([
-      { type: 'focus', key: 'a' },
       { type: 'select', keys: ['a'], anchorKey: 'a', extentKey: 'a' },
-      { type: 'focus', key: 'a' },
       { type: 'expand', key: 'a', expanded: false },
     ])
   })
@@ -77,9 +75,7 @@ describe('useTreeviewPattern', () => {
     fireEvent.click(screen.getByText('a'))
 
     expect(events).toEqual([
-      { type: 'focus', key: 'a' },
       { type: 'select', keys: ['a'], anchorKey: 'a', extentKey: 'a' },
-      { type: 'focus', key: 'a' },
       { type: 'expand', key: 'a', expanded: false },
     ])
   })

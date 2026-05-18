@@ -58,9 +58,10 @@ export function useSourcePreviewState(activeSourceName: SourceName) {
 }
 
 async function copyText(value: string): Promise<boolean> {
+  if (!navigator.clipboard?.writeText) return false
   try {
-    await navigator.clipboard?.writeText(value)
-    return Boolean(navigator.clipboard)
+    await navigator.clipboard.writeText(value)
+    return true
   } catch {
     return false
   }

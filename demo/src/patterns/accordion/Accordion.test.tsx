@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import type { PatternData, PatternEvent } from '../../../../src'
@@ -29,14 +29,14 @@ describe('Accordion demo', () => {
     const [first] = screen.getAllByRole('button')
     expect(first!.getAttribute('aria-expanded')).toBe('false')
 
-    fireEvent.click(first!)
+    act(() => { fireEvent.click(first!) })
     expect(first!.getAttribute('aria-expanded')).toBe('true')
     const panel = screen.getByRole('region')
     expect(panel).toBeTruthy()
     expect(panel.getAttribute('aria-labelledby')).toBe(first!.getAttribute('id'))
     expect(first!.getAttribute('aria-controls')).toBe(panel.getAttribute('id'))
 
-    fireEvent.click(first!)
+    act(() => { fireEvent.click(first!) })
     expect(first!.getAttribute('aria-expanded')).toBe('false')
     expect(screen.queryByRole('region')).toBeNull()
   })
@@ -44,8 +44,8 @@ describe('Accordion demo', () => {
   it('allows multiple panels expanded at once', () => {
     render(<AccordionDemo />)
     const [first, second] = screen.getAllByRole('button')
-    fireEvent.click(first!)
-    fireEvent.click(second!)
+    act(() => { fireEvent.click(first!) })
+    act(() => { fireEvent.click(second!) })
     expect(first!.getAttribute('aria-expanded')).toBe('true')
     expect(second!.getAttribute('aria-expanded')).toBe('true')
     expect(screen.getAllByRole('region')).toHaveLength(2)
@@ -55,9 +55,9 @@ describe('Accordion demo', () => {
     render(<AccordionDemo />)
     const [first] = screen.getAllByRole('button')
     first!.focus()
-    fireEvent.keyDown(first!, { key: 'Enter', code: 'Enter' })
+    act(() => { fireEvent.keyDown(first!, { key: 'Enter', code: 'Enter' }) })
     expect(first!.getAttribute('aria-expanded')).toBe('true')
-    fireEvent.keyDown(first!, { key: 'Enter', code: 'Enter' })
+    act(() => { fireEvent.keyDown(first!, { key: 'Enter', code: 'Enter' }) })
     expect(first!.getAttribute('aria-expanded')).toBe('false')
   })
 
@@ -65,9 +65,9 @@ describe('Accordion demo', () => {
     render(<AccordionDemo />)
     const [first] = screen.getAllByRole('button')
     first!.focus()
-    fireEvent.keyDown(first!, { key: ' ', code: 'Space' })
+    act(() => { fireEvent.keyDown(first!, { key: ' ', code: 'Space' }) })
     expect(first!.getAttribute('aria-expanded')).toBe('true')
-    fireEvent.keyDown(first!, { key: ' ', code: 'Space' })
+    act(() => { fireEvent.keyDown(first!, { key: ' ', code: 'Space' }) })
     expect(first!.getAttribute('aria-expanded')).toBe('false')
   })
 
@@ -76,13 +76,13 @@ describe('Accordion demo', () => {
     const [first, second, third] = screen.getAllByRole('button')
     first!.focus()
 
-    fireEvent.keyDown(first!, { key: 'ArrowDown', code: 'ArrowDown' })
+    act(() => { fireEvent.keyDown(first!, { key: 'ArrowDown', code: 'ArrowDown' }) })
     expect(document.activeElement).toBe(second)
 
-    fireEvent.keyDown(second!, { key: 'ArrowDown', code: 'ArrowDown' })
+    act(() => { fireEvent.keyDown(second!, { key: 'ArrowDown', code: 'ArrowDown' }) })
     expect(document.activeElement).toBe(third)
 
-    fireEvent.keyDown(third!, { key: 'ArrowUp', code: 'ArrowUp' })
+    act(() => { fireEvent.keyDown(third!, { key: 'ArrowUp', code: 'ArrowUp' }) })
     expect(document.activeElement).toBe(second)
   })
 
@@ -93,10 +93,10 @@ describe('Accordion demo', () => {
     const last = headers[headers.length - 1]
     first!.focus()
 
-    fireEvent.keyDown(first!, { key: 'End', code: 'End' })
+    act(() => { fireEvent.keyDown(first!, { key: 'End', code: 'End' }) })
     expect(document.activeElement).toBe(last)
 
-    fireEvent.keyDown(last!, { key: 'Home', code: 'Home' })
+    act(() => { fireEvent.keyDown(last!, { key: 'Home', code: 'Home' }) })
     expect(document.activeElement).toBe(first)
   })
 
@@ -107,7 +107,7 @@ describe('Accordion demo', () => {
     expect(second!.getAttribute('tabindex')).toBe('-1')
 
     first!.focus()
-    fireEvent.keyDown(first!, { key: 'ArrowDown', code: 'ArrowDown' })
+    act(() => { fireEvent.keyDown(first!, { key: 'ArrowDown', code: 'ArrowDown' }) })
     expect(second!.getAttribute('tabindex')).toBe('0')
     expect(first!.getAttribute('tabindex')).toBe('-1')
   })

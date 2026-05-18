@@ -18,25 +18,14 @@ export function useRovingFocusEventHandler({
   onEvent: (event: PatternEvent) => void
 }) {
   const pendingFocusKeyRef = useRef<Key | null>(null)
-  const delayedFocusTimerRef = useRef<number | null>(null)
 
   useLayoutEffect(() => {
     if (!usesRovingFocus(definition, options)) return
     const pendingFocusKey = pendingFocusKeyRef.current
     if (!pendingFocusKey || pendingFocusKey !== data.state?.activeKey) return
-    if (delayedFocusTimerRef.current !== null) {
-      window.clearTimeout(delayedFocusTimerRef.current)
-      delayedFocusTimerRef.current = null
-    }
     pendingFocusKeyRef.current = null
     document.getElementById(keyToElementId(pendingFocusKey))?.focus({ preventScroll: true })
   }, [data.state?.activeKey, definition, keyToElementId, options])
-
-  useLayoutEffect(() => {
-    return () => {
-      if (delayedFocusTimerRef.current !== null) window.clearTimeout(delayedFocusTimerRef.current)
-    }
-  }, [])
 
   return (event: PatternEvent) => {
     let nextFocusKey: Key | null = null
@@ -48,13 +37,6 @@ export function useRovingFocusEventHandler({
       keyboardFocusKeyRef.current = null
     }
     onEvent(event)
-    if (nextFocusKey) {
-      if (delayedFocusTimerRef.current !== null) window.clearTimeout(delayedFocusTimerRef.current)
-      delayedFocusTimerRef.current = window.setTimeout(() => {
-        delayedFocusTimerRef.current = null
-        document.getElementById(keyToElementId(nextFocusKey))?.focus({ preventScroll: true })
-      })
-    }
   }
 }
 

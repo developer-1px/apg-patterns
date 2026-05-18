@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import { useLayoutEffect, useReducer } from 'react'
 import { useTreeviewPattern, type PatternData, type PatternEvent } from '../index'
 
@@ -40,7 +40,7 @@ export const visibleKeys = () => [...tree().querySelectorAll('[role="treeitem"]'
 export const activeKey = () => visibleKeys().find((key) => item(key).getAttribute('tabindex') === '0' || item(key).tabIndex === 0)
 export const selectedKeys = () => visibleKeys().filter((key) => item(key).getAttribute('aria-selected') === 'true')
 export const expandedKeys = () => visibleKeys().filter((key) => item(key).getAttribute('aria-expanded') === 'true')
-export const press = (key: string, opts: Record<string, unknown> = {}) => fireEvent.keyDown(tree(), { key, code: key, ...opts })
+export const press = (key: string, opts: Record<string, unknown> = {}) => act(() => { fireEvent.keyDown(tree(), { key, code: key, ...opts }) })
 
 export function renderHost(options: HostOptions = {}) {
   const events: PatternEvent[] = []

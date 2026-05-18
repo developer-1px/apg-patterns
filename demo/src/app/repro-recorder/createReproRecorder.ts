@@ -49,37 +49,12 @@ function getComponentInfo(el: Element | null): { stack: string[]; source: string
     current = current.parentElement
   }
 
-  const stack: string[] = []
-  let fiberKey: string | undefined
-  for (const key in el) {
-    if (key.startsWith('__reactFiber$')) {
-      fiberKey = key
-      break
-    }
-  }
-  if (!fiberKey) return { stack, source }
-
-  let fiber = (el as unknown as Record<string, unknown>)[fiberKey] as { type?: unknown; return?: unknown } | undefined
-  while (fiber) {
-    const type = fiber.type
-    let name = ''
-    if (typeof type === 'function') {
-      const component = type as Function & { displayName?: string }
-      name = component.displayName || component.name || ''
-    } else if (type && typeof type === 'object') {
-      const record = type as { type?: { displayName?: string; name?: string }; render?: { displayName?: string; name?: string } }
-      const wrappedType = record.type ?? record.render
-      if (wrappedType) name = wrappedType.displayName || wrappedType.name || ''
-    }
-    if (name && name !== 'Anonymous' && !stack.includes(name)) stack.unshift(name)
-    fiber = fiber.return as typeof fiber
-  }
-
-  return { stack, source }
+  const component = el.closest<HTMLElement>('[data-component]')
+  return { stack: component?.dataset.component ? [component.dataset.component] : [], source }
 }
 
 function currentUrl(): string {
-  return `${window.location.pathname}${window.location.hash}`
+  return `${window.location.pathname}${window.location.search}${window.location.hash}`
 }
 
 function shortcutMatches(event: KeyboardEvent): boolean {
@@ -121,6 +96,7 @@ export function createReproRecorder() {
   let active = false
   let seq = 0
   let startTime = 0
+  let startedAtWallTime = 0
   let lastAriaTree = ''
   let lastContainer: Element | null = null
   let isFirstInput = true
@@ -250,6 +226,7 @@ export function createReproRecorder() {
       active = true
       seq = 0
       startTime = performance.now()
+      startedAtWallTime = Date.now()
       lastAriaTree = ''
       lastContainer = null
       isFirstInput = true
@@ -295,7 +272,7 @@ export function createReproRecorder() {
       cleanups.length = 0
       const meta = {
         url: currentUrl(),
-        startedAt: new Date(Date.now() - (performance.now() - startTime)).toISOString(),
+        startedAt: new Date(startedAtWallTime).toISOString(),
         duration: Math.round(performance.now() - startTime),
         eventCount: timeline.length,
       }

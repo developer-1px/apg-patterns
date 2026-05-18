@@ -96,7 +96,9 @@ function formatAriaValue(attr: string, val: string): string {
   return `activedescendant=${val}${targetName ? ` "${targetName}"` : ''}`
 }
 
-function serializeARIANode(el: Element, depth: number, activeEl: Element | null, activeDescendant: Element | null): string {
+function serializeARIANode(el: Element, depth: number, activeEl: Element | null, activeDescendant: Element | null, visited: Set<Element>): string {
+  if (visited.has(el)) return ''
+  visited.add(el)
   const role = el.getAttribute('role') || implicitRole(el)
   if (!role) return ''
 
@@ -116,17 +118,17 @@ function serializeARIANode(el: Element, depth: number, activeEl: Element | null,
   for (const child of el.children) {
     const childRole = child.getAttribute('role') || implicitRole(child)
     if (childRole) {
-      const serialized = serializeARIANode(child, depth + 1, activeEl, activeDescendant)
+      const serialized = serializeARIANode(child, depth + 1, activeEl, activeDescendant, visited)
       if (serialized) childLines.push(serialized)
     } else {
       for (const grandchild of child.children) {
-        const serialized = serializeARIANode(grandchild, depth + 1, activeEl, activeDescendant)
+        const serialized = serializeARIANode(grandchild, depth + 1, activeEl, activeDescendant, visited)
         if (serialized) childLines.push(serialized)
       }
     }
   }
   for (const controlled of getControlledElements(el)) {
-    const serialized = serializeARIANode(controlled, depth + 1, activeEl, activeDescendant)
+    const serialized = serializeARIANode(controlled, depth + 1, activeEl, activeDescendant, visited)
     if (serialized) childLines.push(serialized)
   }
 
@@ -145,9 +147,10 @@ export function findRoleContainer(el: Element | null): Element | null {
 
 export function serializeARIATree(container: Element, activeEl: Element | null): string {
   const activeDescendant = getActiveDescendant(activeEl)
-  const serialized = serializeARIANode(container, 0, activeEl, activeDescendant)
+  const visited = new Set<Element>()
+  const serialized = serializeARIANode(container, 0, activeEl, activeDescendant, visited)
     || Array.from(container.children)
-      .map((child) => serializeARIANode(child, 0, activeEl, activeDescendant))
+      .map((child) => serializeARIANode(child, 0, activeEl, activeDescendant, visited))
       .filter(Boolean)
       .join('\n')
   return serialized || '(no ARIA nodes)'

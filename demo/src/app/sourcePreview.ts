@@ -7,7 +7,8 @@ export async function loadSourcePreview(sourceName: SourceName, loaders: SourceL
   if (!loadSource) return `missing source: ${sourceName}`
 
   try {
-    return await loadSource()
+    const source = await loadSource()
+    return source.length > 0 ? source : `empty source: ${sourceName}`
   } catch {
     return `failed source: ${sourceName}`
   }
@@ -18,5 +19,5 @@ export function isCopyableSource(source: string): boolean {
 }
 
 export function isSourceLoadFailure(source: string): boolean {
-  return source.startsWith('missing source:') || source.startsWith('failed source:')
+  return source.startsWith('missing source:') || source.startsWith('failed source:') || source.startsWith('empty source:')
 }

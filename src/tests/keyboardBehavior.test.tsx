@@ -1,3 +1,4 @@
+import { act } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { activeKey, expandedKeys, press, renderHost, selectedKeys, tree, visibleKeys } from './keyboardBehaviorHost'
 
@@ -103,7 +104,7 @@ describe('keyboard navigation — multi-step sequences', () => {
   it('preventDefault is signalled on bound shortcuts', () => {
     renderHost()
     const event = new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true })
-    tree().dispatchEvent(event)
+    act(() => { tree().dispatchEvent(event) })
     expect(event.defaultPrevented).toBe(true)
   })
 
