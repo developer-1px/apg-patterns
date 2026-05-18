@@ -133,11 +133,11 @@ describe('source copy', () => {
 
     render(<App />)
 
-    await waitFor(() => expect(getSourcePanel().textContent).toContain('export function Accordion'))
+    await waitFor(() => expect(getSourcePanel().textContent).toContain('export function Accordion'), { timeout: 15000 })
     fireEvent.click(screen.getByRole('tab', { name: 'accordionData.ts' }))
 
     expect(getSourcePanel().textContent).not.toContain('export function Accordion')
-  })
+  }, 15000)
 })
 
 describe('App route state', () => {

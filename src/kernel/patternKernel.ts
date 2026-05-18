@@ -13,8 +13,49 @@
  */
 import type { KeyInput } from '@interactive-os/keyboard'
 import type { Key, PatternData, PatternOptions, Predicate } from '../schema'
+import {
+  ariaSourceRegistry,
+  defineAriaSource,
+  defineNavigationTarget,
+  definePredicate,
+  defineStateProjection,
+  defineVisibleOrder,
+  isRegisteredAriaSource,
+  isRegisteredNavigationTarget,
+  isRegisteredStateProjection,
+  isRegisteredVisibleOrder,
+  navigationTargetRegistry,
+  predicateRegistry,
+  stateProjectionRegistry,
+  visibleOrderRegistry,
+  type AriaSourceResolver,
+  type NavigationTargetContext,
+  type NavigationTargetResolver,
+  type PredicateResolver,
+  type StateProjectionResolver,
+  type VisibleOrderResolver,
+} from './kernelRegistries'
 export { resolveEventTemplate } from './patternEventTemplate'
 export { createParentByKey } from './patternRelations'
+export {
+  defineAriaSource,
+  defineNavigationTarget,
+  definePredicate,
+  defineStateProjection,
+  defineVisibleOrder,
+  isRegisteredAriaSource,
+  isRegisteredNavigationTarget,
+  isRegisteredStateProjection,
+  isRegisteredVisibleOrder,
+}
+export type {
+  AriaSourceResolver,
+  NavigationTargetContext,
+  NavigationTargetResolver,
+  PredicateResolver,
+  StateProjectionResolver,
+  VisibleOrderResolver,
+}
 
 // KeyInput 재export — root onKeyDown handler 의 입력 형이 외부에서 보이도록.
 export type { KeyInput }
@@ -31,70 +72,6 @@ export interface PatternRuntimeContext {
   keyToElementId?: (key: Key) => string
   parentByKey?: ReadonlyMap<Key, Key>
 }
-
-export type AriaSourceResolver = (ctx: PatternRuntimeContext) => unknown
-export type StateProjectionResolver = (ctx: PatternRuntimeContext) => unknown
-export type PredicateResolver = (predicate: Predicate, ctx: PatternRuntimeContext) => boolean
-export type VisibleOrderResolver = (visibleOrder: { kind: string } & Record<string, unknown>, data: PatternData) => readonly Key[]
-export interface NavigationTargetContext {
-  activeKey: Key
-  data: PatternData
-  parentByKey: ReadonlyMap<Key, Key>
-  visibleKeys: readonly Key[]
-}
-export type NavigationTargetResolver = (
-  target: { kind: string; key?: string } & Record<string, unknown>,
-  ctx: NavigationTargetContext,
-) => Key | null
-
-// ─────────────────────────────────────────────────────────────
-// Registries
-// ─────────────────────────────────────────────────────────────
-
-const ariaSourceRegistry = new Map<string, AriaSourceResolver>()
-const stateProjectionRegistry = new Map<string, StateProjectionResolver>()
-const predicateRegistry = new Map<string, PredicateResolver>()
-const visibleOrderRegistry = new Map<string, VisibleOrderResolver>()
-const navigationTargetRegistry = new Map<string, NavigationTargetResolver>()
-
-// ─────────────────────────────────────────────────────────────
-// Define API — 패턴은 자기 토큰을 자기 정의 옆에서 등록한다.
-// ─────────────────────────────────────────────────────────────
-
-// 동일 이름으로 "다른" resolver 가 등록되면 fragmentation 경고.
-// 같은 함수 객체로 재등록(HMR / 모듈 재평가)은 silent pass.
-function warnDuplicate(category: string, name: string, existing: unknown, incoming: unknown) {
-  if (existing && existing !== incoming) {
-    // eslint-disable-next-line no-console
-    console.warn(`[apg-pattern] ${category} "${name}" is being re-registered with a different resolver — possible vocabulary fragmentation. Choose one canonical implementation.`)
-  }
-}
-export const defineAriaSource = (name: string, resolve: AriaSourceResolver) => {
-  warnDuplicate('ariaSource', name, ariaSourceRegistry.get(name), resolve)
-  ariaSourceRegistry.set(name, resolve)
-}
-export const defineStateProjection = (from: string, resolve: StateProjectionResolver) => {
-  warnDuplicate('stateProjection', from, stateProjectionRegistry.get(from), resolve)
-  stateProjectionRegistry.set(from, resolve)
-}
-export const definePredicate = (kind: string, resolve: PredicateResolver) => {
-  warnDuplicate('predicate', kind, predicateRegistry.get(kind), resolve)
-  predicateRegistry.set(kind, resolve)
-}
-export const defineVisibleOrder = (kind: string, resolve: VisibleOrderResolver) => {
-  warnDuplicate('visibleOrder', kind, visibleOrderRegistry.get(kind), resolve)
-  visibleOrderRegistry.set(kind, resolve)
-}
-export const defineNavigationTarget = (kind: string, resolve: NavigationTargetResolver) => {
-  warnDuplicate('navigationTarget', kind, navigationTargetRegistry.get(kind), resolve)
-  navigationTargetRegistry.set(kind, resolve)
-}
-
-// Registry 상태를 schema refinement 가 조회할 수 있도록 노출.
-export const isRegisteredAriaSource = (name: string) => ariaSourceRegistry.has(name)
-export const isRegisteredStateProjection = (from: string) => stateProjectionRegistry.has(from)
-export const isRegisteredVisibleOrder = (kind: string) => visibleOrderRegistry.has(kind)
-export const isRegisteredNavigationTarget = (kind: string) => navigationTargetRegistry.has(kind)
 
 // ─────────────────────────────────────────────────────────────
 // Resolve helpers — runtime 의 분기 함수를 대체

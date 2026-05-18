@@ -19,8 +19,20 @@ export function describeElement(element: EventTarget | Element | null): string {
   return `${tag}${id}${role ? `[role=${role}]` : ''}${name ? ` "${name}"` : ''}`
 }
 
-export function serializeCombobox(): string {
-  const combobox = document.querySelector<HTMLElement>('[role="combobox"]')
+export function serializePreview(target?: EventTarget | Element | null): string {
+  const root = target instanceof Element
+    ? target.closest<HTMLElement>('[data-demo-preview]') ?? document
+    : document
+  const combobox = root.querySelector<HTMLElement>('[role="combobox"]')
+  if (combobox) return serializeCombobox(combobox)
+
+  const listbox = root.querySelector<HTMLElement>('[role="listbox"]')
+  if (listbox) return serializeListbox(listbox)
+
+  return 'preview pattern: not found'
+}
+
+export function serializeCombobox(combobox = document.querySelector<HTMLElement>('[role="combobox"]')): string {
   if (!combobox) return 'combobox: not found'
 
   const activeId = combobox.getAttribute('aria-activedescendant')
@@ -48,6 +60,34 @@ export function serializeCombobox(): string {
     }
   } else {
     lines.push(`popup: not found (${popupId ?? 'no aria-controls'})`)
+  }
+
+  return lines.join('\n')
+}
+
+export function serializeListbox(listbox = document.querySelector<HTMLElement>('[role="listbox"]')): string {
+  if (!listbox) return 'listbox: not found'
+
+  const activeId = listbox.getAttribute('aria-activedescendant')
+  const activeOption = activeId ? document.getElementById(activeId) : null
+  const focusedOption = document.activeElement instanceof HTMLElement && document.activeElement.getAttribute('role') === 'option'
+    ? document.activeElement
+    : null
+  const activeElement = activeOption ?? focusedOption
+
+  const lines = [
+    `listbox "${getName(listbox)}"`,
+    `  focus=${document.activeElement === listbox}`,
+    `  focusedOption=${focusedOption ? `#${focusedOption.id || '(no id)'} "${getName(focusedOption)}"` : 'null'}`,
+    `  activeDescendant=${activeId ?? 'null'}${activeOption ? ` "${getName(activeOption)}"` : ''}`,
+    `  activeVisible=${activeElement instanceof HTMLElement ? isVisibleWithin(activeElement, listbox) : 'n/a'}`,
+  ]
+
+  const options = Array.from(listbox.querySelectorAll<HTMLElement>('[role="option"]'))
+  for (const option of options) {
+    const selected = option.getAttribute('aria-selected')
+    const marker = option === activeElement ? '>' : ' '
+    lines.push(`${marker} option #${option.id || '(no id)'} "${getName(option)}" selected=${selected ?? 'null'} data-active=${option.hasAttribute('data-active')}`)
   }
 
   return lines.join('\n')

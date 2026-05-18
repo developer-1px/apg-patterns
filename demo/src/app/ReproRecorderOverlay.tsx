@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   describeElement,
   formatRecording,
-  serializeCombobox,
+  serializePreview,
   type RecorderEntry,
 } from './reproRecorderFormat'
 
@@ -105,7 +105,7 @@ export function ReproRecorderOverlay() {
           ...(key ? { key } : {}),
           target: describeElement(target),
           defaultPrevented: event.defaultPrevented,
-          snapshot: serializeCombobox(),
+          snapshot: serializePreview(target),
         }
         recorder.entries.push(entry)
         setSummary(formatRecording(recorder.entries.slice(-3)))
