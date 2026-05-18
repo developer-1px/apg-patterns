@@ -14,7 +14,7 @@ const treegridDemoDefinition = {
     hooks: ['treegrid/useTreegridPattern.ts'],
     data: ['treegridData.ts'],
     definition: 'treegrid/definition.ts',
-    extra: ['treegrid/navigation.ts', 'treegrid/geometry.ts', 'treegrid/keyboard.ts', 'treegrid/parts.ts', 'treegrid/treegridRow.ts'],
+    extra: ['treegrid/effects.ts', 'treegrid/navigation.ts', 'treegrid/geometry.ts', 'treegrid/keyboard.ts', 'treegrid/parts.ts', 'treegrid/treegridRow.ts'],
   },
   view: {
     kind: 'component',

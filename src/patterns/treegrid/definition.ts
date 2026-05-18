@@ -1,4 +1,5 @@
 import { PatternDefinitionSchema } from '../../schema'
+import { treegridEffects } from './effects'
 import { treegridKeyboard } from './keyboard'
 import { treegridParts } from './parts'
 import './navigation'
@@ -10,7 +11,7 @@ export const treegridDefinition = PatternDefinitionSchema.parse({
   rootRole: 'treegrid',
   containedRoles: ['row', 'gridcell', 'columnheader', 'rowheader'],
   focusModel: 'rovingTabIndex',
-  effects: [{ kind: 'focus', on: { state: 'activeKey', reasons: ['keyboard'] }, scope: { kind: 'focusWithin' }, target: { kind: 'activeKeyElement' }, preventScroll: true }],
+  effects: treegridEffects,
   parts: treegridParts,
   navigation: {
     visibleOrder: { kind: 'treegridVisibleCells' },
