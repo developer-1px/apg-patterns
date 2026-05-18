@@ -3,10 +3,17 @@ import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import '../kernel/kernelBuiltins'
 import { defineDomEvent, defineDomEventHandlerProp, resolvePartEventBindings, withDefaultReason } from '../kernel/domEventBindings'
+import { useAccordionPattern } from '../patterns/accordion/useAccordionPattern'
+import { AlertDefinitionSchema } from '../patterns/alert/definition'
 import { createAlertActions } from '../patterns/alert/alertActions'
+import { useAlertPattern } from '../patterns/alert/useAlertPattern'
 import { createButtonRootProps } from '../patterns/button/buttonRootProps'
+import { useButtonPattern } from '../patterns/button/useButtonPattern'
 import { createCheckboxActions } from '../patterns/checkbox/checkboxActions'
+import { useCheckboxPattern } from '../patterns/checkbox/useCheckboxPattern'
 import { createGridEditInputProps } from '../patterns/grid/gridEditInputProps'
+import { LinkDefinitionSchema } from '../patterns/link/definition'
+import { useLinkPattern } from '../patterns/link/useLinkPattern'
 import { createMenuButtonTriggerProps } from '../patterns/menu/menuButtonTriggerProps'
 import { getMenuButtonRuntimeState } from '../patterns/menu/menuButtonRuntimeState'
 import { createRadioGroupActions } from '../patterns/radio/radioGroupActions'
@@ -41,6 +48,15 @@ function HookRuntimeHost() {
     },
     (event) => setEvents((current) => [...current, event]),
     { elementIdPrefix: 'edge-spin-' },
+  )
+  const checkbox = useCheckboxPattern(
+    {
+      items: { agree: { label: 'Agree' } },
+      relations: { rootKeys: ['agree'] },
+      state: { activeKey: 'agree', checkedByKey: { agree: 'mixed' }, disabledKeys: [] },
+    },
+    (event) => setEvents((current) => [...current, event]),
+    { elementIdPrefix: 'edge-check-' },
   )
   const switchRuntime = useSwitchPattern(
     {
@@ -83,6 +99,52 @@ function HookRuntimeHost() {
     (event) => setEvents((current) => [...current, event]),
     { elementIdPrefix: 'edge-table-' },
   )
+  const accordion = useAccordionPattern(
+    {
+      items: { section: { label: 'Section' } },
+      relations: { rootKeys: ['section'] },
+      state: { activeKey: 'section', expandedKeys: [], disabledKeys: [] },
+    },
+    (event) => setEvents((current) => [...current, event]),
+    { elementIdPrefix: 'edge-accordion-' },
+  )
+  const alert = useAlertPattern(
+    {
+      items: { alert: { label: 'Alert', message: 'Saved' }, dismiss: { label: 'Dismiss' } },
+      relations: { rootKeys: ['alert'] },
+      state: {},
+    },
+    (event) => setEvents((current) => [...current, event]),
+    { elementIdPrefix: 'edge-alert-' },
+  )
+  const button = useButtonPattern(
+    {
+      items: { submit: { label: 'Submit' } },
+      relations: { rootKeys: ['submit'] },
+      state: { activeKey: 'submit', pressedByKey: { submit: true } },
+    },
+    (event) => setEvents((current) => [...current, event]),
+    { elementIdPrefix: 'edge-button-' },
+  )
+  const link = useLinkPattern(
+    {
+      items: { docs: { label: 'Docs', href: '#docs', variant: 'quiet' } },
+      relations: { rootKeys: ['docs'] },
+      state: { activeKey: 'docs' },
+    },
+    (event) => setEvents((current) => [...current, event]),
+    { elementIdPrefix: 'edge-link-' },
+  )
+  const defaultLink = useLinkPattern({
+    items: { fallback: {} },
+    relations: { rootKeys: ['fallback'] },
+    state: {},
+  })
+  const emptyLink = useLinkPattern({
+    items: {},
+    relations: { rootKeys: [] },
+    state: {},
+  })
 
   return (
     <div>
@@ -93,11 +155,28 @@ function HookRuntimeHost() {
           radio.actions.select('two')
           spin.actions.focus('spin')
           spin.actions.step('spin', 'increment')
+          checkbox.actions.focus('agree')
+          checkbox.actions.check('agree', false)
+          checkbox.renderItems[0]?.checkboxProps.onFocus?.({} as never)
+          checkbox.renderItems[0]?.checkboxProps.onKeyDown?.({ key: ' ', code: 'Space', preventDefault: () => undefined, altKey: false, ctrlKey: false, metaKey: false, shiftKey: false, repeat: false, location: 0, nativeEvent: { isComposing: false } } as never)
+          checkbox.renderItems[0]?.checkboxProps.onKeyDown?.({ key: 'Escape', code: 'Escape', preventDefault: () => undefined, altKey: false, ctrlKey: false, metaKey: false, shiftKey: false, repeat: false, location: 0, nativeEvent: { isComposing: false } } as never)
           switchRuntime.actions.focus('power')
           switchRuntime.actions.check('power', true)
+          switchRuntime.renderItems[0]?.switchProps.onFocus?.({} as never)
+          switchRuntime.renderItems[0]?.switchProps.onKeyDown?.({ key: ' ', code: 'Space', preventDefault: () => undefined, altKey: false, ctrlKey: false, metaKey: false, shiftKey: false, repeat: false, location: 0, nativeEvent: { isComposing: false } } as never)
+          switchRuntime.renderItems[0]?.switchProps.onKeyDown?.({ key: 'Escape', code: 'Escape', preventDefault: () => undefined, altKey: false, ctrlKey: false, metaKey: false, shiftKey: false, repeat: false, location: 0, nativeEvent: { isComposing: false } } as never)
           toolbar.actions.focus('bold')
           toolbar.actions.select('bold')
           table.headerRow?.cells[0]?.cellProps.onClick?.({} as never)
+          accordion.actions.focus('section')
+          accordion.actions.toggle('section')
+          accordion.actions.expand('section')
+          accordion.actions.collapse('section')
+          alert.actions.dismiss()
+          button.actions.focus()
+          button.actions.press(false)
+          button.actions.activate()
+          link.actions.activate()
         }}
       >
         Run hook runtimes
@@ -116,9 +195,15 @@ function HookRuntimeHost() {
           spin.state.activeKey,
           spin.ids.forKey('spin'),
           spin.keyToElementId('spin'),
+          checkbox.rootProps.role ?? 'none',
+          checkbox.renderItems.length,
+          checkbox.state.activeKey,
+          checkbox.renderItems[0]?.state.checked,
+          checkbox.ids.forKey('agree'),
           switchRuntime.rootProps.role ?? 'none',
           switchRuntime.renderItems.length,
           switchRuntime.state.activeKey,
+          switchRuntime.renderItems[0]?.state.checked,
           switchRuntime.ids.forKey('power'),
           toolbar.rootProps.role,
           toolbar.renderItems.length,
@@ -129,6 +214,35 @@ function HookRuntimeHost() {
           table.bodyRows.length,
           table.rows.length,
           table.ids.forKey('header'),
+          accordion.rootProps.role,
+          accordion.renderItems.length,
+          accordion.state.activeKey,
+          accordion.ids.forKey('section'),
+          alert.rootProps.role,
+          alert.dismissProps.role,
+          alert.key,
+          alert.message,
+          alert.state.visible,
+          alert.ids.forKey('alert'),
+          button.rootProps.role,
+          button.key,
+          button.label,
+          button.state.pressed,
+          button.ids.forKey('submit'),
+          link.linkProps.role ?? 'none',
+          link.key,
+          link.label,
+          link.href,
+          link.variant,
+          link.state.active,
+          link.ids.forKey('docs'),
+          defaultLink.label,
+          defaultLink.href,
+          defaultLink.variant,
+          emptyLink.key ?? 'null',
+          emptyLink.label,
+          emptyLink.href,
+          emptyLink.variant,
           events.map((event) => `${event.type}:${'key' in event ? event.key ?? '' : ''}`).join('|'),
         ].join('|')}
       </output>
@@ -168,6 +282,22 @@ function HelperHost() {
         }}
       >
         Run action helpers
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          const messages: string[] = []
+          const invalidAlertKind = AlertDefinitionSchema.safeParse({ apgPattern: 'button', rootRole: 'button', containedRoles: [], parts: { alert: { role: 'button' } }, navigation: { visibleOrder: { kind: 'flat' }, targets: {} }, keyboard: [] })
+          const invalidAlertPart = AlertDefinitionSchema.safeParse({ apgPattern: 'alert', rootRole: 'alert', containedRoles: [], parts: { other: { role: 'alert' } }, navigation: { visibleOrder: { kind: 'flat' }, targets: {} }, keyboard: [] })
+          const invalidLinkKind = LinkDefinitionSchema.safeParse({ apgPattern: 'button', rootRole: 'button', containedRoles: [], parts: { link: { role: 'button' } }, navigation: { visibleOrder: { kind: 'flat' }, targets: {} }, keyboard: [] })
+          const invalidLinkPart = LinkDefinitionSchema.safeParse({ apgPattern: 'link', rootRole: 'link', containedRoles: [], parts: { other: { role: 'link' } }, navigation: { visibleOrder: { kind: 'flat' }, targets: {} }, keyboard: [] })
+          for (const result of [invalidAlertKind, invalidAlertPart, invalidLinkKind, invalidLinkPart]) {
+            if (!result.success) messages.push(result.error.issues.map((issue) => issue.message).join(','))
+          }
+          setResult(messages.join('|'))
+        }}
+      >
+        Parse definition guards
       </button>
       <button
         type="button"
@@ -320,6 +450,9 @@ describe('action and prop helper coverage from pointer input', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Run action helpers' }))
     expect(screen.getByText('dismiss:alert|focus:spin|focus:spin|valueStep:spin|focus:check|check:check|focus:radio|select:|focus:switch|check:switch|focus:tool|select:')).toBeTruthy()
 
+    fireEvent.click(screen.getByRole('button', { name: 'Parse definition guards' }))
+    expect(screen.getByText('expected "alert",expected "alert"|alert requires parts.alert|expected "link",expected "link"|link requires parts.link')).toBeTruthy()
+
     fireEvent.click(screen.getByRole('button', { name: 'Run button props' }))
     expect(screen.getByText('0|focus|activate')).toBeTruthy()
 
@@ -346,6 +479,11 @@ describe('action and prop helper coverage from pointer input', () => {
 
     render(<HookRuntimeHost />)
     fireEvent.click(screen.getByRole('button', { name: 'Run hook runtimes' }))
-    expect(screen.getByTestId('hook-runtime').textContent).toContain('radiogroup|2|one|one|two|edge-radio-one|edge-radio-two|none|1|spin|edge-spin-spin|edge-spin-spin|none|1|power|edge-switch-power|toolbar|1|bold|edge-tool-bold|table|row|0|1|edge-table-header|focus:two|select:|focus:spin|focus:spin|valueStep:spin|focus:power|check:power|focus:bold|select:|sort:header')
+    const hookOutput = screen.getByTestId('hook-runtime').textContent
+    expect(hookOutput).toContain('radiogroup|2|one|one|two|edge-radio-one|edge-radio-two')
+    expect(hookOutput).toContain('none|1|agree|mixed|edge-check-agree|none|1|power|false|edge-switch-power')
+    expect(hookOutput).toContain('table|row|0|1|edge-table-header|group|1|section|edge-accordion-section')
+    expect(hookOutput).toContain('link|docs|Docs|#docs|quiet|true|edge-link-docs|fallback|#|anchor|null||#|anchor')
+    expect(hookOutput).toContain('focus:two|select:|focus:spin|focus:spin|valueStep:spin|focus:agree|check:agree|focus:agree|check:agree|focus:power|check:power|focus:power|check:power')
   })
 })
