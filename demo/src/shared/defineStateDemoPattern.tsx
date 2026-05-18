@@ -13,6 +13,7 @@ export function defineStateDemoPattern({
   componentName,
   component,
   eventAction = 'dispatchEvent',
+  getStateValues,
 }: {
   definition: DemoPatternDefinition
   initialData: PatternData
@@ -20,6 +21,7 @@ export function defineStateDemoPattern({
   componentName: string
   component: React.ComponentType<any>
   eventAction?: string
+  getStateValues?: (data: PatternData) => Record<string, unknown>
 }): PatternEntry {
   return defineDemoPattern({
     definition,
@@ -32,7 +34,7 @@ export function defineStateDemoPattern({
       return {
         inspect: renderDataInspect(host.data),
         context: {
-          values: { state: { data: host.data } },
+          values: { state: { data: host.data, ...(getStateValues?.(host.data) ?? {}) } },
           actions: { [eventAction]: emitAndReduce },
           components: { [componentName]: component },
         },

@@ -1,8 +1,8 @@
 import { useCheckboxPattern, type PatternData, type PatternEvent } from '../../../../src'
+import { cx, ds } from '../../shared/designSystem'
 import { Icon } from '../../shared/Icon'
 
-const itemClass =
-  'inline-flex h-8 max-w-sm items-center gap-2 rounded-lg px-2 text-sm text-zinc-800 outline-none transition hover:bg-white/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:text-zinc-200 dark:hover:bg-white/[0.06] dark:focus-visible:outline-zinc-500'
+const itemClass = cx(ds.option, ds.checkable, 'inline-flex h-8 max-w-sm items-center gap-2 text-sm')
 
 export function Checkbox({
   data,

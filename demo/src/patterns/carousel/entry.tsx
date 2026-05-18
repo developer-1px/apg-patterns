@@ -1,26 +1,34 @@
 import { reducePatternData } from '../../../../src'
 import { carouselDefinition } from '../../../../src/patterns/carousel/definition'
-import { usePatternDataHost } from '../../shared/demoHostState'
 import { Carousel } from './Carousel'
 import { initialCarouselData } from './carouselData'
-import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
-import { renderDataInspect } from '../../shared/inspect/genericInspect'
+import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 
-export const entry: PatternEntry = {
+const carouselDemoDefinition = {
   key: 'carousel',
   label: 'Carousel',
-  useDemoPattern: (onEvent) => {
-    const host = usePatternDataHost(initialCarouselData, (data, event) => reducePatternData(carouselDefinition, data, event))
-    return {
-      key: 'carousel',
-      label: 'Carousel',
-      keyboardShortcuts: ['ArrowRight', 'ArrowLeft', 'Tab', 'Enter', 'Space'],
-      sourceNames: ['Carousel.tsx', 'carousel/entry.tsx', 'carousel/useCarouselPattern.ts', 'carouselData.ts', 'carousel/definition.ts', ...KERNEL_SOURCES],
-      inspect: renderDataInspect(host.data),
-      preview: <Carousel data={host.data} onEvent={(event) => {
-        onEvent(event)
-        host.dispatchEvent(event)
-      }} />,
-    }
+  keyboardShortcuts: ['ArrowRight', 'ArrowLeft', 'Tab', 'Enter', 'Space'],
+  sources: {
+    main: 'Carousel.tsx',
+    entry: 'carousel/entry.tsx',
+    hooks: ['carousel/useCarouselPattern.ts'],
+    data: ['carouselData.ts'],
+    definition: 'carousel/definition.ts',
   },
-}
+  view: {
+    kind: 'component',
+    component: 'Carousel',
+    props: {
+      data: '$state.data',
+      onEvent: '$actions.dispatchEvent',
+    },
+  },
+} as const satisfies DemoPatternDefinition
+
+export const entry = defineStateDemoPattern({
+  definition: carouselDemoDefinition,
+  initialData: initialCarouselData,
+  reduce: (data, event) => reducePatternData(carouselDefinition, data, event),
+  componentName: 'Carousel',
+  component: Carousel,
+})

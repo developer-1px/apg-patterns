@@ -1,6 +1,7 @@
 import { useReducer } from 'react'
 import { reducePatternData, useCarouselPattern, type PatternData, type PatternEvent } from '../../../../src'
 import { carouselDefinition } from '../../../../src/patterns/carousel/definition'
+import { cx, ds } from '../../shared/designSystem'
 import { initialCarouselData } from './carouselData'
 import { Icon } from '../../shared/Icon'
 
@@ -24,7 +25,7 @@ export function Carousel({ data = initialCarouselData, onEvent }: CarouselProps)
         <button
           {...carousel.prevProps}
           type="button"
-          className="grid size-8 place-items-center rounded-xl bg-zinc-100/80 text-zinc-700 shadow-sm outline-none transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.06] dark:text-zinc-300 dark:hover:bg-white/[0.08] dark:focus-visible:outline-zinc-500"
+          className={cx(ds.iconButton, 'size-8 rounded-xl text-zinc-700')}
         >
           <Icon name="arrow-left" className="text-sm" />
           <span className="sr-only">Previous slide</span>
@@ -35,7 +36,7 @@ export function Carousel({ data = initialCarouselData, onEvent }: CarouselProps)
         <button
           {...carousel.nextProps}
           type="button"
-          className="grid size-8 place-items-center rounded-xl bg-zinc-100/80 text-zinc-700 shadow-sm outline-none transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.06] dark:text-zinc-300 dark:hover:bg-white/[0.08] dark:focus-visible:outline-zinc-500"
+          className={cx(ds.iconButton, 'size-8 rounded-xl text-zinc-700')}
         >
           <Icon name="arrow-right" className="text-sm" />
           <span className="sr-only">Next slide</span>

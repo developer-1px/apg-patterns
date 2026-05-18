@@ -2,6 +2,12 @@ import { describe, expect, it } from 'vitest'
 
 import { ds } from './designSystem'
 
+const demoSources = import.meta.glob('../**/*.{ts,tsx}', {
+  eager: true,
+  import: 'default',
+  query: '?raw',
+}) as Record<string, string>
+
 describe('design system interactive states', () => {
   it.each([
     ['focusRing', ['ui-focus:']],
@@ -26,5 +32,24 @@ describe('design system interactive states', () => {
     expect(ds.listOption).not.toContain('aria-selected:')
     expect(ds.listOption).not.toContain('data-[active]:')
     expect(ds.button).not.toContain('aria-pressed:')
+  })
+
+  it('keeps demo components from bypassing shared interactive state variants', () => {
+    const blockedPatterns = [
+      'aria-selected:',
+      'aria-checked:',
+      'aria-expanded:',
+      'aria-pressed:',
+      'aria-disabled:',
+      'data-[active]:',
+      'data-[focus-visible]:',
+      'focus-visible:',
+    ]
+
+    const offenders = Object.entries(demoSources)
+      .filter(([path]) => !path.endsWith('.test.ts') && !path.endsWith('.test.tsx'))
+      .flatMap(([path, source]) => blockedPatterns.filter((pattern) => source.includes(pattern)).map((pattern) => `${path}: ${pattern}`))
+
+    expect(offenders).toEqual([])
   })
 })

@@ -1,26 +1,34 @@
 import { reducePatternData } from '../../../../src'
 import { feedDefinition } from '../../../../src/patterns/feed/definition'
-import { usePatternDataHost } from '../../shared/demoHostState'
 import { Feed } from './Feed'
 import { initialFeedData } from './feedData'
-import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
-import { renderDataInspect } from '../../shared/inspect/genericInspect'
+import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 
-export const entry: PatternEntry = {
+const feedDemoDefinition = {
   key: 'feed',
   label: 'Feed',
-  useDemoPattern: (onEvent) => {
-    const host = usePatternDataHost(initialFeedData, (data, event) => reducePatternData(feedDefinition, data, event))
-    return {
-      key: 'feed',
-      label: 'Feed',
-      keyboardShortcuts: ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End'],
-      sourceNames: ['Feed.tsx', 'feed/entry.tsx', 'feed/useFeedPattern.ts', 'feedData.ts', 'feed/definition.ts', ...KERNEL_SOURCES],
-      inspect: renderDataInspect(host.data),
-      preview: <Feed data={host.data} onEvent={(event) => {
-        onEvent(event)
-        host.dispatchEvent(event)
-      }} />,
-    }
+  keyboardShortcuts: ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End'],
+  sources: {
+    main: 'Feed.tsx',
+    entry: 'feed/entry.tsx',
+    hooks: ['feed/useFeedPattern.ts'],
+    data: ['feedData.ts'],
+    definition: 'feed/definition.ts',
   },
-}
+  view: {
+    kind: 'component',
+    component: 'Feed',
+    props: {
+      data: '$state.data',
+      onEvent: '$actions.dispatchEvent',
+    },
+  },
+} as const satisfies DemoPatternDefinition
+
+export const entry = defineStateDemoPattern({
+  definition: feedDemoDefinition,
+  initialData: initialFeedData,
+  reduce: (data, event) => reducePatternData(feedDefinition, data, event),
+  componentName: 'Feed',
+  component: Feed,
+})

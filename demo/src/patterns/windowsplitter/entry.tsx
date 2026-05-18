@@ -1,24 +1,34 @@
-import { usePatternDataHost } from '../../shared/demoHostState'
 import { WindowSplitter } from './WindowSplitter'
 import { initialWindowSplitterData, reduceWindowSplitterData, windowSplitterOptions } from './windowsplitterData'
-import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
-import { renderDataInspect } from '../../shared/inspect/genericInspect'
+import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 
-export const entry: PatternEntry = {
+const windowSplitterDemoDefinition = {
   key: 'windowsplitter',
   label: 'Window Splitter',
-  useDemoPattern: (onEvent) => {
-    const host = usePatternDataHost(initialWindowSplitterData, (data, event) => reduceWindowSplitterData(data, event, windowSplitterOptions))
-    return {
-      key: 'windowsplitter',
-      label: 'Window Splitter',
-      keyboardShortcuts: ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'Enter'],
-      sourceNames: ['WindowSplitter.tsx', 'windowsplitter/entry.tsx', 'windowsplitter/useWindowSplitterPattern.ts', 'windowsplitterData.ts', 'windowsplitter/definition.ts', ...KERNEL_SOURCES],
-      inspect: renderDataInspect(host.data),
-      preview: <WindowSplitter data={host.data} onEvent={(event) => {
-        onEvent(event)
-        host.dispatchEvent(event)
-      }} options={windowSplitterOptions} />,
-    }
+  keyboardShortcuts: ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'Enter'],
+  sources: {
+    main: 'WindowSplitter.tsx',
+    entry: 'windowsplitter/entry.tsx',
+    hooks: ['windowsplitter/useWindowSplitterPattern.ts'],
+    data: ['windowsplitterData.ts'],
+    definition: 'windowsplitter/definition.ts',
   },
-}
+  view: {
+    kind: 'component',
+    component: 'WindowSplitter',
+    props: {
+      data: '$state.data',
+      onEvent: '$actions.dispatchEvent',
+      options: '$state.options',
+    },
+  },
+} as const satisfies DemoPatternDefinition
+
+export const entry = defineStateDemoPattern({
+  definition: windowSplitterDemoDefinition,
+  initialData: initialWindowSplitterData,
+  reduce: (data, event) => reduceWindowSplitterData(data, event, windowSplitterOptions),
+  componentName: 'WindowSplitter',
+  component: WindowSplitter,
+  getStateValues: () => ({ options: windowSplitterOptions }),
+})

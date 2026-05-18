@@ -1,4 +1,5 @@
 import { useSpinbuttonPattern, type PatternData, type PatternEvent, type PatternOptions, type ReactSpinbuttonRenderItem } from '../../../../src'
+import { cx, ds } from '../../shared/designSystem'
 import { Icon } from '../../shared/Icon'
 
 export function Spinbutton({
@@ -40,20 +41,20 @@ function SpinField({
         <div className="flex items-center gap-1">
           <button
             {...item.decrementButtonProps}
-            className="grid size-7 place-items-center rounded-lg bg-zinc-100/80 text-xs text-zinc-600 shadow-sm outline-none transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.06] dark:text-zinc-300 dark:hover:bg-white/[0.08] dark:focus-visible:outline-zinc-500"
+            className={cx(ds.iconButton, 'text-zinc-600')}
           >
             <Icon name="minus" />
           </button>
           <div
             {...item.spinbuttonProps}
             data-testid={`spinbutton-${item.key}`}
-            className="min-w-[2.75rem] rounded-lg bg-white/80 px-2.5 py-1 text-center shadow-[0_6px_18px_rgba(24,24,27,0.06)] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.065] dark:shadow-black/20 dark:focus-visible:outline-zinc-500"
+            className={cx('min-w-[2.75rem] rounded-lg bg-white/80 px-2.5 py-1 text-center shadow-[0_6px_18px_rgba(24,24,27,0.06)] dark:bg-white/[0.065] dark:shadow-black/20', ds.focusRing)}
           >
             {item.value}
           </div>
           <button
             {...item.incrementButtonProps}
-            className="grid size-7 place-items-center rounded-lg bg-zinc-100/80 text-xs text-zinc-600 shadow-sm outline-none transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.06] dark:text-zinc-300 dark:hover:bg-white/[0.08] dark:focus-visible:outline-zinc-500"
+            className={cx(ds.iconButton, 'text-zinc-600')}
           >
             <Icon name="plus" />
           </button>

@@ -3,6 +3,7 @@ import { useMenubarPattern, type PatternData, type PatternEvent } from '../../..
 import { cx, ds } from '../../shared/designSystem'
 import { Icon } from '../../shared/Icon'
 import type { MenuProps } from './menuTypes'
+import { useMenubarSubmenuKeyboard } from './useMenubarSubmenuKeyboard'
 
 type Props = HTMLAttributes<HTMLElement>
 
@@ -41,64 +42,11 @@ function Submenu({ data, ownerKey, rootKeys, onEvent }: { data: PatternData; own
   const children = data.relations?.childrenByKey?.[ownerKey] ?? []
   const radioGroup = children.filter((key) => (data.items[key] as { kind?: string } | undefined)?.kind === 'menuitemradio')
   const activeKey = children.includes(data.state?.activeKey ?? '') ? data.state?.activeKey : children[0]
-  const focusOwner = () => {
-    onEvent({ type: 'focus', key: ownerKey, meta: { reason: 'keyboard' } })
-    document.getElementById(`menubar-${ownerKey}`)?.focus({ preventScroll: true })
-  }
   const close = () => onEvent({ type: 'expand', key: ownerKey, expanded: false })
-  const focusChild = (key: string | undefined) => {
-    if (key) onEvent({ type: 'focus', key, meta: { reason: 'keyboard' } })
-  }
-  const openSibling = (direction: 'next' | 'previous') => {
-    const target = siblingKey(rootKeys, ownerKey, direction)
-    if (!target) return
-    onEvent({ type: 'focus', key: target, meta: { reason: 'keyboard' } })
-    const targetChildren = data.relations?.childrenByKey?.[target] ?? []
-    if (targetChildren.length > 0) {
-      onEvent({ type: 'expand', key: target, expanded: true })
-      focusChild(targetChildren[0])
-    }
-    close()
-  }
+  const onSubmenuKeyDown = useMenubarSubmenuKeyboard({ data, ownerKey, rootKeys, children, activeKey, onEvent, close })
   const popupLeft = `${rootKeys.indexOf(ownerKey) * 4.25}rem`
   return (
-    <ul role="menu" aria-labelledby={`menubar-${ownerKey}`} style={{ left: popupLeft }} className="absolute top-10 z-10 grid w-56 gap-0.5 rounded-[6px] bg-white/96 p-1 text-sm shadow-[0_20px_56px_rgba(24,24,27,0.15)] outline-none backdrop-blur dark:bg-zinc-950/96 dark:shadow-black/35" onKeyDown={(event) => {
-      if (event.key === 'Escape') {
-        event.preventDefault()
-        close()
-        focusOwner()
-        return
-      }
-      if (event.key === 'ArrowDown') {
-        event.preventDefault()
-        focusChild(stepKey(children, activeKey, 1))
-        return
-      }
-      if (event.key === 'ArrowUp') {
-        event.preventDefault()
-        focusChild(stepKey(children, activeKey, -1))
-        return
-      }
-      if (event.key === 'Home') {
-        event.preventDefault()
-        focusChild(children[0])
-        return
-      }
-      if (event.key === 'End') {
-        event.preventDefault()
-        focusChild(children[children.length - 1])
-        return
-      }
-      if (event.key === 'ArrowRight') {
-        event.preventDefault()
-        openSibling('next')
-        return
-      }
-      if (event.key === 'ArrowLeft') {
-        event.preventDefault()
-        openSibling('previous')
-      }
-    }}>
+    <ul role="menu" aria-labelledby={`menubar-${ownerKey}`} style={{ left: popupLeft }} className="absolute top-10 z-10 grid w-56 gap-0.5 rounded-[6px] bg-white/96 p-1 text-sm shadow-[0_20px_56px_rgba(24,24,27,0.15)] outline-none backdrop-blur dark:bg-zinc-950/96 dark:shadow-black/35" onKeyDown={onSubmenuKeyDown}>
       {children.map((key) => <SubmenuItem key={key} itemKey={key} data={data} active={key === activeKey} radioGroup={radioGroup} onEvent={onEvent} onClose={close} />)}
     </ul>
   )
@@ -130,18 +78,4 @@ function SubmenuItem({ itemKey, data, active, radioGroup, onEvent, onClose }: { 
       {item?.label ?? itemKey}
     </li>
   )
-}
-
-function stepKey(keys: readonly string[], activeKey: string | null | undefined, delta: 1 | -1) {
-  if (keys.length === 0) return undefined
-  const index = activeKey ? keys.indexOf(activeKey) : -1
-  if (index === -1) return keys[delta === 1 ? 0 : keys.length - 1]
-  return keys[(index + delta + keys.length) % keys.length]
-}
-
-function siblingKey(keys: readonly string[], key: string, direction: 'next' | 'previous') {
-  if (keys.length === 0) return undefined
-  const index = keys.indexOf(key)
-  if (index === -1) return undefined
-  return keys[(index + (direction === 'next' ? 1 : -1) + keys.length) % keys.length]
 }

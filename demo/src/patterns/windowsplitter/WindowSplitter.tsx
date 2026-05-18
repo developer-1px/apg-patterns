@@ -1,4 +1,5 @@
 import { useWindowSplitterPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
+import { cx, ds } from '../../shared/designSystem'
 import { Icon } from '../../shared/Icon'
 
 export function WindowSplitter({
@@ -23,7 +24,7 @@ export function WindowSplitter({
       />
       <div
         {...splitter.separatorProps}
-        className="grid w-4 cursor-col-resize place-items-center bg-zinc-200/80 text-xs text-zinc-500 outline-none transition focus-visible:bg-zinc-300 focus-visible:text-zinc-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.08] dark:text-zinc-400 dark:focus-visible:bg-white/[0.12] dark:focus-visible:text-zinc-100 dark:focus-visible:outline-zinc-500"
+        className={cx('grid w-4 cursor-col-resize place-items-center bg-zinc-200/80 text-xs text-zinc-500 transition ui-focus:bg-zinc-300 ui-focus:text-zinc-900 dark:bg-white/[0.08] dark:text-zinc-400 dark:ui-focus:bg-white/[0.12] dark:ui-focus:text-zinc-100', ds.focusRing)}
       >
         <Icon name="grip-vertical" />
       </div>

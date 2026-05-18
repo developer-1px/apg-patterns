@@ -1,11 +1,11 @@
 import type { KeyboardEvent } from 'react'
 import { useDisclosurePattern, type PatternData, type PatternEvent } from '../../../../src'
+import { cx, ds } from '../../shared/designSystem'
 import { disclosurePanelText, faqDisclosureContent, imageDisclosureContent, type DisclosureVariantKey } from './disclosureData'
 import { Icon } from '../../shared/Icon'
 import { NavMenuDisclosure, NavMenuTopLinksDisclosure } from './NavMenuDisclosure'
 
-const buttonClass =
-  'inline-flex h-8 items-center justify-between rounded-xl bg-zinc-100/80 px-3 text-sm font-medium text-zinc-800 shadow-sm outline-none transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-white/[0.06] dark:text-zinc-200 dark:hover:bg-white/[0.08] dark:focus-visible:outline-zinc-500'
+const buttonClass = cx(ds.button, ds.expandable, 'justify-between')
 const panelClass =
   'rounded-xl bg-zinc-100/70 p-3 text-sm leading-relaxed text-zinc-700 shadow-inner shadow-zinc-200/50 dark:bg-white/[0.045] dark:text-zinc-300 dark:shadow-black/10'
 

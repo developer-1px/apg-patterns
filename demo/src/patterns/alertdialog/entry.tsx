@@ -1,26 +1,34 @@
 import { reducePatternData } from '../../../../src'
 import { AlertDialog } from './AlertDialog'
 import { initialAlertDialogData } from './alertdialogData'
-import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
-import { usePatternDataHost } from '../../shared/demoHostState'
 import { alertDialogDefinition } from '../../../../src/patterns/alertdialog/definition'
-import { renderDataInspect } from '../../shared/inspect/genericInspect'
+import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 
-export const entry: PatternEntry = {
+const alertDialogDemoDefinition = {
   key: 'alertdialog',
   label: 'Alert Dialog',
-  useDemoPattern: (onEvent) => {
-    const host = usePatternDataHost(initialAlertDialogData, (data, event) => reducePatternData(alertDialogDefinition, data, event))
-    return {
-      key: 'alertdialog',
-      label: 'Alert Dialog',
-      keyboardShortcuts: ['Tab', 'Shift+Tab', 'Escape', 'Enter', 'Space'],
-      sourceNames: ['AlertDialog.tsx', 'alertdialog/entry.tsx', 'alertdialogData.ts', 'alertdialog/useAlertDialogPattern.ts', 'alertdialog/definition.ts', ...KERNEL_SOURCES],
-      inspect: renderDataInspect(host.data),
-      preview: <AlertDialog data={host.data} onEvent={(event) => {
-        onEvent(event)
-        host.dispatchEvent(event)
-      }} />,
-    }
+  keyboardShortcuts: ['Tab', 'Shift+Tab', 'Escape', 'Enter', 'Space'],
+  sources: {
+    main: 'AlertDialog.tsx',
+    entry: 'alertdialog/entry.tsx',
+    data: ['alertdialogData.ts'],
+    hooks: ['alertdialog/useAlertDialogPattern.ts'],
+    definition: 'alertdialog/definition.ts',
   },
-}
+  view: {
+    kind: 'component',
+    component: 'AlertDialog',
+    props: {
+      data: '$state.data',
+      onEvent: '$actions.dispatchEvent',
+    },
+  },
+} as const satisfies DemoPatternDefinition
+
+export const entry = defineStateDemoPattern({
+  definition: alertDialogDemoDefinition,
+  initialData: initialAlertDialogData,
+  reduce: (data, event) => reducePatternData(alertDialogDefinition, data, event),
+  componentName: 'AlertDialog',
+  component: AlertDialog,
+})

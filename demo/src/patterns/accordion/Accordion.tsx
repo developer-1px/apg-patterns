@@ -5,6 +5,7 @@ import {
   type PatternItem,
   type PatternOptions,
 } from '../../../../src'
+import { cx, ds } from '../../shared/designSystem'
 import { Icon } from '../../shared/Icon'
 
 type AccordionItem = PatternItem & {
@@ -32,7 +33,7 @@ export function Accordion({ data, onEvent, options }: AccordionProps) {
             <h3 className="m-0">
               <button
                 {...section.headerProps}
-                className="flex w-full items-center justify-between px-3 py-2 text-left text-sm font-medium text-zinc-800 outline-none transition hover:bg-white/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:text-zinc-200 dark:hover:bg-white/[0.06] dark:focus-visible:outline-zinc-500"
+                className={cx(ds.button, ds.expandable, 'w-full justify-between rounded-none bg-transparent shadow-none')}
               >
                 <span>{section.label}</span>
                 <Icon name={section.state.expanded ? 'minus' : 'plus'} className="text-xs text-zinc-500 dark:text-zinc-400" />

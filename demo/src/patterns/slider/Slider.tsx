@@ -1,4 +1,5 @@
 import { useSliderPattern, type PatternEvent, type ReactSliderRenderItem, type SliderData, type SliderOptions } from '../../../../src'
+import { cx, ds } from '../../shared/designSystem'
 import { MultiThumbSlider } from './MultiThumbSlider'
 
 const thumbColorClass: Record<string, string> = {
@@ -46,7 +47,7 @@ function ThumbSlider({
   return (
     <div
       {...item.sliderProps}
-      className="grid gap-2 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-zinc-400 dark:focus-visible:outline-zinc-500"
+      className={cx('grid gap-2 ui-focus:outline-offset-4', ds.focusRing)}
     >
       <div className="flex items-center justify-between text-sm text-zinc-800 dark:text-zinc-200">
         <span>{item.label}</span>

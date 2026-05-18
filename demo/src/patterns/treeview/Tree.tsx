@@ -1,4 +1,5 @@
 import { useTreeviewPattern, type PatternData, type PatternEvent, type PatternItem, type PatternOptions } from '../../../../src'
+import { cx, ds } from '../../shared/designSystem'
 import { Icon } from '../../shared/Icon'
 
 type TreeItem = PatternItem & {
@@ -17,7 +18,7 @@ export function Tree({
   const tree = useTreeviewPattern(data, onEvent, options ?? {})
 
   return (
-    <div {...tree.rootProps} className="min-h-56 rounded-xl bg-white/40 py-1 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:bg-transparent dark:focus-visible:outline-zinc-500">
+    <div {...tree.rootProps} className={cx('min-h-56 rounded-xl bg-white/40 py-1 dark:bg-transparent', ds.focusRing)}>
       {tree.renderItems.map((item) => {
         const href = data.items[item.key]?.href
         const indent = item.level * 18
@@ -55,7 +56,7 @@ export function Tree({
           <div
             key={item.key}
             {...item.treeitemProps}
-            className="flex min-h-8 items-center gap-1.5 rounded-lg px-1 text-sm text-zinc-800 outline-none transition aria-selected:bg-zinc-100 aria-selected:text-zinc-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400 dark:text-zinc-300 dark:aria-selected:bg-white/[0.07] dark:aria-selected:text-zinc-50 dark:focus-visible:outline-zinc-500"
+            className={cx(ds.listOption, 'flex min-h-8 items-center gap-1.5 px-1')}
             style={{ paddingLeft: `${indent}px` }}
           >
             {indicator}

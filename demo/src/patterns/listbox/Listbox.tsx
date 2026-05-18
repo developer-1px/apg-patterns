@@ -1,4 +1,5 @@
 import { useListboxPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
+import { cx, ds } from '../../shared/designSystem'
 import { ListboxContent } from './ListboxContent'
 import { ListboxOption } from './ListboxOption'
 import type { ListboxGroup } from './listboxTypes'
@@ -36,7 +37,7 @@ export function Listbox({
   }
 
   const containerClass = [
-    'grid max-w-sm gap-0.5 rounded-xl bg-white/82 p-1 shadow-[0_12px_32px_rgba(24,24,27,0.06)] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-zinc-400 dark:bg-white/[0.045] dark:shadow-black/20 dark:focus-visible:outline-zinc-500',
+    cx('grid max-w-sm gap-0.5 rounded-xl bg-white/82 p-1 shadow-[0_12px_32px_rgba(24,24,27,0.06)] ui-focus:outline-offset-4 dark:bg-white/[0.045] dark:shadow-black/20', ds.focusRing),
     scrollable ? 'max-h-48 overflow-y-auto' : '',
   ]
     .filter(Boolean)

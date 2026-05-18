@@ -1,19 +1,32 @@
 import { Breadcrumb } from './Breadcrumb'
 import { initialBreadcrumbData } from './breadcrumbData'
-import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
-import { renderDataInspect } from '../../shared/inspect/genericInspect'
+import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 
-export const entry: PatternEntry = {
+const breadcrumbDemoDefinition = {
   key: 'breadcrumb',
   label: 'Breadcrumb',
-  useDemoPattern: (onEvent) => {
-    return {
-      key: 'breadcrumb',
-      label: 'Breadcrumb',
-      keyboardShortcuts: ['Tab', 'Enter'],
-      sourceNames: ['Breadcrumb.tsx', 'breadcrumb/entry.tsx', 'breadcrumb/useBreadcrumbPattern.ts', 'breadcrumbData.ts', 'breadcrumb/definition.ts', ...KERNEL_SOURCES],
-      inspect: renderDataInspect(initialBreadcrumbData),
-      preview: <Breadcrumb data={initialBreadcrumbData} onEvent={onEvent} />,
-    }
+  keyboardShortcuts: ['Tab', 'Enter'],
+  sources: {
+    main: 'Breadcrumb.tsx',
+    entry: 'breadcrumb/entry.tsx',
+    hooks: ['breadcrumb/useBreadcrumbPattern.ts'],
+    data: ['breadcrumbData.ts'],
+    definition: 'breadcrumb/definition.ts',
   },
-}
+  view: {
+    kind: 'component',
+    component: 'Breadcrumb',
+    props: {
+      data: '$state.data',
+      onEvent: '$actions.dispatchEvent',
+    },
+  },
+} as const satisfies DemoPatternDefinition
+
+export const entry = defineStateDemoPattern({
+  definition: breadcrumbDemoDefinition,
+  initialData: initialBreadcrumbData,
+  reduce: (data) => data,
+  componentName: 'Breadcrumb',
+  component: Breadcrumb,
+})

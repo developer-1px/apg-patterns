@@ -1,26 +1,34 @@
 import { reducePatternData } from '../../../../src'
 import { dialogDefinition } from '../../../../src/patterns/dialog/definition'
-import { usePatternDataHost } from '../../shared/demoHostState'
 import { Dialog } from './Dialog'
 import { initialDialogData } from './dialogData'
-import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
-import { renderDataInspect } from '../../shared/inspect/genericInspect'
+import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 
-export const entry: PatternEntry = {
+const dialogDemoDefinition = {
   key: 'dialog',
   label: 'Dialog',
-  useDemoPattern: (onEvent) => {
-    const host = usePatternDataHost(initialDialogData, (data, event) => reducePatternData(dialogDefinition, data, event))
-    return {
-      key: 'dialog',
-      label: 'Dialog',
-      keyboardShortcuts: ['Tab', 'Shift+Tab', 'Escape'],
-      sourceNames: ['Dialog.tsx', 'dialog/entry.tsx', 'dialogData.ts', 'dialog/useDialogPattern.ts', 'dialog/definition.ts', ...KERNEL_SOURCES],
-      inspect: renderDataInspect(host.data),
-      preview: <Dialog data={host.data} onEvent={(event) => {
-        onEvent(event)
-        host.dispatchEvent(event)
-      }} />,
-    }
+  keyboardShortcuts: ['Tab', 'Shift+Tab', 'Escape'],
+  sources: {
+    main: 'Dialog.tsx',
+    entry: 'dialog/entry.tsx',
+    data: ['dialogData.ts'],
+    hooks: ['dialog/useDialogPattern.ts'],
+    definition: 'dialog/definition.ts',
   },
-}
+  view: {
+    kind: 'component',
+    component: 'Dialog',
+    props: {
+      data: '$state.data',
+      onEvent: '$actions.dispatchEvent',
+    },
+  },
+} as const satisfies DemoPatternDefinition
+
+export const entry = defineStateDemoPattern({
+  definition: dialogDemoDefinition,
+  initialData: initialDialogData,
+  reduce: (data, event) => reducePatternData(dialogDefinition, data, event),
+  componentName: 'Dialog',
+  component: Dialog,
+})

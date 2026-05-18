@@ -1,0 +1,85 @@
+import { Icon } from '../shared/Icon'
+import type { SourceName } from '../shared/sources'
+import type { DemoPattern } from '../shared/demoPatternTypes'
+import { cx, ds } from '../shared/designSystem'
+import { SourceTabs, useSourceTabs } from './SourceTabs'
+import { formatEvent } from './eventLog'
+import { useSourcePreviewState } from './useSourcePreviewState'
+import { rightModeLabels, rightModes, type AppAction, type AppState } from './appState'
+import { scrollPanelClass } from './ActiveDemoWorkspace'
+
+const buttonClass = ds.textButton
+const preClass = ds.dataBlock
+const sourcePreClass = ds.codeBlock
+const optionButtonClass = cx('inline-flex h-8 items-center', ds.option)
+
+export function ActiveDemoRightPanel({
+  activeDemo,
+  activeSourceName,
+  state,
+  dispatch,
+}: {
+  activeDemo: DemoPattern
+  activeSourceName: SourceName
+  state: AppState
+  dispatch: (action: AppAction) => void
+}) {
+  const sourceTabs = useSourceTabs({ label: 'source files', tabs: activeDemo.sourceNames, value: activeSourceName, onChange: (sourceName) => dispatch({ type: 'selectSource', sourceName }) })
+  const rightModeTabs = useSourceTabs({ label: 'right panel', tabs: rightModes, value: state.rightMode, onChange: (rightMode) => dispatch({ type: 'selectRightMode', rightMode }) })
+  const eventLog = state.events.map(formatEvent).join('\n') || 'none'
+  const { canCopySource, copySource, copyState, displayedSource } = useSourcePreviewState(activeSourceName)
+
+  return (
+    <section className={`${scrollPanelClass} flex min-h-0 flex-col`}>
+      <header className="mb-3 grid gap-2">
+        <div {...rightModeTabs.getTablistProps()} className={cx('flex items-center gap-1', ds.controlGroup)}>
+          {rightModes.map((mode) => (
+            <button {...rightModeTabs.getTabProps(mode)} key={mode} type="button" className={optionButtonClass}>
+              {rightModeLabels[mode]}
+            </button>
+          ))}
+        </div>
+      </header>
+      <div {...rightModeTabs.getPanelProps()} className="flex min-h-0 flex-col gap-3">
+        {state.rightMode === 'source' ? (
+          <div className="grid gap-1">
+            <div className="flex min-w-0 items-start gap-2">
+              <SourceTabs tabs={sourceTabs.tabs} getTablistProps={sourceTabs.getTablistProps} getTabProps={sourceTabs.getTabProps} />
+            </div>
+            <div className="truncate px-1 font-mono text-[11px] text-zinc-400 dark:text-zinc-600" title={activeSourceName}>
+              {activeSourceName}
+            </div>
+          </div>
+        ) : null}
+        {state.rightMode === 'inspect' ? activeDemo.inspectControls : null}
+        {state.rightMode === 'log' ? (
+          <div className="flex items-center justify-between gap-2 px-1">
+            <div className="font-mono text-[11px] text-zinc-400 dark:text-zinc-600">{state.events.length} events</div>
+            <button type="button" className={buttonClass} onClick={() => dispatch({ type: 'clearEvents' })}>
+              clear
+            </button>
+          </div>
+        ) : null}
+        {state.rightMode === 'source' ? (
+          <div className="relative min-h-0">
+            <button
+              type="button"
+              className={cx(ds.iconButton, 'absolute right-2 top-2 z-10 size-8 bg-transparent text-zinc-400 shadow-none hover:bg-white/10 hover:text-zinc-100 disabled:cursor-not-allowed')}
+              aria-label={copyState === 'idle' ? 'copy' : copyState}
+              title={copyState === 'idle' ? 'Copy source' : 'Copied'}
+              onClick={copySource}
+              disabled={!canCopySource}
+            >
+              <Icon name={copyState === 'idle' ? 'copy' : 'check'} className="size-4" />
+            </button>
+            <pre {...sourceTabs.getPanelProps()} className={`${sourcePreClass} select-text cursor-text`}>
+              {displayedSource}
+            </pre>
+          </div>
+        ) : null}
+        {state.rightMode === 'inspect' ? <pre className={preClass}>{activeDemo.inspect}</pre> : null}
+        {state.rightMode === 'log' ? <pre className={preClass}>{eventLog}</pre> : null}
+      </div>
+    </section>
+  )
+}

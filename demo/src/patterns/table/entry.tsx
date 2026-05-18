@@ -1,10 +1,8 @@
 import { reducePatternData, type PatternData, type PatternEvent } from '../../../../src'
 import { tableDefinition } from '../../../../src/patterns/table/definition'
-import { usePatternDataHost } from '../../shared/demoHostState'
 import { Table } from './Table'
 import { initialTableData } from './tableData'
-import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
-import { renderDataInspect } from '../../shared/inspect/genericInspect'
+import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 
 const reduceTableDemoData = (data: PatternData, event: PatternEvent): PatternData => {
   if (event.type === 'sort') {
@@ -13,21 +11,31 @@ const reduceTableDemoData = (data: PatternData, event: PatternEvent): PatternDat
   return reducePatternData(tableDefinition, data, event)
 }
 
-export const entry: PatternEntry = {
+const tableDemoDefinition = {
   key: 'table',
   label: 'Table',
-  useDemoPattern: (onEvent) => {
-    const host = usePatternDataHost(initialTableData, reduceTableDemoData)
-    return {
-      key: 'table',
-      label: 'Table',
-      keyboardShortcuts: ['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End'],
-      sourceNames: ['Table.tsx', 'table/entry.tsx', 'table/useTablePattern.ts', 'tableData.ts', 'table/definition.ts', ...KERNEL_SOURCES],
-      inspect: renderDataInspect(host.data),
-      preview: <Table data={host.data} onEvent={(event) => {
-        onEvent(event)
-        host.dispatchEvent(event)
-      }} />,
-    }
+  keyboardShortcuts: ['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End'],
+  sources: {
+    main: 'Table.tsx',
+    entry: 'table/entry.tsx',
+    hooks: ['table/useTablePattern.ts'],
+    data: ['tableData.ts'],
+    definition: 'table/definition.ts',
   },
-}
+  view: {
+    kind: 'component',
+    component: 'Table',
+    props: {
+      data: '$state.data',
+      onEvent: '$actions.dispatchEvent',
+    },
+  },
+} as const satisfies DemoPatternDefinition
+
+export const entry = defineStateDemoPattern({
+  definition: tableDemoDefinition,
+  initialData: initialTableData,
+  reduce: reduceTableDemoData,
+  componentName: 'Table',
+  component: Table,
+})
