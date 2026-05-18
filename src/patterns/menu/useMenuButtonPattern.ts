@@ -6,6 +6,7 @@ import { menuButtonDefinition } from './definition'
 import { createMenuButtonActions } from './menuButtonActions'
 import { createMenuButtonItem, type ReactMenuButtonItem } from './menuButtonItem'
 import { createMenuButtonMenuProps, createMenuButtonTriggerProps } from './menuButtonProps'
+import { getMenuButtonRuntimeState } from './menuButtonRuntimeState'
 import { useMenuButtonActiveDescendantFocus } from './useMenuButtonActiveDescendantFocus'
 
 export interface ReactMenuButtonRuntime {
@@ -23,8 +24,7 @@ export interface ReactMenuButtonRuntime {
 }
 
 export function useMenuButtonPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactMenuButtonRuntime {
-  const focusStrategy = data.state?.focusStrategy === 'ariaActiveDescendant' ? 'ariaActiveDescendant' : 'rovingTabIndex'
-  const runtimeOptions = { focusStrategy, ...(options ?? {}) } satisfies PatternOptions
+  const { focusStrategy, runtimeOptions, triggerKey, menuKey, expanded, itemKeys } = getMenuButtonRuntimeState(data, options)
   const runtime = createPatternRuntime({
     definition: menuButtonDefinition,
     data,
@@ -32,10 +32,6 @@ export function useMenuButtonPattern(data: PatternData, onEvent: (event: Pattern
     onEvent,
     keyToElementId: (key) => `${runtimeOptions.elementIdPrefix ?? 'mb-'}${key}`,
   })
-  const triggerKey = data.relations?.rootKeys?.[0] ?? null
-  const menuKey = triggerKey ? data.relations?.controlsByKey?.[triggerKey]?.[0] ?? null : null
-  const expanded = triggerKey ? data.state?.expandedKeys?.includes(triggerKey) ?? false : false
-  const itemKeys = menuKey ? data.relations?.childrenByKey?.[menuKey] ?? [] : []
 
   usePatternEffects({ definition: menuButtonDefinition, data: runtime.data, keyToElementId: runtime.keyToElementId })
   useMenuButtonActiveDescendantFocus({ data, expanded, focusStrategy, menuKey, runtime })

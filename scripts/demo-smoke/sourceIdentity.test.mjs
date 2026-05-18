@@ -12,6 +12,7 @@ describe('sourceIdentityNeedles', () => {
     ['kernel/patternEventTemplate.ts', ['resolveEventTemplate']],
     ['kernel/rootKeyboardHandler.ts', ['createRootKeyboardHandler']],
     ['kernel/runtimePartProps.ts', ['resolveRuntimePartProps']],
+    ['kernel/slotProps.ts', ['resolveAriaProjections', 'resolveFocusProjection']],
     ['kernel/kernelStateProjections.ts', ['defineStateProjection']],
     ['schema/eventTemplate.ts', ['EventTemplateSchema']],
     ['schema/patternDefinitionValidation.ts', ['validatePatternDefinition']],
@@ -27,6 +28,15 @@ describe('sourceIdentityNeedles', () => {
     ['carousel/carouselRuntimeState.ts', ['getCarouselRuntimeState']],
     ['windowsplitter/windowSplitterState.ts', ['getWindowSplitterState']],
     ['treegrid/predicates.ts', ['definePredicate']],
+    ['button/buttonRootProps.ts', ['createButtonRootProps']],
+    ['tooltip/tooltipTriggerProps.ts', ['createTooltipTriggerProps']],
+    ['windowsplitter/windowSplitterSeparatorProps.ts', ['createWindowSplitterSeparatorProps']],
+    ['menu/menuButtonProps.ts', ['createMenuButtonMenuProps', 'createMenuButtonTriggerProps']],
+    ['alert/alertProps.ts', ['createAlertRootProps']],
+    ['alertdialog/alertDialogProps.ts', ['createAlertDialogDialogProps', 'createAlertDialogActionProps']],
+    ['listbox/createListboxRootProps.ts', ['createListboxRootProps']],
+    ['treeview/adaptTreeviewProps.ts', ['adaptTreeviewProps']],
+    ['accordion/accordionRenderItem.ts', ['createAccordionRenderItem']],
   ])('uses specific identity needles for helper source %s', (sourceName, needles) => {
     expect(sourceIdentityNeedles(sourceName, 'button')).toEqual(needles)
   })

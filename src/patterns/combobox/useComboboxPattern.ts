@@ -1,21 +1,12 @@
 import type { HTMLAttributes, InputHTMLAttributes } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions, PatternState } from '../../schema'
+import type { PatternEvent, PatternOptions } from '../../schema'
 import { createComboboxInputProps } from './comboboxInputProps'
 import { createComboboxOption, type ReactComboboxOption } from './comboboxOption'
+import { getComboboxRuntimeState, type ComboboxData } from './comboboxRuntimeState'
 import { COMBOBOX_KEY, comboboxDefinition } from './definition'
 import { useComboboxActiveOptionScroll } from './useComboboxActiveOptionScroll'
 import { useComboboxInlineCompletionInputRef } from './useComboboxInlineCompletionInputRef'
-
-type ComboboxVariant = 'selectOnly' | 'listAutocomplete' | 'listWithInlineAutocomplete'
-
-interface ComboboxState extends PatternState {
-  variant?: ComboboxVariant
-  query?: string
-  inlineCompletion?: { start: number; end: number } | null
-}
-
-type ComboboxData = PatternData<PatternItem, ComboboxState>
 
 export type { ReactComboboxOption } from './comboboxOption'
 
@@ -30,25 +21,15 @@ export interface ReactComboboxRuntime {
 }
 
 export function useComboboxPattern(data: ComboboxData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactComboboxRuntime {
-  const variant = data.state?.variant ?? 'listAutocomplete'
-  const autocomplete = variant === 'selectOnly' ? 'none' : variant === 'listAutocomplete' ? 'list' : 'both'
-  const editable = variant !== 'selectOnly'
-  const listboxId = options?.listboxId ? String(options.listboxId) : 'combobox-popup'
-  const query = data.state?.query ?? ''
-  const inlineCompletion = data.state?.inlineCompletion ?? null
+  const { runtimeOptions, variant, editable, listboxId, inlineCompletion, open, displayValue, activeKey } = getComboboxRuntimeState(data, options)
   const runtime = createPatternRuntime({
     definition: comboboxDefinition,
     data,
-    options: { focusStrategy: 'ariaActiveDescendant', haspopup: 'listbox', autocomplete, ...(options ?? {}) },
+    options: runtimeOptions,
     onEvent,
     keyToElementId: (key) => `${options?.elementIdPrefix ?? 'combobox-option-'}${key}`,
   })
   const rootProps = runtime.getPartProps('combobox') as InputHTMLAttributes<HTMLInputElement>
-  const open = data.state?.expandedKeys?.includes(COMBOBOX_KEY) ?? false
-  const selectedKey = data.state?.selectedKeys?.[0]
-  const selectedLabel = selectedKey ? data.items[selectedKey]?.label ?? '' : ''
-  const displayValue = editable ? (selectedKey && !open ? selectedLabel : query) : selectedLabel
-  const activeKey = data.state?.activeKey
   const setInputRef = useComboboxInlineCompletionInputRef({ inlineCompletion, variant })
 
   useComboboxActiveOptionScroll({ activeKey, open, runtime })

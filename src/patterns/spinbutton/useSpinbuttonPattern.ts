@@ -1,7 +1,9 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternEvent, PatternOptions, PatternValueStepDirection } from '../../schema'
+import type { Key, PatternEvent, PatternOptions } from '../../schema'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { createSpinbuttonActions, type ReactSpinbuttonActions } from './spinbuttonActions'
 import { createSpinbuttonRenderItem, type ReactSpinbuttonRenderItem, type SpinbuttonData } from './spinbuttonRenderItem'
+import { getSpinbuttonRuntimeState, type SpinbuttonRuntimeState } from './spinbuttonRuntimeState'
 import { spinbuttonDefinition } from './definition'
 
 export type { ReactSpinbuttonRenderItem } from './spinbuttonRenderItem'
@@ -9,14 +11,8 @@ export type { ReactSpinbuttonRenderItem } from './spinbuttonRenderItem'
 export interface ReactSpinbuttonRuntime {
   rootProps: ReactPatternProps
   renderItems: readonly ReactSpinbuttonRenderItem[]
-  state: {
-    activeKey: Key | null
-    valueByKey: Readonly<Record<Key, string | number | boolean | null>>
-  }
-  actions: {
-    focus(key: Key): void
-    step(key: Key, direction: PatternValueStepDirection): void
-  }
+  state: SpinbuttonRuntimeState
+  actions: ReactSpinbuttonActions
   ids: {
     forKey(key: Key): string
   }
@@ -39,19 +35,10 @@ export function useSpinbuttonPattern(data: SpinbuttonData, onEvent: (event: Patt
       return runtime.visibleKeys.map((key) => createSpinbuttonRenderItem(runtime, key))
     },
     get state() {
-      return {
-        activeKey: runtime.data.state?.activeKey ?? null,
-        valueByKey: runtime.data.state?.valueByKey ?? {},
-      }
+      return getSpinbuttonRuntimeState(runtime.data)
     },
     get actions() {
-      return {
-        focus: (key: Key) => runtime.emit({ type: 'focus', key }),
-        step: (key: Key, direction: PatternValueStepDirection) => {
-          runtime.emit({ type: 'focus', key })
-          runtime.emit({ type: 'valueStep', key, direction })
-        },
-      }
+      return createSpinbuttonActions(runtime)
     },
     get ids() {
       return { forKey: runtime.keyToElementId }

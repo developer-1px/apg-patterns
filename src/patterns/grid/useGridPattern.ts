@@ -1,19 +1,11 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions, PatternStateWithOptions } from '../../schema'
+import type { Key, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { gridDefinition } from './definition'
+import { getGridRuntimeState, type GridData } from './gridRuntimeState'
 import { createGridEditActions, createGridRuntimeEventHandler } from './gridRuntimeEvents'
 import { createGridRows, type ReactGridRow } from './gridRow'
-
-interface GridState extends PatternStateWithOptions {
-  multiselectable?: boolean
-  editableKeys?: readonly string[]
-  editingKey?: string | null
-  editDraftByKey?: Record<string, string | number | boolean | null>
-}
-
-type GridData = PatternData<PatternItem, GridState>
 
 export type { ReactGridCell } from './gridCell'
 export type { ReactGridRow } from './gridRow'
@@ -37,17 +29,7 @@ export interface ReactGridRuntime {
 }
 
 export function useGridPattern(data: GridData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactGridRuntime {
-  const dataState = data.state
-  const runtimeOptions = {
-    focusStrategy: 'rovingTabIndex',
-    selectionMode: dataState?.multiselectable ? 'multiple' : 'single',
-    ...(options ?? dataState?.options ?? {}),
-  } satisfies PatternOptions
-  const editableKeys = dataState?.editableKeys ?? []
-  const editingKey = dataState?.editingKey ?? null
-  const editDraftByKey = dataState?.editDraftByKey ?? {}
-  const valueByKey = data.state?.valueByKey ?? {}
-  const sortByKey = data.state?.sortByKey ?? {}
+  const { runtimeOptions, editableKeys, editingKey, editDraftByKey, valueByKey, sortByKey } = getGridRuntimeState(data, options)
 
   const runtime = createPatternRuntime({
     definition: gridDefinition,

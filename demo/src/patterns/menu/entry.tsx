@@ -29,6 +29,7 @@ const menuDemoDefinition = {
       'menu/menuButtonParts.ts',
       'menu/menuButtonProps.ts',
       'menu/menuButtonPropsInput.ts',
+      'menu/menuButtonRuntimeState.ts',
       'menu/menuButtonTriggerProps.ts',
       'menu/menubarEffects.ts',
       'menu/menubarItem.ts',

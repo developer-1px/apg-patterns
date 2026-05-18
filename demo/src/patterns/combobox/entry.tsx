@@ -23,6 +23,7 @@ const comboboxDemoDefinition = {
     extra: [
       'combobox/comboboxInputProps.ts',
       'combobox/comboboxOption.ts',
+      'combobox/comboboxRuntimeState.ts',
       'combobox/keyboard.ts',
       'combobox/navigation.ts',
       'combobox/parts.ts',
