@@ -24,6 +24,7 @@ export function sourceIdentityNeedles(sourceName, patternKey) {
       if (sourcePatternKey === 'menu') return ['menuButtonDefinition', 'menubarDefinition']
       return [`apgPattern: '${sourcePatternKey}'`]
     }
+    if (fileName.endsWith('Sources')) return ['defineAriaSource']
     if (fileName.endsWith('AriaSources')) return ['defineAriaSource']
     if (/^use[A-Z].*Pattern$/.test(fileName)) return [`export function ${fileName}`]
     if (fileName === 'runtime') return []
