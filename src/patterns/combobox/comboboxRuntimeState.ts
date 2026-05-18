@@ -1,7 +1,13 @@
 import type { Key, PatternData, PatternItem, PatternOptions, PatternState } from '../../schema'
 import { COMBOBOX_KEY } from './definition'
 
-export type ComboboxVariant = 'selectOnly' | 'listAutocomplete' | 'listWithInlineAutocomplete'
+export type ComboboxVariant =
+  | 'selectOnly'
+  | 'listNoAutocomplete'
+  | 'listAutocomplete'
+  | 'listWithInlineAutocomplete'
+  | 'datepicker'
+  | 'gridPopup'
 
 interface ComboboxState extends PatternState {
   variant?: ComboboxVariant
@@ -21,11 +27,12 @@ export interface ComboboxRuntimeState {
   open: boolean
   displayValue: string
   activeKey: Key | null | undefined
+  label: string
 }
 
 export function getComboboxRuntimeState(data: ComboboxData, options?: PatternOptions): ComboboxRuntimeState {
   const variant = data.state?.variant ?? 'listAutocomplete'
-  const autocomplete = variant === 'selectOnly' ? 'none' : variant === 'listAutocomplete' ? 'list' : 'both'
+  const autocomplete = variant === 'listAutocomplete' || variant === 'gridPopup' ? 'list' : variant === 'listWithInlineAutocomplete' ? 'both' : 'none'
   const editable = variant !== 'selectOnly'
   const listboxId = options?.listboxId ? String(options.listboxId) : 'combobox-popup'
   const query = data.state?.query ?? ''
@@ -34,6 +41,7 @@ export function getComboboxRuntimeState(data: ComboboxData, options?: PatternOpt
   const selectedKey = data.state?.selectedKeys?.[0]
   const selectedLabel = selectedKey ? data.items[selectedKey]?.label ?? '' : ''
   const displayValue = editable ? (selectedKey && !open ? selectedLabel : query) : selectedLabel
+  const label = typeof data.refs?.label === 'string' ? data.refs.label : data.items[COMBOBOX_KEY]?.label ?? 'Option'
 
   return {
     runtimeOptions: { focusStrategy: 'ariaActiveDescendant', haspopup: 'listbox', autocomplete, ...(options ?? {}) },
@@ -45,5 +53,6 @@ export function getComboboxRuntimeState(data: ComboboxData, options?: PatternOpt
     open,
     displayValue,
     activeKey: data.state?.activeKey,
+    label,
   }
 }

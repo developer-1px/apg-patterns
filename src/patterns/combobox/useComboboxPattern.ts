@@ -22,7 +22,7 @@ export interface ReactComboboxRuntime {
 }
 
 export function useComboboxPattern(data: ComboboxData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactComboboxRuntime {
-  const { runtimeOptions, variant, editable, listboxId, inlineCompletion, open, displayValue, activeKey } = getComboboxRuntimeState(data, options)
+  const { runtimeOptions, variant, editable, listboxId, inlineCompletion, open, displayValue, activeKey, label } = getComboboxRuntimeState(data, options)
   const keyToElementId = usePatternElementId(options, 'combobox-option-')
   const runtime = createPatternRuntime({
     definition: comboboxDefinition,
@@ -37,7 +37,7 @@ export function useComboboxPattern(data: ComboboxData, onEvent: (event: PatternE
   useComboboxActiveOptionScroll({ activeKey, open, runtime })
 
   return {
-    inputProps: createComboboxInputProps({ rootProps, editable, displayValue, listboxId, open, variant, onEvent }),
+    inputProps: createComboboxInputProps({ rootProps, editable, displayValue, listboxId, open, variant, label, onEvent }),
     listboxProps: runtime.getPartProps('listbox') as HTMLAttributes<HTMLElement>,
     get options() {
       return Object.keys(data.items)

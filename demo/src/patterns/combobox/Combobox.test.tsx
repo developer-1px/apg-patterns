@@ -5,7 +5,7 @@ import type { PatternData, PatternEvent } from '../../../../src'
 import { Combobox } from './Combobox'
 import { buildComboboxData, FRUITS, reduceComboboxData } from './comboboxData'
 
-type Variant = 'selectOnly' | 'listAutocomplete' | 'listWithInlineAutocomplete'
+type Variant = 'selectOnly' | 'listAutocomplete' | 'listWithInlineAutocomplete' | 'datepicker' | 'gridPopup'
 
 function ComboboxDemo({ variant }: { variant: Variant }) {
   const [data, setData] = useState<PatternData>(() => buildComboboxData(undefined, variant))
@@ -138,5 +138,30 @@ describe('Combobox demo — listWithInlineAutocomplete', () => {
     // inline completion expands 'ap' → 'Apple' (or similar) — value length should exceed 'ap'
     expect(input.value.length).toBeGreaterThan(2)
     expect(input.value.toLowerCase().startsWith('ap')).toBe(true)
+  })
+})
+
+describe('Combobox demo — variant data', () => {
+  it('Date Picker keyboard input filters date options instead of fruit options', () => {
+    render(<ComboboxDemo variant="datepicker" />)
+    const input = screen.getByRole('combobox') as HTMLInputElement
+
+    expect(input.placeholder).toBe('Search date')
+    fireEvent.change(input, { target: { value: 'May 19' } })
+
+    expect(input.getAttribute('aria-expanded')).toBe('true')
+    expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual(['May 19, 2026'])
+  })
+
+  it('Grid Popup mouse selection commits a person option instead of a fruit option', () => {
+    render(<ComboboxDemo variant="gridPopup" />)
+    const input = screen.getByRole('combobox') as HTMLInputElement
+
+    expect(input.placeholder).toBe('Search recipient')
+    fireEvent.change(input, { target: { value: 'Grace' } })
+    fireEvent.mouseDown(screen.getByRole('option', { name: 'Grace Hopper, Platform' }))
+
+    expect(input.value).toBe('Grace Hopper, Platform')
+    expect(input.getAttribute('aria-expanded')).toBe('false')
   })
 })

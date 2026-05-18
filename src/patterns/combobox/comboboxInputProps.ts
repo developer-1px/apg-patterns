@@ -2,7 +2,13 @@ import type { InputHTMLAttributes, KeyboardEvent } from 'react'
 import type { PatternEvent } from '../../schema'
 import { COMBOBOX_KEY } from './definition'
 
-type ComboboxVariant = 'selectOnly' | 'listAutocomplete' | 'listWithInlineAutocomplete'
+type ComboboxVariant =
+  | 'selectOnly'
+  | 'listNoAutocomplete'
+  | 'listAutocomplete'
+  | 'listWithInlineAutocomplete'
+  | 'datepicker'
+  | 'gridPopup'
 
 export function createComboboxInputProps({
   rootProps,
@@ -11,6 +17,7 @@ export function createComboboxInputProps({
   listboxId,
   open,
   variant,
+  label,
   onEvent,
 }: {
   rootProps: InputHTMLAttributes<HTMLInputElement>
@@ -19,6 +26,7 @@ export function createComboboxInputProps({
   listboxId: string
   open: boolean
   variant: ComboboxVariant
+  label: string
   onEvent: (event: PatternEvent) => void
 }): InputHTMLAttributes<HTMLInputElement> {
   return {
@@ -26,7 +34,7 @@ export function createComboboxInputProps({
     type: 'text',
     readOnly: !editable,
     value: displayValue,
-    placeholder: editable ? 'Search fruit' : 'Select fruit',
+    placeholder: editable ? `Search ${label.toLowerCase()}` : `Select ${label.toLowerCase()}`,
     'aria-controls': listboxId,
     onChange: (event) => {
       if (editable) onEvent({ type: 'inputValue', key: COMBOBOX_KEY, value: event.currentTarget.value, inline: variant === 'listWithInlineAutocomplete' })

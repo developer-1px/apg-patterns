@@ -86,11 +86,12 @@ export function reduceComboboxData(current: PatternData, event: PatternEvent): P
   if (event.type === 'inputValue') {
     const raw = event.value
     const inline = event.inline === true
-    const filtered = filterFruits(raw)
-    const match = inline ? firstMatch(raw) : null
-    const matchLabel = match ? FRUITS.find((f) => f.key === match)?.label ?? '' : ''
-    const shouldComplete = inline && raw.length > 0 && match && matchLabel.toLowerCase().startsWith(raw.toLowerCase()) && matchLabel.length > raw.length
     const variant = (current.state?.variant as ComboboxVariantKey | undefined) ?? 'listAutocomplete'
+    const sourceItems = getComboboxSourceItems(variant)
+    const filtered = filterComboboxItems(sourceItems, raw)
+    const match = inline ? firstMatch(sourceItems, raw) : null
+    const matchLabel = match ? sourceItems.find((item) => item.key === match)?.label ?? '' : ''
+    const shouldComplete = inline && raw.length > 0 && match && matchLabel.toLowerCase().startsWith(raw.toLowerCase()) && matchLabel.length > raw.length
     const next = buildComboboxData(filtered, variant)
     return {
       ...next,
@@ -115,7 +116,9 @@ export function reduceComboboxData(current: PatternData, event: PatternEvent): P
   }
   if (event.type === 'typeahead') {
     const nextQuery = `${(current.state as { query?: string } | undefined)?.query ?? ''}${event.query}`
-    const match = firstMatch(nextQuery) ?? firstMatch(event.query)
+    const variant = (current.state?.variant as ComboboxVariantKey | undefined) ?? 'listAutocomplete'
+    const sourceItems = getComboboxSourceItems(variant)
+    const match = firstMatch(sourceItems, nextQuery) ?? firstMatch(sourceItems, event.query)
     return {
       ...current,
       state: {
@@ -129,16 +132,28 @@ export function reduceComboboxData(current: PatternData, event: PatternEvent): P
 }
 
 export function filterFruits(query: string): readonly string[] {
-  const q = query.trim().toLowerCase()
-  if (!q) return FRUITS.map((f) => f.key)
-  return FRUITS.filter((f) => f.label.toLowerCase().includes(q)).map((f) => f.key)
+  return filterComboboxItems(FRUITS, query)
 }
 
-export function firstMatch(query: string): string | null {
+export function firstMatch(sourceItems: readonly ComboboxItem[], query: string): string | null {
   const q = query.trim().toLowerCase()
   if (!q) return null
-  const f = FRUITS.find((f) => f.label.toLowerCase().startsWith(q))
-  return f?.key ?? null
+  const item = sourceItems.find((item) => item.label.toLowerCase().startsWith(q))
+  return item?.key ?? null
+}
+
+type ComboboxItem = { key: string; label: string }
+
+function filterComboboxItems(sourceItems: readonly ComboboxItem[], query: string): readonly string[] {
+  const q = query.trim().toLowerCase()
+  if (!q) return sourceItems.map((item) => item.key)
+  return sourceItems.filter((item) => item.label.toLowerCase().includes(q)).map((item) => item.key)
+}
+
+function getComboboxSourceItems(variant: ComboboxVariantKey): readonly ComboboxItem[] {
+  if (variant === 'datepicker') return DATES
+  if (variant === 'gridPopup') return PEOPLE
+  return FRUITS
 }
 
 const DATES = [

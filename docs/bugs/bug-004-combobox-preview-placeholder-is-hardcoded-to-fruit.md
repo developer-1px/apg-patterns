@@ -2,7 +2,8 @@
 
 - Progress: 4 / 100
 - Area: combobox preview
-- Evidence: `src/patterns/combobox/comboboxInputProps.ts:31`
+- Verified in preview: `http://127.0.0.1:5174/#pattern=combobox&panel=code&source=Combobox.tsx&variant=datepicker`
+- Evidence: In the rendered Date Picker Combobox preview, the selected variant is `Date Picker Combobox`, but the visible input placeholder is `Search fruit`. DOM inspection also reports `aria-label="Date"` with `placeholder="Search fruit"`.
 - Symptom: Editable combobox previews always use `placeholder="Search fruit"` and select-only previews always use `placeholder="Select fruit"`.
 - Impact: Date Picker and Grid Popup combobox variants advertise non-fruit data, but their input placeholder still says fruit. This makes those previews misleading and reduces confidence in variant-specific behavior.
 - Reproduction:
