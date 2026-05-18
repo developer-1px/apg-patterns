@@ -7,6 +7,7 @@ import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import type { PatternData, PatternEvent } from '../../../../src'
 import { Tree } from './Tree'
+import { entry } from './entry'
 import { initialData, reduceData, resolveTarget } from './treeContract'
 import { navigation } from './treeVariantData'
 
@@ -40,6 +41,21 @@ function TreeReducerEdgesDemo() {
       <output data-testid="tree-first-target">{String(target('first'))}</output>
       <output data-testid="tree-parent-target">{String(target('parent'))}</output>
       <output data-testid="tree-unknown-target">{String(target('rowStart'))}</output>
+    </div>
+  )
+}
+
+function TreeviewEntryDemo() {
+  const [events, setEvents] = useState<string[]>([])
+  const demo = entry.useDemoPattern((event) => setEvents((current) => [...current, event.type]))
+
+  return (
+    <div>
+      <div data-testid="tree-entry-variants">{demo.variants}</div>
+      <div data-testid="tree-entry-inspect-controls">{demo.inspectControls}</div>
+      <output data-testid="tree-entry-inspect">{demo.inspect}</output>
+      <output data-testid="tree-entry-events">{events.join(',')}</output>
+      {demo.preview}
     </div>
   )
 }
@@ -211,5 +227,23 @@ describe('APG §Activation', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Reduce ignored' }))
     expect(screen.getByTestId('tree-active').textContent).toBe('docs')
+  })
+
+  it('entry runtime controls update inspect, options, variant, and follow-focus navigation', () => {
+    const { container } = render(<TreeviewEntryDemo />)
+
+    fireEvent.click(screen.getByRole('option', { name: 'File directory · declared' }))
+
+    const selects = Array.from(container.querySelectorAll('select'))
+    fireEvent.change(selects[0]!, { target: { value: 'toggleExpand' } })
+    fireEvent.change(selects[1]!, { target: { value: 'ariaActiveDescendant' } })
+    fireEvent.change(selects[2]!, { target: { value: 'html' } })
+    fireEvent.click(screen.getByLabelText('followFocus'))
+
+    fireEvent.keyDown(screen.getByRole('tree'), { key: 'ArrowDown' })
+
+    expect(screen.getByTestId('tree-entry-events').textContent).toContain('navigate')
+    expect(screen.getByRole('treeitem', { name: 'project-1' }).getAttribute('aria-selected')).toBe('true')
+    expect(screen.getByTestId('tree-entry-inspect').textContent).toContain('aria-activedescendant="treeitem-project-1"')
   })
 })

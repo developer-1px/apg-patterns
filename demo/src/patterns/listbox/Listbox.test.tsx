@@ -16,6 +16,7 @@ if (typeof Element.prototype.scrollIntoView !== 'function') {
 
 import { ListboxDemo } from './ListboxTestHost'
 import { Listbox } from './Listbox'
+import { RearrangeableListbox } from './RearrangeableListbox'
 
 const activeOption = () => document.querySelector('[role="option"][data-active]') as HTMLElement | null
 
@@ -28,6 +29,24 @@ function MultiEdgeListboxDemo({ empty = false }: { empty?: boolean }) {
   })
   const handleEvent = (event: PatternEvent) => setData((current) => reducePatternData(listboxDefinition, current, event))
   return <Listbox data={data} onEvent={handleEvent} options={{ focusStrategy: 'rovingTabIndex', selectionMode: 'multiple' }} />
+}
+
+function RearrangeableEdgeDemo({ mode }: { mode: 'missingActive' | 'noActive' }) {
+  const [events, setEvents] = useState<PatternEvent[]>([])
+  const rootKeys = mode === 'missingActive' ? ['a', 'b'] : []
+  const data: PatternData = {
+    items: { a: { label: 'Alpha' }, b: { label: 'Beta' }, missing: { label: 'Missing' } },
+    relations: { rootKeys },
+    state: { activeKey: mode === 'missingActive' ? 'missing' : null, selectedKeys: mode === 'missingActive' ? ['missing'] : [] },
+    refs: { label: `Rearrange ${mode}` },
+  }
+
+  return (
+    <div>
+      <RearrangeableListbox data={data} onEvent={(event) => setEvents((current) => [...current, event])} />
+      <output data-testid="rearrange-event-count">{events.length}</output>
+    </div>
+  )
 }
 
 describe('Listbox demo — basic', () => {
@@ -207,6 +226,30 @@ describe('Listbox demo — rearrangeable (single)', () => {
     const after = screen.getAllByRole('option')
     expect(after).toHaveLength(beforeCount - 1)
     expect(after.map((o) => o.textContent)).not.toContain('Leonardo')
+  })
+
+  it('toolbar and keyboard controls are harmless when active key is missing', () => {
+    render(<RearrangeableEdgeDemo mode="missingActive" />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Move down' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Remove' }))
+    fireEvent.keyDown(screen.getByRole('listbox'), { key: 'ArrowDown', altKey: true })
+    fireEvent.keyDown(screen.getByRole('listbox'), { key: 'Delete' })
+
+    expect(screen.getByTestId('rearrange-event-count').textContent).toBe('0')
+  })
+
+  it('Alt+Arrow and Delete are harmless when no active key exists', () => {
+    render(<RearrangeableEdgeDemo mode="noActive" />)
+
+    fireEvent.keyDown(screen.getByRole('listbox'), { key: 'ArrowUp', altKey: true })
+    fireEvent.keyDown(screen.getByRole('listbox'), { key: 'ArrowDown', altKey: true })
+    fireEvent.keyDown(screen.getByRole('listbox'), { key: 'Delete' })
+
+    expect(screen.getByRole('button', { name: 'Move up' }).hasAttribute('disabled')).toBe(true)
+    expect(screen.getByRole('button', { name: 'Move down' }).hasAttribute('disabled')).toBe(true)
+    expect(screen.getByRole('button', { name: 'Remove' }).hasAttribute('disabled')).toBe(true)
+    expect(screen.getByTestId('rearrange-event-count').textContent).toBe('0')
   })
 })
 
