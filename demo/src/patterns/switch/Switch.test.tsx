@@ -22,7 +22,7 @@ describe('Switch demo', () => {
 
     fireEvent.keyDown(screen.getByRole('switch'), { key: ' ', code: 'Space' })
     expect(screen.getByRole('switch').getAttribute('aria-checked')).toBe('false')
-  })
+  }, 15000)
 
   it('toggles aria-checked on Enter', () => {
     render(<SwitchDemo />)

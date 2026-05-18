@@ -15,34 +15,12 @@
 import {
   AriaSources,
   DomEvents,
-  KeyTokens,
   PatternDefinitionSchema,
-  defineAriaSource,
-  defineKeyToken,
-  defineNavigationTarget,
-  defineVisibleOrder,
 } from '../../index'
+import { comboboxKeyboard } from './keyboard'
+import { COMBOBOX_KEY, COMBOBOX_TOKEN } from './navigation'
 
-export const COMBOBOX_KEY = 'combobox'
-const COMBOBOX_TOKEN = '$combobox'
-
-defineKeyToken(COMBOBOX_TOKEN, () => COMBOBOX_KEY)
-
-defineAriaSource('combobox.popupOpen', (ctx) => ctx.data.state?.expandedKeys?.includes(COMBOBOX_KEY) ?? false)
-
-defineVisibleOrder('comboboxOptions', (_v, data) => Object.keys(data.items).filter((k) => k !== COMBOBOX_KEY))
-
-defineNavigationTarget('optionLinear', (target, ctx) => {
-  const options = ctx.visibleKeys
-  if (options.length === 0) return null
-  const direction = typeof target.direction === 'string' ? target.direction : null
-  const currentIdx = ctx.activeKey === COMBOBOX_KEY ? -1 : options.indexOf(ctx.activeKey)
-  if (direction === 'next') return options[Math.min(currentIdx + 1, options.length - 1)] ?? options[0]
-  if (direction === 'previous') return currentIdx <= 0 ? options[0] : options[currentIdx - 1]
-  if (direction === 'first') return options[0]
-  if (direction === 'last') return options[options.length - 1]
-  return null
-})
+export { COMBOBOX_KEY } from './navigation'
 
 export const comboboxDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'combobox',
@@ -88,77 +66,5 @@ export const comboboxDefinition = PatternDefinitionSchema.parse({
       last: { kind: 'optionLinear', direction: 'last' },
     },
   },
-  keyboard: [
-    {
-      shortcut: 'ArrowDown',
-      preventDefault: true,
-      cases: [
-        {
-          case: 'when',
-          when: { kind: 'not', predicate: { kind: 'isPopupOpen' } },
-          events: [
-            { type: 'expand', key: COMBOBOX_TOKEN, expanded: true },
-            { type: 'navigate', direction: 'first' },
-          ],
-        },
-        { case: 'otherwise', events: [{ type: 'navigate', direction: 'next' }] },
-      ],
-    },
-    {
-      shortcut: 'ArrowUp',
-      preventDefault: true,
-      cases: [
-        {
-          case: 'when',
-          when: { kind: 'not', predicate: { kind: 'isPopupOpen' } },
-          events: [
-            { type: 'expand', key: COMBOBOX_TOKEN, expanded: true },
-            { type: 'navigate', direction: 'last' },
-          ],
-        },
-        { case: 'otherwise', events: [{ type: 'navigate', direction: 'previous' }] },
-      ],
-    },
-    {
-      shortcut: 'Home',
-      preventDefault: false,
-      cases: [
-        {
-          case: 'when',
-          when: { kind: 'isPopupOpen' },
-          events: [{ type: 'navigate', direction: 'first' }],
-        },
-      ],
-    },
-    {
-      shortcut: 'End',
-      preventDefault: false,
-      cases: [
-        {
-          case: 'when',
-          when: { kind: 'isPopupOpen' },
-          events: [{ type: 'navigate', direction: 'last' }],
-        },
-      ],
-    },
-    {
-      shortcut: 'Enter',
-      preventDefault: true,
-      cases: [
-        {
-          case: 'when',
-          when: { kind: 'isPopupOpen' },
-          events: [
-            { type: 'select', key: KeyTokens.activeKey },
-            { type: 'expand', key: COMBOBOX_TOKEN, expanded: false },
-          ],
-        },
-      ],
-    },
-    {
-      shortcut: 'Escape',
-      preventDefault: true,
-      cases: [{ case: 'always', events: [{ type: 'expand', key: COMBOBOX_TOKEN, expanded: false }] }],
-    },
-  ],
+  keyboard: comboboxKeyboard,
 })

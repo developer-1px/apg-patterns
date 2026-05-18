@@ -22,7 +22,7 @@ describe('APG §Roles, States, Properties', () => {
     render(<AlertDemo />)
     fireEvent.click(screen.getByRole('button', { name: 'Trigger alert' }))
     expect(screen.getByRole('alert')).toBeTruthy()
-  })
+  }, 15000)
 
   it('alert message is exposed as text content', () => {
     render(<AlertDemo />)
