@@ -167,6 +167,12 @@ npm run build
 npm run demo:smoke
 ```
 
+To compare the demo's APG example coverage against the currently linked examples on w3.org:
+
+```bash
+npm run check:apg
+```
+
 ## Design Notes
 
 - [React facade zod blind loop](docs/proposals/2026-05-18-react-facade-zod-blind-loop.md)

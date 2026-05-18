@@ -1,4 +1,7 @@
 import { PatternDefinitionSchema } from '../../schema'
+import { accordionKeyboard } from './keyboard'
+import { accordionParts } from './parts'
+import { accordionReact } from './react'
 
 export const AccordionDefinitionSchema = PatternDefinitionSchema.superRefine((value, ctx) => {
   if (value.apgPattern !== 'accordion') ctx.addIssue({ code: 'custom', path: ['apgPattern'], message: 'expected "accordion"' })
@@ -14,52 +17,7 @@ export const accordionDefinition = AccordionDefinitionSchema.parse({
   containedRoles: ['button', 'region'],
   focusModel: 'rovingTabIndex',
   effects: [{ kind: 'focus', on: { state: 'activeKey', reasons: ['keyboard'] }, scope: { kind: 'focusWithin' }, target: { kind: 'activeKeyElement' }, preventScroll: true }],
-  parts: {
-    accordion: {
-      role: 'group',
-      aria: [
-        { attribute: 'aria-label', from: 'refs.label' },
-        { attribute: 'aria-labelledby', from: 'refs.labelledBy' },
-      ],
-    },
-    header: {
-      role: 'button',
-      aria: [
-        { attribute: 'aria-expanded', from: 'state.expandedKeys' },
-        { attribute: 'aria-controls', from: 'relations.controlsByKey' },
-      ],
-      focus: {
-        tabIndex: {
-          when: { kind: 'always' },
-          active: 0,
-          inactive: -1,
-        },
-      },
-      state: [
-        { name: 'active', from: 'state.activeKey' },
-        { name: 'expanded', from: 'state.expandedKeys' },
-      ],
-      events: [
-        { event: 'focus', events: [{ type: 'focus', key: '$key' }] },
-        {
-          event: 'click',
-          when: { kind: 'isExpanded', key: '$key' },
-          events: [{ type: 'expand', key: '$key', expanded: false }],
-        },
-        {
-          event: 'click',
-          when: { kind: 'not', predicate: { kind: 'isExpanded', key: '$key' } },
-          events: [{ type: 'expand', key: '$key', expanded: true }],
-        },
-      ],
-    },
-    panel: {
-      role: 'region',
-      aria: [
-        { attribute: 'aria-labelledby', from: 'relations.ownerByKey' },
-      ],
-    },
-  },
+  parts: accordionParts,
   navigation: {
     visibleOrder: { kind: 'flat' },
     targets: {
@@ -69,53 +27,6 @@ export const accordionDefinition = AccordionDefinitionSchema.parse({
       last: { kind: 'linear', action: 'last' },
     },
   },
-  keyboard: [
-    { shortcut: 'ArrowDown', preventDefault: true, cases: [{ case: 'when', when: { kind: 'hasActiveKey' }, events: [{ type: 'navigate', direction: 'next' }] }] },
-    { shortcut: 'ArrowUp', preventDefault: true, cases: [{ case: 'when', when: { kind: 'hasActiveKey' }, events: [{ type: 'navigate', direction: 'previous' }] }] },
-    { shortcut: 'Home', preventDefault: true, cases: [{ case: 'always', events: [{ type: 'navigate', direction: 'first' }] }] },
-    { shortcut: 'End', preventDefault: true, cases: [{ case: 'always', events: [{ type: 'navigate', direction: 'last' }] }] },
-    {
-      shortcut: 'Enter',
-      preventDefault: true,
-      cases: [
-        { case: 'when', when: { kind: 'isExpanded', key: '$activeKey' }, events: [{ type: 'expand', key: '$activeKey', expanded: false }] },
-        { case: 'otherwise', events: [{ type: 'expand', key: '$activeKey', expanded: true }] },
-      ],
-    },
-    {
-      shortcut: 'Space',
-      preventDefault: true,
-      cases: [
-        { case: 'when', when: { kind: 'isExpanded', key: '$activeKey' }, events: [{ type: 'expand', key: '$activeKey', expanded: false }] },
-        { case: 'otherwise', events: [{ type: 'expand', key: '$activeKey', expanded: true }] },
-      ],
-    },
-  ],
-  react: {
-    hook: 'useAccordionPattern',
-    root: { prop: 'rootProps', part: 'accordion', element: 'div' },
-    renderItems: {
-      name: 'renderItems',
-      source: { kind: 'visibleOrder' },
-      order: 'flat',
-      variants: [
-        {
-          kind: 'section',
-          when: { kind: 'always' },
-          fields: {
-            key: { kind: 'key' },
-            kind: { kind: 'literal', value: 'section' },
-            label: { kind: 'itemField', field: 'label', fallback: 'key' },
-            textValue: { kind: 'textValue', fallback: 'label' },
-            panelKey: { kind: 'firstControlledKey', fallback: null },
-            state: { kind: 'partState', part: 'header' },
-          },
-          props: {
-            headerProps: { part: 'header', element: 'button', owner: 'item', defaults: { type: 'button' } },
-            panelProps: { part: 'panel', element: 'div', owner: 'panel' },
-          },
-        },
-      ],
-    },
-  },
+  keyboard: accordionKeyboard,
+  react: accordionReact,
 })
