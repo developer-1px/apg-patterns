@@ -129,6 +129,21 @@ describe('Combobox demo — listAutocomplete', () => {
     expect(options.length).toBeLessThan(FRUITS.length)
   })
 
+  it('keyboard navigation is harmless when filtering leaves no popup options', () => {
+    render(<ComboboxDemo variant="listAutocomplete" />)
+    const input = screen.getByRole('combobox') as HTMLInputElement
+    fireEvent.change(input, { target: { value: 'zzzz' } })
+    expect(input.getAttribute('aria-expanded')).toBe('true')
+    expect(screen.queryAllByRole('option')).toEqual([])
+
+    fireEvent.keyDown(input, { key: 'ArrowDown', code: 'ArrowDown' })
+    fireEvent.keyDown(input, { key: 'ArrowUp', code: 'ArrowUp' })
+    fireEvent.keyDown(input, { key: 'Home', code: 'Home' })
+    fireEvent.keyDown(input, { key: 'End', code: 'End' })
+
+    expect(input.getAttribute('aria-activedescendant')).toBeNull()
+  })
+
   it('Enter commits selection and closes popup', () => {
     render(<ComboboxDemo variant="listAutocomplete" />)
     const input = screen.getByRole('combobox') as HTMLInputElement

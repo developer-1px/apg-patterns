@@ -36,13 +36,13 @@ function TreegridDemo() {
   )
 }
 
-function RowFocusTreegridDemo() {
+function RowFocusTreegridDemo({ activeKey = 'src' }: { activeKey?: string }) {
   const [data, setData] = useState<PatternData>({
     ...initialTreegridData,
     state: {
       ...initialTreegridData.state,
-      activeKey: 'src',
-      selectedKeys: ['src'],
+      activeKey,
+      selectedKeys: [activeKey],
     },
   })
   return (
@@ -226,6 +226,27 @@ describe('APG §Keyboard — Row Focus Navigation', () => {
 
     fireEvent.keyDown(grid, { key: 'PageUp' })
     expect(activeRow()?.id).toBe('treegridcell-headerRow')
+  })
+
+  it('row focus mode clamps row keyboard navigation at visible row boundaries', () => {
+    render(<RowFocusTreegridDemo activeKey="headerRow" />)
+    const grid = screen.getByRole('treegrid')
+    const activeRow = () => document.querySelector('[role="row"][tabindex="0"]') as HTMLElement | null
+
+    fireEvent.keyDown(grid, { key: 'ArrowUp' })
+    expect(activeRow()?.id).toBe('treegridcell-headerRow')
+
+    fireEvent.keyDown(grid, { key: 'PageUp' })
+    expect(activeRow()?.id).toBe('treegridcell-headerRow')
+
+    fireEvent.keyDown(grid, { key: 'End' })
+    expect(activeRow()?.id).toBe('treegridcell-pkg.json')
+
+    fireEvent.keyDown(grid, { key: 'ArrowDown' })
+    expect(activeRow()?.id).toBe('treegridcell-pkg.json')
+
+    fireEvent.keyDown(grid, { key: 'PageDown' })
+    expect(activeRow()?.id).toBe('treegridcell-pkg.json')
   })
 })
 

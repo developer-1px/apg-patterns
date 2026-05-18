@@ -127,6 +127,51 @@ describe('createReproRecorder', () => {
     expect(recording.text).toContain('warn: recorded warning')
     expect(recording.text).toContain('route pushState:')
   })
+
+  it('records rich implicit-role ARIA trees from mouse and keyboard input', async () => {
+    document.body.innerHTML = `
+      <main data-demo-preview="document">
+        <header><h1>Dashboard</h1></header>
+        <nav aria-label="Primary"><a id="home" href="#home" aria-current="page">Home</a></nav>
+        <section aria-label="Metrics">
+          <table>
+            <thead><tr><th aria-sort="ascending">Name</th><th>Value</th></tr></thead>
+            <tbody><tr><td>Revenue</td><td>42</td></tr></tbody>
+          </table>
+          <label for="query">Query</label>
+          <input id="query" aria-label="Query" aria-invalid="true" aria-required="true" />
+          <textarea aria-label="Notes">Ready</textarea>
+          <select aria-label="Status"><option>Open</option></select>
+          <aside aria-label="Related">Links</aside>
+          <footer>Footer</footer>
+        </section>
+      </main>
+    `
+    const link = document.getElementById('home') as HTMLAnchorElement
+    const input = document.getElementById('query') as HTMLInputElement
+    const recorder = createReproRecorder()
+
+    recorder.start()
+    link.focus()
+    fireEvent.keyDown(link, { key: 'Enter', code: 'Enter' })
+    await nextFrame()
+
+    input.focus()
+    fireEvent.click(input)
+    await nextFrame()
+
+    const recording = recorder.stop()
+
+    expect(recording.text).toContain('main')
+    expect(recording.text).toContain('navigation "Primary"')
+    expect(recording.text).toContain('link "Home" [current=page')
+    expect(recording.text).toContain('table')
+    expect(recording.text).toContain('columnheader "Name"')
+    expect(recording.text).toContain('textbox "Query" [invalid, required')
+    expect(recording.text).toContain('combobox "Status"')
+    expect(recording.text).toContain('complementary "Related"')
+    expect(recording.text).toContain('contentinfo "Footer"')
+  })
 })
 
 function nextFrame(): Promise<void> {
