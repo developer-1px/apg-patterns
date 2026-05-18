@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest'
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, render, within } from '@testing-library/react'
 import { createElement } from 'react'
 import { apgExampleCoverage, exampleId, officialApgExamples } from './apgExampleCoverage'
 import { patternEntries, useDemoPattern } from './demoPatterns'
@@ -104,13 +104,18 @@ describe('APG example coverage', () => {
       (item) => `${item.demoPattern}:${item.variant}`,
     )
 
-    for (const item of coveredVariants) {
-      cleanup()
-      render(createElement(DemoControlsProbe, { patternKey: item.demoPattern }))
+    const variantsByPattern = groupBy(coveredVariants, (item) => item.demoPattern)
 
-      const label = implementedVariantLabels[item.demoPattern]?.[item.variant!]
-      expect(label, `${item.demoPattern}:${item.variant}`).toBeTruthy()
-      expect(screen.getByRole('option', { name: label })).toBeTruthy()
+    for (const [patternKey, items] of Object.entries(variantsByPattern)) {
+      cleanup()
+      const { container } = render(createElement(DemoControlsProbe, { patternKey }))
+      const controls = within(container)
+
+      for (const item of items) {
+        const label = implementedVariantLabels[item.demoPattern]?.[item.variant!]
+        expect(label, `${item.demoPattern}:${item.variant}`).toBeTruthy()
+        expect(controls.getByRole('option', { name: label })).toBeTruthy()
+      }
     }
   }, 15000)
 })
@@ -131,4 +136,13 @@ function uniqueBy<T>(items: readonly T[], keyOf: (item: T) => string) {
     seen.add(key)
     return true
   })
+}
+
+function groupBy<T>(items: readonly T[], keyOf: (item: T) => string) {
+  const groups: Record<string, T[]> = {}
+  for (const item of items) {
+    const key = keyOf(item)
+    groups[key] = [...(groups[key] ?? []), item]
+  }
+  return groups
 }

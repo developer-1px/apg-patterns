@@ -1,32 +1,18 @@
-import type { Key, PatternData, PatternEvent, PatternDefinition } from '../schema'
-import { resolveVisibleOrder, resolveNavigationTarget, createParentByKey } from './patternKernel'
+import type { PatternData, PatternEvent, PatternDefinition } from '../schema'
 import { reduceDeclarativeTransitions } from './patternTransitions'
 import { reduceExpandActiveRowEvent, reduceExpandEvent } from './expansionEvents'
+import { reduceCheckEvent, reducePressEvent, reduceValueEvent } from './itemStateEvents'
+import { reduceFocusEvent, reduceNavigateEvent } from './navigationEvents'
 import { reduceExtendSelectionEvent, reduceSelectAllEvent, reduceSelectColumnEvent, reduceSelectRowEvent, withSelection } from './selectionEvents'
 
 export function reducePatternData(definition: PatternDefinition, data: PatternData, event: PatternEvent): PatternData {
   const declarative = reduceDeclarativeTransitions(definition, data, event)
   if (declarative) return withLastEventReason(declarative, event)
 
-  if (event.type === 'focus') return withLastEventReason(withActiveKey(data, event.key), event)
+  if (event.type === 'focus') return withLastEventReason(reduceFocusEvent(data, event), event)
 
   if (event.type === 'navigate') {
-    const visibleKeys = resolveVisibleOrder(definition.navigation.visibleOrder, data)
-    const activeKey = data.state?.activeKey ?? visibleKeys[0]
-    if (!activeKey) return withLastEventReason(data, event)
-    const target = definition.navigation.targets[event.direction]
-    if (!target) {
-      throw new Error(
-        `[apg-pattern] navigate(direction="${event.direction}") emitted but definition.navigation.targets["${event.direction}"] is missing — register a target or fix the keyboard binding.`,
-      )
-    }
-    const nextKey = resolveNavigationTarget(target, {
-      activeKey,
-      data,
-      parentByKey: createParentByKey(data),
-      visibleKeys,
-    })
-    return withLastEventReason(nextKey ? withActiveKey(data, nextKey) : data, event)
+    return withLastEventReason(reduceNavigateEvent(definition, data, event), event)
   }
 
   if (event.type === 'select') {
@@ -67,23 +53,19 @@ export function reducePatternData(definition: PatternDefinition, data: PatternDa
   }
 
   if (event.type === 'check') {
-    return withLastEventReason({ ...data, state: { ...data.state, checkedByKey: { ...data.state?.checkedByKey, [event.key]: event.checked } } }, event)
+    return withLastEventReason(reduceCheckEvent(data, event), event)
   }
 
   if (event.type === 'press') {
-    return withLastEventReason({ ...data, state: { ...data.state, pressedByKey: { ...data.state?.pressedByKey, [event.key]: event.pressed ?? true } } }, event)
+    return withLastEventReason(reducePressEvent(data, event), event)
   }
 
   if (event.type === 'value') {
-    return withLastEventReason({ ...data, state: { ...data.state, valueByKey: { ...data.state?.valueByKey, [event.key]: event.value } } }, event)
+    return withLastEventReason(reduceValueEvent(data, event), event)
   }
 
   // 'activate'/'typeahead'/'dismiss'/'extension' 는 outbound-only signal — state 미갱신 (의도).
   return withLastEventReason(data, event)
-}
-
-function withActiveKey(data: PatternData, activeKey: Key): PatternData {
-  return { ...data, state: { ...data.state, activeKey } }
 }
 
 function withLastEventReason(data: PatternData, event: PatternEvent): PatternData {
