@@ -12,7 +12,7 @@ const switchDemoDefinition = {
     data: ['switchData.ts'],
     hooks: ['switch/useSwitchPattern.ts'],
     definition: 'switch/definition.ts',
-    extra: ['switch/keyboard.ts', 'switch/parts.ts', 'switch/switchRenderItem.ts'],
+    extra: ['switch/keyboard.ts', 'switch/parts.ts', 'switch/switchActions.ts', 'switch/switchRuntimeState.ts', 'switch/switchRenderItem.ts'],
   },
   controls: {
     kind: 'listbox',

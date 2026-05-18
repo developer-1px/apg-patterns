@@ -14,6 +14,7 @@ import {
   type PatternOptions,
 } from '../../schema'
 import { disclosureDefinition } from './definition'
+import { createDisclosureElementId, getDisclosureKeys, isDisclosureExpanded } from './disclosureRuntimeKeys'
 export { reduceDisclosureData } from './disclosureReducer'
 
 export interface DisclosureRuntime {
@@ -47,9 +48,8 @@ export function createDisclosureRuntime(input: CreateDisclosureRuntimeInput): Di
     onEvent: emit,
   }) as PatternRuntime
 
-  const triggerKey = data.relations?.rootKeys?.[0] ?? null
-  const panelKey = triggerKey ? data.relations?.controlsByKey?.[triggerKey]?.[0] ?? null : null
-  const expanded = triggerKey ? data.state?.expandedKeys?.includes(triggerKey) ?? false : false
+  const { triggerKey, panelKey } = getDisclosureKeys(data)
+  const expanded = isDisclosureExpanded(data, triggerKey)
 
   return {
     definition: disclosureDefinition,
@@ -63,8 +63,4 @@ export function createDisclosureRuntime(input: CreateDisclosureRuntimeInput): Di
     getRootKeyboardHandler: () => runtime.getRootKeyboardHandler(),
     emit,
   }
-}
-
-function createDisclosureElementId(prefix: string, key: Key) {
-  return `${prefix}${key.toLowerCase().replace(/[^a-z0-9_-]+/g, '-')}`
 }

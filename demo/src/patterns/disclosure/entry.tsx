@@ -39,7 +39,7 @@ const disclosureDemoDefinition = {
     hooks: ['disclosure/useDisclosurePattern.ts'],
     runtime: ['disclosure/runtime.ts'],
     definition: 'disclosure/definition.ts',
-    extra: ['disclosure/disclosureItem.ts', 'disclosure/disclosureReducer.ts', 'disclosure/keyboard.ts', 'disclosure/parts.ts', 'disclosure/inspect.ts'],
+    extra: ['disclosure/disclosureItem.ts', 'disclosure/disclosureRuntimeKeys.ts', 'disclosure/disclosureReducer.ts', 'disclosure/keyboard.ts', 'disclosure/parts.ts', 'disclosure/inspect.ts'],
   },
   controls: {
     kind: 'listbox',

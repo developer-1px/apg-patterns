@@ -2,7 +2,8 @@ import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternDataWithOptions, PatternEvent, PatternOptions } from '../../schema'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { disclosureDefinition } from './definition'
-import { createDisclosureElementId, createDisclosureItems, createDisclosureTriggerProps, type ReactDisclosureItem } from './disclosureItem'
+import { createDisclosureItems, createDisclosureTriggerProps, type ReactDisclosureItem } from './disclosureItem'
+import { createDisclosureElementId, getDisclosureKeys, isDisclosureExpanded } from './disclosureRuntimeKeys'
 export type { ReactDisclosureItem } from './disclosureItem'
 
 export interface ReactDisclosureRuntime {
@@ -30,14 +31,13 @@ export function useDisclosurePattern(data: PatternDataWithOptions, onEvent: (eve
     onEvent,
     keyToElementId: (key) => createDisclosureElementId(runtimeOptions.elementIdPrefix ?? 'disclosure-', key),
   })
-  const triggerKey = data.relations?.rootKeys?.[0] ?? null
-  const panelKey = triggerKey ? data.relations?.controlsByKey?.[triggerKey]?.[0] ?? null : null
+  const { triggerKey, panelKey } = getDisclosureKeys(data)
   const expandedKeys = data.state?.expandedKeys ?? []
 
   return {
     triggerKey,
     panelKey,
-    expanded: triggerKey ? expandedKeys.includes(triggerKey) : false,
+    expanded: isDisclosureExpanded(data, triggerKey),
     get triggerProps() {
       return triggerKey ? createDisclosureTriggerProps(runtime, triggerKey) : {}
     },

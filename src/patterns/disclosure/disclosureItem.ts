@@ -42,7 +42,3 @@ export function createDisclosureTriggerProps(runtime: ReturnType<typeof createPa
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => rootKeyDown(reactKeyInput(event)),
   }
 }
-
-export function createDisclosureElementId(prefix: string, key: Key) {
-  return `${prefix}${key.toLowerCase().replace(/[^a-z0-9_-]+/g, '-')}`
-}

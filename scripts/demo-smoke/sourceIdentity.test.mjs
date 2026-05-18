@@ -26,6 +26,7 @@ describe('sourceIdentityNeedles', () => {
     ['alert/alertRuntimeState.ts', ['getAlertRuntimeState']],
     ['carousel/carouselRuntimeState.ts', ['getCarouselRuntimeState']],
     ['windowsplitter/windowSplitterState.ts', ['getWindowSplitterState']],
+    ['treegrid/predicates.ts', ['definePredicate']],
   ])('uses specific identity needles for helper source %s', (sourceName, needles) => {
     expect(sourceIdentityNeedles(sourceName, 'button')).toEqual(needles)
   })

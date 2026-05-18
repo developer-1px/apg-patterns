@@ -1,8 +1,10 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { createSwitchActions } from './switchActions'
 import { switchDefinition } from './definition'
 import { createSwitchRenderItem, type ReactSwitchRenderItem } from './switchRenderItem'
+import { getSwitchRuntimeState } from './switchRuntimeState'
 export type { ReactSwitchRenderItem } from './switchRenderItem'
 
 export interface ReactSwitchRuntime {
@@ -38,17 +40,10 @@ export function useSwitchPattern(data: PatternData, onEvent: (event: PatternEven
       return runtime.visibleKeys.map((key) => createSwitchRenderItem(runtime, key))
     },
     get state() {
-      return {
-        activeKey: runtime.data.state?.activeKey ?? null,
-        checkedByKey: runtime.data.state?.checkedByKey ?? {},
-        disabledKeys: runtime.data.state?.disabledKeys ?? [],
-      }
+      return getSwitchRuntimeState(runtime.data)
     },
     get actions() {
-      return {
-        focus: (key: Key) => runtime.emit({ type: 'focus', key }),
-        check: (key: Key, checked: boolean) => runtime.emit({ type: 'check', key, checked }),
-      }
+      return createSwitchActions(runtime)
     },
     get ids() {
       return { forKey: runtime.keyToElementId }

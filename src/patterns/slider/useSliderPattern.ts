@@ -3,6 +3,7 @@ import type { Key, PatternEvent } from '../../schema'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { sliderContract, type SliderData, type SliderOptions } from './contract'
 import { createSliderRenderItem, type ReactSliderRenderItem } from './sliderRenderItem'
+import { getSliderRuntimeState, isMultiThumbSlider } from './sliderRuntimeState'
 export type { ReactSliderRenderItem } from './sliderRenderItem'
 
 export interface ReactSliderRuntime {
@@ -39,16 +40,10 @@ export function useSliderPattern(data: SliderData, onEvent: (event: PatternEvent
     },
     orientation,
     get isMultiThumb() {
-      return runtime.visibleKeys.length >= 2 && runtime.visibleKeys.every((key) => {
-        const item = runtime.data.items[key]
-        return typeof item?.valuemin === 'number' || typeof item?.valuemax === 'number'
-      })
+      return isMultiThumbSlider(runtime)
     },
     get state() {
-      return {
-        activeKey: runtime.data.state?.activeKey ?? null,
-        valueByKey: runtime.data.state?.valueByKey ?? {},
-      }
+      return getSliderRuntimeState(runtime)
     },
     get ids() {
       return { forKey: runtime.keyToElementId }

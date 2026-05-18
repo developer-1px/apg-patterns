@@ -38,6 +38,7 @@ export function sourceIdentityNeedles(sourceName, patternKey) {
     if (sourcePatternKey === 'kernel' && fileName === 'kernelNavigationTargets') return ['defineNavigationTarget']
     if (sourcePatternKey === 'kernel' && fileName === 'kernelPredicates') return ['definePredicate']
     if (sourcePatternKey === 'kernel' && fileName === 'kernelStateProjections') return ['defineStateProjection']
+    if (fileName === 'predicates') return ['definePredicate']
     if (fileName === 'definition') {
       if (sourcePatternKey === 'menu') return ['menuButtonDefinition', 'menubarDefinition']
       return [`apgPattern: '${sourcePatternKey}'`]
