@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 import { renderDataInspect } from '../../shared/inspect'
 import { Landmarks } from './Landmarks'
 import {

@@ -1,6 +1,6 @@
 import { WindowSplitter } from './WindowSplitter'
 import { initialWindowSplitterData, reduceWindowSplitterData, windowSplitterOptions } from './windowsplitterData'
-import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const windowSplitterDemoDefinition = {
   key: 'windowsplitter',

@@ -2,7 +2,7 @@ import { reducePatternData } from '../../../../src'
 import { carouselDefinition } from '../../../../src/patterns/carousel/definition'
 import { Carousel } from './Carousel'
 import { carouselVariantItems, carouselVariants, initialCarouselData, type CarouselVariantKey } from './carouselData'
-import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const carouselDemoDefinition = {
   key: 'carousel',

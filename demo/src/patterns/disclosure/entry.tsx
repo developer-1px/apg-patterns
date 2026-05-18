@@ -10,7 +10,7 @@ import {
   type DisclosureVariantKey,
 } from './disclosureData'
 import { renderDataInspect } from '../../shared/inspect/index'
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const variants: Record<DisclosureVariantKey, PatternData> = {
   simple: initialDisclosureData,

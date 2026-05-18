@@ -1,6 +1,6 @@
 import { Switch } from './Switch'
 import { initialSwitchData, reduceSwitchData, switchVariantItems, switchVariants, type SwitchVariantKey } from './switchData'
-import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const switchDemoDefinition = {
   key: 'switch',

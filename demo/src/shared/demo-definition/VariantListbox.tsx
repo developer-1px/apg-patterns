@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
 import type { HTMLAttributes } from 'react'
-import { listboxDefinition, reducePatternData, useListboxPattern, type PatternData } from '../../../src'
-import { cx, ds } from './designSystem'
-import { readVariantRoute, useVariantRoutePattern, writeVariantRoute } from './variantRoute'
+import { listboxDefinition, reducePatternData, useListboxPattern, type PatternData } from '../../../../src'
+import { cx, ds } from '../designSystem'
+import { readVariantRoute, useVariantRoutePattern, writeVariantRoute } from '../variantRoute'
 
 type Props = HTMLAttributes<HTMLElement>
 

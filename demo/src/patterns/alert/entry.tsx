@@ -3,7 +3,7 @@ import { PatternDataSchema } from '../../../../src'
 import { Alert } from './Alert'
 import { type AlertDomainEvent, initialAlertData, reduceAlertState } from './alertData'
 import { renderDataInspect } from '../../shared/inspect/genericInspect'
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 type AlertDemoAction =
   | { type: 'event'; event: AlertDomainEvent }

@@ -1,4 +1,4 @@
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 import { useListboxDemoRuntime } from './listboxDemoRuntime'
 
 const listboxDemoDefinition = {

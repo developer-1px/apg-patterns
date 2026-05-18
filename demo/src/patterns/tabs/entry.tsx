@@ -3,7 +3,7 @@ import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { renderDataInspect } from '../../shared/inspect/index'
 import { Tabs } from './Tabs'
 import { closeTabInData, initialTabsVariant, tabsVariantItems, tabsVariants, type TabsVariantKey } from './tabsData'
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const tabsDemoDefinition = {
   key: 'tabs',

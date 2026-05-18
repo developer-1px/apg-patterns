@@ -1,10 +1,10 @@
 import type React from 'react'
-import type { PatternData, PatternEvent } from '../../../src'
-import { useVariantPatternDataHost } from './demoHostState'
-import type { PatternEntry } from './demoPatternTypes'
+import type { PatternData, PatternEvent } from '../../../../src'
+import { useVariantPatternDataHost } from '../demoHostState'
+import type { PatternEntry } from '../demoPatternTypes'
 import type { DemoPatternDefinition } from './demoPatternDefinition'
 import { defineDemoPattern } from './defineDemoPatternCore'
-import { renderDataInspect } from './inspect/index'
+import { renderDataInspect } from '../inspect/index'
 
 export function defineVariantDemoPattern<Variant extends string>({
   definition,

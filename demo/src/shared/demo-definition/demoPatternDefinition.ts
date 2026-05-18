@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { KERNEL_SOURCES } from './demoPatternTypes'
+import { KERNEL_SOURCES } from '../demoPatternTypes'
 import { UiNodeSchema, type UiNode } from './uiSchema'
 
 const SourceNameSchema = z.string().min(1)

@@ -1,6 +1,6 @@
 import { Checkbox } from './Checkbox'
 import { checkboxVariantItems, checkboxVariants, type CheckboxVariantKey } from './checkboxData'
-import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const checkboxDemoDefinition = {
   key: 'checkbox',

@@ -2,7 +2,7 @@ import { reducePatternData } from '../../../../src'
 import { treegridDefinition } from '../../../../src/patterns/treegrid/definition'
 import { Treegrid } from './Treegrid'
 import { initialTreegridData } from './treegridData'
-import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const treegridDemoDefinition = {
   key: 'treegrid',

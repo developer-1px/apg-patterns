@@ -3,7 +3,7 @@ import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { renderDataInspect } from '../../shared/inspect/index'
 import { Menu } from './Menu'
 import { menuVariantItems, menuVariants, type MenuVariantKey } from './menuData'
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 import type { PatternEvent } from '../../../../src'
 
 const menuDemoDefinition = {

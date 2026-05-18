@@ -4,7 +4,7 @@ import { resolveTarget } from './treeContract'
 import { renderAriaTree, renderHtmlTree } from './inspect'
 import { Tree } from './Tree'
 import { treeVariantItems, treeVariants, type TreeVariantKey } from './treeVariants'
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 import {
   FocusStrategyControl,
   FollowFocusControl,

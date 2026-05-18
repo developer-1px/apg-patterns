@@ -1,7 +1,7 @@
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { Meter } from './Meter'
 import { meterVariantItems, meterVariants, type MeterVariantKey } from './meterData'
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 import { renderDataInspect } from '../../shared/inspect/genericInspect'
 
 const meterDemoDefinition = {

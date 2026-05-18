@@ -2,7 +2,7 @@ import { reducePatternData, type PatternData, type PatternEvent } from '../../..
 import { tableDefinition } from '../../../../src/patterns/table/definition'
 import { Table } from './Table'
 import { initialTableData, tableVariants, type TableVariantKey } from './tableData'
-import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const reduceTableDemoData = (data: PatternData, event: PatternEvent): PatternData => {
   if (event.type === 'sort') {

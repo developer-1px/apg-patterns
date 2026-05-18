@@ -1,6 +1,6 @@
 import { Breadcrumb } from './Breadcrumb'
 import { initialBreadcrumbData } from './breadcrumbData'
-import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const breadcrumbDemoDefinition = {
   key: 'breadcrumb',

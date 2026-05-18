@@ -1,6 +1,6 @@
 import { Accordion } from './Accordion'
 import { initialAccordionData, reduceAccordionData } from './accordionData'
-import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const accordionDemoDefinition = {
   key: 'accordion',

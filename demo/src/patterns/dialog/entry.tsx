@@ -2,7 +2,7 @@ import { reducePatternData } from '../../../../src'
 import { dialogDefinition } from '../../../../src/patterns/dialog/definition'
 import { Dialog } from './Dialog'
 import { dialogVariantItems, dialogVariants, initialDialogData, type DialogVariantKey } from './dialogData'
-import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const dialogDemoDefinition = {
   key: 'dialog',

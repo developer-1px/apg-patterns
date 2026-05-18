@@ -3,7 +3,7 @@ import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { Grid } from './Grid'
 import { gridVariantItems, gridVariants, type GridVariantKey } from './gridData'
 import { renderDataInspect } from '../../shared/inspect/index'
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const reduceGridDemoData = (data: PatternData, event: PatternEvent): PatternData => {
   if (event.type === 'sort') {

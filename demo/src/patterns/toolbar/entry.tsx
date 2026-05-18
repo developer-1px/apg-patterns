@@ -1,6 +1,6 @@
 import { Toolbar } from './Toolbar'
 import { initialToolbarData, reduceToolbarData, toolbarVariantItems, toolbarVariants, type ToolbarVariantKey } from './toolbarData'
-import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const toolbarDemoDefinition = {
   key: 'toolbar',

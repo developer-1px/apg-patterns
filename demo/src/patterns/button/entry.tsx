@@ -1,6 +1,6 @@
 import { Button } from './Button'
 import { buttonVariantItems, buttonVariants, type ButtonVariantKey } from './buttonData'
-import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const buttonDemoDefinition = {
   key: 'button',

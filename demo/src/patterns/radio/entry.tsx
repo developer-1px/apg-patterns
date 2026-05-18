@@ -1,6 +1,6 @@
 import { RadioGroup } from './RadioGroup'
 import { initialRadioData, radioVariantItems, radioVariants, reduceRadioData, type RadioVariantKey } from './radioData'
-import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const radioDemoDefinition = {
   key: 'radio',

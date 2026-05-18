@@ -1,7 +1,7 @@
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { Link } from './Link'
 import { linkVariantItems, linkVariants, type LinkVariantKey } from './linkData'
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 import { renderDataInspect } from '../../shared/inspect/genericInspect'
 
 const linkDemoDefinition = {

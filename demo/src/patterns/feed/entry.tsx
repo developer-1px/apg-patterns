@@ -2,7 +2,7 @@ import { reducePatternData } from '../../../../src'
 import { feedDefinition } from '../../../../src/patterns/feed/definition'
 import { Feed } from './Feed'
 import { initialFeedData } from './feedData'
-import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const feedDemoDefinition = {
   key: 'feed',

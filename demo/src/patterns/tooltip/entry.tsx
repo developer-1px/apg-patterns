@@ -1,6 +1,6 @@
 import { Tooltip } from './Tooltip'
 import { initialTooltipData } from './tooltipData'
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 import { renderDataInspect } from '../../shared/inspect/genericInspect'
 
 const tooltipDemoDefinition = {

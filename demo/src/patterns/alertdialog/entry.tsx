@@ -2,7 +2,7 @@ import { reducePatternData } from '../../../../src'
 import { AlertDialog } from './AlertDialog'
 import { initialAlertDialogData } from './alertdialogData'
 import { alertDialogDefinition } from '../../../../src/patterns/alertdialog/definition'
-import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const alertDialogDemoDefinition = {
   key: 'alertdialog',
