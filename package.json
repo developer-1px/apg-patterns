@@ -19,6 +19,7 @@
     "./src/kernel/kernelPredicates.ts",
     "./src/patterns/*/definition.ts",
     "./src/patterns/*/*AriaSources.ts",
+    "./src/patterns/*/*Navigation.ts",
     "./src/patterns/*/*Sources.ts",
     "./src/patterns/*/navigation.ts",
     "./dist/kernel/kernelAriaSources.*",
@@ -27,6 +28,7 @@
     "./dist/kernel/kernelPredicates.*",
     "./dist/patterns/*/definition.*",
     "./dist/patterns/*/*AriaSources.*",
+    "./dist/patterns/*/*Navigation.*",
     "./dist/patterns/*/*Sources.*",
     "./dist/patterns/*/navigation.*"
   ],

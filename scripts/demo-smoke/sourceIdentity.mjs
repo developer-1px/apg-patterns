@@ -42,6 +42,7 @@ export function sourceIdentityNeedles(sourceName, patternKey) {
     }
     if (fileName.endsWith('Sources')) return ['defineAriaSource']
     if (fileName.endsWith('AriaSources')) return ['defineAriaSource']
+    if (fileName.endsWith('Navigation')) return ['defineNavigationTarget']
     if (/^use[A-Z].*Pattern$/.test(fileName)) return [`export function ${fileName}`]
     if (fileName === 'runtime') return []
     if (fileName === 'navigation') return []

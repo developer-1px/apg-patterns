@@ -33,6 +33,7 @@ defineAriaSource('relations.ownerByKey', (ctx) => {
 defineAriaSource('state.selectedKeys', (ctx) => (ctx.key ? ctx.data.state?.selectedKeys?.includes(ctx.key) ?? false : undefined))
 defineAriaSource('state.disabledKeys', (ctx) => (ctx.key && ctx.data.state?.disabledKeys?.includes(ctx.key)) || undefined)
 defineAriaSource('state.expandedKeys', (ctx) => (ctx.key ? ctx.data.state?.expandedKeys?.includes(ctx.key) ?? false : undefined))
+defineAriaSource('state.readonly', (ctx) => ctx.data.state?.readonly === true || undefined)
 defineAriaSource('state.checkedByKey', (ctx) => (ctx.key ? ctx.data.state?.checkedByKey?.[ctx.key] : undefined))
 defineAriaSource('state.pressedByKey', (ctx) => (ctx.key ? ctx.data.state?.pressedByKey?.[ctx.key] : undefined))
 defineAriaSource('state.currentKey', (ctx) => (ctx.key ? ctx.data.state?.currentByKey?.[ctx.key] : undefined))
