@@ -15,6 +15,18 @@ function AlertDemo() {
   return <Alert data={state.data} onEvent={handleEvent} />
 }
 
+function AlertDataEdgesDemo() {
+  const [state, setState] = useState<AlertReducerState>({ data: { ...initialAlertData, state: { activeKey: null, expandedKeys: [] } } })
+  return (
+    <div>
+      <button type="button" onClick={() => setState((current) => reduceAlertState(current, { type: 'dismiss' }))}>Dismiss without target</button>
+      <button type="button" onClick={() => setState((current) => reduceAlertState(current, { type: 'focus', key: 'alert' }))}>Fallback reducer</button>
+      <output data-testid="alert-active">{String(state.data.state?.activeKey ?? '')}</output>
+      <output data-testid="alert-expanded">{state.data.state?.expandedKeys?.join(',') ?? ''}</output>
+    </div>
+  )
+}
+
 describe('Alert demo', () => {
   it('renders trigger and no alert initially', () => {
     render(<AlertDemo />)
@@ -49,5 +61,15 @@ describe('Alert demo', () => {
     const alert = screen.getByRole('alert')
     fireEvent.keyDown(alert, { key: 'Escape', code: 'Escape' })
     expect(screen.queryByRole('alert')).toBeNull()
+  })
+
+  it('covers alert data reducer guard branches from pointer controls', () => {
+    render(<AlertDataEdgesDemo />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Dismiss without target' }))
+    expect(screen.getByTestId('alert-expanded').textContent).toBe('')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Fallback reducer' }))
+    expect(screen.getByTestId('alert-active').textContent).toBe('alert')
   })
 })

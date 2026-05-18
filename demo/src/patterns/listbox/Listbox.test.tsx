@@ -32,6 +32,22 @@ function MultiEdgeListboxDemo({ empty = false }: { empty?: boolean }) {
   return <Listbox data={data} onEvent={handleEvent} options={{ focusStrategy: 'rovingTabIndex', selectionMode: 'multiple' }} />
 }
 
+function ScrollEdgeListboxDemo({ activeKey }: { activeKey: string | null }) {
+  const data: PatternData = {
+    items: { label: { label: 'Letters' }, a: { label: 'Alpha' }, b: { label: 'Beta' }, missing: { label: 'Missing' } },
+    relations: { rootKeys: ['a', 'b'] },
+    state: { activeKey, selectedKeys: activeKey ? [activeKey] : [], scrollable: true },
+    refs: { labelledBy: 'edge-listbox-label' },
+  }
+
+  return (
+    <>
+      <span id="edge-listbox-label">Edge listbox</span>
+      <Listbox data={data} onEvent={() => undefined} />
+    </>
+  )
+}
+
 function RearrangeableEdgeDemo({ mode }: { mode: 'missingActive' | 'noActive' }) {
   const [events, setEvents] = useState<PatternEvent[]>([])
   const rootKeys = mode === 'missingActive' ? ['a', 'b'] : []
@@ -164,6 +180,23 @@ describe('Listbox demo — scrollable', () => {
 
       expect(activeOption()?.textContent).toBe('Emu')
       expect(calls).toContainEqual({ block: 'nearest' })
+    } finally {
+      HTMLElement.prototype.scrollIntoView = original
+    }
+  })
+
+  it('scroll effect handles labelled and missing active states', () => {
+    const original = HTMLElement.prototype.scrollIntoView
+    HTMLElement.prototype.scrollIntoView = undefined as unknown as typeof HTMLElement.prototype.scrollIntoView
+    try {
+      const { rerender } = render(<ScrollEdgeListboxDemo activeKey={null} />)
+      expect(screen.getByRole('listbox').getAttribute('aria-labelledby')).toBe('edge-listbox-label')
+
+      rerender(<ScrollEdgeListboxDemo activeKey="missing" />)
+      expect(screen.queryByRole('option', { name: 'Missing' })).toBeNull()
+
+      rerender(<ScrollEdgeListboxDemo activeKey="a" />)
+      expect(screen.getByRole('option', { name: 'Alpha' }).hasAttribute('data-active')).toBe(true)
     } finally {
       HTMLElement.prototype.scrollIntoView = original
     }

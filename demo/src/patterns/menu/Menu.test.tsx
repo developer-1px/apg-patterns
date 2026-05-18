@@ -195,6 +195,21 @@ describe('Menu — editorMenubar', () => {
     expect(dark.getAttribute('aria-checked')).toBe('false')
   })
 
+  it('submenu activation handles disabled and plain items', () => {
+    const events: PatternEvent[] = []
+    render(<MenuDemo variant="editorMenubar" onEvent={(event) => events.push(event)} />)
+    const [file, edit] = screen.getAllByRole('menuitem')
+
+    fireEvent.keyDown(file!, { key: 'ArrowRight' })
+    fireEvent.keyDown(edit!, { key: 'ArrowDown' })
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Redo' }))
+    expect(events).not.toContainEqual({ type: 'activate', key: 'editRedo' })
+
+    fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Undo' }), { key: 'Enter' })
+    expect(events).toContainEqual({ type: 'activate', key: 'editUndo' })
+    expect(events).toContainEqual({ type: 'expand', key: 'edit', expanded: false })
+  })
+
   it('covers submenu keyboard guard branches through pointer-triggered keys', () => {
     render(<MenubarSubmenuKeyboardEdges />)
 

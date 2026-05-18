@@ -4,9 +4,15 @@ import { describe, expect, it } from 'vitest'
 import { defineDomEvent, defineDomEventHandlerProp, resolvePartEventBindings, withDefaultReason } from '../kernel/domEventBindings'
 import { createAlertActions } from '../patterns/alert/alertActions'
 import { createButtonRootProps } from '../patterns/button/buttonRootProps'
+import { createCheckboxActions } from '../patterns/checkbox/checkboxActions'
 import { createGridEditInputProps } from '../patterns/grid/gridEditInputProps'
 import { getMenuButtonRuntimeState } from '../patterns/menu/menuButtonRuntimeState'
+import { createRadioGroupActions } from '../patterns/radio/radioGroupActions'
+import { getSliderRuntimeState, isMultiThumbSlider } from '../patterns/slider/sliderRuntimeState'
 import { createSpinbuttonActions } from '../patterns/spinbutton/spinbuttonActions'
+import { getSpinbuttonRuntimeState } from '../patterns/spinbutton/spinbuttonRuntimeState'
+import { createSwitchActions } from '../patterns/switch/switchActions'
+import { createToolbarActions } from '../patterns/toolbar/toolbarActions'
 import type { PatternData, PatternEvent } from '../index'
 
 function HelperHost() {
@@ -25,6 +31,18 @@ function HelperHost() {
           const spin = createSpinbuttonActions(runtime as never)
           spin.focus('spin')
           spin.step('spin', 'increment')
+          const checkbox = createCheckboxActions(runtime as never)
+          checkbox.focus('check')
+          checkbox.check('check', 'mixed')
+          const radio = createRadioGroupActions(runtime as never)
+          radio.focus('radio')
+          radio.select('radio')
+          const switchActions = createSwitchActions(runtime as never)
+          switchActions.focus('switch')
+          switchActions.check('switch', true)
+          const toolbar = createToolbarActions(runtime as never)
+          toolbar.focus('tool')
+          toolbar.select('tool')
           setResult(events.map((event) => `${event.type}:${'key' in event ? event.key ?? '' : ''}`).join('|'))
         }}
       >
@@ -93,6 +111,34 @@ function HelperHost() {
       <button
         type="button"
         onClick={() => {
+          const sliderRuntime = {
+            visibleKeys: ['min', 'max'],
+            data: {
+              items: {
+                min: { valuemax: 50 },
+                max: { valuemin: 50 },
+              },
+              relations: { rootKeys: ['min', 'max'] },
+              state: {},
+            },
+          }
+          const sliderState = getSliderRuntimeState(sliderRuntime as never)
+          const spinState = getSpinbuttonRuntimeState({ items: {}, relations: {}, state: {} })
+          setResult([
+            sliderState.activeKey ?? 'null',
+            Object.keys(sliderState.valueByKey).length,
+            isMultiThumbSlider(sliderRuntime as never),
+            getSliderRuntimeState({ ...sliderRuntime, visibleKeys: ['min'], data: { ...sliderRuntime.data, state: { activeKey: 'min', valueByKey: { min: 4 } } } } as never).activeKey,
+            spinState.activeKey ?? 'null',
+            Object.keys(spinState.valueByKey).length,
+          ].map(String).join('|'))
+        }}
+      >
+        Read runtime state helpers
+      </button>
+      <button
+        type="button"
+        onClick={() => {
           const data: PatternData = { items: { item: { label: 'Item' } }, relations: { rootKeys: ['item'] }, state: { activeKey: 'item' } }
           const events: PatternEvent[] = []
           defineDomEvent('coverage-unknown-test', { handlerProp: 'onCoverageUnknownTest' })
@@ -123,7 +169,7 @@ describe('action and prop helper coverage from pointer input', () => {
     render(<HelperHost />)
 
     fireEvent.click(screen.getByRole('button', { name: 'Run action helpers' }))
-    expect(screen.getByText('dismiss:alert|focus:spin|focus:spin|valueStep:spin')).toBeTruthy()
+    expect(screen.getByText('dismiss:alert|focus:spin|focus:spin|valueStep:spin|focus:check|check:check|focus:radio|select:|focus:switch|check:switch|focus:tool|select:')).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Run button props' }))
     expect(screen.getByText('0|focus|activate')).toBeTruthy()
@@ -138,6 +184,9 @@ describe('action and prop helper coverage from pointer input', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Read empty menu state' }))
     expect(screen.getByText('null|null|false|0')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Read runtime state helpers' }))
+    expect(screen.getByText('null|0|true|min|null|0')).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Resolve dom bindings' }))
     expect(screen.getByText(/\[apg-pattern\] unk/)).toBeTruthy()

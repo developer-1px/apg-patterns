@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { act, useState } from 'react'
 import { coerceRightMode } from './appState'
@@ -12,6 +12,7 @@ import { sourceLoaders, sourceNameCollisions } from '../shared/sources'
 import type { PatternEvent } from '../../../src'
 
 afterEach(() => {
+  vi.useRealTimers()
   cleanup()
 })
 
@@ -128,6 +129,26 @@ describe('source copy', () => {
     await waitFor(() => expect(currentHashParam('source')).toBe('accordionData.ts'))
     expect(screen.queryByRole('button', { name: 'copied' })).toBeNull()
   })
+
+  it('returns copied source feedback to idle after the timeout', async () => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: async () => undefined },
+    })
+    replaceHash('#pattern=accordion&panel=code&source=Accordion.tsx')
+
+    render(<App />)
+
+    const copyButton = screen.getByRole('button', { name: 'copy' })
+    await waitFor(() => expect(copyButton).toHaveProperty('disabled', false))
+    fireEvent.click(copyButton)
+
+    await waitFor(() => expect(copyButton.getAttribute('title')).toBe('Copied'))
+    await act(async () => {
+      await new Promise((resolve) => window.setTimeout(resolve, 1250))
+    })
+    expect(copyButton.getAttribute('title')).toBe('Copy source')
+  }, 15000)
 
   it('does not keep stale source text while switching source tabs', async () => {
     replaceHash('#pattern=accordion&panel=code&source=Accordion.tsx')
