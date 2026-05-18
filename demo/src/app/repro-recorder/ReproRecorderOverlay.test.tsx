@@ -1,9 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act } from 'react'
 import { ReproRecorderOverlay } from './ReproRecorderOverlay'
 
 afterEach(() => {
   cleanup()
+  vi.useRealTimers()
   vi.restoreAllMocks()
 })
 
@@ -57,6 +59,30 @@ describe('ReproRecorderOverlay', () => {
 
     await waitFor(() => expect(writes).toHaveLength(1))
     expect(screen.getByRole('button', { name: 'REC' })).toBeTruthy()
+  })
+
+  it('updates elapsed recording text and ignores unrelated shortcuts', () => {
+    vi.useFakeTimers()
+    render(<ReproRecorderOverlay />)
+
+    fireEvent.keyDown(window, { key: 'x', code: 'KeyX', ctrlKey: true, shiftKey: true })
+    expect(screen.getByRole('button', { name: 'REC' })).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'REC' }))
+    act(() => {
+      vi.advanceTimersByTime(1200)
+    })
+
+    expect(screen.getByText(/REC recording\.\.\. 1s/)).toBeTruthy()
+  })
+
+  it('stops active recordings on unmount', () => {
+    const { unmount } = render(<ReproRecorderOverlay />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'REC' }))
+    expect(screen.getByRole('button', { name: 'STOP REC' })).toBeTruthy()
+
+    unmount()
   })
 
   it('shows the recording when clipboard is unavailable', async () => {

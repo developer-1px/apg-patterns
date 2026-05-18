@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
+import '../kernel/kernelBuiltins'
 import { defineDomEvent, defineDomEventHandlerProp, resolvePartEventBindings, withDefaultReason } from '../kernel/domEventBindings'
 import { createAlertActions } from '../patterns/alert/alertActions'
 import { createButtonRootProps } from '../patterns/button/buttonRootProps'
@@ -9,12 +10,131 @@ import { createGridEditInputProps } from '../patterns/grid/gridEditInputProps'
 import { createMenuButtonTriggerProps } from '../patterns/menu/menuButtonTriggerProps'
 import { getMenuButtonRuntimeState } from '../patterns/menu/menuButtonRuntimeState'
 import { createRadioGroupActions } from '../patterns/radio/radioGroupActions'
+import { useRadioGroupPattern } from '../patterns/radio/useRadioGroupPattern'
 import { getSliderRuntimeState, isMultiThumbSlider } from '../patterns/slider/sliderRuntimeState'
 import { createSpinbuttonActions } from '../patterns/spinbutton/spinbuttonActions'
 import { getSpinbuttonRuntimeState } from '../patterns/spinbutton/spinbuttonRuntimeState'
+import { useSpinbuttonPattern } from '../patterns/spinbutton/useSpinbuttonPattern'
 import { createSwitchActions } from '../patterns/switch/switchActions'
+import { useSwitchPattern } from '../patterns/switch/useSwitchPattern'
+import { useTablePattern } from '../patterns/table/useTablePattern'
 import { createToolbarActions } from '../patterns/toolbar/toolbarActions'
+import { useToolbarPattern } from '../patterns/toolbar/useToolbarPattern'
 import type { PatternData, PatternEvent } from '../index'
+
+function HookRuntimeHost() {
+  const [events, setEvents] = useState<PatternEvent[]>([])
+  const radio = useRadioGroupPattern(
+    {
+      items: { one: { label: 'One' }, two: { label: 'Two' } },
+      relations: { rootKeys: ['one', 'two'] },
+      state: { activeKey: 'one', selectedKeys: ['one'], disabledKeys: ['two'] },
+    },
+    (event) => setEvents((current) => [...current, event]),
+    { elementIdPrefix: 'edge-radio-' },
+  )
+  const spin = useSpinbuttonPattern(
+    {
+      items: { spin: { label: 'Spin' } },
+      relations: { rootKeys: ['spin'] },
+      state: { activeKey: 'spin', valueByKey: { spin: 3 } },
+    },
+    (event) => setEvents((current) => [...current, event]),
+    { elementIdPrefix: 'edge-spin-' },
+  )
+  const switchRuntime = useSwitchPattern(
+    {
+      items: { power: { label: 'Power' } },
+      relations: { rootKeys: ['power'] },
+      state: { activeKey: 'power', checkedByKey: { power: false }, disabledKeys: [] },
+    },
+    (event) => setEvents((current) => [...current, event]),
+    { elementIdPrefix: 'edge-switch-' },
+  )
+  const toolbar = useToolbarPattern(
+    {
+      items: { bold: { label: 'Bold' } },
+      relations: { rootKeys: ['bold'] },
+      state: { activeKey: 'bold', selectedKeys: [], disabledKeys: [] },
+    },
+    (event) => setEvents((current) => [...current, event]),
+    { elementIdPrefix: 'edge-tool-' },
+  )
+  const table = useTablePattern(
+    {
+      items: {
+        name: { label: 'Name column' },
+        header: { label: 'Name', kind: 'columnheader' },
+        value: { label: 'Value' },
+        row: { label: 'Row' },
+      },
+      relations: {
+        rootKeys: ['header', 'value'],
+        rowKeys: ['row'],
+        columnKeys: ['name', 'value'],
+        cells: [
+          { rowKey: 'row', columnKey: 'name', cellKey: 'header' },
+          { rowKey: 'row', columnKey: 'value', cellKey: 'value' },
+        ],
+      },
+      state: { sortByKey: { header: 'ascending' } },
+      refs: { label: 'Metrics' },
+    },
+    (event) => setEvents((current) => [...current, event]),
+    { elementIdPrefix: 'edge-table-' },
+  )
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => {
+          radio.actions.focus('two')
+          radio.actions.select('two')
+          spin.actions.focus('spin')
+          spin.actions.step('spin', 'increment')
+          switchRuntime.actions.focus('power')
+          switchRuntime.actions.check('power', true)
+          toolbar.actions.focus('bold')
+          toolbar.actions.select('bold')
+          table.headerRow?.cells[0]?.cellProps.onClick?.({} as never)
+        }}
+      >
+        Run hook runtimes
+      </button>
+      <output data-testid="hook-runtime">
+        {[
+          radio.rootProps.role,
+          radio.renderItems.length,
+          radio.state.activeKey,
+          radio.state.selectedKeys.join(','),
+          radio.state.disabledKeys.join(','),
+          radio.ids.forKey('one'),
+          radio.keyToElementId('two'),
+          spin.rootProps.role ?? 'none',
+          spin.renderItems.length,
+          spin.state.activeKey,
+          spin.ids.forKey('spin'),
+          spin.keyToElementId('spin'),
+          switchRuntime.rootProps.role ?? 'none',
+          switchRuntime.renderItems.length,
+          switchRuntime.state.activeKey,
+          switchRuntime.ids.forKey('power'),
+          toolbar.rootProps.role,
+          toolbar.renderItems.length,
+          toolbar.state.activeKey,
+          toolbar.ids.forKey('bold'),
+          table.tableProps.role,
+          table.headerRow?.key,
+          table.bodyRows.length,
+          table.rows.length,
+          table.ids.forKey('header'),
+          events.map((event) => `${event.type}:${'key' in event ? event.key ?? '' : ''}`).join('|'),
+        ].join('|')}
+      </output>
+    </div>
+  )
+}
 
 function HelperHost() {
   const [result, setResult] = useState('')
@@ -223,5 +343,9 @@ describe('action and prop helper coverage from pointer input', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Resolve dom bindings' }))
     expect(screen.getByText(/\[apg-pattern\] unk/)).toBeTruthy()
     expect(screen.getByText(/activate:kept:pointer/)).toBeTruthy()
+
+    render(<HookRuntimeHost />)
+    fireEvent.click(screen.getByRole('button', { name: 'Run hook runtimes' }))
+    expect(screen.getByTestId('hook-runtime').textContent).toContain('radiogroup|2|one|one|two|edge-radio-one|edge-radio-two|none|1|spin|edge-spin-spin|edge-spin-spin|none|1|power|edge-switch-power|toolbar|1|bold|edge-tool-bold|table|row|0|1|edge-table-header|focus:two|select:|focus:spin|focus:spin|valueStep:spin|focus:power|check:power|focus:bold|select:|sort:header')
   })
 })

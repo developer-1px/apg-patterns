@@ -333,6 +333,46 @@ function KernelResolverHost() {
       <button
         type="button"
         onClick={() => {
+          const ctx = {
+            data: {
+              items: {},
+              relations: {},
+              state: {},
+            },
+            options: {},
+            activeKey: null,
+            key: undefined,
+            parentByKey,
+          }
+          setResult([
+            resolveAriaSource('items.valuemin', ctx),
+            resolveAriaSource('items.valuemax', ctx),
+            resolveAriaSource('items.valuetext', ctx),
+            resolveAriaSource('state.selectedKeys', ctx),
+            resolveAriaSource('state.expandedKeys', ctx),
+            resolveAriaSource('state.checkedByKey', ctx),
+            resolveAriaSource('state.pressedByKey', ctx),
+            resolveAriaSource('state.currentKey', ctx),
+            resolveAriaSource('state.invalidByKey', ctx),
+            resolveAriaSource('state.levelByKey', ctx),
+            resolveAriaSource('state.posInSetByKey', ctx),
+            resolveAriaSource('state.setSizeByKey', ctx),
+            resolveAriaSource('state.rowIndexByKey', ctx),
+            resolveAriaSource('state.columnIndexByKey', ctx),
+            resolveAriaSource('state.sortByKey', ctx),
+            resolveAriaSource('state.valueByKey', ctx),
+            resolveAriaSource('state.rangeValueByKey.min', ctx),
+            resolveAriaSource('state.rangeValueByKey.max', ctx),
+            resolveAriaSource('state.rangeValueByKey.now', ctx),
+            resolveAriaSource('state.rangeValueByKey.text', ctx),
+          ].map(String).join('|'))
+        }}
+      >
+        Resolve aria keyless fallbacks
+      </button>
+      <button
+        type="button"
+        onClick={() => {
           const emptyRows: PatternData = { ...treegridData, relations: { ...treegridData.relations, rootKeys: [], rowKeys: [] } }
           const collapsedRows: PatternData = { ...treegridData, state: { activeKey: null, expandedKeys: [] } }
           const hiddenCellRows: PatternData = { ...treegridData, state: { activeKey: 'childName', expandedKeys: [] } }
@@ -628,6 +668,9 @@ describe('kernel resolver coverage from pointer input', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Resolve aria source fallbacks' }))
     expect(screen.getByText('undefined|true|#parent|Parent|parent-label|1|9|five|menu|both|1|1|child|owner|false|undefined|false|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Resolve aria keyless fallbacks' }))
+    expect(screen.getByText('undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined|undefined')).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Resolve treegrid row edges' }))
     expect(screen.getByText('parent|child|parent|child|parent|null|null|parent|null|null|parent|null')).toBeTruthy()
