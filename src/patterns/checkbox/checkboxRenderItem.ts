@@ -1,7 +1,7 @@
 import type { KeyboardEvent } from 'react'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key } from '../../schema'
-import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 
 export interface ReactCheckboxRenderItem {
   key: Key
@@ -14,7 +14,7 @@ export interface ReactCheckboxRenderItem {
 }
 
 export function createCheckboxRenderItem(runtime: PatternRuntime, key: Key): ReactCheckboxRenderItem {
-  const { onKeyDown: _onKeyDown, ...props } = runtime.getPartProps('checkbox', key) as ReactPatternProps
+  const { onKeyDown: _onKeyDown, ...props } = reactProps(runtime.getPartProps('checkbox', key))
   const state = runtime.getItemState(key, 'checkbox')
   return {
     key,

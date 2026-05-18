@@ -1,6 +1,6 @@
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key } from '../../schema'
-import type { ReactPatternProps, ReactRenderItemState } from '../../adapters/reactBaseTypes'
+import { reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
 
 export interface ReactRadioRenderItem {
   key: Key
@@ -20,6 +20,6 @@ export function createRadioRenderItem(runtime: PatternRuntime, key: Key): ReactR
       checked: Boolean(state.checked),
       disabled: Boolean(state.disabled),
     },
-    radioProps: runtime.getPartProps('radio', key) as ReactPatternProps,
+    radioProps: reactProps(runtime.getPartProps('radio', key)),
   }
 }

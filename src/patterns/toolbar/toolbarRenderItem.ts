@@ -1,6 +1,6 @@
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key } from '../../schema'
-import type { ReactPatternProps, ReactRenderItemState } from '../../adapters/reactBaseTypes'
+import { reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
 
 export interface ReactToolbarRenderItem {
   key: Key
@@ -20,6 +20,6 @@ export function createToolbarRenderItem(runtime: PatternRuntime, key: Key): Reac
       pressed: Boolean(state.pressed),
       disabled: Boolean(state.disabled),
     },
-    itemProps: runtime.getPartProps('item', key) as ReactPatternProps,
+    itemProps: reactProps(runtime.getPartProps('item', key)),
   }
 }

@@ -1,6 +1,6 @@
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternItem, PatternStateWithOptions } from '../../schema'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 
 interface CarouselItem extends PatternItem {
   title?: unknown
@@ -45,8 +45,8 @@ export function createCarouselSlides({
       imageUrl: typeof item?.imageUrl === 'string' ? item.imageUrl : null,
       active: key === activeKey,
       index,
-      slideProps: runtime.getPartProps('slide', key) as ReactPatternProps,
-      pickerProps: runtime.getPartProps('picker', key) as ReactPatternProps,
+      slideProps: reactProps(runtime.getPartProps('slide', key)),
+      pickerProps: reactProps(runtime.getPartProps('picker', key)),
     }
   })
 }

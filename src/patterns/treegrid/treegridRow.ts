@@ -1,6 +1,6 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternDataWithOptions } from '../../schema'
-import type { ReactPatternProps, ReactRenderItemState } from '../../adapters/reactBaseTypes'
+import { reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
 import { treegridVisibleCells, treegridVisibleRowKeys } from './definition'
 
 export interface ReactTreegridCell {
@@ -30,7 +30,7 @@ export function createTreegridRows({
   const cells = treegridVisibleCells(data)
   return rowKeys.map((rowKey, rowIndex) => ({
     key: rowKey,
-    rowProps: runtime.getPartProps('row', rowKey) as ReactPatternProps,
+    rowProps: reactProps(runtime.getPartProps('row', rowKey)),
     cells: (cells[rowIndex] ?? []).map((cellKey, colIndex) => createTreegridCell(runtime, data, rowKey, cellKey, colIndex)),
   }))
 }
@@ -58,6 +58,6 @@ function createTreegridCell(
       disabled: Boolean(state.disabled),
     },
     indent: part === 'gridcell' && colIndex === 0 && level ? (level - 1) * 16 : 0,
-    cellProps: runtime.getPartProps(part, cellKey) as ReactPatternProps,
+    cellProps: reactProps(runtime.getPartProps(part, cellKey)),
   }
 }

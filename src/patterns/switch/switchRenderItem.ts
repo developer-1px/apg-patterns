@@ -1,7 +1,7 @@
 import type { KeyboardEvent } from 'react'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key } from '../../schema'
-import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 
 export interface ReactSwitchRenderItem {
   key: Key
@@ -14,7 +14,7 @@ export interface ReactSwitchRenderItem {
 }
 
 export function createSwitchRenderItem(runtime: PatternRuntime, key: Key): ReactSwitchRenderItem {
-  const { onKeyDown: _onKeyDown, ...props } = runtime.getPartProps('switch', key) as ReactPatternProps
+  const { onKeyDown: _onKeyDown, ...props } = reactProps(runtime.getPartProps('switch', key))
   const state = runtime.getItemState(key, 'switch')
   return {
     key,

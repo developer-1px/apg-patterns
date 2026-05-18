@@ -1,7 +1,7 @@
 import type { KeyboardEvent } from 'react'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternItem, PatternOptions, PatternState } from '../../schema'
-import { reactKeyInput, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
+import { reactKeyInput, reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
 
 interface SpinbuttonItem extends PatternItem {
   valuemin?: number
@@ -25,7 +25,7 @@ export interface ReactSpinbuttonRenderItem {
 }
 
 export function createSpinbuttonRenderItem(runtime: PatternRuntime<SpinbuttonData>, key: Key): ReactSpinbuttonRenderItem {
-  const { onKeyDown: _onKeyDown, ...props } = runtime.getPartProps('spinbutton', key) as ReactPatternProps
+  const { onKeyDown: _onKeyDown, ...props } = reactProps(runtime.getPartProps('spinbutton', key))
   const state = runtime.getItemState(key, 'spinbutton')
   const label = runtime.data.items[key]?.label ?? key
   const itemRange = runtime.data.items[key]
@@ -61,7 +61,7 @@ export function createSpinbuttonRenderItem(runtime: PatternRuntime<SpinbuttonDat
         runtime.emit({ type: 'focus', key })
         runtime.emit({ type: 'valueStep', key, direction: 'decrement' })
       },
-    } as ReactPatternProps,
+    },
     incrementButtonProps: {
       type: 'button',
       'aria-label': `Increment ${label}`,
@@ -69,6 +69,6 @@ export function createSpinbuttonRenderItem(runtime: PatternRuntime<SpinbuttonDat
         runtime.emit({ type: 'focus', key })
         runtime.emit({ type: 'valueStep', key, direction: 'increment' })
       },
-    } as ReactPatternProps,
+    },
   }
 }

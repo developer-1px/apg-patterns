@@ -19,6 +19,7 @@ const menuDemoDefinition = {
     extra: [
       'menu/menuAriaSources.ts',
       'menu/menuButtonDefinition.ts',
+      'menu/menuButtonDefinitionKeyboard.ts',
       'menu/menuButtonEffects.ts',
       'menu/menubarDefinition.ts',
       'menu/menuButtonItem.ts',
