@@ -9,6 +9,7 @@ import {
   type PatternOptions,
 } from '../../schema'
 import { treeviewDefinition } from './definition'
+import { withNonEnumerableMeta } from './eventMeta'
 import { createPatternRuntime, type CreatePatternRuntimeInput } from '../../kernel/patternRuntime'
 import { createTreeviewRenderItems, type TreeviewRenderItem, type TreeviewSlotProps } from './renderItem'
 import { createTreeProps } from './treeProps'
@@ -89,17 +90,6 @@ export function createTreeviewRuntime(input: CreateTreeviewRuntimeInput): Treevi
     keyToElementId,
     emit,
   }
-}
-
-function withNonEnumerableMeta(event: PatternEvent): PatternEvent {
-  if (!event.meta) return event
-  const next = { ...event } as PatternEvent
-  Object.defineProperty(next, 'meta', {
-    value: event.meta,
-    enumerable: false,
-    configurable: true,
-  })
-  return next
 }
 
 export { getTreeItemState } from './renderState'

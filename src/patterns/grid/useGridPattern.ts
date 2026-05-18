@@ -3,6 +3,7 @@ import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions, Patte
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { gridDefinition } from './definition'
+import { createGridEditActions, createGridRuntimeEventHandler } from './gridRuntimeEvents'
 import { createGridRows, type ReactGridRow } from './gridRow'
 
 interface GridState extends PatternStateWithOptions {
@@ -52,36 +53,13 @@ export function useGridPattern(data: GridData, onEvent: (event: PatternEvent) =>
     definition: gridDefinition,
     data,
     options: runtimeOptions,
-    onEvent: (event) => {
-      if (event.type === 'activate') {
-        const key = event.key
-        if (data.items[key]?.kind === 'columnheader') {
-          const current = sortByKey[key]
-          onEvent({ type: 'sort', key, sort: current === 'ascending' ? 'descending' : 'ascending' })
-          return
-        }
-        if (editableKeys.includes(key)) {
-          onEvent({ type: 'editStart', key, value: String(valueByKey[key] ?? data.items[key]?.label ?? '') })
-          return
-        }
-      }
-      if (event.type === 'dismiss') {
-        onEvent({ type: 'editEnd', key: editingKey ?? undefined })
-        return
-      }
-      onEvent(event)
-    },
+    onEvent: createGridRuntimeEventHandler({ data, editableKeys, editingKey, valueByKey, sortByKey, onEvent }),
     keyToElementId: (key) => `${runtimeOptions.elementIdPrefix ?? 'gridcell-'}${key}`,
   })
 
   usePatternEffects({ definition: gridDefinition, data: runtime.data, keyToElementId: runtime.keyToElementId })
 
-  const commitEdit = () => {
-    if (!editingKey) return
-    onEvent({ type: 'value', key: editingKey, value: String(editDraftByKey[editingKey] ?? '') })
-    onEvent({ type: 'editEnd', key: editingKey })
-  }
-  const cancelEdit = () => onEvent({ type: 'editEnd', key: editingKey ?? undefined })
+  const { commitEdit, cancelEdit } = createGridEditActions({ editingKey, editDraftByKey, onEvent })
 
   return {
     get gridProps() {
