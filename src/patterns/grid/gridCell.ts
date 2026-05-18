@@ -1,7 +1,7 @@
-import type { InputHTMLAttributes } from 'react'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent } from '../../schema'
 import { reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
+import { createGridEditInputProps, type ReactGridEditInputProps } from './gridEditInputProps'
 
 export interface ReactGridCell {
   key: Key
@@ -13,7 +13,7 @@ export interface ReactGridCell {
   editing: boolean
   sort: 'ascending' | 'descending' | 'other' | null
   cellProps: ReactPatternProps
-  editInputProps: InputHTMLAttributes<HTMLInputElement> & { 'data-edit': string }
+  editInputProps: ReactGridEditInputProps
 }
 
 export function createGridCell(input: {
@@ -46,27 +46,12 @@ export function createGridCell(input: {
     editing: input.editingKey === input.key,
     sort: part === 'columnheader' ? input.sortByKey[input.key] ?? null : null,
     cellProps: reactProps(input.runtime.getPartProps(part, input.key)),
-    editInputProps: {
-      'data-edit': '',
-      value: String(input.editDraftByKey[input.key] ?? ''),
-      onChange: (event) => input.onEvent({ type: 'editDraft', key: input.key, value: event.currentTarget.value }),
-      onKeyDown: (event) => {
-        if (event.key === 'Enter') {
-          event.preventDefault()
-          event.stopPropagation()
-          input.commitEdit()
-        } else if (event.key === 'Escape') {
-          event.preventDefault()
-          event.stopPropagation()
-          input.cancelEdit()
-        } else if (event.key === 'Tab') {
-          event.stopPropagation()
-          input.commitEdit()
-        } else {
-          event.stopPropagation()
-        }
-      },
-      onBlur: input.commitEdit,
-    } as ReactGridCell['editInputProps'],
+    editInputProps: createGridEditInputProps({
+      key: input.key,
+      editDraftByKey: input.editDraftByKey,
+      commitEdit: input.commitEdit,
+      cancelEdit: input.cancelEdit,
+      onEvent: input.onEvent,
+    }),
   }
 }

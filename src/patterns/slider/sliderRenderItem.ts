@@ -3,6 +3,7 @@ import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key } from '../../schema'
 import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import type { SliderData } from './contract'
+import { valueFromSliderPointer } from './sliderPointerValue'
 
 export interface ReactSliderRenderItem {
   key: Key
@@ -47,12 +48,7 @@ export function createSliderRenderItem(runtime: PatternRuntime<SliderData>, key:
       onFocus: () => runtime.emit({ type: 'focus', key }),
     },
     updateFromPointer: (event: PointerEvent<HTMLElement>) => {
-      const rect = event.currentTarget.getBoundingClientRect()
-      const ratio = orientation === 'vertical'
-        ? rect.height <= 0 ? 0 : Math.min(1, Math.max(0, 1 - (event.clientY - rect.top) / rect.height))
-        : rect.width <= 0 ? 0 : Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width))
-      const raw = min + ratio * (max - min)
-      runtime.emit({ type: 'value', key, value: Math.round(raw / step) * step })
+      runtime.emit({ type: 'value', key, value: valueFromSliderPointer({ event, min, max, orientation, step }) })
     },
   }
 }
