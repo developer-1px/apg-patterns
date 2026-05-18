@@ -86,8 +86,7 @@ function Host({ options = {}, onEmit }: { options?: HostOptions; onEmit?: (event
   )
 }
 
-function reduce(data: PatternData, event: PatternEvent | { type: 'reset' }): PatternData {
-  if (event.type === 'reset') return initialData
+function reduce(data: PatternData, event: PatternEvent): PatternData {
   if (event.type === 'focus') return { ...data, state: { ...data.state, activeKey: event.key } }
   if (event.type === 'navigate') {
     const target = resolveNavTarget(event.direction, data)

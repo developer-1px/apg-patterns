@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import { createDisclosureRuntime, reduceDisclosureData, type PatternData, type PatternEvent } from '../../../../src'
 import { Disclosure } from './Disclosure'
@@ -10,6 +10,7 @@ import {
   initialNavMenuTopLinksDisclosureData,
   type DisclosureVariantKey,
 } from './disclosureData'
+import { useNavMenuKeyboard } from './useNavMenuKeyboard'
 
 function DisclosureDemo({ initial }: { variant: DisclosureVariantKey; initial: PatternData }) {
   const [data, setData] = useState(initial)
@@ -30,6 +31,34 @@ function DisclosureRuntimeDemo() {
         {data.items[runtime.triggerKey ?? '']?.label ?? 'Details'}
       </button>
       {runtime.expanded ? <section {...runtime.getPanelProps()}>Runtime panel</section> : null}
+    </div>
+  )
+}
+
+function NavMenuKeyboardEdgesDemo() {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [events, setEvents] = useState<string[]>([])
+  const { onButtonKey, onLinkKey } = useNavMenuKeyboard({
+    containerRef,
+    expandedKeys: ['about'],
+    onEvent: (event) => setEvents((current) => [...current, `${event.type}:${event.key}:${'expanded' in event ? event.expanded : ''}`]),
+  })
+
+  return (
+    <div ref={containerRef}>
+      <button type="button" data-nav-button="about" data-nav-key="about" onKeyDown={onButtonKey('about')}>About</button>
+      <button type="button" data-nav-button="admissions" data-nav-key="admissions" onKeyDown={onButtonKey('admissions')}>Admissions</button>
+      <div data-nav-panel="about">
+        <a href="#one" onKeyDown={onLinkKey('about')}>One</a>
+        <a href="#two" onKeyDown={onLinkKey('about')}>Two</a>
+      </div>
+      <a href="#outside" onKeyDown={onLinkKey('about')}>Outside</a>
+      <button type="button" onClick={() => fireEvent.keyDown(screen.getByText('Two'), { key: 'ArrowDown', code: 'ArrowDown' })}>Wrap link next</button>
+      <button type="button" onClick={() => fireEvent.keyDown(screen.getByText('Outside'), { key: 'ArrowDown', code: 'ArrowDown' })}>Missing link index</button>
+      <button type="button" onClick={() => fireEvent.keyDown(screen.getByText('About'), { key: 'ArrowUp', code: 'ArrowUp' })}>Focus last link</button>
+      <button type="button" onClick={() => fireEvent.keyDown(screen.getByText('Admissions'), { key: 'Escape', code: 'Escape' })}>Escape collapsed</button>
+      <button type="button" onClick={() => fireEvent.keyDown(screen.getByText('Admissions'), { key: 'ArrowLeft', code: 'ArrowLeft' })}>Move previous</button>
+      <output data-testid="nav-events">{events.join('|')}</output>
     </div>
   )
 }
@@ -259,6 +288,26 @@ describe('Disclosure demo (navMenu)', () => {
 
     expect(about!.getAttribute('aria-expanded')).toBe('false')
     expect(document.activeElement).toBe(admissions)
+  })
+
+  it('covers nav menu keyboard guard branches through pointer-triggered keys', () => {
+    render(<NavMenuKeyboardEdgesDemo />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Wrap link next' }))
+    expect(document.activeElement).toBe(screen.getByText('One'))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Missing link index' }))
+    expect(document.activeElement).toBe(screen.getByText('One'))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Focus last link' }))
+    expect(document.activeElement).toBe(screen.getByText('Two'))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Escape collapsed' }))
+    expect(document.activeElement).toBe(screen.getByText('Admissions'))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Move previous' }))
+    expect(document.activeElement).toBe(screen.getByText('About'))
+    expect(screen.getByTestId('nav-events').textContent).toBe('')
   })
 })
 
