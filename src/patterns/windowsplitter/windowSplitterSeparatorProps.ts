@@ -1,7 +1,7 @@
 import type { KeyboardEvent } from 'react'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternDataWithOptions, PatternOptions } from '../../schema'
-import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 
 export function createWindowSplitterSeparatorProps({
   runtime,
@@ -17,7 +17,7 @@ export function createWindowSplitterSeparatorProps({
   options: PatternOptions
 }): ReactPatternProps {
   if (!key) return {}
-  const { onKeyDown: _onKeyDown, ...props } = runtime.getPartProps('separator', key) as ReactPatternProps
+  const { onKeyDown: _onKeyDown, ...props } = reactProps(runtime.getPartProps('separator', key))
   return {
     ...props,
     'aria-valuemin': min,

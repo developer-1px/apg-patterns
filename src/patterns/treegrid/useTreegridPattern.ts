@@ -1,7 +1,7 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternDataWithOptions, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { treegridDefinition } from './definition'
 import { createTreegridRows, type ReactTreegridRow } from './treegridRow'
 export type { ReactTreegridCell, ReactTreegridRow } from './treegridRow'
@@ -34,7 +34,7 @@ export function useTreegridPattern(data: PatternDataWithOptions, onEvent: (event
 
   return {
     get treegridProps() {
-      return runtime.getPartProps('treegrid') as ReactPatternProps
+      return reactProps(runtime.getPartProps('treegrid'))
     },
     get rows() {
       return createTreegridRows({ runtime, data })

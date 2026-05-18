@@ -12,7 +12,7 @@ const breadcrumbDemoDefinition = {
     hooks: ['breadcrumb/useBreadcrumbPattern.ts'],
     data: ['breadcrumbData.ts'],
     definition: 'breadcrumb/definition.ts',
-    extra: ['breadcrumb/breadcrumbItem.ts'],
+    extra: ['breadcrumb/breadcrumbItem.ts', 'breadcrumb/parts.ts'],
   },
   view: {
     kind: 'component',

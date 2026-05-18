@@ -1,6 +1,6 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { tooltipDefinition } from './definition'
 import { createTooltipTriggerProps } from './tooltipTriggerProps'
 
@@ -40,7 +40,7 @@ export function useTooltipPattern(data: PatternData, onEvent: (event: PatternEve
       return createTooltipTriggerProps(runtime, triggerKey)
     },
     get tooltipProps() {
-      return tooltipKey ? runtime.getPartProps('tooltip', tooltipKey) as ReactPatternProps : {}
+      return tooltipKey ? reactProps(runtime.getPartProps('tooltip', tooltipKey)) : {}
     },
     triggerKey,
     tooltipKey,

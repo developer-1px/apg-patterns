@@ -1,6 +1,6 @@
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent } from '../../schema'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { createGridCell, type ReactGridCell } from './gridCell'
 import { gridRows } from './definition'
 
@@ -37,7 +37,7 @@ export function createGridRows({
     const rowKey = data.relations?.rowKeys?.[rowIndex] ?? `row-${rowIndex}`
     return {
       key: rowKey,
-      rowProps: runtime.getPartProps('row', rowKey) as ReactPatternProps,
+      rowProps: reactProps(runtime.getPartProps('row', rowKey)),
       cells: cellKeys.map((cellKey) => createGridCell({
         runtime,
         data,

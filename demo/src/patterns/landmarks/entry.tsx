@@ -18,6 +18,7 @@ const landmarksDemoDefinition = {
     entry: 'landmarks/entry.tsx',
     data: ['landmarksData.ts'],
     definition: 'landmarks/definition.ts',
+    extra: ['landmarks/parts.ts'],
     includeKernel: false,
   },
   controls: {

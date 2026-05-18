@@ -1,7 +1,7 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions, PatternStateWithOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { gridDefinition } from './definition'
 import { createGridRows, type ReactGridRow } from './gridRow'
 
@@ -85,7 +85,7 @@ export function useGridPattern(data: GridData, onEvent: (event: PatternEvent) =>
 
   return {
     get gridProps() {
-      return runtime.getPartProps('grid') as ReactPatternProps
+      return reactProps(runtime.getPartProps('grid'))
     },
     get rows() {
       return createGridRows({ runtime, data, editableKeys, editingKey, editDraftByKey, valueByKey, sortByKey, commitEdit, cancelEdit, onEvent })
