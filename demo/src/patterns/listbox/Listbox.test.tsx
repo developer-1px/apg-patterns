@@ -17,6 +17,7 @@ if (typeof Element.prototype.scrollIntoView !== 'function') {
 import { ListboxDemo } from './ListboxTestHost'
 import { Listbox } from './Listbox'
 import { RearrangeableListbox } from './RearrangeableListbox'
+import { entry } from './entry'
 
 const activeOption = () => document.querySelector('[role="option"][data-active]') as HTMLElement | null
 
@@ -45,6 +46,19 @@ function RearrangeableEdgeDemo({ mode }: { mode: 'missingActive' | 'noActive' })
     <div>
       <RearrangeableListbox data={data} onEvent={(event) => setEvents((current) => [...current, event])} />
       <output data-testid="rearrange-event-count">{events.length}</output>
+    </div>
+  )
+}
+
+function ListboxEntryDemo() {
+  const [events, setEvents] = useState<PatternEvent[]>([])
+  const demo = entry.useDemoPattern((event) => setEvents((current) => [...current, event]))
+
+  return (
+    <div>
+      <div data-testid="entry-variants">{demo.variants}</div>
+      <output data-testid="entry-events">{events.map((event) => event.type).join(',')}</output>
+      {demo.preview}
     </div>
   )
 }
@@ -191,6 +205,20 @@ describe('Listbox demo — grouped', () => {
     render(<ListboxDemo variant="grouped" />)
     const firstGroup = screen.getAllByRole('group')[0]!
     expect(within(firstGroup).getAllByRole('option')).toHaveLength(3)
+  })
+
+  it('entry runtime switches variants and dispatches preview input events', () => {
+    render(<ListboxEntryDemo />)
+
+    fireEvent.click(screen.getByRole('option', { name: 'Grouped' }))
+    expect(screen.getAllByRole('group')).toHaveLength(3)
+
+    fireEvent.click(screen.getByRole('option', { name: 'Rearrangeable (single-select)' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Move down' }))
+    expect(screen.getByTestId('entry-events').textContent).toContain('reorder')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Remove' }))
+    expect(screen.getByTestId('entry-events').textContent).toContain('remove')
   })
 })
 

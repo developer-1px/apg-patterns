@@ -55,12 +55,19 @@ describe('createReproRecorder', () => {
     }
     history.replaceState(null, '', '#replace')
     window.dispatchEvent(new HashChangeEvent('hashchange'))
-    fireEvent.keyDown(button, { key: 'Shift', code: 'ShiftLeft' })
-    fireEvent.keyDown(button, { key: 'Meta', code: 'MetaLeft', metaKey: true, shiftKey: true })
-    await nextFrame()
-
-    const recording = recorder.stop()
-    fireEvent.click(button)
+	    fireEvent.keyDown(button, { key: 'Shift', code: 'ShiftLeft' })
+	    fireEvent.keyDown(button, { key: 'Meta', code: 'MetaLeft', metaKey: true, shiftKey: true })
+	    fireEvent.keyDown(button, { key: '\\', code: 'Backslash', ctrlKey: true, shiftKey: true })
+	    fireEvent.keyDown(button, { key: 'R', code: 'KeyR', altKey: true, shiftKey: true })
+	    await nextFrame()
+	
+	    const recording = recorder.stop()
+	    fireEvent.click(button)
+	    fireEvent.keyDown(button, { key: 'Enter', code: 'Enter' })
+	    button.focus()
+	    window.dispatchEvent(new CustomEvent('apg-pattern-event', {
+	      detail: { event: { type: 'activate', key: 'personal' } },
+	    }))
 
     expect(recording.text).toContain('- button "Personal Information" [expanded=false')
     expect(recording.text).toContain('+ - button "Personal Information" [expanded')
@@ -79,9 +86,11 @@ describe('createReproRecorder', () => {
     expect(recording.text).toContain('activate: activate=personal')
     expect(recording.text).toContain('dismiss: dismiss')
     expect(recording.text).toContain('route replaceState:')
-    expect(recording.text).not.toContain('Shift+Shift')
-    expect(recording.text).not.toContain('Mod+Shift+Meta')
-  })
+	    expect(recording.text).not.toContain('Shift+Shift')
+	    expect(recording.text).not.toContain('Mod+Shift+Meta')
+	    expect(recording.text).not.toContain('Mod+Shift+\\')
+	    expect(recording.text).not.toContain('Alt+Shift+R')
+	  })
 
   it('records focus, route, console, active descendant, and controlled popup details', async () => {
     document.body.innerHTML = `

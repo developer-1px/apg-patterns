@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
+import { Component, useState, type ReactNode } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { defineDemoPattern, defineStateDemoPattern, defineVariantDemoPattern, type DemoPatternDefinition } from './defineDemoPattern'
 import type { PatternData, PatternEvent } from '../../../../src'
@@ -22,6 +23,19 @@ const definition = {
     },
   },
 } as const satisfies DemoPatternDefinition
+
+class ErrorBoundary extends Component<{ children: ReactNode }, { message: string | null }> {
+  state = { message: null }
+
+  static getDerivedStateFromError(error: Error) {
+    return { message: error.message }
+  }
+
+  render() {
+    if (this.state.message) return <output data-testid="render-error">{this.state.message}</output>
+    return this.props.children
+  }
+}
 
 describe('defineDemoPattern', () => {
   it('turns a validated definition and runtime context into a PatternEntry', () => {
@@ -85,7 +99,7 @@ describe('defineDemoPattern', () => {
     expect(screen.getByRole('button', { name: 'Rendered' })).toBeTruthy()
   })
 
-  it('renders declared controls outside the preview node', () => {
+	  it('renders declared controls outside the preview node', () => {
     const entry = defineDemoPattern({
       definition: {
         ...definition,
@@ -111,9 +125,9 @@ describe('defineDemoPattern', () => {
           },
         },
       }),
-    })
+	  })
 
-    const demo = entry.useDemoPattern(() => undefined)
+	    const demo = entry.useDemoPattern(() => undefined)
     render(
       <>
         {demo.variants}
@@ -122,7 +136,56 @@ describe('defineDemoPattern', () => {
     )
 
     expect(screen.getByRole('listbox', { name: 'variants' })).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Rendered' }).closest('[data-preview]')).toBeTruthy()
+	    expect(screen.getByRole('button', { name: 'Rendered' }).closest('[data-preview]')).toBeTruthy()
+	  })
+
+  it.each([
+    ['unknown binding root', { view: { kind: 'component', component: 'Preview', props: { label: '$missing.label' } } }, '[uiSchema] unknown binding root: $missing.label'],
+    ['non-string listbox value', {
+      controls: { kind: 'listbox', label: 'variants', idPrefix: 'variant', items: '$model.items', value: '$state.value', onChange: '$actions.selectValue' },
+    }, '[uiSchema] binding is not a string: $state.value'],
+    ['non-listbox items', {
+      controls: { kind: 'listbox', label: 'variants', idPrefix: 'variant', items: '$model.items', value: '$state.value', onChange: '$actions.selectValue' },
+    }, '[uiSchema] binding is not listbox items: $model.items', { values: { state: { label: 'Rendered', value: 'one' }, model: { items: { key: 'one', label: 'One' } } }, actions: { selectValue: () => undefined } }],
+    ['non-function action', {
+      controls: { kind: 'listbox', label: 'variants', idPrefix: 'variant', items: '$model.items', value: '$state.value', onChange: '$actions.selectValue' },
+    }, '[uiSchema] binding is not an action: $actions.selectValue', { values: { state: { label: 'Rendered', value: 'one' }, model: { items: [{ key: 'one', label: 'One' }] } }, actions: { selectValue: 'nope' } }],
+  ] as const)('surfaces %s render errors after pointer input', (_name, override, message, runtimeContext) => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    const entry = defineDemoPattern({
+      definition: { ...definition, ...override } as DemoPatternDefinition,
+      useRuntime: () => ({
+        inspect: 'state',
+        context: {
+          values: runtimeContext?.values ?? { state: { label: 'Rendered', value: 1 }, model: { items: [{ key: 'one', label: 'One' }] } },
+          actions: runtimeContext?.actions ?? { selectValue: () => undefined },
+          components: {
+            Preview: ({ label }) => <button type="button">{String(label)}</button>,
+          },
+        },
+      }),
+    })
+
+    function MalformedDemo() {
+      const demo = entry.useDemoPattern(() => undefined)
+      return <>{demo.variants ?? demo.preview}</>
+    }
+
+    function Harness() {
+      const [open, setOpen] = useState(false)
+      return (
+        <>
+          <button type="button" onClick={() => setOpen(true)}>Open malformed demo</button>
+          <ErrorBoundary>{open ? <MalformedDemo /> : null}</ErrorBoundary>
+        </>
+      )
+    }
+
+    render(<Harness />)
+    fireEvent.click(screen.getByRole('button', { name: 'Open malformed demo' }))
+
+    expect(screen.getByTestId('render-error').textContent).toBe(message)
+    errorSpy.mockRestore()
   })
 
   it('rejects invalid definitions before an entry is created', () => {
