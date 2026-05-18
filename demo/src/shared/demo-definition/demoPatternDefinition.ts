@@ -58,6 +58,7 @@ export function assertSourceRoles(label: string, sources: DemoPatternDefinition[
   for (const source of sources.hooks ?? []) assertSourceName(`${label} hooks`, source, /^[a-z][a-z0-9]*\/use[A-Z].*Pattern\.ts$/)
   for (const source of sources.runtime ?? []) assertSourceName(`${label} runtime`, source, /^[a-z][a-z0-9]*\/.+\.ts$/)
   for (const source of sources.extra ?? []) assertSourceName(`${label} extra`, source, /^([a-z][a-z0-9]*\/)?.+\.ts$/)
+  assertSourcePrefixes(label, sources)
 }
 
 export function assertUnique(label: string, values: readonly string[]) {
@@ -67,6 +68,20 @@ export function assertUnique(label: string, values: readonly string[]) {
 
 function assertSourceName(label: string, value: string, pattern: RegExp) {
   if (!pattern.test(value)) throw new Error(`[defineDemoPattern] invalid ${label}: ${value}`)
+}
+
+function assertSourcePrefixes(label: string, sources: DemoPatternDefinition['sources']) {
+  const prefix = sources.entry.replace(/entry\.tsx$/, '')
+  assertPatternSourcePrefix(`${label} definition`, sources.definition, prefix)
+  for (const source of sources.hooks ?? []) assertPatternSourcePrefix(`${label} hooks`, source, prefix)
+  for (const source of sources.runtime ?? []) assertPatternSourcePrefix(`${label} runtime`, source, prefix)
+  for (const source of sources.extra ?? []) {
+    if (source.includes('/')) assertPatternSourcePrefix(`${label} extra`, source, prefix)
+  }
+}
+
+function assertPatternSourcePrefix(label: string, value: string, prefix: string) {
+  if (!value.startsWith(prefix)) throw new Error(`[defineDemoPattern] mismatched ${label}: ${value}`)
 }
 
 function autoCollectedPatternSources(sources: DemoPatternDefinition['sources']) {

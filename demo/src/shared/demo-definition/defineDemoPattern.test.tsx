@@ -164,6 +164,28 @@ describe('defineDemoPattern', () => {
     ).toThrow('[defineDemoPattern] duplicate example sources: Example.tsx')
   })
 
+  it.each([
+    ['definition', { definition: 'button/definition.ts' }, 'mismatched example sources definition: button/definition.ts'],
+    ['hooks', { hooks: ['button/useButtonPattern.ts'] }, 'mismatched example sources hooks: button/useButtonPattern.ts'],
+    ['runtime', { runtime: ['button/keyboard.ts'] }, 'mismatched example sources runtime: button/keyboard.ts'],
+    ['extra', { extra: ['button/inspect.ts'] }, 'mismatched example sources extra: button/inspect.ts'],
+  ] as const)('rejects %s sources from a different pattern prefix', (_role, sourceOverride, message) => {
+    expect(() =>
+      defineDemoPattern({
+        definition: {
+          ...definition,
+          sources: {
+            ...definition.sources,
+            ...sourceOverride,
+          },
+        },
+        useRuntime: () => {
+          throw new Error('unused')
+        },
+      }),
+    ).toThrow(`[defineDemoPattern] ${message}`)
+  })
+
   it('adds collected implementation sources for the declared pattern entry', () => {
     const entry = defineDemoPattern({
       definition: {
