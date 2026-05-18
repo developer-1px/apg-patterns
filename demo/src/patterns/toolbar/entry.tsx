@@ -12,7 +12,7 @@ const toolbarDemoDefinition = {
     data: ['toolbarData.ts'],
     hooks: ['toolbar/useToolbarPattern.ts'],
     definition: 'toolbar/definition.ts',
-    extra: ['toolbar/toolbarRenderItem.ts'],
+    extra: ['toolbar/effects.ts', 'toolbar/keyboard.ts', 'toolbar/parts.ts', 'toolbar/toolbarRenderItem.ts'],
   },
   controls: {
     kind: 'listbox',

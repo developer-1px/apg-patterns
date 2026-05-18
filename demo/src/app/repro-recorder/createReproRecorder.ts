@@ -1,4 +1,4 @@
-import type { PatternEvent } from '../../../src/schema/patternEvent'
+import type { PatternEvent } from '../../../../src/schema/patternEvent'
 import { diffARIATree, findRoleContainer, serializeARIATree } from './reproARIATree'
 import { formatTimelineAsText, type ReproEvent, type ReproMeta, type StateEntry } from './reproRecorderFormat'
 
