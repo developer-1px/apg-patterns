@@ -31,7 +31,7 @@ export type HostOptions = {
   focusStrategy?: 'rovingTabIndex' | 'ariaActiveDescendant'
   itemClickAction?: 'select' | 'toggleExpand' | 'none'
   typeaheadEnabled?: boolean
-  initialActiveKey?: string
+  initialActiveKey?: string | null
 }
 
 export const tree = () => screen.getByTestId('tree')
@@ -50,7 +50,7 @@ export function renderHost(options: HostOptions = {}) {
 }
 
 function Host({ options = {}, onEmit }: { options?: HostOptions; onEmit?: (event: PatternEvent) => void }) {
-  const seed: PatternData = options.initialActiveKey ? { ...initialData, state: { ...initialData.state, activeKey: options.initialActiveKey } } : initialData
+  const seed: PatternData = options.initialActiveKey === undefined ? initialData : { ...initialData, state: { ...initialData.state, activeKey: options.initialActiveKey } }
   const [data, dispatch] = useReducer(reduce, seed)
   const treeRuntime = useTreeviewPattern({
     data,

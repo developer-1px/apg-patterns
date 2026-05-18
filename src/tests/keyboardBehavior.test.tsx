@@ -113,4 +113,11 @@ describe('keyboard navigation — multi-step sequences', () => {
     press('ArrowDown', { shiftKey: true })
     expect(events).toBeDefined()
   })
+
+  it('ArrowDown from no active item focuses the first visible item', () => {
+    const events = renderHost({ initialActiveKey: null })
+    press('ArrowDown')
+    expect(events[0]).toEqual({ type: 'navigate', direction: 'next' })
+    expect(activeKey()).toBe('docs')
+  })
 })

@@ -274,6 +274,39 @@ describe('createReproRecorder', () => {
     expect(recording.text).toContain('click -> button#action "Action"')
     expect(recording.text).toContain('-> editStart: no diff')
   })
+
+  it('keeps inactive and null-target input events out of recordings', async () => {
+    document.body.innerHTML = `
+      <div data-demo-preview="button">
+        <button id="action">Action</button>
+      </div>
+    `
+    const action = document.getElementById('action') as HTMLButtonElement
+    vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    const recorder = createReproRecorder()
+
+    fireEvent.keyDown(action, { key: 'A', code: 'KeyA', ctrlKey: true, shiftKey: true, altKey: true })
+    fireEvent.click(action)
+    action.focus()
+    window.dispatchEvent(new CustomEvent('apg-pattern-event', {
+      detail: { event: { type: 'activate', key: 'action' } },
+    }))
+    console.warn('inactive warning')
+
+    recorder.start()
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', code: 'Space', ctrlKey: true, shiftKey: true, altKey: true }))
+    window.dispatchEvent(new MouseEvent('click'))
+    window.dispatchEvent(new FocusEvent('focusin'))
+    await nextFrame()
+
+    const recording = recorder.stop()
+
+    expect(recording.text).toContain('keydown Mod+Shift+Alt+Space -> null')
+    expect(recording.text).toContain('click -> null')
+    expect(recording.text).toContain('focus -> null')
+    expect(recording.text).not.toContain('inactive warning')
+    expect(recording.meta.eventCount).toBe(3)
+  })
 })
 
 function nextFrame(): Promise<void> {

@@ -22,7 +22,7 @@ declare global {
 }
 
 function describeTarget(el: Element | null): string {
-  if (!el) return 'null'
+  if (!el || !(el instanceof Element)) return 'null'
   const tag = el.tagName.toLowerCase()
   const id = el.id ? `#${el.id}` : ''
   const role = el.getAttribute('role')
@@ -128,7 +128,7 @@ export function createReproRecorder() {
     return diff
   }
 
-  function pushInputEntry(type: 'keydown' | 'click' | 'focus', target: Element, prevented: boolean, key?: string) {
+  function pushInputEntry(type: 'keydown' | 'click' | 'focus', target: Element | null, prevented: boolean, key?: string) {
     const info = getComponentInfo(target)
     const source = info.source ? `${info.stack.at(-1) ?? ''} (${info.source})`.trim() : info.stack.at(-1) ?? null
     const entry: ReproEvent = {
@@ -145,7 +145,7 @@ export function createReproRecorder() {
     }
     timeline.push(entry)
     requestAnimationFrame(() => {
-      entry.ariaTree = captureAriaTree(target)
+      entry.ariaTree = target ? captureAriaTree(target) : '(no role container found)'
       entry.focus = describeFocus(document.activeElement)
     })
   }
@@ -155,17 +155,17 @@ export function createReproRecorder() {
     if (shortcutMatches(event)) return
     if (isModifierOnlyKey(event)) return
     const key = `${event.ctrlKey || event.metaKey ? 'Mod+' : ''}${event.shiftKey ? 'Shift+' : ''}${event.altKey ? 'Alt+' : ''}${event.key === ' ' ? 'Space' : event.key}`
-    pushInputEntry('keydown', event.target as Element, event.defaultPrevented, key)
+    pushInputEntry('keydown', event.target instanceof Element ? event.target : null, event.defaultPrevented, key)
   }
 
   function onClick(event: MouseEvent) {
     if (!active) return
-    pushInputEntry('click', event.target as Element, event.defaultPrevented)
+    pushInputEntry('click', event.target instanceof Element ? event.target : null, event.defaultPrevented)
   }
 
   function onFocusIn(event: FocusEvent) {
     if (!active) return
-    const target = event.target as Element
+    const target = event.target instanceof Element ? event.target : null
     const desc = describeTarget(target)
     if (desc === lastFocusDesc) return
     lastFocusDesc = desc
