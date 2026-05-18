@@ -26,6 +26,11 @@ function GridDemo({ variant }: { variant: GridVariantKey }) {
   )
 }
 
+function GridDataDemo({ initialData }: { initialData: PatternData }) {
+  const [data, setData] = useState<PatternData>(initialData)
+  return <Grid data={data} onEvent={(event) => setData((current) => reducePatternData(gridDefinition, current, event))} />
+}
+
 const cellOf = (key: string) => document.getElementById(`gridcell-${key}`)!
 
 describe('Grid demo (layoutLinks)', () => {
@@ -150,6 +155,30 @@ describe('Grid demo (dataEditable)', () => {
 
     expect(cellOf('e11').querySelector('input[data-edit]')).toBeNull()
     expect(cellOf('e11').textContent).toBe('Ada')
+  })
+
+  it('renders non-string draft values as editable text before committing', () => {
+    render(
+      <GridDataDemo
+        initialData={{
+          ...gridVariants.dataEditable.data,
+          state: {
+            ...gridVariants.dataEditable.data.state,
+            activeKey: 'e11',
+            editingKey: 'e11',
+            editDraftByKey: { e11: 42, e12: true },
+          },
+        }}
+      />,
+    )
+
+    const input = cellOf('e11').querySelector('input[data-edit]') as HTMLInputElement
+    expect(input.value).toBe('42')
+
+    fireEvent.keyDown(input, { key: 'Enter' })
+
+    expect(cellOf('e11').querySelector('input[data-edit]')).toBeNull()
+    expect(cellOf('e11').textContent).toBe('42')
   })
 })
 

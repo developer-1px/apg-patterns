@@ -1,21 +1,31 @@
 import type { HTMLAttributes } from 'react'
-import { useTabsPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
+import { useTabsPattern, type PatternData, type PatternEvent, type PatternItem, type PatternOptions, type PatternStateWithOptions } from '../../../../src'
 import { Icon } from '../../shared/Icon'
 
 type Props = HTMLAttributes<HTMLElement>
+
+interface TabsDemoItem extends PatternItem {
+  content?: string
+}
+
+interface TabsDemoState extends PatternStateWithOptions {
+  options?: PatternOptions & {
+    activationMode?: 'automatic' | 'manual'
+    closeable?: boolean
+    scrollable?: boolean
+  }
+}
+
+type TabsDemoData = PatternData<TabsDemoItem, TabsDemoState>
 
 export function Tabs({
   data,
   onEvent,
 }: {
-  data: PatternData
+  data: TabsDemoData
   onEvent: (event: PatternEvent) => void
 }) {
-  const dataOptions = ((data.state as { options?: PatternOptions } | undefined)?.options ?? {}) as PatternOptions & {
-    activationMode?: 'automatic' | 'manual'
-    closeable?: boolean
-    scrollable?: boolean
-  }
+  const dataOptions = data.state?.options ?? {}
   const mergedOptions = { orientation: 'horizontal' as const, activationMode: 'automatic' as const, ...dataOptions }
   const tabs = useTabsPattern(data, onEvent, mergedOptions)
   const panelKey = tabs.selectedPanelKey
@@ -68,7 +78,7 @@ export function Tabs({
         {panelKey ? (
           <div {...(tabs.getTabPanelProps(panelKey) as Props)} className={panelClass}>
             <div className="font-semibold mb-1">{data.items[panelKey]?.label}</div>
-            <div>{(data.items[panelKey] as { content?: string })?.content}</div>
+            <div>{data.items[panelKey]?.content}</div>
           </div>
         ) : null}
       </div>

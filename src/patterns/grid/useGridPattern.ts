@@ -1,9 +1,18 @@
 import type { InputHTMLAttributes, KeyboardEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
+import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions, PatternStateWithOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
 import type { ReactPatternProps, ReactRenderItemState } from '../../adapters/reactBaseTypes'
 import { gridDefinition, gridRows } from './definition'
+
+interface GridState extends PatternStateWithOptions {
+  multiselectable?: boolean
+  editableKeys?: readonly string[]
+  editingKey?: string | null
+  editDraftByKey?: Record<string, string | number | boolean | null>
+}
+
+type GridData = PatternData<PatternItem, GridState>
 
 export interface ReactGridCell {
   key: Key
@@ -42,14 +51,8 @@ export interface ReactGridRuntime {
   keyToElementId(key: Key): string
 }
 
-export function useGridPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactGridRuntime {
-  const dataState = data.state as {
-    options?: PatternOptions
-    multiselectable?: boolean
-    editableKeys?: readonly string[]
-    editingKey?: string | null
-    editDraftByKey?: Record<string, string>
-  } | undefined
+export function useGridPattern(data: GridData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactGridRuntime {
+  const dataState = data.state
   const runtimeOptions = {
     focusStrategy: 'rovingTabIndex',
     selectionMode: dataState?.multiselectable ? 'multiple' : 'single',
@@ -91,7 +94,7 @@ export function useGridPattern(data: PatternData, onEvent: (event: PatternEvent)
 
   const commitEdit = () => {
     if (!editingKey) return
-    onEvent({ type: 'value', key: editingKey, value: editDraftByKey[editingKey] ?? '' })
+    onEvent({ type: 'value', key: editingKey, value: String(editDraftByKey[editingKey] ?? '') })
     onEvent({ type: 'editEnd', key: editingKey })
   }
   const cancelEdit = () => onEvent({ type: 'editEnd', key: editingKey ?? undefined })
@@ -141,7 +144,7 @@ function createGridCell(input: {
   key: Key
   editableKeys: readonly string[]
   editingKey: string | null
-  editDraftByKey: Record<string, string>
+  editDraftByKey: Record<string, string | number | boolean | null>
   valueByKey: Readonly<Record<Key, string | number | boolean | null>>
   sortByKey: Readonly<Record<Key, 'ascending' | 'descending' | 'other'>>
   commitEdit(): void
@@ -167,7 +170,7 @@ function createGridCell(input: {
     cellProps: input.runtime.getPartProps(part, input.key) as ReactPatternProps,
     editInputProps: {
       'data-edit': '',
-      value: input.editDraftByKey[input.key] ?? '',
+      value: String(input.editDraftByKey[input.key] ?? ''),
       onChange: (event) => input.onEvent({ type: 'editDraft', key: input.key, value: event.currentTarget.value }),
       onKeyDown: (event) => {
         if (event.key === 'Enter') {

@@ -1,4 +1,10 @@
-import { PatternDataSchema, type Key, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
+import { PatternDataSchema, type Key, type PatternData, type PatternEvent, type PatternItem, type PatternOptions, type PatternStateWithOptions } from '../../../../src'
+
+interface WindowSplitterDemoState extends PatternStateWithOptions {
+  previousValueByKey?: Record<string, number>
+}
+
+type WindowSplitterDemoData = PatternData<PatternItem, WindowSplitterDemoState>
 
 export const initialWindowSplitterData: PatternData = PatternDataSchema.parse({
   items: {
@@ -37,10 +43,10 @@ const computeDelta = (direction: unknown, step: number): number => {
 }
 
 export function reduceWindowSplitterData(
-  data: PatternData,
+  data: WindowSplitterDemoData,
   event: PatternEvent,
   options: PatternOptions = windowSplitterOptions,
-): PatternData {
+): WindowSplitterDemoData {
   if (event.type === 'focus' && event.key) {
     return { ...data, state: { ...data.state, activeKey: event.key } }
   }
@@ -50,8 +56,7 @@ export function reduceWindowSplitterData(
   const max = Number(options.max ?? 100)
   const step = Number(options.step ?? 1)
   const current = Number(data.state?.valueByKey?.[key] ?? min)
-  const prev = data.state as { previousValueByKey?: Record<string, number> } | undefined
-  const previousValueByKey = { ...(prev?.previousValueByKey ?? {}) }
+  const previousValueByKey = { ...(data.state?.previousValueByKey ?? {}) }
 
   if (event.type === 'collapse') {
     let next: number

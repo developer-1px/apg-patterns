@@ -29,7 +29,7 @@ defineAriaSource('menu.expandedIfHasPopup', (ctx) => {
 })
 
 // items.kind — used to drive role variation (menuitem / menuitemcheckbox / menuitemradio).
-defineAriaSource('items.kind', (ctx) => (ctx.key ? (ctx.data.items[ctx.key] as { kind?: string } | undefined)?.kind : undefined))
+defineAriaSource('items.kind', (ctx) => (ctx.key ? ctx.data.items[ctx.key]?.kind : undefined))
 
 // ─────────────────────────────────────────────────────────────
 // Menubar (Editor + Navigation share this definition)
