@@ -1,11 +1,11 @@
-import { useLayoutEffect, type KeyboardEvent } from 'react'
+import { useLayoutEffect } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
-import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { menuButtonDefinition } from './definition'
 import { createMenuButtonItem, type ReactMenuButtonItem } from './menuButtonItem'
-import { resolveMenuButtonKey } from './menuButtonKeyboard'
+import { createMenuButtonMenuProps, createMenuButtonTriggerProps } from './menuButtonProps'
 
 export interface ReactMenuButtonRuntime {
   triggerKey: Key | null
@@ -62,59 +62,10 @@ export function useMenuButtonPattern(data: PatternData, onEvent: (event: Pattern
     expanded,
     focusStrategy,
     get triggerProps() {
-      if (!triggerKey) return {}
-      const props = runtime.getPartProps('trigger', triggerKey) as ReactPatternProps
-      return {
-        ...props,
-        id: runtime.keyToElementId(triggerKey),
-        onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
-          if (!expanded && (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ')) {
-            event.preventDefault()
-            onEvent({ type: 'expand', key: triggerKey, expanded: true, meta: { reason: 'open' } })
-            if (itemKeys[0]) onEvent({ type: 'focus', key: itemKeys[0], meta: { reason: 'open' } })
-            return
-          }
-          if (!expanded && event.key === 'ArrowUp') {
-            event.preventDefault()
-            onEvent({ type: 'expand', key: triggerKey, expanded: true, meta: { reason: 'open' } })
-            if (itemKeys.length > 0) onEvent({ type: 'focus', key: itemKeys[itemKeys.length - 1]!, meta: { reason: 'open' } })
-            return
-          }
-          props.onKeyDown?.(event)
-        },
-      }
+      return createMenuButtonTriggerProps({ runtime, data, triggerKey, itemKeys, expanded, onEvent })
     },
     get menuProps() {
-      if (!menuKey || !triggerKey) return {}
-      const props = runtime.getPartProps('menu', menuKey) as ReactPatternProps
-      const rootKeyDown = runtime.getRootKeyboardHandler()
-      return {
-        ...props,
-        tabIndex: focusStrategy === 'ariaActiveDescendant' ? 0 : -1,
-        onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
-          if (event.key === 'Escape') {
-            event.preventDefault()
-            closeAndFocusTrigger()
-            return
-          }
-          if (event.key === 'Tab') {
-            if (triggerKey) onEvent({ type: 'expand', key: triggerKey, expanded: false, meta: { reason: 'keyboard' } })
-            return
-          }
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault()
-            activateActiveItem()
-            return
-          }
-          const nextKey = resolveMenuButtonKey(event.key, itemKeys, data.state?.activeKey, data)
-          if (nextKey) {
-            event.preventDefault()
-            onEvent({ type: 'focus', key: nextKey, meta: { reason: 'keyboard' } })
-            return
-          }
-          rootKeyDown(reactKeyInput(event))
-        },
-      }
+      return createMenuButtonMenuProps({ runtime, data, triggerKey, menuKey, itemKeys, focusStrategy, onEvent, closeAndFocusTrigger, activateActiveItem })
     },
     get items() {
       return itemKeys.map((key) => createMenuButtonItem({ runtime, data, key, onEvent, closeAndFocusTrigger }))

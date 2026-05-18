@@ -1,6 +1,8 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
+import { cleanup, render, screen } from '@testing-library/react'
+import { createElement } from 'react'
 import { apgExampleCoverage, exampleId, officialApgExamples } from './apgExampleCoverage'
-import { patternEntries } from './demoPatterns'
+import { patternEntries, useDemoPattern } from './demoPatterns'
 import { buttonVariantItems } from '../patterns/button/buttonData'
 import { carouselVariantItems } from '../patterns/carousel/carouselData'
 import { checkboxVariantItems } from '../patterns/checkbox/checkboxData'
@@ -43,6 +45,32 @@ const implementedVariants: Record<string, readonly string[]> = {
   treeview: treeVariantItems.map((item) => item.key),
 }
 
+const implementedVariantLabels: Record<string, Readonly<Record<string, string>>> = {
+  button: labelsByKey(buttonVariantItems),
+  carousel: labelsByKey(carouselVariantItems),
+  checkbox: labelsByKey(checkboxVariantItems),
+  combobox: Object.fromEntries(Object.entries(comboboxVariants).map(([key, value]) => [key, value.label])),
+  dialog: labelsByKey(dialogVariantItems),
+  disclosure: labelsByKey(disclosureVariantItems),
+  grid: labelsByKey(gridVariantItems),
+  landmarks: labelsByKey(landmarkVariantItems),
+  link: labelsByKey(linkVariantItems),
+  listbox: labelsByKey(listboxVariantItems),
+  menuAndMenubar: labelsByKey(menuVariantItems),
+  radio: labelsByKey(radioVariantItems),
+  slider: labelsByKey(sliderVariantItems),
+  spinbutton: labelsByKey(spinbuttonVariantItems),
+  switch: labelsByKey(switchVariantItems),
+  table: Object.fromEntries(Object.entries(tableVariants).map(([key, value]) => [key, value.label])),
+  tabs: labelsByKey(tabsVariantItems),
+  toolbar: labelsByKey(toolbarVariantItems),
+  treeview: labelsByKey(treeVariantItems),
+}
+
+afterEach(() => {
+  cleanup()
+})
+
 describe('APG example coverage', () => {
   it('tracks every official APG example slug', () => {
     const official = Object.entries(officialApgExamples).flatMap(([apgPattern, examples]) =>
@@ -69,4 +97,38 @@ describe('APG example coverage', () => {
 
     expect(missing).toEqual([])
   })
+
+  it('renders each covered variant in its demo controls', () => {
+    const coveredVariants = uniqueBy(
+      apgExampleCoverage.filter((item) => item.variant),
+      (item) => `${item.demoPattern}:${item.variant}`,
+    )
+
+    for (const item of coveredVariants) {
+      cleanup()
+      render(createElement(DemoControlsProbe, { patternKey: item.demoPattern }))
+
+      const label = implementedVariantLabels[item.demoPattern]?.[item.variant!]
+      expect(label, `${item.demoPattern}:${item.variant}`).toBeTruthy()
+      expect(screen.getByRole('option', { name: label })).toBeTruthy()
+    }
+  })
 })
+
+function DemoControlsProbe({ patternKey }: { patternKey: string }) {
+  return useDemoPattern(patternKey, () => undefined).variants
+}
+
+function labelsByKey<T extends string>(items: readonly { key: T; label: string }[]) {
+  return Object.fromEntries(items.map((item) => [item.key, item.label]))
+}
+
+function uniqueBy<T>(items: readonly T[], keyOf: (item: T) => string) {
+  const seen = new Set<string>()
+  return items.filter((item) => {
+    const key = keyOf(item)
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+}
