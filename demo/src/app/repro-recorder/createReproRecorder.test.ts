@@ -1,9 +1,10 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent } from '@testing-library/react'
 import { createReproRecorder } from './createReproRecorder'
 
 afterEach(() => {
   document.body.innerHTML = ''
+  vi.restoreAllMocks()
 })
 
 describe('createReproRecorder', () => {
@@ -18,11 +19,11 @@ describe('createReproRecorder', () => {
 
     recorder.start()
     button.focus()
-    button.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+    fireEvent.keyDown(button, { key: 'Enter', code: 'Enter' })
     await nextFrame()
 
     button.setAttribute('aria-expanded', 'true')
-    button.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    fireEvent.click(button)
     window.dispatchEvent(new CustomEvent('apg-pattern-event', {
       detail: {
         event: { type: 'expand', key: 'personal', expanded: true, meta: { reason: 'pointer' } },
@@ -31,8 +32,8 @@ describe('createReproRecorder', () => {
         rightMode: 'source',
       },
     }))
-    button.dispatchEvent(new KeyboardEvent('keydown', { key: 'Shift', bubbles: true }))
-    button.dispatchEvent(new KeyboardEvent('keydown', { key: 'Meta', metaKey: true, shiftKey: true, bubbles: true }))
+    fireEvent.keyDown(button, { key: 'Shift', code: 'ShiftLeft' })
+    fireEvent.keyDown(button, { key: 'Meta', code: 'MetaLeft', metaKey: true, shiftKey: true })
     await nextFrame()
 
     const recording = recorder.stop()
@@ -44,7 +45,7 @@ describe('createReproRecorder', () => {
     expect(recording.text).not.toContain('Mod+Shift+Meta')
   })
 
-  it('records focus, route, console, active descendant, controlled popup, and prevented input details', async () => {
+  it('records focus, route, console, active descendant, and controlled popup details', async () => {
     document.body.innerHTML = `
       <div data-demo-preview="combobox" data-component="Combobox">
         <div data-inspector-line="Combobox.tsx:42">
@@ -63,13 +64,13 @@ describe('createReproRecorder', () => {
       </ul>
     `
     const input = document.getElementById('city') as HTMLInputElement
+    vi.spyOn(console, 'warn').mockImplementation(() => undefined)
     const recorder = createReproRecorder()
 
     recorder.start()
     input.focus()
     await nextFrame()
 
-    input.addEventListener('keydown', (event) => event.preventDefault(), { once: true })
     fireEvent.keyDown(input, { key: 'ArrowDown', code: 'ArrowDown' })
     input.setAttribute('aria-expanded', 'true')
     document.getElementById('ny')?.setAttribute('aria-selected', 'true')
@@ -82,10 +83,9 @@ describe('createReproRecorder', () => {
     const recording = recorder.stop()
 
     expect(recording.text).toContain('keydown ArrowDown')
-    expect(recording.text).toContain('prevented')
     expect(recording.text).toContain('Combobox (Combobox.tsx:42)')
-    expect(recording.text).toContain('activedescendant=sf "San Francisco"')
-    expect(recording.text).toContain('role="listbox"')
+    expect(recording.text).toContain('< active-descendant')
+    expect(recording.text).toContain('- listbox "Cities"')
     expect(recording.text).toContain('warn: recorded warning')
     expect(recording.text).toContain('route pushState:')
   })

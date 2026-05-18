@@ -36,6 +36,26 @@ function TreegridDemo() {
   )
 }
 
+function RowFocusTreegridDemo() {
+  const [data, setData] = useState<PatternData>({
+    ...initialTreegridData,
+    state: {
+      ...initialTreegridData.state,
+      activeKey: 'src',
+      selectedKeys: ['src'],
+    },
+  })
+  return (
+    <Treegrid
+      data={data}
+      options={{ focusMode: 'row' }}
+      onEvent={(event: PatternEvent) => {
+        setData((current) => reducePatternData(treegridDefinition, current, event))
+      }}
+    />
+  )
+}
+
 const cellOf = (key: string) => document.getElementById(`treegridcell-${key}`)!
 const rowOf = (rowKey: string) =>
   Array.from(document.querySelectorAll('[role="row"]')).find(
@@ -180,6 +200,34 @@ describe('APG §Roles, States, Properties', () => {
 // §2. Keyboard Interaction — Navigation
 // https://www.w3.org/WAI/ARIA/apg/patterns/treegrid/#keyboardinteraction
 // ---------------------------------------------------------------------------
+
+describe('APG §Keyboard — Row Focus Navigation', () => {
+  it('row focus mode uses keyboard input to navigate visible rows', () => {
+    render(<RowFocusTreegridDemo />)
+    const grid = screen.getByRole('treegrid')
+    const activeRow = () => document.querySelector('[role="row"][tabindex="0"]') as HTMLElement | null
+
+    expect(activeRow()?.id).toBe('treegridcell-src')
+
+    fireEvent.keyDown(grid, { key: 'ArrowDown' })
+    expect(activeRow()?.id).toBe('treegridcell-components')
+
+    fireEvent.keyDown(grid, { key: 'ArrowUp' })
+    expect(activeRow()?.id).toBe('treegridcell-src')
+
+    fireEvent.keyDown(grid, { key: 'End' })
+    expect(activeRow()?.id).toBe('treegridcell-pkg.json')
+
+    fireEvent.keyDown(grid, { key: 'Home' })
+    expect(activeRow()?.id).toBe('treegridcell-headerRow')
+
+    fireEvent.keyDown(grid, { key: 'PageDown' })
+    expect(activeRow()?.id).toBe('treegridcell-pkg.json')
+
+    fireEvent.keyDown(grid, { key: 'PageUp' })
+    expect(activeRow()?.id).toBe('treegridcell-headerRow')
+  })
+})
 
 describe('APG §Keyboard — Right Arrow', () => {
   it('on collapsed row: expands the row', () => {

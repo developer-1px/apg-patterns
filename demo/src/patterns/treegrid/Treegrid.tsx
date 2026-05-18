@@ -1,14 +1,16 @@
-import { useTreegridPattern, type PatternData, type PatternEvent } from '../../../../src'
+import { useTreegridPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
 import { cx, ds } from '../../shared/designSystem'
 
 export function Treegrid({
   data,
   onEvent,
+  options,
 }: {
   data: PatternData
   onEvent: (event: PatternEvent) => void
+  options?: PatternOptions
 }) {
-  const treegrid = useTreegridPattern(data, onEvent)
+  const treegrid = useTreegridPattern(data, onEvent, options)
 
   return (
     <div
