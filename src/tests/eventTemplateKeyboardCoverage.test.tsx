@@ -245,6 +245,18 @@ describe('event templates through keyboard input', () => {
 
     fireEvent.keyDown(host, { key: 'n' })
     expect(screen.getByTestId('transition-active').textContent).toBe('Alpha')
+
+    fireEvent.keyDown(host, { key: 'l' })
+    expect(alpha().getAttribute('aria-disabled')).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Named transition' }))
+    expect(screen.getByRole('option', { name: 'Beta' }).getAttribute('aria-disabled')).toBe('true')
+
+    fireEvent.keyDown(host, { key: 'p' })
+    fireEvent.keyDown(host, { key: 'v' })
+    fireEvent.click(screen.getByRole('button', { name: 'Select with range' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Named mismatch' }))
+    expect(screen.getByTestId('transition-state').textContent).toBe('a|b|true|7|')
   })
 })
 
@@ -282,14 +294,27 @@ const transitionDefinition = {
     { shortcut: 't', cases: [{ case: 'always', events: [{ type: 'press', key: '$activeKey' }] }] },
     { shortcut: 'c', cases: [{ case: 'always', events: [{ type: 'check', key: '$activeKey', checked: true }] }] },
     { shortcut: 'n', cases: [{ case: 'always', events: [{ type: 'activate', key: '$activeKey' }] }] },
+    { shortcut: 'l', cases: [{ case: 'always', events: [{ type: 'sort', key: '$activeKey', sort: 'other' }] }] },
+    { shortcut: 'p', cases: [{ case: 'always', events: [{ type: 'press', key: '$activeKey', pressed: true }] }] },
+    { shortcut: 'v', cases: [{ case: 'always', events: [{ type: 'value', key: '$activeKey', value: 7 }] }] },
   ],
   transitions: [
     { on: 'select', actions: [{ kind: 'replaceSet', field: 'selectedKeys', values: [{ from: '$activeKey' }] }] },
+    { on: 'select', when: { kind: 'hasActiveKey' }, actions: [{ kind: 'set', field: 'anchorKey', value: { from: '$event.anchorKey' } }] },
+    { on: 'select', when: { kind: 'hasActiveKey' }, actions: [{ kind: 'set', field: 'extentKey', value: { from: '$event.extentKey' } }] },
     { on: 'expand', actions: [{ kind: 'setMembership', field: 'expandedKeys', value: { from: '$event.key' }, present: { from: '$event.expanded' } }] },
     { on: 'collapse', actions: [{ kind: 'remove', field: 'expandedKeys', value: { from: '$event.key' } }] },
+    { on: 'collapse', name: 'ignored', actions: [{ kind: 'add', field: 'expandedKeys', value: { literal: 'b' } }] },
     { on: 'press', actions: [{ kind: 'toggleInSet', field: 'disabledKeys', value: { from: '$event.key' } }] },
+    { on: 'press', actions: [{ kind: 'setMembership', field: 'requiredKeys', value: { literal: 'b' }, present: { from: '$event.pressed' } }] },
     { on: 'check', actions: [{ kind: 'setRecordValue', field: 'checkedByKey', key: { from: '$event.key' }, value: { from: '$event.checked' } }] },
+    { on: 'check', actions: [{ kind: 'setRecordValue', field: 'checkedByKey', key: { from: '$event.extentKey' }, value: { from: '$event.checked' } }] },
     { on: 'activate', actions: [{ kind: 'set', field: 'activeKey', value: { from: '$event.key' } }] },
+    { on: 'value', actions: [{ kind: 'setRecordValue', field: 'valueByKey', key: { from: '$event.key' }, value: { from: '$event.value' } }] },
+    { on: 'value', actions: [{ kind: 'add', field: 'selectedKeys', value: { from: '$event.value' } }] },
+    { on: 'select', actions: [{ kind: 'replaceSet', field: 'busyKeys', values: [{ from: '$event.keys' }] }] },
+    { on: 'sort', name: 'literal', actions: [{ kind: 'add', field: 'disabledKeys', value: { literal: 'b' } }] },
+    { on: 'sort', name: 'fallback', actions: [{ kind: 'set', field: 'currentByKey', value: { from: '$event.value' } }] },
   ],
 } satisfies PatternDefinition
 
@@ -310,7 +335,32 @@ function TransitionHost() {
           </div>
         ))}
       </div>
+      <button
+        type="button"
+        onClick={() => setCurrent((data) => reducePatternData(transitionDefinition, data, { type: 'sort', key: 'a', sort: 'other', name: 'literal' } as never))}
+      >
+        Named transition
+      </button>
+      <button
+        type="button"
+        onClick={() => setCurrent((data) => reducePatternData(transitionDefinition, data, { type: 'select', keys: ['a'], anchorKey: 'a', extentKey: 'b' }))}
+      >
+        Select with range
+      </button>
+      <button
+        type="button"
+        onClick={() => setCurrent((data) => reducePatternData(transitionDefinition, data, { type: 'sort', key: 'a', sort: 'other', name: 'other' } as never))}
+      >
+        Named mismatch
+      </button>
       <output data-testid="transition-active">{current.items[current.state?.activeKey ?? '']?.label}</output>
+      <output data-testid="transition-state">{[
+        current.state?.anchorKey ?? '',
+        current.state?.extentKey ?? '',
+        String(current.state?.requiredKeys?.includes('b') ?? ''),
+        String(current.state?.valueByKey?.a ?? ''),
+        current.state?.busyKeys?.join(',') ?? '',
+      ].join('|')}</output>
     </div>
   )
 }
