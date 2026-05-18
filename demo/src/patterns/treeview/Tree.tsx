@@ -39,8 +39,6 @@ export function Tree({
           href ? (
             <a
               href={href}
-              tabIndex={-1}
-              onClick={(event) => event.preventDefault()}
               className="text-zinc-800 underline-offset-2 hover:underline dark:text-zinc-200"
             >
               {item.label}

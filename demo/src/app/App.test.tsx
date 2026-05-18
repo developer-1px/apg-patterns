@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { act, useState } from 'react'
 import { coerceRightMode } from './appState'
 import { App } from './App'
@@ -387,6 +387,33 @@ describe('App route state', () => {
     await waitFor(() => expect(currentHashParam('pattern')).toBe('checkbox'))
     expect(currentHashParam('variant')).toBeNull()
   })
+
+  it('drives every preview with advertised keyboard and pointer input', async () => {
+    const routes = collectPatternRoutes()
+
+    for (const route of routes) {
+      replaceHash(routeHash(route))
+      const { unmount } = render(<App />)
+
+      await waitFor(() => expect(currentHashParam('pattern')).toBe(route.key))
+      const preview = document.querySelector<HTMLElement>(`[data-demo-preview="${route.key}"]`)
+      if (!preview) throw new Error(`missing preview for ${route.key}`)
+
+      preview.focus()
+      for (const shortcut of route.keyboardShortcuts) {
+        fireEvent.keyDown(preview, keyboardEventInit(shortcut))
+      }
+
+      const previewScope = within(preview)
+      for (const role of ['button', 'option', 'tab', 'link'] as const) {
+        for (const target of previewScope.queryAllByRole(role).slice(0, 3)) {
+          fireEvent.click(target)
+        }
+      }
+
+      unmount()
+    }
+  }, 30000)
 })
 
 describe('SourceTabs', () => {
@@ -1004,6 +1031,20 @@ function isValidShortcut(shortcut: string) {
   return validShortcutKeys.has(key)
     && modifiers.length === new Set(modifiers).size
     && modifiers.every((modifier) => validShortcutModifiers.has(modifier))
+}
+
+function keyboardEventInit(shortcut: string) {
+  const parts = shortcut.split('+')
+  const keyToken = parts.at(-1) ?? ''
+  const key = keyToken === 'Space' ? ' ' : keyToken
+  return {
+    key,
+    code: keyToken === 'Space' ? 'Space' : keyToken,
+    altKey: parts.includes('Alt'),
+    ctrlKey: parts.includes('Ctrl'),
+    metaKey: parts.includes('Meta'),
+    shiftKey: parts.includes('Shift'),
+  }
 }
 
 function duplicates(values: readonly string[]) {
