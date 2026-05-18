@@ -24,10 +24,17 @@ export type EmitPatternEvent = (event: PatternEvent) => void
 export const KERNEL_SOURCES = [
   'kernel/patternRuntime.ts',
   'kernel/runtimeKeyboard.ts',
+  'kernel/domEventBindings.ts',
+  'kernel/slotProps.ts',
   'kernel/patternReducer.ts',
   'kernel/patternKernel.ts',
   'kernel/keyTokenRegistry.ts',
+  'kernel/kernelRegistries.ts',
+  'kernel/patternEventTemplate.ts',
+  'kernel/patternRelations.ts',
   'schema/index.ts',
+  'schema/patternDefinition.ts',
+  'schema/patternDefinitionVocabulary.ts',
 ] as const satisfies readonly SourceName[]
 
 export interface PatternEntry {
