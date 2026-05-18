@@ -4,11 +4,13 @@ import { describe, expect, it } from 'vitest'
 import {
 	  createParentByKey,
 	  evaluatePredicate,
+	  reducePatternData,
 	  resolveAriaSource,
 	  resolveNavigationTarget,
 	  type PatternData,
+	  type PatternDefinition,
 	  type Predicate,
-} from '../index'
+	} from '../index'
 import { treegridDefinition } from '../patterns/treegrid/definition'
 
 const treegridData = {
@@ -30,6 +32,43 @@ const treegridData = {
     ],
   },
   state: { activeKey: 'childName', expandedKeys: ['parent'] },
+} satisfies PatternData
+
+const selectionDefinition = {
+  apgPattern: 'selection-grid',
+  rootRole: 'grid',
+  containedRoles: ['gridcell'],
+  focusModel: 'rovingTabIndex',
+  parts: {
+    root: { role: 'grid' },
+    cell: { role: 'gridcell' },
+  },
+  navigation: {
+    visibleOrder: { kind: 'flat' },
+    targets: {},
+  },
+  keyboard: [],
+} satisfies PatternDefinition
+
+const selectionData = {
+  items: {
+    ghost: { label: 'Ghost' },
+    a1: { label: 'A1' },
+    a2: { label: 'A2' },
+    b1: { label: 'B1' },
+    b2: { label: 'B2' },
+  },
+  relations: {
+    rootKeys: ['ghost', 'a1', 'a2', 'b1', 'b2'],
+    cells: [
+      { rowKey: 'a', columnKey: 'one', cellKey: 'a1' },
+      { rowKey: 'a', columnKey: 'two', cellKey: 'a2' },
+      { rowKey: 'b', columnKey: 'one', cellKey: 'b1' },
+      { rowKey: 'b', columnKey: 'two', cellKey: 'b2' },
+    ],
+  },
+  state: { activeKey: 'a1', selectedKeys: ['a1'] },
+  refs: { label: 'Selection grid' },
 } satisfies PatternData
 
 function KernelResolverHost() {
@@ -178,6 +217,36 @@ function KernelResolverHost() {
       >
         Resolve treegrid row edges
       </button>
+      <button
+        type="button"
+        onClick={() => {
+          const emptyData: PatternData = { ...selectionData, relations: { rootKeys: ['ghost'], cells: [] } }
+          const noActiveData: PatternData = { ...selectionData, state: { activeKey: null, selectedKeys: [] } }
+          const missingActiveData: PatternData = { ...selectionData, state: { activeKey: 'ghost', selectedKeys: [] } }
+          const anchoredData: PatternData = { ...selectionData, state: { activeKey: 'a2', selectedKeys: ['ghost'], anchorKey: 'ghost' } }
+          const raggedData: PatternData = {
+            ...selectionData,
+            relations: { ...selectionData.relations, rootKeys: ['a1', 'a2', 'b1'], cells: selectionData.relations.cells.slice(0, 3) },
+            state: { activeKey: 'b1', selectedKeys: ['a2'], anchorKey: 'a2' },
+          }
+          const values = [
+            reducePatternData(selectionDefinition, emptyData, { type: 'selectAll' }).state?.selectedKeys?.join(',') ?? '',
+            reducePatternData(selectionDefinition, noActiveData, { type: 'selectColumn' }).state?.selectedKeys?.join(',') ?? '',
+            reducePatternData(selectionDefinition, missingActiveData, { type: 'selectRow' }).state?.selectedKeys?.join(',') ?? '',
+            reducePatternData(selectionDefinition, noActiveData, { type: 'extendSelection', direction: 'right' }).state?.selectedKeys?.join(',') ?? '',
+            reducePatternData(selectionDefinition, missingActiveData, { type: 'extendSelection', direction: 'right' }).state?.selectedKeys?.join(',') ?? '',
+            reducePatternData(selectionDefinition, selectionData, { type: 'extendSelection', direction: 'right' }).state?.selectedKeys?.join(',') ?? '',
+            reducePatternData(selectionDefinition, selectionData, { type: 'extendSelection', direction: 'down' }).state?.selectedKeys?.join(',') ?? '',
+            reducePatternData(selectionDefinition, selectionData, { type: 'extendSelection', direction: 'rowEnd' }).state?.selectedKeys?.join(',') ?? '',
+            reducePatternData(selectionDefinition, anchoredData, { type: 'extendSelection', direction: 'left' }).state?.selectedKeys?.join(',') ?? '',
+            reducePatternData(selectionDefinition, selectionData, { type: 'extendSelection', direction: 'sideways' as never }).state?.selectedKeys?.join(',') ?? '',
+            reducePatternData(selectionDefinition, raggedData, { type: 'extendSelection', direction: 'left' }).state?.selectedKeys?.join(',') ?? '',
+          ]
+          setResult(values.join('|'))
+        }}
+      >
+        Reduce selection edges
+      </button>
 	      <output>{result}</output>
 	    </div>
 	  )
@@ -204,5 +273,8 @@ describe('kernel resolver coverage from pointer input', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Resolve treegrid row edges' }))
     expect(screen.getByText('parent|child|parent|child|parent|null|null|parent|null|null|parent|null')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Reduce selection edges' }))
+    expect(screen.getByText('a1||||ghost|a1,a2|a1,b1|a1,a2|a1|a1|a1,a2,b1')).toBeTruthy()
 	  })
 	})
