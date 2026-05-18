@@ -24,6 +24,7 @@ function TreeviewDemo(props: {
   data?: PatternData
   options?: Parameters<typeof useTreeviewPattern>[0]['options']
   onEvent: (event: PatternEvent) => void
+  exposeActions?: boolean
 }) {
   const tree = useTreeviewPattern({
     data: props.data ?? data,
@@ -39,6 +40,20 @@ function TreeviewDemo(props: {
           {item.key}
         </div>
       ))}
+      {props.exposeActions ? (
+        <>
+          <button type="button" onClick={() => tree.actions.focus('b')}>Action focus</button>
+          <button type="button" onClick={() => tree.actions.select('b')}>Action select</button>
+          <button type="button" onClick={() => tree.actions.toggle('a')}>Action toggle</button>
+          <output data-testid="tree-state">{[
+            tree.state.activeKey ?? '',
+            tree.state.selectedKeys.join(','),
+            tree.state.disabledKeys.join(','),
+            tree.state.expandedKeys.join(','),
+            tree.ids.forKey('a'),
+          ].join('|')}</output>
+        </>
+      ) : null}
     </div>
   )
 }
@@ -76,6 +91,23 @@ describe('useTreeviewPattern', () => {
 
     expect(events).toEqual([
       { type: 'select', keys: ['a'], anchorKey: 'a', extentKey: 'a' },
+      { type: 'expand', key: 'a', expanded: false },
+    ])
+  })
+
+  it('exposes React state, ids, and imperative actions from pointer controls', () => {
+    const events: PatternEvent[] = []
+    render(<TreeviewDemo exposeActions onEvent={(event) => events.push(event)} />)
+
+    expect(screen.getByTestId('tree-state').textContent).toBe('a|||a|treeitem-a')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Action focus' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Action select' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Action toggle' }))
+
+    expect(events).toEqual([
+      { type: 'focus', key: 'b' },
+      { type: 'select', keys: ['b'], anchorKey: 'b', extentKey: 'b' },
       { type: 'expand', key: 'a', expanded: false },
     ])
   })

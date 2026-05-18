@@ -2,16 +2,21 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import {
-	  createParentByKey,
-	  evaluatePredicate,
-	  reducePatternData,
-	  resolveAriaSource,
-	  resolveNavigationTarget,
-	  type PatternData,
+		  createParentByKey,
+		  evaluatePredicate,
+		  hasKeyToken,
+		  reducePatternData,
+		  resolveAriaSource,
+		  resolveKeyToken,
+		  resolveNavigationTarget,
+		  resolveStateProjection,
+		  resolveVisibleOrder,
+		  type PatternData,
 	  type PatternDefinition,
 	  type Predicate,
-	} from '../index'
+		} from '../index'
 import { treegridDefinition } from '../patterns/treegrid/definition'
+import { treeviewDefinition } from '../patterns/treeview/definition'
 
 const treegridData = {
   items: {
@@ -247,7 +252,99 @@ function KernelResolverHost() {
       >
         Reduce selection edges
       </button>
-	      <output>{result}</output>
+      <button
+        type="button"
+        onClick={() => {
+          const data: PatternData = {
+            ...treegridData,
+            state: {
+              activeKey: 'parent',
+              selectedKeys: ['parent'],
+              disabledKeys: ['parent'],
+              expandedKeys: ['parent'],
+              checkedByKey: { parent: true },
+              pressedByKey: { parent: 'mixed' },
+              currentByKey: { parent: 'page' },
+              valueByKey: { parent: 3 },
+            },
+          }
+          const ctx = { data, activeKey: 'parent', key: 'parent', parentByKey }
+          const missingKeyCtx = { ...ctx, key: undefined }
+          const values = [
+            resolveStateProjection('state.activeKey', ctx),
+            resolveStateProjection('state.activeKey', missingKeyCtx),
+            resolveStateProjection('state.selectedKeys', missingKeyCtx),
+            resolveStateProjection('state.disabledKeys', missingKeyCtx),
+            resolveStateProjection('state.expandedKeys', missingKeyCtx),
+            resolveStateProjection('state.checkedByKey', missingKeyCtx),
+            resolveStateProjection('state.pressedByKey', missingKeyCtx),
+            resolveStateProjection('state.currentByKey', missingKeyCtx),
+            resolveStateProjection('state.valueByKey', missingKeyCtx),
+            resolveStateProjection('state.checkedByKey', ctx),
+            resolveStateProjection('state.pressedByKey', ctx),
+            resolveStateProjection('state.currentByKey', ctx),
+            resolveStateProjection('state.valueByKey', ctx),
+          ]
+          setResult(values.map(String).join('|'))
+        }}
+      >
+        Resolve state projections
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          const ctx = { data: { ...treegridData, state: { activeKey: 'parent', anchorKey: 'parent', extentKey: 'child' } }, activeKey: 'parent', key: 'child', parentByKey }
+          const values = [
+            String(hasKeyToken('$key')),
+            String(hasKeyToken('$missing')),
+            resolveKeyToken('$key', 'child', 'parent', ctx),
+            resolveKeyToken('$activeKey', 'child', 'parent', ctx),
+            resolveKeyToken('$anchorKey', 'child', 'parent', ctx),
+            resolveKeyToken('$extentKey', 'child', 'parent', ctx),
+          ]
+          try {
+            resolveKeyToken('$missing', 'child', 'parent', ctx)
+          } catch (error) {
+            values.push((error as Error).message)
+          }
+          try {
+            resolveKeyToken('$key', null, null, ctx)
+          } catch (error) {
+            values.push((error as Error).message)
+          }
+          setResult(values.join('|'))
+        }}
+      >
+        Resolve key tokens
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          const parentByKey = createParentByKey(treegridData)
+          const values: string[] = [
+            String(resolveNavigationTarget({ kind: 'firstChild' }, { activeKey: 'parent', data: treegridData, parentByKey, visibleKeys: ['parent', 'child'] })),
+            String(resolveNavigationTarget({ kind: 'parentKey' }, { activeKey: 'child', data: treegridData, parentByKey, visibleKeys: ['parent', 'child'] })),
+            String(resolveNavigationTarget({ kind: 'parentKey' }, { activeKey: 'orphan', data: treegridData, parentByKey, visibleKeys: ['parent', 'child'] })),
+            resolveVisibleOrder(treeviewDefinition.navigation.visibleOrder, { ...treegridData, relations: {}, state: {} }).join(','),
+          ]
+          for (const action of [
+            () => resolveAriaSource('missing.source', { data: treegridData, activeKey: 'parent', key: 'parent' }),
+            () => resolveStateProjection('missing.projection', { data: treegridData, activeKey: 'parent', key: 'parent' }),
+            () => resolveVisibleOrder({ kind: 'missingVisible' }, treegridData),
+            () => resolveNavigationTarget({ kind: 'missingTarget' }, { activeKey: 'parent', data: treegridData, parentByKey, visibleKeys: [] }),
+          ]) {
+            try {
+              action()
+            } catch (error) {
+              values.push((error as Error).message)
+            }
+          }
+          setResult(values.join('|'))
+        }}
+      >
+        Resolve registry misses
+      </button>
+		      <output>{result}</output>
 	    </div>
 	  )
 }
@@ -274,7 +371,16 @@ describe('kernel resolver coverage from pointer input', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Resolve treegrid row edges' }))
     expect(screen.getByText('parent|child|parent|child|parent|null|null|parent|null|null|parent|null')).toBeTruthy()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Reduce selection edges' }))
-    expect(screen.getByText('a1||||ghost|a1,a2|a1,b1|a1,a2|a1|a1|a1,a2,b1')).toBeTruthy()
-	  })
-	})
+	    fireEvent.click(screen.getByRole('button', { name: 'Reduce selection edges' }))
+	    expect(screen.getByText('a1||||ghost|a1,a2|a1,b1|a1,a2|a1|a1|a1,a2,b1')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Resolve state projections' }))
+    expect(screen.getByText('true|false|false|false|false|undefined|undefined|undefined|undefined|true|mixed|page|3')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Resolve key tokens' }))
+    expect(screen.getByText('true|false|child|parent|parent|child|[apg-pattern] unknown keyToken token: "$missing" — register via defineKeyToken()|Cannot resolve key token: $key')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Resolve registry misses' }))
+    expect(screen.getByText('child|parent|parent||[apg-pattern] unknown ariaSource token: "missing.source" — register via defineAriaSource()|[apg-pattern] unknown stateProjection token: "missing.projection" — register via defineStateProjection()|[apg-pattern] unknown visibleOrder token: "missingVisible" — register via defineVisibleOrder()|[apg-pattern] unknown navigationTarget token: "missingTarget" — register via defineNavigationTarget()')).toBeTruthy()
+		  })
+		})
