@@ -34,6 +34,29 @@ describe('design system interactive states', () => {
     expect(ds.button).not.toContain('aria-pressed:')
   })
 
+  it.each([
+    ['option', 'ui-active:', ['ui-active:bg-', 'ui-active:text-', 'ui-active:ring-']],
+    ['option', 'ui-focus:', ['ui-focus:outline', 'ui-focus:ring-']],
+    ['option', 'ui-selected:', ['ui-selected:bg-', 'ui-selected:text-']],
+    ['listOption', 'ui-active:', ['ui-active:bg-', 'ui-active:text-', 'ui-active:ring-']],
+    ['listOption', 'ui-focus:', ['ui-focus:outline', 'ui-focus:ring-']],
+    ['listOption', 'ui-selected:', ['ui-selected:bg-', 'ui-selected:text-']],
+    ['button', 'ui-active:', ['ui-active:bg-', 'ui-active:translate-']],
+    ['button', 'ui-focus:', ['ui-focus:outline']],
+    ['button', 'ui-pressed:', ['ui-pressed:bg-', 'ui-pressed:text-']],
+    ['iconButton', 'ui-active:', ['ui-active:bg-', 'ui-active:translate-']],
+    ['iconButton', 'ui-focus:', ['ui-focus:outline']],
+    ['textButton', 'ui-active:', ['ui-active:translate-']],
+    ['textButton', 'ui-focus:', ['ui-focus:outline']],
+    ['checkable', 'ui-checked:', ['ui-checked:bg-', 'ui-checked:text-']],
+    ['expandable', 'ui-expanded:', ['ui-expanded:bg-', 'ui-expanded:text-']],
+  ] as const)('%s makes %s visually perceivable', (token, stateVariant, visualUtilities) => {
+    expect(ds[token]).toContain(stateVariant)
+    for (const utility of visualUtilities) {
+      expect(ds[token]).toContain(utility)
+    }
+  })
+
   it('keeps demo components from bypassing shared interactive state variants', () => {
     const blockedPatterns = [
       'aria-selected:',

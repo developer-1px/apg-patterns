@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from 'react'
 import { useListboxPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
 import { cx, ds } from '../../shared/designSystem'
 import { ListboxContent } from './ListboxContent'
@@ -17,10 +18,20 @@ export function Listbox({
   const scrollable = data.state?.scrollable === true
   const ariaLabelledBy = typeof data.refs?.labelledBy === 'string' ? data.refs.labelledBy : undefined
   const listbox = useListboxPattern(data, onEvent, options)
+  const rootRef = useRef<HTMLDivElement>(null)
   const selectionMode = options?.selectionMode ?? 'single'
   const isMulti = selectionMode === 'multiple'
   const renderItemsByKey = new Map(listbox.renderItems.map((item) => [item.key, item]))
   const visibleKeys = listbox.renderItems.map((item) => item.key)
+  const activeKey = listbox.state.activeKey
+
+  useLayoutEffect(() => {
+    if (!scrollable || !activeKey) return
+    const root = rootRef.current
+    const active = document.getElementById(listbox.ids.forKey(activeKey))
+    if (!root || !active || !root.contains(active)) return
+    active.scrollIntoView({ block: 'nearest' })
+  }, [activeKey, listbox.ids, scrollable])
 
   const renderOption = (key: string, posIndex?: number, setSize?: number) => {
     const item = renderItemsByKey.get(key)
@@ -44,7 +55,7 @@ export function Listbox({
     .join(' ')
 
   return (
-    <div {...listbox.rootProps} aria-labelledby={ariaLabelledBy} className={containerClass}>
+    <div {...listbox.rootProps} ref={rootRef} aria-labelledby={ariaLabelledBy} className={containerClass}>
       <ListboxContent data={data} groups={groups} visibleKeys={visibleKeys} renderOption={renderOption} />
     </div>
   )
