@@ -1,8 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { evaluatePredicate, type PatternData, type PatternEvent } from '../index'
+import { createParentByKey, evaluatePredicate, resolveNavigationTarget, type PatternData, type PatternEvent } from '../index'
 import { handleListboxMultiKeyDown } from '../patterns/listbox/handleListboxMultiKeyDown'
+import { useListboxPattern } from '../patterns/listbox/useListboxPattern'
 import { cellRowKey, visibleCells, visibleRowKeys } from '../patterns/treegrid/geometry'
 import '../patterns/treegrid/predicates'
 
@@ -22,6 +23,44 @@ const data = {
   },
   state: { activeKey: 'cell', expandedKeys: ['row'] },
 } satisfies PatternData
+
+function ListboxRuntimeHost() {
+  const [events, setEvents] = useState<PatternEvent[]>([])
+  const listbox = useListboxPattern(
+    {
+      items: { a: { label: 'Alpha' }, b: { label: 'Beta' } },
+      relations: { rootKeys: ['a', 'b'] },
+      state: { activeKey: 'a', selectedKeys: ['a'], disabledKeys: ['b'] },
+    },
+    (event) => setEvents((current) => [...current, event]),
+    { elementIdPrefix: 'edge-option-' },
+  )
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => {
+          listbox.actions.focus('b')
+          listbox.actions.select('b')
+        }}
+      >
+        Run listbox runtime
+      </button>
+      <output data-testid="listbox-runtime">
+        {[
+          listbox.state.activeKey,
+          listbox.state.selectedKeys.join(','),
+          listbox.state.disabledKeys.join(','),
+          listbox.ids.forKey('a'),
+          listbox.keyToElementId('b'),
+          listbox.renderItems.length,
+          events.map((event) => `${event.type}:${'key' in event ? event.key ?? '' : 'keys' in event ? event.keys.join(',') : ''}`).join('|'),
+        ].join('|')}
+      </output>
+    </div>
+  )
+}
 
 function ListboxTreegridHelperHost() {
   const [result, setResult] = useState('')
@@ -47,6 +86,34 @@ function ListboxTreegridHelperHost() {
         }}
       >
         Run listbox keys
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          const parentByKey = createParentByKey(data)
+          const emptyRows: PatternData = { ...data, relations: { ...data.relations, rootKeys: [], rowKeys: [], cells: [] } }
+          const collapsed: PatternData = { ...data, state: { activeKey: 'cell', expandedKeys: [] } }
+          const rows = [
+            resolveNavigationTarget({ kind: 'treegridPage', direction: 'up' }, { activeKey: 'cell', data, parentByKey, visibleKeys: [] }),
+            resolveNavigationTarget({ kind: 'treegridPage', direction: 'down' }, { activeKey: null as never, data, parentByKey, visibleKeys: [] }),
+            resolveNavigationTarget({ kind: 'treegridPage', direction: 'down' }, { activeKey: 'missing', data, parentByKey, visibleKeys: [] }),
+            resolveNavigationTarget({ kind: 'treegridPage', direction: 'down' }, { activeKey: 'cell', data, parentByKey, visibleKeys: [] }),
+            resolveNavigationTarget({ kind: 'treegridParentRowFirstCell' }, { activeKey: 'cell', data: collapsed, parentByKey, visibleKeys: [] }),
+            resolveNavigationTarget({ kind: 'treegridParentRowFirstCell' }, { activeKey: 'child', data, parentByKey, visibleKeys: [] }),
+            resolveNavigationTarget({ kind: 'treegridRow', action: 'gridStart' }, { activeKey: 'cell', data, parentByKey, visibleKeys: [] }),
+            resolveNavigationTarget({ kind: 'treegridRow', action: 'gridEnd' }, { activeKey: 'cell', data, parentByKey, visibleKeys: [] }),
+            resolveNavigationTarget({ kind: 'treegridRow', action: 'down' }, { activeKey: null as never, data, parentByKey, visibleKeys: [] }),
+            resolveNavigationTarget({ kind: 'treegridRow', action: 'up' }, { activeKey: 'missing', data, parentByKey, visibleKeys: [] }),
+            resolveNavigationTarget({ kind: 'treegridRow', action: 'sideways' }, { activeKey: 'cell', data, parentByKey, visibleKeys: [] }),
+            resolveNavigationTarget({ kind: 'treegridRowPage', direction: 'up' }, { activeKey: 'cell', data, parentByKey, visibleKeys: [] }),
+            resolveNavigationTarget({ kind: 'treegridRowPage', direction: 'down' }, { activeKey: null as never, data, parentByKey, visibleKeys: [] }),
+            resolveNavigationTarget({ kind: 'treegridRowPage', direction: 'down' }, { activeKey: 'missing', data, parentByKey, visibleKeys: [] }),
+            resolveNavigationTarget({ kind: 'treegridRowPage', direction: 'down' }, { activeKey: 'cell', data: emptyRows, parentByKey: createParentByKey(emptyRows), visibleKeys: [] }),
+          ]
+          setResult(rows.map(String).join('|'))
+        }}
+      >
+        Run treegrid navigation
       </button>
       <button
         type="button"
@@ -78,5 +145,12 @@ describe('listbox and treegrid helper coverage from pointer input', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Run treegrid helpers' }))
     expect(screen.getByText('row|1|null|false|false|false|false')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Run treegrid navigation' }))
+    expect(screen.getByText('null|null|null|null|null|null|row|child|row|row|null|row|row|row|null')).toBeTruthy()
+
+    render(<ListboxRuntimeHost />)
+    fireEvent.click(screen.getByRole('button', { name: 'Run listbox runtime' }))
+    expect(screen.getByTestId('listbox-runtime').textContent).toContain('a|a|b|edge-option-a|edge-option-b|2|focus:b|select:b')
   })
 })
