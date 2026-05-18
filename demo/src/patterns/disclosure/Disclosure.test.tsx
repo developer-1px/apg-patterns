@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import { reduceDisclosureData, type PatternData, type PatternEvent } from '../../../../src'
@@ -153,6 +153,51 @@ describe('Disclosure demo (navMenu)', () => {
 
     fireEvent.keyDown(mission, { key: 'ArrowUp', code: 'ArrowUp' })
     expect(document.activeElement).toBe(history)
+  })
+
+  it('ArrowDown opens a closed submenu and moves focus to its first link', async () => {
+    render(<DisclosureDemo variant="navMenu" initial={initialNavMenuDisclosureData} />)
+    const [about] = screen.getAllByRole('button')
+
+    fireEvent.keyDown(about!, { key: 'ArrowDown', code: 'ArrowDown' })
+
+    expect(about!.getAttribute('aria-expanded')).toBe('true')
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByRole('link', { name: 'Overview' })))
+  })
+
+  it('ArrowUp on an open trigger focuses the last submenu link', () => {
+    render(<DisclosureDemo variant="navMenu" initial={initialNavMenuDisclosureData} />)
+    const [about] = screen.getAllByRole('button')
+
+    fireEvent.click(about!)
+    fireEvent.keyDown(about!, { key: 'ArrowUp', code: 'ArrowUp' })
+
+    expect(document.activeElement).toBe(screen.getByRole('link', { name: 'Mission' }))
+  })
+
+  it('Spacebar toggles a trigger and Escape on a collapsed trigger keeps focus there', () => {
+    render(<DisclosureDemo variant="navMenu" initial={initialNavMenuDisclosureData} />)
+    const [about] = screen.getAllByRole('button')
+
+    fireEvent.keyDown(about!, { key: 'Spacebar', code: 'Space' })
+    expect(about!.getAttribute('aria-expanded')).toBe('true')
+
+    fireEvent.keyDown(about!, { key: 'Spacebar', code: 'Space' })
+    expect(about!.getAttribute('aria-expanded')).toBe('false')
+
+    fireEvent.keyDown(about!, { key: 'Escape', code: 'Escape' })
+    expect(document.activeElement).toBe(about)
+  })
+
+  it('ArrowRight closes an open trigger before moving to the next top-level item', () => {
+    render(<DisclosureDemo variant="navMenu" initial={initialNavMenuDisclosureData} />)
+    const [about, admissions] = screen.getAllByRole('button')
+
+    fireEvent.click(about!)
+    fireEvent.keyDown(about!, { key: 'ArrowRight', code: 'ArrowRight' })
+
+    expect(about!.getAttribute('aria-expanded')).toBe('false')
+    expect(document.activeElement).toBe(admissions)
   })
 })
 

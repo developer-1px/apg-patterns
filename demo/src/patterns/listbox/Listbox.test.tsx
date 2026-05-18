@@ -242,6 +242,42 @@ describe('Listbox demo — rearrangeable (multi)', () => {
     expect(selected).toEqual(['Leonardo', 'Donatello'])
   })
 
+  it('Shift+ArrowUp extends selection backwards from the active option', () => {
+    render(<ListboxDemo variant="rearrangeableMulti" />)
+    const listbox = screen.getByRole('listbox')
+    fireEvent.keyDown(listbox, { key: 'ArrowDown' })
+    fireEvent.keyDown(listbox, { key: 'ArrowDown' })
+    fireEvent.keyDown(listbox, { key: 'ArrowUp', shiftKey: true })
+
+    const selected = screen
+      .getAllByRole('option')
+      .filter((o) => o.getAttribute('aria-selected') === 'true')
+      .map((o) => o.textContent)
+    expect(selected).toEqual(['Donatello', 'Raphael'])
+  })
+
+  it('Ctrl+Shift+Home and Ctrl+Shift+End select ranges from the active option', () => {
+    render(<ListboxDemo variant="rearrangeableMulti" />)
+    const listbox = screen.getByRole('listbox')
+    fireEvent.keyDown(listbox, { key: 'ArrowDown' })
+    fireEvent.keyDown(listbox, { key: 'ArrowDown' })
+
+    fireEvent.keyDown(listbox, { key: 'Home', ctrlKey: true, shiftKey: true })
+    let selected = screen
+      .getAllByRole('option')
+      .filter((o) => o.getAttribute('aria-selected') === 'true')
+      .map((o) => o.textContent)
+    expect(selected).toEqual(['Leonardo', 'Donatello', 'Raphael'])
+
+    fireEvent.keyDown(listbox, { key: 'End', ctrlKey: true, shiftKey: true })
+    selected = screen
+      .getAllByRole('option')
+      .filter((o) => o.getAttribute('aria-selected') === 'true')
+      .map((o) => o.textContent)
+    expect(selected).toContain('Raphael')
+    expect(selected.at(-1)).toBe('April')
+  })
+
   it('Ctrl+A selects all options', () => {
     render(<ListboxDemo variant="rearrangeableMulti" />)
     const listbox = screen.getByRole('listbox')

@@ -17,7 +17,11 @@ describe('createReproRecorder', () => {
     const button = document.getElementById('personal') as HTMLButtonElement
     const recorder = createReproRecorder()
 
+    fireEvent.keyDown(button, { key: 'Escape', code: 'Escape' })
+    fireEvent.click(button)
     recorder.start()
+    recorder.start()
+    button.focus()
     button.focus()
     fireEvent.keyDown(button, { key: 'Enter', code: 'Enter' })
     await nextFrame()
@@ -32,15 +36,49 @@ describe('createReproRecorder', () => {
         rightMode: 'source',
       },
     }))
+    for (const event of [
+      { type: 'focus', key: 'personal' },
+      { type: 'navigate', direction: 'next' },
+      { type: 'select', key: 'personal', keys: ['personal'], anchorKey: 'personal', extentKey: 'personal' },
+      { type: 'selectAll' },
+      { type: 'selectColumn' },
+      { type: 'selectRow' },
+      { type: 'extendSelection', direction: 'next' },
+      { type: 'expandActiveRow', expanded: true },
+      { type: 'check', key: 'personal', checked: true },
+      { type: 'press', key: 'personal' },
+      { type: 'value', key: 'personal', value: 2 },
+      { type: 'activate', key: 'personal' },
+      { type: 'dismiss' },
+    ] as const) {
+      window.dispatchEvent(new CustomEvent('apg-pattern-event', { detail: { event } }))
+    }
+    history.replaceState(null, '', '#replace')
+    window.dispatchEvent(new HashChangeEvent('hashchange'))
     fireEvent.keyDown(button, { key: 'Shift', code: 'ShiftLeft' })
     fireEvent.keyDown(button, { key: 'Meta', code: 'MetaLeft', metaKey: true, shiftKey: true })
     await nextFrame()
 
     const recording = recorder.stop()
+    fireEvent.click(button)
 
     expect(recording.text).toContain('- button "Personal Information" [expanded=false')
     expect(recording.text).toContain('+ - button "Personal Information" [expanded')
     expect(recording.text).toContain('expand: personal.expanded=true (accordion / Accordion.tsx / code)')
+    expect(recording.text).toContain('focus: activeKey=personal')
+    expect(recording.text).toContain('navigate: direction=next')
+    expect(recording.text).toContain('select: selectedKeys=personal')
+    expect(recording.text).toContain('selectAll: selectAll')
+    expect(recording.text).toContain('selectColumn: selectColumn')
+    expect(recording.text).toContain('selectRow: selectRow')
+    expect(recording.text).toContain('extendSelection: direction=next')
+    expect(recording.text).toContain('expandActiveRow: activeRow.expanded=true')
+    expect(recording.text).toContain('check: personal.checked=true')
+    expect(recording.text).toContain('press: personal.pressed=true')
+    expect(recording.text).toContain('value: personal.value=2')
+    expect(recording.text).toContain('activate: activate=personal')
+    expect(recording.text).toContain('dismiss: dismiss')
+    expect(recording.text).toContain('route replaceState:')
     expect(recording.text).not.toContain('Shift+Shift')
     expect(recording.text).not.toContain('Mod+Shift+Meta')
   })
