@@ -1,8 +1,10 @@
 import type { ReactNode } from 'react'
 import { z } from 'zod'
-import type { PatternEvent } from '../../../src'
+import type { PatternData, PatternEvent } from '../../../src'
+import { usePatternDataHost, useVariantPatternDataHost } from './demoHostState'
 import { type DemoPattern, type PatternEntry, KERNEL_SOURCES } from './demoPatternTypes'
 import { renderUiNode, UiNodeSchema, type UiNode, type UiRenderContext } from './uiSchema'
+import { renderDataInspect } from './inspect/index'
 
 const SourceNameSchema = z.string().min(1)
 
@@ -66,6 +68,91 @@ export function defineDemoPattern({
       }
     },
   }
+}
+
+export function defineStateDemoPattern({
+  definition,
+  initialData,
+  reduce,
+  componentName,
+  component,
+  eventAction = 'dispatchEvent',
+}: {
+  definition: DemoPatternDefinition
+  initialData: PatternData
+  reduce: (data: PatternData, event: PatternEvent) => PatternData
+  componentName: string
+  component: React.ComponentType<any>
+  eventAction?: string
+}): PatternEntry {
+  return defineDemoPattern({
+    definition,
+    useRuntime: (onEvent) => {
+      const host = usePatternDataHost(initialData, reduce)
+      const emitAndReduce = (event: PatternEvent) => {
+        onEvent(event)
+        host.dispatchEvent(event)
+      }
+      return {
+        inspect: renderDataInspect(host.data),
+        context: {
+          values: { state: { data: host.data } },
+          actions: { [eventAction]: emitAndReduce },
+          components: { [componentName]: component },
+        },
+      }
+    },
+  })
+}
+
+export function defineVariantDemoPattern<Variant extends string>({
+  definition,
+  initialVariant,
+  initialData,
+  dataByVariant,
+  reduce,
+  variantItems,
+  componentName,
+  component,
+  eventAction = 'dispatchEvent',
+}: {
+  definition: DemoPatternDefinition
+  initialVariant: Variant
+  initialData: PatternData
+  dataByVariant: (variant: Variant) => PatternData
+  reduce: (variant: Variant, data: PatternData, event: PatternEvent) => PatternData
+  variantItems: readonly { key: Variant; label: string }[]
+  componentName: string
+  component: React.ComponentType<any>
+  eventAction?: string
+}): PatternEntry {
+  return defineDemoPattern({
+    definition,
+    useRuntime: (onEvent) => {
+      const host = useVariantPatternDataHost(initialVariant, initialData, dataByVariant, reduce)
+      const emitAndReduce = (event: PatternEvent) => {
+        onEvent(event)
+        host.dispatchEvent(event)
+      }
+      return {
+        inspect: renderDataInspect(host.data),
+        context: {
+          values: {
+            state: {
+              variant: host.variant,
+              data: host.data,
+            },
+            model: { variantItems },
+          },
+          actions: {
+            selectVariant: host.selectVariant,
+            [eventAction]: emitAndReduce,
+          },
+          components: { [componentName]: component },
+        },
+      }
+    },
+  })
 }
 
 function sourceNamesFromDefinition(sources: DemoPatternDefinition['sources']) {

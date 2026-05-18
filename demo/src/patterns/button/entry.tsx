@@ -1,9 +1,6 @@
 import { Button } from './Button'
 import { buttonVariantItems, buttonVariants, type ButtonVariantKey } from './buttonData'
-import { useVariantPatternDataHost } from '../../shared/demoHostState'
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
-import { renderDataInspect } from '../../shared/inspect/genericInspect'
-import type { PatternEvent } from '../../../../src'
+import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 
 const buttonDemoDefinition = {
   key: 'button',
@@ -35,38 +32,13 @@ const buttonDemoDefinition = {
   },
 } as const satisfies DemoPatternDefinition
 
-export const entry = defineDemoPattern({
+export const entry = defineVariantDemoPattern<ButtonVariantKey>({
   definition: buttonDemoDefinition,
-  useRuntime: (onEvent) => {
-    const host = useVariantPatternDataHost<ButtonVariantKey>(
-      'action',
-      buttonVariants.action.data,
-      (variant) => buttonVariants[variant].data,
-      (variant, data, event) => buttonVariants[variant].reduce(data, event),
-    )
-    return {
-      inspect: renderDataInspect(host.data),
-      context: {
-        values: {
-          state: {
-            variant: host.variant,
-            data: host.data,
-          },
-          model: {
-            variantItems: buttonVariantItems,
-          },
-        },
-        actions: {
-          selectVariant: host.selectVariant,
-          dispatchEvent: (event: PatternEvent) => {
-            onEvent(event)
-            host.dispatchEvent(event)
-          },
-        },
-        components: {
-          Button,
-        },
-      },
-    }
-  },
+  initialVariant: 'action',
+  initialData: buttonVariants.action.data,
+  dataByVariant: (variant) => buttonVariants[variant].data,
+  reduce: (variant, data, event) => buttonVariants[variant].reduce(data, event),
+  variantItems: buttonVariantItems,
+  componentName: 'Button',
+  component: Button,
 })

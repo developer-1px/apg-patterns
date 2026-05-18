@@ -1,9 +1,6 @@
-import { usePatternDataHost } from '../../shared/demoHostState'
 import { Switch } from './Switch'
 import { initialSwitchData, reduceSwitchData } from './switchData'
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
-import { renderDataInspect } from '../../shared/inspect/genericInspect'
-import type { PatternEvent } from '../../../../src'
+import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 
 const switchDemoDefinition = {
   key: 'switch',
@@ -26,28 +23,10 @@ const switchDemoDefinition = {
   },
 } as const satisfies DemoPatternDefinition
 
-export const entry = defineDemoPattern({
+export const entry = defineStateDemoPattern({
   definition: switchDemoDefinition,
-  useRuntime: (onEvent) => {
-    const host = usePatternDataHost(initialSwitchData, reduceSwitchData)
-    return {
-      inspect: renderDataInspect(host.data),
-      context: {
-        values: {
-          state: {
-            data: host.data,
-          },
-        },
-        actions: {
-          dispatchEvent: (event: PatternEvent) => {
-            onEvent(event)
-            host.dispatchEvent(event)
-          },
-        },
-        components: {
-          Switch,
-        },
-      },
-    }
-  },
+  initialData: initialSwitchData,
+  reduce: reduceSwitchData,
+  componentName: 'Switch',
+  component: Switch,
 })
