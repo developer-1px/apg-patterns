@@ -2,6 +2,8 @@ import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { tooltipDefinition } from './definition'
+import { createTooltipActions } from './tooltipActions'
+import { getTooltipLabel, getTooltipRuntimeState } from './tooltipRuntimeState'
 import { createTooltipTriggerProps } from './tooltipTriggerProps'
 
 export interface ReactTooltipRuntime {
@@ -45,25 +47,16 @@ export function useTooltipPattern(data: PatternData, onEvent: (event: PatternEve
     triggerKey,
     tooltipKey,
     get triggerLabel() {
-      return triggerKey ? data.items[triggerKey]?.label ?? triggerKey : ''
+      return getTooltipLabel(data, triggerKey)
     },
     get tooltipLabel() {
-      return tooltipKey ? data.items[tooltipKey]?.label ?? tooltipKey : ''
+      return getTooltipLabel(data, tooltipKey)
     },
     get state() {
-      return {
-        open: triggerKey ? data.state?.expandedKeys?.includes(triggerKey) ?? false : false,
-      }
+      return getTooltipRuntimeState(data, triggerKey)
     },
     get actions() {
-      return {
-        open: () => {
-          if (triggerKey) runtime.emit({ type: 'expand', key: triggerKey, expanded: true })
-        },
-        close: () => {
-          if (triggerKey) runtime.emit({ type: 'expand', key: triggerKey, expanded: false })
-        },
-      }
+      return createTooltipActions(runtime, triggerKey)
     },
     get ids() {
       return { forKey: runtime.keyToElementId }

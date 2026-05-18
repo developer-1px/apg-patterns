@@ -4,6 +4,7 @@
  * 세부 등록은 범주별 파일에 둔다. 이 파일은 side-effect entrypoint 이다.
  */
 import './kernelAriaSources'
+import './kernelStateProjections'
 import './kernelPredicates'
 import './kernelNavigationTargets'
 

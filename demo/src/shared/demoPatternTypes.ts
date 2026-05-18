@@ -26,6 +26,7 @@ export const KERNEL_SIDE_EFFECT_SOURCES = [
   'kernel/kernelBuiltins.ts',
   'kernel/kernelNavigationTargets.ts',
   'kernel/kernelPredicates.ts',
+  'kernel/kernelStateProjections.ts',
 ] as const satisfies readonly SourceName[]
 
 export const KERNEL_IMPLEMENTATION_SOURCES = [

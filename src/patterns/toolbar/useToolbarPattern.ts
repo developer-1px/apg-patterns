@@ -1,9 +1,11 @@
-import type { KeyboardEvent } from 'react'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { useReactPatternRuntime } from '../../adapters/reactPatternEffects'
 import { toolbarDefinition } from './definition'
+import { createToolbarActions } from './toolbarActions'
 import { createToolbarRenderItem, type ReactToolbarRenderItem } from './toolbarRenderItem'
+import { createToolbarRootProps } from './toolbarRootProps'
+import { getToolbarRuntimeState } from './toolbarRuntimeState'
 export type { ReactToolbarRenderItem } from './toolbarRenderItem'
 
 export interface ReactToolbarRuntime {
@@ -33,29 +35,17 @@ export function useToolbarPattern(data: PatternData, onEvent: (event: PatternEve
     onEvent,
     keyToElementId: (key) => `${mergedOptions.elementIdPrefix ?? 'toolbar-item-'}${key}`,
   })
-  const rootProps = reactProps(runtime.getPartProps('toolbar'))
-  const onKeyDown = runtime.getRootKeyboardHandler()
 
   return {
-    rootProps: {
-      ...rootProps,
-      onKeyDown: (event: KeyboardEvent<HTMLElement>) => onKeyDown(reactKeyInput(event)),
-    },
+    rootProps: createToolbarRootProps(runtime),
     get renderItems() {
       return runtime.visibleKeys.map((key) => createToolbarRenderItem(runtime, key))
     },
     get state() {
-      return {
-        activeKey: runtime.data.state?.activeKey ?? null,
-        selectedKeys: runtime.data.state?.selectedKeys ?? [],
-        disabledKeys: runtime.data.state?.disabledKeys ?? [],
-      }
+      return getToolbarRuntimeState(runtime.data)
     },
     get actions() {
-      return {
-        focus: (key: Key) => runtime.emit({ type: 'focus', key }),
-        select: (key: Key) => runtime.emit({ type: 'select', keys: [key], anchorKey: key, extentKey: key }),
-      }
+      return createToolbarActions(runtime)
     },
     get ids() {
       return { forKey: runtime.keyToElementId }

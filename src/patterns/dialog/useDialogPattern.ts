@@ -4,6 +4,7 @@ import type { Key, PatternDataWithOptions, PatternEvent, PatternOptions } from '
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { dialogDefinition } from './definition'
 import { createDialogProps } from './dialogProps'
+import { createDialogElementId, isDialogOpen, labelDialogItem } from './dialogRuntimeKeys'
 
 export interface ReactDialogRuntime {
   open: boolean
@@ -23,13 +24,13 @@ export interface ReactDialogRuntime {
 
 export function useDialogPattern(data: PatternDataWithOptions, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactDialogRuntime {
   const runtimeOptions = options ?? data.state?.options ?? {}
-  const keyToElementId = (key: Key) => key === 'dialog' ? 'dialog-panel' : `${runtimeOptions.elementIdPrefix ?? 'dialog-'}${key}`
+  const keyToElementId = createDialogElementId(runtimeOptions)
   const runtime = createPatternRuntime({ definition: dialogDefinition, data, options: runtimeOptions, onEvent, keyToElementId })
 
   usePatternEffects({ definition: dialogDefinition, data: runtime.data, keyToElementId })
 
   return {
-    open: data.state?.expandedKeys?.includes('trigger') ?? false,
+    open: isDialogOpen(data),
     get triggerProps() {
       return reactProps(runtime.getPartProps('trigger', 'trigger'))
     },
@@ -51,7 +52,7 @@ export function useDialogPattern(data: PatternDataWithOptions, onEvent: (event: 
     get submitProps() {
       return reactProps(runtime.getPartProps('submit', 'submit'))
     },
-    labelOf: (key) => data.items[key]?.label ?? key,
+    labelOf: (key) => labelDialogItem(data, key),
     get ids() {
       return { forKey: keyToElementId }
     },

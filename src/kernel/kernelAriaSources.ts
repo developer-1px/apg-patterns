@@ -1,4 +1,4 @@
-import { defineAriaSource, defineStateProjection } from './patternKernel'
+import { defineAriaSource } from './patternKernel'
 
 defineAriaSource('refs.label', (ctx) => ctx.data.refs?.label)
 defineAriaSource('refs.labelledBy', (ctx) => ctx.data.refs?.labelledBy)
@@ -53,12 +53,3 @@ defineAriaSource('state.rangeValueByKey.min', (ctx) => (ctx.key ? ctx.data.state
 defineAriaSource('state.rangeValueByKey.max', (ctx) => (ctx.key ? ctx.data.state?.rangeValueByKey?.[ctx.key]?.max : undefined))
 defineAriaSource('state.rangeValueByKey.now', (ctx) => (ctx.key ? ctx.data.state?.rangeValueByKey?.[ctx.key]?.now : undefined))
 defineAriaSource('state.rangeValueByKey.text', (ctx) => (ctx.key ? ctx.data.state?.rangeValueByKey?.[ctx.key]?.text : undefined))
-
-defineStateProjection('state.activeKey', (ctx) => ctx.key != null && ctx.activeKey === ctx.key)
-defineStateProjection('state.selectedKeys', (ctx) => (ctx.key ? ctx.data.state?.selectedKeys?.includes(ctx.key) ?? false : false))
-defineStateProjection('state.disabledKeys', (ctx) => (ctx.key ? ctx.data.state?.disabledKeys?.includes(ctx.key) ?? false : false))
-defineStateProjection('state.expandedKeys', (ctx) => (ctx.key ? ctx.data.state?.expandedKeys?.includes(ctx.key) ?? false : false))
-defineStateProjection('state.checkedByKey', (ctx) => (ctx.key ? ctx.data.state?.checkedByKey?.[ctx.key] : undefined))
-defineStateProjection('state.pressedByKey', (ctx) => (ctx.key ? ctx.data.state?.pressedByKey?.[ctx.key] : undefined))
-defineStateProjection('state.currentByKey', (ctx) => (ctx.key ? ctx.data.state?.currentByKey?.[ctx.key] : undefined))
-defineStateProjection('state.valueByKey', (ctx) => (ctx.key ? ctx.data.state?.valueByKey?.[ctx.key] : undefined))

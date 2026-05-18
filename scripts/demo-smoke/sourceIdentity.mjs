@@ -27,6 +27,7 @@ export function sourceIdentityNeedles(sourceName, patternKey) {
   if (sourceName === 'kernel/patternEventTemplate.ts') return ['resolveEventTemplate']
   if (sourceName === 'kernel/kernelNavigationTargets.ts') return ['defineNavigationTarget']
   if (sourceName === 'kernel/kernelPredicates.ts') return ['definePredicate']
+  if (sourceName === 'kernel/kernelStateProjections.ts') return ['defineStateProjection']
   if (sourceName === 'schema/index.ts') return ["export * from './patternDefinition'"]
   if (sourceName === 'schema/eventTemplate.ts') return ['EventTemplateSchema']
   if (sourceName === 'schema/patternDefinitionValidation.ts') return ['validatePatternDefinition']
@@ -36,6 +37,7 @@ export function sourceIdentityNeedles(sourceName, patternKey) {
     const [, sourcePatternKey, fileName] = patternSource
     if (sourcePatternKey === 'kernel' && fileName === 'kernelNavigationTargets') return ['defineNavigationTarget']
     if (sourcePatternKey === 'kernel' && fileName === 'kernelPredicates') return ['definePredicate']
+    if (sourcePatternKey === 'kernel' && fileName === 'kernelStateProjections') return ['defineStateProjection']
     if (fileName === 'definition') {
       if (sourcePatternKey === 'menu') return ['menuButtonDefinition', 'menubarDefinition']
       return [`apgPattern: '${sourcePatternKey}'`]
@@ -43,6 +45,9 @@ export function sourceIdentityNeedles(sourceName, patternKey) {
     if (fileName.endsWith('Sources')) return ['defineAriaSource']
     if (fileName.endsWith('AriaSources')) return ['defineAriaSource']
     if (fileName.endsWith('Navigation')) return ['defineNavigationTarget']
+    if (fileName.endsWith('Actions')) return [`create${pascalCase(fileName.replace(/Actions$/, ''))}Actions`]
+    if (fileName.endsWith('RuntimeState')) return [`get${pascalCase(fileName.replace(/RuntimeState$/, ''))}RuntimeState`]
+    if (fileName === 'windowSplitterState') return ['getWindowSplitterState']
     if (/^use[A-Z].*Pattern$/.test(fileName)) return [`export function ${fileName}`]
     if (fileName === 'runtime') return []
     if (fileName === 'navigation') return []
@@ -53,4 +58,8 @@ export function sourceIdentityNeedles(sourceName, patternKey) {
   if (sourceName === 'treeVariants.ts') return ['treeVariants']
 
   return [patternKey]
+}
+
+function pascalCase(value) {
+  return value.charAt(0).toUpperCase() + value.slice(1)
 }

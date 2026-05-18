@@ -1,8 +1,11 @@
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { useReactPatternRuntime } from '../../adapters/reactPatternEffects'
 import { radioGroupDefinition } from './definition'
+import { createRadioGroupActions } from './radioGroupActions'
 import { createRadioRenderItem, type ReactRadioRenderItem } from './radioRenderItem'
+import { createRadioGroupRootProps } from './radioGroupRootProps'
+import { getRadioGroupRuntimeState } from './radioGroupRuntimeState'
 export type { ReactRadioRenderItem } from './radioRenderItem'
 
 export interface ReactRadioGroupRuntime {
@@ -32,29 +35,17 @@ export function useRadioGroupPattern(data: PatternData, onEvent: (event: Pattern
     onEvent,
     keyToElementId: (key) => `${mergedOptions.elementIdPrefix ?? 'radio-'}${key}`,
   })
-  const rootProps = reactProps(runtime.getPartProps('radiogroup'))
-  const onKeyDown = runtime.getRootKeyboardHandler()
 
   return {
-    rootProps: {
-      ...rootProps,
-      onKeyDown: (event) => onKeyDown(reactKeyInput(event)),
-    },
+    rootProps: createRadioGroupRootProps(runtime),
     get renderItems() {
       return runtime.visibleKeys.map((key) => createRadioRenderItem(runtime, key))
     },
     get state() {
-      return {
-        activeKey: runtime.data.state?.activeKey ?? null,
-        selectedKeys: runtime.data.state?.selectedKeys ?? [],
-        disabledKeys: runtime.data.state?.disabledKeys ?? [],
-      }
+      return getRadioGroupRuntimeState(runtime.data)
     },
     get actions() {
-      return {
-        focus: (key: Key) => runtime.emit({ type: 'focus', key }),
-        select: (key: Key) => runtime.emit({ type: 'select', keys: [key], anchorKey: key, extentKey: key }),
-      }
+      return createRadioGroupActions(runtime)
     },
     get ids() {
       return { forKey: runtime.keyToElementId }
