@@ -1,7 +1,7 @@
-import type { MouseEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternDataWithOptions, PatternEvent, PatternItem, PatternOptions, PatternStateWithOptions } from '../../schema'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { createBreadcrumbItems, type ReactBreadcrumbItem } from './breadcrumbItem'
 import { breadcrumbDefinition } from './definition'
 
 interface BreadcrumbItem extends PatternItem {
@@ -10,12 +10,7 @@ interface BreadcrumbItem extends PatternItem {
 
 type BreadcrumbData = PatternData<BreadcrumbItem, PatternStateWithOptions>
 
-export interface ReactBreadcrumbItem {
-  key: Key
-  label: string
-  current: string | boolean | null
-  crumbProps: ReactPatternProps
-}
+export type { ReactBreadcrumbItem } from './breadcrumbItem'
 
 export interface ReactBreadcrumbRuntime {
   rootProps: ReactPatternProps
@@ -48,24 +43,7 @@ export function useBreadcrumbPattern(data: BreadcrumbData, onEvent: (event: Patt
       return runtime.getPartProps('list') as ReactPatternProps
     },
     get items() {
-      return (data.relations?.rootKeys ?? []).map((key) => {
-        const props = runtime.getPartProps('crumb', key) as ReactPatternProps
-        const current = data.state?.currentByKey?.[key] ?? null
-        return {
-          key,
-          label: data.items[key]?.label ?? key,
-          current,
-          crumbProps: {
-            ...props,
-            href: String(data.items[key]?.href ?? '#'),
-            'aria-current': current || undefined,
-            onClick: (event: MouseEvent<HTMLElement>) => {
-              event.preventDefault()
-              onEvent({ type: 'activate', key })
-            },
-          } as ReactPatternProps,
-        }
-      })
+      return createBreadcrumbItems({ runtime, data, onEvent })
     },
     get ids() {
       return { forKey: runtime.keyToElementId }

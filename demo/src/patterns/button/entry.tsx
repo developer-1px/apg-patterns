@@ -12,6 +12,7 @@ const buttonDemoDefinition = {
     data: ['buttonData.ts'],
     hooks: ['button/useButtonPattern.ts'],
     definition: 'button/definition.ts',
+    extra: ['button/buttonRootProps.ts'],
   },
   controls: {
     kind: 'listbox',

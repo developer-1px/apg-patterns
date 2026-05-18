@@ -14,6 +14,7 @@ const meterDemoDefinition = {
     data: ['meterData.ts'],
     hooks: ['meter/useMeterPattern.ts'],
     definition: 'meter/definition.ts',
+    extra: ['meter/meterRenderItem.ts'],
   },
   controls: {
     kind: 'listbox',

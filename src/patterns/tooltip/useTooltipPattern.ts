@@ -1,7 +1,8 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { tooltipDefinition } from './definition'
+import { createTooltipTriggerProps } from './tooltipTriggerProps'
 
 export interface ReactTooltipRuntime {
   triggerProps: ReactPatternProps
@@ -33,17 +34,10 @@ export function useTooltipPattern(data: PatternData, onEvent: (event: PatternEve
   })
   const triggerKey = data.relations?.rootKeys?.[0] ?? null
   const tooltipKey = triggerKey ? data.relations?.controlsByKey?.[triggerKey]?.[0] ?? null : null
-  const rootKeyDown = runtime.getRootKeyboardHandler()
 
   return {
     get triggerProps() {
-      if (!triggerKey) return {}
-      const { onKeyDown: _onKeyDown, ...props } = runtime.getPartProps('trigger', triggerKey) as ReactPatternProps
-      return {
-        ...props,
-        type: 'button',
-        onKeyDown: (event) => rootKeyDown(reactKeyInput(event)),
-      } as ReactPatternProps
+      return createTooltipTriggerProps(runtime, triggerKey)
     },
     get tooltipProps() {
       return tooltipKey ? runtime.getPartProps('tooltip', tooltipKey) as ReactPatternProps : {}

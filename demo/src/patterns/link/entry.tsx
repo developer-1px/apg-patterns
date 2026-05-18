@@ -14,6 +14,7 @@ const linkDemoDefinition = {
     data: ['linkData.ts'],
     hooks: ['link/useLinkPattern.ts'],
     definition: 'link/definition.ts',
+    extra: ['link/linkProps.ts'],
   },
   controls: {
     kind: 'listbox',

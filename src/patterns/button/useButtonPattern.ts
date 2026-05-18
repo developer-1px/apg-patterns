@@ -1,7 +1,7 @@
-import type { KeyboardEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { createButtonRootProps } from './buttonRootProps'
 import { buttonDefinition } from './definition'
 
 export interface ReactButtonRuntime {
@@ -37,14 +37,7 @@ export function useButtonPattern(data: PatternData, onEvent: (event: PatternEven
 
   return {
     get rootProps() {
-      if (!key) return {}
-      const { role: _role, onKeyDown: _onKeyDown, ...props } = runtime.getPartProps('button', key) as ReactPatternProps & { role?: string }
-      return {
-        ...props,
-        type: 'button',
-        onKeyDown: (event) => handleButtonKeyDown(runtime, key, event),
-        onFocus: () => runtime.emit({ type: 'focus', key }),
-      } as ReactPatternProps
+      return createButtonRootProps(runtime, key)
     },
     key,
     label: key ? data.items[key]?.label ?? '' : '',
@@ -73,11 +66,4 @@ export function useButtonPattern(data: PatternData, onEvent: (event: PatternEven
     },
     keyToElementId: runtime.keyToElementId,
   }
-}
-
-function handleButtonKeyDown(runtime: ReturnType<typeof createPatternRuntime>, key: Key, event: KeyboardEvent<HTMLElement>) {
-  const result = runtime.resolveKeyboardBinding(reactKeyInput(event), key)
-  if (!result) return
-  if (result.preventDefault) event.preventDefault()
-  for (const next of result.events) runtime.emit(next)
 }
