@@ -1,19 +1,49 @@
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { Spinbutton } from './Spinbutton'
 import { reduceSpinbuttonData, spinbuttonVariants, type SpinbuttonVariantKey } from './spinbuttonData'
-import { VariantListbox } from '../../shared/VariantListbox'
-import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
 import { renderDataInspect } from '../../shared/inspect/genericInspect'
+import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import type { PatternEvent } from '../../../../src'
 
 const items: readonly { key: SpinbuttonVariantKey; label: string }[] = [
   { key: 'numeric', label: 'Numeric' },
   { key: 'time', label: 'Time' },
 ]
 
-export const entry: PatternEntry = {
+const spinbuttonDemoDefinition = {
   key: 'spinbutton',
   label: 'Spinbutton',
-  useDemoPattern: (onEvent) => {
+  keyboardShortcuts: ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'],
+  sources: {
+    main: 'Spinbutton.tsx',
+    entry: 'spinbutton/entry.tsx',
+    hooks: ['spinbutton/useSpinbuttonPattern.ts'],
+    data: ['spinbuttonData.ts'],
+    definition: 'spinbutton/definition.ts',
+  },
+  controls: {
+    kind: 'listbox',
+    orientation: 'horizontal',
+    value: '$state.variant',
+    items: '$model.variantItems',
+    label: 'spinbutton variants',
+    idPrefix: 'spinbutton-variant',
+    onChange: '$actions.selectVariant',
+  },
+  view: {
+    kind: 'component',
+    component: 'Spinbutton',
+    props: {
+      data: '$state.data',
+      onEvent: '$actions.dispatchEvent',
+      options: '$state.options',
+    },
+  },
+} as const satisfies DemoPatternDefinition
+
+export const entry = defineDemoPattern({
+  definition: spinbuttonDemoDefinition,
+  useRuntime: (onEvent) => {
     const host = useVariantPatternDataHost<SpinbuttonVariantKey>(
       'numeric',
       spinbuttonVariants.numeric.data,
@@ -21,16 +51,21 @@ export const entry: PatternEntry = {
       (variant, data, event) => reduceSpinbuttonData(data, event, spinbuttonVariants[variant].options),
     )
     return {
-      key: 'spinbutton',
-      label: 'Spinbutton',
-      keyboardShortcuts: ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'],
-      sourceNames: ['Spinbutton.tsx', 'spinbutton/entry.tsx', 'spinbutton/useSpinbuttonPattern.ts', 'spinbuttonData.ts', 'spinbutton/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
-      variants: <VariantListbox orientation="horizontal" value={host.variant} items={items} label="spinbutton variants" idPrefix="spinbutton-variant" onChange={host.selectVariant} />,
-      preview: <Spinbutton data={host.data} onEvent={(event) => {
-        onEvent(event)
-        host.dispatchEvent(event)
-      }} options={spinbuttonVariants[host.variant].options} />,
+      context: {
+        values: {
+          state: { variant: host.variant, data: host.data, options: spinbuttonVariants[host.variant].options },
+          model: { variantItems: items },
+        },
+        actions: {
+          selectVariant: host.selectVariant,
+          dispatchEvent: (event: PatternEvent) => {
+            onEvent(event)
+            host.dispatchEvent(event)
+          },
+        },
+        components: { Spinbutton },
+      },
     }
   },
-}
+})

@@ -3,8 +3,7 @@ import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { Grid } from './Grid'
 import { gridVariantItems, gridVariants, type GridVariantKey } from './gridData'
 import { renderDataInspect } from '../../shared/inspect/index'
-import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
-import { VariantListbox } from '../../shared/VariantListbox'
+import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 
 const reduceGridDemoData = (data: PatternData, event: PatternEvent): PatternData => {
   if (event.type === 'sort') {
@@ -13,10 +12,38 @@ const reduceGridDemoData = (data: PatternData, event: PatternEvent): PatternData
   return reducePatternData(gridDefinition, data, event)
 }
 
-export const entry: PatternEntry = {
+const gridDemoDefinition = {
   key: 'grid',
   label: 'Grid',
-  useDemoPattern: (onEvent) => {
+  keyboardShortcuts: ['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End', 'Ctrl+Home', 'Ctrl+End', 'PageUp', 'PageDown', 'Enter', 'F2', 'Escape'],
+  sources: {
+    main: 'Grid.tsx',
+    entry: 'grid/entry.tsx',
+    hooks: ['grid/useGridPattern.ts'],
+    data: ['gridData.ts'],
+    definition: 'grid/definition.ts',
+  },
+  controls: {
+    kind: 'listbox',
+    value: '$state.variant',
+    items: '$model.variantItems',
+    label: 'grid variants',
+    idPrefix: 'grid-variant',
+    onChange: '$actions.selectVariant',
+  },
+  view: {
+    kind: 'component',
+    component: 'Grid',
+    props: {
+      data: '$state.data',
+      onEvent: '$actions.dispatchEvent',
+    },
+  },
+} as const satisfies DemoPatternDefinition
+
+export const entry = defineDemoPattern({
+  definition: gridDemoDefinition,
+  useRuntime: (onEvent) => {
     const host = useVariantPatternDataHost<GridVariantKey>(
       'dataTransactions',
       gridVariants.dataTransactions.data,
@@ -24,16 +51,21 @@ export const entry: PatternEntry = {
       (_variant, data, event) => reduceGridDemoData(data, event),
     )
     return {
-      key: 'grid',
-      label: 'Grid',
-      keyboardShortcuts: ['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End', 'Ctrl+Home', 'Ctrl+End', 'PageUp', 'PageDown', 'Enter', 'F2', 'Escape'],
-      sourceNames: ['Grid.tsx', 'grid/entry.tsx', 'grid/useGridPattern.ts', 'gridData.ts', 'grid/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
-      variants: <VariantListbox value={host.variant} items={gridVariantItems} label="grid variants" idPrefix="grid-variant" onChange={host.selectVariant} />,
-      preview: <Grid data={host.data} onEvent={(event) => {
-        onEvent(event)
-        host.dispatchEvent(event)
-      }} />,
+      context: {
+        values: {
+          state: { variant: host.variant, data: host.data },
+          model: { variantItems: gridVariantItems },
+        },
+        actions: {
+          selectVariant: host.selectVariant,
+          dispatchEvent: (event: PatternEvent) => {
+            onEvent(event)
+            host.dispatchEvent(event)
+          },
+        },
+        components: { Grid },
+      },
     }
   },
-}
+})

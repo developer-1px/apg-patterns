@@ -1,24 +1,32 @@
-import { usePatternDataHost } from '../../shared/demoHostState'
 import { Accordion } from './Accordion'
 import { initialAccordionData, reduceAccordionData } from './accordionData'
-import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
-import { renderDataInspect } from '../../shared/inspect/genericInspect'
+import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 
-export const entry: PatternEntry = {
+const accordionDemoDefinition = {
   key: 'accordion',
   label: 'Accordion',
-  useDemoPattern: (onEvent) => {
-    const host = usePatternDataHost(initialAccordionData, reduceAccordionData)
-    return {
-      key: 'accordion',
-      label: 'Accordion',
-      keyboardShortcuts: ['Enter', 'Space', 'ArrowDown', 'ArrowUp', 'Home', 'End'],
-      sourceNames: ['Accordion.tsx', 'accordion/entry.tsx', 'accordionData.ts', 'accordion/useAccordionPattern.ts', 'accordion/definition.ts', ...KERNEL_SOURCES],
-      inspect: renderDataInspect(host.data),
-      preview: <Accordion data={host.data} onEvent={(event) => {
-        onEvent(event)
-        host.dispatchEvent(event)
-      }} />,
-    }
+  keyboardShortcuts: ['Enter', 'Space', 'ArrowDown', 'ArrowUp', 'Home', 'End'],
+  sources: {
+    main: 'Accordion.tsx',
+    entry: 'accordion/entry.tsx',
+    data: ['accordionData.ts'],
+    hooks: ['accordion/useAccordionPattern.ts'],
+    definition: 'accordion/definition.ts',
   },
-}
+  view: {
+    kind: 'component',
+    component: 'Accordion',
+    props: {
+      data: '$state.data',
+      onEvent: '$actions.dispatchEvent',
+    },
+  },
+} as const satisfies DemoPatternDefinition
+
+export const entry = defineStateDemoPattern({
+  definition: accordionDemoDefinition,
+  initialData: initialAccordionData,
+  reduce: reduceAccordionData,
+  componentName: 'Accordion',
+  component: Accordion,
+})

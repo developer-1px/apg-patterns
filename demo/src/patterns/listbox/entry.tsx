@@ -10,8 +10,7 @@ import {
   initialScrollableListboxData,
 } from './listboxData'
 import { RearrangeableListbox } from './RearrangeableListbox'
-import { VariantListbox } from '../../shared/VariantListbox'
-import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
+import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 
 type ListboxVariantKey = 'basic' | 'scrollable' | 'grouped' | 'rearrangeable' | 'rearrangeableMulti'
 
@@ -41,10 +40,41 @@ const reduceListboxDemoData = (data: PatternData, event: PatternEvent): PatternD
   return reducePatternData(listboxDefinition, data, event)
 }
 
-export const entry: PatternEntry = {
+const listboxDemoDefinition = {
   key: 'listbox',
   label: 'Listbox',
-  useDemoPattern: (onEvent) => {
+  keyboardShortcuts: ['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Space'],
+  sources: {
+    main: 'Listbox.tsx',
+    entry: 'listbox/entry.tsx',
+    data: ['RearrangeableListbox.tsx', 'listboxData.ts'],
+    hooks: ['listbox/useListboxPattern.ts'],
+    definition: 'listbox/definition.ts',
+  },
+  controls: {
+    kind: 'listbox',
+    orientation: 'horizontal',
+    value: '$state.variant',
+    items: '$model.variantItems',
+    label: 'listbox variants',
+    idPrefix: 'listbox-variant',
+    onChange: '$actions.selectVariant',
+  },
+  view: {
+    kind: 'component',
+    component: 'ListboxPreview',
+    props: {
+      variant: '$state.variant',
+      data: '$state.data',
+      options: '$state.options',
+      onEvent: '$actions.dispatchEvent',
+    },
+  },
+} as const satisfies DemoPatternDefinition
+
+export const entry = defineDemoPattern({
+  definition: listboxDemoDefinition,
+  useRuntime: (onEvent) => {
     const host = useVariantPatternDataHost<ListboxVariantKey>(
       'basic',
       initialListboxData,
@@ -66,18 +96,36 @@ export const entry: PatternEntry = {
       ...host.data,
       state: host.variant === 'grouped' ? { ...state, groups: groupedListboxStructure } : state,
     }
-    const preview = host.variant === 'rearrangeable' || host.variant === 'rearrangeableMulti'
-      ? <RearrangeableListbox data={data} onEvent={handleEvent} options={options} />
-      : <Listbox data={data} onEvent={handleEvent} options={options} />
 
     return {
-      key: 'listbox',
-      label: 'Listbox',
-      keyboardShortcuts: ['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Space'],
-      sourceNames: ['Listbox.tsx', 'listbox/entry.tsx', 'RearrangeableListbox.tsx', 'listboxData.ts', 'listbox/useListboxPattern.ts', 'listbox/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
-      variants: <VariantListbox orientation="horizontal" value={host.variant} items={listboxVariantItems} label="listbox variants" idPrefix="listbox-variant" onChange={host.selectVariant} />,
-      preview,
+      context: {
+        values: {
+          state: { variant: host.variant, data, options },
+          model: { variantItems: listboxVariantItems },
+        },
+        actions: {
+          selectVariant: host.selectVariant,
+          dispatchEvent: handleEvent,
+        },
+        components: { ListboxPreview },
+      },
     }
   },
+})
+
+function ListboxPreview({
+  variant,
+  data,
+  onEvent,
+  options,
+}: {
+  variant: ListboxVariantKey
+  data: PatternData
+  onEvent: (event: PatternEvent) => void
+  options: PatternOptions
+}) {
+  return variant === 'rearrangeable' || variant === 'rearrangeableMulti'
+    ? <RearrangeableListbox data={data} onEvent={onEvent} options={options} />
+    : <Listbox data={data} onEvent={onEvent} options={options} />
 }

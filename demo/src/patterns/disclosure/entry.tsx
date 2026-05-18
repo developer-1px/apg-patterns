@@ -1,5 +1,4 @@
-import { type ReactNode } from 'react'
-import { reduceDisclosureData, type PatternData } from '../../../../src'
+import { reduceDisclosureData, type PatternData, type PatternEvent } from '../../../../src'
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { Disclosure } from './Disclosure'
 import {
@@ -11,36 +10,58 @@ import {
   type DisclosureVariantKey,
 } from './disclosureData'
 import { renderDataInspect } from '../../shared/inspect/index'
-import { VariantListbox } from '../../shared/VariantListbox'
-import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
+import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 
-function VariantControl({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="grid gap-1 text-xs text-zinc-600 dark:text-zinc-400">
-      <span>{label}</span>
-      {children}
-    </div>
-  )
+const variants: Record<DisclosureVariantKey, PatternData> = {
+  simple: initialDisclosureData,
+  image: initialImageDisclosureData,
+  faq: initialFaqDisclosureData,
+  navMenu: initialNavMenuDisclosureData,
+  navMenuTopLinks: initialNavMenuTopLinksDisclosureData,
 }
 
-export const entry: PatternEntry = {
+const items: readonly { key: DisclosureVariantKey; label: string }[] = [
+  { key: 'simple', label: 'simple' },
+  { key: 'image', label: 'image description' },
+  { key: 'faq', label: 'FAQ' },
+  { key: 'navMenu', label: 'navigation menu' },
+  { key: 'navMenuTopLinks', label: 'navigation menu (top-level links)' },
+]
+
+const disclosureDemoDefinition = {
   key: 'disclosure',
   label: 'Disclosure',
-  useDemoPattern: (onEvent) => {
-    const variants: Record<DisclosureVariantKey, PatternData> = {
-      simple: initialDisclosureData,
-      image: initialImageDisclosureData,
-      faq: initialFaqDisclosureData,
-      navMenu: initialNavMenuDisclosureData,
-      navMenuTopLinks: initialNavMenuTopLinksDisclosureData,
-    }
-    const items: readonly { key: DisclosureVariantKey; label: string }[] = [
-      { key: 'simple', label: 'simple' },
-      { key: 'image', label: 'image description' },
-      { key: 'faq', label: 'FAQ' },
-      { key: 'navMenu', label: 'navigation menu' },
-      { key: 'navMenuTopLinks', label: 'navigation menu (top-level links)' },
-    ]
+  keyboardShortcuts: ['Enter', 'Space'],
+  sources: {
+    main: 'Disclosure.tsx',
+    entry: 'disclosure/entry.tsx',
+    data: ['NavMenuDisclosure.tsx', 'disclosureData.ts'],
+    hooks: ['disclosure/useDisclosurePattern.ts'],
+    runtime: ['disclosure/runtime.ts'],
+    definition: 'disclosure/definition.ts',
+  },
+  controls: {
+    kind: 'listbox',
+    orientation: 'horizontal',
+    value: '$state.variant',
+    items: '$model.variantItems',
+    label: 'disclosure variants',
+    idPrefix: 'disclosure-variant',
+    onChange: '$actions.selectVariant',
+  },
+  view: {
+    kind: 'component',
+    component: 'Disclosure',
+    props: {
+      data: '$state.data',
+      onEvent: '$actions.dispatchEvent',
+    },
+  },
+} as const satisfies DemoPatternDefinition
+
+export const entry = defineDemoPattern({
+  definition: disclosureDemoDefinition,
+  useRuntime: (onEvent) => {
     const host = useVariantPatternDataHost<DisclosureVariantKey>(
       'simple',
       initialDisclosureData,
@@ -48,20 +69,21 @@ export const entry: PatternEntry = {
       (_variant, data, event) => reduceDisclosureData(data, event),
     )
     return {
-      key: 'disclosure',
-      label: 'Disclosure',
-      keyboardShortcuts: ['Enter', 'Space'],
-      sourceNames: ['Disclosure.tsx', 'disclosure/entry.tsx', 'NavMenuDisclosure.tsx', 'disclosureData.ts', 'disclosure/useDisclosurePattern.ts', 'disclosure/runtime.ts', 'disclosure/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
-      variants: (
-        <VariantControl label="variant">
-          <VariantListbox orientation="horizontal" value={host.variant} items={items} label="disclosure variants" idPrefix="disclosure-variant" onChange={host.selectVariant} />
-        </VariantControl>
-      ),
-      preview: <Disclosure data={host.data} onEvent={(event) => {
-        onEvent(event)
-        host.dispatchEvent(event)
-      }} />,
+      context: {
+        values: {
+          state: { variant: host.variant, data: host.data },
+          model: { variantItems: items },
+        },
+        actions: {
+          selectVariant: host.selectVariant,
+          dispatchEvent: (event: PatternEvent) => {
+            onEvent(event)
+            host.dispatchEvent(event)
+          },
+        },
+        components: { Disclosure },
+      },
     }
   },
-}
+})

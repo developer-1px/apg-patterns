@@ -2,18 +2,47 @@ import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { Combobox } from './Combobox'
 import { buildComboboxData, comboboxVariants, reduceComboboxData, type ComboboxVariantKey } from './comboboxData'
 import { renderDataInspect } from '../../shared/inspect/index'
-import { VariantListbox } from '../../shared/VariantListbox'
-import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
+import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import type { PatternEvent } from '../../../../src'
 
 const comboboxVariantItems = (Object.keys(comboboxVariants) as ComboboxVariantKey[]).map((key) => ({
   key,
   label: comboboxVariants[key].label,
 }))
 
-export const entry: PatternEntry = {
+const comboboxDemoDefinition = {
   key: 'combobox',
   label: 'Combobox',
-  useDemoPattern: (onEvent) => {
+  keyboardShortcuts: ['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Escape'],
+  sources: {
+    main: 'Combobox.tsx',
+    entry: 'combobox/entry.tsx',
+    hooks: ['combobox/useComboboxPattern.ts'],
+    data: ['comboboxData.ts'],
+    definition: 'combobox/definition.ts',
+  },
+  controls: {
+    kind: 'listbox',
+    orientation: 'horizontal',
+    value: '$state.variant',
+    items: '$model.variantItems',
+    label: 'combobox variants',
+    idPrefix: 'combobox-variant',
+    onChange: '$actions.selectVariant',
+  },
+  view: {
+    kind: 'component',
+    component: 'Combobox',
+    props: {
+      data: '$state.data',
+      onEvent: '$actions.dispatchEvent',
+    },
+  },
+} as const satisfies DemoPatternDefinition
+
+export const entry = defineDemoPattern({
+  definition: comboboxDemoDefinition,
+  useRuntime: (onEvent) => {
     const host = useVariantPatternDataHost<ComboboxVariantKey>(
       'listAutocomplete',
       buildComboboxData(undefined, 'listAutocomplete'),
@@ -21,21 +50,21 @@ export const entry: PatternEntry = {
       (_variant, data, event) => reduceComboboxData(data, event),
     )
     return {
-      key: 'combobox',
-      label: 'Combobox',
-      keyboardShortcuts: ['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Escape'],
-      sourceNames: ['Combobox.tsx', 'combobox/entry.tsx', 'combobox/useComboboxPattern.ts', 'comboboxData.ts', 'combobox/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
-      variants: <VariantListbox orientation="horizontal" value={host.variant} items={comboboxVariantItems} label="combobox variants" idPrefix="combobox-variant" onChange={host.selectVariant} />,
-      preview: (
-        <Combobox
-          data={host.data}
-          onEvent={(event) => {
+      context: {
+        values: {
+          state: { variant: host.variant, data: host.data },
+          model: { variantItems: comboboxVariantItems },
+        },
+        actions: {
+          selectVariant: host.selectVariant,
+          dispatchEvent: (event: PatternEvent) => {
             onEvent(event)
             host.dispatchEvent(event)
-          }}
-        />
-      ),
+          },
+        },
+        components: { Combobox },
+      },
     }
   },
-}
+})
