@@ -1,15 +1,9 @@
-import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import { reactKeyInput, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
+import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { useReactPatternRuntime } from '../../adapters/reactPatternEffects'
 import { radioGroupDefinition } from './definition'
-
-export interface ReactRadioRenderItem {
-  key: Key
-  label: string
-  state: ReactRenderItemState & { checked: boolean }
-  radioProps: ReactPatternProps
-}
+import { createRadioRenderItem, type ReactRadioRenderItem } from './radioRenderItem'
+export type { ReactRadioRenderItem } from './radioRenderItem'
 
 export interface ReactRadioGroupRuntime {
   rootProps: ReactPatternProps
@@ -66,20 +60,5 @@ export function useRadioGroupPattern(data: PatternData, onEvent: (event: Pattern
       return { forKey: runtime.keyToElementId }
     },
     keyToElementId: runtime.keyToElementId,
-  }
-}
-
-function createRadioRenderItem(runtime: PatternRuntime, key: Key): ReactRadioRenderItem {
-  const state = runtime.getItemState(key, 'radio')
-  return {
-    key,
-    label: runtime.data.items[key]?.label ?? key,
-    state: {
-      active: Boolean(state.active),
-      selected: Boolean(state.checked),
-      checked: Boolean(state.checked),
-      disabled: Boolean(state.disabled),
-    },
-    radioProps: runtime.getPartProps('radio', key) as ReactPatternProps,
   }
 }
