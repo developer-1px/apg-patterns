@@ -1,7 +1,9 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { createAlertActions } from './alertActions'
 import { createAlertRootProps } from './alertProps'
+import { getAlertMessage, getAlertRuntimeState } from './alertRuntimeState'
 import { alertDefinition } from './definition'
 
 interface AlertItem extends PatternItem {
@@ -46,19 +48,13 @@ export function useAlertPattern(data: AlertData, onEvent: (event: PatternEvent) 
     },
     key,
     get message() {
-      return key ? String(data.items[key]?.message ?? '') : ''
+      return getAlertMessage(data, key)
     },
     get state() {
-      return {
-        visible: key ? (data.state?.expandedKeys ?? []).includes(key) : false,
-      }
+      return getAlertRuntimeState(data, key)
     },
     get actions() {
-      return {
-        dismiss: () => {
-          if (key) runtime.emit({ type: 'dismiss', key })
-        },
-      }
+      return createAlertActions(runtime, key)
     },
     get ids() {
       return { forKey: runtime.keyToElementId }

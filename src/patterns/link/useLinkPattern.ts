@@ -2,7 +2,9 @@ import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { linkDefinition } from './definition'
+import { createLinkActions } from './linkActions'
 import { createLinkProps } from './linkProps'
+import { getLinkRuntimeState } from './linkRuntimeState'
 
 interface LinkItem extends PatternItem {
   href?: unknown
@@ -55,18 +57,10 @@ export function useLinkPattern(data: LinkData, onEvent: (event: PatternEvent) =>
       return key ? data.items[key]?.variant ?? 'anchor' : 'anchor'
     },
     get state() {
-      const state = key ? runtime.getItemState(key, 'link') : {}
-      return {
-        active: Boolean(state.active),
-        disabled: Boolean(state.disabled),
-      }
+      return getLinkRuntimeState(runtime, key)
     },
     get actions() {
-      return {
-        activate: () => {
-          if (key) runtime.emit({ type: 'activate', key })
-        },
-      }
+      return createLinkActions(runtime, key)
     },
     get ids() {
       return { forKey: runtime.keyToElementId }

@@ -2,19 +2,16 @@ import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternDataWithOptions, PatternEvent, PatternOptions, PatternValueStepDirection } from '../../schema'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { windowsplitterDefinition } from './definition'
+import { createWindowSplitterActions } from './windowSplitterActions'
 import { createWindowSplitterSeparatorProps } from './windowSplitterSeparatorProps'
+import { getWindowSplitterState, type ReactWindowSplitterState } from './windowSplitterState'
 
 export interface ReactWindowSplitterRuntime {
   rootProps: ReactPatternProps
   separatorProps: ReactPatternProps
   key: Key | null
   controlledKey: Key | null
-  state: {
-    value: number
-    min: number
-    max: number
-    position: number
-  }
+  state: ReactWindowSplitterState
   actions: {
     focus(): void
     step(direction: PatternValueStepDirection): void
@@ -37,31 +34,18 @@ export function useWindowSplitterPattern(data: PatternDataWithOptions, onEvent: 
   })
   const key = data.relations?.rootKeys?.[0] ?? null
   const controlledKey = key ? data.relations?.controlsByKey?.[key]?.[0] ?? null : null
-  const min = Number(runtimeOptions.min ?? 0)
-  const max = Number(runtimeOptions.max ?? 100)
-  const value = key ? Number(data.state?.valueByKey?.[key] ?? min) : min
-  const position = max === min ? 0 : ((value - min) / (max - min)) * 100
+  const state = getWindowSplitterState({ data, key, options: runtimeOptions })
 
   return {
     rootProps: {},
     get separatorProps() {
-      return createWindowSplitterSeparatorProps({ runtime, key, min, max, options: runtimeOptions })
+      return createWindowSplitterSeparatorProps({ runtime, key, min: state.min, max: state.max, options: runtimeOptions })
     },
     key,
     controlledKey,
-    state: { value, min, max, position },
+    state,
     get actions() {
-      return {
-        focus: () => {
-          if (key) runtime.emit({ type: 'focus', key })
-        },
-        step: (direction: PatternValueStepDirection) => {
-          if (key) runtime.emit({ type: 'valueStep', key, direction })
-        },
-        collapse: () => {
-          if (key) runtime.emit({ type: 'collapse', key })
-        },
-      }
+      return createWindowSplitterActions({ key, runtime })
     },
     get ids() {
       return { forKey: runtime.keyToElementId }

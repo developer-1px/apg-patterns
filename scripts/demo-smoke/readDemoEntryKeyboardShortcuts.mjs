@@ -24,24 +24,37 @@ export async function readDemoEntryKeyboardShortcuts(demoPatternsDir) {
 }
 
 function extractDemoEntryMetadata(sourceFile) {
-  const metadata = { key: null, keyboardShortcuts: null }
+  let metadata = { key: null, keyboardShortcuts: null }
 
   function visit(node) {
-    if (ts.isPropertyAssignment(node)) {
-      const name = propertyNameText(node.name)
-      if (name === 'key' && ts.isStringLiteralLike(node.initializer)) {
-        metadata.key = node.initializer.text
-      }
-      if (name === 'keyboardShortcuts' && ts.isArrayLiteralExpression(node.initializer)) {
-        metadata.keyboardShortcuts = node.initializer.elements.map((element) => (
-          ts.isStringLiteralLike(element) ? element.text : null
-        ))
-      }
+    if (ts.isObjectLiteralExpression(node)) {
+      const objectMetadata = extractObjectMetadata(node)
+      if (objectMetadata.key && objectMetadata.keyboardShortcuts) metadata = objectMetadata
     }
     ts.forEachChild(node, visit)
   }
 
   visit(sourceFile)
+  return metadata
+}
+
+function extractObjectMetadata(objectLiteral) {
+  const metadata = { key: null, keyboardShortcuts: null }
+
+  for (const property of objectLiteral.properties) {
+    if (!ts.isPropertyAssignment(property)) continue
+    const name = propertyNameText(property.name)
+    if (name === 'key' && ts.isStringLiteralLike(property.initializer)) {
+      metadata.key = property.initializer.text
+    }
+    if (name === 'keyboardShortcuts' && ts.isArrayLiteralExpression(property.initializer)) {
+      const shortcuts = property.initializer.elements.map((element) => (
+        ts.isStringLiteralLike(element) ? element.text : null
+      ))
+      metadata.keyboardShortcuts = shortcuts.every((shortcut) => shortcut !== null) ? shortcuts : null
+    }
+  }
+
   return metadata
 }
 

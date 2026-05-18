@@ -1,7 +1,9 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { createButtonActions } from './buttonActions'
 import { createButtonRootProps } from './buttonRootProps'
+import { getButtonRuntimeState } from './buttonRuntimeState'
 import { buttonDefinition } from './definition'
 
 export interface ReactButtonRuntime {
@@ -33,7 +35,6 @@ export function useButtonPattern(data: PatternData, onEvent: (event: PatternEven
     keyToElementId: (key) => `${options?.elementIdPrefix ?? 'button-'}${key}`,
   })
   const key = data.relations?.rootKeys?.[0] ?? null
-  const pressed = key ? data.state?.pressedByKey?.[key] : undefined
 
   return {
     get rootProps() {
@@ -42,24 +43,10 @@ export function useButtonPattern(data: PatternData, onEvent: (event: PatternEven
     key,
     label: key ? data.items[key]?.label ?? '' : '',
     get state() {
-      return {
-        activeKey: data.state?.activeKey ?? null,
-        pressed: pressed === undefined ? null : Boolean(pressed),
-        disabled: key ? data.state?.disabledKeys?.includes(key) ?? false : false,
-      }
+      return getButtonRuntimeState(data, key)
     },
     get actions() {
-      return {
-        focus: () => {
-          if (key) runtime.emit({ type: 'focus', key })
-        },
-        press: (nextPressed: boolean) => {
-          if (key) runtime.emit({ type: 'press', key, pressed: nextPressed })
-        },
-        activate: () => {
-          if (key) runtime.emit({ type: 'activate', key })
-        },
-      }
+      return createButtonActions(runtime, key)
     },
     get ids() {
       return { forKey: runtime.keyToElementId }
