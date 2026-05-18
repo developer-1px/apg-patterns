@@ -32,14 +32,19 @@ function TreeReducerEdgesDemo() {
     <div>
       <button type="button" onClick={() => apply({ type: 'navigate', direction: 'next', meta: { reason: 'keyboard' } })}>Reduce navigate</button>
       <button type="button" onClick={() => apply({ type: 'select', keys: ['demo'], anchorKey: 'docs', extentKey: 'demo', meta: { reason: 'pointer' } })}>Reduce select</button>
+      <button type="button" onClick={() => apply({ type: 'focus', key: 'schema' })}>Reduce focus without reason</button>
+      <button type="button" onClick={() => apply({ type: 'expand', key: 'docs', expanded: true })}>Expand docs</button>
       <button type="button" onClick={() => apply({ type: 'dismiss' })}>Reduce ignored</button>
       <button type="button" onClick={() => setData((current) => ({ ...current, state: { ...current.state, activeKey: 'runtime' } }))}>Set runtime active</button>
       <button type="button" onClick={() => apply({ type: 'expand', key: 'docs', expanded: false, meta: { reason: 'keyboard' } })}>Collapse docs</button>
+      <button type="button" onClick={() => setData({ ...initialData, relations: {}, state: {} } as PatternData)}>Empty relations</button>
       <output data-testid="tree-active">{String(data.state?.activeKey ?? '')}</output>
       <output data-testid="tree-selected">{data.state?.selectedKeys?.join(',') ?? ''}</output>
       <output data-testid="tree-reason">{String(data.state?.lastEventReason ?? '')}</output>
       <output data-testid="tree-first-target">{String(target('first'))}</output>
       <output data-testid="tree-parent-target">{String(target('parent'))}</output>
+      <output data-testid="tree-child-target">{String(target('child'))}</output>
+      <output data-testid="tree-last-target">{String(target('last'))}</output>
       <output data-testid="tree-unknown-target">{String(target('rowStart'))}</output>
     </div>
   )
@@ -218,8 +223,16 @@ describe('APG §Activation', () => {
     expect(screen.getByTestId('tree-selected').textContent).toBe('demo')
     expect(screen.getByTestId('tree-reason').textContent).toBe('pointer')
 
+    fireEvent.click(screen.getByRole('button', { name: 'Reduce focus without reason' }))
+    expect(screen.getByTestId('tree-active').textContent).toBe('schema')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Expand docs' }))
+    expect(screen.getByTestId('tree-active').textContent).toBe('schema')
+
     fireEvent.click(screen.getByRole('button', { name: 'Set runtime active' }))
     expect(screen.getByTestId('tree-parent-target').textContent).toBe('docs')
+    expect(screen.getByTestId('tree-child-target').textContent).toBe('undefined')
+    expect(screen.getByTestId('tree-last-target').textContent).toBe('demo')
     expect(screen.getByTestId('tree-unknown-target').textContent).toBe('undefined')
 
     fireEvent.click(screen.getByRole('button', { name: 'Collapse docs' }))
@@ -227,6 +240,9 @@ describe('APG §Activation', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Reduce ignored' }))
     expect(screen.getByTestId('tree-active').textContent).toBe('docs')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Empty relations' }))
+    expect(screen.getByTestId('tree-first-target').textContent).toBe('undefined')
   })
 
   it('entry runtime controls update inspect, options, variant, and follow-focus navigation', () => {
