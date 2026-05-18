@@ -2,6 +2,7 @@ import { PatternDefinitionSchema } from '../../schema'
 import { gridKeyboard } from './keyboard'
 import { gridParts } from './parts'
 import { gridTransitions } from './transitions'
+import './ariaSources'
 import './navigation'
 
 export { gridRows } from './navigation'

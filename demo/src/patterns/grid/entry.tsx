@@ -26,6 +26,7 @@ const gridDemoDefinition = {
       'grid/gridCell.ts',
       'grid/gridRow.ts',
       'grid/gridRuntimeEvents.ts',
+      'grid/ariaSources.ts',
       'grid/navigation.ts',
       'grid/keyboard.ts',
       'grid/parts.ts',

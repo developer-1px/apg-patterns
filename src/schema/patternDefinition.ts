@@ -5,6 +5,7 @@ import { NavigationSchema } from './patternNavigation'
 import { PredicateSchema } from './patternPredicate'
 import { TransitionSchema } from './patternTransition'
 import { AriaAttributeSchema, AriaRoleSchema, AriaSourcePathSchema, DomEventNameSchema, FocusModelSchema } from './patternDefinitionVocabulary'
+import { validatePatternDefinition } from './patternDefinitionValidation'
 import { ReactFacadeSchema } from './reactFacade'
 export * from './patternDefinitionVocabulary'
 export * from './patternEffects'
@@ -59,38 +60,6 @@ export const PatternDefinitionSchema = z
     react: ReactFacadeSchema.optional(),
   })
   .strict()
-  .superRefine((value, ctx) => {
-    const rootParts = Object.entries(value.parts).filter(([, part]) => part.role === value.rootRole)
-    if (rootParts.length === 0) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['parts'],
-        message: `no part with role="${value.rootRole}" — definition must contain exactly one root part whose role matches rootRole.`,
-      })
-    } else if (rootParts.length > 1) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['parts'],
-        message: `multiple parts (${rootParts.map(([n]) => `"${n}"`).join(', ')}) share rootRole="${value.rootRole}" — exactly one allowed.`,
-      })
-    }
-    if (!value.react) return
-    const hasPart = (part: string) => Object.prototype.hasOwnProperty.call(value.parts, part)
-    if (!hasPart(value.react.root.part)) {
-      ctx.addIssue({ code: 'custom', path: ['react', 'root', 'part'], message: `unknown react root part "${value.react.root.part}".` })
-    }
-    for (const [variantIndex, variant] of (value.react.renderItems?.variants ?? []).entries()) {
-      for (const [field, source] of Object.entries(variant.fields)) {
-        if (source.kind === 'partState' && !hasPart(source.part)) {
-          ctx.addIssue({ code: 'custom', path: ['react', 'renderItems', 'variants', variantIndex, 'fields', field, 'part'], message: `unknown partState part "${source.part}".` })
-        }
-      }
-      for (const [propName, prop] of Object.entries(variant.props)) {
-        if (!hasPart(prop.part)) {
-          ctx.addIssue({ code: 'custom', path: ['react', 'renderItems', 'variants', variantIndex, 'props', propName, 'part'], message: `unknown react prop part "${prop.part}".` })
-        }
-      }
-    }
-  })
+  .superRefine(validatePatternDefinition)
 
 export type PatternDefinition = z.infer<typeof PatternDefinitionSchema>

@@ -16,6 +16,8 @@ export function sourceIdentityNeedles(sourceName, patternKey) {
   }
 
   if (sourceName === 'kernel/patternRuntime.ts') return ['createPatternRuntime']
+  if (sourceName === 'kernel/rootKeyboardHandler.ts') return ['createRootKeyboardHandler']
+  if (sourceName === 'kernel/runtimePartProps.ts') return ['resolveRuntimePartProps']
   if (sourceName === 'kernel/patternReducer.ts') return ['reducePatternData']
   if (sourceName === 'kernel/patternKernel.ts') return ['defineAriaSource']
   if (sourceName === 'kernel/domEventRegistry.ts') return ['defineDomEvent']
@@ -27,6 +29,7 @@ export function sourceIdentityNeedles(sourceName, patternKey) {
   if (sourceName === 'kernel/kernelPredicates.ts') return ['definePredicate']
   if (sourceName === 'schema/index.ts') return ["export * from './patternDefinition'"]
   if (sourceName === 'schema/eventTemplate.ts') return ['EventTemplateSchema']
+  if (sourceName === 'schema/patternDefinitionValidation.ts') return ['validatePatternDefinition']
 
   const patternSource = sourceName.match(/^([^/]+)\/(.+)\.ts$/)
   if (patternSource) {

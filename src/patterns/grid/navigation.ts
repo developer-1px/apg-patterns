@@ -1,5 +1,5 @@
 import { moveGrid } from '@interactive-os/collection-navigation'
-import { defineAriaSource, defineNavigationTarget, defineVisibleOrder } from '../../kernel/patternKernel'
+import { defineNavigationTarget, defineVisibleOrder } from '../../kernel/patternKernel'
 import type { Key, PatternData } from '../../schema'
 
 type GridAction = 'left' | 'right' | 'up' | 'down' | 'rowStart' | 'rowEnd' | 'gridStart' | 'gridEnd'
@@ -14,11 +14,6 @@ export const gridRows = (data: PatternData): readonly (readonly Key[])[] =>
   )
 
 defineVisibleOrder('gridRows', (_visibleOrder, data) => gridRows(data).flat())
-
-defineAriaSource('state.readonly', (ctx) => ctx.data.state?.readonly === true || undefined)
-defineAriaSource('state.multiselectable', (ctx) =>
-  ctx.options?.selectionMode === 'multiple' || ctx.data.state?.multiselectable === true || undefined,
-)
 
 defineNavigationTarget('gridCell', (target, ctx) => {
   const action = target.action

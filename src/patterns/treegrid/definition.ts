@@ -2,6 +2,7 @@ import { PatternDefinitionSchema } from '../../schema'
 import { treegridEffects } from './effects'
 import { treegridKeyboard } from './keyboard'
 import { treegridParts } from './parts'
+import './ariaSources'
 import './navigation'
 
 export { treegridVisibleRowKeys, treegridVisibleCells } from './navigation'

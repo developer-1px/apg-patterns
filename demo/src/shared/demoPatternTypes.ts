@@ -30,7 +30,9 @@ export const KERNEL_SIDE_EFFECT_SOURCES = [
 
 export const KERNEL_IMPLEMENTATION_SOURCES = [
   'kernel/patternRuntime.ts',
+  'kernel/rootKeyboardHandler.ts',
   'kernel/runtimeKeyboard.ts',
+  'kernel/runtimePartProps.ts',
   'kernel/domEventBindings.ts',
   'kernel/domEventRegistry.ts',
   'kernel/slotProps.ts',
@@ -46,6 +48,7 @@ export const KERNEL_IMPLEMENTATION_SOURCES = [
   'schema/index.ts',
   'schema/eventTemplate.ts',
   'schema/patternDefinition.ts',
+  'schema/patternDefinitionValidation.ts',
   'schema/patternDefinitionVocabulary.ts',
 ] as const satisfies readonly SourceName[]
 

@@ -5,11 +5,10 @@ import {
   createParentByKey,
   type PatternRuntimeContext,
 } from './patternKernel'
-import { resolvePartEventBindings } from './domEventBindings'
+import { resolveRuntimePartProps } from './runtimePartProps'
 import { resolveRuntimeItemState } from './runtimeItemState'
 import { createRootKeyboardHandler } from './rootKeyboardHandler'
 import { resolveRuntimeKeyboardBinding } from './runtimeKeyboard'
-import { compactProps, resolveAriaProjections, resolveFocusProjection } from './slotProps'
 export { defineDomEvent, defineDomEventHandlerProp } from './domEventBindings'
 
 export type SlotProps = Record<string, unknown>
@@ -68,20 +67,7 @@ export function createPatternRuntime<TData extends PatternData = PatternData>(in
   const getRootKeyboardHandler = () => createRootKeyboardHandler({ data, visibleKeys, emit, resolveKeyboardBinding })
 
   const getPartProps = (partName: string, key?: Key): SlotProps => {
-    const part = definition.parts[partName]
-    if (!part) throw new Error(`[apg-pattern] unknown part "${partName}" in definition "${definition.apgPattern}"`)
-    if (key !== undefined && !(key in data.items)) throw new Error(`Unknown item key: ${key}`)
-    const ctx = context(key)
-    const isRoot = part.role === definition.rootRole && key === undefined
-    const props: SlotProps = {
-      role: part.role,
-      ...(key !== undefined ? { id: keyToElementId(key) } : {}),
-      ...resolveAriaProjections(part.aria ?? [], ctx),
-      ...resolveFocusProjection(part.focus, ctx),
-      ...resolvePartEventBindings(part.events ?? [], ctx, emit),
-      ...(isRoot ? { onKeyDown: getRootKeyboardHandler() } : {}),
-    }
-    return compactProps(props)
+    return resolveRuntimePartProps({ definition, data, partName, key, keyToElementId, context, emit, getRootKeyboardHandler })
   }
 
   const getItemState = (key: Key, partName: string): Record<string, unknown> => {

@@ -1,6 +1,5 @@
 import { moveGrid } from '@interactive-os/collection-navigation'
 import {
-  defineAriaSource,
   defineNavigationTarget,
   defineVisibleOrder,
 } from '../../kernel/patternKernel'
@@ -10,13 +9,6 @@ import { cellRowKey, visibleCells, visibleRowKeys } from './geometry'
 type TreegridAction = 'left' | 'right' | 'up' | 'down' | 'rowStart' | 'rowEnd' | 'gridStart' | 'gridEnd'
 
 defineVisibleOrder('treegridVisibleCells', (_v, data) => visibleCells(data).flat())
-
-defineAriaSource('state.rowExpanded', (ctx) => {
-  if (!ctx.key) return undefined
-  const hasChildren = (ctx.data.relations?.childrenByKey?.[ctx.key]?.length ?? 0) > 0
-  if (!hasChildren) return undefined
-  return ctx.data.state?.expandedKeys?.includes(ctx.key) ?? false
-})
 
 defineNavigationTarget('treegridCell', (target, ctx) => {
   const action = target.action as TreegridAction
