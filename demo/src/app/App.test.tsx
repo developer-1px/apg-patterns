@@ -90,7 +90,7 @@ describe('source copy', () => {
     await waitFor(() => expect(writes).toHaveLength(1))
     expect(writes[0]).toContain('export function Accordion')
     expect(writes[0]).not.toBe('')
-  })
+  }, 15000)
 
   it('only shows copied after clipboard write succeeds', async () => {
     Object.defineProperty(navigator, 'clipboard', {

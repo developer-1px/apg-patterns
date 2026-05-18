@@ -14,9 +14,9 @@
 import type { KeyInput } from '@interactive-os/keyboard'
 import type { Key, PatternData, PatternOptions } from '../schema'
 import { defineKeyToken, hasKeyToken, resolveKeyToken } from './keyTokenRegistry'
+import { resolveAriaSource, resolveNavigationTarget, resolveStateProjection, resolveVisibleOrder, unknownTokenError } from './kernelResolvers'
 import { evaluatePredicate } from './predicateEvaluation'
 import {
-  ariaSourceRegistry,
   defineAriaSource,
   defineNavigationTarget,
   definePredicate,
@@ -27,9 +27,6 @@ import {
   isRegisteredPredicate,
   isRegisteredStateProjection,
   isRegisteredVisibleOrder,
-  navigationTargetRegistry,
-  stateProjectionRegistry,
-  visibleOrderRegistry,
   type AriaSourceResolver,
   type NavigationTargetContext,
   type NavigationTargetResolver,
@@ -53,6 +50,11 @@ export {
   defineKeyToken,
   hasKeyToken,
   resolveKeyToken,
+  resolveAriaSource,
+  resolveNavigationTarget,
+  resolveStateProjection,
+  resolveVisibleOrder,
+  unknownTokenError,
   evaluatePredicate,
 }
 export type {
@@ -78,41 +80,6 @@ export interface PatternRuntimeContext {
   activeKey: Key | null
   keyToElementId?: (key: Key) => string
   parentByKey?: ReadonlyMap<Key, Key>
-}
-
-// ─────────────────────────────────────────────────────────────
-// Resolve helpers — runtime 의 분기 함수를 대체
-// ─────────────────────────────────────────────────────────────
-
-export function unknownTokenError(category: string, token: string): Error {
-  return new Error(`[apg-pattern] unknown ${category} token: "${token}" — register via define${category[0].toUpperCase()}${category.slice(1)}()`)
-}
-
-export function resolveAriaSource(name: string, ctx: PatternRuntimeContext): unknown {
-  const resolver = ariaSourceRegistry.get(name)
-  if (!resolver) throw unknownTokenError('ariaSource', name)
-  return resolver(ctx)
-}
-
-export function resolveStateProjection(from: string, ctx: PatternRuntimeContext): unknown {
-  const resolver = stateProjectionRegistry.get(from)
-  if (!resolver) throw unknownTokenError('stateProjection', from)
-  return resolver(ctx)
-}
-
-export function resolveVisibleOrder(visibleOrder: { kind: string } & Record<string, unknown>, data: PatternData): readonly Key[] {
-  const resolver = visibleOrderRegistry.get(visibleOrder.kind)
-  if (!resolver) throw unknownTokenError('visibleOrder', visibleOrder.kind)
-  return resolver(visibleOrder, data)
-}
-
-export function resolveNavigationTarget(
-  target: { kind: string; key?: string } & Record<string, unknown>,
-  ctx: NavigationTargetContext,
-): Key | null {
-  const resolver = navigationTargetRegistry.get(target.kind)
-  if (!resolver) throw unknownTokenError('navigationTarget', target.kind)
-  return resolver(target, ctx)
 }
 
 export const hasAriaSource = isRegisteredAriaSource
