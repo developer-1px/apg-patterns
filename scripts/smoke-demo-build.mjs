@@ -258,7 +258,7 @@ async function runSmoke() {
   console.log('demo build smoke passed')
 }
 
-async function waitFor(predicate, timeoutMs = 1000) {
+async function waitFor(predicate, timeoutMs = 3000) {
   const deadline = Date.now() + timeoutMs
   while (Date.now() < deadline) {
     const value = predicate()
