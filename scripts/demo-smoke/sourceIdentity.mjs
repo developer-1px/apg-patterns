@@ -36,16 +36,12 @@ export function sourceIdentityNeedles(sourceName, patternKey) {
   const patternSource = sourceName.match(/^([^/]+)\/(.+)\.ts$/)
   if (patternSource) {
     const [, sourcePatternKey, fileName] = patternSource
-    if (sourcePatternKey === 'kernel' && fileName === 'kernelNavigationTargets') return ['defineNavigationTarget']
-    if (sourcePatternKey === 'kernel' && fileName === 'kernelPredicates') return ['definePredicate']
-    if (sourcePatternKey === 'kernel' && fileName === 'kernelStateProjections') return ['defineStateProjection']
     if (fileName === 'predicates') return ['definePredicate']
     if (fileName === 'definition') {
       if (sourcePatternKey === 'menu') return ['menuButtonDefinition', 'menubarDefinition']
       return [`apgPattern: '${sourcePatternKey}'`]
     }
     if (fileName.endsWith('Sources')) return ['defineAriaSource']
-    if (fileName.endsWith('AriaSources')) return ['defineAriaSource']
     if (fileName.endsWith('Navigation')) return ['defineNavigationTarget']
     if (fileName.endsWith('Actions')) return [`create${pascalCase(fileName.replace(/Actions$/, ''))}Actions`]
     if (fileName.endsWith('RuntimeState')) return [`get${pascalCase(fileName.replace(/RuntimeState$/, ''))}RuntimeState`]

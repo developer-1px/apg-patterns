@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import { createPatternRuntime, reducePatternData, type PatternData, type PatternDefinition, type PatternEvent } from '../index'
+import { resolveTransitionValue } from '../kernel/transitionValue'
 
 const data = {
   items: {
@@ -257,6 +258,9 @@ describe('event templates through keyboard input', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Select with range' }))
     fireEvent.click(screen.getByRole('button', { name: 'Named mismatch' }))
     expect(screen.getByTestId('transition-state').textContent).toBe('a|b|true|7|')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Resolve transition values' }))
+    expect(screen.getByTestId('transition-values').textContent).toBe('true|false|false|4|null')
   })
 })
 
@@ -320,6 +324,7 @@ const transitionDefinition = {
 
 function TransitionHost() {
   const [current, setCurrent] = useState<PatternData>(transitionData)
+  const [resolved, setResolved] = useState('')
   const runtime = createPatternRuntime({
     definition: transitionDefinition,
     data: current,
@@ -353,6 +358,20 @@ function TransitionHost() {
       >
         Named mismatch
       </button>
+      <button
+        type="button"
+        onClick={() => {
+          setResolved([
+            resolveTransitionValue({ from: '$event.expanded' }, { type: 'expand', key: 'a', expanded: true }, current),
+            resolveTransitionValue({ from: '$event.checked' }, { type: 'check', key: 'a', checked: false }, current),
+            resolveTransitionValue({ from: '$event.pressed' }, { type: 'press', key: 'a', pressed: false }, current),
+            resolveTransitionValue({ from: '$event.value' }, { type: 'value', key: 'a', value: 4 }, current),
+            resolveTransitionValue({ from: '$unknown' } as never, { type: 'dismiss' }, current),
+          ].map(String).join('|'))
+        }}
+      >
+        Resolve transition values
+      </button>
       <output data-testid="transition-active">{current.items[current.state?.activeKey ?? '']?.label}</output>
       <output data-testid="transition-state">{[
         current.state?.anchorKey ?? '',
@@ -361,6 +380,7 @@ function TransitionHost() {
         String(current.state?.valueByKey?.a ?? ''),
         current.state?.busyKeys?.join(',') ?? '',
       ].join('|')}</output>
+      <output data-testid="transition-values">{resolved}</output>
     </div>
   )
 }
