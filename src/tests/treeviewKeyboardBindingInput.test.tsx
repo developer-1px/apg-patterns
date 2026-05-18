@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import type { PatternData, PatternOptions } from '../index'
 import '../index'
-import { resolveTreeviewKeyboardBinding } from '../patterns/treeview/runtimeCompatibility'
+import { resolveTreeviewKeyboardBinding, resolveTreeviewNavigationTarget } from '../patterns/treeview/runtimeCompatibility'
 
 const data = {
   items: {
@@ -26,15 +26,30 @@ function KeyboardBindingHost() {
   const [result, setResult] = useState('')
 
   return (
-    <div
-      role="tree"
-      tabIndex={0}
-      onKeyDown={(event) => {
-        const binding = resolveTreeviewKeyboardBinding(event, 'docs', data, options)
-        setResult(binding ? `${binding.preventDefault}:${binding.events.map((item) => item.type).join(',')}` : 'none')
-      }}
-    >
-      <div role="treeitem">Docs</div>
+    <div>
+      <div
+        role="tree"
+        tabIndex={0}
+        onKeyDown={(event) => {
+          const binding = resolveTreeviewKeyboardBinding(event, 'docs', data, options)
+          setResult(binding ? `${binding.preventDefault}:${binding.events.map((item) => item.type).join(',')}` : 'none')
+        }}
+      >
+        <div role="treeitem">Docs</div>
+      </div>
+      <button
+        type="button"
+        onClick={() => {
+          const values = [
+            resolveTreeviewNavigationTarget({ type: 'navigate', direction: 'first' }, 'docs', data),
+            resolveTreeviewNavigationTarget({ type: 'navigate', direction: 'parent' }, 'adr', data),
+            resolveTreeviewNavigationTarget({ type: 'navigate', direction: 'rowStart' }, 'docs', data),
+          ]
+          setResult(values.map(String).join('|'))
+        }}
+      >
+        Resolve tree navigation
+      </button>
       <output>{result}</output>
     </div>
   )
@@ -53,5 +68,8 @@ describe('treeview keyboard binding from keyboard input', () => {
 
     fireEvent.keyDown(tree, { key: 'F9', code: 'F9' })
     expect(screen.getByText('none')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Resolve tree navigation' }))
+    expect(screen.getByText('docs|docs|null')).toBeTruthy()
   })
 })

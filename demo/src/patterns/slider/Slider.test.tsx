@@ -33,19 +33,51 @@ function SliderReducerEdgesDemo() {
         { focusStrategy: 'rovingTabIndex' },
       ),
     )
+  const applyCustomText = (event: PatternEvent) =>
+    setData(() =>
+      reduceSliderData(
+        {
+          ...initialSliderData,
+          items: { custom: { label: 'Custom', valuetext: 'Custom text' } },
+          relations: { rootKeys: ['custom'] },
+          state: { activeKey: 'custom', valueByKey: { custom: 1 } },
+        },
+        event,
+      ),
+    )
+  const applyMin = (event: PatternEvent) =>
+    setData(() =>
+      reduceSliderData(
+        {
+          ...sliderVariants.range.data,
+          items: {
+            min: { label: 'Minimum price', valuemin: 0, valuemax: 500 },
+            max: { label: 'Maximum price', valuemin: 200, valuemax: 500 },
+          },
+          state: { ...sliderVariants.range.data.state, activeKey: 'min', valueByKey: { min: 200, max: 400 } },
+        },
+        event,
+        sliderVariants.range.options,
+      ),
+    )
 
   return (
     <div>
       <button type="button" onClick={() => apply({ type: 'value', key: 'max', value: 390 })}>Move max down</button>
+      <button type="button" onClick={() => applyMin({ type: 'value', key: 'min', value: 210 })}>Move min up</button>
       <button type="button" onClick={() => apply({ type: 'valueStep', key: 'min', direction: 'unknown' })}>Unknown step</button>
+      <button type="button" onClick={() => apply({ type: 'dismiss' })}>Ignored event</button>
       <button type="button" onClick={() => applyTemperature({ type: 'value', key: 'temp', value: 'ignored' })}>String temperature</button>
       <button type="button" onClick={() => applyFallback({ type: 'valueStep', key: 'loose', direction: 'increment' })}>Fallback range</button>
+      <button type="button" onClick={() => applyCustomText({ type: 'value', key: 'custom', value: 2 })}>Custom valuetext</button>
       <output data-testid="slider-active">{String(data.state?.activeKey ?? '')}</output>
       <output data-testid="slider-min">{String(data.state?.valueByKey?.min ?? '')}</output>
       <output data-testid="slider-max">{String(data.state?.valueByKey?.max ?? '')}</output>
       <output data-testid="slider-temp">{String(data.state?.valueByKey?.temp ?? '')}</output>
       <output data-testid="slider-loose">{String(data.state?.valueByKey?.loose ?? '')}</output>
+      <output data-testid="slider-custom-text">{String(data.items.custom?.valuetext ?? '')}</output>
       <output data-testid="slider-min-max">{String(data.items.min?.valuemax ?? '')}</output>
+      <output data-testid="slider-max-min">{String(data.items.max?.valuemin ?? '')}</output>
     </div>
   )
 }
@@ -239,8 +271,15 @@ describe('Slider demo — variant: Multi-Thumb Range', () => {
     expect(screen.getByTestId('slider-max').textContent).toBe('390')
     expect(screen.getByTestId('slider-min-max').textContent).toBe('390')
 
+    fireEvent.click(screen.getByRole('button', { name: 'Move min up' }))
+    expect(screen.getByTestId('slider-min').textContent).toBe('210')
+    expect(screen.getByTestId('slider-max-min').textContent).toBe('210')
+
     fireEvent.click(screen.getByRole('button', { name: 'Unknown step' }))
-    expect(screen.getByTestId('slider-min').textContent).toBe('200')
+    expect(screen.getByTestId('slider-min').textContent).toBe('210')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Ignored event' }))
+    expect(screen.getByTestId('slider-min').textContent).toBe('210')
 
     fireEvent.click(screen.getByRole('button', { name: 'String temperature' }))
     expect(screen.getByTestId('slider-active').textContent).toBe('temp')
@@ -248,5 +287,8 @@ describe('Slider demo — variant: Multi-Thumb Range', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Fallback range' }))
     expect(screen.getByTestId('slider-loose').textContent).toBe('1')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Custom valuetext' }))
+    expect(screen.getByTestId('slider-custom-text').textContent).toBe('Custom text')
   })
 })
