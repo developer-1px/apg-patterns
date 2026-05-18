@@ -1,4 +1,6 @@
 import { PatternDefinitionSchema } from '../../schema'
+import { alertKeyboard } from './keyboard'
+import { alertParts } from './parts'
 
 export const AlertDefinitionSchema = PatternDefinitionSchema.superRefine((value, ctx) => {
   if (value.apgPattern !== 'alert') ctx.addIssue({ code: 'custom', path: ['apgPattern'], message: 'expected "alert"' })
@@ -15,41 +17,10 @@ export const alertDefinition = AlertDefinitionSchema.parse({
   apgPattern: 'alert',
   rootRole: 'alert',
   containedRoles: [],
-  parts: {
-    alert: {
-      role: 'alert',
-      aria: [
-        { attribute: 'aria-label', from: 'items.label' },
-      ],
-      state: [
-        { name: 'expanded', from: 'state.expandedKeys' },
-      ],
-    },
-    dismiss: {
-      role: 'button',
-      aria: [
-        { attribute: 'aria-label', from: 'items.label' },
-        { attribute: 'aria-controls', from: 'relations.controlsByKey' },
-      ],
-      events: [
-        {
-          event: 'click',
-          events: [{ type: 'dismiss', key: '$activeKey' }],
-        },
-      ],
-    },
-  },
+  parts: alertParts,
   navigation: {
     visibleOrder: { kind: 'flat' },
     targets: {},
   },
-  keyboard: [
-    {
-      shortcut: 'Escape',
-      preventDefault: true,
-      cases: [
-        { case: 'always', events: [{ type: 'dismiss', key: '$activeKey' }] },
-      ],
-    },
-  ],
+  keyboard: alertKeyboard,
 })
