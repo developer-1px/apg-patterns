@@ -1,116 +1,114 @@
-export type RecorderEntry = {
+export interface ReproMeta {
+  url: string
+  startedAt: string
+  duration: number
+  eventCount: number
+}
+
+export type InputEntry = {
   seq: number
   time: string
-  type: string
+  ch: 'input'
+  type: 'keydown' | 'click' | 'focus'
   key?: string
   target: string
-  defaultPrevented: boolean
-  snapshot: string
+  source: string | null
+  focus: string
+  prevented: boolean
+  ariaTree: string
 }
 
-export function describeElement(element: EventTarget | Element | null): string {
-  if (!(element instanceof Element)) return 'null'
-  const tag = element.tagName.toLowerCase()
-  const role = element.getAttribute('role')
-  const id = element.id ? `#${element.id}` : ''
-  const label = element.getAttribute('aria-label')
-  const text = element.textContent?.trim().replace(/\s+/g, ' ').slice(0, 48)
-  const name = label ?? text
-  return `${tag}${id}${role ? `[role=${role}]` : ''}${name ? ` "${name}"` : ''}`
+export type StateEntry = {
+  seq: number
+  time: string
+  ch: 'state'
+  command: string
+  payload: unknown
+  diff: string[]
+  context?: string
 }
 
-export function serializePreview(target?: EventTarget | Element | null): string {
-  const root = target instanceof Element
-    ? target.closest<HTMLElement>('[data-demo-preview]') ?? document
-    : document
-  const combobox = root.querySelector<HTMLElement>('[role="combobox"]')
-  if (combobox) return serializeCombobox(combobox)
-
-  const listbox = root.querySelector<HTMLElement>('[role="listbox"]')
-  if (listbox) return serializeListbox(listbox)
-
-  return 'preview pattern: not found'
+export type RouteEntry = {
+  seq: number
+  time: string
+  ch: 'route'
+  from: string
+  to: string
+  method: 'pushState' | 'replaceState' | 'popstate' | 'hashchange'
 }
 
-export function serializeCombobox(combobox = document.querySelector<HTMLElement>('[role="combobox"]')): string {
-  if (!combobox) return 'combobox: not found'
+export type ConsoleEntry = {
+  seq: number
+  time: string
+  ch: 'console'
+  level: 'error' | 'warn'
+  message: string
+}
 
-  const activeId = combobox.getAttribute('aria-activedescendant')
-  const activeOption = activeId ? document.getElementById(activeId) : null
-  const popupId = combobox.getAttribute('aria-controls')
-  const popup = popupId ? document.getElementById(popupId) : null
-  const input = combobox instanceof HTMLInputElement ? combobox : null
+export type ReproEvent = InputEntry | StateEntry | RouteEntry | ConsoleEntry
 
-  const lines = [
-    `combobox "${getName(combobox)}"`,
-    `  focus=${document.activeElement === combobox}`,
-    `  value=${JSON.stringify(input?.value ?? '')}`,
-    `  expanded=${combobox.getAttribute('aria-expanded') ?? 'null'}`,
-    `  activeDescendant=${activeId ?? 'null'}${activeOption ? ` "${getName(activeOption)}"` : ''}`,
-    `  activeVisible=${activeOption ? isVisibleWithin(activeOption, popup) : 'n/a'}`,
+export function formatTimelineAsText(meta: ReproMeta, timeline: ReproEvent[]): string {
+  const lines: string[] = [
+    `# REC ${meta.url}`,
+    `# ${meta.startedAt} | ${(meta.duration / 1000).toFixed(1)}s | ${meta.eventCount} events`,
+    '',
   ]
 
-  if (popup) {
-    lines.push(`popup #${popup.id} scrollTop=${popup.scrollTop} clientHeight=${popup.clientHeight}`)
-    const options = Array.from(popup.querySelectorAll<HTMLElement>('[role="option"]'))
-    for (const option of options) {
-      const selected = option.getAttribute('aria-selected')
-      const marker = option === activeOption ? '>' : ' '
-      lines.push(`${marker} option #${option.id} "${getName(option)}" selected=${selected ?? 'null'} data-active=${option.hasAttribute('data-active')}`)
+  let lastSource = ''
+  let index = 0
+  while (index < timeline.length) {
+    const event = timeline[index]
+    if (event.ch !== 'input') {
+      lines.push(formatStandalone(event))
+      lines.push('')
+      index += 1
+      continue
     }
-  } else {
-    lines.push(`popup: not found (${popupId ?? 'no aria-controls'})`)
+
+    const key = event.key ? ` ${event.key}` : ''
+    const sourceChanged = event.source !== null && event.source !== lastSource
+    if (event.source) lastSource = event.source
+    const source = sourceChanged ? ` <- ${event.source}` : ''
+
+    let next = index + 1
+    const trailing: string[] = []
+    while (next < timeline.length && timeline[next].ch !== 'input') {
+      trailing.push(formatTrailing(timeline[next]))
+      next += 1
+    }
+
+    if (event.ariaTree === '(no changes)' && trailing.length === 0) {
+      lines.push(`[${event.seq}] ${event.time} ${event.type}${key} -> ${event.target} (no changes)`)
+    } else {
+      lines.push(`[${event.seq}] ${event.time} ${event.type}${key} -> ${event.target}${source}`)
+      const metaLine = [
+        event.focus !== event.target ? `focus: ${event.focus}` : '',
+        event.prevented ? 'prevented' : '',
+      ].filter(Boolean).join(' | ')
+      if (metaLine) lines.push(metaLine)
+      for (const treeLine of event.ariaTree.split('\n')) lines.push(`  ${treeLine}`)
+      for (const line of trailing) lines.push(line)
+    }
+    lines.push('')
+    index = next
   }
 
   return lines.join('\n')
 }
 
-export function serializeListbox(listbox = document.querySelector<HTMLElement>('[role="listbox"]')): string {
-  if (!listbox) return 'listbox: not found'
-
-  const activeId = listbox.getAttribute('aria-activedescendant')
-  const activeOption = activeId ? document.getElementById(activeId) : null
-  const focusedOption = document.activeElement instanceof HTMLElement && document.activeElement.getAttribute('role') === 'option'
-    ? document.activeElement
-    : null
-  const activeElement = activeOption ?? focusedOption
-
-  const lines = [
-    `listbox "${getName(listbox)}"`,
-    `  focus=${document.activeElement === listbox}`,
-    `  focusedOption=${focusedOption ? `#${focusedOption.id || '(no id)'} "${getName(focusedOption)}"` : 'null'}`,
-    `  activeDescendant=${activeId ?? 'null'}${activeOption ? ` "${getName(activeOption)}"` : ''}`,
-    `  activeVisible=${activeElement instanceof HTMLElement ? isVisibleWithin(activeElement, listbox) : 'n/a'}`,
-  ]
-
-  const options = Array.from(listbox.querySelectorAll<HTMLElement>('[role="option"]'))
-  for (const option of options) {
-    const selected = option.getAttribute('aria-selected')
-    const marker = option === activeElement ? '>' : ' '
-    lines.push(`${marker} option #${option.id || '(no id)'} "${getName(option)}" selected=${selected ?? 'null'} data-active=${option.hasAttribute('data-active')}`)
-  }
-
-  return lines.join('\n')
+function formatStandalone(event: ReproEvent): string {
+  if (event.ch === 'state') return `[${event.seq}] ${event.time} -> ${event.command}: ${formatDiffs(event.diff)}${event.context ? ` (${event.context})` : ''}`
+  if (event.ch === 'route') return `[${event.seq}] ${event.time} route ${event.method}: ${event.from} -> ${event.to}`
+  return `[${event.seq}] ${event.time} ${event.level}: ${event.message}`
 }
 
-export function formatRecording(entries: RecorderEntry[]): string {
-  if (entries.length === 0) return 'REC: no events'
-  return entries.map((entry) => {
-    const key = entry.key ? ` ${entry.key}` : ''
-    return `[${entry.seq}] ${entry.time} ${entry.type}${key} -> ${entry.target} prevented=${entry.defaultPrevented}\n${entry.snapshot}`
-  }).join('\n\n')
+function formatTrailing(event: ReproEvent): string {
+  if (event.ch === 'state') return `  -> ${event.command}: ${formatDiffs(event.diff)}${event.context ? ` (${event.context})` : ''}`
+  if (event.ch === 'route') return `  route ${event.method}: ${event.from} -> ${event.to}`
+  if (event.ch === 'console') return `  ${event.level}: ${event.message}`
+  return ''
 }
 
-function getName(element: Element): string {
-  return element.getAttribute('aria-label')
-    ?? element.getAttribute('aria-labelledby')
-    ?? element.textContent?.trim().replace(/\s+/g, ' ').slice(0, 60)
-    ?? ''
-}
-
-function isVisibleWithin(element: HTMLElement, container: HTMLElement | null): boolean {
-  if (!container) return false
-  const elementTop = element.offsetTop
-  const elementBottom = elementTop + element.offsetHeight
-  return elementTop >= container.scrollTop && elementBottom <= container.scrollTop + container.clientHeight
+function formatDiffs(diff: string[]): string {
+  return diff.length > 0 ? diff.join(', ') : 'no diff'
 }

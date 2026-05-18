@@ -17,20 +17,11 @@ import {
 } from '../../kernel/patternKernel'
 import { createPatternRuntime, type CreatePatternRuntimeInput } from '../../kernel/patternRuntime'
 import { resolveTreeKeyboardBinding, type ResolvedKeyboardBinding } from './keyboardBinding'
-import { getTreeItemState, type TreeviewRenderState } from './renderState'
+import { createTreeviewRenderItems, type TreeviewRenderItem, type TreeviewSlotProps } from './renderItem'
 import { resolveTreeviewVisibleKeys, resolveTypeaheadTarget } from './typeahead'
 
-export type TreeviewSlotProps = Record<string, unknown>
 export type { TreeviewRenderState } from './renderState'
-
-export interface TreeviewRenderItem {
-  key: Key
-  state: TreeviewRenderState
-  slotProps: {
-    treeitem: TreeviewSlotProps
-    indicator?: TreeviewSlotProps
-  }
-}
+export type { TreeviewRenderItem, TreeviewSlotProps } from './renderItem'
 
 export interface TreeviewRuntime {
   definition: typeof treeviewDefinition
@@ -111,11 +102,7 @@ export function createTreeviewRuntime(input: CreateTreeviewRuntimeInput): Treevi
     data,
     options,
     get items() {
-      return resolveTreeviewVisibleKeys(data).map((key) => ({
-        key,
-        state: getTreeItemState(data, key),
-        slotProps: { treeitem: getTreeItemProps(key), indicator: getIndicatorProps(key) },
-      }))
+      return createTreeviewRenderItems(data, getTreeItemProps, getIndicatorProps)
     },
     get slotProps() {
       return { tree: getTreeProps() }

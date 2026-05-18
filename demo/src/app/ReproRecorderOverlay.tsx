@@ -1,16 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
-  describeElement,
-  formatRecording,
-  serializePreview,
-  type RecorderEntry,
+  formatTimelineAsText,
+  type ReproEvent,
+  type ReproMeta,
 } from './reproRecorderFormat'
+import { findRoleContainer, serializeARIATree } from './reproARIATree'
 
 type RecorderState = {
   active: boolean
   startedAt: number
+  startedAtIso: string
   seq: number
-  entries: RecorderEntry[]
+  entries: ReproEvent[]
 }
 
 const buttonStyle = {
@@ -62,7 +63,7 @@ function shortcutMatches(event: KeyboardEvent): boolean {
 }
 
 export function ReproRecorderOverlay() {
-  const recorderRef = useRef<RecorderState>({ active: false, startedAt: 0, seq: 0, entries: [] })
+  const recorderRef = useRef<RecorderState>({ active: false, startedAt: 0, startedAtIso: '', seq: 0, entries: [] })
   const [recording, setRecording] = useState(false)
   const [summary, setSummary] = useState('REC ready. Shortcut: Cmd/Ctrl+Shift+\\ or Alt+Shift+R')
 
@@ -70,14 +71,20 @@ export function ReproRecorderOverlay() {
     const recorder = recorderRef.current
     recorder.active = false
     setRecording(false)
-    const text = formatRecording(recorder.entries)
+    const meta: ReproMeta = {
+      url: window.location.href,
+      startedAt: recorder.startedAtIso,
+      duration: performance.now() - recorder.startedAt,
+      eventCount: recorder.entries.length,
+    }
+    const text = formatTimelineAsText(meta, recorder.entries)
     setSummary(text)
     console.log(text)
     void navigator.clipboard?.writeText(text).catch(() => undefined)
   }, [])
 
   const start = useCallback(() => {
-    recorderRef.current = { active: true, startedAt: performance.now(), seq: 0, entries: [] }
+    recorderRef.current = { active: true, startedAt: performance.now(), startedAtIso: new Date().toISOString(), seq: 0, entries: [] }
     setSummary('REC recording...')
     setRecording(true)
   }, [])
@@ -98,17 +105,28 @@ export function ReproRecorderOverlay() {
       const target = event.target
       const key = event instanceof KeyboardEvent ? event.key : undefined
       window.requestAnimationFrame(() => {
-        const entry: RecorderEntry = {
+        const activeElement = document.activeElement instanceof Element ? document.activeElement : null
+        const targetElement = target instanceof Element ? target : null
+        const container = findRoleContainer(targetElement)
+        const entry: ReproEvent = {
           seq,
           time: `+${Math.round(performance.now() - startedAt)}ms`,
-          type: event.type,
+          ch: 'input',
+          type: event.type === 'focusin' ? 'focus' : event.type,
           ...(key ? { key } : {}),
           target: describeElement(target),
-          defaultPrevented: event.defaultPrevented,
-          snapshot: serializePreview(target),
+          source: container ? describeElement(container) : null,
+          focus: describeElement(activeElement),
+          prevented: event.defaultPrevented,
+          ariaTree: container ? serializeARIATree(container, activeElement) : '(no ARIA nodes)',
         }
         recorder.entries.push(entry)
-        setSummary(formatRecording(recorder.entries.slice(-3)))
+        setSummary(formatTimelineAsText({
+          url: window.location.href,
+          startedAt: recorder.startedAtIso,
+          duration: performance.now() - recorder.startedAt,
+          eventCount: recorder.entries.length,
+        }, recorder.entries.slice(-3)))
       })
     }
 
@@ -139,4 +157,15 @@ export function ReproRecorderOverlay() {
       <div style={panelStyle}>{summary}</div>
     </>
   )
+}
+
+function describeElement(element: EventTarget | Element | null): string {
+  if (!(element instanceof Element)) return 'null'
+  const tag = element.tagName.toLowerCase()
+  const role = element.getAttribute('role')
+  const id = element.id ? `#${element.id}` : ''
+  const label = element.getAttribute('aria-label')
+  const text = element.textContent?.trim().replace(/\s+/g, ' ').slice(0, 48)
+  const name = label ?? text
+  return `${tag}${id}${role ? `[role=${role}]` : ''}${name ? ` "${name}"` : ''}`
 }
