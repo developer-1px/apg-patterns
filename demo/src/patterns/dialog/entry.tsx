@@ -14,7 +14,14 @@ const dialogDemoDefinition = {
     data: ['dialogData.ts'],
     hooks: ['dialog/useDialogPattern.ts'],
     definition: 'dialog/definition.ts',
-    extra: ['dialog/dialogProps.ts', 'dialog/effects.ts', 'dialog/keyboard.ts', 'dialog/parts.ts', 'dialog/transitions.ts'],
+    extra: [
+      'dialog/dialogProps.ts',
+      'dialog/dialogRuntimeKeys.ts',
+      'dialog/effects.ts',
+      'dialog/keyboard.ts',
+      'dialog/parts.ts',
+      'dialog/transitions.ts',
+    ],
   },
   controls: {
     kind: 'listbox',

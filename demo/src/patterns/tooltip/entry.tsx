@@ -13,7 +13,14 @@ const tooltipDemoDefinition = {
     data: ['tooltipData.ts'],
     hooks: ['tooltip/useTooltipPattern.ts'],
     definition: 'tooltip/definition.ts',
-    extra: ['tooltip/keyboard.ts', 'tooltip/parts.ts', 'tooltip/tooltipTriggerProps.ts', 'tooltip/transitions.ts'],
+    extra: [
+      'tooltip/keyboard.ts',
+      'tooltip/parts.ts',
+      'tooltip/tooltipActions.ts',
+      'tooltip/tooltipRuntimeState.ts',
+      'tooltip/tooltipTriggerProps.ts',
+      'tooltip/transitions.ts',
+    ],
   },
   view: {
     kind: 'component',

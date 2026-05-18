@@ -4,6 +4,7 @@ import { treegridKeyboard } from './keyboard'
 import { treegridParts } from './parts'
 import './ariaSources'
 import './navigation'
+import './predicates'
 import './rowNavigation'
 
 export { treegridVisibleRowKeys, treegridVisibleCells } from './navigation'

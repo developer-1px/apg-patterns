@@ -9,6 +9,7 @@ import {
   type PatternOptions,
 } from '../../schema'
 import { treeviewDefinition } from './definition'
+import { treeviewDefaultOptions } from './defaultOptions'
 import { withNonEnumerableMeta } from './eventMeta'
 import { createPatternRuntime, type CreatePatternRuntimeInput } from '../../kernel/patternRuntime'
 import { createTreeviewRenderItems, type TreeviewRenderItem, type TreeviewSlotProps } from './renderItem'
@@ -39,21 +40,11 @@ export interface CreateTreeviewRuntimeInput {
   typeaheadBuffer?: TypeaheadBuffer
 }
 
-const defaultOptions = {
-  selectionMode: 'single',
-  focusStrategy: 'rovingTabIndex',
-  followFocus: false,
-  itemClickAction: 'select',
-  indicatorClickAction: 'toggleExpand',
-  typeaheadEnabled: true,
-  elementIdPrefix: 'treeitem-',
-} satisfies PatternOptions
-
 export function createTreeviewRuntime(input: CreateTreeviewRuntimeInput): TreeviewRuntime {
   const data = PatternDataSchema.parse(input.data)
-  const options = { ...defaultOptions, ...PatternOptionsSchema.parse(input.options ?? {}) }
+  const options = { ...treeviewDefaultOptions, ...PatternOptionsSchema.parse(input.options ?? {}) }
   const emit = (event: PatternEvent) => input.onEvent(withNonEnumerableMeta(PatternEventSchema.parse(event)))
-  const keyToElementId = (key: Key) => `${options.elementIdPrefix ?? defaultOptions.elementIdPrefix}${key}`
+  const keyToElementId = (key: Key) => `${options.elementIdPrefix ?? treeviewDefaultOptions.elementIdPrefix}${key}`
   const typeahead = input.typeaheadBuffer ?? createTypeaheadBuffer()
   const runtime = createPatternRuntime({
     definition: treeviewDefinition,

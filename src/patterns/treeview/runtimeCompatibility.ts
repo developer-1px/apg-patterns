@@ -5,24 +5,15 @@ import {
   resolveNavigationTarget,
 } from '../../kernel/patternKernel'
 import { treeviewDefinition } from './definition'
+import { treeviewDefaultOptions } from './defaultOptions'
 import { resolveTreeKeyboardBinding, type ResolvedKeyboardBinding } from './keyboardBinding'
 import { resolveTreeviewVisibleKeys } from './typeahead'
-
-const defaultOptions = {
-  selectionMode: 'single',
-  focusStrategy: 'rovingTabIndex',
-  followFocus: false,
-  itemClickAction: 'select',
-  indicatorClickAction: 'toggleExpand',
-  typeaheadEnabled: true,
-  elementIdPrefix: 'treeitem-',
-} satisfies PatternOptions
 
 export function resolveTreeviewKeyboardBinding(
   input: KeyInput,
   activeKey: Key,
   data: PatternData,
-  options: PatternOptions = defaultOptions,
+  options: PatternOptions = treeviewDefaultOptions,
   keyboard: readonly KeyboardBinding[] = treeviewDefinition.keyboard,
 ): ResolvedKeyboardBinding | null {
   return resolveTreeKeyboardBinding({ input, activeKey, data, options, keyboard })

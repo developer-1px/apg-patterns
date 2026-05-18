@@ -12,7 +12,16 @@ const radioDemoDefinition = {
     data: ['radioData.ts'],
     hooks: ['radio/useRadioGroupPattern.ts'],
     definition: 'radio/definition.ts',
-    extra: ['radio/keyboard.ts', 'radio/parts.ts', 'radio/radioRenderItem.ts', 'radio/stateSources.ts', 'radio/inspect.ts'],
+    extra: [
+      'radio/keyboard.ts',
+      'radio/parts.ts',
+      'radio/radioGroupActions.ts',
+      'radio/radioGroupRootProps.ts',
+      'radio/radioGroupRuntimeState.ts',
+      'radio/radioRenderItem.ts',
+      'radio/stateSources.ts',
+      'radio/inspect.ts',
+    ],
   },
   controls: {
     kind: 'listbox',

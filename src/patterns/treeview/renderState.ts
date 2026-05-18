@@ -1,27 +1,18 @@
 import type { Key, PatternData } from '../../schema'
 import { PatternDataSchema } from '../../schema'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
+import { treeviewDefaultOptions } from './defaultOptions'
 import { treeviewDefinition } from './definition'
 
 export type TreeviewRenderState = Record<'active' | 'selected' | 'disabled' | 'expanded', boolean> & {
   checked?: boolean | 'mixed'
 }
 
-const defaultStateOptions = {
-  selectionMode: 'single',
-  focusStrategy: 'rovingTabIndex',
-  followFocus: false,
-  itemClickAction: 'select',
-  indicatorClickAction: 'toggleExpand',
-  typeaheadEnabled: true,
-  elementIdPrefix: 'treeitem-',
-} as const
-
 export function getTreeItemState(data: PatternData, key: Key): TreeviewRenderState {
   const runtime = createPatternRuntime({
     definition: treeviewDefinition,
     data: PatternDataSchema.parse(data),
-    options: defaultStateOptions,
+    options: treeviewDefaultOptions,
     onEvent: () => undefined,
   })
   const state = runtime.getItemState(key, 'treeitem')

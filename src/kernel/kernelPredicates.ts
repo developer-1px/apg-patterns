@@ -1,24 +1,6 @@
-import type { Key, PatternData } from '../schema'
 import { definePredicate, resolveKeyToken } from './patternKernel'
 
 definePredicate('hasActiveKey', (_p, ctx) => Boolean(ctx.activeKey))
-definePredicate('activeCellInFirstColumn', (_p, ctx) => {
-  const cell = activeCellRelation(ctx.data, ctx.activeKey)
-  return Boolean(cell && cell.columnKey === ctx.data.relations?.columnKeys?.[0])
-})
-definePredicate('activeRowHasChildren', (_p, ctx) => {
-  const rowKey = activeCellRelation(ctx.data, ctx.activeKey)?.rowKey
-  return Boolean(rowKey && (ctx.data.relations?.childrenByKey?.[rowKey]?.length ?? 0) > 0)
-})
-definePredicate('activeRowExpanded', (_p, ctx) => {
-  const rowKey = activeCellRelation(ctx.data, ctx.activeKey)?.rowKey
-  return Boolean(rowKey && (ctx.data.state?.expandedKeys?.includes(rowKey) ?? false))
-})
-definePredicate('activeKeyIsRow', (_p, ctx) => {
-  if (!ctx.activeKey) return false
-  const rowKeys = ctx.data.relations?.rowKeys ?? []
-  return rowKeys.includes(ctx.activeKey)
-})
 definePredicate('isChecked', (p, ctx) => {
   if (p.kind !== 'isChecked') return false
   const key = resolveKeyToken(p.key, ctx.key, ctx.activeKey, ctx)
@@ -58,8 +40,3 @@ definePredicate('isDisabled', (p, ctx) => {
   const key = resolveKeyToken(p.key, ctx.key, ctx.activeKey, ctx)
   return ctx.data.state?.disabledKeys?.includes(key) ?? false
 })
-
-function activeCellRelation(data: PatternData, activeKey: Key | null | undefined) {
-  if (!activeKey) return null
-  return data.relations?.cells?.find((cell) => cell.cellKey === activeKey) ?? null
-}
