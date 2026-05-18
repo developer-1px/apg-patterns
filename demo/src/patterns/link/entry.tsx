@@ -1,19 +1,42 @@
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { Link } from './Link'
-import { linkVariants, type LinkVariantKey } from './linkData'
-import { VariantListbox } from '../../shared/VariantListbox'
-import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
+import { linkVariantItems, linkVariants, type LinkVariantKey } from './linkData'
+import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
 import { renderDataInspect } from '../../shared/inspect/genericInspect'
 
-const items: readonly { key: LinkVariantKey; label: string }[] = [
-  { key: 'anchor', label: 'Anchor <a href>' },
-  { key: 'spanRole', label: 'Span role="link"' },
-]
-
-export const entry: PatternEntry = {
+const linkDemoDefinition = {
   key: 'link',
   label: 'Link',
-  useDemoPattern: (onEvent) => {
+  keyboardShortcuts: ['Enter'],
+  sources: {
+    main: 'Link.tsx',
+    entry: 'link/entry.tsx',
+    data: ['linkData.ts'],
+    hooks: ['link/useLinkPattern.ts'],
+    definition: 'link/definition.ts',
+  },
+  controls: {
+    kind: 'listbox',
+    orientation: 'horizontal',
+    value: '$state.variant',
+    items: '$model.variantItems',
+    label: 'link variants',
+    idPrefix: 'link-variant',
+    onChange: '$actions.selectVariant',
+  },
+  view: {
+    kind: 'component',
+    component: 'Link',
+    props: {
+      data: '$state.data',
+      onEvent: '$actions.emitEvent',
+    },
+  },
+} as const satisfies DemoPatternDefinition
+
+export const entry = defineDemoPattern({
+  definition: linkDemoDefinition,
+  useRuntime: (onEvent) => {
     const host = useVariantPatternDataHost<LinkVariantKey>(
       'anchor',
       linkVariants.anchor.data,
@@ -21,13 +44,25 @@ export const entry: PatternEntry = {
       (_variant, data) => data,
     )
     return {
-      key: 'link',
-      label: 'Link',
-      keyboardShortcuts: ['Enter'],
-      sourceNames: ['Link.tsx', 'link/entry.tsx', 'link/useLinkPattern.ts', 'linkData.ts', 'link/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
-      variants: <VariantListbox orientation="horizontal" value={host.variant} items={items} label="link variants" idPrefix="link-variant" onChange={host.selectVariant} />,
-      preview: <Link data={host.data} onEvent={onEvent} />,
+      context: {
+        values: {
+          state: {
+            variant: host.variant,
+            data: host.data,
+          },
+          model: {
+            variantItems: linkVariantItems,
+          },
+        },
+        actions: {
+          selectVariant: host.selectVariant,
+          emitEvent: onEvent,
+        },
+        components: {
+          Link,
+        },
+      },
     }
   },
-}
+})

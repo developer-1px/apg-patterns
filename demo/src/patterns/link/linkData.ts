@@ -37,5 +37,6 @@ export const linkVariants: Record<LinkVariantKey, LinkVariant> = {
   },
 }
 
+export const linkVariantItems = Object.values(linkVariants).map((variant) => ({ key: variant.key, label: variant.label }))
 export const initialAnchorLinkData = anchorInitial
 export const initialSpanLinkData = spanRoleInitial
