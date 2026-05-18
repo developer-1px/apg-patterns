@@ -43,6 +43,11 @@ export const listboxDefinition = PatternDefinitionSchema.parse({
       ],
       events: [
         { event: 'focus', when: { kind: 'not', predicate: { kind: 'isDisabled', key: '$key' } }, events: [{ type: 'focus', key: '$key' }] },
+        {
+          event: 'focus',
+          when: { kind: 'all', predicates: [{ kind: 'not', predicate: { kind: 'isDisabled', key: '$key' } }, { kind: 'optionEquals', option: 'followFocus', value: true }] },
+          events: [{ type: 'select', key: '$key' }],
+        },
         { event: 'click', when: { kind: 'not', predicate: { kind: 'isDisabled', key: '$key' } }, events: [{ type: 'focus', key: '$key' }, { type: 'select', key: '$key' }] },
       ],
     },

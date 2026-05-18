@@ -56,8 +56,10 @@ describe('defineDemoPattern', () => {
       'example/useExamplePattern.ts',
       'example/definition.ts',
       'kernel/patternRuntime.ts',
+      'kernel/runtimeKeyboard.ts',
       'kernel/patternReducer.ts',
       'kernel/patternKernel.ts',
+      'kernel/keyTokenRegistry.ts',
       'schema/index.ts',
     ])
     expect(screen.getByRole('button', { name: 'Rendered' })).toBeTruthy()

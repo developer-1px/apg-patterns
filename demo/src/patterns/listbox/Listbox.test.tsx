@@ -88,6 +88,16 @@ describe('Listbox demo — scrollable', () => {
     fireEvent.keyDown(listbox, { key: 'End', code: 'End' })
     expect(activeOption()?.textContent).toBe('Emu')
   })
+
+  it('keyboard navigation updates selected option', () => {
+    render(<ListboxDemo variant="scrollable" />)
+    const listbox = screen.getByRole('listbox')
+
+    fireEvent.keyDown(listbox, { key: 'ArrowDown', code: 'ArrowDown' })
+
+    const selected = screen.getAllByRole('option').filter((option) => option.getAttribute('aria-selected') === 'true')
+    expect(selected.map((option) => option.textContent)).toEqual(['Albatross'])
+  })
 })
 
 describe('Listbox demo — grouped', () => {

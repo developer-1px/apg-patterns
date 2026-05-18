@@ -34,7 +34,7 @@ export function ListboxDemo({ variant = 'basic' }: { variant?: ListboxTestVarian
   const host = usePatternDataHost(initialByVariant[variant], reduceListboxDemoData)
   const options: PatternOptions = variant === 'rearrangeableMulti'
     ? { focusStrategy: 'rovingTabIndex', selectionMode: 'multiple' }
-    : { focusStrategy: 'rovingTabIndex', selectionMode: 'single' }
+    : { focusStrategy: 'rovingTabIndex', selectionMode: 'single', followFocus: variant === 'scrollable' }
   const state = {
     ...host.data.state,
     scrollable: variant === 'scrollable',

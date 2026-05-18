@@ -1,6 +1,7 @@
 import type { Key, PatternData, PatternEvent, PatternDefinition } from '../schema'
 import { resolveVisibleOrder, resolveNavigationTarget, createParentByKey } from './patternKernel'
 import { reduceDeclarativeTransitions } from './patternTransitions'
+import { reduceExpandActiveRowEvent, reduceExpandEvent } from './expansionEvents'
 import { reduceExtendSelectionEvent, reduceSelectAllEvent, reduceSelectColumnEvent, reduceSelectRowEvent, withSelection } from './selectionEvents'
 
 export function reducePatternData(definition: PatternDefinition, data: PatternData, event: PatternEvent): PatternData {
@@ -58,23 +59,11 @@ export function reducePatternData(definition: PatternDefinition, data: PatternDa
   }
 
   if (event.type === 'expand') {
-    const expanded = new Set(data.state?.expandedKeys ?? [])
-    if (event.expanded) expanded.add(event.key)
-    else expanded.delete(event.key)
-    // Preserve a pre-existing activeKey (e.g. a treegrid cell key) — only adopt the row key when no active.
-    const currentActive = data.state?.activeKey
-    const nextActive = currentActive ?? event.key
-    return withLastEventReason({ ...data, state: { ...data.state, activeKey: nextActive, expandedKeys: [...expanded] } }, event)
+    return withLastEventReason(reduceExpandEvent(data, event), event)
   }
 
   if (event.type === 'expandActiveRow') {
-    const activeKey = data.state?.activeKey
-    const rowKey = activeKey ? data.relations?.cells?.find((cell) => cell.cellKey === activeKey)?.rowKey : undefined
-    if (!rowKey) return withLastEventReason(data, event)
-    const expanded = new Set(data.state?.expandedKeys ?? [])
-    if (event.expanded) expanded.add(rowKey)
-    else expanded.delete(rowKey)
-    return withLastEventReason({ ...data, state: { ...data.state, expandedKeys: [...expanded] } }, event)
+    return withLastEventReason(reduceExpandActiveRowEvent(data, event), event)
   }
 
   if (event.type === 'check') {

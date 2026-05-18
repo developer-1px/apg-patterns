@@ -38,7 +38,7 @@ export function useListboxDemoRuntime(onEvent: (event: PatternEvent) => void) {
   )
   const options: PatternOptions = host.variant === 'rearrangeableMulti'
     ? { focusStrategy: 'rovingTabIndex', selectionMode: 'multiple' }
-    : { focusStrategy: 'rovingTabIndex', selectionMode: 'single' }
+    : { focusStrategy: 'rovingTabIndex', selectionMode: 'single', followFocus: host.variant === 'scrollable' }
   const handleEvent = (event: PatternEvent) => {
     onEvent(event)
     host.dispatchEvent(event)
