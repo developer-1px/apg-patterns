@@ -8,9 +8,16 @@ import { describe, expect, it } from 'vitest'
 import type { PatternData, PatternEvent } from '../../../../src'
 import { Tree } from './Tree'
 import { initialData, reduceData } from './treeContract'
+import { navigation } from './treeVariantData'
 
 function TreeDemo() {
   const [data, setData] = useState<PatternData>(initialData as PatternData)
+  const handleEvent = (event: PatternEvent) => setData((current) => reduceData(current, event))
+  return <Tree data={data} onEvent={handleEvent} />
+}
+
+function NavigationTreeDemo() {
+  const [data, setData] = useState<PatternData>(navigation as PatternData)
   const handleEvent = (event: PatternEvent) => setData((current) => reduceData(current, event))
   return <Tree data={data} onEvent={handleEvent} />
 }
@@ -78,5 +85,13 @@ describe('APG §Keyboard — Right expands, Left collapses', () => {
     fireEvent.keyDown(t, { key: 'ArrowRight' })
     // either same node now expanded, or focus moved to first child
     expect(screen.getAllByRole('treeitem').length).toBeGreaterThan(0)
+  })
+})
+
+describe('APG §Activation', () => {
+  it('does not cancel mouse activation for link treeitems', () => {
+    render(<NavigationTreeDemo />)
+
+    expect(fireEvent.click(screen.getByRole('link', { name: 'Getting Started' }))).toBe(true)
   })
 })
