@@ -1,13 +1,14 @@
 import type { KeyInput } from '@interactive-os/keyboard'
 import { PatternDataSchema, PatternDefinitionSchema, PatternOptionsSchema, type Key, type PatternData, type PatternEvent, type PatternOptions, type PatternDefinition } from '../schema'
 import {
-  resolveStateProjection,
   resolveVisibleOrder,
   createParentByKey,
   type PatternRuntimeContext,
 } from './patternKernel'
 import { resolvePartEventBindings } from './domEventBindings'
-import { createRootKeyboardHandler, resolveRuntimeKeyboardBinding } from './runtimeKeyboard'
+import { resolveRuntimeItemState } from './runtimeItemState'
+import { createRootKeyboardHandler } from './rootKeyboardHandler'
+import { resolveRuntimeKeyboardBinding } from './runtimeKeyboard'
 import { compactProps, resolveAriaProjections, resolveFocusProjection } from './slotProps'
 export { defineDomEvent, defineDomEventHandlerProp } from './domEventBindings'
 
@@ -84,14 +85,7 @@ export function createPatternRuntime<TData extends PatternData = PatternData>(in
   }
 
   const getItemState = (key: Key, partName: string): Record<string, unknown> => {
-    const part = definition.parts[partName]
-    if (!part) return {}
-    const ctx = context(key)
-    const out: Record<string, unknown> = {}
-    for (const projection of part.state ?? []) {
-      out[projection.name] = resolveStateProjection(projection.from, ctx)
-    }
-    return out
+    return resolveRuntimeItemState({ definition, partName, key, context })
   }
 
   const rootPartName = Object.keys(definition.parts).find((name) => definition.parts[name]?.role === definition.rootRole)

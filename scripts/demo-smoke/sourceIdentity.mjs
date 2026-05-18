@@ -15,6 +15,19 @@ export function sourceIdentityNeedles(sourceName, patternKey) {
     return []
   }
 
+  if (sourceName === 'kernel/patternRuntime.ts') return ['createPatternRuntime']
+  if (sourceName === 'kernel/patternReducer.ts') return ['reducePatternData']
+  if (sourceName === 'kernel/patternKernel.ts') return ['defineAriaSource']
+  if (sourceName === 'kernel/domEventRegistry.ts') return ['defineDomEvent']
+  if (sourceName === 'kernel/runtimeItemState.ts') return ['resolveRuntimeItemState']
+  if (sourceName === 'kernel/patternTransitions.ts') return ['reduceDeclarativeTransitions']
+  if (sourceName === 'kernel/transitionValue.ts') return ['resolveTransitionValue']
+  if (sourceName === 'kernel/patternEventTemplate.ts') return ['resolveEventTemplate']
+  if (sourceName === 'kernel/kernelNavigationTargets.ts') return ['defineNavigationTarget']
+  if (sourceName === 'kernel/kernelPredicates.ts') return ['definePredicate']
+  if (sourceName === 'schema/index.ts') return ["export * from './patternDefinition'"]
+  if (sourceName === 'schema/eventTemplate.ts') return ['EventTemplateSchema']
+
   const patternSource = sourceName.match(/^([^/]+)\/(.+)\.ts$/)
   if (patternSource) {
     const [, sourcePatternKey, fileName] = patternSource
@@ -32,12 +45,6 @@ export function sourceIdentityNeedles(sourceName, patternKey) {
     return ['export ']
   }
 
-  if (sourceName === 'kernel/patternRuntime.ts') return ['createPatternRuntime']
-  if (sourceName === 'kernel/patternReducer.ts') return ['reducePatternData']
-  if (sourceName === 'kernel/patternKernel.ts') return ['defineAriaSource']
-  if (sourceName === 'kernel/kernelNavigationTargets.ts') return ['defineNavigationTarget']
-  if (sourceName === 'kernel/kernelPredicates.ts') return ['definePredicate']
-  if (sourceName === 'schema/index.ts') return ["export * from './patternDefinition'"]
   if (sourceName === 'treeContract.ts') return ['initialData']
   if (sourceName === 'treeVariants.ts') return ['treeVariants']
 
