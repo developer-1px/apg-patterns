@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { reduceDisclosureData, type PatternData, type PatternEvent } from '../../../../src'
+import { createDisclosureRuntime, reduceDisclosureData, type PatternData, type PatternEvent } from '../../../../src'
 import { Disclosure } from './Disclosure'
 import {
   initialFaqDisclosureData,
@@ -15,6 +15,23 @@ function DisclosureDemo({ initial }: { variant: DisclosureVariantKey; initial: P
   const [data, setData] = useState(initial)
   const handleEvent = (event: PatternEvent) => setData((current) => reduceDisclosureData(current, event))
   return <Disclosure data={data} onEvent={handleEvent} />
+}
+
+function DisclosureRuntimeDemo() {
+  const [data, setData] = useState(initialImageDisclosureData)
+  const runtime = createDisclosureRuntime({
+    data,
+    options: { elementIdPrefix: 'runtime-disclosure-' },
+    onEvent: (event) => setData((current) => reduceDisclosureData(current, event)),
+  })
+  return (
+    <div onKeyDown={runtime.getRootKeyboardHandler()}>
+      <button {...runtime.getTriggerProps()}>
+        {data.items[runtime.triggerKey ?? '']?.label ?? 'Details'}
+      </button>
+      {runtime.expanded ? <section {...runtime.getPanelProps()}>Runtime panel</section> : null}
+    </div>
+  )
 }
 
 describe('Disclosure demo (image)', () => {
@@ -41,6 +58,22 @@ describe('Disclosure demo (image)', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('true')
 
     fireEvent.keyDown(trigger, { key: ' ', code: 'Space' })
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+  })
+
+  it('standalone runtime exposes trigger and panel props for keyboard and pointer input', () => {
+    render(<DisclosureRuntimeDemo />)
+    const trigger = screen.getByRole('button')
+
+    expect(trigger.id).toMatch(/^runtime-disclosure-/)
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+    expect(screen.queryByRole('region')).toBeNull()
+
+    fireEvent.keyDown(trigger, { key: 'Enter', code: 'Enter' })
+    expect(trigger.getAttribute('aria-expanded')).toBe('true')
+    expect(screen.getByRole('region').id).toBe(trigger.getAttribute('aria-controls'))
+
+    fireEvent.click(trigger)
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
   })
 })

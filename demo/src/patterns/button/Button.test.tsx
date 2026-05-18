@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import type { PatternEvent } from '../../../../src'
+import { useButtonPattern, type PatternEvent } from '../../../../src'
 import { Button } from './Button'
 import { buttonVariants } from './buttonData'
 
@@ -20,6 +20,22 @@ function ToggleDemo() {
   const [data, setData] = useState(variant.data)
   const handleEvent = (event: PatternEvent) => setData((current) => variant.reduce(current, event))
   return <Button data={data} onEvent={handleEvent} />
+}
+
+function ButtonActionsDemo() {
+  const variant = buttonVariants.toggle
+  const [data, setData] = useState(variant.data)
+  const button = useButtonPattern(data, (event) => setData((current) => variant.reduce(current, event)))
+
+  return (
+    <div>
+      <button {...button.rootProps}>{button.label}</button>
+      <button type="button" onClick={() => button.actions.focus()}>Focus action</button>
+      <button type="button" onClick={() => button.actions.press(true)}>Press action</button>
+      <button type="button" onClick={() => button.actions.activate()}>Activate action</button>
+      <output>{String(button.state.pressed)}</output>
+    </div>
+  )
 }
 
 describe('Button demo (action)', () => {
@@ -98,5 +114,17 @@ describe('Button demo (toggle, aria-pressed)', () => {
     expect(btn.getAttribute('aria-disabled')).toBe('true')
     fireEvent.click(btn)
     expect(events.length).toBeGreaterThan(0)
+  })
+
+  it('imperative actions emit focus, press, and activate from pointer controls', () => {
+    render(<ButtonActionsDemo />)
+    const controls = screen.getAllByRole('button')
+
+    fireEvent.click(controls[1]!)
+    fireEvent.click(controls[2]!)
+    expect(screen.getByText('true')).toBeTruthy()
+
+    fireEvent.click(controls[3]!)
+    expect(screen.getByRole('button', { name: 'Mute' })).toBeTruthy()
   })
 })

@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import type { PatternEvent } from '../../../../src'
+import { useWindowSplitterPattern, type PatternEvent } from '../../../../src'
 import { WindowSplitter } from './WindowSplitter'
 import { initialWindowSplitterData, reduceWindowSplitterData, windowSplitterOptions } from './windowsplitterData'
 
@@ -11,6 +11,23 @@ function Demo() {
     setData((current) => reduceWindowSplitterData(current, event, windowSplitterOptions))
   }
   return <WindowSplitter data={data} onEvent={handleEvent} />
+}
+
+function ActionsDemo() {
+  const [data, setData] = useState(initialWindowSplitterData)
+  const splitter = useWindowSplitterPattern(
+    data,
+    (event) => setData((current) => reduceWindowSplitterData(current, event, windowSplitterOptions)),
+    windowSplitterOptions,
+  )
+  return (
+    <div>
+      <div {...splitter.separatorProps} />
+      <button type="button" onClick={() => splitter.actions.focus()}>Focus separator</button>
+      <button type="button" onClick={() => splitter.actions.step('increment')}>Increase separator</button>
+      <button type="button" onClick={() => splitter.actions.collapse()}>Collapse separator</button>
+    </div>
+  )
 }
 
 describe('WindowSplitter demo', () => {
@@ -51,5 +68,18 @@ describe('WindowSplitter demo', () => {
     expect(sep.getAttribute('aria-valuenow')).toBe('0')
     fireEvent.keyDown(sep, { key: 'Enter', code: 'Enter' })
     expect(sep.getAttribute('aria-valuenow')).toBe('50')
+  })
+
+  it('imperative actions emit focus, step, and collapse from pointer controls', () => {
+    render(<ActionsDemo />)
+    const sep = screen.getByRole('separator')
+    const controls = screen.getAllByRole('button')
+
+    fireEvent.click(controls[0]!)
+    fireEvent.click(controls[1]!)
+    expect(sep.getAttribute('aria-valuenow')).toBe('51')
+
+    fireEvent.click(controls[2]!)
+    expect(sep.getAttribute('aria-valuenow')).toBe('0')
   })
 })

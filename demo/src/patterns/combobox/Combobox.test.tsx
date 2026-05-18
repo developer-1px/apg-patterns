@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import type { PatternData, PatternEvent } from '../../../../src'
+import { comboboxDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src'
 import { Combobox } from './Combobox'
 import { buildComboboxData, FRUITS, reduceComboboxData } from './comboboxData'
 
@@ -10,6 +10,15 @@ type Variant = 'selectOnly' | 'listAutocomplete' | 'listWithInlineAutocomplete' 
 function ComboboxDemo({ variant }: { variant: Variant }) {
   const [data, setData] = useState<PatternData>(() => buildComboboxData(undefined, variant))
   const handleEvent = (event: PatternEvent) => setData((current) => reduceComboboxData(current, event))
+  return <Combobox data={data} onEvent={handleEvent} />
+}
+
+function KernelComboboxDemo({ activeKey }: { activeKey?: string | null }) {
+  const [data, setData] = useState<PatternData>(() => {
+    const initial = buildComboboxData(['apple', 'banana', 'cherry'], 'selectOnly')
+    return { ...initial, state: { ...initial.state, activeKey: activeKey ?? initial.state?.activeKey ?? null } }
+  })
+  const handleEvent = (event: PatternEvent) => setData((current) => reducePatternData(comboboxDefinition, current, event))
   return <Combobox data={data} onEvent={handleEvent} />
 }
 
@@ -109,6 +118,27 @@ describe('Combobox demo — selectOnly', () => {
     const input = screen.getByRole('combobox')
     fireEvent.click(input)
     expect(input.getAttribute('aria-expanded')).toBe('true')
+  })
+
+  it('kernel navigation resolves option targets from keyboard input', () => {
+    render(<KernelComboboxDemo activeKey="combobox" />)
+    const input = screen.getByRole('combobox')
+    fireEvent.keyDown(input, { key: 'ArrowDown', code: 'ArrowDown' })
+    let options = screen.getAllByRole('option')
+    expect(input.getAttribute('aria-activedescendant')).toBe(options[0].getAttribute('id'))
+
+    fireEvent.keyDown(input, { key: 'ArrowDown', code: 'ArrowDown' })
+    options = screen.getAllByRole('option')
+    expect(input.getAttribute('aria-activedescendant')).toBe(options[1].getAttribute('id'))
+
+    fireEvent.keyDown(input, { key: 'ArrowUp', code: 'ArrowUp' })
+    expect(input.getAttribute('aria-activedescendant')).toBe(options[0].getAttribute('id'))
+
+    fireEvent.keyDown(input, { key: 'End', code: 'End' })
+    expect(input.getAttribute('aria-activedescendant')).toBe(options[options.length - 1].getAttribute('id'))
+
+    fireEvent.keyDown(input, { key: 'Home', code: 'Home' })
+    expect(input.getAttribute('aria-activedescendant')).toBe(options[0].getAttribute('id'))
   })
 })
 

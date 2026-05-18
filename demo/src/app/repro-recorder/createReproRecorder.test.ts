@@ -172,6 +172,63 @@ describe('createReproRecorder', () => {
     expect(recording.text).toContain('complementary "Related"')
     expect(recording.text).toContain('contentinfo "Footer"')
   })
+
+  it('records controlled ARIA surfaces and value states from input events', async () => {
+    document.body.innerHTML = `
+      <div data-demo-preview="combobox">
+        <div
+          id="picker"
+          role="combobox"
+          tabindex="0"
+          aria-label="Picker"
+          aria-controls="picker-list picker-help missing-panel picker-list"
+          aria-activedescendant="missing-active"
+          aria-expanded="true"
+          aria-disabled="false"
+          aria-checked="false"
+          aria-valuemin="0"
+          aria-valuemax="10"
+          aria-valuenow="4"
+          aria-valuetext="Four"
+        >
+          Choose
+        </div>
+      </div>
+      <div id="picker-list" role="listbox" aria-label="Choices">
+        <div id="one" role="option" aria-selected="false">One</div>
+      </div>
+      <div id="picker-help" role="region" aria-label="Help">
+        <button id="hint">Hint</button>
+      </div>
+    `
+    const picker = document.getElementById('picker') as HTMLDivElement
+    const recorder = createReproRecorder()
+
+    recorder.start()
+    picker.focus()
+    fireEvent.keyDown(picker, { key: 'ArrowDown', code: 'ArrowDown', altKey: true })
+    await nextFrame()
+
+    picker.setAttribute('aria-activedescendant', 'one')
+    picker.setAttribute('aria-checked', 'true')
+    fireEvent.click(picker)
+    await nextFrame()
+
+    const recording = recorder.stop()
+
+    expect(recording.text).toContain('combobox "Picker"')
+    expect(recording.text).toContain('activedescendant=missing-active')
+    expect(recording.text).toContain('activedescendant=one "One"')
+    expect(recording.text).toContain('checked=false')
+    expect(recording.text).toContain('checked')
+    expect(recording.text).toContain('valuemin=0')
+    expect(recording.text).toContain('valuemax=10')
+    expect(recording.text).toContain('valuenow=4')
+    expect(recording.text).toContain('valuetext=Four')
+    expect(recording.text).toContain('listbox "Choices"')
+    expect(recording.text).toContain('region "Help"')
+    expect(recording.text).toContain('button "Hint"')
+  })
 })
 
 function nextFrame(): Promise<void> {

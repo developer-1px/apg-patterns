@@ -248,6 +248,22 @@ describe('APG §Keyboard — Row Focus Navigation', () => {
     fireEvent.keyDown(grid, { key: 'PageDown' })
     expect(activeRow()?.id).toBe('treegridcell-pkg.json')
   })
+
+  it('row focus mode recovers keyboard navigation from a hidden active row', () => {
+    const { unmount } = render(<RowFocusTreegridDemo activeKey="readme.md" />)
+    const grid = screen.getByRole('treegrid')
+    const activeRow = () => document.querySelector('[role="row"][tabindex="0"]') as HTMLElement | null
+
+    expect(activeRow()).toBeNull()
+
+    fireEvent.keyDown(grid, { key: 'ArrowDown' })
+    expect(activeRow()?.id).toBe('treegridcell-headerRow')
+
+    unmount()
+    render(<RowFocusTreegridDemo activeKey="readme.md" />)
+    fireEvent.keyDown(screen.getByRole('treegrid'), { key: 'PageDown' })
+    expect(activeRow()?.id).toBe('treegridcell-headerRow')
+  })
 })
 
 describe('APG §Keyboard — Right Arrow', () => {
