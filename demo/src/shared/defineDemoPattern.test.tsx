@@ -142,6 +142,30 @@ describe('defineDemoPattern', () => {
     ).toThrow('[defineDemoPattern] duplicate example sources: Example.tsx')
   })
 
+  it.each([
+    ['main', { main: 'example/Example.tsx' }, 'invalid example sources main: example/Example.tsx'],
+    ['entry', { entry: 'entry.tsx' }, 'invalid example sources entry: entry.tsx'],
+    ['definition', { definition: 'definition.ts' }, 'invalid example sources definition: definition.ts'],
+    ['data', { data: ['example/data.ts'] }, 'invalid example sources data: example/data.ts'],
+    ['hooks', { hooks: ['example/keyboard.ts'] }, 'invalid example sources hooks: example/keyboard.ts'],
+    ['runtime', { runtime: ['runtime.ts'] }, 'invalid example sources runtime: runtime.ts'],
+  ] as const)('rejects source names in the wrong %s role', (_role, sourceOverride, message) => {
+    expect(() =>
+      defineDemoPattern({
+        definition: {
+          ...definition,
+          sources: {
+            ...definition.sources,
+            ...sourceOverride,
+          },
+        },
+        useRuntime: () => {
+          throw new Error('unused')
+        },
+      }),
+    ).toThrow(`[defineDemoPattern] ${message}`)
+  })
+
   it('builds a state-backed demo runtime from a schema definition', () => {
     const initialData: PatternData = {
       items: { root: { label: 'Off' } },

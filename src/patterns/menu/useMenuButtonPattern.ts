@@ -1,16 +1,11 @@
-import { useLayoutEffect, type KeyboardEvent, type MouseEvent } from 'react'
+import { useLayoutEffect, type KeyboardEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
-import { reactKeyInput, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
+import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { menuButtonDefinition } from './definition'
-
-export interface ReactMenuButtonItem {
-  key: Key
-  label: string
-  state: Pick<ReactRenderItemState, 'active' | 'disabled'>
-  itemProps: ReactPatternProps
-}
+import { createMenuButtonItem, type ReactMenuButtonItem } from './menuButtonItem'
+import { resolveMenuButtonKey } from './menuButtonKeyboard'
 
 export interface ReactMenuButtonRuntime {
   triggerKey: Key | null
@@ -122,52 +117,11 @@ export function useMenuButtonPattern(data: PatternData, onEvent: (event: Pattern
       }
     },
     get items() {
-      return itemKeys.map((key) => {
-        const itemProps = runtime.getPartProps('menuitem', key) as ReactPatternProps
-        const state = runtime.getItemState(key, 'menuitem')
-        return {
-          key,
-          label: data.items[key]?.label ?? key,
-          state: {
-            active: Boolean(state.active),
-            disabled: Boolean(state.disabled),
-          },
-          itemProps: {
-            ...itemProps,
-            id: runtime.keyToElementId(key),
-            onFocus: () => onEvent({ type: 'focus', key }),
-            onClick: (event: MouseEvent<HTMLElement>) => {
-              itemProps.onClick?.(event)
-              closeAndFocusTrigger()
-            },
-          },
-        }
-      })
+      return itemKeys.map((key) => createMenuButtonItem({ runtime, data, key, onEvent, closeAndFocusTrigger }))
     },
     get ids() {
       return { forKey: runtime.keyToElementId }
     },
     keyToElementId: runtime.keyToElementId,
   }
-}
-
-function resolveMenuButtonKey(key: string, keys: readonly string[], activeKey: string | null | undefined, data: PatternData) {
-  if (keys.length === 0) return undefined
-  const index = activeKey ? keys.indexOf(activeKey) : -1
-  if (key === 'ArrowDown') return keys[(index + 1 + keys.length) % keys.length]
-  if (key === 'ArrowUp') return keys[(index - 1 + keys.length) % keys.length]
-  if (key === 'Home') return keys[0]
-  if (key === 'End') return keys[keys.length - 1]
-  if (key.length === 1 && /\S/.test(key)) return resolveMenuButtonTypeaheadKey(key, keys, index, data)
-  return undefined
-}
-
-function resolveMenuButtonTypeaheadKey(key: string, keys: readonly string[], activeIndex: number, data: PatternData) {
-  const query = key.toLocaleLowerCase()
-  for (let offset = 1; offset <= keys.length; offset += 1) {
-    const candidate = keys[(activeIndex + offset + keys.length) % keys.length]!
-    const label = data.items[candidate]?.label ?? candidate
-    if (label.toLocaleLowerCase().startsWith(query)) return candidate
-  }
-  return undefined
 }

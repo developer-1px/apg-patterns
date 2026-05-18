@@ -3,6 +3,7 @@ import type { PatternEvent } from '../../../src'
 import { type DemoPattern, type PatternEntry } from './demoPatternTypes'
 import {
   assertUnique,
+  assertSourceRoles,
   DemoPatternDefinitionSchema,
   sourceNamesFromDefinition,
   type DemoPatternDefinition,
@@ -25,6 +26,7 @@ export function defineDemoPattern({
 }): PatternEntry {
   const parsed = DemoPatternDefinitionSchema.parse(definition) as DemoPatternDefinition
   assertUnique(`${parsed.key} keyboardShortcuts`, parsed.keyboardShortcuts)
+  assertSourceRoles(`${parsed.key} sources`, parsed.sources)
   const sourceNames = sourceNamesFromDefinition(parsed.sources)
   assertUnique(`${parsed.key} sources`, sourceNames)
   return {

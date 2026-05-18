@@ -42,9 +42,23 @@ export function sourceNamesFromDefinition(sources: DemoPatternDefinition['source
   ]
 }
 
+export function assertSourceRoles(label: string, sources: DemoPatternDefinition['sources']) {
+  assertSourceName(`${label} main`, sources.main, /^[^/]+\.tsx$/)
+  assertSourceName(`${label} entry`, sources.entry, /^[a-z][a-z0-9]*\/entry\.tsx$/)
+  assertSourceName(`${label} definition`, sources.definition, /^[a-z][a-z0-9]*\/definition\.ts$/)
+  for (const source of sources.data ?? []) assertSourceName(`${label} data`, source, /^[^/]+\.(ts|tsx)$/)
+  for (const source of sources.hooks ?? []) assertSourceName(`${label} hooks`, source, /^[a-z][a-z0-9]*\/use[A-Z].*Pattern\.ts$/)
+  for (const source of sources.runtime ?? []) assertSourceName(`${label} runtime`, source, /^[a-z][a-z0-9]*\/.+\.ts$/)
+  for (const source of sources.extra ?? []) assertSourceName(`${label} extra`, source, /^([a-z][a-z0-9]*\/)?.+\.ts$/)
+}
+
 export function assertUnique(label: string, values: readonly string[]) {
   const duplicates = duplicateValues(values)
   if (duplicates.length > 0) throw new Error(`[defineDemoPattern] duplicate ${label}: ${duplicates.join(', ')}`)
+}
+
+function assertSourceName(label: string, value: string, pattern: RegExp) {
+  if (!pattern.test(value)) throw new Error(`[defineDemoPattern] invalid ${label}: ${value}`)
 }
 
 function duplicateValues(values: readonly string[]) {
