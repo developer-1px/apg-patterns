@@ -1,6 +1,6 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternDataWithOptions, PatternEvent, PatternOptions } from '../../schema'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { disclosureDefinition } from './definition'
 import { createDisclosureElementId, createDisclosureItems, createDisclosureTriggerProps, type ReactDisclosureItem } from './disclosureItem'
 export type { ReactDisclosureItem } from './disclosureItem'
@@ -42,7 +42,7 @@ export function useDisclosurePattern(data: PatternDataWithOptions, onEvent: (eve
       return triggerKey ? createDisclosureTriggerProps(runtime, triggerKey) : {}
     },
     get panelProps() {
-      return panelKey ? runtime.getItemProps('panel', panelKey) as ReactPatternProps : {}
+      return panelKey ? reactProps(runtime.getItemProps('panel', panelKey)) : {}
     },
     get items() {
       return createDisclosureItems({ runtime, data, expandedKeys })

@@ -1,6 +1,6 @@
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key } from '../../schema'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 
 export interface ReactMeterRenderItem {
   key: Key
@@ -30,10 +30,10 @@ export function createMeterRenderItem(runtime: PatternRuntime, key: Key): ReactM
     ratio,
     percent: ratio * 100,
     valueText: itemRange?.valuetext,
-    meterProps: {
-      ...(runtime.getPartProps('meter', key) as ReactPatternProps),
+    meterProps: reactProps({
+      ...runtime.getPartProps('meter', key),
       'aria-valuemin': min,
       'aria-valuemax': max,
-    } as ReactPatternProps,
+    }),
   }
 }

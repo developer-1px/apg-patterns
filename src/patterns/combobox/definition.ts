@@ -12,13 +12,10 @@
  *   - 'listbox' part has role 'listbox'.
  *   - 'option' part has role 'option' with aria-selected.
  */
-import {
-  AriaSources,
-  DomEvents,
-  PatternDefinitionSchema,
-} from '../../index'
+import { PatternDefinitionSchema } from '../../index'
 import { comboboxKeyboard } from './keyboard'
-import { COMBOBOX_KEY, COMBOBOX_TOKEN } from './navigation'
+import { COMBOBOX_KEY } from './navigation'
+import { comboboxParts } from './parts'
 
 export { COMBOBOX_KEY } from './navigation'
 
@@ -27,36 +24,7 @@ export const comboboxDefinition = PatternDefinitionSchema.parse({
   rootRole: 'combobox',
   containedRoles: ['listbox', 'option'],
   focusModel: 'ariaActiveDescendant',
-  parts: {
-    combobox: {
-      role: 'combobox',
-      aria: [
-        { attribute: 'aria-expanded', from: 'combobox.popupOpen' },
-        { attribute: 'aria-haspopup', from: 'options.haspopup' },
-        { attribute: 'aria-autocomplete', from: 'options.autocomplete' },
-        { attribute: 'aria-activedescendant', from: AriaSources.state.activeKeyElementId },
-        { attribute: 'aria-label', from: AriaSources.refs.label },
-      ],
-      events: [
-        {
-          event: DomEvents.input,
-          events: [{ type: 'inputValue', key: COMBOBOX_TOKEN }],
-        },
-      ],
-    },
-    listbox: {
-      role: 'listbox',
-      aria: [{ attribute: 'aria-label', from: AriaSources.items.label }],
-    },
-    option: {
-      role: 'option',
-      aria: [{ attribute: 'aria-selected', from: AriaSources.state.selectedKeys }],
-      state: [
-        { name: 'active', from: 'state.activeKey' },
-        { name: 'selected', from: 'state.selectedKeys' },
-      ],
-    },
-  },
+  parts: comboboxParts,
   navigation: {
     visibleOrder: { kind: 'comboboxOptions' },
     targets: {

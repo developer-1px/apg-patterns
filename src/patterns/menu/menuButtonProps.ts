@@ -1,7 +1,7 @@
 import type { KeyboardEvent } from 'react'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent } from '../../schema'
-import { reactKeyInput, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { resolveMenuButtonKey } from './menuButtonKeyboard'
 
 interface MenuButtonPropsInput {
@@ -20,7 +20,7 @@ export function createMenuButtonTriggerProps({
   onEvent,
 }: MenuButtonPropsInput & { expanded: boolean }): ReactPatternProps {
   if (!triggerKey) return {}
-  const props = runtime.getPartProps('trigger', triggerKey) as ReactPatternProps
+  const props = reactProps(runtime.getPartProps('trigger', triggerKey))
   return {
     ...props,
     id: runtime.keyToElementId(triggerKey),
@@ -59,7 +59,7 @@ export function createMenuButtonMenuProps({
   activateActiveItem: () => void
 }): ReactPatternProps {
   if (!menuKey || !triggerKey) return {}
-  const props = runtime.getPartProps('menu', menuKey) as ReactPatternProps
+  const props = reactProps(runtime.getPartProps('menu', menuKey))
   const rootKeyDown = runtime.getRootKeyboardHandler()
   return {
     ...props,

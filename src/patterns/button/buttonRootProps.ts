@@ -5,11 +5,11 @@ import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapter
 
 export function createButtonRootProps(runtime: ReturnType<typeof createPatternRuntime>, key: Key | null): ReactPatternProps {
   if (!key) return {}
-  const { role: _role, onKeyDown: _onKeyDown, ...props } = reactProps(runtime.getPartProps('button', key)) as ReactPatternProps & { role?: string }
+  const { role: _role, onKeyDown: _onKeyDown, ...props } = reactProps<ReactPatternProps & { role?: string }>(runtime.getPartProps('button', key))
   return reactProps({
     ...props,
     type: 'button',
-    onKeyDown: (event) => handleButtonKeyDown(runtime, key, event),
+    onKeyDown: (event: KeyboardEvent<HTMLElement>) => handleButtonKeyDown(runtime, key, event),
     onFocus: () => runtime.emit({ type: 'focus', key }),
   })
 }

@@ -1,7 +1,7 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternDataWithOptions, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { feedDefinition } from './definition'
 import { createFeedArticle, type ReactFeedArticle } from './feedArticle'
 export type { ReactFeedArticle } from './feedArticle'
@@ -29,7 +29,7 @@ export function useFeedPattern(data: PatternDataWithOptions, onEvent: (event: Pa
 
   return {
     get feedProps() {
-      return runtime.getRootProps() as ReactPatternProps
+      return reactProps(runtime.getRootProps())
     },
     get articles() {
       return runtime.visibleKeys.map((key) => createFeedArticle(runtime, key))

@@ -1,6 +1,6 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions, PatternStateWithOptions } from '../../schema'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { createCarouselSlides, type ReactCarouselSlide } from './carouselSlide'
 import { carouselDefinition } from './definition'
 
@@ -49,13 +49,13 @@ export function useCarouselPattern(data: CarouselData, onEvent: (event: PatternE
 
   return {
     get rootProps() {
-      return runtime.getPartProps('root') as ReactPatternProps
+      return reactProps(runtime.getPartProps('root'))
     },
     get prevProps() {
-      return runtime.getPartProps('prev', 'prev') as ReactPatternProps
+      return reactProps(runtime.getPartProps('prev', 'prev'))
     },
     get nextProps() {
-      return runtime.getPartProps('next', 'next') as ReactPatternProps
+      return reactProps(runtime.getPartProps('next', 'next'))
     },
     get slides() {
       return createCarouselSlides({ runtime, data, slideKeys, activeKey })

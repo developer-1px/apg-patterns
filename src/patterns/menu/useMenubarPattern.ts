@@ -1,7 +1,7 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { menubarDefinition } from './definition'
 import { createMenubarItem, type ReactMenubarItem } from './menubarItem'
 import { createMenubarRootProps } from './menubarRootProps'
@@ -36,7 +36,7 @@ export function useMenubarPattern(data: PatternData, onEvent: (event: PatternEve
 
   return {
     get rootProps() {
-      const props = runtime.getPartProps('menubar') as ReactPatternProps
+      const props = reactProps(runtime.getPartProps('menubar'))
       return createMenubarRootProps(props, typeahead)
     },
     get rootItems() {
