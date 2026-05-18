@@ -54,21 +54,21 @@ export function createSpinbuttonRenderItem(runtime: PatternRuntime<SpinbuttonDat
       },
       onFocus: () => runtime.emit({ type: 'focus', key }),
     },
-    decrementButtonProps: {
+    decrementButtonProps: reactProps({
       type: 'button',
       'aria-label': `Decrement ${label}`,
       onClick: () => {
         runtime.emit({ type: 'focus', key })
         runtime.emit({ type: 'valueStep', key, direction: 'decrement' })
       },
-    },
-    incrementButtonProps: {
+    }),
+    incrementButtonProps: reactProps({
       type: 'button',
       'aria-label': `Increment ${label}`,
       onClick: () => {
         runtime.emit({ type: 'focus', key })
         runtime.emit({ type: 'valueStep', key, direction: 'increment' })
       },
-    },
+    }),
   }
 }
