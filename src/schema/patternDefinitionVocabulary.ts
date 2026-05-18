@@ -1,10 +1,11 @@
 import { z } from 'zod'
 
 export const AriaRoleSchema = z.enum([
-  'alert', 'alertdialog', 'article', 'button', 'cell', 'checkbox', 'columnheader', 'combobox',
-  'dialog', 'feed', 'grid', 'gridcell', 'group', 'heading', 'link', 'list', 'listbox', 'listitem',
-  'menu', 'menubar', 'menuitem', 'menuitemcheckbox', 'menuitemradio', 'meter', 'navigation',
-  'option', 'paragraph', 'presentation', 'radio', 'radiogroup', 'region', 'row', 'rowheader',
+  'alert', 'alertdialog', 'article', 'banner', 'button', 'cell', 'checkbox', 'columnheader',
+  'combobox', 'complementary', 'contentinfo', 'dialog', 'document', 'feed', 'form', 'grid',
+  'gridcell', 'group', 'heading', 'link', 'list', 'listbox', 'listitem', 'main', 'menu',
+  'menubar', 'menuitem', 'menuitemcheckbox', 'menuitemradio', 'meter', 'navigation', 'option',
+  'paragraph', 'presentation', 'radio', 'radiogroup', 'region', 'row', 'rowheader', 'search',
   'separator', 'slider', 'spinbutton', 'switch', 'tab', 'table', 'tablist', 'tabpanel', 'toolbar',
   'tooltip', 'tree', 'treegrid', 'treeitem',
 ])
@@ -35,7 +36,7 @@ export const AriaSourcePathSchema = z.enum([
   '$activeKey',
   '$event.expanded', '$event.extentKey', '$event.key', '$event.payload.value',
   'combobox.popupOpen',
-  'items.href', 'items.kind', 'items.label', 'items.labelledBy',
+  'items.href', 'items.kind', 'items.label', 'items.$key.label', 'items.labelledBy',
   'items.valuemax', 'items.valuemin', 'items.valuetext',
   'literal.true',
   'menu.expandedIfHasPopup', 'menu.hasPopup',

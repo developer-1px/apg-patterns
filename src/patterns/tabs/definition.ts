@@ -1,15 +1,8 @@
-import { moveLinear } from '@interactive-os/collection-navigation'
 import { PatternDefinitionSchema } from '../../schema'
-import { defineNavigationTarget } from '../../kernel/patternKernel'
+import { tabsKeyboard } from './keyboard'
+import './navigation'
 
 // flatTabs 별칭은 제거 — kernel 의 'flat' 을 재사용한다 (P1 fragmentation 통합).
-
-defineNavigationTarget('tabsLinear', (target, ctx) => {
-  const action = target.action as 'next' | 'previous' | 'first' | 'last'
-  if (action === 'next') return moveLinear(ctx.visibleKeys, ctx.activeKey, 'next') ?? ctx.visibleKeys[0] ?? null
-  if (action === 'previous') return moveLinear(ctx.visibleKeys, ctx.activeKey, 'previous') ?? ctx.visibleKeys[ctx.visibleKeys.length - 1] ?? null
-  return moveLinear(ctx.visibleKeys, ctx.activeKey, action)
-})
 
 export const TabsDefinitionSchema = PatternDefinitionSchema.superRefine((value, ctx) => {
   const containedRoles = value.containedRoles ?? []
@@ -81,25 +74,5 @@ export const tabsDefinition = TabsDefinitionSchema.parse({
       last: { kind: 'tabsLinear', action: 'last' },
     },
   },
-  keyboard: [
-    { shortcut: 'ArrowRight', preventDefault: true, cases: [{ case: 'always', events: [{ type: 'navigate', direction: 'next' }] }] },
-    { shortcut: 'ArrowLeft', preventDefault: true, cases: [{ case: 'always', events: [{ type: 'navigate', direction: 'previous' }] }] },
-    { shortcut: 'ArrowDown', preventDefault: true, cases: [{ case: 'when', when: { kind: 'optionEquals', option: 'orientation', value: 'vertical' }, events: [{ type: 'navigate', direction: 'next' }] }] },
-    { shortcut: 'ArrowUp', preventDefault: true, cases: [{ case: 'when', when: { kind: 'optionEquals', option: 'orientation', value: 'vertical' }, events: [{ type: 'navigate', direction: 'previous' }] }] },
-    { shortcut: 'Home', preventDefault: true, cases: [{ case: 'always', events: [{ type: 'navigate', direction: 'first' }] }] },
-    { shortcut: 'End', preventDefault: true, cases: [{ case: 'always', events: [{ type: 'navigate', direction: 'last' }] }] },
-    { shortcut: 'Enter', preventDefault: true, cases: [{ case: 'always', events: [{ type: 'select', key: '$activeKey' }] }] },
-    { shortcut: 'Space', preventDefault: true, cases: [{ case: 'always', events: [{ type: 'select', key: '$activeKey' }] }] },
-    {
-      shortcut: 'Delete',
-      preventDefault: true,
-      cases: [
-        {
-          case: 'when',
-          when: { kind: 'optionEquals', option: 'closeable', value: true },
-          events: [{ type: 'close', key: '$activeKey' }],
-        },
-      ],
-    },
-  ],
+  keyboard: tabsKeyboard,
 })

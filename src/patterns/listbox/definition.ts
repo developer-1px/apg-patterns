@@ -1,4 +1,5 @@
 import { PatternDefinitionSchema } from '../../schema'
+import { listboxKeyboard } from './keyboard'
 
 export const listboxDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'listbox',
@@ -61,14 +62,7 @@ export const listboxDefinition = PatternDefinitionSchema.parse({
       last: { kind: 'linear', action: 'last' },
     },
   },
-  keyboard: [
-    { shortcut: 'ArrowDown', preventDefault: true, cases: [{ case: 'when', when: { kind: 'hasActiveKey' }, events: [{ type: 'navigate', direction: 'next' }] }] },
-    { shortcut: 'ArrowUp', preventDefault: true, cases: [{ case: 'when', when: { kind: 'hasActiveKey' }, events: [{ type: 'navigate', direction: 'previous' }] }] },
-    { shortcut: 'Home', preventDefault: true, cases: [{ case: 'always', events: [{ type: 'navigate', direction: 'first' }] }] },
-    { shortcut: 'End', preventDefault: true, cases: [{ case: 'always', events: [{ type: 'navigate', direction: 'last' }] }] },
-    { shortcut: 'Enter', preventDefault: true, cases: [{ case: 'when', when: { kind: 'hasActiveKey' }, events: [{ type: 'select', key: '$activeKey' }] }] },
-    { shortcut: 'Space', preventDefault: true, cases: [{ case: 'when', when: { kind: 'hasActiveKey' }, events: [{ type: 'select', key: '$activeKey' }] }] },
-  ],
+  keyboard: listboxKeyboard,
   react: {
     hook: 'useListboxPattern',
     root: { prop: 'rootProps', part: 'listbox', element: 'div' },

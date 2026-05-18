@@ -14,7 +14,7 @@ const tabsDemoDefinition = {
     entry: 'tabs/entry.tsx',
     data: ['tabsData.ts'],
     hooks: ['tabs/useTabsPattern.ts'],
-    runtime: ['tabs/runtime.ts'],
+    runtime: ['tabs/runtime.ts', 'tabs/keyboard.ts', 'tabs/navigation.ts'],
     definition: 'tabs/definition.ts',
     extra: ['tabs/inspect.ts'],
   },
