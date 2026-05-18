@@ -48,16 +48,26 @@ function NavMenuKeyboardEdgesDemo() {
     <div ref={containerRef}>
       <button type="button" data-nav-button="about" data-nav-key="about" onKeyDown={onButtonKey('about')}>About</button>
       <button type="button" data-nav-button="admissions" data-nav-key="admissions" onKeyDown={onButtonKey('admissions')}>Admissions</button>
+      <button type="button" data-nav-button="empty" data-nav-key="empty" onKeyDown={onButtonKey('empty')}>Empty</button>
+      <button type="button" onKeyDown={onButtonKey('ghost')}>Ghost</button>
       <div data-nav-panel="about">
         <a href="#one" onKeyDown={onLinkKey('about')}>One</a>
         <a href="#two" onKeyDown={onLinkKey('about')}>Two</a>
       </div>
       <a href="#outside" onKeyDown={onLinkKey('about')}>Outside</a>
+      <button type="button" onClick={() => fireEvent.keyDown(screen.getByText('One'), { key: 'ArrowUp', code: 'ArrowUp' })}>Wrap link previous</button>
+      <button type="button" onClick={() => fireEvent.keyDown(screen.getByText('One'), { key: 'Home', code: 'Home' })}>Ignore link key</button>
       <button type="button" onClick={() => fireEvent.keyDown(screen.getByText('Two'), { key: 'ArrowDown', code: 'ArrowDown' })}>Wrap link next</button>
       <button type="button" onClick={() => fireEvent.keyDown(screen.getByText('Outside'), { key: 'ArrowDown', code: 'ArrowDown' })}>Missing link index</button>
       <button type="button" onClick={() => fireEvent.keyDown(screen.getByText('About'), { key: 'ArrowUp', code: 'ArrowUp' })}>Focus last link</button>
+      <button type="button" onClick={() => fireEvent.keyDown(screen.getByText('Empty'), { key: 'ArrowUp', code: 'ArrowUp' })}>Focus missing last link</button>
+      <button type="button" onClick={() => fireEvent.keyDown(screen.getByText('Admissions'), { key: 'ArrowUp', code: 'ArrowUp' })}>Arrow up collapsed</button>
+      <button type="button" onClick={() => fireEvent.keyDown(screen.getByText('About'), { key: 'Escape', code: 'Escape' })}>Escape expanded</button>
       <button type="button" onClick={() => fireEvent.keyDown(screen.getByText('Admissions'), { key: 'Escape', code: 'Escape' })}>Escape collapsed</button>
       <button type="button" onClick={() => fireEvent.keyDown(screen.getByText('Admissions'), { key: 'ArrowLeft', code: 'ArrowLeft' })}>Move previous</button>
+      <button type="button" onClick={() => fireEvent.keyDown(screen.getByText('About'), { key: 'PageDown', code: 'PageDown' })}>Ignore button key</button>
+      <button type="button" onClick={() => fireEvent.keyDown(screen.getByText('About'), { key: 'ArrowRight', code: 'ArrowRight' })}>Move next expanded</button>
+      <button type="button" onClick={() => fireEvent.keyDown(screen.getByText('Ghost'), { key: 'ArrowRight', code: 'ArrowRight' })}>Move missing index</button>
       <output data-testid="nav-events">{events.join('|')}</output>
     </div>
   )
@@ -293,6 +303,12 @@ describe('Disclosure demo (navMenu)', () => {
   it('covers nav menu keyboard guard branches through pointer-triggered keys', () => {
     render(<NavMenuKeyboardEdgesDemo />)
 
+    fireEvent.click(screen.getByRole('button', { name: 'Wrap link previous' }))
+    expect(document.activeElement).toBe(screen.getByText('Two'))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Ignore link key' }))
+    expect(document.activeElement).toBe(screen.getByText('Two'))
+
     fireEvent.click(screen.getByRole('button', { name: 'Wrap link next' }))
     expect(document.activeElement).toBe(screen.getByText('One'))
 
@@ -302,12 +318,30 @@ describe('Disclosure demo (navMenu)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Focus last link' }))
     expect(document.activeElement).toBe(screen.getByText('Two'))
 
+    fireEvent.click(screen.getByRole('button', { name: 'Focus missing last link' }))
+    expect(document.activeElement).toBe(screen.getByText('Two'))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Arrow up collapsed' }))
+    expect(document.activeElement).toBe(screen.getByText('Two'))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Escape expanded' }))
+    expect(document.activeElement).toBe(screen.getByText('About'))
+
     fireEvent.click(screen.getByRole('button', { name: 'Escape collapsed' }))
     expect(document.activeElement).toBe(screen.getByText('Admissions'))
 
     fireEvent.click(screen.getByRole('button', { name: 'Move previous' }))
     expect(document.activeElement).toBe(screen.getByText('About'))
-    expect(screen.getByTestId('nav-events').textContent).toBe('')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Ignore button key' }))
+    expect(document.activeElement).toBe(screen.getByText('About'))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Move next expanded' }))
+    expect(document.activeElement).toBe(screen.getByText('Admissions'))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Move missing index' }))
+    expect(document.activeElement).toBe(screen.getByText('Admissions'))
+    expect(screen.getByTestId('nav-events').textContent).toContain('expand:about:false')
   })
 })
 

@@ -25,11 +25,17 @@ function KernelComboboxDemo({ activeKey }: { activeKey?: string | null }) {
 function ComboboxReducerEdgesDemo() {
   const [data, setData] = useState<PatternData>(() => buildComboboxData(['apple'], 'selectOnly'))
   const apply = (event: PatternEvent) => setData((current) => reduceComboboxData(current, event))
+  const applyFrom = (nextData: PatternData, event: PatternEvent) => setData(reduceComboboxData(nextData, event))
 
   return (
     <div>
       <button type="button" onClick={() => apply({ type: 'focus', key: 'apple' })}>Focus apple</button>
       <button type="button" onClick={() => apply({ type: 'navigate', direction: 'previous' })}>Previous</button>
+      <button type="button" onClick={() => applyFrom(buildComboboxData(['apple', 'apricot'], 'selectOnly'), { type: 'focus', key: 'apricot' })}>Seed apricot</button>
+      <button type="button" onClick={() => apply({ type: 'navigate', direction: 'previous' })}>Previous from second</button>
+      <button type="button" onClick={() => applyFrom(buildComboboxData([], 'selectOnly'), { type: 'navigate', direction: 'next' })}>Empty navigate</button>
+      <button type="button" onClick={() => applyFrom({ items: { combobox: { label: 'Fruit' } }, state: { query: 'x' } }, { type: 'typeahead', query: 'z' })}>Typeahead fallback</button>
+      <button type="button" onClick={() => applyFrom({ items: { combobox: { label: 'Fruit' } }, state: {} }, { type: 'inputValue', value: 'ba', inline: true })}>Input default variant</button>
       <button type="button" onClick={() => apply({ type: 'typeahead', query: 'zz' })}>No match typeahead</button>
       <button type="button" onClick={() => apply({ type: 'inputValue', value: '' })}>Empty input</button>
       <button type="button" onClick={() => apply({ type: 'dismiss' })}>Ignored event</button>
@@ -169,8 +175,25 @@ describe('Combobox demo — selectOnly', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Previous' }))
     expect(screen.getByTestId('combobox-active').textContent).toBe('apple')
 
-    fireEvent.click(screen.getByRole('button', { name: 'No match typeahead' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Seed apricot' }))
+    expect(screen.getByTestId('combobox-active').textContent).toBe('apricot')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Previous from second' }))
     expect(screen.getByTestId('combobox-active').textContent).toBe('apple')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Empty navigate' }))
+    expect(screen.getByTestId('combobox-active').textContent).toBe('')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Typeahead fallback' }))
+    expect(screen.getByTestId('combobox-query').textContent).toBe('xz')
+    expect(screen.getByTestId('combobox-active').textContent).toBe('')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Input default variant' }))
+    expect(screen.getByTestId('combobox-query').textContent).toBe('Banana')
+    expect(screen.getByTestId('combobox-active').textContent).toBe('banana')
+
+    fireEvent.click(screen.getByRole('button', { name: 'No match typeahead' }))
+    expect(screen.getByTestId('combobox-active').textContent).toBe('banana')
 
     fireEvent.click(screen.getByRole('button', { name: 'Empty input' }))
     expect(screen.getByTestId('combobox-query').textContent).toBe('')

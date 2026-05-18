@@ -260,7 +260,7 @@ describe('event templates through keyboard input', () => {
     expect(screen.getByTestId('transition-state').textContent).toBe('a|b|true|7|')
 
     fireEvent.click(screen.getByRole('button', { name: 'Resolve transition values' }))
-    expect(screen.getByTestId('transition-values').textContent).toBe('true|false|false|4|null')
+    expect(screen.getByTestId('transition-values').textContent).toBe('true|false|false|4|null|null||null|null|null|null|null|null|null')
   })
 })
 
@@ -366,6 +366,15 @@ function TransitionHost() {
             resolveTransitionValue({ from: '$event.checked' }, { type: 'check', key: 'a', checked: false }, current),
             resolveTransitionValue({ from: '$event.pressed' }, { type: 'press', key: 'a', pressed: false }, current),
             resolveTransitionValue({ from: '$event.value' }, { type: 'value', key: 'a', value: 4 }, current),
+            resolveTransitionValue({ from: '$activeKey' }, { type: 'dismiss' }, { items: {}, state: {} }),
+            resolveTransitionValue({ from: '$event.key' }, { type: 'dismiss' }, current),
+            resolveTransitionValue({ from: '$event.keys' }, { type: 'dismiss' }, current),
+            resolveTransitionValue({ from: '$event.anchorKey' }, { type: 'dismiss' }, current),
+            resolveTransitionValue({ from: '$event.extentKey' }, { type: 'dismiss' }, current),
+            resolveTransitionValue({ from: '$event.expanded' }, { type: 'dismiss' }, current),
+            resolveTransitionValue({ from: '$event.checked' }, { type: 'dismiss' }, current),
+            resolveTransitionValue({ from: '$event.pressed' }, { type: 'dismiss' }, current),
+            resolveTransitionValue({ from: '$event.value' }, { type: 'dismiss' }, current),
             resolveTransitionValue({ from: '$unknown' } as never, { type: 'dismiss' }, current),
           ].map(String).join('|'))
         }}

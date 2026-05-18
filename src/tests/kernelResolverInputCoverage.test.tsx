@@ -479,6 +479,28 @@ function KernelResolverHost() {
       <button
         type="button"
         onClick={() => {
+          const values = [
+            resolveVisibleOrder({ kind: 'flat' }, { items: {}, state: {} }).join(','),
+            resolveNavigationTarget({ kind: 'linearWrap', action: 'next' }, { activeKey: 'parent', data: treegridData, parentByKey, visibleKeys: [] }),
+            resolveNavigationTarget({ kind: 'linearWrap', action: 'next' }, { activeKey: 'parent', data: treegridData, parentByKey, visibleKeys: ['parent', 'child'] }),
+            resolveNavigationTarget({ kind: 'linearWrap', action: 'previous' }, { activeKey: 'parent', data: treegridData, parentByKey, visibleKeys: ['parent', 'child'] }),
+            resolveNavigationTarget({ kind: 'linearWrap', action: 'sideways' }, { activeKey: 'parent', data: treegridData, parentByKey, visibleKeys: ['parent', 'child'] }),
+          ].map(String)
+          for (const token of ['$triggerKey', '$initialFocusKey'] as const) {
+            try {
+              values.push(resolveKeyToken(token, null, null, { data: { items: {}, refs: {}, state: {} }, activeKey: null }))
+            } catch (error) {
+              values.push((error as Error).message)
+            }
+          }
+          setResult(values.join('|'))
+        }}
+      >
+        Resolve kernel navigation edges
+      </button>
+      <button
+        type="button"
+        onClick={() => {
           const comboData: PatternData = {
             items: { combobox: { label: 'Combo' }, alpha: { label: 'Alpha' }, beta: { label: 'Beta' } },
             relations: { rootKeys: ['combobox', 'alpha', 'beta'] },
@@ -621,6 +643,9 @@ describe('kernel resolver coverage from pointer input', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Resolve registry misses' }))
     expect(screen.getByText('child|parent|parent||[apg-pattern] unknown ariaSource token: "missing.source" — register via defineAriaSource()|[apg-pattern] unknown stateProjection token: "missing.projection" — register via defineStateProjection()|[apg-pattern] unknown visibleOrder token: "missingVisible" — register via defineVisibleOrder()|[apg-pattern] unknown navigationTarget token: "missingTarget" — register via defineNavigationTarget()')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Resolve kernel navigation edges' }))
+    expect(screen.getByText('|null|child|child|null|Cannot resolve key token: $triggerKey|Cannot resolve key token: $initialFocusKey')).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Resolve combobox navigation edges' }))
     expect(screen.getByText('false|alpha,beta|alpha|alpha|alpha|beta|null|null')).toBeTruthy()
