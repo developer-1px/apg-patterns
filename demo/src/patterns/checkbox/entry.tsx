@@ -2,13 +2,42 @@ import { Checkbox } from './Checkbox'
 import { checkboxVariantItems, checkboxVariants, type CheckboxVariantKey } from './checkboxData'
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { renderDataInspect } from '../../shared/inspect/index'
-import { VariantListbox } from '../../shared/VariantListbox'
-import { type PatternEntry, KERNEL_SOURCES } from '../../shared/demoPatternTypes'
+import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/defineDemoPattern'
+import type { PatternEvent } from '../../../../src'
 
-export const entry: PatternEntry = {
+const checkboxDemoDefinition = {
   key: 'checkbox',
   label: 'Checkbox',
-  useDemoPattern: (onEvent) => {
+  keyboardShortcuts: ['Space'],
+  sources: {
+    main: 'Checkbox.tsx',
+    entry: 'checkbox/entry.tsx',
+    data: ['checkboxData.ts'],
+    hooks: ['checkbox/useCheckboxPattern.ts'],
+    definition: 'checkbox/definition.ts',
+  },
+  controls: {
+    kind: 'listbox',
+    orientation: 'horizontal',
+    value: '$state.variant',
+    items: '$model.variantItems',
+    label: 'checkbox variants',
+    idPrefix: 'checkbox-variant',
+    onChange: '$actions.selectVariant',
+  },
+  view: {
+    kind: 'component',
+    component: 'Checkbox',
+    props: {
+      data: '$state.data',
+      onEvent: '$actions.dispatchEvent',
+    },
+  },
+} as const satisfies DemoPatternDefinition
+
+export const entry = defineDemoPattern({
+  definition: checkboxDemoDefinition,
+  useRuntime: (onEvent) => {
     const host = useVariantPatternDataHost<CheckboxVariantKey>(
       'twoState',
       checkboxVariants.twoState.data,
@@ -16,16 +45,28 @@ export const entry: PatternEntry = {
       (variant, data, event) => checkboxVariants[variant].reduce(data, event),
     )
     return {
-      key: 'checkbox',
-      label: 'Checkbox',
-      keyboardShortcuts: ['Space'],
-      sourceNames: ['Checkbox.tsx', 'checkbox/entry.tsx', 'checkboxData.ts', 'checkbox/useCheckboxPattern.ts', 'checkbox/definition.ts', ...KERNEL_SOURCES],
       inspect: renderDataInspect(host.data),
-      variants: <VariantListbox orientation="horizontal" value={host.variant} items={checkboxVariantItems} label="checkbox variants" idPrefix="checkbox-variant" onChange={host.selectVariant} />,
-      preview: <Checkbox data={host.data} onEvent={(event) => {
-        onEvent(event)
-        host.dispatchEvent(event)
-      }} />,
+      context: {
+        values: {
+          state: {
+            variant: host.variant,
+            data: host.data,
+          },
+          model: {
+            variantItems: checkboxVariantItems,
+          },
+        },
+        actions: {
+          selectVariant: host.selectVariant,
+          dispatchEvent: (event: PatternEvent) => {
+            onEvent(event)
+            host.dispatchEvent(event)
+          },
+        },
+        components: {
+          Checkbox,
+        },
+      },
     }
   },
-}
+})
