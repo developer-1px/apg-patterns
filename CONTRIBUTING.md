@@ -29,6 +29,8 @@ For release readiness, run the complete publish preflight:
 npm run release:check
 ```
 
+The publish workflow enforces `VERIFY_RELEASE_TAG=true`; run it from the `v<package.version>` git tag.
+
 ## Public Surface
 
 Keep runtime dependencies small and declared in `package.json`. The root entry and `@interactive-os/apg-patterns/core` must stay React-free; React-only APIs belong under `@interactive-os/apg-patterns/react`.

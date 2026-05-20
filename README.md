@@ -315,6 +315,7 @@ npm run check:readme
 npm run check:publish
 npm run smoke:package
 npm run demo:smoke
+npm run check:release-ref
 ```
 
 To compare the demo's APG example coverage against the currently linked examples on w3.org:
@@ -341,15 +342,17 @@ After changing public exports, run `npm run update:api` after `npm run build` to
 
 Before publishing a new version, run `npm run check:registry` to confirm the current package version is still unpublished on the public npm registry and, when the package already exists, is newer than the current `latest` dist-tag.
 
+`check:release-ref` reports the expected release tag. In the publish workflow it is strict and requires `GITHUB_REF_TYPE=tag` with `GITHUB_REF_NAME=v<package.version>`.
+
 For the full release preflight:
 
 ```bash
 npm run release:check
 ```
 
-`prepublishOnly` also runs `npm run release:check`, so direct `npm publish` still executes the full local and registry preflight.
+`prepublishOnly` also runs `npm run release:check`, so direct `npm publish` still executes the full local, registry, and release-ref preflight.
 
-Publish from the manual `Publish Package` GitHub Actions workflow after configuring the package as an npm trusted publisher, or publish from a trusted GitHub Actions run after the preflight passes:
+Publish from the manual `Publish Package` GitHub Actions workflow on the `v<package.version>` git tag after configuring the package as an npm trusted publisher, or publish from a trusted GitHub Actions run after the preflight passes:
 
 ```bash
 npm publish --access public --provenance --registry https://registry.npmjs.org/

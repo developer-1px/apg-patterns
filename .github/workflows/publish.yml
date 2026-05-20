@@ -32,6 +32,8 @@ jobs:
 
       - name: Verify release readiness
         run: npm run release:check
+        env:
+          VERIFY_RELEASE_TAG: 'true'
 
       - name: Publish with provenance
         run: npm publish --access public --provenance --registry https://registry.npmjs.org/

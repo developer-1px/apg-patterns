@@ -362,6 +362,8 @@ function assertContributingGuide(contributingGuide) {
     'npm run build',
     'npm run update:api',
     'npm run release:check',
+    'VERIFY_RELEASE_TAG=true',
+    'v<package.version>',
     '@interactive-os/apg-patterns/core',
     '@interactive-os/apg-patterns/react',
     'npm run check:publish',
@@ -549,8 +551,11 @@ function assertPackageScripts() {
   if (scripts.prepublishOnly !== 'npm run release:check') {
     failures.push('prepublishOnly must run npm run release:check')
   }
-  if (scripts['release:check'] !== 'npm run check && npm run check:registry') {
-    failures.push('release:check must run npm run check && npm run check:registry')
+  if (scripts['release:check'] !== 'npm run check && npm run check:registry && npm run check:release-ref') {
+    failures.push('release:check must run npm run check && npm run check:registry && npm run check:release-ref')
+  }
+  if (scripts['check:release-ref'] !== 'node scripts/verify-release-git-ref.mjs') {
+    failures.push('check:release-ref must run node scripts/verify-release-git-ref.mjs')
   }
   if (scripts['check:react-peer'] !== 'node scripts/verify-react-peer-compatibility.mjs') {
     failures.push('check:react-peer must run node scripts/verify-react-peer-compatibility.mjs')

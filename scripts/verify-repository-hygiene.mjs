@@ -132,6 +132,7 @@ function assertPublishWorkflow() {
     'npm install -g npm@11.6.2',
     'npm ci',
     'npm run release:check',
+    "VERIFY_RELEASE_TAG: 'true'",
     'npm publish --access public --provenance --registry https://registry.npmjs.org/',
   ])
 }
