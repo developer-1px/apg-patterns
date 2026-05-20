@@ -21,6 +21,10 @@ if (packageJson.name?.startsWith('@') && packageJson.publishConfig?.access !== '
 if (!existsSync('README.md')) failures.push('README.md is required')
 if (!existsSync('CHANGELOG.md')) failures.push('CHANGELOG.md is required')
 if (!existsSync('LICENSE')) failures.push('LICENSE is required')
+assertDependencyNames('dependencies', packageJson.dependencies, ['zod'])
+assertDependencyNames('peerDependencies', packageJson.peerDependencies, ['react'])
+assertDependencyNames('optionalDependencies', packageJson.optionalDependencies, [])
+assertDependencyNames('bundledDependencies', packageJson.bundledDependencies, [])
 if (packageJson.peerDependencies?.react && packageJson.peerDependenciesMeta?.react?.optional !== true) {
   failures.push('react peer dependency must be optional because the root and ./core entries are React-free')
 }
@@ -127,6 +131,21 @@ function dependencySections(pkg) {
     peerDependencies: pkg.peerDependencies ?? {},
     optionalDependencies: pkg.optionalDependencies ?? {},
     bundledDependencies: pkg.bundledDependencies ?? {},
+  }
+}
+
+function assertDependencyNames(section, dependencies, expectedNames) {
+  const names = dependencies
+    ? Array.isArray(dependencies)
+      ? dependencies
+      : Object.keys(dependencies)
+    : []
+  const expected = new Set(expectedNames)
+  for (const name of names) {
+    if (!expected.has(name)) failures.push(`${section}.${name} is not part of the publish dependency surface`)
+  }
+  for (const name of expected) {
+    if (!names.includes(name)) failures.push(`${section}.${name} is required`)
   }
 }
 
