@@ -12,6 +12,7 @@
     "a11y"
   ],
   "license": "MIT",
+  "author": "Interactive OS",
   "type": "module",
   "packageManager": "npm@11.6.2",
   "engines": {

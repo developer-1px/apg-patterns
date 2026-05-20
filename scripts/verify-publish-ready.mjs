@@ -12,6 +12,7 @@ if (packageJson.private === true) failures.push('package must not be private')
 if (!packageJson.name) failures.push('package name is required')
 if (!packageJson.description) failures.push('package description is required')
 if (!packageJson.license) failures.push('package license is required')
+if (!packageAuthorName(packageJson.author)) failures.push('package author is required')
 if (!packageJson.version || packageJson.version === '0.0.0') failures.push('package version must be publishable, not 0.0.0')
 if (!/^npm@\d+\.\d+\.\d+$/.test(packageJson.packageManager ?? '')) failures.push('packageManager must pin the npm version')
 if (typeof packageJson.engines?.node !== 'string') failures.push('engines.node is required')
@@ -147,6 +148,7 @@ function assertDocumentationMetadata() {
   const license = readTextIfExists('LICENSE')
   const packageName = packageJson.name
   const packageVersion = packageJson.version
+  const packageAuthor = packageAuthorName(packageJson.author)
 
   if (packageName && readme && !readme.startsWith(`# ${packageName}\n`)) {
     failures.push('README title must match package name')
@@ -174,6 +176,9 @@ function assertDocumentationMetadata() {
   if (packageJson.license === 'MIT' && license && !/^MIT License\s*$/m.test(license)) {
     failures.push('LICENSE must contain the MIT license heading')
   }
+  if (packageAuthor && license && !new RegExp(`^Copyright \\(c\\) \\d{4} ${escapeRegExp(packageAuthor)}\\s*$`, 'm').test(license)) {
+    failures.push('LICENSE copyright holder must match package author')
+  }
 }
 
 function assertReadmeCommandExamples() {
@@ -197,6 +202,12 @@ function readTextIfExists(path) {
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+function packageAuthorName(author) {
+  if (typeof author === 'string') return author.trim()
+  if (author && typeof author === 'object' && typeof author.name === 'string') return author.name.trim()
+  return ''
 }
 
 function assertDependencyNames(section, dependencies, expectedNames) {
