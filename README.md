@@ -28,11 +28,12 @@ Use `@interactive-os/apg-patterns/react` for React hooks and preset components.
 
 ## Compatibility
 
-- Node.js `>=18.18`.
+- Runtime: Node.js `>=18.18`.
 - Runtime dependency: `zod`.
 - React `^18.0.0 || ^19.0.0` is an optional peer dependency for `@interactive-os/apg-patterns/react`.
 - The root entry and `@interactive-os/apg-patterns/core` are React-free.
 - ESM, CommonJS, and TypeScript declarations are published for every public entry.
+- Release verification uses `npm@11.6.2` from `packageManager`.
 
 ## Quick Start
 

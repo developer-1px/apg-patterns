@@ -64,7 +64,12 @@ if (!packageJson.description) failures.push('package description is required')
 if (!packageJson.license) failures.push('package license is required')
 if (!packageAuthorName(packageJson.author)) failures.push('package author is required')
 if (!packageJson.version || packageJson.version === '0.0.0') failures.push('package version must be publishable, not 0.0.0')
-if (!/^npm@\d+\.\d+\.\d+$/.test(packageJson.packageManager ?? '')) failures.push('packageManager must pin the npm version')
+const packageManagerMatch = /^npm@(\d+\.\d+\.\d+)$/.exec(packageJson.packageManager ?? '')
+if (!packageManagerMatch) {
+  failures.push('packageManager must pin the npm version')
+} else {
+  assertPinnedPackageManagerVersion(packageManagerMatch[1])
+}
 if (typeof packageJson.engines?.node !== 'string') failures.push('engines.node is required')
 if (packageJson.name?.startsWith('@') && packageJson.publishConfig?.access !== 'public') {
   failures.push('scoped package must set publishConfig.access to public')
@@ -267,9 +272,13 @@ function assertReadmeCompatibility(readme) {
   const plainSection = section.replace(/`/g, '')
   const nodeRange = packageJson.engines?.node
   const reactRange = packageJson.peerDependencies?.react
+  const packageManager = packageJson.packageManager
 
   if (nodeRange && !plainSection.includes(`Node.js ${nodeRange}`)) {
     failures.push(`README Compatibility must document Node.js ${nodeRange}`)
+  }
+  if (packageManager && !plainSection.includes(`Release verification uses ${packageManager}`)) {
+    failures.push(`README Compatibility must document release verification with ${packageManager}`)
   }
   if (reactRange && !plainSection.includes(`React ${reactRange}`)) {
     failures.push(`README Compatibility must document React ${reactRange}`)
@@ -476,6 +485,20 @@ function sortJson(value) {
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+function assertPinnedPackageManagerVersion(expectedVersion) {
+  let actualVersion
+  try {
+    actualVersion = execFileSync('npm', ['--version'], { encoding: 'utf8' }).trim()
+  } catch (error) {
+    failures.push(`could not verify npm version from packageManager: ${error.message}`)
+    return
+  }
+
+  if (actualVersion !== expectedVersion) {
+    failures.push(`npm --version must match packageManager ${packageJson.packageManager}; actual npm@${actualVersion}`)
+  }
 }
 
 function packageAuthorName(author) {
