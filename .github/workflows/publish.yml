@@ -35,6 +35,9 @@ jobs:
         env:
           VERIFY_RELEASE_TAG: 'true'
 
+      - name: Verify external release state
+        run: npm run check:external
+
       - name: Pack release artifact
         run: |
           mkdir -p release-artifacts

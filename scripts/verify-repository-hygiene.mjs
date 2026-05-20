@@ -148,6 +148,7 @@ function assertPublishWorkflow() {
     'npm ci',
     'npm run release:check',
     "VERIFY_RELEASE_TAG: 'true'",
+    'npm run check:external',
     'npm pack --pack-destination release-artifacts --json > release-artifacts/npm-pack.json',
     uploadArtifactActionRef,
     'if-no-files-found: error',

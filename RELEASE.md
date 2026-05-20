@@ -22,6 +22,8 @@ The release gate includes `npm run check:signatures`, package smoke tests, regis
 
 The external check verifies that local `origin` matches the package repository metadata, the public GitHub repository is reachable, and the npm registry can still accept the current version.
 
+The publish workflow runs the external check before packing or publishing.
+
 ## Publish
 
 Create and push the `v<package.version>` git tag after the preflight passes. Run the manual GitHub Actions `Publish Package` workflow from that tag.

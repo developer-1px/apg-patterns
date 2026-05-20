@@ -347,6 +347,8 @@ Before publishing a new version, run `npm run check:registry` to confirm the cur
 
 `check:external` verifies the final external publishing state: local `origin` must match `package.json` `repository`, the public GitHub repository must be reachable, and the npm registry must still accept the current package version.
 
+The publish workflow runs `npm run check:external` after the release preflight and before packing or publishing.
+
 The release-check and publish workflows upload `release-artifacts/`, including the `npm pack` tarball and `npm-pack.json`, before publishing.
 
 For the full release preflight:
