@@ -644,6 +644,7 @@ const expectedDocs = {
   'API.md': '# ' + expectedMetadata.name + ' API Reference\\n',
   'CHANGELOG.md': '## ' + expectedMetadata.version,
   'CONTRIBUTING.md': '# Contributing',
+  'RELEASE.md': '# Release Checklist',
   'SECURITY.md': '# Security Policy',
   'LICENSE': 'MIT License',
   'docs/proposals/2026-05-18-llm-friendly-apg-react-api.md': '# LLM-Friendly APG React API',

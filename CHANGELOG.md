@@ -8,6 +8,7 @@
 - Published package includes a checked and regenerable API reference for root, `./core`, and `./react` exports.
 - README documents the source, demo, and release-script code structure for external consumers and contributors.
 - Published package includes a contributing guide for local checks, API updates, release preflight, and public surface boundaries.
+- Published package includes a release checklist for public repository metadata, trusted publishing, release tags, artifacts, and provenance-backed npm publishing.
 - Published package includes a security reporting policy.
 - Release preflight can verify that the current package version is still unpublished on the public npm registry and, for existing packages, is newer than the current `latest` dist-tag.
 - `release:check` runs the full local gate, dependency signature audit, npm registry preflight, and release git-ref preflight before publishing.

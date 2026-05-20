@@ -43,4 +43,4 @@ Package contents are controlled by the `files` whitelist in `package.json` and v
 
 ## Documentation
 
-Update `README.md` for user-facing behavior, `API.md` for generated public exports, `CHANGELOG.md` for release-visible changes, and `SECURITY.md` for vulnerability reporting policy changes.
+Update `README.md` for user-facing behavior, `API.md` for generated public exports, `CHANGELOG.md` for release-visible changes, `RELEASE.md` for publish procedure changes, and `SECURITY.md` for vulnerability reporting policy changes.

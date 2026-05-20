@@ -373,6 +373,10 @@ npm publish --access public --provenance --registry https://registry.npmjs.org/
 
 See [CHANGELOG.md](CHANGELOG.md).
 
+## Release
+
+See [RELEASE.md](RELEASE.md).
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).

@@ -56,6 +56,7 @@ const expectedPackageFiles = [
   'API.md',
   'CHANGELOG.md',
   'CONTRIBUTING.md',
+  'RELEASE.md',
   'SECURITY.md',
   'LICENSE',
 ]
@@ -139,6 +140,7 @@ if (!existsSync('README.md')) failures.push('README.md is required')
 if (!existsSync('API.md')) failures.push('API.md is required')
 if (!existsSync('CHANGELOG.md')) failures.push('CHANGELOG.md is required')
 if (!existsSync('CONTRIBUTING.md')) failures.push('CONTRIBUTING.md is required')
+if (!existsSync('RELEASE.md')) failures.push('RELEASE.md is required')
 if (!existsSync('SECURITY.md')) failures.push('SECURITY.md is required')
 if (!existsSync('LICENSE')) failures.push('LICENSE is required')
 assertDocumentationMetadata()
@@ -182,6 +184,7 @@ const requiredPackedPaths = [
   'API.md',
   'CHANGELOG.md',
   'CONTRIBUTING.md',
+  'RELEASE.md',
   'SECURITY.md',
   'LICENSE',
   'docs/proposals/2026-05-18-llm-friendly-apg-react-api.md',
@@ -303,6 +306,7 @@ function assertDocumentationMetadata() {
   const apiReference = readTextIfExists('API.md')
   const changelog = readTextIfExists('CHANGELOG.md')
   const contributingGuide = readTextIfExists('CONTRIBUTING.md')
+  const releaseGuide = readTextIfExists('RELEASE.md')
   const securityPolicy = readTextIfExists('SECURITY.md')
   const license = readTextIfExists('LICENSE')
   const packageName = packageJson.name
@@ -323,6 +327,9 @@ function assertDocumentationMetadata() {
   }
   if (contributingGuide && readme && !/\bCONTRIBUTING\.md\b/.test(readme)) {
     failures.push('README must link to CONTRIBUTING.md')
+  }
+  if (releaseGuide && readme && !/\bRELEASE\.md\b/.test(readme)) {
+    failures.push('README must link to RELEASE.md')
   }
   if (securityPolicy && readme && !/\bSECURITY\.md\b/.test(readme)) {
     failures.push('README must link to SECURITY.md')
@@ -359,6 +366,7 @@ function assertDocumentationMetadata() {
     failures.push('LICENSE copyright holder must match package author')
   }
   assertContributingGuide(contributingGuide)
+  assertReleaseGuide(releaseGuide)
   assertSecurityPolicy(securityPolicy)
 }
 
@@ -403,6 +411,35 @@ function assertSecurityPolicy(securityPolicy) {
   ]
   for (const marker of requiredMarkers) {
     if (!securityPolicy.includes(marker)) failures.push(`SECURITY.md must include ${marker}`)
+  }
+}
+
+function assertReleaseGuide(releaseGuide) {
+  if (!releaseGuide) return
+  if (!releaseGuide.startsWith('# Release Checklist\n')) {
+    failures.push('RELEASE.md must start with a Release Checklist title')
+  }
+
+  const requiredMarkers = [
+    'git remote get-url origin',
+    'repository',
+    'bugs',
+    'homepage',
+    'npm trusted publisher',
+    'Publish Package',
+    'GitHub environment `npm`',
+    'NPM_TOKEN',
+    'NODE_AUTH_TOKEN',
+    '_authToken',
+    'npm run release:check',
+    'npm run check:signatures',
+    'v<package.version>',
+    'release-artifacts/',
+    'npm-pack.json',
+    'npm publish --access public --provenance --registry https://registry.npmjs.org/',
+  ]
+  for (const marker of requiredMarkers) {
+    if (!releaseGuide.includes(marker)) failures.push(`RELEASE.md must include ${marker}`)
   }
 }
 
