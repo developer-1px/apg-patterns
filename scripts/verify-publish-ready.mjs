@@ -6,7 +6,14 @@ const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
 const failures = []
 const maxPackedBytes = 600_000
 const maxUnpackedBytes = 4_000_000
-const maxDeclarationBytes = 750_000
+const declarationByteBudgets = {
+  'dist/index.d.ts': 20_000,
+  'dist/index.d.cts': 20_000,
+  'dist/core.d.ts': 450_000,
+  'dist/core.d.cts': 450_000,
+  'dist/react.d.ts': 100_000,
+  'dist/react.d.cts': 100_000,
+}
 
 if (packageJson.private === true) failures.push('package must not be private')
 if (!packageJson.name) failures.push('package name is required')
@@ -81,6 +88,12 @@ for (const requiredPath of requiredPackedPaths) {
   if (!packedPaths.has(requiredPath)) failures.push(`packed tarball missing ${requiredPath}`)
 }
 
+for (const declarationPath of requiredPackedPaths.filter(isPublicDeclarationPath)) {
+  if (declarationByteBudgets[declarationPath] === undefined) {
+    failures.push(`${declarationPath} is missing a declaration size budget`)
+  }
+}
+
 if (pack.size > maxPackedBytes) failures.push(`packed tarball size ${pack.size} exceeds ${maxPackedBytes} bytes`)
 if (pack.unpackedSize > maxUnpackedBytes) failures.push(`unpacked package size ${pack.unpackedSize} exceeds ${maxUnpackedBytes} bytes`)
 
@@ -101,9 +114,7 @@ for (const file of pack.files) {
   if (/\.test\.[cm]?[jt]sx?$/.test(file.path)) failures.push(`packed tarball includes test file ${file.path}`)
   if (/^dist\/.*\.(?:js|cjs)$/.test(file.path)) assertRuntimeSourceMapReference(file.path, packedPaths)
   if (/^dist\/.*\.map$/.test(file.path)) assertPortableSourceMap(file.path)
-  if (/^dist\/(?:index|core|react)\.d\.(ts|cts)$/.test(file.path) && file.size > maxDeclarationBytes) {
-    failures.push(`${file.path} size ${file.size} exceeds ${maxDeclarationBytes} bytes`)
-  }
+  if (isPublicDeclarationPath(file.path)) assertDeclarationSizeBudget(file)
 }
 
 for (const entry of reactFreeEntries()) {
@@ -261,6 +272,17 @@ function readPackManifest() {
 
 function isAllowedPackedPath(path) {
   return requiredPackedPaths.includes(path) || /^dist\/chunk-[A-Z0-9]+\.(?:js|cjs)(?:\.map)?$/.test(path)
+}
+
+function isPublicDeclarationPath(path) {
+  return /^dist\/(?:index|core|react)\.d\.(ts|cts)$/.test(path)
+}
+
+function assertDeclarationSizeBudget(file) {
+  const maxBytes = declarationByteBudgets[file.path]
+  if (maxBytes !== undefined && file.size > maxBytes) {
+    failures.push(`${file.path} size ${file.size} exceeds ${maxBytes} bytes`)
+  }
 }
 
 function assertRuntimeSourceMapReference(runtimePath, packedPaths) {
