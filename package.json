@@ -50,6 +50,7 @@
   "files": [
     "dist",
     "README.md",
+    "API.md",
     "CHANGELOG.md",
     "LICENSE"
   ],
@@ -60,7 +61,8 @@
     "demo:build": "vite build --config vite.config.ts",
     "demo:preview": "vite preview --config vite.config.ts --host 127.0.0.1",
     "demo:smoke": "npm run demo:build && node scripts/smoke-demo-build.mjs && node scripts/smoke-demo-preview-server.mjs",
-    "check": "npm run typecheck && npm test && npm run check:apg && npm run check:preset && npm run check:demo && npm run check:package && npm run build && npm run check:exports && npm run check:readme && npm run check:publish && npm run smoke:package && npm run demo:smoke",
+    "check": "npm run typecheck && npm test && npm run check:apg && npm run check:preset && npm run check:demo && npm run check:package && npm run build && npm run check:api && npm run check:exports && npm run check:readme && npm run check:publish && npm run smoke:package && npm run demo:smoke",
+    "check:api": "node scripts/verify-api-reference.mjs",
     "check:apg": "node scripts/verify-apg-example-coverage.mjs",
     "check:demo": "node scripts/verify-demo-consistency.mjs",
     "check:exports": "node scripts/verify-package-exports.mjs",

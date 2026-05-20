@@ -32,7 +32,7 @@ const expectedExportEntries = {
   },
 }
 const expectedExportSubpaths = [...Object.keys(expectedExportEntries), './package.json']
-const expectedPackageFiles = ['dist', 'README.md', 'CHANGELOG.md', 'LICENSE']
+const expectedPackageFiles = ['dist', 'README.md', 'API.md', 'CHANGELOG.md', 'LICENSE']
 const allowedDeclarationExternalSpecifiers = {
   'dist/index.d.ts': new Set(['zod']),
   'dist/index.d.cts': new Set(['zod']),
@@ -54,6 +54,7 @@ if (packageJson.name?.startsWith('@') && packageJson.publishConfig?.access !== '
   failures.push('scoped package must set publishConfig.access to public')
 }
 if (!existsSync('README.md')) failures.push('README.md is required')
+if (!existsSync('API.md')) failures.push('API.md is required')
 if (!existsSync('CHANGELOG.md')) failures.push('CHANGELOG.md is required')
 if (!existsSync('LICENSE')) failures.push('LICENSE is required')
 assertDocumentationMetadata()
@@ -90,6 +91,7 @@ const packedPaths = new Set(pack.files.map((file) => file.path))
 const requiredPackedPaths = [
   'package.json',
   'README.md',
+  'API.md',
   'CHANGELOG.md',
   'LICENSE',
   'dist/index.js',
@@ -189,6 +191,7 @@ function dependencySections(pkg) {
 
 function assertDocumentationMetadata() {
   const readme = readTextIfExists('README.md')
+  const apiReference = readTextIfExists('API.md')
   const changelog = readTextIfExists('CHANGELOG.md')
   const license = readTextIfExists('LICENSE')
   const packageName = packageJson.name
@@ -197,6 +200,12 @@ function assertDocumentationMetadata() {
 
   if (packageName && readme && !readme.startsWith(`# ${packageName}\n`)) {
     failures.push('README title must match package name')
+  }
+  if (packageName && apiReference && !apiReference.startsWith(`# ${packageName} API Reference\n`)) {
+    failures.push('API.md title must match package name')
+  }
+  if (readme && !/\bAPI\.md\b/.test(readme)) {
+    failures.push('README must link to API.md')
   }
   if (packageName && readme && !new RegExp(`\\bnpm\\s+install\\s+${escapeRegExp(packageName)}\\b`).test(readme)) {
     failures.push('README must document installing the package by its package name')

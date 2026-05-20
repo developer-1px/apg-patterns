@@ -6,6 +6,8 @@ Runtime dependencies are limited to `zod`. The root entry is React-free. React i
 
 The package models APG behavior as serializable `PatternDefinition` data, validates it with Zod, and projects it into runtime props, state, effects, and React-facing render items.
 
+See [API.md](API.md) for the published entrypoints and export names.
+
 ## Install
 
 ```bash
@@ -264,7 +266,7 @@ npm run demo
 npm run check
 ```
 
-`check` runs TypeScript validation, the Vitest suite, APG coverage validation, demo/source consistency checks, package manifest checks, the package build, export validation, publish-readiness validation, package consumer smoke tests including npm tarball installation and Vite bundling, and the production demo smoke test:
+`check` runs TypeScript validation, the Vitest suite, APG coverage validation, demo/source consistency checks, package manifest checks, the package build, API reference validation, export validation, publish-readiness validation, package consumer smoke tests including npm tarball installation and Vite bundling, and the production demo smoke test:
 
 ```bash
 npm run typecheck
@@ -274,6 +276,7 @@ npm run check:preset
 npm run check:demo
 npm run check:package
 npm run build
+npm run check:api
 npm run check:exports
 npm run check:readme
 npm run check:publish
@@ -288,6 +291,8 @@ npm run check:apg
 ```
 
 `check:readme` type-checks the Quick Start and React API TypeScript examples against the built package.
+
+`check:api` validates that API.md matches the built root, `./core`, and `./react` declaration export surfaces.
 
 `check:exports` validates package manifest paths and ESM/CJS declaration export boundaries for the root, `./core`, and `./react` entries.
 
