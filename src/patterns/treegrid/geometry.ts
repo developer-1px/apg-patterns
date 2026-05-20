@@ -1,4 +1,4 @@
-import { visibleTreeItems } from '@interactive-os/collection-navigation'
+import { visibleTreeItems } from '../../internal/collectionNavigation'
 import type { Key, PatternData } from '../../schema'
 
 export const visibleRowKeys = (data: PatternData): readonly Key[] => {

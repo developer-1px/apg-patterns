@@ -1,4 +1,4 @@
-import type { KeyInput } from '@interactive-os/keyboard'
+import type { KeyInput } from '../internal/keyboard'
 import type { Key, PatternData, PatternEvent } from '../schema'
 import { withDefaultReason } from './domEventBindings'
 import type { RuntimeKeyboardBindingResult } from './runtimeKeyboard'

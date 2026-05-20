@@ -2,6 +2,8 @@
 
 Zod-validated APG pattern runtime and React adapters.
 
+Runtime dependencies are limited to `zod`. React is a peer dependency for the React adapter and preset components.
+
 The package models APG behavior as serializable `PatternDefinition` data, validates it with Zod, and projects it into runtime props, state, effects, and React-facing render items.
 
 ```txt
@@ -219,15 +221,18 @@ npm run demo
 npm run check
 ```
 
-`check` runs TypeScript validation, the Vitest suite, APG coverage validation, package manifest checks, the package build, export validation, and the production demo smoke test:
+`check` runs TypeScript validation, the Vitest suite, APG coverage validation, demo/source consistency checks, package manifest checks, the package build, export validation, publish-readiness validation, and the production demo smoke test:
 
 ```bash
 npm run typecheck
 npm test
 npm run check:apg
+npm run check:preset
+npm run check:demo
 npm run check:package
 npm run build
 npm run check:exports
+npm run check:publish
 npm run demo:smoke
 ```
 

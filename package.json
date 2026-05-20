@@ -1,6 +1,6 @@
 {
   "name": "@interactive-os/apg-patterns",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Serializable WAI-ARIA APG pattern definitions, runtime, and React adapters.",
   "keywords": [
     "aria",
@@ -42,7 +42,6 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "development": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
@@ -59,19 +58,19 @@
     "demo:build": "vite build --config vite.config.ts",
     "demo:preview": "vite preview --config vite.config.ts --host 127.0.0.1",
     "demo:smoke": "npm run demo:build && node scripts/smoke-demo-build.mjs && node scripts/smoke-demo-preview-server.mjs",
-    "check": "npm run typecheck && npm test && npm run check:apg && npm run check:preset && npm run check:demo && npm run check:package && npm run build && npm run check:exports && npm run demo:smoke",
+    "check": "npm run typecheck && npm test && npm run check:apg && npm run check:preset && npm run check:demo && npm run check:package && npm run build && npm run check:exports && npm run check:publish && npm run demo:smoke",
     "check:apg": "node scripts/verify-apg-example-coverage.mjs",
     "check:demo": "node scripts/verify-demo-consistency.mjs",
     "check:exports": "node scripts/verify-package-exports.mjs",
     "check:package": "node scripts/verify-package-side-effects.mjs",
+    "check:publish": "node scripts/verify-publish-ready.mjs",
     "check:preset": "node scripts/verify-react-preset-surface.mjs",
+    "prepublishOnly": "npm run check",
     "test": "vitest run --config vitest.config.ts",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@interactive-os/collection-navigation": "file:../keyboard-navigation/packages/collection-navigation",
-    "@interactive-os/keyboard": "file:../keyboard/packages/keyboard",
     "zod": "^4.3.6"
   },
   "peerDependencies": {

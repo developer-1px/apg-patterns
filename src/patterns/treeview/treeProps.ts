@@ -1,4 +1,4 @@
-import type { KeyInput, TypeaheadBuffer } from '@interactive-os/keyboard'
+import type { KeyInput, TypeaheadBuffer } from '../../internal/keyboard'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { resolveTypeaheadTarget } from './typeahead'

@@ -1,5 +1,5 @@
 import type { HTMLAttributes, KeyboardEvent } from 'react'
-import type { KeyInput } from '@interactive-os/keyboard'
+import type { KeyInput } from '../internal/keyboard'
 
 export type ReactPatternProps = HTMLAttributes<HTMLElement>
 

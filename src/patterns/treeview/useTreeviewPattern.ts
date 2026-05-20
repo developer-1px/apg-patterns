@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { createTypeaheadBuffer } from '@interactive-os/keyboard'
+import { createTypeaheadBuffer } from '../../internal/keyboard'
 import { createTreeviewRuntime, type CreateTreeviewRuntimeInput } from './runtime'
 import type { PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'

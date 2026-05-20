@@ -1,4 +1,4 @@
-import { matchesShortcut, type KeyInput } from '@interactive-os/keyboard'
+import { matchesShortcut, type KeyInput } from '../../internal/keyboard'
 import type { Key, KeyboardBinding, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { evaluatePredicate, resolveEventTemplate } from '../../kernel/patternKernel'
 import { treeviewDefinition } from './definition'

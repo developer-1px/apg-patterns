@@ -1,4 +1,4 @@
-import type { KeyInput } from '@interactive-os/keyboard'
+import type { KeyInput } from '../internal/keyboard'
 import { PatternDataSchema, PatternDefinitionSchema, PatternOptionsSchema, type Key, type PatternData, type PatternEvent, type PatternOptions, type PatternDefinition } from '../schema'
 import {
   resolveVisibleOrder,

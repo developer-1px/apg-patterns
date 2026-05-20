@@ -1,4 +1,4 @@
-import { moveGrid } from '@interactive-os/collection-navigation'
+import { moveGrid } from '../../internal/collectionNavigation'
 import {
   defineNavigationTarget,
   defineVisibleOrder,

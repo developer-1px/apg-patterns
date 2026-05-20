@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { createTypeaheadBuffer } from '@interactive-os/keyboard'
+import { createTypeaheadBuffer } from '../../internal/keyboard'
 import { listboxDefinition } from './definition'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { useReactPatternRuntime } from '../../adapters/reactPatternEffects'

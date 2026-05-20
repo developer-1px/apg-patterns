@@ -1,4 +1,4 @@
-import { createTypeaheadBuffer, type TypeaheadBuffer } from '@interactive-os/keyboard'
+import { createTypeaheadBuffer, type TypeaheadBuffer } from '../../internal/keyboard'
 import {
   PatternDataSchema,
   PatternEventSchema,

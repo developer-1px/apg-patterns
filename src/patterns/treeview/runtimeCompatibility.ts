@@ -1,4 +1,4 @@
-import type { KeyInput } from '@interactive-os/keyboard'
+import type { KeyInput } from '../../internal/keyboard'
 import type { Key, KeyboardBinding, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import {
   createParentByKey,

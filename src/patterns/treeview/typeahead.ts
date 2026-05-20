@@ -1,4 +1,4 @@
-import { findTypeaheadMatch } from '@interactive-os/collection-navigation'
+import { findTypeaheadMatch } from '../../internal/collectionNavigation'
 import type { Key, PatternData, PatternOptions } from '../../schema'
 import { treeviewDefinition } from './definition'
 import { resolveVisibleOrder } from '../../kernel/patternKernel'

@@ -1,4 +1,4 @@
-import { createTypeaheadBuffer } from '@interactive-os/keyboard'
+import { createTypeaheadBuffer } from '../../internal/keyboard'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactTypes'
 import { handleListboxMultiKeyDown } from './handleListboxMultiSelect'

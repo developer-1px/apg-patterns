@@ -1,4 +1,4 @@
-import { findTypeaheadMatch } from '@interactive-os/collection-navigation'
+import { findTypeaheadMatch } from '../../internal/collectionNavigation'
 import type { Key, PatternData } from '../../schema'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 

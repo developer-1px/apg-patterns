@@ -1,4 +1,4 @@
-import { moveLinear } from '@interactive-os/collection-navigation'
+import { moveLinear } from '../../internal/collectionNavigation'
 import { defineNavigationTarget } from '../../kernel/patternKernel'
 
 defineNavigationTarget('tabsLinear', (target, ctx) => {

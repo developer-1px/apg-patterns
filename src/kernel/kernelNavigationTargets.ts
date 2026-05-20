@@ -1,4 +1,4 @@
-import { moveLinear } from '@interactive-os/collection-navigation'
+import { moveLinear } from '../internal/collectionNavigation'
 import { defineKeyToken, defineNavigationTarget, defineVisibleOrder } from './patternKernel'
 
 defineVisibleOrder('flat', (_v, data) => data.relations?.rootKeys ?? [])
