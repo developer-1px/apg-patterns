@@ -578,16 +578,18 @@ function packageMetadataSmokeSource() {
     author: packageJson.author,
     type: packageJson.type,
     packageManager: packageJson.packageManager,
-    nodeEngine: packageJson.engines?.node,
+    engines: packageJson.engines,
     files: packageJson.files,
+    sideEffects: packageJson.sideEffects,
     main: packageJson.main,
     module: packageJson.module,
     types: packageJson.types,
     private: false,
-    reactPeerRange: packageJson.peerDependencies?.react,
-    reactPeerOptional: packageJson.peerDependenciesMeta?.react?.optional === true,
-    packageJsonExport: packageJson.exports?.['./package.json'],
-    publishAccess: packageJson.publishConfig?.access,
+    dependencies: packageJson.dependencies,
+    peerDependencies: packageJson.peerDependencies,
+    peerDependenciesMeta: packageJson.peerDependenciesMeta,
+    exports: packageJson.exports,
+    publishConfig: packageJson.publishConfig,
   }
 
   return `
@@ -604,27 +606,25 @@ for (const key of ['name', 'version', 'description', 'license', 'author', 'type'
 }
 assertJsonEqual('keywords', packageMetadata.keywords, expectedMetadata.keywords)
 assertJsonEqual('files', packageMetadata.files, expectedMetadata.files)
-if (packageMetadata.engines?.node !== expectedMetadata.nodeEngine) {
-  throw new Error('package metadata export did not expose the expected Node engine')
-}
+assertJsonEqual('sideEffects', packageMetadata.sideEffects, expectedMetadata.sideEffects)
+assertJsonEqual('engines', packageMetadata.engines, expectedMetadata.engines)
+assertJsonEqual('dependencies', packageMetadata.dependencies, expectedMetadata.dependencies)
+assertJsonEqual('peerDependencies', packageMetadata.peerDependencies, expectedMetadata.peerDependencies)
+assertJsonEqual('peerDependenciesMeta', packageMetadata.peerDependenciesMeta, expectedMetadata.peerDependenciesMeta)
+assertJsonEqual('exports', packageMetadata.exports, expectedMetadata.exports)
+assertJsonEqual('publishConfig', packageMetadata.publishConfig, expectedMetadata.publishConfig)
 if (packageMetadata.private === true) throw new Error('package metadata export marked the package private')
-if (packageMetadata.peerDependencies?.react !== expectedMetadata.reactPeerRange) {
-  throw new Error('package metadata export did not expose the expected React peer range')
-}
-if (packageMetadata.peerDependenciesMeta?.react?.optional !== expectedMetadata.reactPeerOptional) {
-  throw new Error('package metadata export did not expose the optional React peer')
-}
-if (packageMetadata.exports?.['./package.json'] !== expectedMetadata.packageJsonExport) {
-  throw new Error('package metadata export did not expose its metadata subpath')
-}
-if (packageMetadata.publishConfig?.access !== expectedMetadata.publishAccess) {
-  throw new Error('package metadata export did not expose public publish access')
-}
 
 function assertJsonEqual(label, actual, expected) {
-  if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+  if (JSON.stringify(sortJson(actual)) !== JSON.stringify(sortJson(expected))) {
     throw new Error('package metadata export did not expose ' + label)
   }
+}
+
+function sortJson(value) {
+  if (Array.isArray(value)) return value.map(sortJson)
+  if (!value || typeof value !== 'object') return value
+  return Object.fromEntries(Object.keys(value).sort().map((key) => [key, sortJson(value[key])]))
 }
 
 const expectedDocs = {
