@@ -33,7 +33,7 @@ try {
     smokeKind: 'react',
   })
 
-  console.log('package consumer smoke passed for ESM, CJS, npm tarball install, Vite bundler build, NodeNext/Bundler TypeScript, package metadata, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
+  console.log('package consumer smoke passed for ESM, CJS, npm tarball install, Vite bundler build, NodeNext/Bundler/CJS TypeScript, package metadata, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
 } finally {
   rmSync(tempRoot, { recursive: true, force: true })
 }
@@ -59,6 +59,7 @@ function runConsumerSmoke({ tarballPath, consumerRoot, includeReact, smokeKind }
   execFileSync(process.execPath, ['cjs-smoke.cjs'], { cwd: consumerRoot, stdio: 'pipe' })
   execFileSync(join(repoRoot, 'node_modules/.bin/tsc'), ['--project', 'tsconfig.nodenext.json', '--noEmit'], { cwd: consumerRoot, stdio: 'pipe' })
   execFileSync(join(repoRoot, 'node_modules/.bin/tsc'), ['--project', 'tsconfig.bundler.json', '--noEmit'], { cwd: consumerRoot, stdio: 'pipe' })
+  execFileSync(join(repoRoot, 'node_modules/.bin/tsc'), ['--project', 'tsconfig.cjs-nodenext.json', '--noEmit'], { cwd: consumerRoot, stdio: 'pipe' })
 }
 
 function runNpmInstalledConsumerSmoke({ tarballPath, consumerRoot, smokeKind }) {
@@ -89,6 +90,7 @@ function runNpmInstalledConsumerSmoke({ tarballPath, consumerRoot, smokeKind }) 
   execFileSync(process.execPath, ['cjs-smoke.cjs'], { cwd: consumerRoot, stdio: 'pipe' })
   execFileSync(join(repoRoot, 'node_modules/.bin/tsc'), ['--project', 'tsconfig.nodenext.json', '--noEmit'], { cwd: consumerRoot, stdio: 'pipe' })
   execFileSync(join(repoRoot, 'node_modules/.bin/tsc'), ['--project', 'tsconfig.bundler.json', '--noEmit'], { cwd: consumerRoot, stdio: 'pipe' })
+  execFileSync(join(repoRoot, 'node_modules/.bin/tsc'), ['--project', 'tsconfig.cjs-nodenext.json', '--noEmit'], { cwd: consumerRoot, stdio: 'pipe' })
   runViteBundlerSmoke(consumerRoot)
 }
 
@@ -120,6 +122,7 @@ function localFileSpec(path) {
 
 function writeConsumerFiles(consumerRoot, smokeKind, options = {}) {
   const typeSmokeFilename = smokeKind === 'react' ? 'type-smoke.tsx' : 'type-smoke.ts'
+  const cjsTypeSmokeFilename = 'cjs-type-smoke.cts'
   if (options.writePackageJson !== false) {
     writeFileSync(join(consumerRoot, 'package.json'), JSON.stringify({ private: true, type: 'module' }, null, 2))
   }
@@ -135,10 +138,16 @@ function writeConsumerFiles(consumerRoot, smokeKind, options = {}) {
     moduleResolution: 'Bundler',
     include: [typeSmokeFilename],
   }))
+  writeFileSync(join(consumerRoot, 'tsconfig.cjs-nodenext.json'), tsconfigSource({
+    module: 'NodeNext',
+    moduleResolution: 'NodeNext',
+    include: [cjsTypeSmokeFilename],
+  }))
   const typeSmoke = smokeKind === 'core' || smokeKind === 'root'
     ? coreTypeSmokeSource(smokeKind === 'core' ? '@interactive-os/apg-patterns/core' : '@interactive-os/apg-patterns')
     : readFileSync(new URL('./fixtures/package-consumer-react-type-smoke.tsx', import.meta.url), 'utf8')
   writeFileSync(join(consumerRoot, typeSmokeFilename), typeSmoke)
+  writeFileSync(join(consumerRoot, cjsTypeSmokeFilename), cjsTypeSmokeSource(smokeKind))
 }
 
 function runViteBundlerSmoke(consumerRoot) {
@@ -273,6 +282,53 @@ const keyInput: KeyInput = {
 }
 
 runtime.resolveKeyboardBinding(keyInput, 'primary')
+void runtime
+`
+}
+
+function cjsTypeSmokeSource(smokeKind) {
+  const packagePath = smokeKind === 'core' ? '@interactive-os/apg-patterns/core' : '@interactive-os/apg-patterns'
+  const reactSmoke = smokeKind === 'react'
+    ? `
+import reactApi = require('@interactive-os/apg-patterns/react')
+
+const Component: typeof reactApi.Button = reactApi.Button
+const button = reactApi.useButtonPattern(data, (event: coreApi.PatternEvent) => events.push(event))
+void button.rootProps
+void Component
+`
+    : ''
+
+  return `import coreApi = require('${packagePath}')
+
+const data: coreApi.PatternData = {
+  items: { primary: { label: 'Primary' } },
+  relations: { rootKeys: ['primary'] },
+  state: { activeKey: 'primary' },
+}
+
+const events: coreApi.PatternEvent[] = []
+const runtime = coreApi.createPatternRuntime({
+  definition: coreApi.buttonDefinition,
+  data,
+  onEvent: (event) => events.push(event),
+})
+
+const keyInput: coreApi.KeyInput = {
+  key: 'Enter',
+  ctrlKey: false,
+  shiftKey: false,
+  altKey: false,
+  metaKey: false,
+}
+
+runtime.resolveKeyboardBinding(keyInput, 'primary')
+
+// @ts-expect-error React hooks must stay behind the /react subpath.
+void coreApi.useButtonPattern
+// @ts-expect-error React preset components must stay behind the /react subpath.
+void coreApi.Button
+${reactSmoke}
 void runtime
 `
 }
