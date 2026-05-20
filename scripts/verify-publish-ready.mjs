@@ -465,9 +465,35 @@ function assertPortableSourceMap(mapPath) {
   }
 
   if (map.version !== 3) failures.push(`${mapPath} must be a v3 source map`)
+  if (typeof map.sourceRoot === 'string' && map.sourceRoot.length > 0) {
+    failures.push(`${mapPath} must not use sourceRoot because packed sourcemaps should be portable`)
+  }
+
   for (const sourcePath of map.sources ?? []) {
     if (/^(?:\/|[A-Za-z]:[\\/]|file:|https?:)/.test(sourcePath)) {
       failures.push(`${mapPath} contains non-portable source path ${sourcePath}`)
+    }
+    if (sourcePath.includes('node_modules/')) failures.push(`${mapPath} contains dependency source path ${sourcePath}`)
+    if (!sourcePath.startsWith('../src/')) failures.push(`${mapPath} source path must stay under ../src/: ${sourcePath}`)
+  }
+
+  assertSourceMapContent(mapPath, map)
+}
+
+function assertSourceMapContent(mapPath, map) {
+  const sources = Array.isArray(map.sources) ? map.sources : []
+  if (sources.length === 0) return
+
+  if (!Array.isArray(map.sourcesContent)) {
+    failures.push(`${mapPath} must include sourcesContent for package debugging`)
+    return
+  }
+  if (map.sourcesContent.length !== sources.length) {
+    failures.push(`${mapPath} sourcesContent length must match sources length`)
+  }
+  for (let index = 0; index < map.sourcesContent.length; index += 1) {
+    if (typeof map.sourcesContent[index] !== 'string' || map.sourcesContent[index].length === 0) {
+      failures.push(`${mapPath} sourcesContent[${index}] must contain source text`)
     }
   }
 }
