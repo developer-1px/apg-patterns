@@ -33,7 +33,7 @@ try {
     smokeKind: 'react',
   })
 
-  console.log('package consumer smoke passed for ESM, CJS, npm tarball install, NodeNext/Bundler TypeScript, package metadata, React-free root/core imports, and React TSX subpath imports.')
+  console.log('package consumer smoke passed for ESM, CJS, npm tarball install, NodeNext/Bundler TypeScript, package metadata, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
 } finally {
   rmSync(tempRoot, { recursive: true, force: true })
 }
@@ -198,6 +198,11 @@ function coreTypeSmokeSource(packagePath) {
   type PatternData,
   type PatternEvent,
 } from '${packagePath}'
+
+// @ts-expect-error React hooks must stay behind the /react subpath.
+import { useButtonPattern } from '${packagePath}'
+// @ts-expect-error React preset components must stay behind the /react subpath.
+import { Button } from '${packagePath}'
 
 const data: PatternData = {
   items: { primary: { label: 'Primary' } },
