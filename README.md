@@ -337,7 +337,7 @@ After changing public exports, run `npm run update:api` after `npm run build` to
 
 `check:exports` validates package manifest paths, ESM/CJS conditional declaration and runtime export boundaries, and TypeScript declaration resolution for the root, `./core`, and `./react` entries.
 
-`check:publish` validates package metadata, package-lock root consistency, local-only dependency specs, packed tarball contents, npm provenance publish dry-run metadata, the documented public provenance publish command, runtime external imports, portable sourcemaps with source content, and production source imports that would create public-entry circular initialization.
+`check:publish` validates package metadata, package-lock root and runtime dependency consistency, local-only dependency specs, packed tarball contents, npm provenance publish dry-run metadata, the documented public provenance publish command, runtime external imports, portable sourcemaps with source content, and production source imports that would create public-entry circular initialization.
 
 Before publishing a new version, run `npm run check:registry` to confirm the current package version is still unpublished on the public npm registry.
 

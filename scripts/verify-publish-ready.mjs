@@ -51,6 +51,9 @@ const expectedExportEntries = {
 const expectedExportSubpaths = [...Object.keys(expectedExportEntries), './package.json']
 const expectedPackageFiles = ['dist', 'docs/proposals', 'README.md', 'API.md', 'CHANGELOG.md', 'LICENSE']
 const requiredPackageKeywords = ['aria', 'wai-aria', 'apg', 'patterns', 'react', 'zod', 'a11y']
+const allowedRuntimeDependencyLicenses = {
+  zod: new Set(['MIT']),
+}
 const hangulTextPattern = /[\u1100-\u11FF\u3130-\u318F\uAC00-\uD7AF]/
 const allowedDeclarationExternalSpecifiers = {
   'dist/index.d.ts': new Set(['zod']),
@@ -482,6 +485,65 @@ function assertPackageLock() {
     rootPackage.peerDependenciesMeta ?? {},
     packageJson.peerDependenciesMeta ?? {},
   )
+  assertPackageLockRuntimeDependencies(packageLock)
+}
+
+function assertPackageLockRuntimeDependencies(packageLock) {
+  for (const [name, spec] of Object.entries(packageJson.dependencies ?? {})) {
+    const lockPath = `node_modules/${name}`
+    const lockPackage = packageLock.packages?.[lockPath]
+    if (!lockPackage || typeof lockPackage !== 'object' || Array.isArray(lockPackage)) {
+      failures.push(`package-lock.json is missing runtime dependency ${lockPath}`)
+      continue
+    }
+
+    if (!semverPattern.test(lockPackage.version ?? '')) {
+      failures.push(`package-lock runtime dependency ${name} must resolve to a SemVer version`)
+    }
+    if (!matchesDeclaredDependencySpec(lockPackage.version, spec)) {
+      failures.push(`package-lock runtime dependency ${name}@${lockPackage.version} must satisfy ${spec}`)
+    }
+    if (lockPackage.dev === true) failures.push(`package-lock runtime dependency ${name} must not be marked dev`)
+    if (lockPackage.optional === true) failures.push(`package-lock runtime dependency ${name} must not be optional`)
+    if (lockPackage.hasInstallScript === true) {
+      failures.push(`package-lock runtime dependency ${name} must not run install scripts`)
+    }
+    if (lockPackage.dependencies && Object.keys(lockPackage.dependencies).length > 0) {
+      failures.push(`package-lock runtime dependency ${name} must not add transitive runtime dependencies`)
+    }
+    if (!runtimeDependencyResolvedPattern(name).test(lockPackage.resolved ?? '')) {
+      failures.push(`package-lock runtime dependency ${name} must resolve from the npm registry`)
+    }
+    if (!/^sha512-[A-Za-z0-9+/=]+$/.test(lockPackage.integrity ?? '')) {
+      failures.push(`package-lock runtime dependency ${name} must include sha512 integrity`)
+    }
+
+    const allowedLicenses = allowedRuntimeDependencyLicenses[name]
+    if (!allowedLicenses) {
+      failures.push(`package-lock runtime dependency ${name} is missing an allowed license policy`)
+    } else if (!allowedLicenses.has(lockPackage.license)) {
+      failures.push(`package-lock runtime dependency ${name} license ${lockPackage.license} is not allowed`)
+    }
+  }
+}
+
+function matchesDeclaredDependencySpec(version, spec) {
+  if (typeof version !== 'string' || typeof spec !== 'string') return false
+  if (spec.startsWith('^')) {
+    const [major, minor, patch] = version.split('.').map((part) => Number.parseInt(part, 10))
+    const [minMajor, minMinor, minPatch] = spec.slice(1).split('.').map((part) => Number.parseInt(part, 10))
+    if ([major, minor, patch, minMajor, minMinor, minPatch].some((part) => Number.isNaN(part))) return false
+    if (major !== minMajor) return false
+    if (minor < minMinor || (minor === minMinor && patch < minPatch)) return false
+    if (minMajor === 0 && minMinor === 0) return minor === minMinor && patch === minPatch
+    if (minMajor === 0) return minor === minMinor
+    return true
+  }
+  return version === spec
+}
+
+function runtimeDependencyResolvedPattern(name) {
+  return new RegExp(`^https://registry\\.npmjs\\.org/${escapeRegExp(name)}/-/`)
 }
 
 function assertPackageFiles() {
