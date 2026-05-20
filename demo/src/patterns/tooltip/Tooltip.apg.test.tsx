@@ -7,18 +7,28 @@
  *   3) Focus: tooltip does not steal focus
  */
 import { act, fireEvent, render, screen } from '@testing-library/react'
+import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
+import { reducePatternData, type PatternData, type PatternEvent } from '../../../../src'
+import { tooltipDefinition } from '../../../../src/patterns/tooltip/definition'
 import { Tooltip } from './Tooltip'
+import { initialTooltipData } from './tooltipData'
+
+function TooltipDemo() {
+  const [data, setData] = useState<PatternData>(initialTooltipData)
+  const handleEvent = (event: PatternEvent) => setData((current) => reducePatternData(tooltipDefinition, current, event))
+  return <Tooltip data={data} onEvent={handleEvent} />
+}
 
 describe('APG §Roles, States, Properties', () => {
   it('tooltip element uses role="tooltip"', () => {
-    render(<Tooltip />)
+    render(<TooltipDemo />)
     act(() => { fireEvent.focus(screen.getByRole('button')) })
     expect(screen.getByRole('tooltip')).toBeTruthy()
   })
 
   it('trigger references tooltip via aria-describedby', () => {
-    render(<Tooltip />)
+    render(<TooltipDemo />)
     const trigger = screen.getByRole('button')
     const describedby = trigger.getAttribute('aria-describedby')
     expect(describedby).toBeTruthy()
@@ -29,7 +39,7 @@ describe('APG §Roles, States, Properties', () => {
 
 describe('APG §Keyboard — Escape dismisses', () => {
   it('Escape on focused trigger hides the tooltip', () => {
-    render(<Tooltip />)
+    render(<TooltipDemo />)
     const trigger = screen.getByRole('button')
     act(() => { fireEvent.focus(trigger) })
     expect(screen.getByRole('tooltip')).toBeTruthy()
@@ -40,7 +50,7 @@ describe('APG §Keyboard — Escape dismisses', () => {
 
 describe('APG §Focus — tooltip does not steal focus', () => {
   it('focus stays on trigger when tooltip shows', () => {
-    render(<Tooltip />)
+    render(<TooltipDemo />)
     const trigger = screen.getByRole('button')
     act(() => { trigger.focus() })
     act(() => { fireEvent.focus(trigger) })
@@ -48,7 +58,7 @@ describe('APG §Focus — tooltip does not steal focus', () => {
   })
 
   it('blur on trigger dismisses focus-triggered tooltip', () => {
-    render(<Tooltip />)
+    render(<TooltipDemo />)
     const trigger = screen.getByRole('button')
     act(() => { fireEvent.focus(trigger) })
     expect(screen.getByRole('tooltip')).toBeTruthy()

@@ -3,11 +3,11 @@ import type { LandmarkDataItem } from './landmarksData'
 
 export function Landmarks({
   data,
-  onEvent = () => undefined,
+  onEvent,
   options,
 }: {
   data: PatternData<LandmarkDataItem>
-  onEvent?: (event: PatternEvent) => void
+  onEvent: (event: PatternEvent) => void
   options?: PatternOptions
 }) {
   const landmarks = useLandmarksPattern(data, onEvent, options)

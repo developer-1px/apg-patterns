@@ -24,11 +24,14 @@ for (const folder of srcFolders) {
     failures.push(`${folder}: demo key ${demoEntry.key} does not match expected ${expectedKey}`)
   }
 
-  verifySourceFile(`${folder}: main source`, path.join(demoPatternDir, folder, demoEntry.sources.main))
+  const mainSourcePath = path.join(demoPatternDir, folder, demoEntry.sources.main)
+  verifySourceFile(`${folder}: main source`, mainSourcePath)
   verifySourceFile(`${folder}: entry source`, path.join(demoPatternDir, folder, 'entry.tsx'))
   verifySourceName(`${folder}: entry source name`, demoEntry.sources.entry, `${folder}/entry.tsx`)
   verifySourceName(`${folder}: definition source name`, demoEntry.sources.definition, `${folder}/definition.ts`)
   verifySourceFile(`${folder}: definition source`, path.join(srcPatternDir, folder, 'definition.ts'))
+  verifyDemoViewContract(folder, demoEntry)
+  verifyMainComponentSourceContract(folder, mainSourcePath)
 
   const declaredHooks = [...(demoEntry.sources.hooks ?? [])].sort((a, b) => a.localeCompare(b))
   const actualHooks = readdirSync(path.join(srcPatternDir, folder))
@@ -104,11 +107,16 @@ function readDefinitionObject(node) {
     if (!name) continue
     if (name === 'key' && ts.isStringLiteralLike(property.initializer)) result.key = property.initializer.text
     if (name === 'sources' && ts.isObjectLiteralExpression(property.initializer)) result.sources = readSourcesObject(property.initializer)
+    if (name === 'view' && ts.isObjectLiteralExpression(property.initializer)) result.view = readObject(property.initializer)
   }
   return result
 }
 
 function readSourcesObject(node) {
+  return readObject(node)
+}
+
+function readObject(node) {
   const sources = {}
   for (const property of node.properties) {
     if (!ts.isPropertyAssignment(property)) continue
@@ -116,6 +124,7 @@ function readSourcesObject(node) {
     if (!name) continue
     const value = property.initializer
     if (ts.isStringLiteralLike(value)) sources[name] = value.text
+    if (ts.isObjectLiteralExpression(value)) sources[name] = readObject(value)
     if (ts.isArrayLiteralExpression(value)) {
       sources[name] = value.elements
         .filter((element) => ts.isStringLiteralLike(element))
@@ -138,4 +147,25 @@ function verifySourceName(label, actual, expected) {
 
 function verifySourceFile(label, filePath) {
   if (!existsSync(filePath)) failures.push(`${label} missing file: ${filePath}`)
+}
+
+function verifyDemoViewContract(folder, demoEntry) {
+  const view = demoEntry.view
+  if (view?.kind !== 'component') {
+    failures.push(`${folder}: demo view must render a component`)
+    return
+  }
+  const props = view.props ?? {}
+  if (props.data !== '$state.data') failures.push(`${folder}: demo view must pass data from $state.data`)
+  if (props.onEvent !== '$actions.dispatchEvent') {
+    failures.push(`${folder}: demo view must pass onEvent from $actions.dispatchEvent`)
+  }
+}
+
+function verifyMainComponentSourceContract(folder, filePath) {
+  if (!existsSync(filePath)) return
+  const text = readFileSync(filePath, 'utf8')
+  if (/\bdata\?\s*:/.test(text)) failures.push(`${folder}: main demo component must require data`)
+  if (/\bonEvent\?\s*:/.test(text)) failures.push(`${folder}: main demo component must require onEvent`)
+  if (/\buseReducer\s*\(/.test(text)) failures.push(`${folder}: main demo component must not own reducer state`)
 }

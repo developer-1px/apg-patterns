@@ -1,19 +1,12 @@
-import { useReducer } from 'react'
-import { reducePatternData, useTooltipPattern, type PatternData } from '../../../../src'
-import { tooltipDefinition } from '../../../../src/patterns/tooltip/definition'
-import { initialTooltipData } from './tooltipData'
+import { useTooltipPattern, type PatternData, type PatternEvent } from '../../../../src'
 
 export interface TooltipProps {
-  data?: PatternData
+  data: PatternData
+  onEvent: (event: PatternEvent) => void
 }
 
-export function Tooltip({ data: initialData = initialTooltipData }: TooltipProps) {
-  const [data, dispatch] = useReducer(
-    (current: PatternData, event: Parameters<typeof reducePatternData>[2]) =>
-      reducePatternData(tooltipDefinition, current, event),
-    initialData,
-  )
-  const tooltip = useTooltipPattern(data, dispatch)
+export function Tooltip({ data, onEvent }: TooltipProps) {
+  const tooltip = useTooltipPattern(data, onEvent)
 
   return (
     <>

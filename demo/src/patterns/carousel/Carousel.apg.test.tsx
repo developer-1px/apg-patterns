@@ -3,31 +3,40 @@
  * 출처: https://www.w3.org/WAI/ARIA/apg/patterns/carousel/
  */
 import { render, screen } from '@testing-library/react'
+import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
+import { carouselDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src'
 import { Carousel } from './Carousel'
+import { initialCarouselData } from './carouselData'
+
+function CarouselDemo() {
+  const [data, setData] = useState<PatternData>(initialCarouselData)
+  const handleEvent = (event: PatternEvent) => setData((current) => reducePatternData(carouselDefinition, current, event))
+  return <Carousel data={data} onEvent={handleEvent} />
+}
 
 describe('APG §Roles, States, Properties', () => {
   it('container has role="region" or "group"', () => {
-    render(<Carousel />)
+    render(<CarouselDemo />)
     const r = screen.queryByRole('region') || screen.queryByRole('group')
     expect(r).toBeTruthy()
   })
 
   it('container has aria-roledescription="carousel"', () => {
-    render(<Carousel />)
+    render(<CarouselDemo />)
     const r = screen.queryByRole('region') || screen.queryByRole('group')
     expect(r!.getAttribute('aria-roledescription')).toBe('carousel')
   })
 
   it('container has accessible name', () => {
-    render(<Carousel />)
+    render(<CarouselDemo />)
     const r = (screen.queryByRole('region') || screen.queryByRole('group'))!
     const name = r.getAttribute('aria-label') || r.getAttribute('aria-labelledby')
     expect(name).toBeTruthy()
   })
 
   it('slides have aria-roledescription="slide" (if individually addressable)', () => {
-    render(<Carousel />)
+    render(<CarouselDemo />)
     const slides = document.querySelectorAll('[aria-roledescription="slide"]')
     expect(slides.length).toBeGreaterThan(0)
   })

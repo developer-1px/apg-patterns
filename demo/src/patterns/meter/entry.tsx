@@ -1,8 +1,6 @@
-import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { Meter } from './Meter'
 import { meterVariantItems, meterVariants, type MeterVariantKey } from './meterData'
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
-import { renderDataInspect } from '../../shared/inspect/genericInspect'
+import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const meterDemoDefinition = {
   key: 'meter',
@@ -29,42 +27,20 @@ const meterDemoDefinition = {
     component: 'Meter',
     props: {
       data: '$state.data',
-      onEvent: '$actions.emitEvent',
+      onEvent: '$actions.dispatchEvent',
       options: '$state.options',
     },
   },
 } as const satisfies DemoPatternDefinition
 
-export const entry = defineDemoPattern({
+export const entry = defineVariantDemoPattern<MeterVariantKey>({
   definition: meterDemoDefinition,
-  useRuntime: (onEvent) => {
-    const host = useVariantPatternDataHost<MeterVariantKey>(
-      'disk',
-      meterVariants.disk.data,
-      (variant) => meterVariants[variant].data,
-      (_variant, data) => data,
-    )
-    return {
-      inspect: renderDataInspect(host.data),
-      context: {
-        values: {
-          state: {
-            variant: host.variant,
-            data: host.data,
-            options: meterVariants[host.variant].options,
-          },
-          model: {
-            variantItems: meterVariantItems,
-          },
-        },
-        actions: {
-          selectVariant: host.selectVariant,
-          emitEvent: onEvent,
-        },
-        components: {
-          Meter,
-        },
-      },
-    }
-  },
+  initialVariant: 'disk',
+  initialData: meterVariants.disk.data,
+  dataByVariant: (variant) => meterVariants[variant].data,
+  reduce: (_variant, data) => data,
+  variantItems: meterVariantItems,
+  componentName: 'Meter',
+  component: Meter,
+  getStateValues: (variant) => ({ options: meterVariants[variant].options }),
 })

@@ -1,22 +1,14 @@
-import { useReducer } from 'react'
-import { reducePatternData, useCarouselPattern, type PatternData, type PatternEvent } from '../../../../src'
-import { carouselDefinition } from '../../../../src/patterns/carousel/definition'
+import { useCarouselPattern, type PatternData, type PatternEvent } from '../../../../src'
 import { cx, ds } from '../../shared/designSystem'
-import { initialCarouselData } from './carouselData'
 import { Icon } from '../../shared/Icon'
 
 export interface CarouselProps {
-  data?: PatternData
-  onEvent?: (event: PatternEvent) => void
+  data: PatternData
+  onEvent: (event: PatternEvent) => void
 }
 
-export function Carousel({ data = initialCarouselData, onEvent }: CarouselProps) {
-  const [localData, dispatch] = useReducer(
-    (current: PatternData, event: PatternEvent) => reducePatternData(carouselDefinition, current, event),
-    data,
-  )
-  const isControlled = onEvent !== undefined
-  const carousel = useCarouselPattern(isControlled ? data : localData, isControlled ? onEvent : dispatch)
+export function Carousel({ data, onEvent }: CarouselProps) {
+  const carousel = useCarouselPattern(data, onEvent)
   const count = carousel.slides.length
 
   return (

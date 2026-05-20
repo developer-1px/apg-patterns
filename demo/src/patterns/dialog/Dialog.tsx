@@ -1,8 +1,6 @@
-import { useReducer } from 'react'
-import { reducePatternData, useDialogPattern, type PatternData, type PatternEvent } from '../../../../src'
-import { dialogDefinition } from '../../../../src/patterns/dialog/definition'
+import { useDialogPattern, type PatternData, type PatternEvent } from '../../../../src'
 import { ds } from '../../shared/designSystem'
-import { dialogContent, initialDialogData } from './dialogData'
+import { dialogContent } from './dialogData'
 
 const triggerClass = ds.button
 const overlayClass =
@@ -13,17 +11,12 @@ const inputClass = ds.field
 const buttonClass = ds.button
 
 export interface DialogProps {
-  data?: PatternData
-  onEvent?: (event: PatternEvent) => void
+  data: PatternData
+  onEvent: (event: PatternEvent) => void
 }
 
-export function Dialog({ data = initialDialogData, onEvent }: DialogProps = {}) {
-  const [localData, dispatch] = useReducer(
-    (current: PatternData, event: PatternEvent) => reducePatternData(dialogDefinition, current, event),
-    data,
-  )
-  const isControlled = onEvent !== undefined
-  const dialog = useDialogPattern(isControlled ? data : localData, isControlled ? onEvent : dispatch)
+export function Dialog({ data, onEvent }: DialogProps) {
+  const dialog = useDialogPattern(data, onEvent)
 
   return (
     <div className="grid gap-3">

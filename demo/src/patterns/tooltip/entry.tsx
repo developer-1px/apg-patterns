@@ -1,7 +1,8 @@
 import { Tooltip } from './Tooltip'
 import { initialTooltipData } from './tooltipData'
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
-import { renderDataInspect } from '../../shared/inspect/genericInspect'
+import { reducePatternData } from '../../../../src'
+import { tooltipDefinition } from '../../../../src/patterns/tooltip/definition'
+import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const tooltipDemoDefinition = {
   key: 'tooltip',
@@ -17,21 +18,17 @@ const tooltipDemoDefinition = {
   view: {
     kind: 'component',
     component: 'Tooltip',
+    props: {
+      data: '$state.data',
+      onEvent: '$actions.dispatchEvent',
+    },
   },
 } as const satisfies DemoPatternDefinition
 
-export const entry = defineDemoPattern({
+export const entry = defineStateDemoPattern({
   definition: tooltipDemoDefinition,
-  useRuntime: () => {
-    return {
-      inspect: renderDataInspect(initialTooltipData),
-      context: {
-        values: {},
-        actions: {},
-        components: {
-          Tooltip,
-        },
-      },
-    }
-  },
+  initialData: initialTooltipData,
+  reduce: (data, event) => reducePatternData(tooltipDefinition, data, event),
+  componentName: 'Tooltip',
+  component: Tooltip,
 })

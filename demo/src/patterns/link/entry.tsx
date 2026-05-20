@@ -1,8 +1,6 @@
-import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { Link } from './Link'
 import { linkVariantItems, linkVariants, type LinkVariantKey } from './linkData'
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
-import { renderDataInspect } from '../../shared/inspect/genericInspect'
+import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const linkDemoDefinition = {
   key: 'link',
@@ -29,40 +27,18 @@ const linkDemoDefinition = {
     component: 'Link',
     props: {
       data: '$state.data',
-      onEvent: '$actions.emitEvent',
+      onEvent: '$actions.dispatchEvent',
     },
   },
 } as const satisfies DemoPatternDefinition
 
-export const entry = defineDemoPattern({
+export const entry = defineVariantDemoPattern<LinkVariantKey>({
   definition: linkDemoDefinition,
-  useRuntime: (onEvent) => {
-    const host = useVariantPatternDataHost<LinkVariantKey>(
-      'anchor',
-      linkVariants.anchor.data,
-      (variant) => linkVariants[variant].data,
-      (_variant, data) => data,
-    )
-    return {
-      inspect: renderDataInspect(host.data),
-      context: {
-        values: {
-          state: {
-            variant: host.variant,
-            data: host.data,
-          },
-          model: {
-            variantItems: linkVariantItems,
-          },
-        },
-        actions: {
-          selectVariant: host.selectVariant,
-          emitEvent: onEvent,
-        },
-        components: {
-          Link,
-        },
-      },
-    }
-  },
+  initialVariant: 'anchor',
+  initialData: linkVariants.anchor.data,
+  dataByVariant: (variant) => linkVariants[variant].data,
+  reduce: (_variant, data) => data,
+  variantItems: linkVariantItems,
+  componentName: 'Link',
+  component: Link,
 })

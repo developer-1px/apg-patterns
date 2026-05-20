@@ -6,7 +6,7 @@ const linkClass = cx(ds.focusRing, 'inline-flex items-center rounded-md text-sm 
 
 export interface LinkProps {
   data: PatternData
-  onEvent?: (event: PatternEvent) => void
+  onEvent: (event: PatternEvent) => void
 }
 
 export function Link({ data, onEvent }: LinkProps) {

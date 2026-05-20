@@ -6,6 +6,12 @@ import { tooltipDefinition } from '../../../../src/patterns/tooltip/definition'
 import { Tooltip } from './Tooltip'
 import { initialTooltipData } from './tooltipData'
 
+function TooltipDemo() {
+  const [data, setData] = useState<PatternData>(initialTooltipData)
+  const handleEvent = (event: PatternEvent) => setData((current) => reducePatternData(tooltipDefinition, current, event))
+  return <Tooltip data={data} onEvent={handleEvent} />
+}
+
 function TooltipActionsDemo({ empty = false }: { empty?: boolean }) {
   const [data, setData] = useState<PatternData>(empty ? { items: {}, relations: { rootKeys: [] }, state: {} } : initialTooltipData)
   const tooltip = useTooltipPattern(
@@ -24,7 +30,7 @@ function TooltipActionsDemo({ empty = false }: { empty?: boolean }) {
 
 describe('Tooltip demo', () => {
   it('trigger has aria-describedby pointing to tooltip id', () => {
-    render(<Tooltip />)
+    render(<TooltipDemo />)
     const trigger = screen.getByRole('button')
     const describedby = trigger.getAttribute('aria-describedby')
     expect(describedby).toBeTruthy()
@@ -34,7 +40,7 @@ describe('Tooltip demo', () => {
   })
 
   it('focus shows tooltip and blur hides it', () => {
-    render(<Tooltip />)
+    render(<TooltipDemo />)
     const trigger = screen.getByRole('button')
     expect(screen.queryByRole('tooltip')).toBeNull()
 
@@ -46,7 +52,7 @@ describe('Tooltip demo', () => {
   })
 
   it('mouseenter shows tooltip and mouseleave hides it', () => {
-    render(<Tooltip />)
+    render(<TooltipDemo />)
     const trigger = screen.getByRole('button')
     expect(screen.queryByRole('tooltip')).toBeNull()
 
@@ -58,7 +64,7 @@ describe('Tooltip demo', () => {
   })
 
   it('Escape hides the tooltip while focused', () => {
-    render(<Tooltip />)
+    render(<TooltipDemo />)
     const trigger = screen.getByRole('button')
     fireEvent.focus(trigger)
     expect(screen.getByRole('tooltip')).toBeTruthy()

@@ -9,6 +9,7 @@ const linkHref = (data: typeof initialAnchorLinkData | typeof initialSpanLinkDat
   const key = data.relations?.rootKeys?.[0]!
   return String((data.items[key] as { href?: unknown }).href)
 }
+const ignoreEvent = () => undefined
 
 function LinkActionsDemo({ empty = false }: { empty?: boolean }) {
   const [events, setEvents] = useState(0)
@@ -34,7 +35,7 @@ function LinkActionsDemo({ empty = false }: { empty?: boolean }) {
 describe('Link demo (anchor)', () => {
   it('renders <a> with role=link and href', () => {
     render(
-      <Link data={initialAnchorLinkData} />,
+      <Link data={initialAnchorLinkData} onEvent={ignoreEvent} />,
     )
     const link = screen.getByRole('link')
     expect(link.tagName).toBe('A')
@@ -118,7 +119,7 @@ describe('Link demo (anchor)', () => {
 describe('Link demo (spanRole)', () => {
   it('renders <span role="link"> with data-href', () => {
     render(
-      <Link data={initialSpanLinkData} />,
+      <Link data={initialSpanLinkData} onEvent={ignoreEvent} />,
     )
     const link = screen.getByRole('link')
     expect(link.tagName).toBe('SPAN')

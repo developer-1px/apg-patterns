@@ -11,7 +11,7 @@ function LandmarksHost() {
     <div>
       <button type="button" onClick={() => setVariant('form')}>Show form</button>
       <button type="button" onClick={() => setVariant('region')}>Show region</button>
-      <Landmarks data={buildLandmarkData(landmarkVariants[variant])} />
+      <Landmarks data={buildLandmarkData(landmarkVariants[variant])} onEvent={() => undefined} />
     </div>
   )
 }

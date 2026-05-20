@@ -1,10 +1,19 @@
 import { fireEvent, render, screen } from '@testing-library/react'
+import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
+import { dialogDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src'
 import { Dialog } from './Dialog'
+import { initialDialogData } from './dialogData'
+
+function DialogDemo() {
+  const [data, setData] = useState<PatternData>(initialDialogData)
+  const handleEvent = (event: PatternEvent) => setData((current) => reducePatternData(dialogDefinition, current, event))
+  return <Dialog data={data} onEvent={handleEvent} />
+}
 
 describe('Dialog demo (modal)', () => {
   it('opens on trigger click with role=dialog and aria-modal=true', () => {
-    render(<Dialog />)
+    render(<DialogDemo />)
     const trigger = screen.getByRole('button', { name: /add delivery address/i })
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
     expect(screen.queryByRole('dialog')).toBeNull()
@@ -20,13 +29,13 @@ describe('Dialog demo (modal)', () => {
   })
 
   it('does not move focus to the trigger before the dialog opens', () => {
-    render(<Dialog />)
+    render(<DialogDemo />)
     const trigger = screen.getByRole('button', { name: /add delivery address/i })
     expect(document.activeElement).not.toBe(trigger)
   })
 
   it('focuses first interactive element when opened', () => {
-    render(<Dialog />)
+    render(<DialogDemo />)
     const trigger = screen.getByRole('button', { name: /add delivery address/i })
     fireEvent.click(trigger)
 
@@ -35,7 +44,7 @@ describe('Dialog demo (modal)', () => {
   })
 
   it('closes on Escape and returns focus to trigger', () => {
-    render(<Dialog />)
+    render(<DialogDemo />)
     const trigger = screen.getByRole('button', { name: /add delivery address/i })
     fireEvent.click(trigger)
 
@@ -47,7 +56,7 @@ describe('Dialog demo (modal)', () => {
   })
 
   it('closes on overlay click', () => {
-    render(<Dialog />)
+    render(<DialogDemo />)
     const trigger = screen.getByRole('button', { name: /add delivery address/i })
     fireEvent.click(trigger)
     expect(screen.getByRole('dialog')).toBeTruthy()
@@ -59,7 +68,7 @@ describe('Dialog demo (modal)', () => {
   })
 
   it('Tab from last focusable wraps to first (focus trap)', () => {
-    render(<Dialog />)
+    render(<DialogDemo />)
     const trigger = screen.getByRole('button', { name: /add delivery address/i })
     fireEvent.click(trigger)
 

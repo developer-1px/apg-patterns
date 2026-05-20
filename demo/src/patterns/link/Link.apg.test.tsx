@@ -11,19 +11,21 @@ import type { PatternEvent } from '../../../../src'
 import { Link } from './Link'
 import { initialAnchorLinkData, initialSpanLinkData } from './linkData'
 
+const ignoreEvent = () => undefined
+
 describe('APG §Roles, States, Properties', () => {
   it('anchor variant has role="link"', () => {
-    render(<Link data={initialAnchorLinkData} />)
+    render(<Link data={initialAnchorLinkData} onEvent={ignoreEvent} />)
     expect(screen.getByRole('link')).toBeTruthy()
   })
 
   it('span variant exposes role="link"', () => {
-    render(<Link data={initialSpanLinkData} />)
+    render(<Link data={initialSpanLinkData} onEvent={ignoreEvent} />)
     expect(screen.getByRole('link')).toBeTruthy()
   })
 
   it('has accessible name (text content)', () => {
-    render(<Link data={initialAnchorLinkData} />)
+    render(<Link data={initialAnchorLinkData} onEvent={ignoreEvent} />)
     expect(screen.getByRole('link').textContent?.trim()).toBeTruthy()
   })
 })
@@ -39,7 +41,7 @@ describe('APG §Keyboard — Enter activates', () => {
 
 describe('APG §Implementation note — native anchor preferred', () => {
   it('anchor variant uses <a> with href', () => {
-    render(<Link data={initialAnchorLinkData} />)
+    render(<Link data={initialAnchorLinkData} onEvent={ignoreEvent} />)
     const link = screen.getByRole('link')
     expect(link.tagName).toBe('A')
     expect(link.getAttribute('href')).toBeTruthy()
