@@ -31,19 +31,34 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./core": {
-      "types": "./dist/core.d.ts",
-      "import": "./dist/core.js",
-      "require": "./dist/core.cjs"
+      "import": {
+        "types": "./dist/core.d.ts",
+        "default": "./dist/core.js"
+      },
+      "require": {
+        "types": "./dist/core.d.cts",
+        "default": "./dist/core.cjs"
+      }
     },
     "./react": {
-      "types": "./dist/react.d.ts",
-      "import": "./dist/react.js",
-      "require": "./dist/react.cjs"
+      "import": {
+        "types": "./dist/react.d.ts",
+        "default": "./dist/react.js"
+      },
+      "require": {
+        "types": "./dist/react.d.cts",
+        "default": "./dist/react.cjs"
+      }
     },
     "./package.json": "./package.json"
   },
@@ -61,12 +76,13 @@
     "demo:build": "vite build --config vite.config.ts",
     "demo:preview": "vite preview --config vite.config.ts --host 127.0.0.1",
     "demo:smoke": "npm run demo:build && node scripts/smoke-demo-build.mjs && node scripts/smoke-demo-preview-server.mjs",
-    "check": "npm run check:repo && npm run typecheck && npm test && npm run check:apg && npm run check:preset && npm run check:demo && npm run check:package && npm run build && npm run check:api && npm run check:exports && npm run check:readme && npm run check:publish && npm run smoke:package && npm run demo:smoke",
+    "check": "npm run check:repo && npm run check:independence && npm run typecheck && npm test && npm run check:apg && npm run check:preset && npm run check:demo && npm run check:package && npm run build && npm run check:api && npm run check:exports && npm run check:readme && npm run check:publish && npm run smoke:package && npm run demo:smoke",
     "check:api": "node scripts/verify-api-reference.mjs",
     "update:api": "node scripts/verify-api-reference.mjs --write",
     "check:apg": "node scripts/verify-apg-example-coverage.mjs",
     "check:demo": "node scripts/verify-demo-consistency.mjs",
     "check:exports": "node scripts/verify-package-exports.mjs",
+    "check:independence": "node scripts/verify-package-independence.mjs",
     "check:package": "node scripts/verify-package-side-effects.mjs",
     "check:publish": "node scripts/verify-publish-ready.mjs",
     "check:repo": "node scripts/verify-repository-hygiene.mjs",

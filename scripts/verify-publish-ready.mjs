@@ -16,19 +16,34 @@ const declarationByteBudgets = {
 }
 const expectedExportEntries = {
   '.': {
-    types: './dist/index.d.ts',
-    import: './dist/index.js',
-    require: './dist/index.cjs',
+    import: {
+      types: './dist/index.d.ts',
+      default: './dist/index.js',
+    },
+    require: {
+      types: './dist/index.d.cts',
+      default: './dist/index.cjs',
+    },
   },
   './core': {
-    types: './dist/core.d.ts',
-    import: './dist/core.js',
-    require: './dist/core.cjs',
+    import: {
+      types: './dist/core.d.ts',
+      default: './dist/core.js',
+    },
+    require: {
+      types: './dist/core.d.cts',
+      default: './dist/core.cjs',
+    },
   },
   './react': {
-    types: './dist/react.d.ts',
-    import: './dist/react.js',
-    require: './dist/react.cjs',
+    import: {
+      types: './dist/react.d.ts',
+      default: './dist/react.js',
+    },
+    require: {
+      types: './dist/react.d.cts',
+      default: './dist/react.cjs',
+    },
   },
 }
 const expectedExportSubpaths = [...Object.keys(expectedExportEntries), './package.json']
@@ -435,14 +450,14 @@ function assertPublicExports() {
   if (packageJson.exports['./package.json'] !== './package.json') {
     failures.push('exports["./package.json"] must expose package metadata')
   }
-  if (packageJson.main !== expectedExportEntries['.'].require) {
-    failures.push(`main must match exports["."].require ${expectedExportEntries['.'].require}`)
+  if (packageJson.main !== expectedExportEntries['.'].require.default) {
+    failures.push(`main must match exports["."].require.default ${expectedExportEntries['.'].require.default}`)
   }
-  if (packageJson.module !== expectedExportEntries['.'].import) {
-    failures.push(`module must match exports["."].import ${expectedExportEntries['.'].import}`)
+  if (packageJson.module !== expectedExportEntries['.'].import.default) {
+    failures.push(`module must match exports["."].import.default ${expectedExportEntries['.'].import.default}`)
   }
-  if (packageJson.types !== expectedExportEntries['.'].types) {
-    failures.push(`types must match exports["."].types ${expectedExportEntries['.'].types}`)
+  if (packageJson.types !== expectedExportEntries['.'].import.types) {
+    failures.push(`types must match exports["."].import.types ${expectedExportEntries['.'].import.types}`)
   }
 }
 
@@ -451,10 +466,20 @@ function assertExportConditions(subpath, entry, expected) {
     failures.push(`exports["${subpath}"] is required`)
     return
   }
-  assertExactKeys(`exports["${subpath}"]`, entry, ['types', 'import', 'require'])
-  for (const condition of ['types', 'import', 'require']) {
-    if (entry[condition] !== expected[condition]) {
-      failures.push(`exports["${subpath}"].${condition} must be ${expected[condition]}`)
+  assertExactKeys(`exports["${subpath}"]`, entry, ['import', 'require'])
+  assertConditionalExportBranch(subpath, 'import', entry.import, expected.import)
+  assertConditionalExportBranch(subpath, 'require', entry.require, expected.require)
+}
+
+function assertConditionalExportBranch(subpath, condition, entry, expected) {
+  if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+    failures.push(`exports["${subpath}"].${condition} is required`)
+    return
+  }
+  assertExactKeys(`exports["${subpath}"].${condition}`, entry, ['types', 'default'])
+  for (const branchCondition of ['types', 'default']) {
+    if (entry[branchCondition] !== expected[branchCondition]) {
+      failures.push(`exports["${subpath}"].${condition}.${branchCondition} must be ${expected[branchCondition]}`)
     }
   }
 }

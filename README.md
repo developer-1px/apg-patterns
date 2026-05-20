@@ -266,10 +266,11 @@ npm run demo
 npm run check
 ```
 
-`check` runs repository hygiene validation, TypeScript validation, the Vitest suite, APG coverage validation, demo/source consistency checks, package manifest checks, the package build, API reference validation, export validation, publish-readiness validation, package consumer smoke tests including actual npm pack tarball integrity, published docs, npm tarball installation and Vite bundling, and the production demo smoke test:
+`check` runs repository hygiene validation, package independence validation, TypeScript validation, the Vitest suite, APG coverage validation, demo/source consistency checks, package manifest checks, the package build, API reference validation, export validation, publish-readiness validation, package consumer smoke tests including actual npm pack tarball integrity, published docs, npm tarball installation and Vite bundling, and the production demo smoke test:
 
 ```bash
 npm run check:repo
+npm run check:independence
 npm run typecheck
 npm test
 npm run check:apg
@@ -295,11 +296,13 @@ npm run check:apg
 
 `check:repo` verifies that generated outputs, local environment files, IDE files, and ignored paths are not tracked by git.
 
+`check:independence` verifies that this package keeps its dependency surface separate from legacy APG workspaces.
+
 `check:api` validates that API.md matches the built root, `./core`, and `./react` declaration export surfaces.
 
 After changing public exports, run `npm run update:api` after `npm run build` to refresh API.md.
 
-`check:exports` validates package manifest paths and ESM/CJS declaration export boundaries for the root, `./core`, and `./react` entries.
+`check:exports` validates package manifest paths and ESM/CJS conditional declaration export boundaries for the root, `./core`, and `./react` entries.
 
 `check:publish` validates package metadata, package-lock root consistency, local-only dependency specs, packed tarball contents, npm publish dry-run metadata, the documented public publish command, runtime external imports, portable sourcemaps with source content, and production source imports that would create public-entry circular initialization.
 
