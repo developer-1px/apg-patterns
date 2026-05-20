@@ -710,6 +710,7 @@ function normalizePackFiles(files) {
 }
 
 function assertPackFileMetadata(files) {
+  const seenPaths = new Set()
   for (const file of files) {
     if (!file || typeof file !== 'object' || Array.isArray(file)) {
       failures.push('npm pack file metadata entries must be objects')
@@ -718,6 +719,17 @@ function assertPackFileMetadata(files) {
     if (typeof file.path !== 'string' || file.path.length === 0) {
       failures.push('npm pack file metadata entries must include a path')
       continue
+    }
+    if (seenPaths.has(file.path)) {
+      failures.push(`npm pack file metadata contains duplicate path ${file.path}`)
+      continue
+    }
+    seenPaths.add(file.path)
+    if (file.path.startsWith('/') || file.path.includes('\\') || file.path.split('/').includes('..')) {
+      failures.push(`npm pack file metadata path must be a portable relative POSIX path: ${file.path}`)
+    }
+    if (/[\u0000-\u001F\u007F]/.test(file.path)) {
+      failures.push(`npm pack file metadata path must not contain control characters: ${JSON.stringify(file.path)}`)
     }
     if (!existsSync(file.path)) {
       failures.push(`npm pack file metadata references missing path ${file.path}`)
