@@ -1,5 +1,6 @@
 import { execFileSync, spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
@@ -48,7 +49,7 @@ try {
     smokeKind: 'react',
   })
 
-  console.log('package consumer smoke passed for ESM, CJS, warning-free script-enabled npm tarball install with transitive runtime dependencies and optional React, Vite bundler builds for root/core/react, NodeNext/Bundler/CJS TypeScript, package metadata, package export encapsulation, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
+  console.log('package consumer smoke passed for actual npm pack tarball integrity, ESM, CJS, warning-free script-enabled npm tarball install with transitive runtime dependencies and optional React, Vite bundler builds for root/core/react, NodeNext/Bundler/CJS TypeScript, package metadata, package export encapsulation, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
 } finally {
   rmSync(tempRoot, { recursive: true, force: true })
 }
@@ -122,11 +123,45 @@ function packCurrentPackage(destination) {
     encoding: 'utf8',
   })
   const result = JSON.parse(stdout)
-  const filename = result[0]?.filename
+  const pack = result[0]
+  const filename = pack?.filename
   if (!filename) throw new Error('npm pack did not return a tarball filename')
+  if (!Array.isArray(pack.files)) throw new Error('npm pack did not return packed file metadata')
   const tarballPath = join(destination, filename)
   if (!existsSync(tarballPath)) throw new Error(`npm pack did not create ${tarballPath}`)
+  assertPackedTarballArtifact(tarballPath, pack)
   return tarballPath
+}
+
+function assertPackedTarballArtifact(tarballPath, pack) {
+  const tarball = readFileSync(tarballPath)
+  if (statSync(tarballPath).size !== pack.size || tarball.length !== pack.size) {
+    throw new Error(`npm pack tarball size did not match manifest size for ${pack.filename}`)
+  }
+
+  const shasum = createHash('sha1').update(tarball).digest('hex')
+  if (shasum !== pack.shasum) throw new Error(`npm pack tarball sha1 did not match manifest shasum for ${pack.filename}`)
+
+  const integrity = `sha512-${createHash('sha512').update(tarball).digest('base64')}`
+  if (integrity !== pack.integrity) {
+    throw new Error(`npm pack tarball sha512 did not match manifest integrity for ${pack.filename}`)
+  }
+
+  const expectedPaths = pack.files.map((file) => file.path).sort((left, right) => left.localeCompare(right))
+  const tarEntries = execFileSync('tar', ['-tzf', tarballPath], { encoding: 'utf8' })
+    .split(/\r?\n/)
+    .filter(Boolean)
+  const invalidEntries = tarEntries.filter((entry) => !entry.startsWith('package/') || entry === 'package/')
+  if (invalidEntries.length > 0) {
+    throw new Error(`npm pack tarball contains invalid entries:\n${invalidEntries.join('\n')}`)
+  }
+
+  const actualPaths = tarEntries
+    .map((entry) => entry.slice('package/'.length))
+    .sort((left, right) => left.localeCompare(right))
+  if (actualPaths.join('\n') !== expectedPaths.join('\n')) {
+    throw new Error(`npm pack tarball entries did not match manifest files for ${pack.filename}`)
+  }
 }
 
 function linkPackageDependency(nodeModules, name) {
