@@ -658,6 +658,8 @@ function coreTypeSmokeSource(packagePath) {
 import { useButtonPattern } from '${packagePath}'
 // @ts-expect-error React preset components must stay behind the /react subpath.
 import { Button } from '${packagePath}'
+// @ts-expect-error Package exports must not expose dist ESM deep imports.
+import { buttonDefinition as deepButtonDefinition } from '@interactive-os/apg-patterns/dist/core.js'
 
 const data: PatternData = {
   items: { primary: { label: 'Primary' } },
@@ -681,6 +683,7 @@ const keyInput: KeyInput = {
 }
 
 runtime.resolveKeyboardBinding(keyInput, 'primary')
+void deepButtonDefinition
 void runtime
 `
 }
@@ -699,6 +702,8 @@ void Component
     : ''
 
   return `import coreApi = require('${packagePath}')
+// @ts-expect-error Package exports must not expose dist CJS deep imports.
+import deepCoreApi = require('@interactive-os/apg-patterns/dist/core.cjs')
 
 const data: coreApi.PatternData = {
   items: { primary: { label: 'Primary' } },
@@ -728,6 +733,7 @@ void coreApi.useButtonPattern
 // @ts-expect-error React preset components must stay behind the /react subpath.
 void coreApi.Button
 ${reactSmoke}
+void deepCoreApi
 void runtime
 `
 }
