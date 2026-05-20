@@ -1,8 +1,11 @@
-import { access, readFile } from 'node:fs/promises'
+import { access, mkdir, mkdtemp, readFile, rm, symlink } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import ts from 'typescript'
 
 const repoRoot = new URL('../', import.meta.url)
+const repoRootPath = fileURLToPath(repoRoot)
 const packageJson = JSON.parse(await readFile(new URL('package.json', repoRoot), 'utf8'))
 const checkedPaths = new Set()
 const missing = []
@@ -102,12 +105,13 @@ if (missing.length > 0) {
 }
 
 assertDeclarationExportSurface()
+await assertConditionalDeclarationResolution()
 
 if (missing.length > 0) {
   throw new Error(`package export validation failed:\n${missing.join('\n')}`)
 }
 
-console.log(`package manifest references ${checkedPaths.size} existing files or directories and ESM/CJS declaration exports preserve root/core/react boundaries`)
+console.log(`package manifest references ${checkedPaths.size} existing files or directories, and ESM/CJS declaration exports plus TypeScript resolution preserve root/core/react boundaries`)
 
 async function visitExports(value, label) {
   if (typeof value === 'string') {
@@ -165,6 +169,88 @@ function assertDeclarationExportSurface() {
 
     previousSurface = { label: surface.label, exports }
   }
+}
+
+async function assertConditionalDeclarationResolution() {
+  const tempRoot = await mkdtemp(join(tmpdir(), 'apg-patterns-resolution-'))
+  try {
+    await mkdir(join(tempRoot, 'node_modules', '@interactive-os'), { recursive: true })
+    await symlink(repoRootPath, join(tempRoot, 'node_modules', '@interactive-os', 'apg-patterns'), 'dir')
+
+    for (const scenario of declarationResolutionScenarios()) {
+      const resolved = resolvePackageSpecifier(tempRoot, scenario.specifier, scenario.resolutionMode)
+      const expected = fileURLToPath(new URL(scenario.expected, repoRoot))
+      if (!resolved) {
+        missing.push(`${scenario.label} must resolve ${scenario.specifier} to ${scenario.expected}`)
+        continue
+      }
+      if (resolved !== expected) {
+        missing.push(`${scenario.label} must resolve ${scenario.specifier} to ${scenario.expected}; resolved ${relativePath(resolved)}`)
+      }
+    }
+  } finally {
+    await rm(tempRoot, { recursive: true, force: true })
+  }
+}
+
+function declarationResolutionScenarios() {
+  return [
+    {
+      label: 'ESM root declaration',
+      specifier: '@interactive-os/apg-patterns',
+      resolutionMode: ts.ModuleKind.ESNext,
+      expected: 'dist/index.d.ts',
+    },
+    {
+      label: 'CJS root declaration',
+      specifier: '@interactive-os/apg-patterns',
+      resolutionMode: ts.ModuleKind.CommonJS,
+      expected: 'dist/index.d.cts',
+    },
+    {
+      label: 'ESM ./core declaration',
+      specifier: '@interactive-os/apg-patterns/core',
+      resolutionMode: ts.ModuleKind.ESNext,
+      expected: 'dist/core.d.ts',
+    },
+    {
+      label: 'CJS ./core declaration',
+      specifier: '@interactive-os/apg-patterns/core',
+      resolutionMode: ts.ModuleKind.CommonJS,
+      expected: 'dist/core.d.cts',
+    },
+    {
+      label: 'ESM ./react declaration',
+      specifier: '@interactive-os/apg-patterns/react',
+      resolutionMode: ts.ModuleKind.ESNext,
+      expected: 'dist/react.d.ts',
+    },
+    {
+      label: 'CJS ./react declaration',
+      specifier: '@interactive-os/apg-patterns/react',
+      resolutionMode: ts.ModuleKind.CommonJS,
+      expected: 'dist/react.d.cts',
+    },
+  ]
+}
+
+function resolvePackageSpecifier(tempRoot, specifier, resolutionMode) {
+  const containingFile = join(tempRoot, resolutionMode === ts.ModuleKind.CommonJS ? 'consumer.cts' : 'consumer.mts')
+  return ts.resolveModuleName(
+    specifier,
+    containingFile,
+    {
+      target: ts.ScriptTarget.ES2022,
+      module: ts.ModuleKind.NodeNext,
+      moduleResolution: ts.ModuleResolutionKind.NodeNext,
+      strict: true,
+      skipLibCheck: true,
+    },
+    ts.sys,
+    undefined,
+    undefined,
+    resolutionMode,
+  ).resolvedModule?.resolvedFileName
 }
 
 function assertPublicEntryDeclarationExports(label, exports) {
@@ -229,4 +315,8 @@ function expectExportSuperset(actual, expected, actualLabel, expectedLabel) {
   if (missingNames.length > 0) {
     missing.push(`${actualLabel} must include every ${expectedLabel}: ${missingNames.join(', ')}`)
   }
+}
+
+function relativePath(path) {
+  return path.replace(`${repoRootPath}/`, '')
 }

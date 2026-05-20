@@ -302,7 +302,7 @@ npm run check:apg
 
 After changing public exports, run `npm run update:api` after `npm run build` to refresh API.md.
 
-`check:exports` validates package manifest paths and ESM/CJS conditional declaration export boundaries for the root, `./core`, and `./react` entries.
+`check:exports` validates package manifest paths, ESM/CJS conditional declaration export boundaries, and TypeScript declaration resolution for the root, `./core`, and `./react` entries.
 
 `check:publish` validates package metadata, package-lock root consistency, local-only dependency specs, packed tarball contents, npm publish dry-run metadata, the documented public publish command, runtime external imports, portable sourcemaps with source content, and production source imports that would create public-entry circular initialization.
 
