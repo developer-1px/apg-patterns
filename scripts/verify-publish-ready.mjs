@@ -253,6 +253,12 @@ function assertDocumentationMetadata() {
   if (readme && !/\bAPI\.md\b/.test(readme)) {
     failures.push('README must link to API.md')
   }
+  if (changelog && readme && !/\bCHANGELOG\.md\b/.test(readme)) {
+    failures.push('README must link to CHANGELOG.md')
+  }
+  if (license && readme && !/\bLICENSE\b/.test(readme)) {
+    failures.push('README must link to LICENSE')
+  }
   assertReadmeCompatibility(readme)
   assertReadmeCodeStructure(readme)
   if (packageName && readme && !new RegExp(`\\bnpm\\s+install\\s+${escapeRegExp(packageName)}\\b`).test(readme)) {

@@ -355,6 +355,14 @@ Publish after the preflight passes:
 npm publish --access public
 ```
 
+## Release Notes
+
+See [CHANGELOG.md](CHANGELOG.md).
+
+## License
+
+MIT. See [LICENSE](LICENSE).
+
 ## Design Notes
 
 - [React facade zod blind loop](docs/proposals/2026-05-18-react-facade-zod-blind-loop.md)
