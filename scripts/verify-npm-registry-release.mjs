@@ -42,7 +42,7 @@ export function validatePackageRegistryConfig(packageJson, registry = publicNpmR
   return failures
 }
 
-function readRegistryReleaseState(name, version, registry) {
+export function readRegistryReleaseState(name, version, registry) {
   const result = spawnSync('npm', [
     'view',
     name,

@@ -27,11 +27,14 @@ For release readiness, run the complete publish preflight:
 
 ```bash
 npm run release:check
+npm run check:external
 ```
 
 The publish workflow enforces `VERIFY_RELEASE_TAG=true`; run it from the `v<package.version>` git tag.
 
 Release preflight includes `npm run check:signatures` to verify installed dependency registry signatures and available attestations.
+
+The external check verifies that `origin` matches package repository metadata, the public GitHub repository is reachable, and the npm registry can still accept the current version.
 
 Both release workflows upload `release-artifacts/` with the `npm pack` tarball and `npm-pack.json` for review.
 

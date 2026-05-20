@@ -345,6 +345,8 @@ Before publishing a new version, run `npm run check:registry` to confirm the cur
 
 `check:release-ref` reports the expected release tag. In the publish workflow it is strict and requires `GITHUB_REF_TYPE=tag` with `GITHUB_REF_NAME=v<package.version>`.
 
+`check:external` verifies the final external publishing state: local `origin` must match `package.json` `repository`, the public GitHub repository must be reachable, and the npm registry must still accept the current package version.
+
 The release-check and publish workflows upload `release-artifacts/`, including the `npm pack` tarball and `npm-pack.json`, before publishing.
 
 For the full release preflight:
@@ -359,6 +361,12 @@ npm run release:check
 npm run check:signatures
 npm run check:registry
 npm run check:release-ref
+```
+
+After the public GitHub repository and npm trusted publisher are configured:
+
+```bash
+npm run check:external
 ```
 
 `prepublishOnly` also runs `npm run release:check`, so direct `npm publish` still executes the full local, dependency signature, registry, and release-ref preflight.

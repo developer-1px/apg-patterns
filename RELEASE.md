@@ -15,9 +15,12 @@ Run the full release gate from the release commit:
 
 ```bash
 npm run release:check
+npm run check:external
 ```
 
 The release gate includes `npm run check:signatures`, package smoke tests, registry availability checks, and release git-ref validation.
+
+The external check verifies that local `origin` matches the package repository metadata, the public GitHub repository is reachable, and the npm registry can still accept the current version.
 
 ## Publish
 

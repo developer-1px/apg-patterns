@@ -382,6 +382,7 @@ function assertContributingGuide(contributingGuide) {
     'npm run build',
     'npm run update:api',
     'npm run release:check',
+    'npm run check:external',
     'npm run check:signatures',
     'VERIFY_RELEASE_TAG=true',
     'v<package.version>',
@@ -433,6 +434,7 @@ function assertReleaseGuide(releaseGuide) {
     '_authToken',
     'npm run release:check',
     'npm run check:signatures',
+    'npm run check:external',
     'v<package.version>',
     'release-artifacts/',
     'npm-pack.json',
@@ -693,6 +695,9 @@ function assertPackageScripts() {
   }
   if (scripts['check:release-ref'] !== 'node scripts/verify-release-git-ref.mjs') {
     failures.push('check:release-ref must run node scripts/verify-release-git-ref.mjs')
+  }
+  if (scripts['check:external'] !== 'node scripts/verify-external-release-state.mjs') {
+    failures.push('check:external must run node scripts/verify-external-release-state.mjs')
   }
   if (scripts['check:react-peer'] !== 'node scripts/verify-react-peer-compatibility.mjs') {
     failures.push('check:react-peer must run node scripts/verify-react-peer-compatibility.mjs')

@@ -94,6 +94,7 @@
     "check:apg": "node scripts/verify-apg-example-coverage.mjs",
     "check:demo": "node scripts/verify-demo-consistency.mjs",
     "check:exports": "node scripts/verify-package-exports.mjs",
+    "check:external": "node scripts/verify-external-release-state.mjs",
     "check:independence": "node scripts/verify-package-independence.mjs",
     "check:package": "node scripts/verify-package-side-effects.mjs",
     "check:publish": "node scripts/verify-publish-ready.mjs",
