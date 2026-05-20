@@ -51,6 +51,11 @@ const expectedExportEntries = {
 const expectedExportSubpaths = [...Object.keys(expectedExportEntries), './package.json']
 const expectedPackageFiles = ['dist', 'docs/proposals', 'README.md', 'API.md', 'CHANGELOG.md', 'LICENSE']
 const requiredPackageKeywords = ['aria', 'wai-aria', 'apg', 'patterns', 'react', 'zod', 'a11y']
+const expectedPublishConfig = {
+  access: 'public',
+  provenance: true,
+  registry: 'https://registry.npmjs.org/',
+}
 const allowedRuntimeDependencyLicenses = {
   zod: new Set(['MIT']),
 }
@@ -78,12 +83,7 @@ if (!packageManagerMatch) {
   assertPinnedPackageManagerVersion(packageManagerMatch[1])
 }
 if (typeof packageJson.engines?.node !== 'string') failures.push('engines.node is required')
-if (packageJson.name?.startsWith('@') && packageJson.publishConfig?.access !== 'public') {
-  failures.push('scoped package must set publishConfig.access to public')
-}
-if (packageJson.publishConfig?.provenance !== true) {
-  failures.push('publishConfig.provenance must be true for npm provenance attestations')
-}
+assertPublishConfig()
 if (!existsSync('README.md')) failures.push('README.md is required')
 if (!existsSync('API.md')) failures.push('API.md is required')
 if (!existsSync('CHANGELOG.md')) failures.push('CHANGELOG.md is required')
@@ -295,6 +295,20 @@ function assertDocumentationMetadata() {
   }
 }
 
+function assertPublishConfig() {
+  if (!packageJson.publishConfig || typeof packageJson.publishConfig !== 'object' || Array.isArray(packageJson.publishConfig)) {
+    failures.push('publishConfig is required')
+    return
+  }
+
+  assertExactKeys('publishConfig', packageJson.publishConfig, Object.keys(expectedPublishConfig))
+  for (const [key, expected] of Object.entries(expectedPublishConfig)) {
+    if (packageJson.publishConfig[key] !== expected) {
+      failures.push(`publishConfig.${key} must be ${expected}`)
+    }
+  }
+}
+
 function assertReadmeCompatibility(readme) {
   if (!readme) return
   const section = readSection(readme, 'Compatibility')
@@ -405,6 +419,16 @@ function assertReadmePublishCommand(readme) {
       }
     }
   }
+  if (packageJson.publishConfig?.registry) {
+    if (!publishCommands.some(hasRegistryPublishFlag)) {
+      failures.push('README must document publishing to the public npm registry')
+    }
+    for (const command of publishCommands) {
+      if (!hasRegistryPublishFlag(command)) {
+        failures.push(`README npm publish command must include the public npm registry: ${command}`)
+      }
+    }
+  }
 
   const releaseCheckIndex = readme.indexOf('npm run release:check')
   const publishIndexes = publishCommands.map((command) => readme.indexOf(command)).filter((index) => index >= 0)
@@ -420,6 +444,10 @@ function hasPublicAccessPublishFlag(command) {
 
 function hasProvenancePublishFlag(command) {
   return /(?:^|\s)--provenance(?:\s|$)/.test(command)
+}
+
+function hasRegistryPublishFlag(command) {
+  return /(?:^|\s)--registry(?:=|\s+)https:\/\/registry\.npmjs\.org\/?(?:\s|$)/.test(command)
 }
 
 function assertPackageScripts() {
