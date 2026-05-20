@@ -37,7 +37,15 @@ Descriptor-backed preset components are available for patterns that can fully ow
 
 ```tsx
 <Accordion data={data} onEvent={onEvent} />
+<Breadcrumb data={data} onEvent={onEvent} />
+<Button data={data} onEvent={onEvent} />
+<Checkbox data={data} onEvent={onEvent} />
+<Link data={data} onEvent={onEvent} />
 <Listbox data={data} onEvent={onEvent} />
+<Meter data={data} />
+<RadioGroup data={data} onEvent={onEvent} />
+<Switch data={data} onEvent={onEvent} />
+<Toolbar data={data} onEvent={onEvent} />
 <Tree data={data} onEvent={onEvent} />
 ```
 
