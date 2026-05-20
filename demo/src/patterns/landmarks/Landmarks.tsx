@@ -1,30 +1,44 @@
-import type { LandmarkRegion, LandmarkRegionRole } from './landmarksData'
+import { useLandmarksPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
+import type { LandmarkDataItem } from './landmarksData'
 
-export function Landmarks({ regions }: { regions: readonly LandmarkRegion[] }) {
+export function Landmarks({
+  data,
+  onEvent = () => undefined,
+  options,
+}: {
+  data: PatternData<LandmarkDataItem>
+  onEvent?: (event: PatternEvent) => void
+  options?: PatternOptions
+}) {
+  const landmarks = useLandmarksPattern(data, onEvent, options)
   return (
-    <div className="grid max-w-2xl gap-2 text-sm text-zinc-800 dark:text-zinc-200">
-      {regions.map((region) => (
-        <LandmarkBox key={region.key} region={region} />
+    <div {...landmarks.rootProps} className="grid max-w-2xl gap-2 text-sm text-zinc-800 dark:text-zinc-200">
+      {landmarks.items.map((item) => (
+        <LandmarkBox key={item.key} kind={item.kind} props={item.landmarkProps}>
+          {data.items[item.key]?.content ?? item.label}
+        </LandmarkBox>
       ))}
     </div>
   )
 }
 
-function LandmarkBox({ region }: { region: LandmarkRegion }) {
-  const props = landmarkProps(region.role, region.label)
-  const className = 'rounded-lg border border-zinc-200 bg-white/80 px-3 py-2 dark:border-white/10 dark:bg-white/[0.04]'
+function LandmarkBox({
+  kind,
+  props,
+  children,
+}: {
+  kind: ReturnType<typeof useLandmarksPattern>['items'][number]['kind']
+  props: ReturnType<typeof useLandmarksPattern>['items'][number]['landmarkProps']
+  children: string
+}) {
+  const className = 'border border-zinc-200 px-3 py-2 dark:border-white/10'
 
-  if (region.role === 'banner') return <header {...props} className={className}>{region.content}</header>
-  if (region.role === 'contentinfo') return <footer {...props} className={className}>{region.content}</footer>
-  if (region.role === 'main') return <main {...props} className={className}>{region.content}</main>
-  if (region.role === 'navigation') return <nav {...props} className={className}>{region.content}</nav>
-  if (region.role === 'complementary') return <aside {...props} className={className}>{region.content}</aside>
-  if (region.role === 'search') return <div {...props} role="search" className={className}>{region.content}</div>
-  if (region.role === 'form') return <form {...props} className={className}>{region.content}</form>
-  return <section {...props} className={className}>{region.content}</section>
-}
-
-function landmarkProps(role: LandmarkRegionRole, label: string) {
-  if (role === 'banner' || role === 'contentinfo' || role === 'main') return {}
-  return { 'aria-label': label }
+  if (kind === 'banner') return <header {...props} className={className}>{children}</header>
+  if (kind === 'contentinfo') return <footer {...props} className={className}>{children}</footer>
+  if (kind === 'main') return <main {...props} className={className}>{children}</main>
+  if (kind === 'navigation') return <nav {...props} className={className}>{children}</nav>
+  if (kind === 'complementary') return <aside {...props} className={className}>{children}</aside>
+  if (kind === 'form') return <form {...props} className={className}>{children}</form>
+  if (kind === 'region') return <section {...props} className={className}>{children}</section>
+  return <div {...props} className={className}>{children}</div>
 }

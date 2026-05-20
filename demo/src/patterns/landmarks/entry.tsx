@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import type { PatternEvent } from '../../../../src'
+import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 import { renderDataInspect } from '../../shared/inspect'
 import { Landmarks } from './Landmarks'
 import {
+  buildLandmarkData,
   initialLandmarkVariant,
   landmarkVariantItems,
   landmarkVariants,
@@ -17,8 +19,8 @@ const landmarksDemoDefinition = {
     main: 'Landmarks.tsx',
     entry: 'landmarks/entry.tsx',
     data: ['landmarksData.ts'],
+    hooks: ['landmarks/useLandmarksPattern.ts'],
     definition: 'landmarks/definition.ts',
-    includeKernel: false,
   },
   controls: {
     kind: 'stack',
@@ -38,34 +40,38 @@ const landmarksDemoDefinition = {
     kind: 'component',
     component: 'Landmarks',
     props: {
-      regions: '$state.regions',
+      data: '$state.data',
+      onEvent: '$actions.dispatchEvent',
     },
   },
 } as const satisfies DemoPatternDefinition
 
 export const entry = defineDemoPattern({
   definition: landmarksDemoDefinition,
-  useRuntime: () => {
-    const [variant, setVariant] = useState<LandmarkVariantKey>(initialLandmarkVariant)
-    const current = landmarkVariants[variant]
+  useRuntime: (onEvent) => {
+    const host = useVariantPatternDataHost<LandmarkVariantKey>(
+      initialLandmarkVariant,
+      buildLandmarkData(landmarkVariants[initialLandmarkVariant]),
+      (variant) => buildLandmarkData(landmarkVariants[variant]),
+      (_variant, data) => data,
+    )
 
     return {
-      inspect: renderDataInspect({
-        items: Object.fromEntries(current.regions.map((region) => [region.key, { label: region.label }])),
-        relations: { rootKeys: current.regions.map((region) => region.key) },
-        state: { variant, rolesByKey: Object.fromEntries(current.regions.map((region) => [region.key, region.role])) },
-        refs: { label: current.label },
-      }),
+      inspect: renderDataInspect(host.data),
       context: {
         values: {
           state: {
-            variant,
-            regions: current.regions,
+            variant: host.variant,
+            data: host.data,
           },
           model: { variantItems: landmarkVariantItems },
         },
         actions: {
-          selectVariant: setVariant,
+          selectVariant: host.selectVariant,
+          dispatchEvent: (event: PatternEvent) => {
+            onEvent(event)
+            host.dispatchEvent(event)
+          },
         },
         components: { Landmarks },
       },

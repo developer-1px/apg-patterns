@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import { Landmarks } from './Landmarks'
-import { landmarkVariants, type LandmarkVariantKey } from './landmarksData'
+import { buildLandmarkData, landmarkVariants, type LandmarkVariantKey } from './landmarksData'
 
 function LandmarksHost() {
   const [variant, setVariant] = useState<LandmarkVariantKey>('search')
@@ -11,7 +11,7 @@ function LandmarksHost() {
     <div>
       <button type="button" onClick={() => setVariant('form')}>Show form</button>
       <button type="button" onClick={() => setVariant('region')}>Show region</button>
-      <Landmarks regions={landmarkVariants[variant].regions} />
+      <Landmarks data={buildLandmarkData(landmarkVariants[variant])} />
     </div>
   )
 }

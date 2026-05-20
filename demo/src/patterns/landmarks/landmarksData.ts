@@ -1,3 +1,5 @@
+import type { PatternData, PatternItem } from '../../../../src'
+
 export type LandmarkVariantKey =
   | 'html5'
   | 'all'
@@ -27,6 +29,11 @@ export interface LandmarkRegion {
   readonly role: LandmarkRegionRole
   readonly label: string
   readonly content: string
+}
+
+export type LandmarkDataItem = PatternItem & {
+  kind: LandmarkRegionRole
+  content: string
 }
 
 export interface LandmarkVariant {
@@ -122,3 +129,17 @@ export const landmarkVariantItems: readonly { key: LandmarkVariantKey; label: st
 ).map(({ key, label }) => ({ key, label }))
 
 export const initialLandmarkVariant: LandmarkVariantKey = 'html5'
+
+export function buildLandmarkData(variant: LandmarkVariant): PatternData<LandmarkDataItem> {
+  return {
+    items: Object.fromEntries(
+      variant.regions.map((region) => [
+        region.key,
+        { label: region.label, kind: region.role, content: region.content },
+      ]),
+    ),
+    relations: { rootKeys: variant.regions.map((region) => region.key) },
+    refs: { label: variant.label },
+    state: { variant: variant.key },
+  }
+}
