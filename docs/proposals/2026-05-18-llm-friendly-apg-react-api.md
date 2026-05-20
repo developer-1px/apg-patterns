@@ -1,11 +1,23 @@
 ---
 type: proposal
-status: draft
+status: accepted
 date: 2026-05-18
 title: LLM-Friendly APG React API
 ---
 
 # LLM-Friendly APG React API
+
+## Implementation Progress
+
+The preset renderer layer exists for descriptor-backed patterns:
+
+```tsx
+<Accordion data={data} onEvent={onEvent} />
+<Listbox data={data} onEvent={onEvent} />
+<Tree data={data} onEvent={onEvent} />
+```
+
+The remaining scope is to extend this layer beyond accordion, listbox, and treeview.
 
 ## Problem
 
@@ -216,4 +228,3 @@ For every APG pattern, provide three layers:
 ```
 
 LLM-facing docs should lead with layer 1.
-

@@ -1,11 +1,17 @@
 ---
 type: proposal
-status: draft
+status: implemented
 date: 2026-05-18
 title: React Facade Zod Descriptor Blind Loop
 ---
 
 # React Facade Zod Descriptor Blind Loop
+
+## Implementation Status
+
+Implemented in `src/schema/reactFacade.ts`, `src/schema/reactRenderSchema.ts`, `src/schema/reactPropSchema.ts`, and the descriptor-backed accordion, listbox, and treeview React facades.
+
+The public hook surface and descriptor validation are covered by the TypeScript build and Vitest suite.
 
 ## Goal
 

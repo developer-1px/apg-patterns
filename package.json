@@ -1,12 +1,13 @@
 {
-  "name": "@interactive-os/apg-treeview-contract",
+  "name": "@interactive-os/apg-patterns",
   "version": "0.0.0",
-  "description": "Zod-validated declarative APG treeview MVP contract.",
+  "description": "Serializable WAI-ARIA APG pattern definitions, runtime, and React adapters.",
   "keywords": [
     "aria",
     "wai-aria",
     "apg",
-    "treeview",
+    "patterns",
+    "react",
     "zod",
     "a11y"
   ],

@@ -1,4 +1,4 @@
-# @interactive-os/apg-treeview-contract
+# @interactive-os/apg-patterns
 
 Zod-validated APG pattern runtime and React adapters.
 
@@ -25,29 +25,63 @@ PatternData
    └─ labels and external references
 ```
 
-## Current React API
+## React API
 
-The active React-facing convention is:
+The React-facing convention is:
 
 ```ts
 useXPattern(data, onEvent, options?)
 ```
 
-Implemented pattern hooks:
+Descriptor-backed preset components are available for patterns that can fully own their DOM structure:
 
-```ts
-useTreeviewPattern(data, onEvent, options?)
-useListboxPattern(data, onEvent, options?)
-useTabsPattern(input)
+```tsx
+<Accordion data={data} onEvent={onEvent} />
+<Listbox data={data} onEvent={onEvent} />
+<Tree data={data} onEvent={onEvent} />
 ```
 
-`useTreeviewPattern` still also accepts its legacy object input for compatibility:
+Implemented hooks:
+
+```ts
+useAccordionPattern(data, onEvent, options?)
+useAlertPattern(data, onEvent, options?)
+useAlertDialogPattern(data, onEvent, options?)
+useBreadcrumbPattern(data, onEvent, options?)
+useButtonPattern(data, onEvent, options?)
+useCarouselPattern(data, onEvent, options?)
+useCheckboxPattern(data, onEvent, options?)
+useComboboxPattern(data, onEvent, options?)
+useDialogPattern(data, onEvent, options?)
+useDisclosurePattern(data, onEvent, options?)
+useFeedPattern(data, onEvent, options?)
+useGridPattern(data, onEvent, options?)
+useLinkPattern(data, onEvent, options?)
+useTreeviewPattern(data, onEvent, options?)
+useListboxPattern(data, onEvent, options?)
+useMenuButtonPattern(data, onEvent, options?)
+useMenubarPattern(data, onEvent, options?)
+useMeterPattern(data, onEvent, options?)
+useRadioGroupPattern(data, onEvent, options?)
+useSliderPattern(data, onEvent, options?)
+useSpinbuttonPattern(data, onEvent, options?)
+useSwitchPattern(data, onEvent, options?)
+useTablePattern(data, onEvent, options?)
+useTabsPattern(data, onEvent, options?)
+useToolbarPattern(data, onEvent, options?)
+useTooltipPattern(data, onEvent, options?)
+useTreegridPattern(data, onEvent, options?)
+useWindowSplitterPattern(data, onEvent, options?)
+```
+
+`useTreeviewPattern` and `useTabsPattern` also accept their legacy object inputs for compatibility:
 
 ```ts
 useTreeviewPattern({ data, onEvent, options })
+useTabsPattern({ data, onEvent, options })
 ```
 
-Treeview and listbox return the LLM-oriented facade shape:
+Pattern hooks return semantic props, state, actions, and stable id helpers. Collection patterns also expose an LLM-oriented render surface:
 
 ```ts
 const listbox = useListboxPattern(data, onEvent, options)
@@ -59,7 +93,7 @@ listbox.actions
 listbox.ids
 ```
 
-`renderItems` is the JSX mapping surface. App code should spread the named semantic props onto the named element and own all visual styling.
+`renderItems` is the JSX mapping surface where present. App code should spread the named semantic props onto the named element and own all visual styling.
 
 ```tsx
 const listbox = useListboxPattern(data, onEvent, options)
@@ -138,7 +172,7 @@ react: {
 }
 ```
 
-The descriptor is currently attached to listbox and treeview definitions.
+The descriptor is attached where a pattern has a generated React facade surface.
 
 ## Demo
 
@@ -158,12 +192,15 @@ npm run demo
 npm run check
 ```
 
-`check` runs TypeScript validation, the Vitest suite, the package build, and the production demo smoke test:
+`check` runs TypeScript validation, the Vitest suite, APG coverage validation, package manifest checks, the package build, export validation, and the production demo smoke test:
 
 ```bash
 npm run typecheck
 npm test
+npm run check:apg
+npm run check:package
 npm run build
+npm run check:exports
 npm run demo:smoke
 ```
 
