@@ -102,15 +102,21 @@ describe('WindowSplitter demo', () => {
     expect(sep.getAttribute('aria-controls')).toBe('windowsplitter-primary')
   })
 
-  it('ArrowRight/ArrowLeft change aria-valuenow by ±1', () => {
+  it('arrow and page keys change aria-valuenow', () => {
     render(<Demo />)
     const sep = screen.getByRole('separator')
     fireEvent.keyDown(sep, { key: 'ArrowRight', code: 'ArrowRight' })
     expect(sep.getAttribute('aria-valuenow')).toBe('51')
     fireEvent.keyDown(sep, { key: 'ArrowLeft', code: 'ArrowLeft' })
     expect(sep.getAttribute('aria-valuenow')).toBe('50')
-    fireEvent.keyDown(sep, { key: 'ArrowLeft', code: 'ArrowLeft' })
-    expect(sep.getAttribute('aria-valuenow')).toBe('49')
+    fireEvent.keyDown(sep, { key: 'ArrowUp', code: 'ArrowUp' })
+    expect(sep.getAttribute('aria-valuenow')).toBe('51')
+    fireEvent.keyDown(sep, { key: 'ArrowDown', code: 'ArrowDown' })
+    expect(sep.getAttribute('aria-valuenow')).toBe('50')
+    fireEvent.keyDown(sep, { key: 'PageUp', code: 'PageUp' })
+    expect(sep.getAttribute('aria-valuenow')).toBe('60')
+    fireEvent.keyDown(sep, { key: 'PageDown', code: 'PageDown' })
+    expect(sep.getAttribute('aria-valuenow')).toBe('50')
   })
 
   it('Home/End jump to min/max', () => {

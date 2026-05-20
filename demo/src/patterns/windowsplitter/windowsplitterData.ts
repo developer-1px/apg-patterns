@@ -36,9 +36,11 @@ export const windowSplitterOptions: PatternOptions = {
   orientation: 'horizontal',
 }
 
-const computeDelta = (direction: unknown, step: number): number => {
+const computeDelta = (direction: unknown, step: number, large: number): number => {
   if (direction === 'increment') return step
   if (direction === 'decrement') return -step
+  if (direction === 'incrementLarge') return large
+  if (direction === 'decrementLarge') return -large
   return 0
 }
 
@@ -55,6 +57,7 @@ export function reduceWindowSplitterData(
   const min = Number(options.min ?? 0)
   const max = Number(options.max ?? 100)
   const step = Number(options.step ?? 1)
+  const large = Math.max(step, Math.round((max - min) / 10))
   const current = Number(data.state?.valueByKey?.[key] ?? min)
   const previousValueByKey = { ...(data.state?.previousValueByKey ?? {}) }
 
@@ -81,7 +84,7 @@ export function reduceWindowSplitterData(
   let nextValue: number
   if (event.direction === 'min') nextValue = min
   else if (event.direction === 'max') nextValue = max
-  else nextValue = current + computeDelta(event.direction, step)
+  else nextValue = current + computeDelta(event.direction, step, large)
   const clamped = Math.min(max, Math.max(min, nextValue))
   if (clamped === current) return { ...data, state: { ...data.state, activeKey: key } }
   return {
