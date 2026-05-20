@@ -7,6 +7,7 @@ const failures = []
 const maxPackedBytes = 600_000
 const maxUnpackedBytes = 4_000_000
 const expectedReactPeerRange = '^18.0.0 || ^19.0.0'
+const semverPattern = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*)(?:\.(?:0|[1-9]\d*|[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*))*))?(?:\+([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$/
 const declarationByteBudgets = {
   'dist/index.d.ts': 20_000,
   'dist/index.d.cts': 20_000,
@@ -65,7 +66,7 @@ if (!packageJson.name) failures.push('package name is required')
 if (!packageJson.description) failures.push('package description is required')
 if (!packageJson.license) failures.push('package license is required')
 if (!packageAuthorName(packageJson.author)) failures.push('package author is required')
-if (!packageJson.version || packageJson.version === '0.0.0') failures.push('package version must be publishable, not 0.0.0')
+assertPackageVersion()
 assertPackageKeywords()
 const packageManagerMatch = /^npm@(\d+\.\d+\.\d+)$/.exec(packageJson.packageManager ?? '')
 if (!packageManagerMatch) {
@@ -218,6 +219,19 @@ function dependencySections(pkg) {
     peerDependencies: pkg.peerDependencies ?? {},
     optionalDependencies: pkg.optionalDependencies ?? {},
     bundledDependencies: pkg.bundledDependencies ?? {},
+  }
+}
+
+function assertPackageVersion() {
+  if (typeof packageJson.version !== 'string' || packageJson.version.length === 0) {
+    failures.push('package version is required')
+    return
+  }
+  if (!semverPattern.test(packageJson.version)) {
+    failures.push(`package version must be a valid SemVer 2.0.0 version: ${packageJson.version}`)
+  }
+  if (packageJson.version === '0.0.0') {
+    failures.push('package version must be publishable, not 0.0.0')
   }
 }
 
