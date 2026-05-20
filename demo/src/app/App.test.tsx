@@ -9,7 +9,7 @@ import { SourceTabs, useSourceTabs } from './SourceTabs'
 import { collectPatternEntries, defaultPatternKey, defaultSourceName, patternEntries, useDemoPattern, validatePatternEntries } from '../shared/demoPatterns'
 import { KERNEL_IMPLEMENTATION_SOURCES, KERNEL_SIDE_EFFECT_SOURCES, KERNEL_SOURCES } from '../shared/demoPatternTypes'
 import { sourceLoaders, sourceNameCollisions } from '../shared/sources'
-import type { PatternEvent } from '../../../src'
+import type { PatternEvent } from '../../../src/react'
 
 afterEach(() => {
   vi.useRealTimers()

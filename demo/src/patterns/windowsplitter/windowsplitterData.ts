@@ -1,4 +1,4 @@
-import { PatternDataSchema, type Key, type PatternData, type PatternEvent, type PatternItem, type PatternOptions, type PatternStateWithOptions } from '../../../../src'
+import { PatternDataSchema, type Key, type PatternData, type PatternEvent, type PatternItem, type PatternOptions, type PatternStateWithOptions } from '../../../../src/react'
 
 interface WindowSplitterDemoState extends PatternStateWithOptions {
   previousValueByKey?: Record<string, number>

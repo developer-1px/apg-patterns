@@ -1,4 +1,4 @@
-import type { PatternData, PatternItem } from '../../../../src'
+import type { PatternData, PatternItem } from '../../../../src/react'
 
 export type LandmarkVariantKey =
   | 'html5'

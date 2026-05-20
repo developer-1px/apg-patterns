@@ -1,4 +1,4 @@
-import { COMBOBOX_KEY, PatternDataSchema, type PatternData, type PatternEvent } from '../../../../src'
+import { COMBOBOX_KEY, PatternDataSchema, type PatternData, type PatternEvent } from '../../../../src/react'
 
 export type ComboboxVariantKey =
   | 'selectOnly'

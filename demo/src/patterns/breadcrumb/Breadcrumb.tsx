@@ -1,4 +1,4 @@
-import { useBreadcrumbPattern, type PatternData, type PatternEvent } from '../../../../src'
+import { useBreadcrumbPattern, type PatternData, type PatternEvent } from '../../../../src/react'
 
 export interface BreadcrumbProps {
   data: PatternData

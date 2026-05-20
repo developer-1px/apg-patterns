@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import type { PatternData, PatternOptions } from '../../../../src'
+import type { PatternData, PatternOptions } from '../../../../src/react'
 import { renderAriaTree, renderHtmlTree } from './inspect'
 import { initialData } from './treeContract'
 

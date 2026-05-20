@@ -1,4 +1,4 @@
-import type { PatternData, PatternEvent } from '../../../../src'
+import type { PatternData, PatternEvent } from '../../../../src/react'
 
 export interface MenuProps {
   data: PatternData

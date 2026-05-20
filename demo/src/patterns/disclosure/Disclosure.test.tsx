@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { useRef, useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { createDisclosureRuntime, reduceDisclosureData, type PatternData, type PatternEvent } from '../../../../src'
+import { createDisclosureRuntime, reduceDisclosureData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { Disclosure } from './Disclosure'
 import {
   initialFaqDisclosureData,

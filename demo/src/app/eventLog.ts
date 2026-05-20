@@ -1,4 +1,4 @@
-import type { PatternEvent } from '../../../src'
+import type { PatternEvent } from '../../../src/react'
 
 export function formatEvent(event: PatternEvent): string {
   const fields = Object.entries(event)

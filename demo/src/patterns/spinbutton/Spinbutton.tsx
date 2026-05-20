@@ -1,4 +1,4 @@
-import { useSpinbuttonPattern, type PatternData, type PatternEvent, type PatternOptions, type ReactSpinbuttonRenderItem } from '../../../../src'
+import { useSpinbuttonPattern, type PatternData, type PatternEvent, type PatternOptions, type ReactSpinbuttonRenderItem } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 import { Icon } from '../../shared/Icon'
 

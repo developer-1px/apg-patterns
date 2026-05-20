@@ -1,4 +1,4 @@
-import type { ReactListboxRenderItem } from '../../../../src'
+import type { ReactListboxRenderItem } from '../../../../src/react'
 import { ds } from '../../shared/designSystem'
 
 export function ListboxOption({

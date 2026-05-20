@@ -1,4 +1,4 @@
-import type { ReactSliderRenderItem } from '../../../../src'
+import type { ReactSliderRenderItem } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 
 export function MultiThumbSlider({ items }: { items: readonly ReactSliderRenderItem[] }) {

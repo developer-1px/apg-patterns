@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { useButtonPattern, type PatternEvent } from '../../../../src'
+import { useButtonPattern, type PatternEvent } from '../../../../src/react'
 import { Button } from './Button'
 import { buttonVariants } from './buttonData'
 

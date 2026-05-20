@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { PatternDataSchema, type PatternEvent } from '../../../../src'
+import { PatternDataSchema, type PatternEvent } from '../../../../src/react'
 import { Spinbutton } from './Spinbutton'
 import { formatTime, initialSpinbuttonData, reduceSpinbuttonData, spinbuttonOptions, spinbuttonVariants } from './spinbuttonData'
 

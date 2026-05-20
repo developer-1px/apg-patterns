@@ -1,4 +1,4 @@
-import { useGridPattern, type PatternData, type PatternEvent, type ReactGridCell } from '../../../../src'
+import { useGridPattern, type PatternData, type PatternEvent, type ReactGridCell } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 import { Icon, type IconName } from '../../shared/Icon'
 

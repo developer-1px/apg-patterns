@@ -1,10 +1,10 @@
-import { menubarDefinition, menuButtonDefinition, reducePatternData } from '../../../../src'
+import { menubarDefinition, menuButtonDefinition, reducePatternData } from '../../../../src/react'
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { renderDataInspect } from '../../shared/inspect/index'
 import { Menu } from './Menu'
 import { menuVariantItems, menuVariants, type MenuVariantKey } from './menuData'
 import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
-import type { PatternEvent } from '../../../../src'
+import type { PatternEvent } from '../../../../src/react'
 
 const menuDemoDefinition = {
   key: 'menuAndMenubar',

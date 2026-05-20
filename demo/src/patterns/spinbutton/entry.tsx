@@ -3,7 +3,7 @@ import { Spinbutton } from './Spinbutton'
 import { reduceSpinbuttonData, spinbuttonVariants, type SpinbuttonVariantKey } from './spinbuttonData'
 import { renderDataInspect } from '../../shared/inspect/genericInspect'
 import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
-import type { PatternEvent } from '../../../../src'
+import type { PatternEvent } from '../../../../src/react'
 
 export const spinbuttonVariantItems: readonly { key: SpinbuttonVariantKey; label: string }[] = [
   { key: 'numeric', label: 'Numeric' },

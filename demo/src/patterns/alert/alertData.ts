@@ -1,5 +1,5 @@
-import type { PatternData, PatternEvent } from '../../../../src'
-import { reducePatternData } from '../../../../src'
+import type { PatternData, PatternEvent } from '../../../../src/react'
+import { reducePatternData } from '../../../../src/react'
 import { alertDefinition } from '../../../../src/patterns/alert/definition'
 
 // Single-alert demo: one alert key, one dismiss-button key.

@@ -1,4 +1,4 @@
-import { reduceDisclosureData, type PatternData, type PatternEvent } from '../../../../src'
+import { reduceDisclosureData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { Disclosure } from './Disclosure'
 import {

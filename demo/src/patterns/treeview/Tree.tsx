@@ -1,4 +1,4 @@
-import { useTreeviewPattern, type PatternData, type PatternEvent, type PatternItem, type PatternOptions } from '../../../../src'
+import { useTreeviewPattern, type PatternData, type PatternEvent, type PatternItem, type PatternOptions } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 import { Icon } from '../../shared/Icon'
 

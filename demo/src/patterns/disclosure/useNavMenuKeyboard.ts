@@ -1,5 +1,5 @@
 import type { KeyboardEvent, RefObject } from 'react'
-import type { PatternEvent } from '../../../../src'
+import type { PatternEvent } from '../../../../src/react'
 
 export function useNavMenuKeyboard({
   containerRef,

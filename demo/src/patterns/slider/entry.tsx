@@ -3,7 +3,7 @@ import { renderDataInspect } from '../../shared/inspect/index'
 import { Slider } from './Slider'
 import { reduceSliderData, sliderVariantItems, sliderVariants, type SliderVariantKey } from './sliderData'
 import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
-import type { PatternEvent } from '../../../../src'
+import type { PatternEvent } from '../../../../src/react'
 
 const sliderDemoDefinition = {
   key: 'slider',

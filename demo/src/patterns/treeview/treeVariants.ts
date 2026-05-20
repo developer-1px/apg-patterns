@@ -1,4 +1,4 @@
-import type { PatternData } from '../../../../src'
+import type { PatternData } from '../../../../src/react'
 import { fileDirectoryComputed, fileDirectoryDeclared, navigation } from './treeVariantData'
 
 export type TreeVariantKey = 'fileDirectoryComputed' | 'fileDirectoryDeclared' | 'navigation'

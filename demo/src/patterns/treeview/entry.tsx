@@ -1,5 +1,5 @@
 import { useReducer } from 'react'
-import type { PatternEvent, PatternOptions } from '../../../../src'
+import type { PatternEvent, PatternOptions } from '../../../../src/react'
 import { resolveTarget } from './treeContract'
 import { renderAriaTree, renderHtmlTree } from './inspect'
 import { Tree } from './Tree'

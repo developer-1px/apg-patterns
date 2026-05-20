@@ -1,4 +1,4 @@
-import { sliderContract, type Key, type PatternEvent, type SliderData, type SliderOptions } from '../../../../src'
+import { sliderContract, type Key, type PatternEvent, type SliderData, type SliderOptions } from '../../../../src/react'
 
 // ── Variant definitions ─────────────────────────────────────────────
 //

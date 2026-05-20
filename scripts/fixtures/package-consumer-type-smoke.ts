@@ -1,5 +1,4 @@
 import {
-  Button,
   buttonDefinition,
   createPatternRuntime,
   type KeyInput,
@@ -32,10 +31,8 @@ const keyInput: KeyInput = {
 
 runtime.resolveKeyboardBinding(keyInput, 'primary')
 
-const Component: typeof Button = Button
 const SubpathComponent: typeof ReactButton = ReactButton
 const CoreDefinition: typeof buttonDefinition = coreButtonDefinition
-void Component
 void SubpathComponent
 void CoreDefinition
 void runtime

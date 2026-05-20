@@ -1,4 +1,4 @@
-import type { PatternData, PatternOptions } from '../../../../src'
+import type { PatternData, PatternOptions } from '../../../../src/react'
 import { attrLine, htmlAttrs } from '../../shared/inspect/utils'
 
 export function renderAriaTree(data: PatternData, options: PatternOptions) {

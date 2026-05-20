@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import type { PatternData } from '../../../../src'
+import type { PatternData } from '../../../../src/react'
 
 export interface ListboxGroup {
   groupKey: string

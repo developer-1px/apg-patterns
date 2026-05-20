@@ -2,7 +2,7 @@
 
 Zod-validated APG pattern runtime and React adapters.
 
-Runtime dependencies are limited to `zod`. React is a peer dependency for the React adapter and preset components.
+Runtime dependencies are limited to `zod`. The root entry is React-free. React is an optional peer dependency for the React adapter and preset components.
 
 The package models APG behavior as serializable `PatternDefinition` data, validates it with Zod, and projects it into runtime props, state, effects, and React-facing render items.
 
@@ -20,14 +20,14 @@ For React hooks and preset components:
 npm install @interactive-os/apg-patterns react
 ```
 
-Use `@interactive-os/apg-patterns/core` for schema, runtime, and serializable pattern definitions without React.
+Use `@interactive-os/apg-patterns` or `@interactive-os/apg-patterns/core` for schema, runtime, and serializable pattern definitions without React.
 
 Use `@interactive-os/apg-patterns/react` for React hooks and preset components.
 
 ## Quick Start
 
 ```tsx
-import { buttonDefinition, createPatternRuntime, type PatternData, type PatternEvent } from '@interactive-os/apg-patterns/core'
+import { buttonDefinition, createPatternRuntime, type PatternData, type PatternEvent } from '@interactive-os/apg-patterns'
 
 const data: PatternData = {
   items: { primary: { label: 'Save' } },

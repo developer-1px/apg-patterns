@@ -5,7 +5,7 @@ import { entry as gridEntry } from './grid/entry'
 import { entry as menuEntry } from './menu/entry'
 import { entry as sliderEntry } from './slider/entry'
 import { entry as tableEntry } from './table/entry'
-import type { PatternEvent } from '../../../src'
+import type { PatternEvent } from '../../../src/react'
 
 function EntryDemo({ kind, onEvent = () => undefined }: { kind: 'combobox' | 'grid' | 'menu' | 'slider' | 'table'; onEvent?: (event: PatternEvent) => void }) {
   const entry = kind === 'combobox' ? comboboxEntry : kind === 'grid' ? gridEntry : kind === 'menu' ? menuEntry : kind === 'slider' ? sliderEntry : tableEntry

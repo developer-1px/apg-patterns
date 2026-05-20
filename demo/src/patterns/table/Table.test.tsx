@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 
-import { reducePatternData, type PatternData, type PatternEvent } from '../../../../src'
+import { reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { tableDefinition } from '../../../../src/patterns/table/definition'
 import { Table } from './Table'
 import { tableVariants, type TableVariantKey } from './tableData'

@@ -1,4 +1,4 @@
-import { PatternDataSchema, type PatternData } from '../../../../src'
+import { PatternDataSchema, type PatternData } from '../../../../src/react'
 
 export type LinkVariantKey = 'anchor' | 'spanRole'
 

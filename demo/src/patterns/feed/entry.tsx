@@ -1,4 +1,4 @@
-import { reducePatternData } from '../../../../src'
+import { reducePatternData } from '../../../../src/react'
 import { feedDefinition } from '../../../../src/patterns/feed/definition'
 import { Feed } from './Feed'
 import { initialFeedData } from './feedData'

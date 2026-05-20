@@ -1,5 +1,5 @@
 import { toolbarDefinition } from '../../../../src/patterns/toolbar/definition'
-import { PatternDataSchema, reducePatternData, type PatternData, type PatternEvent } from '../../../../src'
+import { PatternDataSchema, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 
 export type ToolbarVariantKey = 'toolbar' | 'help'
 

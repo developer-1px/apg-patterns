@@ -3,7 +3,7 @@ import { Combobox } from './Combobox'
 import { buildComboboxData, comboboxVariants, reduceComboboxData, type ComboboxVariantKey } from './comboboxData'
 import { renderDataInspect } from '../../shared/inspect/index'
 import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
-import type { PatternEvent } from '../../../../src'
+import type { PatternEvent } from '../../../../src/react'
 
 const comboboxVariantItems = (Object.keys(comboboxVariants) as ComboboxVariantKey[]).map((key) => ({
   key,

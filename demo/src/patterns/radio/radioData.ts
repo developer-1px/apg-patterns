@@ -1,4 +1,4 @@
-import { radioGroupDefinition, PatternDataSchema, reducePatternData, type PatternData, type PatternEvent } from '../../../../src'
+import { radioGroupDefinition, PatternDataSchema, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 
 export type RadioVariantKey = 'rovingTabindex' | 'ariaActiveDescendant' | 'rating'
 

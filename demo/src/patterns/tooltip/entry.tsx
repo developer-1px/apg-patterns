@@ -1,6 +1,6 @@
 import { Tooltip } from './Tooltip'
 import { initialTooltipData } from './tooltipData'
-import { reducePatternData } from '../../../../src'
+import { reducePatternData } from '../../../../src/react'
 import { tooltipDefinition } from '../../../../src/patterns/tooltip/definition'
 import { defineStateDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 

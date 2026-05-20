@@ -1,4 +1,4 @@
-import { useTooltipPattern, type PatternData, type PatternEvent } from '../../../../src'
+import { useTooltipPattern, type PatternData, type PatternEvent } from '../../../../src/react'
 
 export interface TooltipProps {
   data: PatternData

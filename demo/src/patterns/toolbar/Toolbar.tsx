@@ -1,4 +1,4 @@
-import { useToolbarPattern, type PatternData, type PatternEvent } from '../../../../src'
+import { useToolbarPattern, type PatternData, type PatternEvent } from '../../../../src/react'
 import { ds } from '../../shared/designSystem'
 
 export function Toolbar({

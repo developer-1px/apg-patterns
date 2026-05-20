@@ -1,4 +1,4 @@
-import { useComboboxPattern, type PatternData, type PatternEvent } from '../../../../src'
+import { useComboboxPattern, type PatternData, type PatternEvent } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 
 export function Combobox({

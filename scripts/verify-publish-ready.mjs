@@ -16,7 +16,7 @@ if (!packageJson.version || packageJson.version === '0.0.0') failures.push('pack
 if (!existsSync('README.md')) failures.push('README.md is required')
 if (!existsSync('LICENSE')) failures.push('LICENSE is required')
 if (packageJson.peerDependencies?.react && packageJson.peerDependenciesMeta?.react?.optional !== true) {
-  failures.push('react peer dependency must be optional because the ./core subpath is React-free')
+  failures.push('react peer dependency must be optional because the root and ./core entries are React-free')
 }
 
 for (const subpath of ['.', './core', './react']) {
@@ -87,21 +87,23 @@ for (const file of pack.files) {
   }
 }
 
-for (const coreRuntimePath of runtimeClosure('dist/core.js')) {
-  if (hasReactModuleImport(readFileSync(coreRuntimePath, 'utf8'))) {
-    failures.push(`React-free core ESM output imports react: ${relativePath(coreRuntimePath)}`)
+for (const entry of reactFreeEntries()) {
+  for (const runtimePath of runtimeClosure(entry.esm)) {
+    if (hasReactModuleImport(readFileSync(runtimePath, 'utf8'))) {
+      failures.push(`React-free ${entry.label} ESM output imports react: ${relativePath(runtimePath)}`)
+    }
   }
-}
 
-for (const coreRuntimePath of runtimeClosure('dist/core.cjs')) {
-  if (hasReactModuleImport(readFileSync(coreRuntimePath, 'utf8'))) {
-    failures.push(`React-free core CJS output imports react: ${relativePath(coreRuntimePath)}`)
+  for (const runtimePath of runtimeClosure(entry.cjs)) {
+    if (hasReactModuleImport(readFileSync(runtimePath, 'utf8'))) {
+      failures.push(`React-free ${entry.label} CJS output imports react: ${relativePath(runtimePath)}`)
+    }
   }
-}
 
-for (const declarationPath of ['dist/core.d.ts', 'dist/core.d.cts']) {
-  if (hasReactModuleImport(readFileSync(declarationPath, 'utf8'))) {
-    failures.push(`React-free core declarations import react: ${declarationPath}`)
+  for (const declarationPath of entry.declarations) {
+    if (hasReactModuleImport(readFileSync(declarationPath, 'utf8'))) {
+      failures.push(`React-free ${entry.label} declarations import react: ${declarationPath}`)
+    }
   }
 }
 
@@ -119,6 +121,23 @@ function dependencySections(pkg) {
     optionalDependencies: pkg.optionalDependencies ?? {},
     bundledDependencies: pkg.bundledDependencies ?? {},
   }
+}
+
+function reactFreeEntries() {
+  return [
+    {
+      label: 'root',
+      esm: 'dist/index.js',
+      cjs: 'dist/index.cjs',
+      declarations: ['dist/index.d.ts', 'dist/index.d.cts'],
+    },
+    {
+      label: 'core',
+      esm: 'dist/core.js',
+      cjs: 'dist/core.cjs',
+      declarations: ['dist/core.d.ts', 'dist/core.d.cts'],
+    },
+  ]
 }
 
 function assertExportConditions(subpath, entry) {

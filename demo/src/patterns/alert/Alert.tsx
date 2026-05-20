@@ -1,4 +1,4 @@
-import { useAlertPattern, type PatternData, type PatternEvent } from '../../../../src'
+import { useAlertPattern, type PatternData, type PatternEvent } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 import type { AlertDomainEvent } from './alertData'
 

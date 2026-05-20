@@ -1,4 +1,4 @@
-import { useDialogPattern, type PatternData, type PatternEvent } from '../../../../src'
+import { useDialogPattern, type PatternData, type PatternEvent } from '../../../../src/react'
 import { ds } from '../../shared/designSystem'
 import { dialogContent } from './dialogData'
 

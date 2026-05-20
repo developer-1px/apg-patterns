@@ -1,5 +1,5 @@
 import { useReducer } from 'react'
-import { PatternDataSchema } from '../../../../src'
+import { PatternDataSchema } from '../../../../src/react'
 import { Alert } from './Alert'
 import { type AlertDomainEvent, initialAlertData, reduceAlertState } from './alertData'
 import { renderDataInspect } from '../../shared/inspect/genericInspect'

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import type { PatternEvent } from '../../../../src'
+import type { PatternEvent } from '../../../../src/react'
 import { type DemoPattern, type PatternEntry } from '../demoPatternTypes'
 import {
   assertUnique,

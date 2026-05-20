@@ -1,4 +1,4 @@
-import { PatternDataSchema, type PatternData, type PatternOptions } from '../../../../src'
+import { PatternDataSchema, type PatternData, type PatternOptions } from '../../../../src/react'
 
 // Each variant maps to a common APG meter scenario.
 //   - disk:    Disk usage percentage (0–100, percent valuetext)

@@ -1,4 +1,4 @@
-import type { PatternData } from '../../../../src'
+import type { PatternData } from '../../../../src/react'
 
 export function renderDisclosureInspect(data: PatternData) {
   const rootKeys = data.relations?.rootKeys ?? []

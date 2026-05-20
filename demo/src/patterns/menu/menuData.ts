@@ -1,5 +1,5 @@
-import { PatternDataSchema } from '../../../../src'
-import type { PatternData } from '../../../../src'
+import { PatternDataSchema } from '../../../../src/react'
+import type { PatternData } from '../../../../src/react'
 
 export type MenuVariantKey =
   | 'editorMenubar'

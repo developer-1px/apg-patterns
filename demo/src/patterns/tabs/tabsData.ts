@@ -1,4 +1,4 @@
-import { PatternDataSchema, type PatternData, type PatternOptions } from '../../../../src'
+import { PatternDataSchema, type PatternData, type PatternOptions } from '../../../../src/react'
 
 type TabSpec = { key: string; label: string; panelLabel: string; content: string }
 

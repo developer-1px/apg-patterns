@@ -1,4 +1,4 @@
-import { reducePatternData } from '../../../../src'
+import { reducePatternData } from '../../../../src/react'
 import { carouselDefinition } from '../../../../src/patterns/carousel/definition'
 import { Carousel } from './Carousel'
 import { carouselVariantItems, carouselVariants, initialCarouselData, type CarouselVariantKey } from './carouselData'

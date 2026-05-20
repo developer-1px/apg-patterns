@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from 'react'
-import { useTabsPattern, type PatternData, type PatternEvent, type PatternItem, type PatternOptions, type PatternStateWithOptions } from '../../../../src'
+import { useTabsPattern, type PatternData, type PatternEvent, type PatternItem, type PatternOptions, type PatternStateWithOptions } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 import { Icon } from '../../shared/Icon'
 

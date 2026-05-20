@@ -1,5 +1,5 @@
 import type React from 'react'
-import type { PatternData, PatternEvent } from '../../../../src'
+import type { PatternData, PatternEvent } from '../../../../src/react'
 import { usePatternDataHost } from '../demoHostState'
 import type { PatternEntry } from '../demoPatternTypes'
 import type { DemoPatternDefinition } from './demoPatternDefinition'

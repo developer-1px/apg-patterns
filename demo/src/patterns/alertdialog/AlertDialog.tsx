@@ -1,4 +1,4 @@
-import { useAlertDialogPattern, type PatternData, type PatternEvent } from '../../../../src'
+import { useAlertDialogPattern, type PatternData, type PatternEvent } from '../../../../src/react'
 
 export interface AlertDialogProps {
   data: PatternData

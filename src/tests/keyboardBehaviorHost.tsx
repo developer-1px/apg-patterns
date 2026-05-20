@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { useLayoutEffect, useReducer } from 'react'
-import { useTreeviewPattern, type PatternData, type PatternEvent } from '../index'
+import { useTreeviewPattern, type PatternData, type PatternEvent } from '../react'
 
 const initialData = {
   items: {

@@ -5,7 +5,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import type { PatternData, PatternEvent } from '../../../../src'
+import type { PatternData, PatternEvent } from '../../../../src/react'
 import { Combobox } from './Combobox'
 import { buildComboboxData, reduceComboboxData } from './comboboxData'
 

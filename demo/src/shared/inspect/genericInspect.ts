@@ -1,4 +1,4 @@
-import type { PatternData } from '../../../../src'
+import type { PatternData } from '../../../../src/react'
 
 export function renderDataInspect(data: PatternData): string {
   return JSON.stringify(

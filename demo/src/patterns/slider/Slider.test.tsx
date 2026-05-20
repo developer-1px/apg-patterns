@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { PatternDataSchema, type PatternEvent } from '../../../../src'
+import { PatternDataSchema, type PatternEvent } from '../../../../src/react'
 import { Slider } from './Slider'
 import { initialSliderData, reduceSliderData, sliderOptions, sliderVariants } from './sliderData'
 

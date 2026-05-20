@@ -5,7 +5,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { feedDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src'
+import { feedDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { Feed } from './Feed'
 import { initialFeedData } from './feedData'
 

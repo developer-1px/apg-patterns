@@ -1,4 +1,4 @@
-import { useSwitchPattern, type PatternData, type PatternEvent } from '../../../../src'
+import { useSwitchPattern, type PatternData, type PatternEvent } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 
 const itemClass = cx(ds.option, ds.checkable, 'inline-flex h-8 max-w-sm items-center gap-2 text-sm')

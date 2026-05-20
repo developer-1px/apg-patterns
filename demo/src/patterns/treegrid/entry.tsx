@@ -1,4 +1,4 @@
-import { reducePatternData } from '../../../../src'
+import { reducePatternData } from '../../../../src/react'
 import { treegridDefinition } from '../../../../src/patterns/treegrid/definition'
 import { Treegrid } from './Treegrid'
 import { initialTreegridData } from './treegridData'

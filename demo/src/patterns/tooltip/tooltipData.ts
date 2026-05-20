@@ -1,4 +1,4 @@
-import type { PatternData } from '../../../../src'
+import type { PatternData } from '../../../../src/react'
 
 export const tooltipTriggerId = 'tooltip-trigger'
 export const tooltipPanelId = 'tooltip-panel'

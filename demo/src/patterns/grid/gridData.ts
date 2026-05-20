@@ -1,4 +1,4 @@
-import { PatternDataSchema } from '../../../../src'
+import { PatternDataSchema } from '../../../../src/react'
 
 type GridCellSpec = {
   key: string

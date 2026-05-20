@@ -1,4 +1,4 @@
-import { useButtonPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
+import { useButtonPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src/react'
 import { ds } from '../../shared/designSystem'
 
 const buttonClass = ds.button

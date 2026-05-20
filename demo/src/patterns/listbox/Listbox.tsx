@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef } from 'react'
-import { useListboxPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
+import { useListboxPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 import { ListboxContent } from './ListboxContent'
 import { ListboxOption } from './ListboxOption'

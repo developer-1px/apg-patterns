@@ -4,7 +4,7 @@ import {
   type PatternEvent,
   type PatternItem,
   type PatternOptions,
-} from '../../../../src'
+} from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 import { Icon } from '../../shared/Icon'
 

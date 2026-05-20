@@ -7,7 +7,7 @@ import {
   reducePatternData,
   type PatternData,
   type PatternEvent,
-} from '../../../../src'
+} from '../../../../src/react'
 import { Menu } from './Menu'
 import { menuVariants } from './menuData'
 import { useMenubarSubmenuKeyboard } from './useMenubarSubmenuKeyboard'

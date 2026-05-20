@@ -11,6 +11,12 @@ try {
   const tarballPath = packCurrentPackage(tempRoot)
   runConsumerSmoke({
     tarballPath,
+    consumerRoot: join(tempRoot, 'consumer-root'),
+    includeReact: false,
+    smokeKind: 'root',
+  })
+  runConsumerSmoke({
+    tarballPath,
     consumerRoot: join(tempRoot, 'consumer-react'),
     includeReact: true,
     smokeKind: 'react',
@@ -22,7 +28,7 @@ try {
     smokeKind: 'core',
   })
 
-  console.log('package consumer smoke passed for ESM, CJS, TypeScript, and React-free core imports.')
+  console.log('package consumer smoke passed for ESM, CJS, TypeScript, React-free root/core imports, and React subpath imports.')
 } finally {
   rmSync(tempRoot, { recursive: true, force: true })
 }
@@ -86,8 +92,8 @@ function writeConsumerFiles(consumerRoot, smokeKind) {
     },
     include: ['type-smoke.ts'],
   }, null, 2))
-  const typeSmoke = smokeKind === 'core'
-    ? coreTypeSmokeSource()
+  const typeSmoke = smokeKind === 'core' || smokeKind === 'root'
+    ? coreTypeSmokeSource(smokeKind === 'core' ? '@interactive-os/apg-patterns/core' : '@interactive-os/apg-patterns')
     : readFileSync(new URL('./fixtures/package-consumer-type-smoke.ts', import.meta.url), 'utf8')
   writeFileSync(join(consumerRoot, 'type-smoke.ts'), typeSmoke)
 }
@@ -97,7 +103,7 @@ function runtimeSmokeSource(moduleKind, smokeKind) {
   const importLine = moduleKind === 'esm'
     ? `import { buttonDefinition, createPatternRuntime } from '${packagePath}'`
     : `const { buttonDefinition, createPatternRuntime } = require('${packagePath}')`
-  const reactSmoke = smokeKind === 'core'
+  const reactSmoke = smokeKind !== 'react'
     ? ''
     : moduleKind === 'esm'
       ? "\nconst { Button } = await import('@interactive-os/apg-patterns/react')\nif (typeof Button !== 'function') throw new Error('react subpath did not expose Button')\n"
@@ -125,14 +131,14 @@ ${reactSmoke}
 `
 }
 
-function coreTypeSmokeSource() {
+function coreTypeSmokeSource(packagePath) {
   return `import {
   buttonDefinition,
   createPatternRuntime,
   type KeyInput,
   type PatternData,
   type PatternEvent,
-} from '@interactive-os/apg-patterns/core'
+} from '${packagePath}'
 
 const data: PatternData = {
   items: { primary: { label: 'Primary' } },

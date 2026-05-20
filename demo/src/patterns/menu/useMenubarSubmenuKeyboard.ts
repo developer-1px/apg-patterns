@@ -1,5 +1,5 @@
 import type { KeyboardEvent } from 'react'
-import type { PatternData, PatternEvent } from '../../../../src'
+import type { PatternData, PatternEvent } from '../../../../src/react'
 
 export function useMenubarSubmenuKeyboard({
   data,

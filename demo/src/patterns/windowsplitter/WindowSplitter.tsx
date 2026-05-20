@@ -1,4 +1,4 @@
-import { useWindowSplitterPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
+import { useWindowSplitterPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 import { Icon } from '../../shared/Icon'
 

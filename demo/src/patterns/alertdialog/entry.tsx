@@ -1,4 +1,4 @@
-import { reducePatternData } from '../../../../src'
+import { reducePatternData } from '../../../../src/react'
 import { AlertDialog } from './AlertDialog'
 import { initialAlertDialogData } from './alertdialogData'
 import { alertDialogDefinition } from '../../../../src/patterns/alertdialog/definition'

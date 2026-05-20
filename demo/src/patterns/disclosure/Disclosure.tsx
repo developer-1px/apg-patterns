@@ -1,5 +1,5 @@
 import type { KeyboardEvent } from 'react'
-import { useDisclosurePattern, type PatternData, type PatternEvent } from '../../../../src'
+import { useDisclosurePattern, type PatternData, type PatternEvent } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 import { disclosurePanelText, faqDisclosureContent, imageDisclosureContent, type DisclosureVariantKey } from './disclosureData'
 import { Icon } from '../../shared/Icon'

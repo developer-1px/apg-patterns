@@ -1,4 +1,4 @@
-import type { PatternData } from '../../../../src'
+import type { PatternData } from '../../../../src/react'
 import { attrLine } from '../../shared/inspect/utils'
 
 export function renderTabsInspect(data: PatternData) {

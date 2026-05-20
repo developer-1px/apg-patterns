@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { listboxDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src'
+import { listboxDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 
 // jsdom lacks CSS.escape; Listbox uses it inside a useLayoutEffect.
 if (typeof (globalThis as { CSS?: { escape?: (s: string) => string } }).CSS === 'undefined') {

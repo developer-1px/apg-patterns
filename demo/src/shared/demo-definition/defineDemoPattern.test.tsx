@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { Component, useState, type ReactNode } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { defineDemoPattern, defineStateDemoPattern, defineVariantDemoPattern, type DemoPatternDefinition } from './defineDemoPattern'
-import type { PatternData, PatternEvent } from '../../../../src'
+import type { PatternData, PatternEvent } from '../../../../src/react'
 
 const definition = {
   key: 'example',

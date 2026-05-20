@@ -1,4 +1,4 @@
-import { useTablePattern, type PatternData, type PatternEvent, type ReactTableRow } from '../../../../src'
+import { useTablePattern, type PatternData, type PatternEvent, type ReactTableRow } from '../../../../src/react'
 
 export function Table({
   data,

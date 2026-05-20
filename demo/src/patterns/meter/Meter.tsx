@@ -1,4 +1,4 @@
-import { useMeterPattern, type PatternData, type PatternEvent, type PatternOptions, type ReactMeterRenderItem } from '../../../../src'
+import { useMeterPattern, type PatternData, type PatternEvent, type PatternOptions, type ReactMeterRenderItem } from '../../../../src/react'
 
 export function Meter({
   data,

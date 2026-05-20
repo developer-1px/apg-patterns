@@ -1,4 +1,4 @@
-import { useSliderPattern, type PatternEvent, type ReactSliderRenderItem, type SliderData, type SliderOptions } from '../../../../src'
+import { useSliderPattern, type PatternEvent, type ReactSliderRenderItem, type SliderData, type SliderOptions } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 import { MultiThumbSlider } from './MultiThumbSlider'
 

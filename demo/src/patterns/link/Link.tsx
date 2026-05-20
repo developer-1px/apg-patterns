@@ -1,5 +1,5 @@
 import type { MouseEvent } from 'react'
-import { useLinkPattern, type PatternData, type PatternEvent } from '../../../../src'
+import { useLinkPattern, type PatternData, type PatternEvent } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 
 const linkClass = cx(ds.focusRing, 'inline-flex items-center rounded-md text-sm text-blue-700 underline underline-offset-2 transition hover:text-blue-900 dark:text-blue-300 dark:hover:text-blue-100')

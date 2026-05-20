@@ -32,7 +32,7 @@ import {
   WindowSplitter,
   type PatternData,
   type PatternEvent,
-} from '../index'
+} from '../react'
 
 describe('preset React components', () => {
   it('renders a tree and emits branch toggle events', () => {

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { PatternDataSchema, type PatternEvent } from '../../../../src'
+import { PatternDataSchema, type PatternEvent } from '../../../../src/react'
 import { reduceData } from './treeContract'
 import { treeVariants, type TreeVariantKey } from './treeVariants'
 

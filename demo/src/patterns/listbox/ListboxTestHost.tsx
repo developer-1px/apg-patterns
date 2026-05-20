@@ -1,4 +1,4 @@
-import { listboxDefinition, reducePatternData, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
+import { listboxDefinition, reducePatternData, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src/react'
 import { usePatternDataHost } from '../../shared/demoHostState'
 import { Listbox } from './Listbox'
 import {

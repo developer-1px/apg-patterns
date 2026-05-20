@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from 'react'
-import { reduceTabsData, useTabsPattern, type PatternData, type PatternEvent } from '../../../src'
+import { reduceTabsData, useTabsPattern, type PatternData, type PatternEvent } from '../../../src/react'
 import { cx, ds } from '../shared/designSystem'
 
 type SourceTabKey = string

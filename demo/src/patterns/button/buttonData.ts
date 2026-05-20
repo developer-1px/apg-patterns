@@ -1,4 +1,4 @@
-import { PatternDataSchema, reducePatternData, type PatternData, type PatternEvent } from '../../../../src'
+import { PatternDataSchema, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { buttonDefinition } from '../../../../src/patterns/button/definition'
 
 export type ButtonVariantKey = 'action' | 'toggle'

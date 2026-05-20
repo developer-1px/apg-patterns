@@ -19,7 +19,7 @@ if (typeof globalThis.CSS === 'undefined') {
   ;(globalThis as { CSS?: { escape: (value: string) => string } }).CSS = { escape: (value: string) => value }
 }
 
-import { reducePatternData, type PatternData, type PatternEvent } from '../../../../src'
+import { reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { treegridDefinition } from '../../../../src/patterns/treegrid/definition'
 import { Treegrid } from './Treegrid'
 import { initialTreegridData, treegridFirstCell } from './treegridData'

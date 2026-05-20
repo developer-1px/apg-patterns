@@ -5,7 +5,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { reducePatternData, type PatternData, type PatternEvent } from '../../../../src'
+import { reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { alertDialogDefinition } from '../../../../src/patterns/alertdialog/definition'
 import { AlertDialog } from './AlertDialog'
 import { initialAlertDialogData } from './alertdialogData'

@@ -1,4 +1,4 @@
-import { reduceTabsData, type PatternData, type PatternEvent } from '../../../../src'
+import { reduceTabsData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { renderDataInspect } from '../../shared/inspect/index'
 import { Tabs } from './Tabs'

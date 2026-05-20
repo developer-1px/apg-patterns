@@ -1,4 +1,4 @@
-import { PatternDataSchema, reducePatternData, type PatternData, type PatternEvent } from '../../../../src'
+import { PatternDataSchema, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { switchDefinition } from '../../../../src/patterns/switch/definition'
 
 export type SwitchVariantKey = 'switch' | 'button' | 'checkbox'

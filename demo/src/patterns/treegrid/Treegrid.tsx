@@ -1,4 +1,4 @@
-import { useTreegridPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
+import { useTreegridPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 
 export function Treegrid({

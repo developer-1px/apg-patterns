@@ -1,4 +1,4 @@
-import { useLandmarksPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
+import { useLandmarksPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src/react'
 import type { LandmarkDataItem } from './landmarksData'
 
 export function Landmarks({

@@ -1,5 +1,5 @@
-import { PatternDataSchema, type PatternData, type PatternEvent, type PatternItem } from '../../../../src'
-import { accordionDefinition, reducePatternData } from '../../../../src'
+import { PatternDataSchema, type PatternData, type PatternEvent, type PatternItem } from '../../../../src/react'
+import { accordionDefinition, reducePatternData } from '../../../../src/react'
 
 type AccordionItem = PatternItem & {
   content?: string

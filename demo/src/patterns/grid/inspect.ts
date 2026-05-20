@@ -1,4 +1,4 @@
-import { gridRows, type PatternData } from '../../../../src'
+import { gridRows, type PatternData } from '../../../../src/react'
 import { attrLine } from '../../shared/inspect/utils'
 
 export function renderGridInspect(data: PatternData) {

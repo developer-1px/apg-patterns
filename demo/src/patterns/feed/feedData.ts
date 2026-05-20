@@ -1,4 +1,4 @@
-import { PatternDataSchema } from '../../../../src'
+import { PatternDataSchema } from '../../../../src/react'
 
 export interface FeedArticle {
   key: string

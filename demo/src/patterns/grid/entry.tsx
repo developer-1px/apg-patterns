@@ -1,4 +1,4 @@
-import { gridDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src'
+import { gridDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { Grid } from './Grid'
 import { gridVariantItems, gridVariants, type GridVariantKey } from './gridData'

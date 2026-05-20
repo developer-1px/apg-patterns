@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { useLinkPattern, type PatternData, type PatternEvent } from '../../../../src'
+import { useLinkPattern, type PatternData, type PatternEvent } from '../../../../src/react'
 import { Link } from './Link'
 import { initialAnchorLinkData, initialSpanLinkData } from './linkData'
 

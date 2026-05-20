@@ -1,6 +1,6 @@
 import type { HTMLAttributes, KeyboardEvent } from 'react'
 import { useRef } from 'react'
-import { useDisclosurePattern, type PatternData, type PatternEvent } from '../../../../src'
+import { useDisclosurePattern, type PatternData, type PatternEvent } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 import { navMenuContent, navMenuTopLinksContent } from './disclosureData'
 import { Icon } from '../../shared/Icon'

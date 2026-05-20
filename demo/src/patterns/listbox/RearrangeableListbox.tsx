@@ -1,5 +1,5 @@
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
-import { type PatternData, type PatternEvent, type PatternOptions } from '../../../../src'
+import { type PatternData, type PatternEvent, type PatternOptions } from '../../../../src/react'
 import { Icon } from '../../shared/Icon'
 import { ds } from '../../shared/designSystem'
 import { Listbox } from './Listbox'

@@ -1,4 +1,4 @@
-import { useCheckboxPattern, type PatternData, type PatternEvent } from '../../../../src'
+import { useCheckboxPattern, type PatternData, type PatternEvent } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 import { Icon } from '../../shared/Icon'
 

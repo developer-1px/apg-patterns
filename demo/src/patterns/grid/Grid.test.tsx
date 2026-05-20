@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest'
 if (typeof globalThis.CSS === 'undefined') {
   ;(globalThis as { CSS?: { escape: (value: string) => string } }).CSS = { escape: (value: string) => value }
 }
-import { gridDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src'
+import { gridDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { Grid } from './Grid'
 import { gridVariants, type GridVariantKey } from './gridData'
 

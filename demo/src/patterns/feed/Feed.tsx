@@ -1,4 +1,4 @@
-import { useFeedPattern, type PatternData, type PatternEvent } from '../../../../src'
+import { useFeedPattern, type PatternData, type PatternEvent } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 import { feedArticles } from './feedData'
 

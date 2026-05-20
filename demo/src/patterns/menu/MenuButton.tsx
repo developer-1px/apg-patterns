@@ -1,4 +1,4 @@
-import { useMenuButtonPattern } from '../../../../src'
+import { useMenuButtonPattern } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 import { Icon } from '../../shared/Icon'
 import type { MenuProps } from './menuTypes'

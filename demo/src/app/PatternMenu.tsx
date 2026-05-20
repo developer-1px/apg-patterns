@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from 'react'
-import { listboxDefinition, reducePatternData, useListboxPattern, type PatternData } from '../../../src'
+import { listboxDefinition, reducePatternData, useListboxPattern, type PatternData } from '../../../src/react'
 import { patternItems, type PatternKey } from '../shared/demoPatterns'
 import { cx, ds } from '../shared/designSystem'
 

@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { useMeterPattern, type PatternData } from '../../../../src'
+import { useMeterPattern, type PatternData } from '../../../../src/react'
 import { Meter } from './Meter'
 import { initialMeterData, meterVariants } from './meterData'
 

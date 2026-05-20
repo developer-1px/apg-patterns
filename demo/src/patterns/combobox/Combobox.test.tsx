@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { comboboxDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src'
+import { comboboxDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { Combobox } from './Combobox'
 import { buildComboboxData, filterFruits, firstMatch, FRUITS, reduceComboboxData } from './comboboxData'
 

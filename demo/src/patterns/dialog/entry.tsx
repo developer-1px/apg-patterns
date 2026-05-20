@@ -1,4 +1,4 @@
-import { reducePatternData } from '../../../../src'
+import { reducePatternData } from '../../../../src/react'
 import { dialogDefinition } from '../../../../src/patterns/dialog/definition'
 import { Dialog } from './Dialog'
 import { dialogVariantItems, dialogVariants, initialDialogData, type DialogVariantKey } from './dialogData'

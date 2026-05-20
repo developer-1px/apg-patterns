@@ -1,4 +1,4 @@
-import { checkboxDefinition, PatternDataSchema, reducePatternData, type PatternData, type PatternEvent } from '../../../../src'
+import { checkboxDefinition, PatternDataSchema, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 
 export type CheckboxVariantKey = 'twoState' | 'triState'
 

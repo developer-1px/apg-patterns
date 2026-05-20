@@ -5,7 +5,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { reduceTabsData, type PatternData, type PatternEvent } from '../../../../src'
+import { reduceTabsData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { Tabs } from './Tabs'
 import { tabsVariants } from './tabsData'
 

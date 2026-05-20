@@ -10,7 +10,7 @@ if (typeof globalThis.CSS === 'undefined') {
   ;(globalThis as { CSS?: { escape: (s: string) => string } }).CSS = { escape: (s: string) => s }
 }
 
-import { gridDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src'
+import { gridDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { Grid } from './Grid'
 import { gridVariants } from './gridData'
 

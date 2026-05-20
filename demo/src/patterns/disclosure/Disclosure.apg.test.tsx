@@ -9,7 +9,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { reduceDisclosureData, type PatternData, type PatternEvent } from '../../../../src'
+import { reduceDisclosureData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { Disclosure } from './Disclosure'
 import { initialImageDisclosureData } from './disclosureData'
 
