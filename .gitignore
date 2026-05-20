@@ -2,6 +2,7 @@ node_modules/
 dist/
 demo/dist/
 coverage/
+release-artifacts/
 .codex/
 .idea/
 .claude/*.lock

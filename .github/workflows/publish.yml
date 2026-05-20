@@ -35,5 +35,18 @@ jobs:
         env:
           VERIFY_RELEASE_TAG: 'true'
 
+      - name: Pack release artifact
+        run: |
+          mkdir -p release-artifacts
+          npm pack --pack-destination release-artifacts --json > release-artifacts/npm-pack.json
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: apg-patterns-package-${{ github.sha }}
+          path: release-artifacts/
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Publish with provenance
         run: npm publish --access public --provenance --registry https://registry.npmjs.org/

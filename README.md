@@ -326,7 +326,7 @@ npm run check:apg
 
 `check:readme` type-checks the Quick Start and React API TypeScript examples against the built package and executes the root Quick Start.
 
-`check:repo` verifies that generated outputs, local environment files, IDE files, and ignored paths are not tracked by git, that tracked bug records are release-resolved, and that the GitHub Actions release workflow runs the release preflight.
+`check:repo` verifies that generated outputs, local environment files, IDE files, ignored paths, and release artifacts are not tracked by git, that tracked bug records are release-resolved, and that the GitHub Actions release workflows run the release preflight and upload the packed package artifact.
 
 `check:independence` verifies that this package keeps its dependency surface separate from legacy APG workspaces.
 
@@ -343,6 +343,8 @@ After changing public exports, run `npm run update:api` after `npm run build` to
 Before publishing a new version, run `npm run check:registry` to confirm the current package version is still unpublished on the public npm registry and, when the package already exists, is newer than the current `latest` dist-tag.
 
 `check:release-ref` reports the expected release tag. In the publish workflow it is strict and requires `GITHUB_REF_TYPE=tag` with `GITHUB_REF_NAME=v<package.version>`.
+
+The release-check and publish workflows upload `release-artifacts/`, including the `npm pack` tarball and `npm-pack.json`, before publishing.
 
 For the full release preflight:
 

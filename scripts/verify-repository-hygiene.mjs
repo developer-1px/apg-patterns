@@ -7,6 +7,7 @@ const releaseCheckWorkflowPath = '.github/workflows/release-check.yml'
 const publishWorkflowPath = '.github/workflows/publish.yml'
 const checkoutActionRef = 'actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd'
 const setupNodeActionRef = 'actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e'
+const uploadArtifactActionRef = 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02'
 const forbiddenTrackedRules = [
   {
     label: 'coverage output',
@@ -19,6 +20,10 @@ const forbiddenTrackedRules = [
   {
     label: 'demo build output',
     matches: (path) => path.startsWith('demo/dist/'),
+  },
+  {
+    label: 'release artifacts',
+    matches: (path) => path.startsWith('release-artifacts/'),
   },
   {
     label: 'installed dependencies',
@@ -113,6 +118,9 @@ function assertReleaseCheckWorkflow() {
     'npm install -g npm@11.6.2',
     'npm ci',
     'npm run release:check',
+    'npm pack --pack-destination release-artifacts --json > release-artifacts/npm-pack.json',
+    uploadArtifactActionRef,
+    'if-no-files-found: error',
     'contents: read',
   ])
 }
@@ -133,6 +141,9 @@ function assertPublishWorkflow() {
     'npm ci',
     'npm run release:check',
     "VERIFY_RELEASE_TAG: 'true'",
+    'npm pack --pack-destination release-artifacts --json > release-artifacts/npm-pack.json',
+    uploadArtifactActionRef,
+    'if-no-files-found: error',
     'npm publish --access public --provenance --registry https://registry.npmjs.org/',
   ])
 }

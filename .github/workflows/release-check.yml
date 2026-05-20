@@ -34,3 +34,16 @@ jobs:
 
       - name: Verify release readiness
         run: npm run release:check
+
+      - name: Pack release artifact
+        run: |
+          mkdir -p release-artifacts
+          npm pack --pack-destination release-artifacts --json > release-artifacts/npm-pack.json
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: apg-patterns-package-${{ github.sha }}
+          path: release-artifacts/
+          if-no-files-found: error
+          retention-days: 14

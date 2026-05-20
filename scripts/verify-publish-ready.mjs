@@ -364,6 +364,8 @@ function assertContributingGuide(contributingGuide) {
     'npm run release:check',
     'VERIFY_RELEASE_TAG=true',
     'v<package.version>',
+    'release-artifacts/',
+    'npm-pack.json',
     '@interactive-os/apg-patterns/core',
     '@interactive-os/apg-patterns/react',
     'npm run check:publish',
