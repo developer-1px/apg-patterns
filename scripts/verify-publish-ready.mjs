@@ -71,6 +71,7 @@ for (const sourceImport of productionIndexImports()) {
 }
 
 const pack = readPackManifest()
+assertPackMetadata(pack)
 const packedPaths = new Set(pack.files.map((file) => file.path))
 const requiredPackedPaths = [
   'package.json',
@@ -319,6 +320,25 @@ function readPackManifest() {
   const result = JSON.parse(stdout)
   if (!Array.isArray(result) || !result[0]?.files) throw new Error('npm pack --dry-run did not return file metadata')
   return result[0]
+}
+
+function assertPackMetadata(pack) {
+  if (pack.name !== packageJson.name) failures.push(`npm pack name must be ${packageJson.name}`)
+  if (pack.version !== packageJson.version) failures.push(`npm pack version must be ${packageJson.version}`)
+  if (pack.id !== `${packageJson.name}@${packageJson.version}`) {
+    failures.push(`npm pack id must be ${packageJson.name}@${packageJson.version}`)
+  }
+  if (pack.filename !== expectedPackFilename()) {
+    failures.push(`npm pack filename must be ${expectedPackFilename()}`)
+  }
+  if (!/^[a-f0-9]{40}$/.test(pack.shasum ?? '')) failures.push('npm pack must report a sha1 shasum')
+  if (!/^sha512-[A-Za-z0-9+/=]+$/.test(pack.integrity ?? '')) failures.push('npm pack must report sha512 integrity')
+  if (pack.entryCount !== pack.files.length) failures.push('npm pack entryCount must match files.length')
+  if (!Array.isArray(pack.bundled) || pack.bundled.length > 0) failures.push('npm pack must not bundle dependencies')
+}
+
+function expectedPackFilename() {
+  return `${packageJson.name.replace(/^@/, '').replace(/\//g, '-')}-${packageJson.version}.tgz`
 }
 
 function isAllowedPackedPath(path) {
