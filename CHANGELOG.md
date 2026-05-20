@@ -9,4 +9,4 @@
 - README documents the source, demo, and release-script code structure for external consumers and contributors.
 - Release preflight can verify that the current package version is still unpublished on the public npm registry.
 - `release:check` runs the full local gate and the npm registry preflight before publishing.
-- Package verification covers repository hygiene, package independence, React peer compatibility, conditional ESM/CJS declaration exports, packed files, actual npm pack tarball integrity, published docs, documented public publish command, side effects, ESM/CJS runtime imports, README Quick Start type checks, npm tarball installation, Vite bundling, TypeScript consumer imports, and demo smoke tests.
+- Package verification covers repository hygiene, package independence, React peer compatibility, conditional ESM/CJS declaration and runtime exports, packed files, actual npm pack tarball integrity, published docs, documented public publish command, side effects, ESM/CJS runtime imports, README Quick Start type checks, npm tarball installation, Vite bundling, TypeScript consumer imports, and demo smoke tests.

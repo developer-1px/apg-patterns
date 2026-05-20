@@ -1,4 +1,5 @@
 import { access, mkdir, mkdtemp, readFile, rm, symlink } from 'node:fs/promises'
+import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -6,6 +7,7 @@ import ts from 'typescript'
 
 const repoRoot = new URL('../', import.meta.url)
 const repoRootPath = fileURLToPath(repoRoot)
+const require = createRequire(import.meta.url)
 const packageJson = JSON.parse(await readFile(new URL('package.json', repoRoot), 'utf8'))
 const checkedPaths = new Set()
 const missing = []
@@ -21,6 +23,29 @@ const declarationSurfaces = [
     root: 'dist/index.d.cts',
     core: 'dist/core.d.cts',
     react: 'dist/react.d.cts',
+  },
+]
+const runtimeSurfaces = [
+  {
+    label: 'root',
+    esm: 'dist/index.js',
+    cjs: 'dist/index.cjs',
+    esmDeclaration: 'dist/index.d.ts',
+    cjsDeclaration: 'dist/index.d.cts',
+  },
+  {
+    label: './core',
+    esm: 'dist/core.js',
+    cjs: 'dist/core.cjs',
+    esmDeclaration: 'dist/core.d.ts',
+    cjsDeclaration: 'dist/core.d.cts',
+  },
+  {
+    label: './react',
+    esm: 'dist/react.js',
+    cjs: 'dist/react.cjs',
+    esmDeclaration: 'dist/react.d.ts',
+    cjsDeclaration: 'dist/react.d.cts',
   },
 ]
 const reactAdapterExports = [
@@ -106,12 +131,13 @@ if (missing.length > 0) {
 
 assertDeclarationExportSurface()
 await assertConditionalDeclarationResolution()
+await assertRuntimeExportSurface()
 
 if (missing.length > 0) {
   throw new Error(`package export validation failed:\n${missing.join('\n')}`)
 }
 
-console.log(`package manifest references ${checkedPaths.size} existing files or directories, and ESM/CJS declaration exports plus TypeScript resolution preserve root/core/react boundaries`)
+console.log(`package manifest references ${checkedPaths.size} existing files or directories, and ESM/CJS declaration/runtime exports plus TypeScript resolution preserve root/core/react boundaries`)
 
 async function visitExports(value, label) {
   if (typeof value === 'string') {
@@ -251,6 +277,41 @@ function resolvePackageSpecifier(tempRoot, specifier, resolutionMode) {
     undefined,
     resolutionMode,
   ).resolvedModule?.resolvedFileName
+}
+
+async function assertRuntimeExportSurface() {
+  const surfaces = []
+
+  for (const entry of runtimeSurfaces) {
+    const exports = {
+      esm: await runtimeExports(entry.esm, 'esm'),
+      cjs: await runtimeExports(entry.cjs, 'cjs'),
+    }
+    const runtimeLabel = `${entry.label} runtime exports`
+
+    expectExactExportSet(exports.esm, exports.cjs, `${entry.label} ESM runtime exports`, `${entry.label} CJS runtime exports`)
+    expectExportSuperset(declarationExports(entry.esmDeclaration), exports.esm, `${entry.label} ESM declaration exports`, `${entry.label} ESM runtime exports`)
+    expectExportSuperset(declarationExports(entry.cjsDeclaration), exports.cjs, `${entry.label} CJS declaration exports`, `${entry.label} CJS runtime exports`)
+
+    if (exports.esm.has('default')) missing.push(`${runtimeLabel} must not expose an ESM default export`)
+    if (exports.cjs.has('default')) missing.push(`${runtimeLabel} must not expose a CJS default export`)
+
+    surfaces.push({ label: entry.label, exports: exports.esm })
+  }
+
+  const root = surfaces.find((surface) => surface.label === 'root')
+  const core = surfaces.find((surface) => surface.label === './core')
+  const react = surfaces.find((surface) => surface.label === './react')
+  if (!root || !core || !react) return
+
+  expectExactExportSet(root.exports, core.exports, 'root runtime exports', './core runtime exports')
+  expectExportSuperset(react.exports, core.exports, './react runtime exports', './core runtime exports')
+}
+
+async function runtimeExports(packagePath, moduleKind) {
+  const path = fileURLToPath(new URL(packagePath, repoRoot))
+  const module = moduleKind === 'esm' ? await import(new URL(packagePath, repoRoot)) : require(path)
+  return new Set(Object.keys(module))
 }
 
 function assertPublicEntryDeclarationExports(label, exports) {
