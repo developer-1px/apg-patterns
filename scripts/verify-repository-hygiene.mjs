@@ -1,4 +1,5 @@
 import { execFileSync } from 'node:child_process'
+import { readFileSync } from 'node:fs'
 
 const trackedFiles = gitFiles(['ls-files'])
 const ignoredTrackedFiles = gitFiles(['ls-files', '-i', '--exclude-standard', '-c'])
@@ -58,6 +59,8 @@ for (const rule of forbiddenTrackedRules) {
   }
 }
 
+assertBugDocsResolved()
+
 if (failures.length > 0) {
   console.error(`Repository hygiene check failed:\n${failures.map((failure) => `- ${failure}`).join('\n')}`)
   process.exit(1)
@@ -72,4 +75,20 @@ function gitFiles(args) {
 
 function formatList(paths) {
   return paths.map((path) => `  ${path}`).join('\n')
+}
+
+function assertBugDocsResolved() {
+  const bugDocs = trackedFiles.filter((path) => /^docs\/bugs\/.+\.md$/.test(path))
+  for (const path of bugDocs) {
+    const source = readFileSync(path, 'utf8')
+    if (!/^- Status:\s+Resolved\s*$/m.test(source)) {
+      failures.push(`${path} must be marked "Status: Resolved" before release`)
+    }
+    if (!/^- Progress:\s+100\s*\/\s*100\s*$/m.test(source)) {
+      failures.push(`${path} must be marked "Progress: 100 / 100" before release`)
+    }
+    if (!/^- Resolution:\s+\S.+$/m.test(source)) {
+      failures.push(`${path} must include a concrete Resolution line`)
+    }
+  }
 }
