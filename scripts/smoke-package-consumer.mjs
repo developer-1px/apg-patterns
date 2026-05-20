@@ -28,7 +28,7 @@ try {
     smokeKind: 'core',
   })
 
-  console.log('package consumer smoke passed for ESM, CJS, TypeScript, React-free root/core imports, and React subpath imports.')
+  console.log('package consumer smoke passed for ESM, CJS, TypeScript, React-free root/core imports, and React TSX subpath imports.')
 } finally {
   rmSync(tempRoot, { recursive: true, force: true })
 }
@@ -77,6 +77,7 @@ function linkPackageDependency(nodeModules, name) {
 }
 
 function writeConsumerFiles(consumerRoot, smokeKind) {
+  const typeSmokeFilename = smokeKind === 'react' ? 'type-smoke.tsx' : 'type-smoke.ts'
   writeFileSync(join(consumerRoot, 'package.json'), JSON.stringify({ private: true, type: 'module' }, null, 2))
   writeFileSync(join(consumerRoot, 'esm-smoke.mjs'), runtimeSmokeSource('esm', smokeKind))
   writeFileSync(join(consumerRoot, 'cjs-smoke.cjs'), runtimeSmokeSource('cjs', smokeKind))
@@ -90,12 +91,12 @@ function writeConsumerFiles(consumerRoot, smokeKind) {
       lib: ['ES2022', 'DOM'],
       skipLibCheck: false,
     },
-    include: ['type-smoke.ts'],
+    include: [typeSmokeFilename],
   }, null, 2))
   const typeSmoke = smokeKind === 'core' || smokeKind === 'root'
     ? coreTypeSmokeSource(smokeKind === 'core' ? '@interactive-os/apg-patterns/core' : '@interactive-os/apg-patterns')
-    : readFileSync(new URL('./fixtures/package-consumer-type-smoke.ts', import.meta.url), 'utf8')
-  writeFileSync(join(consumerRoot, 'type-smoke.ts'), typeSmoke)
+    : readFileSync(new URL('./fixtures/package-consumer-react-type-smoke.tsx', import.meta.url), 'utf8')
+  writeFileSync(join(consumerRoot, typeSmokeFilename), typeSmoke)
 }
 
 function runtimeSmokeSource(moduleKind, smokeKind) {
