@@ -15,12 +15,12 @@
   "author": "Interactive OS",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/interactive-os/apg-patterns.git"
+    "url": "git+https://github.com/developer-1px/apg-patterns.git"
   },
   "bugs": {
-    "url": "https://github.com/interactive-os/apg-patterns/issues"
+    "url": "https://github.com/developer-1px/apg-patterns/issues"
   },
-  "homepage": "https://github.com/interactive-os/apg-patterns#readme",
+  "homepage": "https://developer-1px.github.io/apg-patterns/",
   "type": "module",
   "packageManager": "npm@11.6.2",
   "engines": {

@@ -5,9 +5,13 @@ const trackedFiles = gitFiles(['ls-files'])
 const ignoredTrackedFiles = gitFiles(['ls-files', '-i', '--exclude-standard', '-c'])
 const releaseCheckWorkflowPath = '.github/workflows/release-check.yml'
 const publishWorkflowPath = '.github/workflows/publish.yml'
+const pagesWorkflowPath = '.github/workflows/pages.yml'
 const checkoutActionRef = 'actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd'
 const setupNodeActionRef = 'actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e'
 const uploadArtifactActionRef = 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02'
+const configurePagesActionRef = 'actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b'
+const uploadPagesArtifactActionRef = 'actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa'
+const deployPagesActionRef = 'actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e'
 const forbiddenNpmTokenAuthMarkers = [
   'NPM_TOKEN',
   'NODE_AUTH_TOKEN',
@@ -78,6 +82,7 @@ for (const rule of forbiddenTrackedRules) {
 assertBugDocsResolved()
 assertReleaseCheckWorkflow()
 assertPublishWorkflow()
+assertPagesWorkflow()
 
 if (failures.length > 0) {
   console.error(`Repository hygiene check failed:\n${failures.map((failure) => `- ${failure}`).join('\n')}`)
@@ -160,6 +165,36 @@ function assertPublishWorkflow() {
     'npm publish --access public --provenance --registry https://registry.npmjs.org/',
   ])
   assertWorkflowExcludes(publishWorkflowPath, source, forbiddenNpmTokenAuthMarkers)
+}
+
+function assertPagesWorkflow() {
+  const source = readTrackedWorkflow(pagesWorkflowPath, 'GitHub Pages demo deployment')
+  assertWorkflowIncludes(pagesWorkflowPath, source, [
+    'push:',
+    'branches:',
+    '- main',
+    'workflow_dispatch:',
+    'contents: read',
+    'pages: write',
+    'id-token: write',
+    'environment:',
+    'name: github-pages',
+    'url: ${{ steps.deployment.outputs.page_url }}',
+    'concurrency:',
+    'group: pages-${{ github.ref }}',
+    'cancel-in-progress: true',
+    checkoutActionRef,
+    setupNodeActionRef,
+    'node-version: 24',
+    'package-manager-cache: false',
+    'npm install -g npm@11.6.2',
+    'npm ci',
+    'npm run demo:build',
+    configurePagesActionRef,
+    uploadPagesArtifactActionRef,
+    'path: demo/dist',
+    deployPagesActionRef,
+  ])
 }
 
 function readTrackedWorkflow(path, purpose) {

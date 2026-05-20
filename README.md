@@ -286,6 +286,8 @@ scripts/
 
 ## Demo
 
+https://developer-1px.github.io/apg-patterns/
+
 ```bash
 npm run demo
 ```
@@ -326,7 +328,7 @@ npm run check:apg
 
 `check:readme` type-checks the Quick Start and React API TypeScript examples against the built package and executes the root Quick Start.
 
-`check:repo` verifies that generated outputs, local environment files, IDE files, ignored paths, and release artifacts are not tracked by git, that tracked bug records are release-resolved, and that the GitHub Actions release workflows run the release preflight, upload the packed package artifact, and keep publishing on trusted OIDC auth instead of static npm tokens.
+`check:repo` verifies that generated outputs, local environment files, IDE files, ignored paths, and release artifacts are not tracked by git, that tracked bug records are release-resolved, that the Pages workflow deploys the demo, and that the GitHub Actions release workflows run the release preflight, upload the packed package artifact, and keep publishing on trusted OIDC auth instead of static npm tokens.
 
 `check:source-safety` scans tracked source files for credential material before the repository is made public.
 
@@ -340,7 +342,7 @@ After changing public exports, run `npm run update:api` after `npm run build` to
 
 `check:exports` validates package manifest paths, ESM/CJS conditional declaration and runtime export boundaries, and TypeScript declaration resolution for the root, `./core`, and `./react` entries.
 
-`check:publish` validates package metadata, public GitHub repository metadata and origin alignment, package-lock root and runtime dependency consistency, local-only dependency specs, packed tarball contents, credential-material scans, packed Markdown links and deferred-placeholder scans, npm provenance publish dry-run metadata, the documented public provenance publish command and registry, runtime external imports, portable sourcemaps with source content, and production source imports that would create public-entry circular initialization.
+`check:publish` validates package metadata, public GitHub repository metadata, GitHub Pages homepage metadata, origin alignment, package-lock root and runtime dependency consistency, local-only dependency specs, packed tarball contents, credential-material scans, packed Markdown links and deferred-placeholder scans, npm provenance publish dry-run metadata, the documented public provenance publish command and registry, runtime external imports, portable sourcemaps with source content, and production source imports that would create public-entry circular initialization.
 
 `check:signatures` verifies installed dependency registry signatures and available attestations with `npm audit signatures`.
 

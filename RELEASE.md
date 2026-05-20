@@ -4,8 +4,10 @@
 
 - Configure `origin` with the public GitHub repository before publishing.
 - Verify it with `git remote get-url origin`.
-- Keep `package.json` `repository`, `bugs`, and `homepage` aligned with the public GitHub repository.
+- Keep `package.json` `repository` and `bugs` aligned with the public GitHub repository.
+- Keep `package.json` `homepage` aligned with the GitHub Pages demo URL.
 - Configure the npm trusted publisher for the GitHub `Publish Package` workflow.
+- Keep the GitHub Pages workflow enabled for the demo.
 - Keep the GitHub environment `npm` required for the publish job.
 - Keep publish workflow concurrency grouped by git ref so duplicate manual runs for the same tag cannot publish in parallel.
 - Do not add static npm token authentication such as `NPM_TOKEN`, `NODE_AUTH_TOKEN`, or `_authToken`.

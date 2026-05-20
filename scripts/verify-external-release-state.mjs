@@ -122,13 +122,17 @@ function assertGitHubPackageMetadata(failures, packageJson, repository) {
   const expectedBugs = {
     url: `https://github.com/${repository.owner}/${repository.repo}/issues`,
   }
-  const expectedHomepage = `https://github.com/${repository.owner}/${repository.repo}#readme`
+  const expectedHomepage = githubPagesHomepage(repository)
 
   assertJsonEqual(failures, 'repository', packageJson.repository, expectedRepository)
   assertJsonEqual(failures, 'bugs', packageJson.bugs, expectedBugs)
   if (packageJson.homepage !== expectedHomepage) {
     failures.push(`homepage must be ${expectedHomepage}`)
   }
+}
+
+function githubPagesHomepage(repository) {
+  return `https://${repository.owner}.github.io/${repository.repo}/`
 }
 
 function assertJsonEqual(failures, label, actual, expected) {

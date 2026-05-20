@@ -20,7 +20,7 @@ const packageJson = {
   bugs: {
     url: 'https://github.com/scope/pkg/issues',
   },
-  homepage: 'https://github.com/scope/pkg#readme',
+  homepage: 'https://scope.github.io/pkg/',
 }
 
 describe('verify-external-release-state', () => {
