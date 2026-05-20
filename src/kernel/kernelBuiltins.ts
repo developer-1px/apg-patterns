@@ -1,7 +1,7 @@
 /**
- * Kernel 기본 어휘 등록 — 패턴 무관 공통 토큰의 resolver 구현.
+ * Kernel built-in vocabulary registration for pattern-agnostic token resolvers.
  *
- * 세부 등록은 범주별 파일에 둔다.
+ * Category-specific registration stays in the category modules.
  */
 import { registerKernelAriaSources } from './kernelAriaSources'
 import { registerKernelNavigationTargets } from './kernelNavigationTargets'

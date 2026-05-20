@@ -2,9 +2,9 @@ import type { z } from 'zod'
 import { validateRefsRefs, validateRelationRefs, validateStateRefs } from './patternDataRefValidators'
 
 /**
- * PatternData 의 cross-field referential integrity 검증.
- * 모든 relations/state/refs 키가 items 에 존재하는지 확인한다.
- * PatternDataSchema 의 .superRefine 으로 attach 된다.
+ * Cross-field referential integrity checks for PatternData.
+ * Every relations/state/refs key must exist in items.
+ * Attached through PatternDataSchema.superRefine.
  */
 export const validatePatternDataRefs = (
   value: {

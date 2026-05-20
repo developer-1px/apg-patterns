@@ -19,11 +19,11 @@ export interface PatternRuntime<TData extends PatternData = PatternData> {
   data: TData
   options: PatternOptions
   visibleKeys: readonly Key[]
-  /** Root part 의 slot props. onKeyDown handler 자동 포함. */
+  /** Slot props for the root part, including the generated onKeyDown handler. */
   getRootProps(): SlotProps
-  /** Item part 의 slot props. key 필수. */
+  /** Slot props for an item part. Requires an item key. */
   getItemProps(partName: string, key: Key): SlotProps
-  /** Deprecated: getRootProps()/getItemProps() 를 직접 사용하라. */
+  /** Deprecated: use getRootProps()/getItemProps() directly. */
   getPartProps(partName: string, key?: Key): SlotProps
   getRootKeyboardHandler(): (event: KeyInput & { preventDefault?: () => void }) => void
   resolveKeyboardBinding(input: KeyInput, activeKey: Key): { events: readonly PatternEvent[]; preventDefault: boolean } | null
@@ -41,7 +41,7 @@ export interface CreatePatternRuntimeInput {
 }
 
 export function createPatternRuntime<TData extends PatternData = PatternData>(input: Omit<CreatePatternRuntimeInput, 'data'> & { data: TData }): PatternRuntime<TData> {
-  // 진입 시점 fail-fast — schema 위반을 boundary 에서 잡는다.
+  // Fail fast at the runtime boundary so schema violations are localized.
   const definition = PatternDefinitionSchema.parse(input.definition)
   const data = PatternDataSchema.parse(input.data) as TData
   const options = PatternOptionsSchema.parse(input.options ?? {})
@@ -77,7 +77,7 @@ export function createPatternRuntime<TData extends PatternData = PatternData>(in
 
   const rootPartName = Object.keys(definition.parts).find((name) => definition.parts[name]?.role === definition.rootRole)
   const getRootProps = (): SlotProps => {
-    if (!rootPartName) throw new Error(`[apg-pattern] no part with role "${definition.rootRole}" found — definition.parts 중 root role 과 일치하는 부품이 없음.`)
+    if (!rootPartName) throw new Error(`[apg-pattern] no part with role "${definition.rootRole}" found in definition.parts.`)
     return getPartProps(rootPartName)
   }
   const getItemProps = (partName: string, key: Key): SlotProps => getPartProps(partName, key)

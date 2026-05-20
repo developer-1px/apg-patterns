@@ -88,6 +88,6 @@ export function createTreeviewRuntime(input: CreateTreeviewRuntimeInput): Treevi
 export { getTreeItemState } from './renderState'
 export { resolveTreeviewKeyboardBinding, resolveTreeviewNavigationTarget } from './runtimeCompatibility'
 
-// 호환용 re-export — 기존 import 경로 유지
+// Compatibility re-export for existing import paths.
 export { resolveEventTemplate, evaluatePredicate, createParentByKey } from '../../kernel/patternKernel'
 export { resolveTypeaheadTarget, resolveTreeviewVisibleKeys } from './typeahead'

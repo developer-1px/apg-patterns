@@ -64,7 +64,7 @@ export function reducePatternData(definition: PatternDefinition, data: PatternDa
     return withLastEventReason(reduceValueEvent(data, event), event)
   }
 
-  // 'activate'/'typeahead'/'dismiss'/'extension' 는 outbound-only signal — state 미갱신 (의도).
+  // 'activate'/'typeahead'/'dismiss'/'extension' are outbound-only signals.
   return withLastEventReason(data, event)
 }
 

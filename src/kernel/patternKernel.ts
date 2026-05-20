@@ -1,15 +1,15 @@
 /**
- * Pattern Kernel — APG 패턴의 generic 메커니즘.
+ * Pattern Kernel - generic APG pattern mechanisms.
  *
- * 안/밖 분리:
- *   - 안: registry + resolver 디스패치 + fallback (이 파일)
- *   - 밖: 각 패턴 정의 파일에서 자기 토큰의 resolver 를 register* 로 등록
+ * Boundary split:
+ *   - inside: registries, resolver dispatch, and fallbacks in this file
+ *   - outside: each pattern definition registers its own token resolvers
  *
- * 등록되지 않은 토큰은 resolve 시점에 진단 에러로 throw — schema 가 enum 으로
- * 닫지 않은 대신 runtime 단일 지점에서 잡는다.
+ * Unknown tokens fail at resolve time with diagnostic errors. The schema stays
+ * extensible instead of closing every token set as an enum.
  *
- * 기본 어휘 등록은 kernelBuiltins.ts, runtime factory 는 patternRuntime.ts,
- * reducer 는 patternReducer.ts 로 분리되어 있다.
+ * Built-in vocabulary registration lives in kernelBuiltins.ts, runtime factory
+ * logic in patternRuntime.ts, and reducer logic in patternReducer.ts.
  */
 import type { KeyInput, ModifierKeyName } from '../internal/keyboard'
 import type { Key, PatternData, PatternOptions } from '../schema'
@@ -66,7 +66,7 @@ export type {
   VisibleOrderResolver,
 }
 
-// KeyInput 재export — root onKeyDown handler 의 입력 형이 외부에서 보이도록.
+// Re-export KeyInput so root onKeyDown handler input is public.
 export type { KeyInput, ModifierKeyName }
 
 // ─────────────────────────────────────────────────────────────

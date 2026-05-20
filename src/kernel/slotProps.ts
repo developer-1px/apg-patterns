@@ -7,7 +7,7 @@ export function resolveAriaProjections(projections: readonly AriaProjection[], c
   for (const projection of projections) {
     if (projection.when && !evaluatePredicate(projection.when, ctx)) continue
     const value = resolveAriaSource(projection.from, ctx)
-    // undefined 만 suppress — false 는 그대로 emit (ARIA 명시적 "false" 의무).
+    // Suppress only undefined; explicit ARIA false values must still be emitted.
     if (value !== undefined) out[projection.attribute] = value
   }
   return out

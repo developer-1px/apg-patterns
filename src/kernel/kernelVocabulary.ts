@@ -1,21 +1,24 @@
 /**
- * Kernel 이 기본 등록하는 토큰의 type-safe 상수 모음.
+ * Type-safe constants for the token vocabulary registered by the kernel.
  *
- * 이유:
- *   - 토큰 어휘가 `z.string()` 으로 열려 있어 LLM/사람이 임의로 발명하면 fragmentation 발생.
- *     (관측 사례: 한 agent 가 `menu.firstChild` 를 발명했지만 kernel/treeview 에는 unscoped `firstChild` 가 이미 존재.)
- *   - 이 모듈을 import 해서 상수로 참조하면 IDE autocomplete + typo 차단 + 어휘 통일 효과.
+ * Rationale:
+ *   - Token sets stay open through `z.string()`, so invented names can fragment
+ *     the vocabulary. For example, `menu.firstChild` duplicated the existing
+ *     unscoped `firstChild` token from the kernel/treeview surface.
+ *   - Importing these constants gives callers IDE autocomplete, typo guards,
+ *     and one canonical vocabulary.
  *
- * 사용 예:
+ * Example:
  *   import { AriaSources, NavigationTargets, Directions } from './kernelVocabulary'
  *   { attribute: 'aria-label', from: AriaSources.refs.label }
  *   { kind: NavigationTargets.linear, action: Directions.next }
  *
- * 새 토큰을 등록하면 여기에도 상수를 추가한다 — 그게 정본(canonical) 어휘다.
- * 등록만 하고 상수를 안 추가하면 "비공식 어휘" — 다른 패턴이 못 발견한다.
+ * When a new token is registered, add a constant here as the canonical
+ * vocabulary. A registered token without a constant is harder for other
+ * patterns to discover.
  */
 
-// AriaSource — 부품의 ARIA attribute 값을 가져오는 토큰
+// AriaSource tokens used to derive ARIA attribute values for parts.
 export const AriaSources = {
   refs: {
     label: 'refs.label',
@@ -49,7 +52,7 @@ export const AriaSources = {
   },
 } as const
 
-// StateProjection.from — 부품의 렌더 state(active/selected/...) 의 출처 토큰
+// StateProjection.from tokens used to derive render state for parts.
 export const StateSources = {
   activeKey: 'state.activeKey',
   selectedKeys: 'state.selectedKeys',
@@ -58,23 +61,23 @@ export const StateSources = {
   checkedByKey: 'state.checkedByKey',
 } as const
 
-// NavigationTarget.kind — kernel 이 기본 등록한 navigation target
+// NavigationTarget.kind tokens registered by the kernel.
 export const NavigationTargets = {
-  linear: 'linear',          // visibleKeys 위 next/previous/first/last
-  firstChild: 'firstChild',  // 자식 첫 항목 (트리)
-  parentKey: 'parentKey',    // 부모 (트리)
+  linear: 'linear',          // next/previous/first/last over visibleKeys
+  firstChild: 'firstChild',  // first child item for tree patterns
+  parentKey: 'parentKey',    // parent item for tree patterns
 } as const
 
-// VisibleOrder.kind — kernel 이 기본 등록한 visible order
+// VisibleOrder.kind tokens registered by the kernel.
 export const VisibleOrders = {
-  flat: 'flat',                          // relations.rootKeys 평면 순회
-  treeVisibleDepthFirst: 'treeVisibleDepthFirst', // 트리 깊이우선
+  flat: 'flat',                          // flat traversal over relations.rootKeys
+  treeVisibleDepthFirst: 'treeVisibleDepthFirst', // tree depth-first traversal
 } as const
 
-// PatternDirection — navigate event 의 direction 어휘.
-// kernel 의 'linear' navigation target 이 인지하는 표준 verb.
-// 새 direction (예: pageUp/increment/...) 은 패턴이 자유롭게 사용하되,
-// 의미 충돌을 피하려면 여기 상수에 추가하고 navigationTarget resolver 가 처리해야 한다.
+// PatternDirection tokens for navigate events.
+// These are the standard verbs recognized by the kernel's 'linear' target.
+// Pattern-specific directions such as pageUp or increment may be added, but
+// shared meanings should become constants here and resolver behavior elsewhere.
 export const Directions = {
   next: 'next',
   previous: 'previous',
@@ -88,15 +91,15 @@ export const Directions = {
   right: 'right',
 } as const
 
-// KeyToken — EventTemplate / Predicate 안에서 key 자리를 가리키는 placeholder.
+// KeyToken placeholders used inside EventTemplate and Predicate values.
 export const KeyTokens = {
-  key: '$key',                 // 현재 이벤트가 발화된 part 의 key (item 키)
+  key: '$key',                 // item key for the part that emitted the event
   activeKey: '$activeKey',     // data.state.activeKey
-  anchorKey: '$anchorKey',     // multi-select 의 anchor
-  extentKey: '$extentKey',     // multi-select 의 extent
+  anchorKey: '$anchorKey',     // multi-select anchor
+  extentKey: '$extentKey',     // multi-select extent
 } as const
 
-// PartEventBinding.event — DOM event 이름. kernel 에서 React handler prop 으로 매핑된 어휘.
+// PartEventBinding.event DOM event names mapped to React handler props.
 export const DomEvents = {
   focus: 'focus',
   blur: 'blur',

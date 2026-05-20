@@ -50,6 +50,7 @@ const expectedExportEntries = {
 const expectedExportSubpaths = [...Object.keys(expectedExportEntries), './package.json']
 const expectedPackageFiles = ['dist', 'docs/proposals', 'README.md', 'API.md', 'CHANGELOG.md', 'LICENSE']
 const requiredPackageKeywords = ['aria', 'wai-aria', 'apg', 'patterns', 'react', 'zod', 'a11y']
+const hangulTextPattern = /[\u1100-\u11FF\u3130-\u318F\uAC00-\uD7AF]/
 const allowedDeclarationExternalSpecifiers = {
   'dist/index.d.ts': new Set(['zod']),
   'dist/index.d.cts': new Set(['zod']),
@@ -171,6 +172,7 @@ for (const [label, packagePath] of manifestRuntimePaths(packageJson)) {
 }
 
 for (const file of pack.files) {
+  assertPackedTextHasNoHangul(file.path)
   if (!isAllowedPackedPath(file.path)) failures.push(`packed tarball includes unexpected path ${file.path}`)
   if (/^(src|demo|scripts|coverage)\//.test(file.path)) failures.push(`packed tarball includes non-runtime path ${file.path}`)
   if (/\.test\.[cm]?[jt]sx?$/.test(file.path)) failures.push(`packed tarball includes test file ${file.path}`)
@@ -707,6 +709,13 @@ function assertPackFileMetadata(files) {
     if (file.mode !== 0o644) {
       failures.push(`npm pack file metadata mode for ${file.path} must be 0644`)
     }
+  }
+}
+
+function assertPackedTextHasNoHangul(path) {
+  const source = readFileSync(path, 'utf8')
+  if (hangulTextPattern.test(source)) {
+    failures.push(`${path} contains Hangul text in the published package`)
   }
 }
 

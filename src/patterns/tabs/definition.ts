@@ -7,7 +7,7 @@ import { tabsParts } from './parts'
 
 registerTabsNavigation()
 
-// flatTabs 별칭은 제거 — kernel 의 'flat' 을 재사용한다 (P1 fragmentation 통합).
+// The old flatTabs alias was removed; tabs now reuse the kernel 'flat' token.
 
 export const TabsDefinitionSchema: ZodType<PatternDefinition> = PatternDefinitionSchema.superRefine((value, ctx) => {
   const containedRoles = value.containedRoles ?? []
