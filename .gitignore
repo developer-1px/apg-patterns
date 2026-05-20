@@ -3,6 +3,8 @@ dist/
 demo/dist/
 coverage/
 .codex/
+.idea/
+.claude/*.lock
 .DS_Store
 *.log
 .env

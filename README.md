@@ -266,9 +266,10 @@ npm run demo
 npm run check
 ```
 
-`check` runs TypeScript validation, the Vitest suite, APG coverage validation, demo/source consistency checks, package manifest checks, the package build, API reference validation, export validation, publish-readiness validation, package consumer smoke tests including actual npm pack tarball integrity, published docs, npm tarball installation and Vite bundling, and the production demo smoke test:
+`check` runs repository hygiene validation, TypeScript validation, the Vitest suite, APG coverage validation, demo/source consistency checks, package manifest checks, the package build, API reference validation, export validation, publish-readiness validation, package consumer smoke tests including actual npm pack tarball integrity, published docs, npm tarball installation and Vite bundling, and the production demo smoke test:
 
 ```bash
+npm run check:repo
 npm run typecheck
 npm test
 npm run check:apg
@@ -291,6 +292,8 @@ npm run check:apg
 ```
 
 `check:readme` type-checks the Quick Start and React API TypeScript examples against the built package.
+
+`check:repo` verifies that generated outputs, local environment files, IDE files, and ignored paths are not tracked by git.
 
 `check:api` validates that API.md matches the built root, `./core`, and `./react` declaration export surfaces.
 
