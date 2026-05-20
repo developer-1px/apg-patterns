@@ -37,12 +37,18 @@ try {
   })
   runNpmInstalledConsumerSmoke({
     tarballPath,
+    consumerRoot: join(tempRoot, 'consumer-npm-install-core'),
+    includeReact: false,
+    smokeKind: 'core',
+  })
+  runNpmInstalledConsumerSmoke({
+    tarballPath,
     consumerRoot: join(tempRoot, 'consumer-npm-install-react'),
     includeReact: true,
     smokeKind: 'react',
   })
 
-  console.log('package consumer smoke passed for ESM, CJS, script-enabled npm tarball install with transitive runtime dependencies and optional React, Vite bundler build, NodeNext/Bundler/CJS TypeScript, package metadata, package export encapsulation, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
+  console.log('package consumer smoke passed for ESM, CJS, script-enabled npm tarball install with transitive runtime dependencies and optional React, Vite bundler builds for root/core/react, NodeNext/Bundler/CJS TypeScript, package metadata, package export encapsulation, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
 } finally {
   rmSync(tempRoot, { recursive: true, force: true })
 }
@@ -110,7 +116,7 @@ function runNpmInstalledConsumerSmoke({ tarballPath, consumerRoot, includeReact,
   execFileSync(join(repoRoot, 'node_modules/.bin/tsc'), ['--project', 'tsconfig.nodenext.json', '--noEmit'], { cwd: consumerRoot, stdio: 'pipe' })
   execFileSync(join(repoRoot, 'node_modules/.bin/tsc'), ['--project', 'tsconfig.bundler.json', '--noEmit'], { cwd: consumerRoot, stdio: 'pipe' })
   execFileSync(join(repoRoot, 'node_modules/.bin/tsc'), ['--project', 'tsconfig.cjs-nodenext.json', '--noEmit'], { cwd: consumerRoot, stdio: 'pipe' })
-  if (includeReact) runViteBundlerSmoke(consumerRoot)
+  runViteBundlerSmoke(consumerRoot, smokeKind)
 }
 
 function packCurrentPackage(destination) {
@@ -192,10 +198,10 @@ function writeConsumerFiles(consumerRoot, smokeKind, options = {}) {
   writeFileSync(join(consumerRoot, cjsTypeSmokeFilename), cjsTypeSmokeSource(smokeKind))
 }
 
-function runViteBundlerSmoke(consumerRoot) {
+function runViteBundlerSmoke(consumerRoot, smokeKind) {
   mkdirSync(join(consumerRoot, 'src'), { recursive: true })
   writeFileSync(join(consumerRoot, 'index.html'), '<!doctype html><html><body><div id="root"></div><script type="module" src="/src/main.ts"></script></body></html>\n')
-  writeFileSync(join(consumerRoot, 'src/main.ts'), viteConsumerSource())
+  writeFileSync(join(consumerRoot, 'src/main.ts'), viteConsumerSource(smokeKind))
   execFileSync(join(repoRoot, 'node_modules/.bin/vite'), ['build', '--logLevel', 'error'], {
     cwd: consumerRoot,
     stdio: 'pipe',
@@ -205,8 +211,9 @@ function runViteBundlerSmoke(consumerRoot) {
   }
 }
 
-function viteConsumerSource() {
-  return `import { createElement } from 'react'
+function viteConsumerSource(smokeKind) {
+  if (smokeKind === 'react') {
+    return `import { createElement } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Button, type PatternData, type PatternEvent } from '@interactive-os/apg-patterns/react'
 import { buttonDefinition, createPatternRuntime } from '@interactive-os/apg-patterns/core'
@@ -233,6 +240,28 @@ createRoot(root).render(createElement(Button, {
   data,
   onEvent: (event: PatternEvent) => events.push(event),
 }))
+`
+  }
+
+  const packagePath = smokeKind === 'core' ? '@interactive-os/apg-patterns/core' : '@interactive-os/apg-patterns'
+  return `import { buttonDefinition, createPatternRuntime, type PatternData, type PatternEvent } from '${packagePath}'
+
+const data: PatternData = {
+  items: { primary: { label: 'Primary' } },
+  relations: { rootKeys: ['primary'] },
+  state: { activeKey: 'primary' },
+}
+
+const events: PatternEvent[] = []
+const runtime = createPatternRuntime({
+  definition: buttonDefinition,
+  data,
+  onEvent: (event) => events.push(event),
+})
+
+if (runtime.visibleKeys[0] !== 'primary') throw new Error('runtime did not resolve visible keys')
+
+document.body.dataset.visibleKey = runtime.visibleKeys[0] ?? ''
 `
 }
 
