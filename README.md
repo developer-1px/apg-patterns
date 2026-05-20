@@ -255,7 +255,7 @@ The descriptor is attached where a pattern has a generated React facade surface.
 ## Demo
 
 ```bash
-pnpm demo
+npm run demo
 ```
 
 or:

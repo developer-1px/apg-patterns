@@ -21,6 +21,7 @@ if (packageJson.name?.startsWith('@') && packageJson.publishConfig?.access !== '
 if (!existsSync('README.md')) failures.push('README.md is required')
 if (!existsSync('CHANGELOG.md')) failures.push('CHANGELOG.md is required')
 if (!existsSync('LICENSE')) failures.push('LICENSE is required')
+assertReadmePackageManager()
 assertDependencyNames('dependencies', packageJson.dependencies, ['zod'])
 assertDependencyNames('peerDependencies', packageJson.peerDependencies, ['react'])
 assertDependencyNames('optionalDependencies', packageJson.optionalDependencies, [])
@@ -136,6 +137,13 @@ function dependencySections(pkg) {
     peerDependencies: pkg.peerDependencies ?? {},
     optionalDependencies: pkg.optionalDependencies ?? {},
     bundledDependencies: pkg.bundledDependencies ?? {},
+  }
+}
+
+function assertReadmePackageManager() {
+  const readme = readFileSync('README.md', 'utf8')
+  if (packageJson.packageManager?.startsWith('npm@') && /\b(?:pnpm|yarn)\s+(?:add|install|demo|run)\b/.test(readme)) {
+    failures.push('README command examples must use npm because packageManager is npm')
   }
 }
 
