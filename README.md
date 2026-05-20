@@ -9,15 +9,25 @@ The package models APG behavior as serializable `PatternDefinition` data, valida
 ## Install
 
 ```bash
+npm install @interactive-os/apg-patterns
+```
+
+`zod` is installed as a runtime dependency.
+
+For React hooks and preset components:
+
+```bash
 npm install @interactive-os/apg-patterns react
 ```
 
-`zod` is installed as a runtime dependency. `react` is a peer dependency because the public package entry includes React hooks and preset components.
+Use `@interactive-os/apg-patterns/core` for schema, runtime, and serializable pattern definitions without React.
+
+Use `@interactive-os/apg-patterns/react` for React hooks and preset components.
 
 ## Quick Start
 
 ```tsx
-import { Button, type PatternData, type PatternEvent } from '@interactive-os/apg-patterns'
+import { buttonDefinition, createPatternRuntime, type PatternData, type PatternEvent } from '@interactive-os/apg-patterns/core'
 
 const data: PatternData = {
   items: { primary: { label: 'Save' } },
@@ -25,12 +35,23 @@ const data: PatternData = {
   state: { activeKey: 'primary' },
 }
 
-function Example() {
-  const onEvent = (event: PatternEvent) => {
-    if (event.type === 'press') console.log(event.key)
-  }
+const events: PatternEvent[] = []
+const runtime = createPatternRuntime({
+  definition: buttonDefinition,
+  data,
+  onEvent: (event) => events.push(event),
+})
 
-  return <Button data={data} onEvent={onEvent} />
+runtime.getPartProps('button', 'primary')
+```
+
+React:
+
+```tsx
+import { Button, type PatternData, type PatternEvent } from '@interactive-os/apg-patterns/react'
+
+function Example(props: { data: PatternData; onEvent: (event: PatternEvent) => void }) {
+  return <Button data={props.data} onEvent={props.onEvent} />
 }
 ```
 

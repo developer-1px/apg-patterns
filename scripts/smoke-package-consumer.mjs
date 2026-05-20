@@ -9,28 +9,44 @@ const tempRoot = mkdtempSync(join(tmpdir(), 'apg-patterns-consumer-'))
 
 try {
   const tarballPath = packCurrentPackage(tempRoot)
-  const consumerRoot = join(tempRoot, 'consumer')
+  runConsumerSmoke({
+    tarballPath,
+    consumerRoot: join(tempRoot, 'consumer-react'),
+    includeReact: true,
+    smokeKind: 'react',
+  })
+  runConsumerSmoke({
+    tarballPath,
+    consumerRoot: join(tempRoot, 'consumer-core'),
+    includeReact: false,
+    smokeKind: 'core',
+  })
+
+  console.log('package consumer smoke passed for ESM, CJS, TypeScript, and React-free core imports.')
+} finally {
+  rmSync(tempRoot, { recursive: true, force: true })
+}
+
+function runConsumerSmoke({ tarballPath, consumerRoot, includeReact, smokeKind }) {
   const nodeModules = join(consumerRoot, 'node_modules')
   const packageRoot = join(nodeModules, '@interactive-os', 'apg-patterns')
 
   mkdirSync(join(nodeModules, '@interactive-os'), { recursive: true })
-  mkdirSync(join(nodeModules, '@types'), { recursive: true })
   execFileSync('tar', ['-xzf', tarballPath, '-C', join(nodeModules, '@interactive-os')], { cwd: repoRoot })
   renameSync(join(nodeModules, '@interactive-os', 'package'), packageRoot)
 
   linkPackageDependency(nodeModules, 'zod')
-  linkPackageDependency(nodeModules, 'react')
-  linkPackageDependency(nodeModules, '@types/react')
-  linkPackageDependency(nodeModules, 'csstype')
+  if (includeReact) {
+    mkdirSync(join(nodeModules, '@types'), { recursive: true })
+    linkPackageDependency(nodeModules, 'react')
+    linkPackageDependency(nodeModules, '@types/react')
+    linkPackageDependency(nodeModules, 'csstype')
+  }
 
-  writeConsumerFiles(consumerRoot)
+  writeConsumerFiles(consumerRoot, smokeKind)
   execFileSync(process.execPath, ['esm-smoke.mjs'], { cwd: consumerRoot, stdio: 'pipe' })
   execFileSync(process.execPath, ['cjs-smoke.cjs'], { cwd: consumerRoot, stdio: 'pipe' })
   execFileSync(join(repoRoot, 'node_modules/.bin/tsc'), ['--project', 'tsconfig.json', '--noEmit'], { cwd: consumerRoot, stdio: 'pipe' })
-
-  console.log('package consumer smoke passed for ESM, CJS, and TypeScript.')
-} finally {
-  rmSync(tempRoot, { recursive: true, force: true })
 }
 
 function packCurrentPackage(destination) {
@@ -54,10 +70,10 @@ function linkPackageDependency(nodeModules, name) {
   symlinkSync(source, target, 'dir')
 }
 
-function writeConsumerFiles(consumerRoot) {
+function writeConsumerFiles(consumerRoot, smokeKind) {
   writeFileSync(join(consumerRoot, 'package.json'), JSON.stringify({ private: true, type: 'module' }, null, 2))
-  writeFileSync(join(consumerRoot, 'esm-smoke.mjs'), runtimeSmokeSource('esm'))
-  writeFileSync(join(consumerRoot, 'cjs-smoke.cjs'), runtimeSmokeSource('cjs'))
+  writeFileSync(join(consumerRoot, 'esm-smoke.mjs'), runtimeSmokeSource('esm', smokeKind))
+  writeFileSync(join(consumerRoot, 'cjs-smoke.cjs'), runtimeSmokeSource('cjs', smokeKind))
   writeFileSync(join(consumerRoot, 'tsconfig.json'), JSON.stringify({
     compilerOptions: {
       strict: true,
@@ -70,13 +86,22 @@ function writeConsumerFiles(consumerRoot) {
     },
     include: ['type-smoke.ts'],
   }, null, 2))
-  writeFileSync(join(consumerRoot, 'type-smoke.ts'), readFileSync(new URL('./fixtures/package-consumer-type-smoke.ts', import.meta.url), 'utf8'))
+  const typeSmoke = smokeKind === 'core'
+    ? coreTypeSmokeSource()
+    : readFileSync(new URL('./fixtures/package-consumer-type-smoke.ts', import.meta.url), 'utf8')
+  writeFileSync(join(consumerRoot, 'type-smoke.ts'), typeSmoke)
 }
 
-function runtimeSmokeSource(moduleKind) {
+function runtimeSmokeSource(moduleKind, smokeKind) {
+  const packagePath = smokeKind === 'core' ? '@interactive-os/apg-patterns/core' : '@interactive-os/apg-patterns'
   const importLine = moduleKind === 'esm'
-    ? "import { buttonDefinition, createPatternRuntime } from '@interactive-os/apg-patterns'"
-    : "const { buttonDefinition, createPatternRuntime } = require('@interactive-os/apg-patterns')"
+    ? `import { buttonDefinition, createPatternRuntime } from '${packagePath}'`
+    : `const { buttonDefinition, createPatternRuntime } = require('${packagePath}')`
+  const reactSmoke = smokeKind === 'core'
+    ? ''
+    : moduleKind === 'esm'
+      ? "\nconst { Button } = await import('@interactive-os/apg-patterns/react')\nif (typeof Button !== 'function') throw new Error('react subpath did not expose Button')\n"
+      : "\nconst { Button } = require('@interactive-os/apg-patterns/react')\nif (typeof Button !== 'function') throw new Error('react subpath did not expose Button')\n"
 
   return `${importLine}
 
@@ -96,5 +121,41 @@ const runtime = createPatternRuntime({
 if (buttonDefinition.apgPattern !== 'button') throw new Error('button definition was not loaded')
 if (runtime.visibleKeys[0] !== 'primary') throw new Error('runtime did not resolve visible keys')
 if (typeof runtime.getRootKeyboardHandler() !== 'function') throw new Error('runtime keyboard handler missing')
+${reactSmoke}
+`
+}
+
+function coreTypeSmokeSource() {
+  return `import {
+  buttonDefinition,
+  createPatternRuntime,
+  type KeyInput,
+  type PatternData,
+  type PatternEvent,
+} from '@interactive-os/apg-patterns/core'
+
+const data: PatternData = {
+  items: { primary: { label: 'Primary' } },
+  relations: { rootKeys: ['primary'] },
+  state: { activeKey: 'primary' },
+}
+
+const events: PatternEvent[] = []
+const runtime = createPatternRuntime({
+  definition: buttonDefinition,
+  data,
+  onEvent: (event) => events.push(event),
+})
+
+const keyInput: KeyInput = {
+  key: 'Enter',
+  ctrlKey: false,
+  shiftKey: false,
+  altKey: false,
+  metaKey: false,
+}
+
+runtime.resolveKeyboardBinding(keyInput, 'primary')
+void runtime
 `
 }

@@ -25,7 +25,14 @@ for (const filePath of sourceFiles) {
 }
 
 const expectedSourceFiles = [...new Set([...registrationFiles, ...patternDefinitionFiles])].sort((a, b) => a.localeCompare(b))
-const expectedDistFiles = ['./dist/index.js', './dist/index.cjs']
+const expectedDistFiles = [
+  './dist/index.js',
+  './dist/index.cjs',
+  './dist/core.js',
+  './dist/core.cjs',
+  './dist/react.js',
+  './dist/react.cjs',
+]
 const missing = []
 const unexpected = sideEffects.filter((pattern) => !expectedDistFiles.includes(pattern))
 

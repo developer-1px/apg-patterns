@@ -15,7 +15,11 @@
   "type": "module",
   "sideEffects": [
     "./dist/index.js",
-    "./dist/index.cjs"
+    "./dist/index.cjs",
+    "./dist/core.js",
+    "./dist/core.cjs",
+    "./dist/react.js",
+    "./dist/react.cjs"
   ],
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -25,6 +29,16 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./core": {
+      "types": "./dist/core.d.ts",
+      "import": "./dist/core.js",
+      "require": "./dist/core.cjs"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js",
+      "require": "./dist/react.cjs"
     }
   },
   "files": [
@@ -56,6 +70,11 @@
   },
   "peerDependencies": {
     "react": "^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.0",

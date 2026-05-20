@@ -29,7 +29,7 @@ for (const sourceImport of productionIndexImports()) {
 
 const pack = readPackManifest()
 const packedPaths = new Set(pack.files.map((file) => file.path))
-const allowedPackedPaths = new Set([
+const requiredPackedPaths = [
   'package.json',
   'README.md',
   'LICENSE',
@@ -39,9 +39,21 @@ const allowedPackedPaths = new Set([
   'dist/index.cjs.map',
   'dist/index.d.ts',
   'dist/index.d.cts',
-])
+  'dist/core.js',
+  'dist/core.js.map',
+  'dist/core.cjs',
+  'dist/core.cjs.map',
+  'dist/core.d.ts',
+  'dist/core.d.cts',
+  'dist/react.js',
+  'dist/react.js.map',
+  'dist/react.cjs',
+  'dist/react.cjs.map',
+  'dist/react.d.ts',
+  'dist/react.d.cts',
+]
 
-for (const requiredPath of ['package.json', 'README.md', 'LICENSE', 'dist/index.js', 'dist/index.cjs', 'dist/index.d.ts', 'dist/index.d.cts']) {
+for (const requiredPath of requiredPackedPaths) {
   if (!packedPaths.has(requiredPath)) failures.push(`packed tarball missing ${requiredPath}`)
 }
 
@@ -54,11 +66,16 @@ for (const sideEffectPath of packageJson.sideEffects ?? []) {
   if (!packedPaths.has(packedPath)) failures.push(`sideEffects references unpacked path ${sideEffectPath}`)
 }
 
+for (const [label, packagePath] of manifestRuntimePaths(packageJson)) {
+  const packedPath = packagePath.replace(/^\.\//, '')
+  if (!packedPaths.has(packedPath)) failures.push(`${label} references unpacked path ${packagePath}`)
+}
+
 for (const file of pack.files) {
-  if (!allowedPackedPaths.has(file.path)) failures.push(`packed tarball includes unexpected path ${file.path}`)
+  if (!isAllowedPackedPath(file.path)) failures.push(`packed tarball includes unexpected path ${file.path}`)
   if (/^(src|demo|scripts|docs|coverage)\//.test(file.path)) failures.push(`packed tarball includes non-runtime path ${file.path}`)
   if (/\.test\.[cm]?[jt]sx?$/.test(file.path)) failures.push(`packed tarball includes test file ${file.path}`)
-  if (/^dist\/index\.d\.(ts|cts)$/.test(file.path) && file.size > maxDeclarationBytes) {
+  if (/^dist\/(?:index|core|react)\.d\.(ts|cts)$/.test(file.path) && file.size > maxDeclarationBytes) {
     failures.push(`${file.path} size ${file.size} exceeds ${maxDeclarationBytes} bytes`)
   }
 }
@@ -84,6 +101,30 @@ function readPackManifest() {
   const result = JSON.parse(stdout)
   if (!Array.isArray(result) || !result[0]?.files) throw new Error('npm pack --dry-run did not return file metadata')
   return result[0]
+}
+
+function isAllowedPackedPath(path) {
+  return requiredPackedPaths.includes(path) || /^dist\/chunk-[A-Z0-9]+\.(?:js|cjs)(?:\.map)?$/.test(path)
+}
+
+function manifestRuntimePaths(pkg) {
+  const paths = []
+  for (const field of ['main', 'module', 'types']) {
+    if (typeof pkg[field] === 'string') paths.push([field, pkg[field]])
+  }
+  collectExportPaths(pkg.exports, 'exports', paths)
+  return paths
+}
+
+function collectExportPaths(value, label, paths) {
+  if (typeof value === 'string') {
+    paths.push([label, value])
+    return
+  }
+  if (!value || typeof value !== 'object') return
+  for (const [key, child] of Object.entries(value)) {
+    collectExportPaths(child, `${label}.${key}`, paths)
+  }
 }
 
 function productionIndexImports() {
