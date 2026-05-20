@@ -32,6 +32,7 @@ const expectedExportEntries = {
   },
 }
 const expectedExportSubpaths = [...Object.keys(expectedExportEntries), './package.json']
+const expectedPackageFiles = ['dist', 'README.md', 'CHANGELOG.md', 'LICENSE']
 
 if (packageJson.private === true) failures.push('package must not be private')
 if (!packageJson.name) failures.push('package name is required')
@@ -51,6 +52,7 @@ assertDocumentationMetadata()
 assertReadmeCommandExamples()
 assertPackageScripts()
 assertPackageLock()
+assertPackageFiles()
 assertDependencyNames('dependencies', packageJson.dependencies, ['zod'])
 assertDependencyNames('peerDependencies', packageJson.peerDependencies, ['react'])
 assertDependencyNames('optionalDependencies', packageJson.optionalDependencies, [])
@@ -277,6 +279,29 @@ function assertPackageLock() {
     rootPackage.peerDependenciesMeta ?? {},
     packageJson.peerDependenciesMeta ?? {},
   )
+}
+
+function assertPackageFiles() {
+  if (!Array.isArray(packageJson.files)) {
+    failures.push('files must be an explicit publish whitelist')
+    return
+  }
+
+  const expected = new Set(expectedPackageFiles)
+  const seen = new Set()
+  for (const file of packageJson.files) {
+    if (typeof file !== 'string') {
+      failures.push('files entries must be strings')
+      continue
+    }
+    if (seen.has(file)) failures.push(`files contains duplicate entry ${file}`)
+    seen.add(file)
+    if (!expected.has(file)) failures.push(`files contains unexpected entry ${file}`)
+  }
+
+  for (const file of expectedPackageFiles) {
+    if (!seen.has(file)) failures.push(`files must include ${file}`)
+  }
 }
 
 function readTextIfExists(path) {
