@@ -6,6 +6,20 @@ const repoRoot = new URL('../', import.meta.url)
 const packageJson = JSON.parse(await readFile(new URL('package.json', repoRoot), 'utf8'))
 const checkedPaths = new Set()
 const missing = []
+const declarationSurfaces = [
+  {
+    label: 'ESM',
+    root: 'dist/index.d.ts',
+    core: 'dist/core.d.ts',
+    react: 'dist/react.d.ts',
+  },
+  {
+    label: 'CJS',
+    root: 'dist/index.d.cts',
+    core: 'dist/core.d.cts',
+    react: 'dist/react.d.cts',
+  },
+]
 const reactAdapterExports = [
   'Accordion',
   'Alert',
@@ -93,7 +107,7 @@ if (missing.length > 0) {
   throw new Error(`package export validation failed:\n${missing.join('\n')}`)
 }
 
-console.log(`package manifest references ${checkedPaths.size} existing files or directories and declaration exports preserve root/core/react boundaries`)
+console.log(`package manifest references ${checkedPaths.size} existing files or directories and ESM/CJS declaration exports preserve root/core/react boundaries`)
 
 async function visitExports(value, label) {
   if (typeof value === 'string') {
@@ -133,23 +147,45 @@ async function assertPackagePathExists(label, packagePath) {
 }
 
 function assertDeclarationExportSurface() {
-  const rootExports = declarationExports('dist/index.d.ts')
-  const coreExports = declarationExports('dist/core.d.ts')
-  const reactExports = declarationExports('dist/react.d.ts')
+  let previousSurface = null
+  for (const surface of declarationSurfaces) {
+    const exports = {
+      root: declarationExports(surface.root),
+      core: declarationExports(surface.core),
+      react: declarationExports(surface.react),
+    }
 
-  expectExactExportSet(rootExports, coreExports, 'root declaration exports', './core declaration exports')
-  expectExportSuperset(reactExports, coreExports, './react declaration exports', './core declaration exports')
+    assertPublicEntryDeclarationExports(surface.label, exports)
+
+    if (previousSurface) {
+      expectExactExportSet(exports.root, previousSurface.exports.root, `${surface.label} root declaration exports`, `${previousSurface.label} root declaration exports`)
+      expectExactExportSet(exports.core, previousSurface.exports.core, `${surface.label} ./core declaration exports`, `${previousSurface.label} ./core declaration exports`)
+      expectExactExportSet(exports.react, previousSurface.exports.react, `${surface.label} ./react declaration exports`, `${previousSurface.label} ./react declaration exports`)
+    }
+
+    previousSurface = { label: surface.label, exports }
+  }
+}
+
+function assertPublicEntryDeclarationExports(label, exports) {
+  const { root: rootExports, core: coreExports, react: reactExports } = exports
+  const rootLabel = `${label} root declaration exports`
+  const coreLabel = `${label} ./core declaration exports`
+  const reactLabel = `${label} ./react declaration exports`
+
+  expectExactExportSet(rootExports, coreExports, rootLabel, coreLabel)
+  expectExportSuperset(reactExports, coreExports, reactLabel, coreLabel)
 
   for (const name of reactAdapterExports) {
-    if (!reactExports.has(name)) missing.push(`./react declaration exports must include ${name}`)
-    if (rootExports.has(name)) missing.push(`root declaration exports must not include React adapter API ${name}`)
-    if (coreExports.has(name)) missing.push(`./core declaration exports must not include React adapter API ${name}`)
+    if (!reactExports.has(name)) missing.push(`${reactLabel} must include ${name}`)
+    if (rootExports.has(name)) missing.push(`${rootLabel} must not include React adapter API ${name}`)
+    if (coreExports.has(name)) missing.push(`${coreLabel} must not include React adapter API ${name}`)
   }
 
   for (const [label, exports] of [
-    ['root declaration exports', rootExports],
-    ['./core declaration exports', coreExports],
-    ['./react declaration exports', reactExports],
+    [rootLabel, rootExports],
+    [coreLabel, coreExports],
+    [reactLabel, reactExports],
   ]) {
     if (exports.has('default')) missing.push(`${label} must not expose a default export`)
   }
