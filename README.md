@@ -347,6 +347,8 @@ For the full release preflight:
 npm run release:check
 ```
 
+`prepublishOnly` also runs `npm run release:check`, so direct `npm publish` still executes the full local and registry preflight.
+
 Publish after the preflight passes:
 
 ```bash

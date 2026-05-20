@@ -371,8 +371,8 @@ function assertReadmePublishCommand(readme) {
 
 function assertPackageScripts() {
   const scripts = packageJson.scripts ?? {}
-  if (scripts.prepublishOnly !== 'npm run check') {
-    failures.push('prepublishOnly must run npm run check')
+  if (scripts.prepublishOnly !== 'npm run release:check') {
+    failures.push('prepublishOnly must run npm run release:check')
   }
   if (scripts['release:check'] !== 'npm run check && npm run check:registry') {
     failures.push('release:check must run npm run check && npm run check:registry')

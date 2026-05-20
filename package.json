@@ -90,7 +90,7 @@
     "check:registry": "node scripts/verify-npm-registry-release.mjs",
     "check:readme": "node scripts/verify-readme-quick-start.mjs",
     "check:preset": "node scripts/verify-react-preset-surface.mjs",
-    "prepublishOnly": "npm run check",
+    "prepublishOnly": "npm run release:check",
     "release:check": "npm run check && npm run check:registry",
     "smoke:package": "node scripts/smoke-package-consumer.mjs",
     "test": "vitest run --config vitest.config.ts",
