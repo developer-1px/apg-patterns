@@ -28,7 +28,7 @@ try {
     smokeKind: 'core',
   })
 
-  console.log('package consumer smoke passed for ESM, CJS, TypeScript, package metadata, React-free root/core imports, and React TSX subpath imports.')
+  console.log('package consumer smoke passed for ESM, CJS, NodeNext/Bundler TypeScript, package metadata, React-free root/core imports, and React TSX subpath imports.')
 } finally {
   rmSync(tempRoot, { recursive: true, force: true })
 }
@@ -52,7 +52,8 @@ function runConsumerSmoke({ tarballPath, consumerRoot, includeReact, smokeKind }
   writeConsumerFiles(consumerRoot, smokeKind)
   execFileSync(process.execPath, ['esm-smoke.mjs'], { cwd: consumerRoot, stdio: 'pipe' })
   execFileSync(process.execPath, ['cjs-smoke.cjs'], { cwd: consumerRoot, stdio: 'pipe' })
-  execFileSync(join(repoRoot, 'node_modules/.bin/tsc'), ['--project', 'tsconfig.json', '--noEmit'], { cwd: consumerRoot, stdio: 'pipe' })
+  execFileSync(join(repoRoot, 'node_modules/.bin/tsc'), ['--project', 'tsconfig.nodenext.json', '--noEmit'], { cwd: consumerRoot, stdio: 'pipe' })
+  execFileSync(join(repoRoot, 'node_modules/.bin/tsc'), ['--project', 'tsconfig.bundler.json', '--noEmit'], { cwd: consumerRoot, stdio: 'pipe' })
 }
 
 function packCurrentPackage(destination) {
@@ -81,22 +82,35 @@ function writeConsumerFiles(consumerRoot, smokeKind) {
   writeFileSync(join(consumerRoot, 'package.json'), JSON.stringify({ private: true, type: 'module' }, null, 2))
   writeFileSync(join(consumerRoot, 'esm-smoke.mjs'), runtimeSmokeSource('esm', smokeKind))
   writeFileSync(join(consumerRoot, 'cjs-smoke.cjs'), runtimeSmokeSource('cjs', smokeKind))
-  writeFileSync(join(consumerRoot, 'tsconfig.json'), JSON.stringify({
-    compilerOptions: {
-      strict: true,
-      target: 'ES2022',
-      module: 'NodeNext',
-      moduleResolution: 'NodeNext',
-      jsx: 'react-jsx',
-      lib: ['ES2022', 'DOM'],
-      skipLibCheck: false,
-    },
+  writeFileSync(join(consumerRoot, 'tsconfig.nodenext.json'), tsconfigSource({
+    module: 'NodeNext',
+    moduleResolution: 'NodeNext',
     include: [typeSmokeFilename],
-  }, null, 2))
+  }))
+  writeFileSync(join(consumerRoot, 'tsconfig.bundler.json'), tsconfigSource({
+    module: 'ESNext',
+    moduleResolution: 'Bundler',
+    include: [typeSmokeFilename],
+  }))
   const typeSmoke = smokeKind === 'core' || smokeKind === 'root'
     ? coreTypeSmokeSource(smokeKind === 'core' ? '@interactive-os/apg-patterns/core' : '@interactive-os/apg-patterns')
     : readFileSync(new URL('./fixtures/package-consumer-react-type-smoke.tsx', import.meta.url), 'utf8')
   writeFileSync(join(consumerRoot, typeSmokeFilename), typeSmoke)
+}
+
+function tsconfigSource({ module, moduleResolution, include }) {
+  return JSON.stringify({
+    compilerOptions: {
+      strict: true,
+      target: 'ES2022',
+      module,
+      moduleResolution,
+      jsx: 'react-jsx',
+      lib: ['ES2022', 'DOM'],
+      skipLibCheck: false,
+    },
+    include,
+  }, null, 2)
 }
 
 function runtimeSmokeSource(moduleKind, smokeKind) {
