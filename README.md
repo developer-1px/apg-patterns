@@ -292,7 +292,7 @@ To compare the demo's APG example coverage against the currently linked examples
 npm run check:apg
 ```
 
-`check:readme` type-checks the Quick Start and React API TypeScript examples against the built package.
+`check:readme` type-checks the Quick Start and React API TypeScript examples against the built package and executes the root Quick Start.
 
 `check:repo` verifies that generated outputs, local environment files, IDE files, and ignored paths are not tracked by git.
 

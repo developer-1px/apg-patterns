@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, 
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import ts from 'typescript'
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const tempRoot = mkdtempSync(join(tmpdir(), 'apg-patterns-readme-'))
@@ -46,7 +47,9 @@ try {
     stdio: 'pipe',
   })
 
-  console.log(`README type-checks ${examples.length} TypeScript examples under NodeNext and Bundler module resolution.`)
+  runRootQuickStartExample(consumerRoot, examples)
+
+  console.log(`README type-checks ${examples.length} TypeScript examples under NodeNext and Bundler module resolution and executes the root Quick Start.`)
 } finally {
   rmSync(tempRoot, { recursive: true, force: true })
 }
@@ -177,6 +180,24 @@ export function ${name}() {
 ${indent(snippet, 2)}
 }
 `
+}
+
+function runRootQuickStartExample(consumerRoot, examples) {
+  const rootQuickStart = examples.find((example) => example.filename === 'readme-quick-start-1.tsx')
+  if (!rootQuickStart) throw new Error('README root Quick Start example is missing')
+
+  const output = ts.transpileModule(rootQuickStart.source, {
+    compilerOptions: {
+      target: ts.ScriptTarget.ES2022,
+      module: ts.ModuleKind.ES2022,
+      moduleResolution: ts.ModuleResolutionKind.NodeNext,
+      jsx: ts.JsxEmit.ReactJSX,
+      strict: true,
+    },
+  })
+  const filename = 'readme-quick-start-runtime.mjs'
+  writeFileSync(join(consumerRoot, filename), output.outputText)
+  execFileSync(process.execPath, [filename], { cwd: consumerRoot, stdio: 'pipe' })
 }
 
 function indent(source, spaces) {
