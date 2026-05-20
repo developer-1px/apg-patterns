@@ -291,7 +291,7 @@ npm run check:apg
 
 `check:exports` validates package manifest paths and ESM/CJS declaration export boundaries for the root, `./core`, and `./react` entries.
 
-`check:publish` validates package metadata, package-lock root consistency, local-only dependency specs, packed tarball contents, runtime external imports, portable sourcemaps with source content, and production source imports that would create public-entry circular initialization.
+`check:publish` validates package metadata, package-lock root consistency, local-only dependency specs, packed tarball contents, npm publish dry-run metadata, runtime external imports, portable sourcemaps with source content, and production source imports that would create public-entry circular initialization.
 
 ## Design Notes
 

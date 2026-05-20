@@ -84,6 +84,8 @@ for (const sourceImport of productionIndexImports()) {
 
 const pack = readPackManifest()
 assertPackMetadata(pack)
+const publishDryRun = readPublishDryRunManifest()
+assertPublishDryRunMatchesPack(publishDryRun, pack)
 const packedPaths = new Set(pack.files.map((file) => file.path))
 const requiredPackedPaths = [
   'package.json',
@@ -174,7 +176,7 @@ if (failures.length > 0) {
   process.exit(1)
 }
 
-console.log(`Publish readiness covers ${pack.files.length} packed files.`)
+console.log(`Publish readiness covers ${pack.files.length} packed files and npm publish dry-run metadata.`)
 
 function dependencySections(pkg) {
   return {
@@ -441,6 +443,15 @@ function readPackManifest() {
   return result[0]
 }
 
+function readPublishDryRunManifest() {
+  const stdout = execFileSync('npm', ['publish', '--dry-run', '--ignore-scripts', '--json'], { encoding: 'utf8' })
+  const result = JSON.parse(stdout)
+  if (!result || typeof result !== 'object' || Array.isArray(result) || !Array.isArray(result.files)) {
+    throw new Error('npm publish --dry-run did not return file metadata')
+  }
+  return result
+}
+
 function assertPackMetadata(pack) {
   if (pack.name !== packageJson.name) failures.push(`npm pack name must be ${packageJson.name}`)
   if (pack.version !== packageJson.version) failures.push(`npm pack version must be ${packageJson.version}`)
@@ -454,6 +465,28 @@ function assertPackMetadata(pack) {
   if (!/^sha512-[A-Za-z0-9+/=]+$/.test(pack.integrity ?? '')) failures.push('npm pack must report sha512 integrity')
   if (pack.entryCount !== pack.files.length) failures.push('npm pack entryCount must match files.length')
   if (!Array.isArray(pack.bundled) || pack.bundled.length > 0) failures.push('npm pack must not bundle dependencies')
+}
+
+function assertPublishDryRunMatchesPack(publishDryRun, pack) {
+  for (const field of ['id', 'name', 'version', 'size', 'unpackedSize', 'shasum', 'integrity', 'filename', 'entryCount']) {
+    if (publishDryRun[field] !== pack[field]) {
+      failures.push(`npm publish --dry-run ${field} must match npm pack --dry-run`)
+    }
+  }
+
+  if (!Array.isArray(publishDryRun.bundled) || publishDryRun.bundled.length > 0) {
+    failures.push('npm publish --dry-run must not bundle dependencies')
+  }
+
+  const packFiles = JSON.stringify(normalizePackFiles(pack.files))
+  const publishFiles = JSON.stringify(normalizePackFiles(publishDryRun.files))
+  if (publishFiles !== packFiles) failures.push('npm publish --dry-run file list must match npm pack --dry-run')
+}
+
+function normalizePackFiles(files) {
+  return [...files]
+    .map((file) => ({ path: file.path, size: file.size, mode: file.mode }))
+    .sort((left, right) => left.path.localeCompare(right.path))
 }
 
 function expectedPackFilename() {
