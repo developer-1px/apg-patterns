@@ -13,6 +13,10 @@
   ],
   "license": "MIT",
   "type": "module",
+  "packageManager": "npm@11.6.2",
+  "engines": {
+    "node": ">=18.18"
+  },
   "sideEffects": [
     "./dist/index.js",
     "./dist/index.cjs",
@@ -43,7 +47,8 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "tsup",

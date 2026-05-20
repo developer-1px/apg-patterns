@@ -13,7 +13,13 @@ if (!packageJson.name) failures.push('package name is required')
 if (!packageJson.description) failures.push('package description is required')
 if (!packageJson.license) failures.push('package license is required')
 if (!packageJson.version || packageJson.version === '0.0.0') failures.push('package version must be publishable, not 0.0.0')
+if (!/^npm@\d+\.\d+\.\d+$/.test(packageJson.packageManager ?? '')) failures.push('packageManager must pin the npm version')
+if (typeof packageJson.engines?.node !== 'string') failures.push('engines.node is required')
+if (packageJson.name?.startsWith('@') && packageJson.publishConfig?.access !== 'public') {
+  failures.push('scoped package must set publishConfig.access to public')
+}
 if (!existsSync('README.md')) failures.push('README.md is required')
+if (!existsSync('CHANGELOG.md')) failures.push('CHANGELOG.md is required')
 if (!existsSync('LICENSE')) failures.push('LICENSE is required')
 if (packageJson.peerDependencies?.react && packageJson.peerDependenciesMeta?.react?.optional !== true) {
   failures.push('react peer dependency must be optional because the root and ./core entries are React-free')
@@ -39,6 +45,7 @@ const packedPaths = new Set(pack.files.map((file) => file.path))
 const requiredPackedPaths = [
   'package.json',
   'README.md',
+  'CHANGELOG.md',
   'LICENSE',
   'dist/index.js',
   'dist/index.js.map',
