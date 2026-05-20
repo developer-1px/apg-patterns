@@ -21,6 +21,7 @@ if (packageJson.name?.startsWith('@') && packageJson.publishConfig?.access !== '
 if (!existsSync('README.md')) failures.push('README.md is required')
 if (!existsSync('CHANGELOG.md')) failures.push('CHANGELOG.md is required')
 if (!existsSync('LICENSE')) failures.push('LICENSE is required')
+assertDocumentationMetadata()
 assertReadmeCommandExamples()
 assertDependencyNames('dependencies', packageJson.dependencies, ['zod'])
 assertDependencyNames('peerDependencies', packageJson.peerDependencies, ['react'])
@@ -140,6 +141,41 @@ function dependencySections(pkg) {
   }
 }
 
+function assertDocumentationMetadata() {
+  const readme = readTextIfExists('README.md')
+  const changelog = readTextIfExists('CHANGELOG.md')
+  const license = readTextIfExists('LICENSE')
+  const packageName = packageJson.name
+  const packageVersion = packageJson.version
+
+  if (packageName && readme && !readme.startsWith(`# ${packageName}\n`)) {
+    failures.push('README title must match package name')
+  }
+  if (packageName && readme && !new RegExp(`\\bnpm\\s+install\\s+${escapeRegExp(packageName)}\\b`).test(readme)) {
+    failures.push('README must document installing the package by its package name')
+  }
+  if (
+    packageName &&
+    packageJson.peerDependencies?.react &&
+    readme &&
+    !new RegExp(`\\bnpm\\s+install\\s+${escapeRegExp(packageName)}\\s+react\\b`).test(readme)
+  ) {
+    failures.push('README must document installing react for the React adapter')
+  }
+  if (packageName && packageJson.exports?.['./core'] && readme && !readme.includes(`${packageName}/core`)) {
+    failures.push('README must document the ./core subpath')
+  }
+  if (packageName && packageJson.exports?.['./react'] && readme && !readme.includes(`${packageName}/react`)) {
+    failures.push('README must document the ./react subpath')
+  }
+  if (packageVersion && changelog && !new RegExp(`^##\\s+${escapeRegExp(packageVersion)}\\s*$`, 'm').test(changelog)) {
+    failures.push('CHANGELOG must include the current package version')
+  }
+  if (packageJson.license === 'MIT' && license && !/^MIT License\s*$/m.test(license)) {
+    failures.push('LICENSE must contain the MIT license heading')
+  }
+}
+
 function assertReadmeCommandExamples() {
   const readme = readFileSync('README.md', 'utf8')
   if (packageJson.packageManager?.startsWith('npm@') && /\b(?:pnpm|yarn)\s+(?:add|install|demo|run)\b/.test(readme)) {
@@ -153,6 +189,14 @@ function assertReadmeCommandExamples() {
   if (/\bnpm\s+test\b/.test(readme) && !scripts.has('test')) {
     failures.push('README command references missing package script "test"')
   }
+}
+
+function readTextIfExists(path) {
+  return existsSync(path) ? readFileSync(path, 'utf8') : ''
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
 function assertDependencyNames(section, dependencies, expectedNames) {
