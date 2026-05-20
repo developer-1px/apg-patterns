@@ -325,7 +325,7 @@ npm run check:apg
 
 `check:readme` type-checks the Quick Start and React API TypeScript examples against the built package and executes the root Quick Start.
 
-`check:repo` verifies that generated outputs, local environment files, IDE files, ignored paths, and release artifacts are not tracked by git, that tracked bug records are release-resolved, and that the GitHub Actions release workflows run the release preflight and upload the packed package artifact.
+`check:repo` verifies that generated outputs, local environment files, IDE files, ignored paths, and release artifacts are not tracked by git, that tracked bug records are release-resolved, and that the GitHub Actions release workflows run the release preflight, upload the packed package artifact, and keep publishing on trusted OIDC auth instead of static npm tokens.
 
 `check:independence` verifies that this package keeps its dependency surface separate from legacy APG workspaces.
 

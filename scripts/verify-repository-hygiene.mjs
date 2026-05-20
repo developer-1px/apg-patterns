@@ -8,6 +8,13 @@ const publishWorkflowPath = '.github/workflows/publish.yml'
 const checkoutActionRef = 'actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd'
 const setupNodeActionRef = 'actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e'
 const uploadArtifactActionRef = 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02'
+const forbiddenNpmTokenAuthMarkers = [
+  'NPM_TOKEN',
+  'NODE_AUTH_TOKEN',
+  '//registry.npmjs.org/:_authToken',
+  '_authToken',
+  'npm token',
+]
 const forbiddenTrackedRules = [
   {
     label: 'coverage output',
@@ -146,6 +153,7 @@ function assertPublishWorkflow() {
     'if-no-files-found: error',
     'npm publish --access public --provenance --registry https://registry.npmjs.org/',
   ])
+  assertWorkflowExcludes(publishWorkflowPath, source, forbiddenNpmTokenAuthMarkers)
 }
 
 function readTrackedWorkflow(path, purpose) {
@@ -164,6 +172,12 @@ function assertWorkflowIncludes(path, source, requiredMarkers) {
   assertWorkflowActionsPinned(path, source)
   for (const marker of requiredMarkers) {
     if (!source.includes(marker)) failures.push(`${path} must include ${marker}`)
+  }
+}
+
+function assertWorkflowExcludes(path, source, forbiddenMarkers) {
+  for (const marker of forbiddenMarkers) {
+    if (source.includes(marker)) failures.push(`${path} must not include static npm token auth marker ${marker}`)
   }
 }
 
