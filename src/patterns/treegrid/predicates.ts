@@ -1,6 +1,12 @@
 import { definePredicate } from '../../kernel/patternKernel'
 import type { Key, PatternData } from '../../schema'
 
+let treegridPredicatesRegistered = false
+
+export function registerTreegridPredicates() {
+  if (treegridPredicatesRegistered) return
+  treegridPredicatesRegistered = true
+
 definePredicate('activeCellInFirstColumn', (_p, ctx) => {
   const cell = activeCellRelation(ctx.data, ctx.activeKey)
   return Boolean(cell && cell.columnKey === ctx.data.relations?.columnKeys?.[0])
@@ -21,8 +27,11 @@ definePredicate('activeKeyIsRow', (_p, ctx) => {
   const rowKeys = ctx.data.relations?.rowKeys ?? []
   return rowKeys.includes(ctx.activeKey)
 })
+}
 
 function activeCellRelation(data: PatternData, activeKey: Key | null | undefined) {
   if (!activeKey) return null
   return data.relations?.cells?.find((cell) => cell.cellKey === activeKey) ?? null
 }
+
+registerTreegridPredicates()

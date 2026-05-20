@@ -1,8 +1,12 @@
 import { PatternDefinitionSchema } from '../../schema'
+import { registerTreeviewNavigation } from '../treeview/navigation'
+import { registerMenuAriaSources } from './menuAriaSources'
 import { menubarEffects } from './menubarEffects'
 import { menubarKeyboard } from './menubarKeyboard'
 import { menubarParts } from './menubarParts'
-import './menuAriaSources'
+
+registerMenuAriaSources()
+registerTreeviewNavigation()
 
 export const menubarDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'menubar',

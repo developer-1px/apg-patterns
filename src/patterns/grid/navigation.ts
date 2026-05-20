@@ -13,6 +13,12 @@ export const gridRows = (data: PatternData): readonly (readonly Key[])[] =>
       .filter((cellKey): cellKey is Key => Boolean(cellKey)),
   )
 
+let gridNavigationRegistered = false
+
+export function registerGridNavigation() {
+  if (gridNavigationRegistered) return
+  gridNavigationRegistered = true
+
 defineVisibleOrder('gridRows', (_visibleOrder, data) => gridRows(data).flat())
 
 defineNavigationTarget('gridCell', (target, ctx) => {
@@ -52,3 +58,6 @@ defineNavigationTarget('gridPage', (target, ctx) => {
   const targetRow = rows[targetRowIndex] ?? []
   return targetRow[Math.min(location.columnIndex, targetRow.length - 1)] ?? null
 })
+}
+
+registerGridNavigation()

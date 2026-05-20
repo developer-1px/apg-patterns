@@ -7,6 +7,12 @@ import { cellRowKey, visibleCells, visibleRowKeys } from './geometry'
 
 type TreegridAction = 'left' | 'right' | 'up' | 'down' | 'rowStart' | 'rowEnd' | 'gridStart' | 'gridEnd'
 
+let treegridNavigationRegistered = false
+
+export function registerTreegridNavigation() {
+  if (treegridNavigationRegistered) return
+  treegridNavigationRegistered = true
+
 defineVisibleOrder('treegridVisibleCells', (_v, data) => visibleCells(data).flat())
 
 defineNavigationTarget('treegridCell', (target, ctx) => {
@@ -48,5 +54,8 @@ defineNavigationTarget('treegridParentRowFirstCell', (_target, ctx) => {
   if (!firstCol) return null
   return ctx.data.relations?.cells?.find((c) => c.rowKey === parent && c.columnKey === firstCol)?.cellKey ?? null
 })
+}
 
 export { visibleRowKeys as treegridVisibleRowKeys, visibleCells as treegridVisibleCells }
+
+registerTreegridNavigation()

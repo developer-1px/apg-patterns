@@ -1,11 +1,14 @@
 import { PatternDefinitionSchema } from '../../schema'
+import { registerGridAriaSources } from './ariaSources'
 import { gridKeyboard } from './keyboard'
+import { gridRows, registerGridNavigation } from './navigation'
 import { gridParts } from './parts'
 import { gridTransitions } from './transitions'
-import './ariaSources'
-import './navigation'
 
-export { gridRows } from './navigation'
+registerGridAriaSources()
+registerGridNavigation()
+
+export { gridRows }
 
 export const gridDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'grid',

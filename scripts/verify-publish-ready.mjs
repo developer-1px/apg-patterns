@@ -26,12 +26,30 @@ for (const sourceImport of productionIndexImports()) {
 
 const pack = readPackManifest()
 const packedPaths = new Set(pack.files.map((file) => file.path))
+const allowedPackedPaths = new Set([
+  'package.json',
+  'README.md',
+  'LICENSE',
+  'dist/index.js',
+  'dist/index.js.map',
+  'dist/index.cjs',
+  'dist/index.cjs.map',
+  'dist/index.d.ts',
+  'dist/index.d.cts',
+])
 
-for (const requiredPath of ['package.json', 'README.md', 'LICENSE', 'dist/index.js', 'dist/index.cjs', 'dist/index.d.ts']) {
+for (const requiredPath of ['package.json', 'README.md', 'LICENSE', 'dist/index.js', 'dist/index.cjs', 'dist/index.d.ts', 'dist/index.d.cts']) {
   if (!packedPaths.has(requiredPath)) failures.push(`packed tarball missing ${requiredPath}`)
 }
 
+for (const sideEffectPath of packageJson.sideEffects ?? []) {
+  if (typeof sideEffectPath !== 'string') continue
+  const packedPath = sideEffectPath.replace(/^\.\//, '')
+  if (!packedPaths.has(packedPath)) failures.push(`sideEffects references unpacked path ${sideEffectPath}`)
+}
+
 for (const file of pack.files) {
+  if (!allowedPackedPaths.has(file.path)) failures.push(`packed tarball includes unexpected path ${file.path}`)
   if (/^(src|demo|scripts|docs|coverage)\//.test(file.path)) failures.push(`packed tarball includes non-runtime path ${file.path}`)
   if (/\.test\.[cm]?[jt]sx?$/.test(file.path)) failures.push(`packed tarball includes test file ${file.path}`)
 }

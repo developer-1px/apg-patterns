@@ -1,13 +1,18 @@
 import { PatternDefinitionSchema } from '../../schema'
+import { registerTreegridAriaSources } from './ariaSources'
 import { treegridEffects } from './effects'
 import { treegridKeyboard } from './keyboard'
+import { registerTreegridNavigation, treegridVisibleCells, treegridVisibleRowKeys } from './navigation'
 import { treegridParts } from './parts'
-import './ariaSources'
-import './navigation'
-import './predicates'
-import './rowNavigation'
+import { registerTreegridPredicates } from './predicates'
+import { registerTreegridRowNavigation } from './rowNavigation'
 
-export { treegridVisibleRowKeys, treegridVisibleCells } from './navigation'
+registerTreegridAriaSources()
+registerTreegridNavigation()
+registerTreegridPredicates()
+registerTreegridRowNavigation()
+
+export { treegridVisibleRowKeys, treegridVisibleCells }
 
 export const treegridDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'treegrid',

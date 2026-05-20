@@ -1,8 +1,10 @@
 import { PatternDefinitionSchema } from '../../schema'
 import { treeviewKeyboard } from './keyboard'
+import { registerTreeviewNavigation } from './navigation'
 import { treeviewParts } from './parts'
 import { treeviewReact } from './react'
-import './navigation'
+
+registerTreeviewNavigation()
 
 export const TreeviewDefinitionSchema = PatternDefinitionSchema.superRefine((value, ctx) => {
   const containedRoles = value.containedRoles ?? []

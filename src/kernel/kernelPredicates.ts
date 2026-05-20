@@ -1,5 +1,11 @@
 import { definePredicate, resolveKeyToken } from './patternKernel'
 
+let kernelPredicatesRegistered = false
+
+export function registerKernelPredicates() {
+  if (kernelPredicatesRegistered) return
+  kernelPredicatesRegistered = true
+
 definePredicate('hasActiveKey', (_p, ctx) => Boolean(ctx.activeKey))
 definePredicate('isChecked', (p, ctx) => {
   if (p.kind !== 'isChecked') return false
@@ -40,3 +46,6 @@ definePredicate('isDisabled', (p, ctx) => {
   const key = resolveKeyToken(p.key, ctx.key, ctx.activeKey, ctx)
   return ctx.data.state?.disabledKeys?.includes(key) ?? false
 })
+}
+
+registerKernelPredicates()

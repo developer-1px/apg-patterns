@@ -12,6 +12,12 @@ const activeRowKey = (ctx: { activeKey: Key | null; data: PatternData }): Key | 
   return cellRowKey(ctx.data, ctx.activeKey)
 }
 
+let treegridRowNavigationRegistered = false
+
+export function registerTreegridRowNavigation() {
+  if (treegridRowNavigationRegistered) return
+  treegridRowNavigationRegistered = true
+
 defineNavigationTarget('treegridRow', (target, ctx) => {
   const action = target.action as TreegridRowAction
   const rows = visibleRowKeys(ctx.data)
@@ -40,3 +46,6 @@ defineNavigationTarget('treegridRowPage', (target, ctx) => {
     : Math.max(0, idx - PAGE_STEP)
   return rows[next] ?? null
 })
+}
+
+registerTreegridRowNavigation()

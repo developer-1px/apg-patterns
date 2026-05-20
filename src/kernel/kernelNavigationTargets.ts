@@ -1,6 +1,12 @@
 import { moveLinear } from '../internal/collectionNavigation'
 import { defineKeyToken, defineNavigationTarget, defineVisibleOrder } from './patternKernel'
 
+let kernelNavigationTargetsRegistered = false
+
+export function registerKernelNavigationTargets() {
+  if (kernelNavigationTargetsRegistered) return
+  kernelNavigationTargetsRegistered = true
+
 defineVisibleOrder('flat', (_v, data) => data.relations?.rootKeys ?? [])
 
 defineNavigationTarget('linear', (target, ctx) => {
@@ -18,3 +24,6 @@ defineNavigationTarget('linearWrap', (target, ctx) => {
 
 defineKeyToken('$triggerKey', (_key, _activeKey, ctx) => ctx?.data.relations?.rootKeys?.[0] ?? null)
 defineKeyToken('$initialFocusKey', (_key, _activeKey, ctx) => ctx?.data.refs?.initialFocusKey ?? null)
+}
+
+registerKernelNavigationTargets()

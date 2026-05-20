@@ -1,8 +1,10 @@
 import { PatternDefinitionSchema } from '../../schema'
 import { tabsEffects } from './effects'
 import { tabsKeyboard } from './keyboard'
+import { registerTabsNavigation } from './navigation'
 import { tabsParts } from './parts'
-import './navigation'
+
+registerTabsNavigation()
 
 // flatTabs 별칭은 제거 — kernel 의 'flat' 을 재사용한다 (P1 fragmentation 통합).
 

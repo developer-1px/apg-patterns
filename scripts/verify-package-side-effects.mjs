@@ -1,5 +1,4 @@
 import { readFile, readdir } from 'node:fs/promises'
-import path from 'node:path'
 
 const repoRoot = new URL('../', import.meta.url)
 const packageJson = JSON.parse(await readFile(new URL('package.json', repoRoot), 'utf8'))
@@ -26,21 +25,23 @@ for (const filePath of sourceFiles) {
 }
 
 const expectedSourceFiles = [...new Set([...registrationFiles, ...patternDefinitionFiles])].sort((a, b) => a.localeCompare(b))
+const expectedDistFiles = ['./dist/index.js', './dist/index.cjs']
 const missing = []
+const unexpected = sideEffects.filter((pattern) => !expectedDistFiles.includes(pattern))
 
-for (const filePath of expectedSourceFiles) {
-  const sourcePackagePath = `./${filePath}`
-  if (!matchesSideEffect(sourcePackagePath)) missing.push(sourcePackagePath)
+for (const packagePath of expectedDistFiles) {
+  if (!matchesSideEffect(packagePath)) missing.push(packagePath)
+}
 
-  const distPackagePath = `./${filePath.replace(/^src\//, 'dist/').replace(/\.ts$/, '.js')}`
-  if (!matchesSideEffect(distPackagePath)) missing.push(distPackagePath.replace(/\.js$/, '.*'))
+for (const pattern of unexpected) {
+  missing.push(`${pattern} (sideEffects must reference bundled dist entries only)`)
 }
 
 if (missing.length > 0) {
-  throw new Error(`package sideEffects missing entries for side-effectful sources:\n${missing.join('\n')}`)
+  throw new Error(`package sideEffects does not match bundled output:\n${missing.join('\n')}`)
 }
 
-console.log(`package sideEffects cover ${expectedSourceFiles.length} side-effectful source files`)
+console.log(`package sideEffects cover ${expectedSourceFiles.length} bundled side-effectful source files via ${expectedDistFiles.length} dist entries`)
 
 async function listFiles(rootUrl, prefix) {
   const entries = await readdir(rootUrl, { withFileTypes: true })

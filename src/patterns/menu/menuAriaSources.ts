@@ -1,5 +1,11 @@
 import { defineAriaSource } from '../../kernel/patternKernel'
 
+let menuAriaSourcesRegistered = false
+
+export function registerMenuAriaSources() {
+  if (menuAriaSourcesRegistered) return
+  menuAriaSourcesRegistered = true
+
 defineAriaSource('menu.hasPopup', (ctx) => {
   if (!ctx.key) return undefined
   return (ctx.data.relations?.childrenByKey?.[ctx.key]?.length ?? 0) > 0 ? 'menu' : undefined
@@ -13,3 +19,6 @@ defineAriaSource('menu.expandedIfHasPopup', (ctx) => {
 })
 
 defineAriaSource('items.kind', (ctx) => (ctx.key ? ctx.data.items[ctx.key]?.kind : undefined))
+}
+
+registerMenuAriaSources()

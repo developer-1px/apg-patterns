@@ -1,6 +1,12 @@
 import { visibleTreeItems } from '../../internal/collectionNavigation'
 import { defineNavigationTarget, defineVisibleOrder, resolveKeyToken } from '../../kernel/patternKernel'
 
+let treeviewNavigationRegistered = false
+
+export function registerTreeviewNavigation() {
+  if (treeviewNavigationRegistered) return
+  treeviewNavigationRegistered = true
+
 defineNavigationTarget('firstChild', (target, ctx) => {
   const key = resolveKeyToken(target.key ?? '$activeKey', undefined, ctx.activeKey)
   return ctx.data.relations?.childrenByKey?.[key]?.[0] ?? null
@@ -19,3 +25,6 @@ defineVisibleOrder('treeVisibleDepthFirst', (_v, data) => {
     isExpanded: (key) => expanded.has(key),
   })
 })
+}
+
+registerTreeviewNavigation()

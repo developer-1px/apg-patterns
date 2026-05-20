@@ -1,8 +1,10 @@
 import { PatternDefinitionSchema } from '../../schema'
+import { registerMenuAriaSources } from './menuAriaSources'
 import { menuButtonDefinitionKeyboard } from './menuButtonDefinitionKeyboard'
 import { menuButtonEffects } from './menuButtonEffects'
 import { menuButtonParts } from './menuButtonParts'
-import './menuAriaSources'
+
+registerMenuAriaSources()
 
 export const menuButtonDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'menu-button',

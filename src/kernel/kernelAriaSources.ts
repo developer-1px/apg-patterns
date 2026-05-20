@@ -1,5 +1,11 @@
 import { defineAriaSource } from './patternKernel'
 
+let kernelAriaSourcesRegistered = false
+
+export function registerKernelAriaSources() {
+  if (kernelAriaSourcesRegistered) return
+  kernelAriaSourcesRegistered = true
+
 defineAriaSource('refs.label', (ctx) => ctx.data.refs?.label)
 defineAriaSource('refs.labelledBy', (ctx) => ctx.data.refs?.labelledBy)
 defineAriaSource('literal.true', () => true)
@@ -54,3 +60,6 @@ defineAriaSource('state.rangeValueByKey.min', (ctx) => (ctx.key ? ctx.data.state
 defineAriaSource('state.rangeValueByKey.max', (ctx) => (ctx.key ? ctx.data.state?.rangeValueByKey?.[ctx.key]?.max : undefined))
 defineAriaSource('state.rangeValueByKey.now', (ctx) => (ctx.key ? ctx.data.state?.rangeValueByKey?.[ctx.key]?.now : undefined))
 defineAriaSource('state.rangeValueByKey.text', (ctx) => (ctx.key ? ctx.data.state?.rangeValueByKey?.[ctx.key]?.text : undefined))
+}
+
+registerKernelAriaSources()
