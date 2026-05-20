@@ -41,7 +41,7 @@ try {
     smokeKind: 'react',
   })
 
-  console.log('package consumer smoke passed for ESM, CJS, npm tarball install with and without React, Vite bundler build, NodeNext/Bundler/CJS TypeScript, package metadata, package export encapsulation, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
+  console.log('package consumer smoke passed for ESM, CJS, script-enabled npm tarball install with and without React, Vite bundler build, NodeNext/Bundler/CJS TypeScript, package metadata, package export encapsulation, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
 } finally {
   rmSync(tempRoot, { recursive: true, force: true })
 }
@@ -93,7 +93,7 @@ function runNpmInstalledConsumerSmoke({ tarballPath, consumerRoot, includeReact,
     devDependencies,
   }, null, 2))
 
-  execFileSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock=false'], {
+  execFileSync('npm', ['install', '--no-audit', '--no-fund', '--package-lock=false'], {
     cwd: consumerRoot,
     stdio: 'pipe',
   })
