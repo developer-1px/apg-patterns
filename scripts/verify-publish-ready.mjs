@@ -631,6 +631,9 @@ function assertExactKeys(label, value, expectedKeys) {
   for (const key of expectedKeys) {
     if (!Object.hasOwn(value, key)) failures.push(`${label} is missing ${key}`)
   }
+  if (actualKeys.length === expectedKeys.length && actualKeys.some((key, index) => key !== expectedKeys[index])) {
+    failures.push(`${label} keys must stay ordered as ${expectedKeys.join(', ')}`)
+  }
 }
 
 function readPackManifest() {
