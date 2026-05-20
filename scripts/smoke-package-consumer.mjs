@@ -403,6 +403,7 @@ function packageMetadataSmokeSource() {
     license: packageJson.license,
     author: packageJson.author,
     private: false,
+    reactPeerRange: packageJson.peerDependencies?.react,
     reactPeerOptional: packageJson.peerDependenciesMeta?.react?.optional === true,
     packageJsonExport: packageJson.exports?.['./package.json'],
     publishAccess: packageJson.publishConfig?.access,
@@ -421,6 +422,9 @@ for (const key of ['name', 'version', 'license', 'author']) {
   }
 }
 if (packageMetadata.private === true) throw new Error('package metadata export marked the package private')
+if (packageMetadata.peerDependencies?.react !== expectedMetadata.reactPeerRange) {
+  throw new Error('package metadata export did not expose the expected React peer range')
+}
 if (packageMetadata.peerDependenciesMeta?.react?.optional !== expectedMetadata.reactPeerOptional) {
   throw new Error('package metadata export did not expose the optional React peer')
 }

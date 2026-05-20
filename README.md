@@ -16,7 +16,7 @@ npm install @interactive-os/apg-patterns
 
 `zod` is installed as a runtime dependency.
 
-For React hooks and preset components:
+For React hooks and preset components, install React 18 or 19:
 
 ```bash
 npm install @interactive-os/apg-patterns react
@@ -287,7 +287,7 @@ npm run demo
 npm run check
 ```
 
-`check` runs repository hygiene validation, package independence validation, TypeScript validation, the Vitest suite, APG coverage validation, demo/source consistency checks, package manifest checks, the package build, API reference validation, export validation, publish-readiness validation, package consumer smoke tests including actual npm pack tarball integrity, published docs, npm tarball installation and Vite bundling, and the production demo smoke test:
+`check` runs repository hygiene validation, package independence validation, TypeScript validation, the Vitest suite, APG coverage validation, demo/source consistency checks, package manifest checks, React peer compatibility validation, the package build, API reference validation, export validation, publish-readiness validation, package consumer smoke tests including actual npm pack tarball integrity, published docs, npm tarball installation and Vite bundling, and the production demo smoke test:
 
 ```bash
 npm run check:repo
@@ -298,6 +298,7 @@ npm run check:apg
 npm run check:preset
 npm run check:demo
 npm run check:package
+npm run check:react-peer
 npm run build
 npm run check:api
 npm run check:exports
@@ -318,6 +319,8 @@ npm run check:apg
 `check:repo` verifies that generated outputs, local environment files, IDE files, and ignored paths are not tracked by git.
 
 `check:independence` verifies that this package keeps its dependency surface separate from legacy APG workspaces.
+
+`check:react-peer` verifies that the optional React peer supports React 18 and React 19 while production source imports stay within the checked React 18/19 API surface.
 
 `check:api` validates that API.md matches the built root, `./core`, and `./react` declaration export surfaces.
 

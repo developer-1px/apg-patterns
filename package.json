@@ -76,7 +76,7 @@
     "demo:build": "vite build --config vite.config.ts",
     "demo:preview": "vite preview --config vite.config.ts --host 127.0.0.1",
     "demo:smoke": "npm run demo:build && node scripts/smoke-demo-build.mjs && node scripts/smoke-demo-preview-server.mjs",
-    "check": "npm run check:repo && npm run check:independence && npm run typecheck && npm test && npm run check:apg && npm run check:preset && npm run check:demo && npm run check:package && npm run build && npm run check:api && npm run check:exports && npm run check:readme && npm run check:publish && npm run smoke:package && npm run demo:smoke",
+    "check": "npm run check:repo && npm run check:independence && npm run typecheck && npm test && npm run check:apg && npm run check:preset && npm run check:demo && npm run check:package && npm run check:react-peer && npm run build && npm run check:api && npm run check:exports && npm run check:readme && npm run check:publish && npm run smoke:package && npm run demo:smoke",
     "check:api": "node scripts/verify-api-reference.mjs",
     "update:api": "node scripts/verify-api-reference.mjs --write",
     "check:apg": "node scripts/verify-apg-example-coverage.mjs",
@@ -85,6 +85,7 @@
     "check:independence": "node scripts/verify-package-independence.mjs",
     "check:package": "node scripts/verify-package-side-effects.mjs",
     "check:publish": "node scripts/verify-publish-ready.mjs",
+    "check:react-peer": "node scripts/verify-react-peer-compatibility.mjs",
     "check:repo": "node scripts/verify-repository-hygiene.mjs",
     "check:registry": "node scripts/verify-npm-registry-release.mjs",
     "check:readme": "node scripts/verify-readme-quick-start.mjs",
@@ -100,7 +101,7 @@
     "zod": "^4.3.6"
   },
   "peerDependencies": {
-    "react": "^19.0.0"
+    "react": "^18.0.0 || ^19.0.0"
   },
   "peerDependenciesMeta": {
     "react": {

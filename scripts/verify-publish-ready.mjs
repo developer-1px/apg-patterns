@@ -6,6 +6,7 @@ const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
 const failures = []
 const maxPackedBytes = 600_000
 const maxUnpackedBytes = 4_000_000
+const expectedReactPeerRange = '^18.0.0 || ^19.0.0'
 const declarationByteBudgets = {
   'dist/index.d.ts': 20_000,
   'dist/index.d.cts': 20_000,
@@ -81,6 +82,9 @@ assertDependencyNames('dependencies', packageJson.dependencies, ['zod'])
 assertDependencyNames('peerDependencies', packageJson.peerDependencies, ['react'])
 assertDependencyNames('optionalDependencies', packageJson.optionalDependencies, [])
 assertDependencyNames('bundledDependencies', packageJson.bundledDependencies, [])
+if (packageJson.peerDependencies?.react !== expectedReactPeerRange) {
+  failures.push(`react peer dependency must be ${expectedReactPeerRange}`)
+}
 if (packageJson.peerDependencies?.react && packageJson.peerDependenciesMeta?.react?.optional !== true) {
   failures.push('react peer dependency must be optional because the root and ./core entries are React-free')
 }
@@ -333,6 +337,12 @@ function assertPackageScripts() {
   }
   if (scripts['release:check'] !== 'npm run check && npm run check:registry') {
     failures.push('release:check must run npm run check && npm run check:registry')
+  }
+  if (scripts['check:react-peer'] !== 'node scripts/verify-react-peer-compatibility.mjs') {
+    failures.push('check:react-peer must run node scripts/verify-react-peer-compatibility.mjs')
+  }
+  if (!scripts.check?.includes('npm run check:react-peer')) {
+    failures.push('check must run npm run check:react-peer')
   }
 
   for (const script of forbiddenLifecycleScripts()) {
