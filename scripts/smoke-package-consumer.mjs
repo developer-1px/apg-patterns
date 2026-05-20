@@ -1,4 +1,4 @@
-import { execFileSync } from 'node:child_process'
+import { execFileSync, spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
@@ -48,7 +48,7 @@ try {
     smokeKind: 'react',
   })
 
-  console.log('package consumer smoke passed for ESM, CJS, script-enabled npm tarball install with transitive runtime dependencies and optional React, Vite bundler builds for root/core/react, NodeNext/Bundler/CJS TypeScript, package metadata, package export encapsulation, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
+  console.log('package consumer smoke passed for ESM, CJS, warning-free script-enabled npm tarball install with transitive runtime dependencies and optional React, Vite bundler builds for root/core/react, NodeNext/Bundler/CJS TypeScript, package metadata, package export encapsulation, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
 } finally {
   rmSync(tempRoot, { recursive: true, force: true })
 }
@@ -103,10 +103,7 @@ function runNpmInstalledConsumerSmoke({ tarballPath, consumerRoot, includeReact,
     overrides,
   }, null, 2))
 
-  execFileSync('npm', ['install', '--no-audit', '--no-fund', '--package-lock=false'], {
-    cwd: consumerRoot,
-    stdio: 'pipe',
-  })
+  runNpmInstall(consumerRoot)
   assertRuntimeDependencyInstallState(consumerRoot)
   assertReactInstallState(consumerRoot, includeReact)
 
@@ -143,6 +140,21 @@ function linkPackageDependency(nodeModules, name) {
 function localFileSpec(path) {
   if (!existsSync(path)) throw new Error(`Missing local package dependency for package smoke: ${path}`)
   return `file:${path}`
+}
+
+function runNpmInstall(consumerRoot) {
+  const result = spawnSync('npm', ['install', '--no-audit', '--no-fund', '--package-lock=false', '--loglevel=warn'], {
+    cwd: consumerRoot,
+    encoding: 'utf8',
+  })
+  const output = [result.stdout, result.stderr].filter(Boolean).join('\n')
+
+  if (result.status !== 0) {
+    throw new Error(`npm install failed in package consumer smoke:\n${output}`)
+  }
+  if (/\bnpm\s+warn\b/i.test(output)) {
+    throw new Error(`npm install emitted warnings in package consumer smoke:\n${output}`)
+  }
 }
 
 function assertReactInstallState(consumerRoot, includeReact) {
