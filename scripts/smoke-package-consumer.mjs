@@ -96,6 +96,7 @@ function runNpmInstalledConsumerSmoke({ tarballPath, consumerRoot, includeReact,
     cwd: consumerRoot,
     stdio: 'pipe',
   })
+  assertReactInstallState(consumerRoot, includeReact)
 
   writeConsumerFiles(consumerRoot, smokeKind, { writePackageJson: false })
   execFileSync(process.execPath, ['esm-smoke.mjs'], { cwd: consumerRoot, stdio: 'pipe' })
@@ -130,6 +131,19 @@ function linkPackageDependency(nodeModules, name) {
 function localFileSpec(path) {
   if (!existsSync(path)) throw new Error(`Missing local package dependency for package smoke: ${path}`)
   return `file:${path}`
+}
+
+function assertReactInstallState(consumerRoot, includeReact) {
+  const packages = ['react', 'react-dom', '@types/react', '@types/react-dom']
+  for (const name of packages) {
+    const installed = existsSync(packageInstallPath(consumerRoot, name))
+    if (includeReact && !installed) throw new Error(`Expected npm consumer to install ${name}`)
+    if (!includeReact && installed) throw new Error(`React-free npm consumer unexpectedly installed ${name}`)
+  }
+}
+
+function packageInstallPath(consumerRoot, name) {
+  return join(consumerRoot, 'node_modules', ...name.split('/'))
 }
 
 function writeConsumerFiles(consumerRoot, smokeKind, options = {}) {
