@@ -31,6 +31,8 @@ npm run release:check
 
 The publish workflow enforces `VERIFY_RELEASE_TAG=true`; run it from the `v<package.version>` git tag.
 
+Release preflight includes `npm run check:signatures` to verify installed dependency registry signatures and available attestations.
+
 Both release workflows upload `release-artifacts/` with the `npm pack` tarball and `npm-pack.json` for review.
 
 ## Public Surface

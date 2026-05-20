@@ -373,6 +373,7 @@ function assertContributingGuide(contributingGuide) {
     'npm run build',
     'npm run update:api',
     'npm run release:check',
+    'npm run check:signatures',
     'VERIFY_RELEASE_TAG=true',
     'v<package.version>',
     'release-artifacts/',
@@ -564,8 +565,11 @@ function assertPackageScripts() {
   if (scripts.prepublishOnly !== 'npm run release:check') {
     failures.push('prepublishOnly must run npm run release:check')
   }
-  if (scripts['release:check'] !== 'npm run check && npm run check:registry && npm run check:release-ref') {
-    failures.push('release:check must run npm run check && npm run check:registry && npm run check:release-ref')
+  if (scripts['release:check'] !== 'npm run check && npm run check:signatures && npm run check:registry && npm run check:release-ref') {
+    failures.push('release:check must run npm run check && npm run check:signatures && npm run check:registry && npm run check:release-ref')
+  }
+  if (scripts['check:signatures'] !== 'npm audit signatures') {
+    failures.push('check:signatures must run npm audit signatures')
   }
   if (scripts['check:release-ref'] !== 'node scripts/verify-release-git-ref.mjs') {
     failures.push('check:release-ref must run node scripts/verify-release-git-ref.mjs')

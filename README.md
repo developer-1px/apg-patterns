@@ -315,7 +315,6 @@ npm run check:readme
 npm run check:publish
 npm run smoke:package
 npm run demo:smoke
-npm run check:release-ref
 ```
 
 To compare the demo's APG example coverage against the currently linked examples on w3.org:
@@ -340,6 +339,8 @@ After changing public exports, run `npm run update:api` after `npm run build` to
 
 `check:publish` validates package metadata, package-lock root and runtime dependency consistency, local-only dependency specs, packed tarball contents, credential-material scans, packed Markdown links and deferred-placeholder scans, npm provenance publish dry-run metadata, the documented public provenance publish command and registry, runtime external imports, portable sourcemaps with source content, and production source imports that would create public-entry circular initialization.
 
+`check:signatures` verifies installed dependency registry signatures and available attestations with `npm audit signatures`.
+
 Before publishing a new version, run `npm run check:registry` to confirm the current package version is still unpublished on the public npm registry and, when the package already exists, is newer than the current `latest` dist-tag.
 
 `check:release-ref` reports the expected release tag. In the publish workflow it is strict and requires `GITHUB_REF_TYPE=tag` with `GITHUB_REF_NAME=v<package.version>`.
@@ -352,7 +353,15 @@ For the full release preflight:
 npm run release:check
 ```
 
-`prepublishOnly` also runs `npm run release:check`, so direct `npm publish` still executes the full local, registry, and release-ref preflight.
+`release:check` adds the dependency signature audit, npm registry preflight, and release git-ref preflight to `npm run check`:
+
+```bash
+npm run check:signatures
+npm run check:registry
+npm run check:release-ref
+```
+
+`prepublishOnly` also runs `npm run release:check`, so direct `npm publish` still executes the full local, dependency signature, registry, and release-ref preflight.
 
 Publish from the manual `Publish Package` GitHub Actions workflow on the `v<package.version>` git tag after configuring the package as an npm trusted publisher, or publish from a trusted GitHub Actions run after the preflight passes:
 
