@@ -42,17 +42,16 @@ for (const entry of surface) {
   expectFile(entry.hookPath, `${entry.apgPattern} hook file`)
   expectIncludes(reactAdapter, exportPath(entry.componentPath), `${entry.apgPattern} component export`)
   expectIncludes(reactAdapter, exportPath(entry.hookPath), `${entry.apgPattern} hook export`)
-  expectIncludes(readme, `<${entry.component}`, `${entry.apgPattern} README component example`)
-  expectIncludes(readme, entry.hook, `${entry.apgPattern} README hook`)
   expectRegex(coverageTest, new RegExp(`<${entry.component}\\b`), `${entry.apgPattern} preset coverage render`)
 }
+expectReadmeReactApiSurface(readme, surface)
 
 if (missing.length > 0) {
   console.error(`React preset surface is incomplete:\n${missing.join('\n')}`)
   process.exit(1)
 }
 
-console.log(`React preset surface covers ${surface.length} APG pattern renderers.`)
+console.log(`React preset surface and README React API cover ${surface.length} APG pattern renderers.`)
 
 function pattern(apgPattern, component, hook, directory) {
   return {
@@ -78,4 +77,53 @@ function expectIncludes(source, value, label) {
 
 function expectRegex(source, regex, label) {
   if (!regex.test(source)) missing.push(`- missing ${label}: ${regex}`)
+}
+
+function expectReadmeReactApiSurface(readme, expectedSurface) {
+  const section = readSection(readme, 'React API')
+  if (!section) {
+    missing.push('- missing README React API section')
+    return
+  }
+
+  const [componentPart, hookAndLaterPart] = splitRequired(section, /^Implemented hooks:\s*$/m, 'README Implemented hooks marker')
+  if (!hookAndLaterPart) return
+
+  const hookPart = hookAndLaterPart.split(/^`useTreeviewPattern` and/m)[0]
+  const actualComponents = [...componentPart.matchAll(/<([A-Z][A-Za-z0-9]*)\b/g)].map((match) => match[1])
+  const actualHooks = [...hookPart.matchAll(/^(use[A-Za-z0-9]+Pattern)\(/gm)].map((match) => match[1])
+
+  expectExactList(actualComponents, expectedSurface.map((entry) => entry.component), 'README React component list')
+  expectExactList(actualHooks, expectedSurface.map((entry) => entry.hook), 'README React hook list')
+}
+
+function readSection(source, heading) {
+  const match = new RegExp(`^## ${escapeRegExp(heading)}\\s*$`, 'm').exec(source)
+  if (!match) return ''
+  const afterHeading = source.slice(match.index + match[0].length)
+  const nextHeadingOffset = afterHeading.search(/\n## /)
+  return nextHeadingOffset === -1 ? afterHeading : afterHeading.slice(0, nextHeadingOffset)
+}
+
+function splitRequired(source, separator, label) {
+  const match = separator.exec(source)
+  if (!match) {
+    missing.push(`- missing ${label}`)
+    return [source, '']
+  }
+  return [source.slice(0, match.index), source.slice(match.index + match[0].length)]
+}
+
+function expectExactList(actual, expected, label) {
+  const missingValues = expected.filter((value) => !actual.includes(value))
+  const extraValues = actual.filter((value) => !expected.includes(value))
+  if (missingValues.length > 0) missing.push(`- ${label} missing: ${missingValues.join(', ')}`)
+  if (extraValues.length > 0) missing.push(`- ${label} has unexpected entries: ${extraValues.join(', ')}`)
+  if (missingValues.length === 0 && extraValues.length === 0 && actual.join('\n') !== expected.join('\n')) {
+    missing.push(`- ${label} order must match the React preset surface`)
+  }
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
