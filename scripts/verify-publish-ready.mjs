@@ -222,6 +222,7 @@ function assertDocumentationMetadata() {
   if (readme && !/\bAPI\.md\b/.test(readme)) {
     failures.push('README must link to API.md')
   }
+  assertReadmeCodeStructure(readme)
   if (packageName && readme && !new RegExp(`\\bnpm\\s+install\\s+${escapeRegExp(packageName)}\\b`).test(readme)) {
     failures.push('README must document installing the package by its package name')
   }
@@ -248,6 +249,44 @@ function assertDocumentationMetadata() {
   if (packageAuthor && license && !new RegExp(`^Copyright \\(c\\) \\d{4} ${escapeRegExp(packageAuthor)}\\s*$`, 'm').test(license)) {
     failures.push('LICENSE copyright holder must match package author')
   }
+}
+
+function assertReadmeCodeStructure(readme) {
+  if (!readme) return
+  const section = readSection(readme, 'Code Structure')
+  if (!section) {
+    failures.push('README must document the source, demo, and release-script code structure')
+    return
+  }
+
+  const requiredStructureMarkers = [
+    'src/',
+    'index.ts: React-free root public entry',
+    'core.ts: React-free schema, runtime, and pattern-definition entry',
+    'react.ts: React adapter and preset-component entry',
+    'schema/: serializable contracts and Zod validators',
+    'kernel/: runtime resolution, reducers, events, and state helpers',
+    'patterns/: APG definitions, runtime helpers, hooks, and presets',
+    'adapters/: React prop, effect, focus, and id helpers',
+    'demo/src/',
+    'app/: demo shell, routing, source viewer, and repro recorder',
+    'patterns/: APG previews, demo data, and APG behavior tests',
+    'shared/: demo registry, state hosts, variant controls, and inspectors',
+    'scripts/',
+    'verify-*.mjs and smoke-*.mjs: API, package, publish, consumer, and demo gates',
+  ]
+
+  for (const marker of requiredStructureMarkers) {
+    if (!section.includes(marker)) failures.push(`README Code Structure must include ${marker}`)
+  }
+}
+
+function readSection(source, heading) {
+  const match = new RegExp(`^## ${escapeRegExp(heading)}\\s*$`, 'm').exec(source)
+  if (!match) return ''
+  const afterHeading = source.slice(match.index + match[0].length)
+  const nextHeadingOffset = afterHeading.search(/\n## /)
+  return nextHeadingOffset === -1 ? afterHeading : afterHeading.slice(0, nextHeadingOffset)
 }
 
 function assertReadmeCommandExamples() {

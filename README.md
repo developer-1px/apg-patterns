@@ -254,6 +254,27 @@ react: {
 
 The descriptor is attached where a pattern has a generated React facade surface.
 
+## Code Structure
+
+```txt
+src/
+├─ index.ts: React-free root public entry
+├─ core.ts: React-free schema, runtime, and pattern-definition entry
+├─ react.ts: React adapter and preset-component entry
+├─ schema/: serializable contracts and Zod validators
+├─ kernel/: runtime resolution, reducers, events, and state helpers
+├─ patterns/: APG definitions, runtime helpers, hooks, and presets
+└─ adapters/: React prop, effect, focus, and id helpers
+
+demo/src/
+├─ app/: demo shell, routing, source viewer, and repro recorder
+├─ patterns/: APG previews, demo data, and APG behavior tests
+└─ shared/: demo registry, state hosts, variant controls, and inspectors
+
+scripts/
+└─ verify-*.mjs and smoke-*.mjs: API, package, publish, consumer, and demo gates
+```
+
 ## Demo
 
 ```bash
