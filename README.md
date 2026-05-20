@@ -289,6 +289,8 @@ npm run check:apg
 
 `check:readme` type-checks the Quick Start examples against the built package.
 
+`check:exports` validates package manifest paths and declaration export boundaries for the root, `./core`, and `./react` entries.
+
 `check:publish` validates package metadata, package-lock root consistency, local-only dependency specs, packed tarball contents, runtime external imports, portable sourcemaps with source content, and production source imports that would create public-entry circular initialization.
 
 ## Design Notes
