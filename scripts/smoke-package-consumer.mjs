@@ -28,7 +28,7 @@ try {
     smokeKind: 'core',
   })
 
-  console.log('package consumer smoke passed for ESM, CJS, TypeScript, React-free root/core imports, and React TSX subpath imports.')
+  console.log('package consumer smoke passed for ESM, CJS, TypeScript, package metadata, React-free root/core imports, and React TSX subpath imports.')
 } finally {
   rmSync(tempRoot, { recursive: true, force: true })
 }
@@ -109,6 +109,9 @@ function runtimeSmokeSource(moduleKind, smokeKind) {
     : moduleKind === 'esm'
       ? "\nconst { Button } = await import('@interactive-os/apg-patterns/react')\nif (typeof Button !== 'function') throw new Error('react subpath did not expose Button')\n"
       : "\nconst { Button } = require('@interactive-os/apg-patterns/react')\nif (typeof Button !== 'function') throw new Error('react subpath did not expose Button')\n"
+  const metadataSmoke = moduleKind === 'cjs'
+    ? "\nconst packageMetadata = require('@interactive-os/apg-patterns/package.json')\nif (packageMetadata.name !== '@interactive-os/apg-patterns') throw new Error('package metadata export did not expose package name')\n"
+    : ''
 
   return `${importLine}
 
@@ -128,6 +131,7 @@ const runtime = createPatternRuntime({
 if (buttonDefinition.apgPattern !== 'button') throw new Error('button definition was not loaded')
 if (runtime.visibleKeys[0] !== 'primary') throw new Error('runtime did not resolve visible keys')
 if (typeof runtime.getRootKeyboardHandler() !== 'function') throw new Error('runtime keyboard handler missing')
+${metadataSmoke}
 ${reactSmoke}
 `
 }

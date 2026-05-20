@@ -32,6 +32,9 @@ if (packageJson.peerDependencies?.react && packageJson.peerDependenciesMeta?.rea
 for (const subpath of ['.', './core', './react']) {
   assertExportConditions(subpath, packageJson.exports?.[subpath])
 }
+if (packageJson.exports?.['./package.json'] !== './package.json') {
+  failures.push('exports["./package.json"] must expose package metadata')
+}
 
 for (const [section, dependencies] of Object.entries(dependencySections(packageJson))) {
   for (const [name, spec] of Object.entries(dependencies)) {

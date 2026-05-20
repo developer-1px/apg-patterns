@@ -43,7 +43,8 @@
       "types": "./dist/react.d.ts",
       "import": "./dist/react.js",
       "require": "./dist/react.cjs"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "dist",
