@@ -1,4 +1,5 @@
-import { KeyTokens, type KeyboardBinding } from '../../index'
+import { KeyTokens } from '../../kernel/kernelVocabulary'
+import type { KeyboardBinding } from '../../schema'
 import { COMBOBOX_TOKEN } from './navigation'
 
 export const comboboxKeyboard = [

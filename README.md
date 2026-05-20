@@ -221,7 +221,7 @@ npm run demo
 npm run check
 ```
 
-`check` runs TypeScript validation, the Vitest suite, APG coverage validation, demo/source consistency checks, package manifest checks, the package build, export validation, publish-readiness validation, and the production demo smoke test:
+`check` runs TypeScript validation, the Vitest suite, APG coverage validation, demo/source consistency checks, package manifest checks, the package build, export validation, publish-readiness validation, package consumer smoke tests, and the production demo smoke test:
 
 ```bash
 npm run typecheck
@@ -233,6 +233,7 @@ npm run check:package
 npm run build
 npm run check:exports
 npm run check:publish
+npm run smoke:package
 npm run demo:smoke
 ```
 

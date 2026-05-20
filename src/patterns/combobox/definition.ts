@@ -12,7 +12,7 @@
  *   - 'listbox' part has role 'listbox'.
  *   - 'option' part has role 'option' with aria-selected.
  */
-import { PatternDefinitionSchema } from '../../index'
+import { PatternDefinitionSchema } from '../../schema'
 import { comboboxKeyboard } from './keyboard'
 import { COMBOBOX_KEY } from './navigation'
 import { comboboxParts } from './parts'

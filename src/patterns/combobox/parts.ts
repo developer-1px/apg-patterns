@@ -1,4 +1,4 @@
-import { AriaSources, DomEvents } from '../../index'
+import { AriaSources, DomEvents } from '../../kernel/kernelVocabulary'
 import { COMBOBOX_TOKEN } from './navigation'
 
 export const comboboxParts = {

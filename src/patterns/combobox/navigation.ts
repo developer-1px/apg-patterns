@@ -3,7 +3,7 @@ import {
   defineKeyToken,
   defineNavigationTarget,
   defineVisibleOrder,
-} from '../../index'
+} from '../../kernel/patternKernel'
 
 export const COMBOBOX_KEY = 'combobox'
 export const COMBOBOX_TOKEN = '$combobox'
