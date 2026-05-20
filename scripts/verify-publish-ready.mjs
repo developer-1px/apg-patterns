@@ -379,6 +379,7 @@ function assertContributingGuide(contributingGuide) {
   const requiredMarkers = [
     'npm ci',
     'npm run check',
+    'npm run check:source-safety',
     'npm run build',
     'npm run update:api',
     'npm run release:check',
@@ -695,6 +696,9 @@ function assertPackageScripts() {
   if (scripts['check:signatures'] !== 'npm audit signatures') {
     failures.push('check:signatures must run npm audit signatures')
   }
+  if (scripts['check:source-safety'] !== 'node scripts/verify-public-source-safety.mjs') {
+    failures.push('check:source-safety must run node scripts/verify-public-source-safety.mjs')
+  }
   if (scripts['check:release-ref'] !== 'node scripts/verify-release-git-ref.mjs') {
     failures.push('check:release-ref must run node scripts/verify-release-git-ref.mjs')
   }
@@ -709,6 +713,9 @@ function assertPackageScripts() {
   }
   if (!scripts.check?.includes('npm run check:react-peer')) {
     failures.push('check must run npm run check:react-peer')
+  }
+  if (!scripts.check?.includes('npm run check:source-safety')) {
+    failures.push('check must run npm run check:source-safety')
   }
 
   for (const script of forbiddenLifecycleScripts()) {

@@ -14,6 +14,7 @@ Run the full local gate before submitting changes:
 
 ```bash
 npm run check
+npm run check:source-safety
 ```
 
 For public export changes, rebuild and refresh the API reference:

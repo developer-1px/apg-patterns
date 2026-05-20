@@ -296,10 +296,11 @@ npm run demo
 npm run check
 ```
 
-`check` runs repository hygiene validation, package independence validation, TypeScript validation, the Vitest suite, APG coverage validation, demo/source consistency checks, package manifest checks, React peer compatibility validation, the package build, API reference validation, export validation, publish-readiness validation, package consumer smoke tests including actual npm pack tarball integrity, runtime export parity, published docs, install-lifecycle-free package metadata, npm tarball installation and Vite bundling, and the production demo smoke test:
+`check` runs repository hygiene validation, public source credential-material scanning, package independence validation, TypeScript validation, the Vitest suite, APG coverage validation, demo/source consistency checks, package manifest checks, React peer compatibility validation, the package build, API reference validation, export validation, publish-readiness validation, package consumer smoke tests including actual npm pack tarball integrity, runtime export parity, published docs, install-lifecycle-free package metadata, npm tarball installation and Vite bundling, and the production demo smoke test:
 
 ```bash
 npm run check:repo
+npm run check:source-safety
 npm run check:independence
 npm run typecheck
 npm test
@@ -326,6 +327,8 @@ npm run check:apg
 `check:readme` type-checks the Quick Start and React API TypeScript examples against the built package and executes the root Quick Start.
 
 `check:repo` verifies that generated outputs, local environment files, IDE files, ignored paths, and release artifacts are not tracked by git, that tracked bug records are release-resolved, and that the GitHub Actions release workflows run the release preflight, upload the packed package artifact, and keep publishing on trusted OIDC auth instead of static npm tokens.
+
+`check:source-safety` scans tracked source files for credential material before the repository is made public.
 
 `check:independence` verifies that this package keeps its dependency surface separate from legacy APG workspaces.
 

@@ -12,6 +12,7 @@
 - Published package includes a security reporting policy.
 - Release preflight can verify that the current package version is still unpublished on the public npm registry and, for existing packages, is newer than the current `latest` dist-tag.
 - External release-state verification can check origin alignment, public GitHub reachability, and current npm registry availability before publishing.
+- Public source safety verification scans tracked files for credential material before making the repository public.
 - `release:check` runs the full local gate, dependency signature audit, npm registry preflight, and release git-ref preflight before publishing.
 - GitHub Actions includes SHA-pinned release and manual trusted-publishing workflows that run the full release preflight, upload the packed package artifact, avoid static npm token auth, and publish with npm provenance.
 - The manual publish workflow verifies external release state before packing or publishing.
