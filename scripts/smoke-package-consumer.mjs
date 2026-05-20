@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
-import { dirname, join, resolve } from 'node:path'
+import { basename, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
@@ -49,7 +49,7 @@ try {
     smokeKind: 'react',
   })
 
-  console.log('package consumer smoke passed for actual npm pack tarball integrity, ESM, CJS, runtime export parity, warning-free script-enabled npm tarball install with transitive runtime dependencies and optional React, Vite bundler builds for root/core/react, NodeNext/Bundler/CJS TypeScript, package metadata and published docs, package export encapsulation, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
+  console.log('package consumer smoke passed for actual npm pack tarball integrity, ESM, CJS, runtime export parity, warning-free script-enabled npm tarball install with package-lock integrity, transitive runtime dependencies and optional React, Vite bundler builds for root/core/react, NodeNext/Bundler/CJS TypeScript, package metadata and published docs, package export encapsulation, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
 } finally {
   rmSync(tempRoot, { recursive: true, force: true })
 }
@@ -105,6 +105,7 @@ function runNpmInstalledConsumerSmoke({ tarballPath, consumerRoot, includeReact,
   }, null, 2))
 
   runNpmInstall(consumerRoot)
+  assertNpmInstallLockfile(consumerRoot, tarballPath, includeReact)
   assertRuntimeDependencyInstallState(consumerRoot)
   assertReactInstallState(consumerRoot, includeReact)
 
@@ -178,7 +179,7 @@ function localFileSpec(path) {
 }
 
 function runNpmInstall(consumerRoot) {
-  const result = spawnSync('npm', ['install', '--no-audit', '--no-fund', '--package-lock=false', '--loglevel=warn'], {
+  const result = spawnSync('npm', ['install', '--no-audit', '--no-fund', '--loglevel=warn'], {
     cwd: consumerRoot,
     encoding: 'utf8',
   })
@@ -190,6 +191,49 @@ function runNpmInstall(consumerRoot) {
   if (/\bnpm\s+warn\b/i.test(output)) {
     throw new Error(`npm install emitted warnings in package consumer smoke:\n${output}`)
   }
+}
+
+function assertNpmInstallLockfile(consumerRoot, tarballPath, includeReact) {
+  const lockPath = join(consumerRoot, 'package-lock.json')
+  if (!existsSync(lockPath)) throw new Error('npm install did not create a package-lock.json')
+
+  const packageLock = JSON.parse(readFileSync(lockPath, 'utf8'))
+  if (packageLock.lockfileVersion !== 3) throw new Error('npm consumer package-lock must use lockfileVersion 3')
+
+  const rootPackage = packageLock.packages?.['']
+  if (!rootPackage) throw new Error('npm consumer package-lock is missing root package metadata')
+  if (rootPackage.dependencies?.['@interactive-os/apg-patterns'] !== localFileSpec(tarballPath)) {
+    throw new Error('npm consumer package-lock did not retain the tarball dependency spec')
+  }
+
+  const installedPackage = packageLock.packages?.['node_modules/@interactive-os/apg-patterns']
+  if (!installedPackage) throw new Error('npm consumer package-lock is missing the installed package entry')
+  if (installedPackage.version !== packageJson.version) throw new Error('npm consumer package-lock recorded the wrong package version')
+  if (installedPackage.license !== packageJson.license) throw new Error('npm consumer package-lock recorded the wrong package license')
+  if (installedPackage.engines?.node !== packageJson.engines?.node) {
+    throw new Error('npm consumer package-lock recorded the wrong Node engine')
+  }
+  if (installedPackage.dependencies?.zod !== packageJson.dependencies?.zod) {
+    throw new Error('npm consumer package-lock recorded the wrong zod runtime dependency')
+  }
+  if (installedPackage.peerDependencies?.react !== packageJson.peerDependencies?.react) {
+    throw new Error('npm consumer package-lock recorded the wrong React peer dependency')
+  }
+  if (installedPackage.peerDependenciesMeta?.react?.optional !== true) {
+    throw new Error('npm consumer package-lock did not record React as an optional peer')
+  }
+  if (typeof installedPackage.resolved !== 'string' || !installedPackage.resolved.startsWith('file:') || !installedPackage.resolved.endsWith(basename(tarballPath))) {
+    throw new Error('npm consumer package-lock did not resolve the package to the packed tarball')
+  }
+
+  const expectedIntegrity = `sha512-${createHash('sha512').update(readFileSync(tarballPath)).digest('base64')}`
+  if (installedPackage.integrity !== expectedIntegrity) {
+    throw new Error('npm consumer package-lock recorded the wrong tarball integrity')
+  }
+  if (!packageLock.packages?.['node_modules/zod']) throw new Error('npm consumer package-lock is missing the zod runtime dependency')
+  const hasReactLockEntry = Boolean(packageLock.packages?.['node_modules/react'])
+  if (includeReact && !hasReactLockEntry) throw new Error('React npm consumer package-lock is missing react')
+  if (!includeReact && hasReactLockEntry) throw new Error('React-free npm consumer package-lock unexpectedly includes react')
 }
 
 function assertReactInstallState(consumerRoot, includeReact) {
