@@ -21,7 +21,7 @@ if (packageJson.name?.startsWith('@') && packageJson.publishConfig?.access !== '
 if (!existsSync('README.md')) failures.push('README.md is required')
 if (!existsSync('CHANGELOG.md')) failures.push('CHANGELOG.md is required')
 if (!existsSync('LICENSE')) failures.push('LICENSE is required')
-assertReadmePackageManager()
+assertReadmeCommandExamples()
 assertDependencyNames('dependencies', packageJson.dependencies, ['zod'])
 assertDependencyNames('peerDependencies', packageJson.peerDependencies, ['react'])
 assertDependencyNames('optionalDependencies', packageJson.optionalDependencies, [])
@@ -140,10 +140,18 @@ function dependencySections(pkg) {
   }
 }
 
-function assertReadmePackageManager() {
+function assertReadmeCommandExamples() {
   const readme = readFileSync('README.md', 'utf8')
   if (packageJson.packageManager?.startsWith('npm@') && /\b(?:pnpm|yarn)\s+(?:add|install|demo|run)\b/.test(readme)) {
     failures.push('README command examples must use npm because packageManager is npm')
+  }
+
+  const scripts = new Set(Object.keys(packageJson.scripts ?? {}))
+  for (const [, script] of readme.matchAll(/\bnpm\s+run\s+([A-Za-z0-9:_-]+)/g)) {
+    if (!scripts.has(script)) failures.push(`README command references missing package script "${script}"`)
+  }
+  if (/\bnpm\s+test\b/.test(readme) && !scripts.has('test')) {
+    failures.push('README command references missing package script "test"')
   }
 }
 

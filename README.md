@@ -258,12 +258,6 @@ The descriptor is attached where a pattern has a generated React facade surface.
 npm run demo
 ```
 
-or:
-
-```bash
-npm run demo
-```
-
 ## Verification
 
 ```bash
