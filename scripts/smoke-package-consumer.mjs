@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -41,7 +42,7 @@ try {
     smokeKind: 'react',
   })
 
-  console.log('package consumer smoke passed for ESM, CJS, script-enabled npm tarball install with and without React, Vite bundler build, NodeNext/Bundler/CJS TypeScript, package metadata, package export encapsulation, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
+  console.log('package consumer smoke passed for ESM, CJS, script-enabled npm tarball install with transitive runtime dependencies and optional React, Vite bundler build, NodeNext/Bundler/CJS TypeScript, package metadata, package export encapsulation, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
 } finally {
   rmSync(tempRoot, { recursive: true, force: true })
 }
@@ -74,9 +75,11 @@ function runNpmInstalledConsumerSmoke({ tarballPath, consumerRoot, includeReact,
   mkdirSync(consumerRoot, { recursive: true })
   const dependencies = {
     '@interactive-os/apg-patterns': localFileSpec(tarballPath),
-    zod: localFileSpec(join(repoRoot, 'node_modules', 'zod')),
   }
   const devDependencies = {}
+  const overrides = {
+    zod: localFileSpec(join(repoRoot, 'node_modules', 'zod')),
+  }
 
   if (includeReact) {
     dependencies.react = localFileSpec(join(repoRoot, 'node_modules', 'react'))
@@ -91,12 +94,14 @@ function runNpmInstalledConsumerSmoke({ tarballPath, consumerRoot, includeReact,
     type: 'module',
     dependencies,
     devDependencies,
+    overrides,
   }, null, 2))
 
   execFileSync('npm', ['install', '--no-audit', '--no-fund', '--package-lock=false'], {
     cwd: consumerRoot,
     stdio: 'pipe',
   })
+  assertRuntimeDependencyInstallState(consumerRoot)
   assertReactInstallState(consumerRoot, includeReact)
 
   writeConsumerFiles(consumerRoot, smokeKind, { writePackageJson: false })
@@ -141,6 +146,16 @@ function assertReactInstallState(consumerRoot, includeReact) {
     if (includeReact && !installed) throw new Error(`Expected npm consumer to install ${name}`)
     if (!includeReact && installed) throw new Error(`React-free npm consumer unexpectedly installed ${name}`)
   }
+}
+
+function assertRuntimeDependencyInstallState(consumerRoot) {
+  const consumerPackageJson = JSON.parse(readFileSync(join(consumerRoot, 'package.json'), 'utf8'))
+  if (consumerPackageJson.dependencies?.zod) throw new Error('npm consumer must not install zod as a direct dependency')
+
+  const packageRoot = packageInstallPath(consumerRoot, '@interactive-os/apg-patterns')
+  const packageRequire = createRequire(join(packageRoot, 'package.json'))
+  const zodPath = packageRequire.resolve('zod')
+  if (!existsSync(zodPath)) throw new Error('Installed package could not resolve its zod runtime dependency')
 }
 
 function packageInstallPath(consumerRoot, name) {
