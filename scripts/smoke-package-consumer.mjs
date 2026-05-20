@@ -27,8 +27,13 @@ try {
     includeReact: false,
     smokeKind: 'core',
   })
+  runNpmInstalledConsumerSmoke({
+    tarballPath,
+    consumerRoot: join(tempRoot, 'consumer-npm-install-react'),
+    smokeKind: 'react',
+  })
 
-  console.log('package consumer smoke passed for ESM, CJS, NodeNext/Bundler TypeScript, package metadata, React-free root/core imports, and React TSX subpath imports.')
+  console.log('package consumer smoke passed for ESM, CJS, npm tarball install, NodeNext/Bundler TypeScript, package metadata, React-free root/core imports, and React TSX subpath imports.')
 } finally {
   rmSync(tempRoot, { recursive: true, force: true })
 }
@@ -56,6 +61,34 @@ function runConsumerSmoke({ tarballPath, consumerRoot, includeReact, smokeKind }
   execFileSync(join(repoRoot, 'node_modules/.bin/tsc'), ['--project', 'tsconfig.bundler.json', '--noEmit'], { cwd: consumerRoot, stdio: 'pipe' })
 }
 
+function runNpmInstalledConsumerSmoke({ tarballPath, consumerRoot, smokeKind }) {
+  mkdirSync(consumerRoot, { recursive: true })
+  writeFileSync(join(consumerRoot, 'package.json'), JSON.stringify({
+    private: true,
+    type: 'module',
+    dependencies: {
+      '@interactive-os/apg-patterns': localFileSpec(tarballPath),
+      zod: localFileSpec(join(repoRoot, 'node_modules', 'zod')),
+      react: localFileSpec(join(repoRoot, 'node_modules', 'react')),
+    },
+    devDependencies: {
+      '@types/react': localFileSpec(join(repoRoot, 'node_modules', '@types/react')),
+      csstype: localFileSpec(join(repoRoot, 'node_modules', 'csstype')),
+    },
+  }, null, 2))
+
+  execFileSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock=false'], {
+    cwd: consumerRoot,
+    stdio: 'pipe',
+  })
+
+  writeConsumerFiles(consumerRoot, smokeKind, { writePackageJson: false })
+  execFileSync(process.execPath, ['esm-smoke.mjs'], { cwd: consumerRoot, stdio: 'pipe' })
+  execFileSync(process.execPath, ['cjs-smoke.cjs'], { cwd: consumerRoot, stdio: 'pipe' })
+  execFileSync(join(repoRoot, 'node_modules/.bin/tsc'), ['--project', 'tsconfig.nodenext.json', '--noEmit'], { cwd: consumerRoot, stdio: 'pipe' })
+  execFileSync(join(repoRoot, 'node_modules/.bin/tsc'), ['--project', 'tsconfig.bundler.json', '--noEmit'], { cwd: consumerRoot, stdio: 'pipe' })
+}
+
 function packCurrentPackage(destination) {
   const stdout = execFileSync('npm', ['pack', '--pack-destination', destination, '--json'], {
     cwd: repoRoot,
@@ -77,9 +110,16 @@ function linkPackageDependency(nodeModules, name) {
   symlinkSync(source, target, 'dir')
 }
 
-function writeConsumerFiles(consumerRoot, smokeKind) {
+function localFileSpec(path) {
+  if (!existsSync(path)) throw new Error(`Missing local package dependency for package smoke: ${path}`)
+  return `file:${path}`
+}
+
+function writeConsumerFiles(consumerRoot, smokeKind, options = {}) {
   const typeSmokeFilename = smokeKind === 'react' ? 'type-smoke.tsx' : 'type-smoke.ts'
-  writeFileSync(join(consumerRoot, 'package.json'), JSON.stringify({ private: true, type: 'module' }, null, 2))
+  if (options.writePackageJson !== false) {
+    writeFileSync(join(consumerRoot, 'package.json'), JSON.stringify({ private: true, type: 'module' }, null, 2))
+  }
   writeFileSync(join(consumerRoot, 'esm-smoke.mjs'), runtimeSmokeSource('esm', smokeKind))
   writeFileSync(join(consumerRoot, 'cjs-smoke.cjs'), runtimeSmokeSource('cjs', smokeKind))
   writeFileSync(join(consumerRoot, 'tsconfig.nodenext.json'), tsconfigSource({
