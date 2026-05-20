@@ -287,7 +287,7 @@ To compare the demo's APG example coverage against the currently linked examples
 npm run check:apg
 ```
 
-`check:readme` type-checks the Quick Start examples against the built package.
+`check:readme` type-checks the Quick Start and React API TypeScript examples against the built package.
 
 `check:exports` validates package manifest paths and ESM/CJS declaration export boundaries for the root, `./core`, and `./react` entries.
 

@@ -9,7 +9,7 @@ const tempRoot = mkdtempSync(join(tmpdir(), 'apg-patterns-readme-'))
 
 try {
   assertBuildOutputExists()
-  const examples = readQuickStartExamples()
+  const examples = readReadmeExamples()
   const consumerRoot = join(tempRoot, 'consumer')
   const nodeModules = join(consumerRoot, 'node_modules')
 
@@ -21,10 +21,9 @@ try {
   linkPackageDependency(nodeModules, 'csstype')
 
   writeFileSync(join(consumerRoot, 'package.json'), JSON.stringify({ private: true, type: 'module' }, null, 2))
-  const filenames = examples.map((source, index) => {
-    const filename = `readme-quick-start-${index + 1}.tsx`
-    writeFileSync(join(consumerRoot, filename), source)
-    return filename
+  const filenames = examples.map((example) => {
+    writeFileSync(join(consumerRoot, example.filename), example.source)
+    return example.filename
   })
 
   writeFileSync(join(consumerRoot, 'tsconfig.nodenext.json'), tsconfigSource({
@@ -47,7 +46,7 @@ try {
     stdio: 'pipe',
   })
 
-  console.log(`README Quick Start type-checks ${examples.length} examples under NodeNext and Bundler module resolution.`)
+  console.log(`README type-checks ${examples.length} TypeScript examples under NodeNext and Bundler module resolution.`)
 } finally {
   rmSync(tempRoot, { recursive: true, force: true })
 }
@@ -60,22 +59,129 @@ function assertBuildOutputExists() {
   }
 }
 
-function readQuickStartExamples() {
+function readReadmeExamples() {
   const readme = readFileSync(join(repoRoot, 'README.md'), 'utf8')
-  const quickStartMatch = /^## Quick Start\s*$/m.exec(readme)
-  if (!quickStartMatch) throw new Error('README is missing a Quick Start section')
+  const quickStartExamples = readQuickStartExamples(readme)
+  const reactApiExamples = readReactApiExamples(readme)
+  return [
+    ...quickStartExamples.map((source, index) => ({
+      filename: `readme-quick-start-${index + 1}.tsx`,
+      source,
+    })),
+    ...reactApiExamples,
+  ]
+}
 
-  const sectionStart = quickStartMatch.index + quickStartMatch[0].length
-  const afterQuickStart = readme.slice(sectionStart)
-  const nextSectionOffset = afterQuickStart.search(/\n## /)
-  const section = nextSectionOffset === -1 ? afterQuickStart : afterQuickStart.slice(0, nextSectionOffset)
-  const examples = [...section.matchAll(/```tsx\n([\s\S]*?)\n```/g)].map((match) => match[1])
+function readQuickStartExamples(readme) {
+  const section = readSection(readme, 'Quick Start')
+  if (!section) throw new Error('README is missing a Quick Start section')
 
+  const examples = tsxCodeBlocks(section)
   if (examples.length !== 2) {
     throw new Error(`README Quick Start must contain exactly 2 tsx examples; found ${examples.length}`)
   }
 
   return examples
+}
+
+function readReactApiExamples(readme) {
+  const section = readSection(readme, 'React API')
+  if (!section) throw new Error('README is missing a React API section')
+
+  const examples = tsxCodeBlocks(section)
+  if (examples.length !== 3) {
+    throw new Error(`README React API must contain exactly 3 tsx examples; found ${examples.length}`)
+  }
+
+  const [componentExample, listboxExample, treeviewExample] = examples
+  if (!componentExample.trimStart().startsWith('<Accordion')) {
+    throw new Error('README React API first tsx example must be the preset component surface')
+  }
+  if (!listboxExample.includes('useListboxPattern')) {
+    throw new Error('README React API second tsx example must cover useListboxPattern renderItems')
+  }
+  if (!treeviewExample.includes('useTreeviewPattern')) {
+    throw new Error('README React API third tsx example must cover useTreeviewPattern renderItems')
+  }
+
+  return [
+    {
+      filename: 'readme-react-api-components.tsx',
+      source: reactPresetComponentExampleSource(componentExample),
+    },
+    {
+      filename: 'readme-react-api-listbox.tsx',
+      source: reactRenderItemsExampleSource({
+        hook: 'useListboxPattern',
+        name: 'ReadmeListboxRenderItems',
+        snippet: listboxExample,
+      }),
+    },
+    {
+      filename: 'readme-react-api-treeview.tsx',
+      source: reactRenderItemsExampleSource({
+        hook: 'useTreeviewPattern',
+        name: 'ReadmeTreeviewRenderItems',
+        snippet: treeviewExample,
+      }),
+    },
+  ]
+}
+
+function readSection(source, heading) {
+  const match = new RegExp(`^## ${escapeRegExp(heading)}\\s*$`, 'm').exec(source)
+  if (!match) return ''
+  const afterHeading = source.slice(match.index + match[0].length)
+  const nextHeadingOffset = afterHeading.search(/\n## /)
+  return nextHeadingOffset === -1 ? afterHeading : afterHeading.slice(0, nextHeadingOffset)
+}
+
+function tsxCodeBlocks(source) {
+  return [...source.matchAll(/```tsx\n([\s\S]*?)\n```/g)].map((match) => match[1])
+}
+
+function reactPresetComponentExampleSource(snippet) {
+  const componentNames = [...snippet.matchAll(/<([A-Z][A-Za-z0-9]*)\b/g)].map((match) => match[1])
+  const uniqueComponentNames = [...new Set(componentNames)]
+  return `import { ${uniqueComponentNames.join(', ')}, type PatternData, type PatternEvent } from '@interactive-os/apg-patterns/react'
+
+const data: PatternData = {
+  items: { primary: { label: 'Primary' } },
+  relations: { rootKeys: ['primary'] },
+  state: { activeKey: 'primary' },
+}
+const onEvent = (event: PatternEvent) => { void event }
+
+export function ReadmeReactPresetComponents() {
+  return (
+    <>
+${indent(snippet, 6)}
+    </>
+  )
+}
+`
+}
+
+function reactRenderItemsExampleSource({ hook, name, snippet }) {
+  return `import { ${hook}, type PatternData, type PatternEvent, type PatternOptions } from '@interactive-os/apg-patterns/react'
+
+const data: PatternData = {
+  items: { primary: { label: 'Primary' } },
+  relations: { rootKeys: ['primary'] },
+  state: { activeKey: 'primary' },
+}
+const onEvent = (event: PatternEvent) => { void event }
+const options: PatternOptions = {}
+
+export function ${name}() {
+${indent(snippet, 2)}
+}
+`
+}
+
+function indent(source, spaces) {
+  const prefix = ' '.repeat(spaces)
+  return source.split('\n').map((line) => `${prefix}${line}`).join('\n')
 }
 
 function linkPackageDependency(nodeModules, name) {
@@ -99,4 +205,8 @@ function tsconfigSource({ module, moduleResolution, include }) {
     },
     include,
   }, null, 2)
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
