@@ -1,6 +1,6 @@
 import { execFileSync, spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import { basename, dirname, join, resolve } from 'node:path'
@@ -49,7 +49,7 @@ try {
     smokeKind: 'react',
   })
 
-  console.log('package consumer smoke passed for actual npm pack tarball integrity, ESM, CJS, runtime export parity, warning-free script-enabled npm tarball install with package-lock integrity, transitive runtime dependencies and optional React, Vite bundler builds for root/core/react, NodeNext/Bundler/CJS TypeScript, package metadata and published docs, package export encapsulation, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
+  console.log('package consumer smoke passed for actual npm pack tarball integrity, ESM, CJS, runtime export parity, warning-free script-enabled npm tarball install with exact installed file tree, package-lock integrity, transitive runtime dependencies and optional React, Vite bundler builds for root/core/react, NodeNext/Bundler/CJS TypeScript, package metadata and published docs, package export encapsulation, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
 } finally {
   rmSync(tempRoot, { recursive: true, force: true })
 }
@@ -105,6 +105,7 @@ function runNpmInstalledConsumerSmoke({ tarballPath, consumerRoot, includeReact,
   }, null, 2))
 
   runNpmInstall(consumerRoot)
+  assertNpmInstalledPackageFiles(consumerRoot, tarballPath)
   assertNpmInstallLockfile(consumerRoot, tarballPath, includeReact)
   assertRuntimeDependencyInstallState(consumerRoot)
   assertReactInstallState(consumerRoot, includeReact)
@@ -191,6 +192,59 @@ function runNpmInstall(consumerRoot) {
   if (/\bnpm\s+warn\b/i.test(output)) {
     throw new Error(`npm install emitted warnings in package consumer smoke:\n${output}`)
   }
+}
+
+function assertNpmInstalledPackageFiles(consumerRoot, tarballPath) {
+  const packageRoot = packageInstallPath(consumerRoot, '@interactive-os/apg-patterns')
+  const expectedPaths = packedTarballFilePaths(tarballPath)
+  const actualPaths = packageFilePaths(packageRoot).sort((left, right) => left.localeCompare(right))
+
+  if (actualPaths.join('\n') !== expectedPaths.join('\n')) {
+    const expected = new Set(expectedPaths)
+    const actual = new Set(actualPaths)
+    const missing = expectedPaths.filter((path) => !actual.has(path))
+    const extra = actualPaths.filter((path) => !expected.has(path))
+    throw new Error(`npm install package file tree did not match the packed tarball:\nmissing:\n${missing.join('\n')}\nextra:\n${extra.join('\n')}`)
+  }
+
+  for (const packagePath of expectedPaths) {
+    const installedPath = join(packageRoot, ...packagePath.split('/'))
+    const installedHash = sha256(readFileSync(installedPath))
+    const packedHash = sha256(execFileSync('tar', ['-xOzf', tarballPath, `package/${packagePath}`]))
+    if (installedHash !== packedHash) {
+      throw new Error(`npm install package file content did not match the packed tarball for ${packagePath}`)
+    }
+  }
+}
+
+function packedTarballFilePaths(tarballPath) {
+  return execFileSync('tar', ['-tzf', tarballPath], { encoding: 'utf8' })
+    .split(/\r?\n/)
+    .filter(Boolean)
+    .map((entry) => {
+      if (!entry.startsWith('package/')) throw new Error(`npm pack tarball contains invalid entry ${entry}`)
+      return entry.slice('package/'.length)
+    })
+    .sort((left, right) => left.localeCompare(right))
+}
+
+function packageFilePaths(root, relativeDir = '') {
+  const out = []
+  for (const entry of readdirSync(join(root, relativeDir), { withFileTypes: true })) {
+    const relativePath = relativeDir ? `${relativeDir}/${entry.name}` : entry.name
+    if (entry.isDirectory()) {
+      out.push(...packageFilePaths(root, relativePath))
+    } else if (entry.isFile()) {
+      out.push(relativePath)
+    } else {
+      throw new Error(`npm install package contains unsupported file entry ${relativePath}`)
+    }
+  }
+  return out
+}
+
+function sha256(buffer) {
+  return createHash('sha256').update(buffer).digest('hex')
 }
 
 function assertNpmInstallLockfile(consumerRoot, tarballPath, includeReact) {
