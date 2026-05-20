@@ -14,6 +14,24 @@ const declarationByteBudgets = {
   'dist/react.d.ts': 100_000,
   'dist/react.d.cts': 100_000,
 }
+const expectedExportEntries = {
+  '.': {
+    types: './dist/index.d.ts',
+    import: './dist/index.js',
+    require: './dist/index.cjs',
+  },
+  './core': {
+    types: './dist/core.d.ts',
+    import: './dist/core.js',
+    require: './dist/core.cjs',
+  },
+  './react': {
+    types: './dist/react.d.ts',
+    import: './dist/react.js',
+    require: './dist/react.cjs',
+  },
+}
+const expectedExportSubpaths = [...Object.keys(expectedExportEntries), './package.json']
 
 if (packageJson.private === true) failures.push('package must not be private')
 if (!packageJson.name) failures.push('package name is required')
@@ -39,12 +57,7 @@ if (packageJson.peerDependencies?.react && packageJson.peerDependenciesMeta?.rea
   failures.push('react peer dependency must be optional because the root and ./core entries are React-free')
 }
 
-for (const subpath of ['.', './core', './react']) {
-  assertExportConditions(subpath, packageJson.exports?.[subpath])
-}
-if (packageJson.exports?.['./package.json'] !== './package.json') {
-  failures.push('exports["./package.json"] must expose package metadata')
-}
+assertPublicExports()
 
 for (const [section, dependencies] of Object.entries(dependencySections(packageJson))) {
   for (const [name, spec] of Object.entries(dependencies)) {
@@ -253,13 +266,51 @@ function reactFreeEntries() {
   ]
 }
 
-function assertExportConditions(subpath, entry) {
-  if (!entry || typeof entry !== 'object') {
+function assertPublicExports() {
+  if (!packageJson.exports || typeof packageJson.exports !== 'object' || Array.isArray(packageJson.exports)) {
+    failures.push('exports must be an object')
+    return
+  }
+
+  assertExactKeys('exports', packageJson.exports, expectedExportSubpaths)
+  for (const [subpath, expected] of Object.entries(expectedExportEntries)) {
+    assertExportConditions(subpath, packageJson.exports[subpath], expected)
+  }
+  if (packageJson.exports['./package.json'] !== './package.json') {
+    failures.push('exports["./package.json"] must expose package metadata')
+  }
+  if (packageJson.main !== expectedExportEntries['.'].require) {
+    failures.push(`main must match exports["."].require ${expectedExportEntries['.'].require}`)
+  }
+  if (packageJson.module !== expectedExportEntries['.'].import) {
+    failures.push(`module must match exports["."].import ${expectedExportEntries['.'].import}`)
+  }
+  if (packageJson.types !== expectedExportEntries['.'].types) {
+    failures.push(`types must match exports["."].types ${expectedExportEntries['.'].types}`)
+  }
+}
+
+function assertExportConditions(subpath, entry, expected) {
+  if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
     failures.push(`exports["${subpath}"] is required`)
     return
   }
+  assertExactKeys(`exports["${subpath}"]`, entry, ['types', 'import', 'require'])
   for (const condition of ['types', 'import', 'require']) {
-    if (typeof entry[condition] !== 'string') failures.push(`exports["${subpath}"].${condition} must be a package path`)
+    if (entry[condition] !== expected[condition]) {
+      failures.push(`exports["${subpath}"].${condition} must be ${expected[condition]}`)
+    }
+  }
+}
+
+function assertExactKeys(label, value, expectedKeys) {
+  const expected = new Set(expectedKeys)
+  const actualKeys = Object.keys(value)
+  for (const key of actualKeys) {
+    if (!expected.has(key)) failures.push(`${label} contains unexpected key ${key}`)
+  }
+  for (const key of expectedKeys) {
+    if (!Object.hasOwn(value, key)) failures.push(`${label} is missing ${key}`)
   }
 }
 
