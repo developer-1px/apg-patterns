@@ -2,6 +2,11 @@ name: Publish Package
 
 on:
   workflow_dispatch:
+    inputs:
+      publish_confirmation:
+        description: Type publish <package.name>@<package.version> to publish to npm.
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -30,6 +35,16 @@ jobs:
           node-version: 24
           registry-url: https://registry.npmjs.org
           package-manager-cache: false
+
+      - name: Verify publish confirmation
+        env:
+          PUBLISH_CONFIRMATION: ${{ inputs.publish_confirmation }}
+        run: |
+          expected="$(node -p "const packageJson = require('./package.json'); 'publish ' + packageJson.name + '@' + packageJson.version")"
+          if [ "$PUBLISH_CONFIRMATION" != "$expected" ]; then
+            echo "Publish confirmation must be exactly: $expected"
+            exit 1
+          fi
 
       - name: Pin npm
         run: npm install -g npm@11.6.2

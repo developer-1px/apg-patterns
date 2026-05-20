@@ -10,6 +10,7 @@
 - Keep the GitHub Pages workflow enabled for the demo.
 - Keep the GitHub environment `npm` required for the publish job.
 - Keep publish workflow concurrency grouped by git ref so duplicate manual runs for the same tag cannot publish in parallel.
+- Keep the publish workflow confirmation input required; type `publish <package.name>@<package.version>` only at the final npm publish step.
 - Do not add static npm token authentication such as `NPM_TOKEN`, `NODE_AUTH_TOKEN`, or `_authToken`.
 
 ## Preflight
@@ -30,7 +31,9 @@ The publish workflow runs the external check before packing or publishing.
 
 ## Publish
 
-Create and push the `v<package.version>` git tag after the preflight passes. Run the manual GitHub Actions `Publish Package` workflow from that tag.
+Create and push the `v<package.version>` git tag after the preflight passes. Run the manual GitHub Actions `Publish Package` workflow from that tag only when npm publishing is the final step.
+
+The workflow requires the exact confirmation input `publish <package.name>@<package.version>`.
 
 Review verified `release-artifacts/`, including the `npm pack` tarball and `npm-pack.json`, before relying on the published package.
 

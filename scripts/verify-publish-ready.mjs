@@ -432,6 +432,7 @@ function assertReleaseGuide(releaseGuide) {
     'Publish Package',
     'GitHub environment `npm`',
     'concurrency grouped by git ref',
+    'publish <package.name>@<package.version>',
     'NPM_TOKEN',
     'NODE_AUTH_TOKEN',
     '_authToken',

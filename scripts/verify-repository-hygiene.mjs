@@ -143,6 +143,10 @@ function assertPublishWorkflow() {
   const source = readTrackedWorkflow(publishWorkflowPath, 'npm trusted publishing')
   assertWorkflowIncludes(publishWorkflowPath, source, [
     'workflow_dispatch:',
+    'publish_confirmation:',
+    'Type publish <package.name>@<package.version> to publish to npm.',
+    'required: true',
+    'type: string',
     'contents: read',
     'id-token: write',
     'concurrency:',
@@ -155,6 +159,9 @@ function assertPublishWorkflow() {
     'node-version: 24',
     'registry-url: https://registry.npmjs.org',
     'package-manager-cache: false',
+    'Verify publish confirmation',
+    'PUBLISH_CONFIRMATION: ${{ inputs.publish_confirmation }}',
+    'Publish confirmation must be exactly',
     'npm install -g npm@11.6.2',
     'npm ci',
     'npm run release:check',
