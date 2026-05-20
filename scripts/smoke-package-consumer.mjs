@@ -449,8 +449,17 @@ function packageMetadataSmokeSource() {
   const expectedMetadata = {
     name: packageJson.name,
     version: packageJson.version,
+    description: packageJson.description,
+    keywords: packageJson.keywords,
     license: packageJson.license,
     author: packageJson.author,
+    type: packageJson.type,
+    packageManager: packageJson.packageManager,
+    nodeEngine: packageJson.engines?.node,
+    files: packageJson.files,
+    main: packageJson.main,
+    module: packageJson.module,
+    types: packageJson.types,
     private: false,
     reactPeerRange: packageJson.peerDependencies?.react,
     reactPeerOptional: packageJson.peerDependenciesMeta?.react?.optional === true,
@@ -465,10 +474,15 @@ const { dirname, join } = require('node:path')
 const expectedMetadata = ${JSON.stringify(expectedMetadata, null, 2)}
 const packageRoot = dirname(require.resolve('@interactive-os/apg-patterns/package.json'))
 
-for (const key of ['name', 'version', 'license', 'author']) {
+for (const key of ['name', 'version', 'description', 'license', 'author', 'type', 'packageManager', 'main', 'module', 'types']) {
   if (packageMetadata[key] !== expectedMetadata[key]) {
     throw new Error(\`package metadata export did not expose \${key}\`)
   }
+}
+assertJsonEqual('keywords', packageMetadata.keywords, expectedMetadata.keywords)
+assertJsonEqual('files', packageMetadata.files, expectedMetadata.files)
+if (packageMetadata.engines?.node !== expectedMetadata.nodeEngine) {
+  throw new Error('package metadata export did not expose the expected Node engine')
 }
 if (packageMetadata.private === true) throw new Error('package metadata export marked the package private')
 if (packageMetadata.peerDependencies?.react !== expectedMetadata.reactPeerRange) {
@@ -482,6 +496,12 @@ if (packageMetadata.exports?.['./package.json'] !== expectedMetadata.packageJson
 }
 if (packageMetadata.publishConfig?.access !== expectedMetadata.publishAccess) {
   throw new Error('package metadata export did not expose public publish access')
+}
+
+function assertJsonEqual(label, actual, expected) {
+  if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+    throw new Error('package metadata export did not expose ' + label)
+  }
 }
 
 const expectedDocs = {
