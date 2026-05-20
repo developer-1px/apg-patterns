@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
+import { dirname, resolve } from 'node:path'
 
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
 const failures = []
@@ -17,6 +18,10 @@ for (const [section, dependencies] of Object.entries(dependencySections(packageJ
     if (typeof spec !== 'string') continue
     if (/^(file|link|workspace):/.test(spec)) failures.push(`${section}.${name} uses local-only spec ${spec}`)
   }
+}
+
+for (const sourceImport of productionIndexImports()) {
+  failures.push(`production source imports the public barrel: ${sourceImport}`)
 }
 
 const pack = readPackManifest()
@@ -52,4 +57,59 @@ function readPackManifest() {
   const result = JSON.parse(stdout)
   if (!Array.isArray(result) || !result[0]?.files) throw new Error('npm pack --dry-run did not return file metadata')
   return result[0]
+}
+
+function productionIndexImports() {
+  const sourceRoot = resolve('src')
+  const publicIndex = resolve(sourceRoot, 'index.ts')
+  const failures = []
+
+  for (const file of sourceFiles(sourceRoot)) {
+    if (resolve(file) === publicIndex) continue
+    const source = readFileSync(file, 'utf8')
+    for (const specifier of relativeImportSpecifiers(source)) {
+      if (resolvesToSourceIndex(file, specifier, publicIndex)) {
+        failures.push(`${file}:${specifier}`)
+      }
+    }
+  }
+
+  return failures
+}
+
+function sourceFiles(directory) {
+  const out = []
+  for (const entry of readdirSync(directory)) {
+    const path = resolve(directory, entry)
+    const testsRoot = resolve('src/tests')
+    if (path === testsRoot || path.startsWith(`${testsRoot}/`)) continue
+    const stat = statSync(path)
+    if (stat.isDirectory()) {
+      out.push(...sourceFiles(path))
+      continue
+    }
+    if (/\.(test|d)\.[cm]?[tj]sx?$/.test(path)) continue
+    if (/\.[cm]?tsx?$/.test(path)) out.push(path)
+  }
+  return out
+}
+
+function relativeImportSpecifiers(source) {
+  const specifiers = []
+  const importPattern = /\bfrom\s+['"](\.{1,2}\/[^'"]+)['"]|\bimport\s+['"](\.{1,2}\/[^'"]+)['"]|\bimport\s*\(\s*['"](\.{1,2}\/[^'"]+)['"]\s*\)|\brequire\s*\(\s*['"](\.{1,2}\/[^'"]+)['"]\s*\)/g
+  for (const match of source.matchAll(importPattern)) {
+    specifiers.push(match[1] ?? match[2] ?? match[3] ?? match[4])
+  }
+  return specifiers
+}
+
+function resolvesToSourceIndex(file, specifier, publicIndex) {
+  const base = resolve(dirname(file), specifier)
+  return [
+    base,
+    `${base}.ts`,
+    `${base}.tsx`,
+    resolve(base, 'index.ts'),
+    resolve(base, 'index.tsx'),
+  ].some((candidate) => candidate === publicIndex)
 }

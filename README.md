@@ -6,6 +6,34 @@ Runtime dependencies are limited to `zod`. React is a peer dependency for the Re
 
 The package models APG behavior as serializable `PatternDefinition` data, validates it with Zod, and projects it into runtime props, state, effects, and React-facing render items.
 
+## Install
+
+```bash
+npm install @interactive-os/apg-patterns react
+```
+
+`zod` is installed as a runtime dependency. `react` is a peer dependency because the public package entry includes React hooks and preset components.
+
+## Quick Start
+
+```tsx
+import { Button, type PatternData, type PatternEvent } from '@interactive-os/apg-patterns'
+
+const data: PatternData = {
+  items: { primary: { label: 'Save' } },
+  relations: { rootKeys: ['primary'] },
+  state: { activeKey: 'primary' },
+}
+
+function Example() {
+  const onEvent = (event: PatternEvent) => {
+    if (event.type === 'press') console.log(event.key)
+  }
+
+  return <Button data={data} onEvent={onEvent} />
+}
+```
+
 ```txt
 PatternDefinition
 ├─ parts: role / aria / focus / state / events
@@ -242,6 +270,8 @@ To compare the demo's APG example coverage against the currently linked examples
 ```bash
 npm run check:apg
 ```
+
+`check:publish` validates package metadata, local-only dependency specs, packed tarball contents, and production source imports that would create public-entry circular initialization.
 
 ## Design Notes
 
