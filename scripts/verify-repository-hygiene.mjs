@@ -1,8 +1,9 @@
 import { execFileSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 
 const trackedFiles = gitFiles(['ls-files'])
 const ignoredTrackedFiles = gitFiles(['ls-files', '-i', '--exclude-standard', '-c'])
+const releaseCheckWorkflowPath = '.github/workflows/release-check.yml'
 const forbiddenTrackedRules = [
   {
     label: 'coverage output',
@@ -60,6 +61,7 @@ for (const rule of forbiddenTrackedRules) {
 }
 
 assertBugDocsResolved()
+assertReleaseCheckWorkflow()
 
 if (failures.length > 0) {
   console.error(`Repository hygiene check failed:\n${failures.map((failure) => `- ${failure}`).join('\n')}`)
@@ -90,5 +92,31 @@ function assertBugDocsResolved() {
     if (!/^- Resolution:\s+\S.+$/m.test(source)) {
       failures.push(`${path} must include a concrete Resolution line`)
     }
+  }
+}
+
+function assertReleaseCheckWorkflow() {
+  if (!trackedFiles.includes(releaseCheckWorkflowPath)) {
+    failures.push(`${releaseCheckWorkflowPath} must be tracked for external release verification`)
+    return
+  }
+  if (!existsSync(releaseCheckWorkflowPath)) {
+    failures.push(`${releaseCheckWorkflowPath} is required for external release verification`)
+    return
+  }
+
+  const source = readFileSync(releaseCheckWorkflowPath, 'utf8')
+  const requiredMarkers = [
+    'actions/checkout@v4',
+    'actions/setup-node@v4',
+    'node-version: 24',
+    'npm install -g npm@11.6.2',
+    'npm ci',
+    'npm run release:check',
+    'contents: read',
+  ]
+
+  for (const marker of requiredMarkers) {
+    if (!source.includes(marker)) failures.push(`${releaseCheckWorkflowPath} must include ${marker}`)
   }
 }
