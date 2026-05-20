@@ -578,6 +578,9 @@ function packageMetadataSmokeSource() {
     keywords: packageJson.keywords,
     license: packageJson.license,
     author: packageJson.author,
+    repository: packageJson.repository,
+    bugs: packageJson.bugs,
+    homepage: packageJson.homepage,
     type: packageJson.type,
     packageManager: packageJson.packageManager,
     engines: packageJson.engines,
@@ -608,6 +611,11 @@ for (const key of ['name', 'version', 'description', 'license', 'author', 'type'
   }
 }
 assertJsonEqual('keywords', packageMetadata.keywords, expectedMetadata.keywords)
+assertJsonEqual('repository', packageMetadata.repository, expectedMetadata.repository)
+assertJsonEqual('bugs', packageMetadata.bugs, expectedMetadata.bugs)
+if (packageMetadata.homepage !== expectedMetadata.homepage) {
+  throw new Error('package metadata export did not expose homepage')
+}
 assertJsonEqual('files', packageMetadata.files, expectedMetadata.files)
 assertJsonEqual('scripts', packageMetadata.scripts, expectedMetadata.scripts)
 assertJsonEqual('sideEffects', packageMetadata.sideEffects, expectedMetadata.sideEffects)

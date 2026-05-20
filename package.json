@@ -13,6 +13,14 @@
   ],
   "license": "MIT",
   "author": "Interactive OS",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/interactive-os/apg-patterns.git"
+  },
+  "bugs": {
+    "url": "https://github.com/interactive-os/apg-patterns/issues"
+  },
+  "homepage": "https://github.com/interactive-os/apg-patterns#readme",
   "type": "module",
   "packageManager": "npm@11.6.2",
   "engines": {

@@ -473,13 +473,11 @@ function assertPublicRepositoryMetadata() {
     return
   }
 
-  if (packageJson.repository || packageJson.bugs || packageJson.homepage) {
-    if (!packageRepositoryInfo) {
-      failures.push('package repository metadata must use a GitHub repository URL')
-      return
-    }
-    assertGitHubPackageMetadata(packageRepositoryInfo)
+  if (!packageRepositoryInfo) {
+    failures.push('package repository metadata must use a GitHub repository URL')
+    return
   }
+  assertGitHubPackageMetadata(packageRepositoryInfo)
 }
 
 function readGitOriginUrl() {
