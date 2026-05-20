@@ -431,6 +431,7 @@ function assertReleaseGuide(releaseGuide) {
     'npm trusted publisher',
     'Publish Package',
     'GitHub environment `npm`',
+    'concurrency grouped by git ref',
     'NPM_TOKEN',
     'NODE_AUTH_TOKEN',
     '_authToken',
