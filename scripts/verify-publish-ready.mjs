@@ -134,6 +134,7 @@ if (!packageManagerMatch) {
 }
 if (typeof packageJson.engines?.node !== 'string') failures.push('engines.node is required')
 assertPublishConfig()
+assertPublicRepositoryMetadata()
 if (!existsSync('README.md')) failures.push('README.md is required')
 if (!existsSync('API.md')) failures.push('API.md is required')
 if (!existsSync('CHANGELOG.md')) failures.push('CHANGELOG.md is required')
@@ -416,6 +417,90 @@ function assertPublishConfig() {
     if (packageJson.publishConfig[key] !== expected) {
       failures.push(`publishConfig.${key} must be ${expected}`)
     }
+  }
+}
+
+function assertPublicRepositoryMetadata() {
+  const originUrl = readGitOriginUrl()
+  const originRepository = parseGitHubRepositoryUrl(originUrl)
+  const packageRepository = packageRepositoryUrl(packageJson.repository)
+  const packageRepositoryInfo = parseGitHubRepositoryUrl(packageRepository)
+
+  if (originUrl && !originRepository) {
+    failures.push(`git origin must be a GitHub repository URL for npm trusted publishing metadata: ${originUrl}`)
+    return
+  }
+
+  if (originRepository) {
+    assertGitHubPackageMetadata(originRepository)
+    return
+  }
+
+  if (packageJson.repository || packageJson.bugs || packageJson.homepage) {
+    if (!packageRepositoryInfo) {
+      failures.push('package repository metadata must use a GitHub repository URL')
+      return
+    }
+    assertGitHubPackageMetadata(packageRepositoryInfo)
+  }
+}
+
+function readGitOriginUrl() {
+  try {
+    return execFileSync('git', ['remote', 'get-url', 'origin'], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim()
+  } catch {
+    return ''
+  }
+}
+
+function packageRepositoryUrl(repository) {
+  if (typeof repository === 'string') return repository
+  if (repository && typeof repository === 'object' && !Array.isArray(repository) && typeof repository.url === 'string') {
+    return repository.url
+  }
+  return ''
+}
+
+function parseGitHubRepositoryUrl(url) {
+  if (typeof url !== 'string' || url.trim().length === 0) return null
+  const normalizedUrl = url.trim().replace(/^git\+/, '').replace(/\.git$/, '')
+  const match = /^(?:https:\/\/github\.com\/|git@github\.com:|ssh:\/\/git@github\.com\/)([^/\s]+)\/([^/\s]+)$/.exec(normalizedUrl)
+  if (!match) return null
+  return {
+    owner: match[1],
+    repo: match[2],
+  }
+}
+
+function assertGitHubPackageMetadata(repository) {
+  const expectedRepository = {
+    type: 'git',
+    url: `git+https://github.com/${repository.owner}/${repository.repo}.git`,
+  }
+  const expectedBugs = {
+    url: `https://github.com/${repository.owner}/${repository.repo}/issues`,
+  }
+  const expectedHomepage = `https://github.com/${repository.owner}/${repository.repo}#readme`
+
+  if (!packageJson.repository || typeof packageJson.repository !== 'object' || Array.isArray(packageJson.repository)) {
+    failures.push('package repository metadata must be an object with type and url')
+  } else {
+    assertExactKeys('repository', packageJson.repository, ['type', 'url'])
+    assertJsonEqual('repository', packageJson.repository, expectedRepository)
+  }
+
+  if (!packageJson.bugs || typeof packageJson.bugs !== 'object' || Array.isArray(packageJson.bugs)) {
+    failures.push('package bugs metadata must be an object with url')
+  } else {
+    assertExactKeys('bugs', packageJson.bugs, ['url'])
+    assertJsonEqual('bugs', packageJson.bugs, expectedBugs)
+  }
+
+  if (packageJson.homepage !== expectedHomepage) {
+    failures.push(`homepage must be ${expectedHomepage}`)
   }
 }
 
