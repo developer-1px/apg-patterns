@@ -33,7 +33,7 @@ try {
     smokeKind: 'react',
   })
 
-  console.log('package consumer smoke passed for ESM, CJS, npm tarball install, Vite bundler build, NodeNext/Bundler/CJS TypeScript, package metadata, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
+  console.log('package consumer smoke passed for ESM, CJS, npm tarball install, Vite bundler build, NodeNext/Bundler/CJS TypeScript, package metadata, package export encapsulation, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
 } finally {
   rmSync(tempRoot, { recursive: true, force: true })
 }
@@ -222,6 +222,39 @@ function runtimeSmokeSource(moduleKind, smokeKind) {
   const metadataSmoke = moduleKind === 'cjs'
     ? "\nconst packageMetadata = require('@interactive-os/apg-patterns/package.json')\nif (packageMetadata.name !== '@interactive-os/apg-patterns') throw new Error('package metadata export did not expose package name')\n"
     : ''
+  const deepImportSmoke = moduleKind === 'esm'
+    ? `
+await assertPackagePathNotExported(
+  () => import('@interactive-os/apg-patterns/dist/core.js'),
+  'ESM dist deep import',
+)
+
+async function assertPackagePathNotExported(load, label) {
+  try {
+    await load()
+  } catch (error) {
+    if (error?.code === 'ERR_PACKAGE_PATH_NOT_EXPORTED') return
+    throw new Error(\`\${label} failed with unexpected error \${error?.code ?? error}\`)
+  }
+  throw new Error(\`\${label} was unexpectedly exported\`)
+}
+`
+    : `
+assertPackagePathNotExported(
+  () => require('@interactive-os/apg-patterns/dist/core.cjs'),
+  'CJS dist deep import',
+)
+
+function assertPackagePathNotExported(load, label) {
+  try {
+    load()
+  } catch (error) {
+    if (error?.code === 'ERR_PACKAGE_PATH_NOT_EXPORTED') return
+    throw new Error(\`\${label} failed with unexpected error \${error?.code ?? error}\`)
+  }
+  throw new Error(\`\${label} was unexpectedly exported\`)
+}
+`
 
   return `${importLine}
 
@@ -243,6 +276,7 @@ if (runtime.visibleKeys[0] !== 'primary') throw new Error('runtime did not resol
 if (typeof runtime.getRootKeyboardHandler() !== 'function') throw new Error('runtime keyboard handler missing')
 ${metadataSmoke}
 ${reactSmoke}
+${deepImportSmoke}
 `
 }
 
