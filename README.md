@@ -359,6 +359,10 @@ npm publish --access public --provenance --registry https://registry.npmjs.org/
 
 See [CHANGELOG.md](CHANGELOG.md).
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Security
 
 Report suspected vulnerabilities privately. See [SECURITY.md](SECURITY.md).

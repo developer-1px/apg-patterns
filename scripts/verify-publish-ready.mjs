@@ -49,7 +49,16 @@ const expectedExportEntries = {
   },
 }
 const expectedExportSubpaths = [...Object.keys(expectedExportEntries), './package.json']
-const expectedPackageFiles = ['dist', 'docs/proposals', 'README.md', 'API.md', 'CHANGELOG.md', 'SECURITY.md', 'LICENSE']
+const expectedPackageFiles = [
+  'dist',
+  'docs/proposals',
+  'README.md',
+  'API.md',
+  'CHANGELOG.md',
+  'CONTRIBUTING.md',
+  'SECURITY.md',
+  'LICENSE',
+]
 const requiredPackageKeywords = ['aria', 'wai-aria', 'apg', 'patterns', 'react', 'zod', 'a11y']
 const expectedPublishConfig = {
   access: 'public',
@@ -118,6 +127,7 @@ assertPublishConfig()
 if (!existsSync('README.md')) failures.push('README.md is required')
 if (!existsSync('API.md')) failures.push('API.md is required')
 if (!existsSync('CHANGELOG.md')) failures.push('CHANGELOG.md is required')
+if (!existsSync('CONTRIBUTING.md')) failures.push('CONTRIBUTING.md is required')
 if (!existsSync('SECURITY.md')) failures.push('SECURITY.md is required')
 if (!existsSync('LICENSE')) failures.push('LICENSE is required')
 assertDocumentationMetadata()
@@ -160,6 +170,7 @@ const requiredPackedPaths = [
   'README.md',
   'API.md',
   'CHANGELOG.md',
+  'CONTRIBUTING.md',
   'SECURITY.md',
   'LICENSE',
   'docs/proposals/2026-05-18-llm-friendly-apg-react-api.md',
@@ -279,6 +290,7 @@ function assertDocumentationMetadata() {
   const readme = readTextIfExists('README.md')
   const apiReference = readTextIfExists('API.md')
   const changelog = readTextIfExists('CHANGELOG.md')
+  const contributingGuide = readTextIfExists('CONTRIBUTING.md')
   const securityPolicy = readTextIfExists('SECURITY.md')
   const license = readTextIfExists('LICENSE')
   const packageName = packageJson.name
@@ -296,6 +308,9 @@ function assertDocumentationMetadata() {
   }
   if (changelog && readme && !/\bCHANGELOG\.md\b/.test(readme)) {
     failures.push('README must link to CHANGELOG.md')
+  }
+  if (contributingGuide && readme && !/\bCONTRIBUTING\.md\b/.test(readme)) {
+    failures.push('README must link to CONTRIBUTING.md')
   }
   if (securityPolicy && readme && !/\bSECURITY\.md\b/.test(readme)) {
     failures.push('README must link to SECURITY.md')
@@ -331,7 +346,29 @@ function assertDocumentationMetadata() {
   if (packageAuthor && license && !new RegExp(`^Copyright \\(c\\) \\d{4} ${escapeRegExp(packageAuthor)}\\s*$`, 'm').test(license)) {
     failures.push('LICENSE copyright holder must match package author')
   }
+  assertContributingGuide(contributingGuide)
   assertSecurityPolicy(securityPolicy)
+}
+
+function assertContributingGuide(contributingGuide) {
+  if (!contributingGuide) return
+  if (!contributingGuide.startsWith('# Contributing\n')) {
+    failures.push('CONTRIBUTING.md must start with a Contributing title')
+  }
+
+  const requiredMarkers = [
+    'npm ci',
+    'npm run check',
+    'npm run build',
+    'npm run update:api',
+    'npm run release:check',
+    '@interactive-os/apg-patterns/core',
+    '@interactive-os/apg-patterns/react',
+    'npm run check:publish',
+  ]
+  for (const marker of requiredMarkers) {
+    if (!contributingGuide.includes(marker)) failures.push(`CONTRIBUTING.md must include ${marker}`)
+  }
 }
 
 function assertSecurityPolicy(securityPolicy) {
