@@ -1,16 +1,17 @@
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import ts from 'typescript'
 
 const repoRoot = new URL('../', import.meta.url)
 const apiReferencePath = new URL('API.md', repoRoot)
+const shouldWrite = process.argv.includes('--write')
 const failures = []
 
 if (!existsSync(apiReferencePath)) {
   throw new Error('API.md is required')
 }
 
-const apiReference = readFileSync(apiReferencePath, 'utf8')
+let apiReference = readFileSync(apiReferencePath, 'utf8')
 const rootExports = declarationExports('dist/index.d.ts')
 const coreExports = declarationExports('dist/core.d.ts')
 const reactExports = declarationExports('dist/react.d.ts')
@@ -18,6 +19,15 @@ const reactExports = declarationExports('dist/react.d.ts')
 expectExactExportSet(rootExports, coreExports, 'root exports', './core exports')
 
 const reactOnlyExports = reactExports.filter((name) => !coreExports.includes(name))
+const nextApiReference = shouldWrite
+  ? replaceExportBlock(replaceExportBlock(apiReference, 'root-core', coreExports), 'react-only', reactOnlyExports)
+  : apiReference
+const wroteApiReference = shouldWrite && nextApiReference !== apiReference
+if (wroteApiReference) {
+  writeFileSync(apiReferencePath, nextApiReference)
+  apiReference = nextApiReference
+}
+
 assertContains("import { createPatternRuntime } from '@interactive-os/apg-patterns'")
 assertContains("import { createPatternRuntime } from '@interactive-os/apg-patterns/core'")
 assertContains("import { Button, useButtonPattern } from '@interactive-os/apg-patterns/react'")
@@ -29,7 +39,7 @@ if (failures.length > 0) {
   process.exit(1)
 }
 
-console.log(`API reference covers ${coreExports.length} root/core exports and ${reactOnlyExports.length} React-only exports.`)
+console.log(`${wroteApiReference ? 'Updated API reference and verified' : 'API reference covers'} ${coreExports.length} root/core exports and ${reactOnlyExports.length} React-only exports.`)
 
 function declarationExports(packagePath) {
   const filePath = fileURLToPath(new URL(packagePath, repoRoot))
@@ -80,16 +90,39 @@ function assertContains(text) {
 }
 
 function assertExportBlock(name, exports) {
+  const actual = readExportBlock(name)
+  if (actual === null) return
+
+  const expected = exportBlockSource(exports)
+  if (actual !== expected) failures.push(`API.md ${name} export block is out of date`)
+}
+
+function replaceExportBlock(source, name, exports) {
+  const markers = exportBlockMarkers(name, source)
+  if (!markers) return source
+
+  return `${source.slice(0, markers.startIndex + markers.startMarker.length)}\n${exportBlockSource(exports)}\n${source.slice(markers.endIndex)}`
+}
+
+function readExportBlock(name) {
+  const markers = exportBlockMarkers(name, apiReference)
+  if (!markers) return null
+  return apiReference.slice(markers.startIndex + markers.startMarker.length, markers.endIndex).trim()
+}
+
+function exportBlockMarkers(name, source) {
   const startMarker = `<!-- apg-api:${name}:start -->`
   const endMarker = `<!-- apg-api:${name}:end -->`
-  const startIndex = apiReference.indexOf(startMarker)
-  const endIndex = apiReference.indexOf(endMarker)
+  const startIndex = source.indexOf(startMarker)
+  const endIndex = source.indexOf(endMarker)
   if (startIndex === -1 || endIndex === -1 || endIndex < startIndex) {
     failures.push(`API.md is missing ${name} export markers`)
-    return
+    return null
   }
 
-  const actual = apiReference.slice(startIndex + startMarker.length, endIndex).trim()
-  const expected = ['```txt', ...exports, '```'].join('\n')
-  if (actual !== expected) failures.push(`API.md ${name} export block is out of date`)
+  return { startMarker, startIndex, endIndex }
+}
+
+function exportBlockSource(exports) {
+  return ['```txt', ...exports, '```'].join('\n')
 }

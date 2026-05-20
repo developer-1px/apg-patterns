@@ -294,6 +294,8 @@ npm run check:apg
 
 `check:api` validates that API.md matches the built root, `./core`, and `./react` declaration export surfaces.
 
+After changing public exports, run `npm run update:api` after `npm run build` to refresh API.md.
+
 `check:exports` validates package manifest paths and ESM/CJS declaration export boundaries for the root, `./core`, and `./react` entries.
 
 `check:publish` validates package metadata, package-lock root consistency, local-only dependency specs, packed tarball contents, npm publish dry-run metadata, runtime external imports, portable sourcemaps with source content, and production source imports that would create public-entry circular initialization.
