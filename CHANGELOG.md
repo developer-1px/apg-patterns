@@ -7,6 +7,7 @@
 - React is an optional peer for React 18 and React 19 consumers.
 - Published package includes a checked and regenerable API reference for root, `./core`, and `./react` exports.
 - README documents the source, demo, and release-script code structure for external consumers and contributors.
+- Published package includes a security reporting policy.
 - Release preflight can verify that the current package version is still unpublished on the public npm registry and, for existing packages, is newer than the current `latest` dist-tag.
 - `release:check` runs the full local gate and the npm registry preflight before publishing.
 - GitHub Actions includes SHA-pinned release and manual trusted-publishing workflows that run the full release preflight and publish with npm provenance.

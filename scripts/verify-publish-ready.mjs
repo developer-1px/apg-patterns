@@ -49,7 +49,7 @@ const expectedExportEntries = {
   },
 }
 const expectedExportSubpaths = [...Object.keys(expectedExportEntries), './package.json']
-const expectedPackageFiles = ['dist', 'docs/proposals', 'README.md', 'API.md', 'CHANGELOG.md', 'LICENSE']
+const expectedPackageFiles = ['dist', 'docs/proposals', 'README.md', 'API.md', 'CHANGELOG.md', 'SECURITY.md', 'LICENSE']
 const requiredPackageKeywords = ['aria', 'wai-aria', 'apg', 'patterns', 'react', 'zod', 'a11y']
 const expectedPublishConfig = {
   access: 'public',
@@ -118,6 +118,7 @@ assertPublishConfig()
 if (!existsSync('README.md')) failures.push('README.md is required')
 if (!existsSync('API.md')) failures.push('API.md is required')
 if (!existsSync('CHANGELOG.md')) failures.push('CHANGELOG.md is required')
+if (!existsSync('SECURITY.md')) failures.push('SECURITY.md is required')
 if (!existsSync('LICENSE')) failures.push('LICENSE is required')
 assertDocumentationMetadata()
 assertReadmeCommandExamples()
@@ -159,6 +160,7 @@ const requiredPackedPaths = [
   'README.md',
   'API.md',
   'CHANGELOG.md',
+  'SECURITY.md',
   'LICENSE',
   'docs/proposals/2026-05-18-llm-friendly-apg-react-api.md',
   'docs/proposals/2026-05-18-react-facade-zod-blind-loop.md',
@@ -277,6 +279,7 @@ function assertDocumentationMetadata() {
   const readme = readTextIfExists('README.md')
   const apiReference = readTextIfExists('API.md')
   const changelog = readTextIfExists('CHANGELOG.md')
+  const securityPolicy = readTextIfExists('SECURITY.md')
   const license = readTextIfExists('LICENSE')
   const packageName = packageJson.name
   const packageVersion = packageJson.version
@@ -293,6 +296,9 @@ function assertDocumentationMetadata() {
   }
   if (changelog && readme && !/\bCHANGELOG\.md\b/.test(readme)) {
     failures.push('README must link to CHANGELOG.md')
+  }
+  if (securityPolicy && readme && !/\bSECURITY\.md\b/.test(readme)) {
+    failures.push('README must link to SECURITY.md')
   }
   if (license && readme && !/\bLICENSE\b/.test(readme)) {
     failures.push('README must link to LICENSE')
@@ -324,6 +330,25 @@ function assertDocumentationMetadata() {
   }
   if (packageAuthor && license && !new RegExp(`^Copyright \\(c\\) \\d{4} ${escapeRegExp(packageAuthor)}\\s*$`, 'm').test(license)) {
     failures.push('LICENSE copyright holder must match package author')
+  }
+  assertSecurityPolicy(securityPolicy)
+}
+
+function assertSecurityPolicy(securityPolicy) {
+  if (!securityPolicy) return
+  if (!securityPolicy.startsWith('# Security Policy\n')) {
+    failures.push('SECURITY.md must start with a Security Policy title')
+  }
+
+  const requiredMarkers = [
+    '## Supported Versions',
+    '## Reporting a Vulnerability',
+    'latest published version',
+    'private npm owner contact channel',
+    'Do not include access tokens, private keys, production data',
+  ]
+  for (const marker of requiredMarkers) {
+    if (!securityPolicy.includes(marker)) failures.push(`SECURITY.md must include ${marker}`)
   }
 }
 
