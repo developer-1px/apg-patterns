@@ -405,6 +405,7 @@ function packageMetadataSmokeSource() {
     private: false,
     reactPeerOptional: packageJson.peerDependenciesMeta?.react?.optional === true,
     packageJsonExport: packageJson.exports?.['./package.json'],
+    publishAccess: packageJson.publishConfig?.access,
   }
 
   return `
@@ -425,6 +426,9 @@ if (packageMetadata.peerDependenciesMeta?.react?.optional !== expectedMetadata.r
 }
 if (packageMetadata.exports?.['./package.json'] !== expectedMetadata.packageJsonExport) {
   throw new Error('package metadata export did not expose its metadata subpath')
+}
+if (packageMetadata.publishConfig?.access !== expectedMetadata.publishAccess) {
+  throw new Error('package metadata export did not expose public publish access')
 }
 
 const expectedDocs = {

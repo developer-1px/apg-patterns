@@ -248,6 +248,28 @@ function assertReadmeCommandExamples() {
   if (/\bnpm\s+test\b/.test(readme) && !scripts.has('test')) {
     failures.push('README command references missing package script "test"')
   }
+
+  assertReadmePublishCommand(readme)
+}
+
+function assertReadmePublishCommand(readme) {
+  const publishCommands = [...readme.matchAll(/^\s*npm\s+publish\b[^\r\n]*/gm)].map((match) => match[0].trim())
+  if (packageJson.name?.startsWith('@') && packageJson.publishConfig?.access === 'public') {
+    if (!publishCommands.includes('npm publish --access public')) {
+      failures.push('README must document publishing the scoped package with npm publish --access public')
+    }
+    for (const command of publishCommands) {
+      if (!/(?:^|\s)--access(?:=|\s+)public(?:\s|$)/.test(command)) {
+        failures.push(`README npm publish command must include --access public: ${command}`)
+      }
+    }
+  }
+
+  const releaseCheckIndex = readme.indexOf('npm run release:check')
+  const publishIndex = readme.indexOf('npm publish --access public')
+  if (publishIndex >= 0 && (releaseCheckIndex < 0 || publishIndex < releaseCheckIndex)) {
+    failures.push('README must document npm run release:check before npm publish --access public')
+  }
 }
 
 function assertPackageScripts() {
