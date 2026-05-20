@@ -60,6 +60,37 @@ const allowedRuntimeDependencyLicenses = {
   zod: new Set(['MIT']),
 }
 const hangulTextPattern = /[\u1100-\u11FF\u3130-\u318F\uAC00-\uD7AF]/
+const packedSensitiveTextPatterns = [
+  {
+    label: 'private key block',
+    pattern: /-----BEGIN (?:[A-Z]+ )?PRIVATE KEY-----/,
+  },
+  {
+    label: 'npm auth token config',
+    pattern: /\/\/registry\.npmjs\.org\/:_authToken\s*=/i,
+  },
+  {
+    label: 'npm access token',
+    pattern: /\bnpm_[A-Za-z0-9]{36,}\b/,
+  },
+  {
+    label: 'GitHub access token',
+    pattern: /\bgh[pousr]_[A-Za-z0-9_]{36,}\b/,
+  },
+  {
+    label: 'AWS access key id',
+    pattern: /\b(?:AKIA|ASIA)[A-Z0-9]{16}\b/,
+  },
+  {
+    label: 'Slack access token',
+    pattern: /\bxox[baprs]-[A-Za-z0-9-]{20,}\b/,
+  },
+  {
+    label: 'basic-auth URL',
+    pattern: /https?:\/\/[^\s/:@]+:[^\s/@]+@/,
+  },
+]
+const packedSensitiveAssignmentPattern = /(?:^|[\s"'`{,])([A-Z0-9_]*(?:SECRET|PASSWORD|TOKEN|API[_-]?KEY|AUTH[_-]?TOKEN)[A-Z0-9_]*)\s*[:=]\s*["']?([A-Za-z0-9_./+=:-]{20,})/gi
 const allowedDeclarationExternalSpecifiers = {
   'dist/index.d.ts': new Set(['zod']),
   'dist/index.d.cts': new Set(['zod']),
@@ -180,6 +211,7 @@ for (const [label, packagePath] of manifestRuntimePaths(packageJson)) {
 
 for (const file of pack.files) {
   assertPackedTextHasNoHangul(file.path)
+  assertPackedTextHasNoSensitiveMaterial(file.path)
   if (!isAllowedPackedPath(file.path)) failures.push(`packed tarball includes unexpected path ${file.path}`)
   if (/^(src|demo|scripts|coverage)\//.test(file.path)) failures.push(`packed tarball includes non-runtime path ${file.path}`)
   if (/\.test\.[cm]?[jt]sx?$/.test(file.path)) failures.push(`packed tarball includes test file ${file.path}`)
@@ -868,6 +900,23 @@ function assertPackedTextHasNoHangul(path) {
   if (hangulTextPattern.test(source)) {
     failures.push(`${path} contains Hangul text in the published package`)
   }
+}
+
+function assertPackedTextHasNoSensitiveMaterial(path) {
+  const source = readFileSync(path, 'utf8')
+  for (const { label, pattern } of packedSensitiveTextPatterns) {
+    if (pattern.test(source)) failures.push(`${path} contains ${label}`)
+  }
+
+  for (const match of source.matchAll(packedSensitiveAssignmentPattern)) {
+    const [, key, value] = match
+    if (isPlaceholderSecretValue(value)) continue
+    failures.push(`${path} contains credential-like assignment ${key}`)
+  }
+}
+
+function isPlaceholderSecretValue(value) {
+  return /^(?:x+|<[^>]+>|\$\{[^}]+}|example|placeholder|redacted|your[-_a-z0-9]*|change[-_a-z0-9]*)$/i.test(value)
 }
 
 function expectedPackFilename() {
