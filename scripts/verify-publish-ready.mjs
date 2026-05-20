@@ -114,6 +114,7 @@ assertPackMetadata(pack)
 const publishDryRun = readPublishDryRunManifest()
 assertPublishDryRunMatchesPack(publishDryRun, pack)
 const packedPaths = new Set(pack.files.map((file) => file.path))
+assertPackFileMetadata(pack.files)
 const requiredPackedPaths = [
   'package.json',
   'README.md',
@@ -681,6 +682,32 @@ function normalizePackFiles(files) {
   return [...files]
     .map((file) => ({ path: file.path, size: file.size, mode: file.mode }))
     .sort((left, right) => left.path.localeCompare(right.path))
+}
+
+function assertPackFileMetadata(files) {
+  for (const file of files) {
+    if (!file || typeof file !== 'object' || Array.isArray(file)) {
+      failures.push('npm pack file metadata entries must be objects')
+      continue
+    }
+    if (typeof file.path !== 'string' || file.path.length === 0) {
+      failures.push('npm pack file metadata entries must include a path')
+      continue
+    }
+    if (!existsSync(file.path)) {
+      failures.push(`npm pack file metadata references missing path ${file.path}`)
+      continue
+    }
+
+    const fileStat = statSync(file.path)
+    if (!fileStat.isFile()) failures.push(`npm pack file metadata path must be a file: ${file.path}`)
+    if (file.size !== fileStat.size) {
+      failures.push(`npm pack file metadata size for ${file.path} must match filesystem size ${fileStat.size}`)
+    }
+    if (file.mode !== 0o644) {
+      failures.push(`npm pack file metadata mode for ${file.path} must be 0644`)
+    }
+  }
 }
 
 function expectedPackFilename() {
