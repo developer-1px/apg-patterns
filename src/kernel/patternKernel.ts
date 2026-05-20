@@ -11,7 +11,7 @@
  * 기본 어휘 등록은 kernelBuiltins.ts, runtime factory 는 patternRuntime.ts,
  * reducer 는 patternReducer.ts 로 분리되어 있다.
  */
-import type { KeyInput } from '../internal/keyboard'
+import type { KeyInput, ModifierKeyName } from '../internal/keyboard'
 import type { Key, PatternData, PatternOptions } from '../schema'
 import { defineKeyToken, hasKeyToken, resolveKeyToken } from './keyTokenRegistry'
 import { resolveAriaSource, resolveNavigationTarget, resolveStateProjection, resolveVisibleOrder, unknownTokenError } from './kernelResolvers'
@@ -67,7 +67,7 @@ export type {
 }
 
 // KeyInput 재export — root onKeyDown handler 의 입력 형이 외부에서 보이도록.
-export type { KeyInput }
+export type { KeyInput, ModifierKeyName }
 
 // ─────────────────────────────────────────────────────────────
 // Resolver context

@@ -143,6 +143,7 @@ for (const file of pack.files) {
   if (isPublicDeclarationPath(file.path)) {
     assertDeclarationSizeBudget(file)
     assertDeclarationImports(file.path, packedPaths)
+    assertReactFreeDeclarationHasNoLooseAny(file.path)
   }
 }
 
@@ -495,6 +496,15 @@ function assertDeclarationImports(declarationPath, packedPaths) {
   }
 }
 
+function assertReactFreeDeclarationHasNoLooseAny(declarationPath) {
+  if (!/^dist\/(?:index|core)\.d\.(?:ts|cts)$/.test(declarationPath)) return
+
+  const source = stripStringLiterals(stripComments(readFileSync(declarationPath, 'utf8')))
+  if (/(^|[^A-Za-z0-9_$]):\s*any\b/.test(source)) {
+    failures.push(`${declarationPath} exposes a loose any annotation`)
+  }
+}
+
 function resolveDeclarationSpecifier(fromPath, specifier) {
   const resolved = relativePath(resolve(dirname(fromPath), specifier))
   if (resolved.endsWith('.d.ts') || resolved.endsWith('.d.cts')) return resolved
@@ -618,6 +628,10 @@ function importSpecifiers(source) {
 
 function stripComments(source) {
   return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\r\n]*/g, '')
+}
+
+function stripStringLiterals(source) {
+  return source.replace(/(['"`])(?:\\[\s\S]|(?!\1)[^\\])*\1/g, '')
 }
 
 function hasReactModuleImport(source) {

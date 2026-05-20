@@ -1,3 +1,19 @@
+export type ModifierKeyName =
+  | 'Alt'
+  | 'AltGraph'
+  | 'CapsLock'
+  | 'Control'
+  | 'Fn'
+  | 'FnLock'
+  | 'Hyper'
+  | 'Meta'
+  | 'NumLock'
+  | 'ScrollLock'
+  | 'Shift'
+  | 'Super'
+  | 'Symbol'
+  | 'SymbolLock'
+
 export interface KeyInput {
   key: string
   ctrlKey: boolean
@@ -8,7 +24,7 @@ export interface KeyInput {
   repeat?: boolean
   location?: number
   code?: string
-  getModifierState?: (key: string) => boolean
+  getModifierState?: (key: ModifierKeyName) => boolean
   modifierState?: Readonly<Record<string, boolean>>
   keyCode?: number
   timeStamp?: number
@@ -115,7 +131,7 @@ function matchOne(e: KeyInput, shortcut: ParsedShortcut): boolean {
   return normalizeMatchKey(e.key) === normalizeMatchKey(shortcut.key)
 }
 
-function getModifierState(input: KeyInput, key: string): boolean {
+function getModifierState(input: KeyInput, key: ModifierKeyName): boolean {
   if (typeof input.getModifierState === 'function') return input.getModifierState(key)
   if (input.modifierState) return input.modifierState[key] ?? false
   return false

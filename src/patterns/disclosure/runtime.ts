@@ -4,6 +4,7 @@ import {
   type PatternRuntime,
   type SlotProps,
 } from '../../kernel/patternRuntime'
+import type { KeyInput } from '../../internal/keyboard'
 import {
   PatternDataSchema,
   PatternEventSchema,
@@ -26,7 +27,7 @@ export interface DisclosureRuntime {
   expanded: boolean
   getTriggerProps(): SlotProps
   getPanelProps(): SlotProps
-  getRootKeyboardHandler(): (event: any) => void
+  getRootKeyboardHandler(): (event: KeyInput & { preventDefault?: () => void }) => void
   emit(event: PatternEvent): void
 }
 
