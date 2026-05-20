@@ -8,11 +8,14 @@ This file lists the published entrypoints and export names included in the npm p
 import { createPatternRuntime } from '@interactive-os/apg-patterns'
 import { createPatternRuntime } from '@interactive-os/apg-patterns/core'
 import { Button, useButtonPattern } from '@interactive-os/apg-patterns/react'
+import type { PatternData, PatternEvent } from '@interactive-os/apg-patterns'
 ```
 
 - `@interactive-os/apg-patterns`: React-free root entry.
 - `@interactive-os/apg-patterns/core`: React-free core entry with the same export surface as the root entry.
 - `@interactive-os/apg-patterns/react`: core exports plus React hooks, runtimes, render items, and preset components.
+
+The export lists include runtime values and TypeScript type-only names. The runtime value sections list names that JavaScript consumers can import at runtime.
 
 ## Root And Core Exports
 
@@ -251,6 +254,170 @@ windowsplitterDefinition
 ```
 <!-- apg-api:root-core:end -->
 
+## Root And Core Runtime Values
+
+<!-- apg-api:root-core-runtime:start -->
+```txt
+accordionDefinition
+AccordionDefinitionSchema
+alertDefinition
+AlertDefinitionSchema
+alertDialogDefinition
+AlertDialogDefinitionSchema
+AriaAttributeSchema
+AriaProjectionSchema
+AriaRoleSchema
+AriaSourcePathSchema
+AriaSources
+AriaSourceSchema
+breadcrumbDefinition
+BreadcrumbDefinitionSchema
+buttonDefinition
+carouselDefinition
+CarouselDefinitionSchema
+checkboxDefinition
+COMBOBOX_KEY
+comboboxDefinition
+createDisclosureRuntime
+createParentByKey
+createPatternRuntime
+createTabsRuntime
+createTreeviewRuntime
+defineAriaSource
+defineDomEvent
+defineDomEventHandlerProp
+defineKeyToken
+defineNavigationTarget
+definePatternContract
+definePredicate
+defineStateProjection
+defineVisibleOrder
+dialogDefinition
+DialogDefinitionSchema
+Directions
+disclosureDefinition
+DisclosureDefinitionSchema
+DomEventNameSchema
+DomEvents
+EffectSchema
+ElementTargetSchema
+evaluatePredicate
+EventTemplateSchema
+EventValueSourceSchema
+feedDefinition
+FocusEffectScopeSchema
+FocusEffectTargetSchema
+FocusEffectTriggerSchema
+FocusModelSchema
+FocusProjectionSchema
+getTreeItemState
+gridDefinition
+gridRows
+hasAriaSource
+hasKeyToken
+hasNavigationTarget
+hasPredicate
+hasVisibleOrder
+IdRefListSchema
+isRegisteredAriaSource
+isRegisteredNavigationTarget
+isRegisteredPredicate
+isRegisteredStateProjection
+isRegisteredVisibleOrder
+KeyboardBindingSchema
+KeyboardCaseSchema
+KeySchema
+KeyTokens
+KeyTokenSchema
+landmarksDefinition
+LandmarksDefinitionSchema
+linkDefinition
+LinkDefinitionSchema
+listboxDefinition
+menubarDefinition
+menuButtonDefinition
+meterDefinition
+NavigationSchema
+NavigationTargetKindSchema
+NavigationTargets
+NavigationTargetSchema
+PartEventBindingSchema
+PartSchema
+PatternDataSchema
+PatternDefinitionSchema
+PatternDirectionSchema
+PatternEventMetaSchema
+PatternEventReasonSchema
+PatternEventSchema
+PatternEventTypeSchema
+PatternItemSchema
+PatternOptionsSchema
+PatternRefsSchema
+PatternRelationsSchema
+PatternStateSchema
+PatternValueStepDirectionSchema
+PredicateSchema
+radioGroupDefinition
+ReactElementNameSchema
+ReactFacadeSchema
+ReactHookNameSchema
+ReactItemFieldNameSchema
+ReactItemPropSchema
+ReactPropNameSchema
+ReactPropOwnerSchema
+ReactRenderItemsSchema
+ReactRenderSourceSchema
+ReactRenderValueSchema
+ReactRenderVariantSchema
+ReactRenderVariantWhenSchema
+ReactSemanticDefaultPropSchema
+ReactSemanticDefaultsSchema
+reduceDisclosureData
+reducePatternData
+reduceTabsData
+resolveAriaSource
+resolveEventTemplate
+resolveKeyToken
+resolveNavigationTarget
+resolveStateProjection
+resolveTreeviewKeyboardBinding
+resolveTreeviewNavigationTarget
+resolveTreeviewVisibleKeys
+resolveTypeaheadTarget
+resolveVisibleOrder
+sliderContract
+sliderDefinition
+SliderItemSchema
+SliderOptionsSchema
+SliderStateSchema
+spinbuttonDefinition
+StateActionSchema
+StateFieldSchema
+StateProjectionSchema
+StateSources
+switchDefinition
+tableDefinition
+tabsDefinition
+TabsDefinitionSchema
+toolbarDefinition
+ToolbarDefinitionSchema
+tooltipDefinition
+TooltipDefinitionSchema
+TransitionSchema
+TransitionValueSchema
+treegridDefinition
+treegridVisibleCells
+treegridVisibleRowKeys
+treeviewDefinition
+TreeviewDefinitionSchema
+unknownTokenError
+VisibleOrderKindSchema
+VisibleOrders
+VisibleOrderSchema
+windowsplitterDefinition
+```
+<!-- apg-api:root-core-runtime:end -->
+
 ## React-Only Exports
 
 <!-- apg-api:react-only:start -->
@@ -407,3 +574,74 @@ WindowSplitter
 WindowSplitterProps
 ```
 <!-- apg-api:react-only:end -->
+
+## React-Only Runtime Values
+
+<!-- apg-api:react-only-runtime:start -->
+```txt
+Accordion
+Alert
+AlertDialog
+Breadcrumb
+Button
+Carousel
+Checkbox
+Combobox
+Dialog
+Disclosure
+Feed
+Grid
+handlePatternTrapFocus
+Landmarks
+Link
+Listbox
+Menubar
+MenuButton
+Meter
+RadioGroup
+reactKeyInput
+reactProps
+Slider
+Spinbutton
+Switch
+Table
+Tabs
+Toolbar
+Tooltip
+Tree
+Treegrid
+useAccordionPattern
+useAlertDialogPattern
+useAlertPattern
+useBreadcrumbPattern
+useButtonPattern
+useCarouselPattern
+useCheckboxPattern
+useComboboxPattern
+useDialogPattern
+useDisclosurePattern
+useFeedPattern
+useGridPattern
+useLandmarksPattern
+useLinkPattern
+useListboxPattern
+useMenubarPattern
+useMenuButtonPattern
+useMeterPattern
+usePatternEffects
+useRadioGroupPattern
+useReactPatternRuntime
+useRovingFocusEventHandler
+useSliderPattern
+useSpinbuttonPattern
+useSwitchPattern
+useTablePattern
+useTabsPattern
+useToolbarPattern
+useTooltipPattern
+useTreegridPattern
+useTreeviewPattern
+useWindowSplitterPattern
+WindowSplitter
+```
+<!-- apg-api:react-only-runtime:end -->

@@ -15,12 +15,31 @@ let apiReference = readFileSync(apiReferencePath, 'utf8')
 const rootExports = declarationExports('dist/index.d.ts')
 const coreExports = declarationExports('dist/core.d.ts')
 const reactExports = declarationExports('dist/react.d.ts')
+const rootRuntimeExports = await runtimeExports('dist/index.js')
+const coreRuntimeExports = await runtimeExports('dist/core.js')
+const reactRuntimeExports = await runtimeExports('dist/react.js')
 
 expectExactExportSet(rootExports, coreExports, 'root exports', './core exports')
+expectExactExportSet(rootRuntimeExports, coreRuntimeExports, 'root runtime exports', './core runtime exports')
+expectExportSuperset(rootExports, rootRuntimeExports, 'root declaration exports', 'root runtime exports')
+expectExportSuperset(reactExports, reactRuntimeExports, './react declaration exports', './react runtime exports')
 
 const reactOnlyExports = reactExports.filter((name) => !coreExports.includes(name))
+const reactOnlyRuntimeExports = reactRuntimeExports.filter((name) => !coreRuntimeExports.includes(name))
 const nextApiReference = shouldWrite
-  ? replaceExportBlock(replaceExportBlock(apiReference, 'root-core', coreExports), 'react-only', reactOnlyExports)
+  ? replaceExportBlock(
+    replaceExportBlock(
+      replaceExportBlock(
+        replaceExportBlock(apiReference, 'root-core', coreExports),
+        'root-core-runtime',
+        rootRuntimeExports,
+      ),
+      'react-only',
+      reactOnlyExports,
+    ),
+    'react-only-runtime',
+    reactOnlyRuntimeExports,
+  )
   : apiReference
 const wroteApiReference = shouldWrite && nextApiReference !== apiReference
 if (wroteApiReference) {
@@ -31,15 +50,18 @@ if (wroteApiReference) {
 assertContains("import { createPatternRuntime } from '@interactive-os/apg-patterns'")
 assertContains("import { createPatternRuntime } from '@interactive-os/apg-patterns/core'")
 assertContains("import { Button, useButtonPattern } from '@interactive-os/apg-patterns/react'")
+assertContains("import type { PatternData, PatternEvent } from '@interactive-os/apg-patterns'")
 assertExportBlock('root-core', coreExports)
+assertExportBlock('root-core-runtime', rootRuntimeExports)
 assertExportBlock('react-only', reactOnlyExports)
+assertExportBlock('react-only-runtime', reactOnlyRuntimeExports)
 
 if (failures.length > 0) {
   console.error(`API reference check failed:\n${failures.map((failure) => `- ${failure}`).join('\n')}`)
   process.exit(1)
 }
 
-console.log(`${wroteApiReference ? 'Updated API reference and verified' : 'API reference covers'} ${coreExports.length} root/core exports and ${reactOnlyExports.length} React-only exports.`)
+console.log(`${wroteApiReference ? 'Updated API reference and verified' : 'API reference covers'} ${coreExports.length} root/core exports, ${rootRuntimeExports.length} root/core runtime values, ${reactOnlyExports.length} React-only exports, and ${reactOnlyRuntimeExports.length} React-only runtime values.`)
 
 function declarationExports(packagePath) {
   const filePath = fileURLToPath(new URL(packagePath, repoRoot))
@@ -70,6 +92,10 @@ function declarationExports(packagePath) {
     .getExportsOfModule(symbol)
     .map((exported) => exported.getName())
     .sort((left, right) => left.localeCompare(right))
+}
+
+async function runtimeExports(packagePath) {
+  return Object.keys(await import(new URL(packagePath, repoRoot))).sort((left, right) => left.localeCompare(right))
 }
 
 function expectExactExportSet(actual, expected, actualLabel, expectedLabel) {
