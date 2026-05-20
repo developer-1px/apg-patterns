@@ -84,6 +84,28 @@ export function parseGitHubRepositoryUrl(url) {
   }
 }
 
+export function parseGitHubRepositoryVisibility(repositoryName, status, body) {
+  if (status !== 200) {
+    return { visibility: '', detail: `GitHub API HTTP ${status}` }
+  }
+
+  let repository
+  try {
+    repository = JSON.parse(body)
+  } catch (error) {
+    return { visibility: '', detail: `GitHub API returned invalid JSON for ${repositoryName}: ${error.message}` }
+  }
+
+  if (!repository || typeof repository !== 'object' || Array.isArray(repository)) {
+    return { visibility: '', detail: `GitHub API returned unexpected repository metadata for ${repositoryName}` }
+  }
+
+  return {
+    visibility: repository.private === false ? 'PUBLIC' : 'PRIVATE',
+    detail: '',
+  }
+}
+
 function packageRepositoryUrl(repository) {
   if (typeof repository === 'string') return repository
   if (repository && typeof repository === 'object' && !Array.isArray(repository) && typeof repository.url === 'string') {
@@ -141,14 +163,28 @@ const defaultProbes = {
     return result.status === 0 ? result.stdout.trim() : ''
   },
   readGitHubRepositoryVisibility(repositoryName) {
-    const result = spawnSync('gh', ['repo', 'view', repositoryName, '--json', 'visibility', '--jq', '.visibility'], {
-      encoding: 'utf8',
-    })
-    if (result.status === 0) {
-      return { visibility: result.stdout.trim(), detail: '' }
+    const result = spawnSync(
+      'curl',
+      [
+        '--silent',
+        '--show-error',
+        '--location',
+        '--header',
+        'Accept: application/vnd.github+json',
+        '--write-out',
+        '\n%{http_code}',
+        `https://api.github.com/repos/${repositoryName}`,
+      ],
+      { encoding: 'utf8' },
+    )
+    if (result.status !== 0) {
+      const detail = `${result.stderr}\n${result.stdout}`.trim().split('\n').find(Boolean) ?? ''
+      return { visibility: '', detail }
     }
-    const detail = `${result.stderr}\n${result.stdout}`.trim().split('\n').find(Boolean) ?? ''
-    return { visibility: '', detail }
+
+    const lines = result.stdout.split('\n')
+    const status = Number.parseInt(lines.pop() ?? '', 10)
+    return parseGitHubRepositoryVisibility(repositoryName, status, lines.join('\n'))
   },
   readPublicGitHead(repositoryUrl) {
     const result = spawnSync('git', ['ls-remote', repositoryUrl, 'HEAD'], {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  parseGitHubRepositoryVisibility,
   parseGitHubRepositoryUrl,
   verifyExternalReleaseState,
 } from './verify-external-release-state.mjs'
@@ -27,6 +28,21 @@ describe('verify-external-release-state', () => {
     expect(parseGitHubRepositoryUrl('git+https://github.com/scope/pkg.git')).toEqual({ owner: 'scope', repo: 'pkg' })
     expect(parseGitHubRepositoryUrl('git@github.com:scope/pkg.git')).toEqual({ owner: 'scope', repo: 'pkg' })
     expect(parseGitHubRepositoryUrl('ssh://git@github.com/scope/pkg.git')).toEqual({ owner: 'scope', repo: 'pkg' })
+  })
+
+  it('derives public GitHub visibility from the public repository API', () => {
+    expect(parseGitHubRepositoryVisibility('scope/pkg', 200, JSON.stringify({ private: false }))).toEqual({
+      visibility: 'PUBLIC',
+      detail: '',
+    })
+    expect(parseGitHubRepositoryVisibility('scope/pkg', 200, JSON.stringify({ private: true }))).toEqual({
+      visibility: 'PRIVATE',
+      detail: '',
+    })
+    expect(parseGitHubRepositoryVisibility('scope/pkg', 404, '{}')).toEqual({
+      visibility: '',
+      detail: 'GitHub API HTTP 404',
+    })
   })
 
   it('accepts aligned public repository and available npm package state', () => {
