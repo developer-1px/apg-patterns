@@ -69,6 +69,7 @@
     "check:exports": "node scripts/verify-package-exports.mjs",
     "check:package": "node scripts/verify-package-side-effects.mjs",
     "check:publish": "node scripts/verify-publish-ready.mjs",
+    "check:registry": "node scripts/verify-npm-registry-release.mjs",
     "check:readme": "node scripts/verify-readme-quick-start.mjs",
     "check:preset": "node scripts/verify-react-preset-surface.mjs",
     "prepublishOnly": "npm run check",

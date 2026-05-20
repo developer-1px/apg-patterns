@@ -300,6 +300,8 @@ After changing public exports, run `npm run update:api` after `npm run build` to
 
 `check:publish` validates package metadata, package-lock root consistency, local-only dependency specs, packed tarball contents, npm publish dry-run metadata, runtime external imports, portable sourcemaps with source content, and production source imports that would create public-entry circular initialization.
 
+Before publishing a new version, run `npm run check:registry` to confirm the current package version is still unpublished on the public npm registry.
+
 ## Design Notes
 
 - [React facade zod blind loop](docs/proposals/2026-05-18-react-facade-zod-blind-loop.md)
