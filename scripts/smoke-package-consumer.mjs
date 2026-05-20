@@ -5,6 +5,7 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+const packageJson = JSON.parse(readFileSync(join(repoRoot, 'package.json'), 'utf8'))
 const tempRoot = mkdtempSync(join(tmpdir(), 'apg-patterns-consumer-'))
 
 try {
@@ -245,9 +246,7 @@ function runtimeSmokeSource(moduleKind, smokeKind) {
     : moduleKind === 'esm'
       ? "\nconst { Button } = await import('@interactive-os/apg-patterns/react')\nif (typeof Button !== 'function') throw new Error('react subpath did not expose Button')\n"
       : "\nconst { Button } = require('@interactive-os/apg-patterns/react')\nif (typeof Button !== 'function') throw new Error('react subpath did not expose Button')\n"
-  const metadataSmoke = moduleKind === 'cjs'
-    ? "\nconst packageMetadata = require('@interactive-os/apg-patterns/package.json')\nif (packageMetadata.name !== '@interactive-os/apg-patterns') throw new Error('package metadata export did not expose package name')\n"
-    : ''
+  const metadataSmoke = moduleKind === 'cjs' ? packageMetadataSmokeSource() : ''
   const deepImportSmoke = moduleKind === 'esm'
     ? `
 await assertPackagePathNotExported(
@@ -303,6 +302,36 @@ if (typeof runtime.getRootKeyboardHandler() !== 'function') throw new Error('run
 ${metadataSmoke}
 ${reactSmoke}
 ${deepImportSmoke}
+`
+}
+
+function packageMetadataSmokeSource() {
+  const expectedMetadata = {
+    name: packageJson.name,
+    version: packageJson.version,
+    license: packageJson.license,
+    author: packageJson.author,
+    private: false,
+    reactPeerOptional: packageJson.peerDependenciesMeta?.react?.optional === true,
+    packageJsonExport: packageJson.exports?.['./package.json'],
+  }
+
+  return `
+const packageMetadata = require('@interactive-os/apg-patterns/package.json')
+const expectedMetadata = ${JSON.stringify(expectedMetadata, null, 2)}
+
+for (const key of ['name', 'version', 'license', 'author']) {
+  if (packageMetadata[key] !== expectedMetadata[key]) {
+    throw new Error(\`package metadata export did not expose \${key}\`)
+  }
+}
+if (packageMetadata.private === true) throw new Error('package metadata export marked the package private')
+if (packageMetadata.peerDependenciesMeta?.react?.optional !== expectedMetadata.reactPeerOptional) {
+  throw new Error('package metadata export did not expose the optional React peer')
+}
+if (packageMetadata.exports?.['./package.json'] !== expectedMetadata.packageJsonExport) {
+  throw new Error('package metadata export did not expose its metadata subpath')
+}
 `
 }
 
