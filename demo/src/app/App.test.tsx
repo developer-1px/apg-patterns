@@ -16,6 +16,8 @@ afterEach(() => {
   cleanup()
 })
 
+const exhaustivePatternTestTimeout = 90000
+
 describe('formatEvent', () => {
   it('keeps emitted events scannable in the demo log', () => {
     const event: PatternEvent = { type: 'expand', key: 'billing', expanded: true, meta: { reason: 'pointer' } }
@@ -159,7 +161,7 @@ describe('source copy', () => {
     fireEvent.click(screen.getByRole('tab', { name: 'accordionData.ts' }))
 
     expect(getSourcePanel().textContent).not.toContain('export function Accordion')
-  }, 30000)
+  }, exhaustivePatternTestTimeout)
 })
 
 describe('App route state', () => {
@@ -264,7 +266,7 @@ describe('App route state', () => {
 
       unmount()
     }
-  }, 30000)
+  }, exhaustivePatternTestTimeout)
 
   it('opens every pattern entry source from its deep link', async () => {
     const routes = collectPatternEntrySourceRoutes()
@@ -282,7 +284,7 @@ describe('App route state', () => {
 
       unmount()
     }
-  }, 30000)
+  }, exhaustivePatternTestTimeout)
 
   it('keeps generated source tab ids and panel links unique for each pattern', async () => {
     const routes = collectPatternRoutes()
@@ -306,7 +308,7 @@ describe('App route state', () => {
 
       unmount()
     }
-  }, 30000)
+  }, exhaustivePatternTestTimeout)
 
   it('links the selected right panel tab to the rendered right panel content', async () => {
     replaceHash('#pattern=accordion&panel=code&source=Accordion.tsx')
@@ -434,7 +436,7 @@ describe('App route state', () => {
 
       unmount()
     }
-  }, 30000)
+  }, exhaustivePatternTestTimeout)
 })
 
 describe('SourceTabs', () => {

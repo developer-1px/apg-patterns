@@ -10,6 +10,7 @@ interface CarouselItem extends PatternItem {
   title?: unknown
   caption?: unknown
   imageUrl?: unknown
+  imageAlt?: unknown
 }
 
 interface CarouselState extends PatternStateWithOptions {

@@ -55,7 +55,7 @@ function ListboxRuntimeHost() {
           listbox.ids.forKey('a'),
           listbox.keyToElementId('b'),
           listbox.renderItems.length,
-          events.map((event) => `${event.type}:${'key' in event ? event.key ?? '' : 'keys' in event ? event.keys.join(',') : ''}`).join('|'),
+          events.map((event) => `${event.type}:${'key' in event ? event.key ?? '' : 'keys' in event ? event.keys?.join(',') ?? '' : ''}`).join('|'),
         ].join('|')}
       </output>
     </div>

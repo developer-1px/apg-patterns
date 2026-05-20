@@ -35,13 +35,13 @@ export function Tabs({
   const closeable = (mergedOptions as { closeable?: boolean }).closeable === true
   const isVertical = orientation === 'vertical'
   const containerClass = isVertical
-    ? 'grid max-w-2xl gap-4 grid-cols-[140px_minmax(0,1fr)]'
+    ? 'grid max-w-2xl gap-3 sm:grid-cols-[minmax(120px,auto)_minmax(0,1fr)] sm:gap-4'
     : 'grid max-w-2xl gap-4'
   const tablistClass = isVertical
-    ? 'flex flex-col gap-1 rounded-xl bg-zinc-100/70 p-1 dark:bg-white/[0.045]'
+    ? 'flex gap-1 overflow-x-auto rounded-xl bg-zinc-100/70 p-1 dark:bg-white/[0.045] sm:flex-col sm:overflow-visible'
     : 'flex gap-1 overflow-x-auto rounded-xl bg-zinc-100/70 p-1 dark:bg-white/[0.045]'
   const tabClass = isVertical
-    ? cx(ds.option, 'h-8 px-3 text-sm')
+    ? cx(ds.option, 'h-8 shrink-0 px-3 text-sm sm:w-full')
     : cx(ds.option, 'h-8 shrink-0 px-3 text-sm')
   const panelClass = scrollable
     ? cx('max-h-48 overflow-auto rounded-xl bg-zinc-100/70 p-3 text-sm leading-relaxed text-zinc-700 shadow-inner shadow-zinc-200/50 dark:bg-white/[0.045] dark:text-zinc-300 dark:shadow-black/10', ds.focusRing)
@@ -62,7 +62,6 @@ export function Tabs({
                   <button
                     type="button"
                     aria-label={`Close ${data.items[key]?.label ?? key}`}
-                    tabIndex={-1}
                     onClick={(event) => {
                       event.stopPropagation()
                       onEvent({ type: 'close', key })

@@ -65,7 +65,7 @@ function SliderReducerEdgesDemo() {
     <div>
       <button type="button" onClick={() => apply({ type: 'value', key: 'max', value: 390 })}>Move max down</button>
       <button type="button" onClick={() => applyMin({ type: 'value', key: 'min', value: 210 })}>Move min up</button>
-      <button type="button" onClick={() => apply({ type: 'valueStep', key: 'min', direction: 'unknown' })}>Unknown step</button>
+      <button type="button" onClick={() => apply({ type: 'valueStep', key: 'min', direction: 'unknown' } as unknown as PatternEvent)}>Unknown step</button>
       <button type="button" onClick={() => apply({ type: 'dismiss' })}>Ignored event</button>
       <button type="button" onClick={() => applyTemperature({ type: 'value', key: 'temp', value: 'ignored' })}>String temperature</button>
       <button type="button" onClick={() => applyFallback({ type: 'valueStep', key: 'loose', direction: 'increment' })}>Fallback range</button>

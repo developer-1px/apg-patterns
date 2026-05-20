@@ -41,7 +41,7 @@ function NavMenuKeyboardEdgesDemo() {
   const { onButtonKey, onLinkKey } = useNavMenuKeyboard({
     containerRef,
     expandedKeys: ['about'],
-    onEvent: (event) => setEvents((current) => [...current, `${event.type}:${event.key}:${'expanded' in event ? event.expanded : ''}`]),
+    onEvent: (event) => setEvents((current) => [...current, `${event.type}:${'key' in event ? event.key ?? '' : ''}:${'expanded' in event ? event.expanded : ''}`]),
   })
 
   return (

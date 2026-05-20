@@ -38,7 +38,7 @@ function WindowSplitterReducerEdgesDemo() {
   return (
     <div>
       <button type="button" onClick={() => apply({ type: 'focus', key: 'splitter' })}>Focus reducer</button>
-      <button type="button" onClick={() => apply({ type: 'valueStep', key: 'splitter', direction: 'unknown' })}>Unknown reducer step</button>
+      <button type="button" onClick={() => apply({ type: 'valueStep', key: 'splitter', direction: 'unknown' } as unknown as PatternEvent)}>Unknown reducer step</button>
       <button type="button" onClick={() => apply({ type: 'collapse', key: 'splitter' })}>Collapse reducer</button>
       <output data-testid="splitter-value">{String(data.state?.valueByKey?.splitter ?? '')}</output>
     </div>
@@ -50,7 +50,7 @@ function SeparatorPropsEdgesDemo() {
   const [focused, setFocused] = useState(false)
   const runtime = {
     getPartProps: () => ({ role: 'separator', id: 'edge-separator', onKeyDown: () => undefined }),
-    emit: (event: PatternEvent) => setEvents((current) => [...current, `${event.type}:${event.key ?? ''}`]),
+    emit: (event: PatternEvent) => setEvents((current) => [...current, `${event.type}:${'key' in event ? event.key ?? '' : ''}`]),
     resolveKeyboardBinding: (input: { key: string }) =>
       input.key === 'ArrowRight'
         ? { preventDefault: false, events: [{ type: 'valueStep', key: 'splitter', direction: 'increment' }] }
@@ -61,7 +61,7 @@ function SeparatorPropsEdgesDemo() {
     key: null,
     min: 0,
     max: 100,
-    options: { orientation: 'diagonal' },
+    options: { orientation: 'diagonal' as never },
   })
   const props = createWindowSplitterSeparatorProps({
     runtime: runtime as never,

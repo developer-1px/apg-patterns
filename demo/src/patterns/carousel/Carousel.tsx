@@ -51,7 +51,7 @@ export function Carousel({ data = initialCarouselData, onEvent }: CarouselProps)
             data-testid={`slide-${slide.key}`}
             className={slide.active ? 'relative block min-h-56 overflow-hidden rounded-xl bg-zinc-100/70 shadow-[0_16px_42px_rgba(24,24,27,0.12)] dark:bg-white/[0.045] dark:shadow-black/25' : 'hidden'}
           >
-            {slide.imageUrl ? <img src={slide.imageUrl} alt="" className="h-56 w-full object-cover" /> : null}
+            {slide.imageUrl ? <img src={slide.imageUrl} alt={slide.imageAlt} className="h-56 w-full object-cover" /> : null}
             <div className="absolute inset-x-0 bottom-0 bg-black/62 p-4 text-white backdrop-blur-sm">
               <div className="text-sm font-semibold">{slide.title}</div>
               <div className="mt-0.5 text-sm text-white/78">{slide.caption}</div>

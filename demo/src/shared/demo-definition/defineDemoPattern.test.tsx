@@ -140,10 +140,10 @@ describe('defineDemoPattern', () => {
 	  })
 
   it.each([
-    ['unknown binding root', { view: { kind: 'component', component: 'Preview', props: { label: '$missing.label' } } }, '[uiSchema] unknown binding root: $missing.label'],
+    ['unknown binding root', { view: { kind: 'component', component: 'Preview', props: { label: '$missing.label' } } }, '[uiSchema] unknown binding root: $missing.label', undefined],
     ['non-string listbox value', {
       controls: { kind: 'listbox', label: 'variants', idPrefix: 'variant', items: '$model.items', value: '$state.value', onChange: '$actions.selectValue' },
-    }, '[uiSchema] binding is not a string: $state.value'],
+    }, '[uiSchema] binding is not a string: $state.value', undefined],
     ['non-listbox items', {
       controls: { kind: 'listbox', label: 'variants', idPrefix: 'variant', items: '$model.items', value: '$state.value', onChange: '$actions.selectValue' },
     }, '[uiSchema] binding is not listbox items: $model.items', { values: { state: { label: 'Rendered', value: 'one' }, model: { items: { key: 'one', label: 'One' } } }, actions: { selectValue: () => undefined } }],

@@ -1,6 +1,7 @@
 # Bug 005: Grid preview can overflow narrow viewports
 
-- Progress: 5 / 100
+- Progress: 100 / 100
+- Status: Resolved
 - Area: grid preview
 - Evidence: `demo/src/patterns/grid/Grid.tsx:16`
 - Symptom: The preview uses `inline-grid` with `repeat(columnCount, minmax(120px, 1fr))` and no horizontal scroll wrapper.
@@ -11,3 +12,4 @@
   3. The grid width can exceed the preview panel instead of scrolling inside the preview.
 - Expected: Wide grid previews should remain usable in a constrained preview pane.
 - Suggested fix: Wrap the grid in an `overflow-x-auto` container or use responsive column sizing that preserves access to every cell.
+- Resolution: `demo/src/patterns/grid/Grid.tsx` now wraps the grid in a local horizontal scroll container and keeps the grid width intrinsic.

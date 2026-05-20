@@ -60,7 +60,7 @@ function MenubarSubmenuKeyboardEdges() {
     children: [],
     activeKey,
     onEvent: (event) => {
-      setEvents((current) => [...current, `${event.type}:${event.key ?? ''}`])
+      setEvents((current) => [...current, `${event.type}:${'key' in event ? event.key ?? '' : ''}`])
       if (event.type === 'focus') setActiveKey(event.key ?? null)
     },
     close: () => setClosed((current) => current + 1),
@@ -71,7 +71,7 @@ function MenubarSubmenuKeyboardEdges() {
     rootKeys: ['orphan'],
     children: ['orphan'],
     activeKey: undefined,
-    onEvent: (event) => setEvents((current) => [...current, `orphan:${event.type}:${event.key ?? ''}`]),
+    onEvent: (event) => setEvents((current) => [...current, `orphan:${event.type}:${'key' in event ? event.key ?? '' : ''}`]),
     close: () => setClosed((current) => current + 1),
   })
   const cycleHandler = useMenubarSubmenuKeyboard({
@@ -81,7 +81,7 @@ function MenubarSubmenuKeyboardEdges() {
     children: ['first', 'second'],
     activeKey: cycleActiveKey,
     onEvent: (event) => {
-      setEvents((current) => [...current, `cycle:${event.type}:${event.key ?? ''}`])
+      setEvents((current) => [...current, `cycle:${event.type}:${'key' in event ? event.key ?? '' : ''}`])
       if (event.type === 'focus') setCycleActiveKey(event.key ?? null)
     },
     close: () => setClosed((current) => current + 1),
@@ -92,7 +92,7 @@ function MenubarSubmenuKeyboardEdges() {
     rootKeys: [],
     children: ['owner'],
     activeKey: 'owner',
-    onEvent: (event) => setEvents((current) => [...current, `empty-sibling:${event.type}:${event.key ?? ''}`]),
+    onEvent: (event) => setEvents((current) => [...current, `empty-sibling:${event.type}:${'key' in event ? event.key ?? '' : ''}`]),
     close: () => setClosed((current) => current + 1),
   })
 

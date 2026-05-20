@@ -28,11 +28,11 @@ export function Listbox({
   useLayoutEffect(() => {
     if (!scrollable || !activeKey) return
     const root = rootRef.current
-    const active = document.getElementById(listbox.ids.forKey(activeKey))
+    const active = document.getElementById(listbox.keyToElementId(activeKey))
     if (!root || !active || !root.contains(active)) return
     if (typeof active.scrollIntoView !== 'function') return
     active.scrollIntoView({ block: 'nearest' })
-  }, [activeKey, listbox.ids, scrollable])
+  }, [activeKey, listbox.keyToElementId, scrollable])
 
   const renderOption = (key: string, posIndex?: number, setSize?: number) => {
     const item = renderItemsByKey.get(key)

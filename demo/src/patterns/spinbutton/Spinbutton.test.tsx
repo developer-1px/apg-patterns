@@ -37,7 +37,7 @@ function SpinbuttonReducerEdgesDemo() {
       <button type="button" onClick={() => apply({ type: 'focus', key: 'minutes' })}>Focus minutes</button>
       <button type="button" onClick={() => apply({ type: 'value', key: 'hours', value: 'ignored' })}>String value</button>
       <button type="button" onClick={() => apply({ type: 'valueStep', key: 'hours', direction: 'decrementLarge' })}>Large decrement</button>
-      <button type="button" onClick={() => apply({ type: 'valueStep', key: 'hours', direction: 'unknown' })}>Unknown step</button>
+      <button type="button" onClick={() => apply({ type: 'valueStep', key: 'hours', direction: 'unknown' } as unknown as PatternEvent)}>Unknown step</button>
       <button type="button" onClick={() => apply({ type: 'valueStep', key: 'hours', direction: 'incrementLarge' })}>Large increment</button>
       <button type="button" onClick={() => apply({ type: 'value', key: 'hours', value: 1 })}>Singular hour</button>
       <button type="button" onClick={() => applyFallback({ type: 'valueStep', key: 'loose', direction: 'increment' })}>Fallback range</button>

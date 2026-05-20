@@ -158,7 +158,7 @@ function KernelResolverHost() {
 	            evaluatePredicate({ kind: 'isDisabled', key: '$activeKey' }, ctx),
 	          ]
           try {
-            evaluatePredicate({ kind: 'unknown' } as Predicate, ctx)
+            evaluatePredicate({ kind: 'unknown' } as unknown as Predicate, ctx)
           } catch {
             values.push(false)
           }
@@ -186,7 +186,7 @@ function KernelResolverHost() {
             key: 'parent',
             parentByKey,
           }
-          const wrong = { kind: 'wrong', key: '$activeKey', option: 'mode', value: 'x' } as Predicate
+          const wrong = { kind: 'wrong', key: '$activeKey', option: 'mode', value: 'x' } as unknown as Predicate
           setResult([
             predicateRegistry.get('isChecked')?.(wrong, ctx),
             predicateRegistry.get('isPressed')?.(wrong, ctx),
@@ -391,10 +391,10 @@ function KernelResolverHost() {
             resolveNavigationTarget(rowTarget('rowPageDown'), { activeKey: 'childName', data: emptyRows, parentByKey, visibleKeys }),
             resolveNavigationTarget(rowTarget('rowDown'), { activeKey: null as never, data: treegridData, parentByKey, visibleKeys }),
             resolveNavigationTarget({ kind: 'treegridRow', action: 'sideways' }, { activeKey: 'parentName', data: treegridData, parentByKey, visibleKeys }),
-            resolveNavigationTarget(rowTarget('rowGridStart'), { activeKey: null, data: sparseRows, parentByKey, visibleKeys }),
-            resolveNavigationTarget(rowTarget('rowGridEnd'), { activeKey: null, data: sparseRows, parentByKey, visibleKeys }),
-            resolveNavigationTarget(rowTarget('rowDown'), { activeKey: null, data: sparseRows, parentByKey, visibleKeys }),
-            resolveNavigationTarget(rowTarget('rowPageDown'), { activeKey: null, data: sparseRows, parentByKey, visibleKeys }),
+            resolveNavigationTarget(rowTarget('rowGridStart'), { activeKey: null as never, data: sparseRows, parentByKey, visibleKeys }),
+            resolveNavigationTarget(rowTarget('rowGridEnd'), { activeKey: null as never, data: sparseRows, parentByKey, visibleKeys }),
+            resolveNavigationTarget(rowTarget('rowDown'), { activeKey: null as never, data: sparseRows, parentByKey, visibleKeys }),
+            resolveNavigationTarget(rowTarget('rowPageDown'), { activeKey: null as never, data: sparseRows, parentByKey, visibleKeys }),
           ].map(String).join('|'))
         }}
       >

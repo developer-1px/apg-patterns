@@ -1,6 +1,7 @@
 # Bug 010: Vertical Tabs preview uses a fixed 140px column
 
-- Progress: 10 / 100
+- Progress: 100 / 100
+- Status: Resolved
 - Area: tabs preview
 - Evidence: `demo/src/patterns/tabs/Tabs.tsx:36`
 - Symptom: The vertical tabs layout uses `grid-cols-[140px_minmax(0,1fr)]` regardless of viewport width or tab label length.
@@ -11,3 +12,4 @@
   3. The fixed tab column leaves too little room for the tab panel.
 - Expected: The vertical tabs preview should collapse or size columns responsively.
 - Suggested fix: Use responsive grid classes that stack on small widths and only switch to the fixed side tablist above a safe breakpoint.
+- Resolution: `demo/src/patterns/tabs/Tabs.tsx` now uses responsive vertical-tab layout classes without the fixed `140px` column.

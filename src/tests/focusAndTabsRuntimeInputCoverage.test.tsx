@@ -25,14 +25,20 @@ function FocusAndTabsRuntimeHost() {
 
   const keyToElementId = (key: string) => `focus-${key}`
   const activeTarget = { kind: 'activeKeyElement' } as const
-  const panelTarget = { kind: 'controlledElement', key: '$activeKey' } as const
+  const panelTarget = { kind: 'controlledBy', key: '$activeKey' } as const
 
   const customRuntime: PatternRuntime = {
     definition: createTabsRuntime({ data: tabsData, onEvent: () => undefined }).definition,
     data: tabsData,
     options: {},
     visibleKeys: [],
+    getRootProps: () => ({ role: 'custom' }) as SlotProps,
+    getItemProps: () => ({ role: 'custom' }) as SlotProps,
     getPartProps: () => ({ role: 'custom' }) as SlotProps,
+    getRootKeyboardHandler: () => () => undefined,
+    resolveKeyboardBinding: () => null,
+    getItemState: () => ({}),
+    keyToElementId,
     emit: (event) => setEvents((current) => [...current, event]),
   }
 

@@ -154,7 +154,7 @@ function TemplateHost({ onEvent }: { onEvent: (event: PatternEvent) => void }) {
     <div data-testid="template-host" {...runtime.getRootProps()}>
       {runtime.visibleKeys.map((key) => (
         <div key={key} {...runtime.getItemProps('option', key)}>
-          {data.items[key]?.label}
+          {(data.items as Record<string, { label?: string }>)[key]?.label}
         </div>
       ))}
       <div data-testid="option-from-options" {...runtime.getItemProps('optionFromOptions', 'a')} />

@@ -1,6 +1,7 @@
 # Bug 004: Combobox preview placeholder is hardcoded to fruit
 
-- Progress: 4 / 100
+- Progress: 100 / 100
+- Status: Resolved
 - Area: combobox preview
 - Verified in preview: `http://127.0.0.1:5174/#pattern=combobox&panel=code&source=Combobox.tsx&variant=datepicker`
 - Evidence: In the rendered Date Picker Combobox preview, the selected variant is `Date Picker Combobox`, but the visible input placeholder is `Search fruit`. DOM inspection also reports `aria-label="Date"` with `placeholder="Search fruit"`.
@@ -12,3 +13,4 @@
   3. It still references fruit instead of date or recipient data.
 - Expected: Placeholder text should come from the combobox label or variant data.
 - Suggested fix: Pass a placeholder from demo data/options, or derive it from the combobox item label.
+- Resolution: `createComboboxInputProps` derives placeholder text from the active combobox label, so date and recipient variants no longer say fruit.

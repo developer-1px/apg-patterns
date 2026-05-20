@@ -12,18 +12,20 @@ export function Grid({
   const grid = useGridPattern(data, onEvent)
 
   return (
-    <div
-      {...grid.gridProps}
-      className={cx('inline-grid overflow-hidden rounded-xl bg-white/82 text-sm text-zinc-800 shadow-[0_12px_32px_rgba(24,24,27,0.06)] dark:bg-white/[0.045] dark:text-zinc-300 dark:shadow-black/20', ds.focusRing)}
-      style={{ gridTemplateColumns: `repeat(${grid.columnCount}, minmax(120px, 1fr))` }}
-    >
-      {grid.rows.map((row) => (
-        <div key={row.key} {...row.rowProps} className="contents">
-          {row.cells.map((cell) => (
-            <GridCell key={cell.key} cell={cell} />
-          ))}
-        </div>
-      ))}
+    <div className="max-w-full overflow-x-auto pb-1">
+      <div
+        {...grid.gridProps}
+        className={cx('grid min-w-max overflow-hidden rounded-xl bg-white/82 text-sm text-zinc-800 shadow-[0_12px_32px_rgba(24,24,27,0.06)] dark:bg-white/[0.045] dark:text-zinc-300 dark:shadow-black/20', ds.focusRing)}
+        style={{ gridTemplateColumns: `repeat(${grid.columnCount}, minmax(120px, 1fr))` }}
+      >
+        {grid.rows.map((row) => (
+          <div key={row.key} {...row.rowProps} className="contents">
+            {row.cells.map((cell) => (
+              <GridCell key={cell.key} cell={cell} />
+            ))}
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

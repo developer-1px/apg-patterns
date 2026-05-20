@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import type { PatternData, PatternOptions } from '../index'
+import type { KeyInput, PatternData, PatternOptions } from '../index'
 import '../index'
 import { resolveTreeviewKeyboardBinding, resolveTreeviewNavigationTarget } from '../patterns/treeview/runtimeCompatibility'
 
@@ -31,7 +31,7 @@ function KeyboardBindingHost() {
         role="tree"
         tabIndex={0}
         onKeyDown={(event) => {
-          const binding = resolveTreeviewKeyboardBinding(event, 'docs', data, options)
+          const binding = resolveTreeviewKeyboardBinding(event as unknown as KeyInput, 'docs', data, options)
           setResult(binding ? `${binding.preventDefault}:${binding.events.map((item) => item.type).join(',')}` : 'none')
         }}
       >

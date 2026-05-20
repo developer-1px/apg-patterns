@@ -6,6 +6,7 @@ interface CarouselItem extends PatternItem {
   title?: unknown
   caption?: unknown
   imageUrl?: unknown
+  imageAlt?: unknown
 }
 
 interface CarouselState extends PatternStateWithOptions {
@@ -19,6 +20,7 @@ export interface ReactCarouselSlide {
   title: string
   caption: string
   imageUrl: string | null
+  imageAlt: string
   active: boolean
   index: number
   slideProps: ReactPatternProps
@@ -43,6 +45,7 @@ export function createCarouselSlides({
       title: String(item?.title ?? data.items[key]?.label ?? key),
       caption: String(item?.caption ?? ''),
       imageUrl: typeof item?.imageUrl === 'string' ? item.imageUrl : null,
+      imageAlt: String(item?.imageAlt ?? item?.caption ?? item?.title ?? data.items[key]?.label ?? key),
       active: key === activeKey,
       index,
       slideProps: reactProps(runtime.getPartProps('slide', key)),

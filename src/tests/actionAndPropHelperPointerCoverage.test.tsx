@@ -353,9 +353,10 @@ function HelperHost() {
             getPartProps: () => ({ role: 'button', onKeyDown: () => events.push({ type: 'activate', key: 'fallback' }) }),
             keyToElementId: (key: string) => `menu-button-${key}`,
           }
-          const empty = createMenuButtonTriggerProps({ runtime: runtime as never, triggerKey: null, itemKeys: [], expanded: false, onEvent: (event) => events.push(event) })
-          const closed = createMenuButtonTriggerProps({ runtime: runtime as never, triggerKey: 'trigger', itemKeys: [], expanded: false, onEvent: (event) => events.push(event) })
-          const open = createMenuButtonTriggerProps({ runtime: runtime as never, triggerKey: 'trigger', itemKeys: ['first'], expanded: true, onEvent: (event) => events.push(event) })
+          const data: PatternData = { items: {}, relations: {}, state: {} }
+          const empty = createMenuButtonTriggerProps({ runtime: runtime as never, data, triggerKey: null, itemKeys: [], expanded: false, onEvent: (event) => events.push(event) })
+          const closed = createMenuButtonTriggerProps({ runtime: runtime as never, data, triggerKey: 'trigger', itemKeys: [], expanded: false, onEvent: (event) => events.push(event) })
+          const open = createMenuButtonTriggerProps({ runtime: runtime as never, data, triggerKey: 'trigger', itemKeys: ['first'], expanded: true, onEvent: (event) => events.push(event) })
           const eventBase = {
             altKey: false,
             ctrlKey: false,
@@ -431,7 +432,8 @@ function HelperHost() {
             { event: 'coverage-known-test' as never, events: [{ type: 'focus', key: '$activeKey', meta: { reason: 'keyboard' } }] },
             { event: 'coverage-known-test' as never, events: [{ type: 'activate', key: '$activeKey' }] },
           ], { data, key: undefined, activeKey: null }, (event) => events.push(event))
-          props.onCoverageKnownTest?.()
+          const knownHandler = props.onCoverageKnownTest
+          if (typeof knownHandler === 'function') knownHandler()
           events.push(withDefaultReason({ type: 'activate', key: 'kept', meta: { reason: 'pointer' } }, 'external'))
           setResult(events.map((event) => `${event.type}:${'key' in event ? String(event.key).slice(0, 18) : ''}:${event.meta?.reason ?? ''}`).join('|'))
         }}

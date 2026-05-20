@@ -10,18 +10,20 @@ export function Table({
   const table = useTablePattern(data, onEvent)
 
   return (
-    <table {...table.tableProps} className="overflow-hidden rounded-xl bg-white/55 text-sm text-zinc-800 shadow-[0_12px_32px_rgba(24,24,27,0.06)] dark:bg-white/[0.04] dark:text-zinc-300 dark:shadow-black/20">
-      {table.headerRow ? (
-        <thead>
-          <TableRow row={table.headerRow} />
-        </thead>
-      ) : null}
-      <tbody>
-        {table.bodyRows.map((row, rowIndex) => (
-          <TableRow key={row.key} row={row} rowIndex={rowIndex} />
-        ))}
-      </tbody>
-    </table>
+    <div className="max-w-full overflow-x-auto rounded-xl shadow-[0_12px_32px_rgba(24,24,27,0.06)] dark:shadow-black/20">
+      <table {...table.tableProps} className="min-w-max bg-white/55 text-sm text-zinc-800 dark:bg-white/[0.04] dark:text-zinc-300">
+        {table.headerRow ? (
+          <thead>
+            <TableRow row={table.headerRow} />
+          </thead>
+        ) : null}
+        <tbody>
+          {table.bodyRows.map((row, rowIndex) => (
+            <TableRow key={row.key} row={row} rowIndex={rowIndex} />
+          ))}
+        </tbody>
+      </table>
+    </div>
   )
 }
 
