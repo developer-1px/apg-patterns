@@ -15,6 +15,13 @@ if (!packageJson.license) failures.push('package license is required')
 if (!packageJson.version || packageJson.version === '0.0.0') failures.push('package version must be publishable, not 0.0.0')
 if (!existsSync('README.md')) failures.push('README.md is required')
 if (!existsSync('LICENSE')) failures.push('LICENSE is required')
+if (packageJson.peerDependencies?.react && packageJson.peerDependenciesMeta?.react?.optional !== true) {
+  failures.push('react peer dependency must be optional because the ./core subpath is React-free')
+}
+
+for (const subpath of ['.', './core', './react']) {
+  assertExportConditions(subpath, packageJson.exports?.[subpath])
+}
 
 for (const [section, dependencies] of Object.entries(dependencySections(packageJson))) {
   for (const [name, spec] of Object.entries(dependencies)) {
@@ -80,6 +87,24 @@ for (const file of pack.files) {
   }
 }
 
+for (const coreRuntimePath of runtimeClosure('dist/core.js')) {
+  if (hasReactModuleImport(readFileSync(coreRuntimePath, 'utf8'))) {
+    failures.push(`React-free core ESM output imports react: ${relativePath(coreRuntimePath)}`)
+  }
+}
+
+for (const coreRuntimePath of runtimeClosure('dist/core.cjs')) {
+  if (hasReactModuleImport(readFileSync(coreRuntimePath, 'utf8'))) {
+    failures.push(`React-free core CJS output imports react: ${relativePath(coreRuntimePath)}`)
+  }
+}
+
+for (const declarationPath of ['dist/core.d.ts', 'dist/core.d.cts']) {
+  if (hasReactModuleImport(readFileSync(declarationPath, 'utf8'))) {
+    failures.push(`React-free core declarations import react: ${declarationPath}`)
+  }
+}
+
 if (failures.length > 0) {
   console.error(`Publish readiness check failed:\n${failures.map((failure) => `- ${failure}`).join('\n')}`)
   process.exit(1)
@@ -93,6 +118,16 @@ function dependencySections(pkg) {
     peerDependencies: pkg.peerDependencies ?? {},
     optionalDependencies: pkg.optionalDependencies ?? {},
     bundledDependencies: pkg.bundledDependencies ?? {},
+  }
+}
+
+function assertExportConditions(subpath, entry) {
+  if (!entry || typeof entry !== 'object') {
+    failures.push(`exports["${subpath}"] is required`)
+    return
+  }
+  for (const condition of ['types', 'import', 'require']) {
+    if (typeof entry[condition] !== 'string') failures.push(`exports["${subpath}"].${condition} must be a package path`)
   }
 }
 
@@ -125,6 +160,41 @@ function collectExportPaths(value, label, paths) {
   for (const [key, child] of Object.entries(value)) {
     collectExportPaths(child, `${label}.${key}`, paths)
   }
+}
+
+function runtimeClosure(entryPath) {
+  const out = []
+  const seen = new Set()
+  visitRuntimePath(resolve(entryPath), out, seen)
+  return out
+}
+
+function visitRuntimePath(path, out, seen) {
+  if (seen.has(path)) return
+  seen.add(path)
+  out.push(path)
+  const source = readFileSync(path, 'utf8')
+  for (const specifier of runtimeImportSpecifiers(source)) {
+    if (!specifier.startsWith('.')) continue
+    visitRuntimePath(resolve(dirname(path), specifier), out, seen)
+  }
+}
+
+function runtimeImportSpecifiers(source) {
+  const specifiers = []
+  const importPattern = /\b(?:import|export)\b(?:[^'"]*\bfrom\s*)?['"]([^'"]+)['"]|\brequire\s*\(\s*['"]([^'"]+)['"]\s*\)|\bimport\s*\(\s*['"]([^'"]+)['"]\s*\)/g
+  for (const match of source.matchAll(importPattern)) {
+    specifiers.push(match[1] ?? match[2] ?? match[3])
+  }
+  return specifiers
+}
+
+function hasReactModuleImport(source) {
+  return /\b(?:import|export)\b(?:[^'"]*\bfrom\s*)?['"]react['"]|\brequire\s*\(\s*['"]react['"]\s*\)|\bimport\s*\(\s*['"]react['"]\s*\)/.test(source)
+}
+
+function relativePath(path) {
+  return path.replace(`${process.cwd()}/`, '')
 }
 
 function productionIndexImports() {
