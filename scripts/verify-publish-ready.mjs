@@ -255,6 +255,9 @@ function assertPackageScripts() {
   if (scripts.prepublishOnly !== 'npm run check') {
     failures.push('prepublishOnly must run npm run check')
   }
+  if (scripts['release:check'] !== 'npm run check && npm run check:registry') {
+    failures.push('release:check must run npm run check && npm run check:registry')
+  }
 
   for (const script of forbiddenLifecycleScripts()) {
     if (Object.hasOwn(scripts, script)) failures.push(`package script "${script}" must not run during install or pack`)

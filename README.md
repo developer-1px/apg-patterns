@@ -302,6 +302,12 @@ After changing public exports, run `npm run update:api` after `npm run build` to
 
 Before publishing a new version, run `npm run check:registry` to confirm the current package version is still unpublished on the public npm registry.
 
+For the full release preflight:
+
+```bash
+npm run release:check
+```
+
 ## Design Notes
 
 - [React facade zod blind loop](docs/proposals/2026-05-18-react-facade-zod-blind-loop.md)
