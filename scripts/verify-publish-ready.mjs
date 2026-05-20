@@ -96,6 +96,8 @@ for (const file of pack.files) {
   if (!isAllowedPackedPath(file.path)) failures.push(`packed tarball includes unexpected path ${file.path}`)
   if (/^(src|demo|scripts|docs|coverage)\//.test(file.path)) failures.push(`packed tarball includes non-runtime path ${file.path}`)
   if (/\.test\.[cm]?[jt]sx?$/.test(file.path)) failures.push(`packed tarball includes test file ${file.path}`)
+  if (/^dist\/.*\.(?:js|cjs)$/.test(file.path)) assertRuntimeSourceMapReference(file.path, packedPaths)
+  if (/^dist\/.*\.map$/.test(file.path)) assertPortableSourceMap(file.path)
   if (/^dist\/(?:index|core|react)\.d\.(ts|cts)$/.test(file.path) && file.size > maxDeclarationBytes) {
     failures.push(`${file.path} size ${file.size} exceeds ${maxDeclarationBytes} bytes`)
   }
@@ -188,6 +190,42 @@ function readPackManifest() {
 
 function isAllowedPackedPath(path) {
   return requiredPackedPaths.includes(path) || /^dist\/chunk-[A-Z0-9]+\.(?:js|cjs)(?:\.map)?$/.test(path)
+}
+
+function assertRuntimeSourceMapReference(runtimePath, packedPaths) {
+  const source = readFileSync(runtimePath, 'utf8')
+  const expectedMapPath = `${runtimePath}.map`
+  const expectedSpecifier = expectedMapPath.replace(/^dist\//, '')
+  const matches = [...source.matchAll(/\/\/# sourceMappingURL=([^\r\n]+)/g)].map((match) => match[1].trim())
+  if (matches.length !== 1) {
+    failures.push(`${runtimePath} must contain exactly one sourceMappingURL comment`)
+    return
+  }
+  if (matches[0] !== expectedSpecifier) failures.push(`${runtimePath} sourceMappingURL must be ${expectedSpecifier}`)
+  if (!packedPaths.has(expectedMapPath)) failures.push(`${runtimePath} sourceMappingURL references unpacked path ${expectedMapPath}`)
+}
+
+function assertPortableSourceMap(mapPath) {
+  const source = readFileSync(mapPath, 'utf8')
+  const localPaths = [process.cwd(), process.env.HOME].filter(Boolean)
+  for (const localPath of localPaths) {
+    if (source.includes(localPath)) failures.push(`${mapPath} contains local filesystem path ${localPath}`)
+  }
+
+  let map
+  try {
+    map = JSON.parse(source)
+  } catch {
+    failures.push(`${mapPath} must be valid JSON`)
+    return
+  }
+
+  if (map.version !== 3) failures.push(`${mapPath} must be a v3 source map`)
+  for (const sourcePath of map.sources ?? []) {
+    if (/^(?:\/|[A-Za-z]:[\\/]|file:|https?:)/.test(sourcePath)) {
+      failures.push(`${mapPath} contains non-portable source path ${sourcePath}`)
+    }
+  }
 }
 
 function manifestRuntimePaths(pkg) {

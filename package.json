@@ -52,7 +52,7 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && node scripts/normalize-dist-source-maps.mjs",
     "dev": "vite --config vite.config.ts",
     "demo": "vite --config vite.config.ts",
     "demo:build": "vite build --config vite.config.ts",
