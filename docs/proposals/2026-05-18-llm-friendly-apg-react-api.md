@@ -1,6 +1,6 @@
 ---
 type: proposal
-status: accepted
+status: implemented
 date: 2026-05-18
 title: LLM-Friendly APG React API
 ---
@@ -13,19 +13,37 @@ The preset renderer layer exists for descriptor-backed patterns:
 
 ```tsx
 <Accordion data={data} onEvent={onEvent} />
+<Alert data={data} onEvent={onEvent} />
+<AlertDialog data={data} onEvent={onEvent} />
 <Breadcrumb data={data} onEvent={onEvent} />
 <Button data={data} onEvent={onEvent} />
+<Carousel data={data} onEvent={onEvent} />
 <Checkbox data={data} onEvent={onEvent} />
+<Combobox data={data} onEvent={onEvent} />
+<Dialog data={data} onEvent={onEvent} />
+<Disclosure data={data} onEvent={onEvent} />
+<Feed data={data} onEvent={onEvent} />
+<Grid data={data} onEvent={onEvent} />
+<Landmarks data={data} />
 <Link data={data} onEvent={onEvent} />
 <Listbox data={data} onEvent={onEvent} />
+<MenuButton data={data} onEvent={onEvent} />
+<Menubar data={data} onEvent={onEvent} />
 <Meter data={data} />
 <RadioGroup data={data} onEvent={onEvent} />
+<Slider data={data} onEvent={onEvent} />
+<Spinbutton data={data} onEvent={onEvent} />
 <Switch data={data} onEvent={onEvent} />
+<Table data={data} />
+<Tabs data={data} onEvent={onEvent} />
 <Toolbar data={data} onEvent={onEvent} />
+<Tooltip data={data} onEvent={onEvent} />
 <Tree data={data} onEvent={onEvent} />
+<Treegrid data={data} onEvent={onEvent} />
+<WindowSplitter data={data} onEvent={onEvent} />
 ```
 
-The remaining scope is to extend this layer beyond these established preset components.
+The preset renderer surface is complete for the currently modeled APG pattern set, and `npm run check:preset` guards the exported component, hook, README, and coverage-test surface.
 
 ## Problem
 

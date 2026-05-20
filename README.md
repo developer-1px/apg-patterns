@@ -37,16 +37,34 @@ Descriptor-backed preset components are available for patterns that can fully ow
 
 ```tsx
 <Accordion data={data} onEvent={onEvent} />
+<Alert data={data} onEvent={onEvent} />
+<AlertDialog data={data} onEvent={onEvent} />
 <Breadcrumb data={data} onEvent={onEvent} />
 <Button data={data} onEvent={onEvent} />
+<Carousel data={data} onEvent={onEvent} />
 <Checkbox data={data} onEvent={onEvent} />
+<Combobox data={data} onEvent={onEvent} />
+<Dialog data={data} onEvent={onEvent} />
+<Disclosure data={data} onEvent={onEvent} />
+<Feed data={data} onEvent={onEvent} />
+<Grid data={data} onEvent={onEvent} />
+<Landmarks data={data} />
 <Link data={data} onEvent={onEvent} />
 <Listbox data={data} onEvent={onEvent} />
+<MenuButton data={data} onEvent={onEvent} />
+<Menubar data={data} onEvent={onEvent} />
 <Meter data={data} />
 <RadioGroup data={data} onEvent={onEvent} />
+<Slider data={data} onEvent={onEvent} />
+<Spinbutton data={data} onEvent={onEvent} />
 <Switch data={data} onEvent={onEvent} />
+<Table data={data} />
+<Tabs data={data} onEvent={onEvent} />
 <Toolbar data={data} onEvent={onEvent} />
+<Tooltip data={data} onEvent={onEvent} />
 <Tree data={data} onEvent={onEvent} />
+<Treegrid data={data} onEvent={onEvent} />
+<WindowSplitter data={data} onEvent={onEvent} />
 ```
 
 Implemented hooks:
@@ -64,6 +82,7 @@ useDialogPattern(data, onEvent, options?)
 useDisclosurePattern(data, onEvent, options?)
 useFeedPattern(data, onEvent, options?)
 useGridPattern(data, onEvent, options?)
+useLandmarksPattern(data, onEvent, options?)
 useLinkPattern(data, onEvent, options?)
 useTreeviewPattern(data, onEvent, options?)
 useListboxPattern(data, onEvent, options?)

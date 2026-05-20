@@ -13,6 +13,7 @@ export type { ReactMenubarItem } from './menubarItem'
 export interface ReactMenubarRuntime {
   rootProps: ReactPatternProps
   rootItems: readonly ReactMenubarItem[]
+  itemsFor(parentKey: Key): readonly ReactMenubarItem[]
   expandedRootKeys: readonly Key[]
   ids: {
     forKey(key: Key): string
@@ -43,6 +44,10 @@ export function useMenubarPattern(data: PatternData, onEvent: (event: PatternEve
     },
     get rootItems() {
       return rootKeys.map((key) => createMenubarItem({ runtime, data, key, rootKeys, onEvent }))
+    },
+    itemsFor(parentKey) {
+      const itemKeys = data.relations?.childrenByKey?.[parentKey] ?? []
+      return itemKeys.map((key) => createMenubarItem({ runtime, data, key, rootKeys: itemKeys, onEvent }))
     },
     expandedRootKeys,
     get ids() {
