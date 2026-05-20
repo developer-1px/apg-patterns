@@ -36,7 +36,7 @@ The publish workflow enforces `VERIFY_RELEASE_TAG=true`; run it from the `v<pack
 
 Release preflight includes `npm run check:signatures` to verify installed dependency registry signatures and available attestations.
 
-The external check verifies that `origin` matches package repository metadata, the public GitHub repository is reachable, and the npm registry can still accept the current version.
+The external check verifies that `origin` matches package repository metadata, the GitHub repository is public and reachable, and the npm registry can still accept the current version.
 
 Both release workflows verify and upload `release-artifacts/` with the `npm pack` tarball and `npm-pack.json` for review.
 

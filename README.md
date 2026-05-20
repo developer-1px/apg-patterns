@@ -348,7 +348,7 @@ Before publishing a new version, run `npm run check:registry` to confirm the cur
 
 `check:release-ref` reports the expected release tag. In the publish workflow it is strict and requires `GITHUB_REF_TYPE=tag` with `GITHUB_REF_NAME=v<package.version>`.
 
-`check:external` verifies the final external publishing state: local `origin` must match `package.json` `repository`, the public GitHub repository must be reachable, and the npm registry must still accept the current package version.
+`check:external` verifies the final external publishing state: local `origin` must match `package.json` `repository`, the GitHub repository visibility must be public, the public GitHub repository must be reachable, and the npm registry must still accept the current package version.
 
 The publish workflow runs `npm run check:external` after the release preflight and before packing or publishing.
 

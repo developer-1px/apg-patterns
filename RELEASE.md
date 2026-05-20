@@ -21,7 +21,7 @@ npm run check:release-artifacts
 
 The release gate includes `npm run check:signatures`, package smoke tests, registry availability checks, and release git-ref validation.
 
-The external check verifies that local `origin` matches the package repository metadata, the public GitHub repository is reachable, and the npm registry can still accept the current version.
+The external check verifies that local `origin` matches the package repository metadata, the GitHub repository is public and reachable, and the npm registry can still accept the current version.
 
 The publish workflow runs the external check before packing or publishing.
 

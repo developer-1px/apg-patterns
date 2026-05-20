@@ -46,6 +46,15 @@ export function verifyExternalReleaseState(packageJson, probes = defaultProbes) 
 
   if (packageRepository) {
     const repositoryUrl = gitHttpsRepositoryUrl(packageRepository)
+    const repositoryName = formatRepository(packageRepository)
+    const visibilityState = probes.readGitHubRepositoryVisibility(repositoryName)
+    if (visibilityState.visibility === 'PUBLIC') {
+      notes.push(`GitHub repository visibility is PUBLIC for ${repositoryName}`)
+    } else {
+      const detail = visibilityState.detail ? `: ${visibilityState.detail}` : ''
+      failures.push(`GitHub repository visibility must be PUBLIC for ${repositoryName}${detail}`)
+    }
+
     const repositoryState = probes.readPublicGitHead(repositoryUrl)
     if (repositoryState.ok) {
       notes.push(`public GitHub repository is reachable at ${repositoryUrl}`)
@@ -130,6 +139,16 @@ const defaultProbes = {
       encoding: 'utf8',
     })
     return result.status === 0 ? result.stdout.trim() : ''
+  },
+  readGitHubRepositoryVisibility(repositoryName) {
+    const result = spawnSync('gh', ['repo', 'view', repositoryName, '--json', 'visibility', '--jq', '.visibility'], {
+      encoding: 'utf8',
+    })
+    if (result.status === 0) {
+      return { visibility: result.stdout.trim(), detail: '' }
+    }
+    const detail = `${result.stderr}\n${result.stdout}`.trim().split('\n').find(Boolean) ?? ''
+    return { visibility: '', detail }
   },
   readPublicGitHead(repositoryUrl) {
     const result = spawnSync('git', ['ls-remote', repositoryUrl, 'HEAD'], {

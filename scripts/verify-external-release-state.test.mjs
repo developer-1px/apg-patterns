@@ -33,6 +33,15 @@ describe('verify-external-release-state', () => {
     expect(verifyExternalReleaseState(packageJson, readyProbes()).failures).toEqual([])
   })
 
+  it('rejects a private GitHub repository', () => {
+    expect(
+      verifyExternalReleaseState(packageJson, {
+        ...readyProbes(),
+        readGitHubRepositoryVisibility: () => ({ visibility: 'PRIVATE', detail: '' }),
+      }).failures,
+    ).toContain('GitHub repository visibility must be PUBLIC for scope/pkg')
+  })
+
   it('requires a configured origin remote before external publishing', () => {
     expect(
       verifyExternalReleaseState(packageJson, {
@@ -64,6 +73,7 @@ describe('verify-external-release-state', () => {
 function readyProbes() {
   return {
     readOriginUrl: () => 'https://github.com/scope/pkg.git',
+    readGitHubRepositoryVisibility: () => ({ visibility: 'PUBLIC', detail: '' }),
     readPublicGitHead: () => ({ ok: true, detail: '' }),
     readRegistryReleaseState: () => ({ failures: [], notes: ['package name has no published versions'] }),
   }
