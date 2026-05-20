@@ -226,6 +226,7 @@ function assertDocumentationMetadata() {
   if (readme && !/\bAPI\.md\b/.test(readme)) {
     failures.push('README must link to API.md')
   }
+  assertReadmeCompatibility(readme)
   assertReadmeCodeStructure(readme)
   if (packageName && readme && !new RegExp(`\\bnpm\\s+install\\s+${escapeRegExp(packageName)}\\b`).test(readme)) {
     failures.push('README must document installing the package by its package name')
@@ -252,6 +253,35 @@ function assertDocumentationMetadata() {
   }
   if (packageAuthor && license && !new RegExp(`^Copyright \\(c\\) \\d{4} ${escapeRegExp(packageAuthor)}\\s*$`, 'm').test(license)) {
     failures.push('LICENSE copyright holder must match package author')
+  }
+}
+
+function assertReadmeCompatibility(readme) {
+  if (!readme) return
+  const section = readSection(readme, 'Compatibility')
+  if (!section) {
+    failures.push('README must document runtime compatibility')
+    return
+  }
+
+  const plainSection = section.replace(/`/g, '')
+  const nodeRange = packageJson.engines?.node
+  const reactRange = packageJson.peerDependencies?.react
+
+  if (nodeRange && !plainSection.includes(`Node.js ${nodeRange}`)) {
+    failures.push(`README Compatibility must document Node.js ${nodeRange}`)
+  }
+  if (reactRange && !plainSection.includes(`React ${reactRange}`)) {
+    failures.push(`README Compatibility must document React ${reactRange}`)
+  }
+  if (reactRange && !plainSection.includes('optional peer dependency')) {
+    failures.push('README Compatibility must document React as an optional peer dependency')
+  }
+  if (packageJson.dependencies?.zod && !plainSection.includes('Runtime dependency: zod')) {
+    failures.push('README Compatibility must document zod as the runtime dependency')
+  }
+  if (packageJson.exports?.['./core'] && !plainSection.includes('core') && !plainSection.includes('./core')) {
+    failures.push('README Compatibility must document the React-free core entry')
   }
 }
 

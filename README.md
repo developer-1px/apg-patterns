@@ -26,6 +26,14 @@ Use `@interactive-os/apg-patterns` or `@interactive-os/apg-patterns/core` for sc
 
 Use `@interactive-os/apg-patterns/react` for React hooks and preset components.
 
+## Compatibility
+
+- Node.js `>=18.18`.
+- Runtime dependency: `zod`.
+- React `^18.0.0 || ^19.0.0` is an optional peer dependency for `@interactive-os/apg-patterns/react`.
+- The root entry and `@interactive-os/apg-patterns/core` are React-free.
+- ESM, CommonJS, and TypeScript declarations are published for every public entry.
+
 ## Quick Start
 
 ```tsx
