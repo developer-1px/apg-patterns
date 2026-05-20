@@ -49,7 +49,7 @@ try {
     smokeKind: 'react',
   })
 
-  console.log('package consumer smoke passed for actual npm pack tarball integrity, ESM, CJS, warning-free script-enabled npm tarball install with transitive runtime dependencies and optional React, Vite bundler builds for root/core/react, NodeNext/Bundler/CJS TypeScript, package metadata, package export encapsulation, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
+  console.log('package consumer smoke passed for actual npm pack tarball integrity, ESM, CJS, warning-free script-enabled npm tarball install with transitive runtime dependencies and optional React, Vite bundler builds for root/core/react, NodeNext/Bundler/CJS TypeScript, package metadata and published docs, package export encapsulation, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
 } finally {
   rmSync(tempRoot, { recursive: true, force: true })
 }
@@ -409,7 +409,10 @@ function packageMetadataSmokeSource() {
 
   return `
 const packageMetadata = require('@interactive-os/apg-patterns/package.json')
+const { existsSync, readFileSync } = require('node:fs')
+const { dirname, join } = require('node:path')
 const expectedMetadata = ${JSON.stringify(expectedMetadata, null, 2)}
+const packageRoot = dirname(require.resolve('@interactive-os/apg-patterns/package.json'))
 
 for (const key of ['name', 'version', 'license', 'author']) {
   if (packageMetadata[key] !== expectedMetadata[key]) {
@@ -422,6 +425,20 @@ if (packageMetadata.peerDependenciesMeta?.react?.optional !== expectedMetadata.r
 }
 if (packageMetadata.exports?.['./package.json'] !== expectedMetadata.packageJsonExport) {
   throw new Error('package metadata export did not expose its metadata subpath')
+}
+
+const expectedDocs = {
+  'README.md': '# ' + expectedMetadata.name + '\\n',
+  'API.md': '# ' + expectedMetadata.name + ' API Reference\\n',
+  'CHANGELOG.md': '## ' + expectedMetadata.version,
+  'LICENSE': 'MIT License',
+}
+
+for (const [filename, marker] of Object.entries(expectedDocs)) {
+  const docPath = join(packageRoot, filename)
+  if (!existsSync(docPath)) throw new Error('published package is missing ' + filename)
+  const source = readFileSync(docPath, 'utf8')
+  if (!source.includes(marker)) throw new Error('published ' + filename + ' did not include expected metadata')
 }
 `
 }
