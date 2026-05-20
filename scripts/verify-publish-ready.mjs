@@ -33,6 +33,14 @@ const expectedExportEntries = {
 }
 const expectedExportSubpaths = [...Object.keys(expectedExportEntries), './package.json']
 const expectedPackageFiles = ['dist', 'README.md', 'CHANGELOG.md', 'LICENSE']
+const allowedDeclarationExternalSpecifiers = {
+  'dist/index.d.ts': new Set(['zod']),
+  'dist/index.d.cts': new Set(['zod']),
+  'dist/core.d.ts': new Set(['zod']),
+  'dist/core.d.cts': new Set(['zod']),
+  'dist/react.d.ts': new Set(['zod', 'react']),
+  'dist/react.d.cts': new Set(['zod', 'react']),
+}
 
 if (packageJson.private === true) failures.push('package must not be private')
 if (!packageJson.name) failures.push('package name is required')
@@ -132,7 +140,10 @@ for (const file of pack.files) {
   if (/\.test\.[cm]?[jt]sx?$/.test(file.path)) failures.push(`packed tarball includes test file ${file.path}`)
   if (/^dist\/.*\.(?:js|cjs)$/.test(file.path)) assertRuntimeSourceMapReference(file.path, packedPaths)
   if (/^dist\/.*\.map$/.test(file.path)) assertPortableSourceMap(file.path)
-  if (isPublicDeclarationPath(file.path)) assertDeclarationSizeBudget(file)
+  if (isPublicDeclarationPath(file.path)) {
+    assertDeclarationSizeBudget(file)
+    assertDeclarationImports(file.path, packedPaths)
+  }
 }
 
 for (const entry of reactFreeEntries()) {
@@ -461,6 +472,37 @@ function assertDeclarationSizeBudget(file) {
   }
 }
 
+function assertDeclarationImports(declarationPath, packedPaths) {
+  const allowedExternal = allowedDeclarationExternalSpecifiers[declarationPath]
+  if (!allowedExternal) {
+    failures.push(`${declarationPath} is missing an allowed declaration import specifier list`)
+    return
+  }
+
+  const source = stripComments(readFileSync(declarationPath, 'utf8'))
+  for (const specifier of importSpecifiers(source)) {
+    if (specifier.startsWith('.')) {
+      const packedDeclarationPath = resolveDeclarationSpecifier(declarationPath, specifier)
+      if (!packedDeclarationPath || !packedPaths.has(packedDeclarationPath)) {
+        failures.push(`${declarationPath} imports unpacked declaration path ${specifier}`)
+      }
+      continue
+    }
+
+    if (!allowedExternal.has(specifier)) {
+      failures.push(`${declarationPath} exposes unexpected external declaration import ${specifier}`)
+    }
+  }
+}
+
+function resolveDeclarationSpecifier(fromPath, specifier) {
+  const resolved = relativePath(resolve(dirname(fromPath), specifier))
+  if (resolved.endsWith('.d.ts') || resolved.endsWith('.d.cts')) return resolved
+  if (resolved.endsWith('.js')) return `${resolved.slice(0, -3)}.d.ts`
+  if (resolved.endsWith('.cjs')) return `${resolved.slice(0, -4)}.d.cts`
+  return null
+}
+
 function assertRuntimeSourceMapReference(runtimePath, packedPaths) {
   const source = readFileSync(runtimePath, 'utf8')
   const expectedMapPath = `${runtimePath}.map`
@@ -562,12 +604,20 @@ function visitRuntimePath(path, out, seen) {
 }
 
 function runtimeImportSpecifiers(source) {
+  return importSpecifiers(source)
+}
+
+function importSpecifiers(source) {
   const specifiers = []
   const importPattern = /\b(?:import|export)\b(?:[^'"]*\bfrom\s*)?['"]([^'"]+)['"]|\brequire\s*\(\s*['"]([^'"]+)['"]\s*\)|\bimport\s*\(\s*['"]([^'"]+)['"]\s*\)/g
   for (const match of source.matchAll(importPattern)) {
     specifiers.push(match[1] ?? match[2] ?? match[3])
   }
   return specifiers
+}
+
+function stripComments(source) {
+  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\r\n]*/g, '')
 }
 
 function hasReactModuleImport(source) {
