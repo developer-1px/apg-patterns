@@ -49,6 +49,7 @@ const expectedExportEntries = {
 }
 const expectedExportSubpaths = [...Object.keys(expectedExportEntries), './package.json']
 const expectedPackageFiles = ['dist', 'docs/proposals', 'README.md', 'API.md', 'CHANGELOG.md', 'LICENSE']
+const requiredPackageKeywords = ['aria', 'wai-aria', 'apg', 'patterns', 'react', 'zod', 'a11y']
 const allowedDeclarationExternalSpecifiers = {
   'dist/index.d.ts': new Set(['zod']),
   'dist/index.d.cts': new Set(['zod']),
@@ -64,6 +65,7 @@ if (!packageJson.description) failures.push('package description is required')
 if (!packageJson.license) failures.push('package license is required')
 if (!packageAuthorName(packageJson.author)) failures.push('package author is required')
 if (!packageJson.version || packageJson.version === '0.0.0') failures.push('package version must be publishable, not 0.0.0')
+assertPackageKeywords()
 const packageManagerMatch = /^npm@(\d+\.\d+\.\d+)$/.exec(packageJson.packageManager ?? '')
 if (!packageManagerMatch) {
   failures.push('packageManager must pin the npm version')
@@ -457,6 +459,34 @@ function assertPackageFiles() {
 
   for (const file of expectedPackageFiles) {
     if (!seen.has(file)) failures.push(`files must include ${file}`)
+  }
+}
+
+function assertPackageKeywords() {
+  if (!Array.isArray(packageJson.keywords) || packageJson.keywords.length === 0) {
+    failures.push('package keywords are required for npm discoverability')
+    return
+  }
+
+  const seen = new Set()
+  for (const keyword of packageJson.keywords) {
+    if (typeof keyword !== 'string') {
+      failures.push('package keywords must be strings')
+      continue
+    }
+    if (keyword.length === 0 || keyword.trim() !== keyword) {
+      failures.push(`package keyword must be non-empty and trimmed: ${JSON.stringify(keyword)}`)
+      continue
+    }
+    if (keyword !== keyword.toLowerCase() || !/^[a-z0-9][a-z0-9-]*$/.test(keyword)) {
+      failures.push(`package keyword must be lowercase npm-search text: ${keyword}`)
+    }
+    if (seen.has(keyword)) failures.push(`package keywords contains duplicate entry ${keyword}`)
+    seen.add(keyword)
+  }
+
+  for (const keyword of requiredPackageKeywords) {
+    if (!seen.has(keyword)) failures.push(`package keywords must include ${keyword}`)
   }
 }
 
