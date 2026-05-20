@@ -16,6 +16,7 @@ Run the full release gate from the release commit:
 ```bash
 npm run release:check
 npm run check:external
+npm run check:release-artifacts
 ```
 
 The release gate includes `npm run check:signatures`, package smoke tests, registry availability checks, and release git-ref validation.
@@ -28,7 +29,7 @@ The publish workflow runs the external check before packing or publishing.
 
 Create and push the `v<package.version>` git tag after the preflight passes. Run the manual GitHub Actions `Publish Package` workflow from that tag.
 
-Review `release-artifacts/`, including the `npm pack` tarball and `npm-pack.json`, before relying on the published package.
+Review verified `release-artifacts/`, including the `npm pack` tarball and `npm-pack.json`, before relying on the published package.
 
 The publish command must stay public, provenance-backed, and targeted at the public npm registry:
 

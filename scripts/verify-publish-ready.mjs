@@ -388,6 +388,7 @@ function assertContributingGuide(contributingGuide) {
     'v<package.version>',
     'release-artifacts/',
     'npm-pack.json',
+    'npm run check:release-artifacts',
     '@interactive-os/apg-patterns/core',
     '@interactive-os/apg-patterns/react',
     'npm run check:publish',
@@ -438,6 +439,7 @@ function assertReleaseGuide(releaseGuide) {
     'v<package.version>',
     'release-artifacts/',
     'npm-pack.json',
+    'npm run check:release-artifacts',
     'npm publish --access public --provenance --registry https://registry.npmjs.org/',
   ]
   for (const marker of requiredMarkers) {
@@ -695,6 +697,9 @@ function assertPackageScripts() {
   }
   if (scripts['check:release-ref'] !== 'node scripts/verify-release-git-ref.mjs') {
     failures.push('check:release-ref must run node scripts/verify-release-git-ref.mjs')
+  }
+  if (scripts['check:release-artifacts'] !== 'node scripts/verify-release-artifacts.mjs') {
+    failures.push('check:release-artifacts must run node scripts/verify-release-artifacts.mjs')
   }
   if (scripts['check:external'] !== 'node scripts/verify-external-release-state.mjs') {
     failures.push('check:external must run node scripts/verify-external-release-state.mjs')

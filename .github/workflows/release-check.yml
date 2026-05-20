@@ -40,6 +40,9 @@ jobs:
           mkdir -p release-artifacts
           npm pack --pack-destination release-artifacts --json > release-artifacts/npm-pack.json
 
+      - name: Verify release artifact
+        run: npm run check:release-artifacts
+
       - name: Upload release artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:

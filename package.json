@@ -100,6 +100,7 @@
     "check:publish": "node scripts/verify-publish-ready.mjs",
     "check:react-peer": "node scripts/verify-react-peer-compatibility.mjs",
     "check:release-ref": "node scripts/verify-release-git-ref.mjs",
+    "check:release-artifacts": "node scripts/verify-release-artifacts.mjs",
     "check:repo": "node scripts/verify-repository-hygiene.mjs",
     "check:registry": "node scripts/verify-npm-registry-release.mjs",
     "check:readme": "node scripts/verify-readme-quick-start.mjs",

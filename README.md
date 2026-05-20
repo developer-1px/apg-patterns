@@ -349,7 +349,7 @@ Before publishing a new version, run `npm run check:registry` to confirm the cur
 
 The publish workflow runs `npm run check:external` after the release preflight and before packing or publishing.
 
-The release-check and publish workflows upload `release-artifacts/`, including the `npm pack` tarball and `npm-pack.json`, before publishing.
+The release-check and publish workflows run `npm run check:release-artifacts`, then upload `release-artifacts/`, including the `npm pack` tarball and `npm-pack.json`, before publishing.
 
 For the full release preflight:
 
