@@ -1,4 +1,5 @@
-import { PatternDefinitionSchema } from '../../schema'
+import type { ZodType } from 'zod'
+import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { toolbarEffects } from './effects'
 import { toolbarKeyboard } from './keyboard'
 import { toolbarParts } from './parts'
@@ -11,14 +12,14 @@ import { toolbarParts } from './parts'
 // toolbar (roving tabindex). Arrow keys move focus among siblings; Home/End
 // jump to first/last. Horizontal orientation uses ArrowLeft/Right; vertical
 // uses ArrowUp/Down.
-export const ToolbarDefinitionSchema = PatternDefinitionSchema.superRefine((value, ctx) => {
+export const ToolbarDefinitionSchema: ZodType<PatternDefinition> = PatternDefinitionSchema.superRefine((value, ctx) => {
   if (value.apgPattern !== 'toolbar') ctx.addIssue({ code: 'custom', path: ['apgPattern'], message: 'expected "toolbar"' })
   if (value.rootRole !== 'toolbar') ctx.addIssue({ code: 'custom', path: ['rootRole'], message: 'expected "toolbar"' })
   if (!value.parts.toolbar) ctx.addIssue({ code: 'custom', path: ['parts', 'toolbar'], message: 'toolbar requires parts.toolbar' })
   if (!value.parts.item) ctx.addIssue({ code: 'custom', path: ['parts', 'item'], message: 'toolbar requires parts.item' })
 })
 
-export const toolbarDefinition = ToolbarDefinitionSchema.parse({
+export const toolbarDefinition: PatternDefinition = ToolbarDefinitionSchema.parse({
   apgPattern: 'toolbar',
   rootRole: 'toolbar',
   containedRoles: ['button'],

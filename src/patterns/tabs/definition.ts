@@ -1,4 +1,5 @@
-import { PatternDefinitionSchema } from '../../schema'
+import type { ZodType } from 'zod'
+import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { tabsEffects } from './effects'
 import { tabsKeyboard } from './keyboard'
 import { registerTabsNavigation } from './navigation'
@@ -8,7 +9,7 @@ registerTabsNavigation()
 
 // flatTabs 별칭은 제거 — kernel 의 'flat' 을 재사용한다 (P1 fragmentation 통합).
 
-export const TabsDefinitionSchema = PatternDefinitionSchema.superRefine((value, ctx) => {
+export const TabsDefinitionSchema: ZodType<PatternDefinition> = PatternDefinitionSchema.superRefine((value, ctx) => {
   const containedRoles = value.containedRoles ?? []
   if (value.apgPattern !== 'tabs') ctx.addIssue({ code: 'custom', path: ['apgPattern'], message: 'expected "tabs"' })
   if (value.rootRole !== 'tablist') ctx.addIssue({ code: 'custom', path: ['rootRole'], message: 'expected "tablist"' })
@@ -20,7 +21,7 @@ export const TabsDefinitionSchema = PatternDefinitionSchema.superRefine((value, 
   if (!value.parts.tabpanel) ctx.addIssue({ code: 'custom', path: ['parts', 'tabpanel'], message: 'tabs requires parts.tabpanel' })
 })
 
-export const tabsDefinition = TabsDefinitionSchema.parse({
+export const tabsDefinition: PatternDefinition = TabsDefinitionSchema.parse({
   apgPattern: 'tabs',
   rootRole: 'tablist',
   containedRoles: ['tab', 'tabpanel'],

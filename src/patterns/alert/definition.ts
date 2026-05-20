@@ -1,8 +1,9 @@
-import { PatternDefinitionSchema } from '../../schema'
+import type { ZodType } from 'zod'
+import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { alertKeyboard } from './keyboard'
 import { alertParts } from './parts'
 
-export const AlertDefinitionSchema = PatternDefinitionSchema.superRefine((value, ctx) => {
+export const AlertDefinitionSchema: ZodType<PatternDefinition> = PatternDefinitionSchema.superRefine((value, ctx) => {
   if (value.apgPattern !== 'alert') ctx.addIssue({ code: 'custom', path: ['apgPattern'], message: 'expected "alert"' })
   if (value.rootRole !== 'alert') ctx.addIssue({ code: 'custom', path: ['rootRole'], message: 'expected "alert"' })
   if (!value.parts.alert) ctx.addIssue({ code: 'custom', path: ['parts', 'alert'], message: 'alert requires parts.alert' })
@@ -13,7 +14,7 @@ export const AlertDefinitionSchema = PatternDefinitionSchema.superRefine((value,
 //   - No focus management; no keyboard interaction on the alert itself.
 //   - Optional dismiss button: Escape or click → emits dismiss / expand:false.
 // State model: an alert key is "visible" iff it is present in state.expandedKeys.
-export const alertDefinition = AlertDefinitionSchema.parse({
+export const alertDefinition: PatternDefinition = AlertDefinitionSchema.parse({
   apgPattern: 'alert',
   rootRole: 'alert',
   containedRoles: [],

@@ -1,8 +1,9 @@
-import { PatternDefinitionSchema } from '../../schema'
+import type { ZodType } from 'zod'
+import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { carouselParts } from './parts'
 import { carouselTransitions } from './transitions'
 
-export const CarouselDefinitionSchema = PatternDefinitionSchema.superRefine((value, ctx) => {
+export const CarouselDefinitionSchema: ZodType<PatternDefinition> = PatternDefinitionSchema.superRefine((value, ctx) => {
   if (value.apgPattern !== 'carousel') ctx.addIssue({ code: 'custom', path: ['apgPattern'], message: 'expected "carousel"' })
   if (value.rootRole !== 'region') ctx.addIssue({ code: 'custom', path: ['rootRole'], message: 'expected "region"' })
   if (!value.parts.root) ctx.addIssue({ code: 'custom', path: ['parts', 'root'], message: 'carousel requires parts.root' })
@@ -11,7 +12,7 @@ export const CarouselDefinitionSchema = PatternDefinitionSchema.superRefine((val
   if (!value.parts.next) ctx.addIssue({ code: 'custom', path: ['parts', 'next'], message: 'carousel requires parts.next' })
 })
 
-export const carouselDefinition = CarouselDefinitionSchema.parse({
+export const carouselDefinition: PatternDefinition = CarouselDefinitionSchema.parse({
   apgPattern: 'carousel',
   rootRole: 'region',
   containedRoles: ['group', 'button'],

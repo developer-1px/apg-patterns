@@ -1,8 +1,8 @@
-import { PatternDefinitionSchema } from '../../schema'
+import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { buttonKeyboard } from './keyboard'
 import { buttonParts } from './parts'
 
-export const buttonDefinition = PatternDefinitionSchema.parse({
+export const buttonDefinition: PatternDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'button',
   rootRole: 'button',
   containedRoles: [],

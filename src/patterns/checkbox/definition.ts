@@ -1,8 +1,8 @@
-import { PatternDefinitionSchema } from '../../schema'
+import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { checkboxKeyboard } from './keyboard'
 import { checkboxParts } from './parts'
 
-export const checkboxDefinition = PatternDefinitionSchema.parse({
+export const checkboxDefinition: PatternDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'checkbox',
   rootRole: 'checkbox',
   containedRoles: [],

@@ -1,4 +1,5 @@
-import { PatternDefinitionSchema } from '../../schema'
+import type { ZodType } from 'zod'
+import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { breadcrumbParts } from './parts'
 
 // APG Breadcrumb pattern
@@ -7,14 +8,14 @@ import { breadcrumbParts } from './parts'
 // Structure: <nav aria-label="Breadcrumb"><ol><li><a>…</a></li>…<li><a aria-current="page">…</a></li></ol></nav>
 // Static pattern: no keyboard model, no interactive state. The single ARIA
 // projection is aria-current="page" on the final crumb's link.
-export const BreadcrumbDefinitionSchema = PatternDefinitionSchema.superRefine((value, ctx) => {
+export const BreadcrumbDefinitionSchema: ZodType<PatternDefinition> = PatternDefinitionSchema.superRefine((value, ctx) => {
   if (value.apgPattern !== 'breadcrumb') ctx.addIssue({ code: 'custom', path: ['apgPattern'], message: 'expected "breadcrumb"' })
   if (value.rootRole !== 'navigation') ctx.addIssue({ code: 'custom', path: ['rootRole'], message: 'expected "navigation"' })
   if (!value.parts.root) ctx.addIssue({ code: 'custom', path: ['parts', 'root'], message: 'breadcrumb requires parts.root' })
   if (!value.parts.crumb) ctx.addIssue({ code: 'custom', path: ['parts', 'crumb'], message: 'breadcrumb requires parts.crumb' })
 })
 
-export const breadcrumbDefinition = BreadcrumbDefinitionSchema.parse({
+export const breadcrumbDefinition: PatternDefinition = BreadcrumbDefinitionSchema.parse({
   apgPattern: 'breadcrumb',
   rootRole: 'navigation',
   containedRoles: ['list', 'listitem', 'link'],

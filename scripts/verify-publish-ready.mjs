@@ -4,6 +4,9 @@ import { dirname, resolve } from 'node:path'
 
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
 const failures = []
+const maxPackedBytes = 600_000
+const maxUnpackedBytes = 4_000_000
+const maxDeclarationBytes = 750_000
 
 if (packageJson.private === true) failures.push('package must not be private')
 if (!packageJson.name) failures.push('package name is required')
@@ -42,6 +45,9 @@ for (const requiredPath of ['package.json', 'README.md', 'LICENSE', 'dist/index.
   if (!packedPaths.has(requiredPath)) failures.push(`packed tarball missing ${requiredPath}`)
 }
 
+if (pack.size > maxPackedBytes) failures.push(`packed tarball size ${pack.size} exceeds ${maxPackedBytes} bytes`)
+if (pack.unpackedSize > maxUnpackedBytes) failures.push(`unpacked package size ${pack.unpackedSize} exceeds ${maxUnpackedBytes} bytes`)
+
 for (const sideEffectPath of packageJson.sideEffects ?? []) {
   if (typeof sideEffectPath !== 'string') continue
   const packedPath = sideEffectPath.replace(/^\.\//, '')
@@ -52,6 +58,9 @@ for (const file of pack.files) {
   if (!allowedPackedPaths.has(file.path)) failures.push(`packed tarball includes unexpected path ${file.path}`)
   if (/^(src|demo|scripts|docs|coverage)\//.test(file.path)) failures.push(`packed tarball includes non-runtime path ${file.path}`)
   if (/\.test\.[cm]?[jt]sx?$/.test(file.path)) failures.push(`packed tarball includes test file ${file.path}`)
+  if (/^dist\/index\.d\.(ts|cts)$/.test(file.path) && file.size > maxDeclarationBytes) {
+    failures.push(`${file.path} size ${file.size} exceeds ${maxDeclarationBytes} bytes`)
+  }
 }
 
 if (failures.length > 0) {

@@ -1,4 +1,4 @@
-import { PatternDefinitionSchema } from '../../schema'
+import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { registerGridAriaSources } from './ariaSources'
 import { gridKeyboard } from './keyboard'
 import { gridRows, registerGridNavigation } from './navigation'
@@ -10,7 +10,7 @@ registerGridNavigation()
 
 export { gridRows }
 
-export const gridDefinition = PatternDefinitionSchema.parse({
+export const gridDefinition: PatternDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'grid',
   rootRole: 'grid',
   containedRoles: ['row', 'gridcell', 'columnheader', 'rowheader'],

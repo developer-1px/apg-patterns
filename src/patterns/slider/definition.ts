@@ -1,8 +1,8 @@
-import { PatternDefinitionSchema } from '../../schema'
+import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { sliderKeyboard } from './keyboard'
 import { sliderParts } from './parts'
 
-export const sliderDefinition = PatternDefinitionSchema.parse({
+export const sliderDefinition: PatternDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'slider',
   rootRole: 'slider',
   containedRoles: [],

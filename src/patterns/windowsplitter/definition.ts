@@ -1,4 +1,4 @@
-import { PatternDefinitionSchema } from '../../schema'
+import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { windowsplitterKeyboard } from './keyboard'
 import { windowsplitterParts } from './parts'
 
@@ -8,7 +8,7 @@ import { windowsplitterParts } from './parts'
 //   items.label / items.labelledBy
 //   relations.controlsByKey
 
-export const windowsplitterDefinition = PatternDefinitionSchema.parse({
+export const windowsplitterDefinition: PatternDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'windowsplitter',
   rootRole: 'separator',
   containedRoles: [],

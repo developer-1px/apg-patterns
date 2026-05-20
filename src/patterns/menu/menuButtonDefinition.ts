@@ -1,4 +1,4 @@
-import { PatternDefinitionSchema } from '../../schema'
+import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { registerMenuAriaSources } from './menuAriaSources'
 import { menuButtonDefinitionKeyboard } from './menuButtonDefinitionKeyboard'
 import { menuButtonEffects } from './menuButtonEffects'
@@ -6,7 +6,7 @@ import { menuButtonParts } from './menuButtonParts'
 
 registerMenuAriaSources()
 
-export const menuButtonDefinition = PatternDefinitionSchema.parse({
+export const menuButtonDefinition: PatternDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'menu-button',
   rootRole: 'button',
   containedRoles: ['menu', 'menuitem', 'menuitemcheckbox', 'menuitemradio'],

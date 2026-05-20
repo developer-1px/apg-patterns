@@ -1,4 +1,4 @@
-import { PatternDefinitionSchema } from '../../schema'
+import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { feedEffects } from './effects'
 import { feedKeyboard } from './keyboard'
 import { feedParts } from './parts'
@@ -9,7 +9,7 @@ import { feedParts } from './parts'
 //   - PageUp   : move focus to previous article
 //   - Ctrl+Home: move focus to first article in feed
 //   - Ctrl+End : move focus to last article in feed
-export const feedDefinition = PatternDefinitionSchema.parse({
+export const feedDefinition: PatternDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'feed',
   rootRole: 'feed',
   containedRoles: ['article'],

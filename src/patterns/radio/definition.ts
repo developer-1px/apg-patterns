@@ -1,11 +1,11 @@
-import { PatternDefinitionSchema } from '../../schema'
+import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { radioKeyboard } from './keyboard'
 import { radioParts } from './parts'
 import { registerRadioStateSources } from './stateSources'
 
 registerRadioStateSources()
 
-export const radioGroupDefinition = PatternDefinitionSchema.parse({
+export const radioGroupDefinition: PatternDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'radio',
   rootRole: 'radiogroup',
   containedRoles: ['radio'],

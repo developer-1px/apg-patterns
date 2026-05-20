@@ -1,4 +1,4 @@
-import { PatternDefinitionSchema } from '../../schema'
+import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { registerTreeviewNavigation } from '../treeview/navigation'
 import { registerMenuAriaSources } from './menuAriaSources'
 import { menubarEffects } from './menubarEffects'
@@ -8,7 +8,7 @@ import { menubarParts } from './menubarParts'
 registerMenuAriaSources()
 registerTreeviewNavigation()
 
-export const menubarDefinition = PatternDefinitionSchema.parse({
+export const menubarDefinition: PatternDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'menubar',
   rootRole: 'menubar',
   containedRoles: ['menuitem', 'menuitemcheckbox', 'menuitemradio'],

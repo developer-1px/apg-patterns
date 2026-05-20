@@ -12,14 +12,14 @@
  *   - 'listbox' part has role 'listbox'.
  *   - 'option' part has role 'option' with aria-selected.
  */
-import { PatternDefinitionSchema } from '../../schema'
+import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { comboboxKeyboard } from './keyboard'
 import { COMBOBOX_KEY } from './navigation'
 import { comboboxParts } from './parts'
 
 export { COMBOBOX_KEY } from './navigation'
 
-export const comboboxDefinition = PatternDefinitionSchema.parse({
+export const comboboxDefinition: PatternDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'combobox',
   rootRole: 'combobox',
   containedRoles: ['listbox', 'option'],

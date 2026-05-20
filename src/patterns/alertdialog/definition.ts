@@ -1,10 +1,11 @@
-import { PatternDefinitionSchema } from '../../schema'
+import type { ZodType } from 'zod'
+import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { alertDialogEffects } from './effects'
 import { alertDialogKeyboard } from './keyboard'
 import { alertDialogParts } from './parts'
 import { alertDialogTransitions } from './transitions'
 
-export const AlertDialogDefinitionSchema = PatternDefinitionSchema.superRefine((value, ctx) => {
+export const AlertDialogDefinitionSchema: ZodType<PatternDefinition> = PatternDefinitionSchema.superRefine((value, ctx) => {
   if (value.apgPattern !== 'alertdialog') ctx.addIssue({ code: 'custom', path: ['apgPattern'], message: 'expected "alertdialog"' })
   if (value.rootRole !== 'alertdialog') ctx.addIssue({ code: 'custom', path: ['rootRole'], message: 'expected "alertdialog"' })
   if (!value.parts.dialog) ctx.addIssue({ code: 'custom', path: ['parts', 'dialog'], message: 'alertdialog requires parts.dialog' })
@@ -13,7 +14,7 @@ export const AlertDialogDefinitionSchema = PatternDefinitionSchema.superRefine((
   if (!value.parts.cancel) ctx.addIssue({ code: 'custom', path: ['parts', 'cancel'], message: 'alertdialog requires parts.cancel' })
 })
 
-export const alertDialogDefinition = AlertDialogDefinitionSchema.parse({
+export const alertDialogDefinition: PatternDefinition = AlertDialogDefinitionSchema.parse({
   apgPattern: 'alertdialog',
   rootRole: 'alertdialog',
   containedRoles: ['button'],

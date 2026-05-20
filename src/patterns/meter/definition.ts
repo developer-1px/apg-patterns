@@ -1,4 +1,4 @@
-import { PatternDefinitionSchema } from '../../schema'
+import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { meterParts } from './parts'
 
 // Meter is a read-only graphical display of a value within a known range.
@@ -6,7 +6,7 @@ import { meterParts } from './parts'
 //
 // No keyboard interaction — it's a display, not a control.
 
-export const meterDefinition = PatternDefinitionSchema.parse({
+export const meterDefinition: PatternDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'meter',
   rootRole: 'meter',
   containedRoles: [],

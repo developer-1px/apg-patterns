@@ -1,4 +1,4 @@
-import { PatternDefinitionSchema } from '../../schema'
+import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { registerTreegridAriaSources } from './ariaSources'
 import { treegridEffects } from './effects'
 import { treegridKeyboard } from './keyboard'
@@ -14,7 +14,7 @@ registerTreegridRowNavigation()
 
 export { treegridVisibleRowKeys, treegridVisibleCells }
 
-export const treegridDefinition = PatternDefinitionSchema.parse({
+export const treegridDefinition: PatternDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'treegrid',
   rootRole: 'treegrid',
   containedRoles: ['row', 'gridcell', 'columnheader', 'rowheader'],

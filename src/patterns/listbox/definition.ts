@@ -1,10 +1,10 @@
-import { PatternDefinitionSchema } from '../../schema'
+import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { listboxEffects } from './effects'
 import { listboxKeyboard } from './keyboard'
 import { listboxParts } from './parts'
 import { listboxReact } from './react'
 
-export const listboxDefinition = PatternDefinitionSchema.parse({
+export const listboxDefinition: PatternDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'listbox',
   rootRole: 'listbox',
   containedRoles: ['option'],

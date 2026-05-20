@@ -1,8 +1,8 @@
-import { PatternDefinitionSchema } from '../../schema'
+import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { switchKeyboard } from './keyboard'
 import { switchParts } from './parts'
 
-export const switchDefinition = PatternDefinitionSchema.parse({
+export const switchDefinition: PatternDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'switch',
   rootRole: 'switch',
   containedRoles: [],
