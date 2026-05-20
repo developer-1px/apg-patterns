@@ -78,6 +78,9 @@ if (typeof packageJson.engines?.node !== 'string') failures.push('engines.node i
 if (packageJson.name?.startsWith('@') && packageJson.publishConfig?.access !== 'public') {
   failures.push('scoped package must set publishConfig.access to public')
 }
+if (packageJson.publishConfig?.provenance !== true) {
+  failures.push('publishConfig.provenance must be true for npm provenance attestations')
+}
 if (!existsSync('README.md')) failures.push('README.md is required')
 if (!existsSync('API.md')) failures.push('API.md is required')
 if (!existsSync('CHANGELOG.md')) failures.push('CHANGELOG.md is required')
@@ -380,21 +383,40 @@ function assertReadmeCommandExamples() {
 function assertReadmePublishCommand(readme) {
   const publishCommands = [...readme.matchAll(/^\s*npm\s+publish\b[^\r\n]*/gm)].map((match) => match[0].trim())
   if (packageJson.name?.startsWith('@') && packageJson.publishConfig?.access === 'public') {
-    if (!publishCommands.includes('npm publish --access public')) {
+    if (!publishCommands.some(hasPublicAccessPublishFlag)) {
       failures.push('README must document publishing the scoped package with npm publish --access public')
     }
     for (const command of publishCommands) {
-      if (!/(?:^|\s)--access(?:=|\s+)public(?:\s|$)/.test(command)) {
+      if (!hasPublicAccessPublishFlag(command)) {
         failures.push(`README npm publish command must include --access public: ${command}`)
+      }
+    }
+  }
+  if (packageJson.publishConfig?.provenance === true) {
+    if (!publishCommands.some(hasProvenancePublishFlag)) {
+      failures.push('README must document publishing with npm provenance')
+    }
+    for (const command of publishCommands) {
+      if (!hasProvenancePublishFlag(command)) {
+        failures.push(`README npm publish command must include --provenance: ${command}`)
       }
     }
   }
 
   const releaseCheckIndex = readme.indexOf('npm run release:check')
-  const publishIndex = readme.indexOf('npm publish --access public')
+  const publishIndexes = publishCommands.map((command) => readme.indexOf(command)).filter((index) => index >= 0)
+  const publishIndex = publishIndexes.length > 0 ? Math.min(...publishIndexes) : -1
   if (publishIndex >= 0 && (releaseCheckIndex < 0 || publishIndex < releaseCheckIndex)) {
     failures.push('README must document npm run release:check before npm publish --access public')
   }
+}
+
+function hasPublicAccessPublishFlag(command) {
+  return /(?:^|\s)--access(?:=|\s+)public(?:\s|$)/.test(command)
+}
+
+function hasProvenancePublishFlag(command) {
+  return /(?:^|\s)--provenance(?:\s|$)/.test(command)
 }
 
 function assertPackageScripts() {

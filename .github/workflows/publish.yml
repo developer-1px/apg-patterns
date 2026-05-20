@@ -1,19 +1,17 @@
-name: Release Check
+name: Publish Package
 
 on:
-  pull_request:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
-  release-check:
+  publish:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    environment: npm
 
     steps:
       - name: Checkout
@@ -34,3 +32,6 @@ jobs:
 
       - name: Verify release readiness
         run: npm run release:check
+
+      - name: Publish with provenance
+        run: npm publish --access public --provenance

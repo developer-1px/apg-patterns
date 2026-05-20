@@ -4,6 +4,7 @@ import { existsSync, readFileSync } from 'node:fs'
 const trackedFiles = gitFiles(['ls-files'])
 const ignoredTrackedFiles = gitFiles(['ls-files', '-i', '--exclude-standard', '-c'])
 const releaseCheckWorkflowPath = '.github/workflows/release-check.yml'
+const publishWorkflowPath = '.github/workflows/publish.yml'
 const forbiddenTrackedRules = [
   {
     label: 'coverage output',
@@ -62,6 +63,7 @@ for (const rule of forbiddenTrackedRules) {
 
 assertBugDocsResolved()
 assertReleaseCheckWorkflow()
+assertPublishWorkflow()
 
 if (failures.length > 0) {
   console.error(`Repository hygiene check failed:\n${failures.map((failure) => `- ${failure}`).join('\n')}`)
@@ -96,27 +98,56 @@ function assertBugDocsResolved() {
 }
 
 function assertReleaseCheckWorkflow() {
-  if (!trackedFiles.includes(releaseCheckWorkflowPath)) {
-    failures.push(`${releaseCheckWorkflowPath} must be tracked for external release verification`)
-    return
-  }
-  if (!existsSync(releaseCheckWorkflowPath)) {
-    failures.push(`${releaseCheckWorkflowPath} is required for external release verification`)
-    return
-  }
-
-  const source = readFileSync(releaseCheckWorkflowPath, 'utf8')
-  const requiredMarkers = [
-    'actions/checkout@v4',
-    'actions/setup-node@v4',
+  const source = readTrackedWorkflow(releaseCheckWorkflowPath, 'external release verification')
+  assertWorkflowIncludes(releaseCheckWorkflowPath, source, [
+    'pull_request:',
+    'branches:',
+    '- main',
+    'actions/checkout@v6',
+    'actions/setup-node@v6',
     'node-version: 24',
+    'registry-url: https://registry.npmjs.org',
+    'package-manager-cache: false',
     'npm install -g npm@11.6.2',
     'npm ci',
     'npm run release:check',
     'contents: read',
-  ]
+  ])
+}
 
+function assertPublishWorkflow() {
+  const source = readTrackedWorkflow(publishWorkflowPath, 'npm trusted publishing')
+  assertWorkflowIncludes(publishWorkflowPath, source, [
+    'workflow_dispatch:',
+    'contents: read',
+    'id-token: write',
+    'environment: npm',
+    'actions/checkout@v6',
+    'actions/setup-node@v6',
+    'node-version: 24',
+    'registry-url: https://registry.npmjs.org',
+    'package-manager-cache: false',
+    'npm install -g npm@11.6.2',
+    'npm ci',
+    'npm run release:check',
+    'npm publish --access public --provenance',
+  ])
+}
+
+function readTrackedWorkflow(path, purpose) {
+  if (!trackedFiles.includes(path)) {
+    failures.push(`${path} must be tracked for ${purpose}`)
+    return ''
+  }
+  if (!existsSync(path)) {
+    failures.push(`${path} is required for ${purpose}`)
+    return ''
+  }
+  return readFileSync(path, 'utf8')
+}
+
+function assertWorkflowIncludes(path, source, requiredMarkers) {
   for (const marker of requiredMarkers) {
-    if (!source.includes(marker)) failures.push(`${releaseCheckWorkflowPath} must include ${marker}`)
+    if (!source.includes(marker)) failures.push(`${path} must include ${marker}`)
   }
 }

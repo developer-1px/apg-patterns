@@ -337,7 +337,7 @@ After changing public exports, run `npm run update:api` after `npm run build` to
 
 `check:exports` validates package manifest paths, ESM/CJS conditional declaration and runtime export boundaries, and TypeScript declaration resolution for the root, `./core`, and `./react` entries.
 
-`check:publish` validates package metadata, package-lock root consistency, local-only dependency specs, packed tarball contents, npm publish dry-run metadata, the documented public publish command, runtime external imports, portable sourcemaps with source content, and production source imports that would create public-entry circular initialization.
+`check:publish` validates package metadata, package-lock root consistency, local-only dependency specs, packed tarball contents, npm publish dry-run metadata, the documented public provenance publish command, runtime external imports, portable sourcemaps with source content, and production source imports that would create public-entry circular initialization.
 
 Before publishing a new version, run `npm run check:registry` to confirm the current package version is still unpublished on the public npm registry.
 
@@ -349,10 +349,10 @@ npm run release:check
 
 `prepublishOnly` also runs `npm run release:check`, so direct `npm publish` still executes the full local and registry preflight.
 
-Publish after the preflight passes:
+Publish from the manual `Publish Package` GitHub Actions workflow after configuring the package as an npm trusted publisher, or publish from a trusted GitHub Actions run after the preflight passes:
 
 ```bash
-npm publish --access public
+npm publish --access public --provenance
 ```
 
 ## Release Notes
