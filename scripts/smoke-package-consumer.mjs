@@ -49,7 +49,7 @@ try {
     smokeKind: 'react',
   })
 
-  console.log('package consumer smoke passed for actual npm pack tarball integrity, ESM, CJS, warning-free script-enabled npm tarball install with transitive runtime dependencies and optional React, Vite bundler builds for root/core/react, NodeNext/Bundler/CJS TypeScript, package metadata and published docs, package export encapsulation, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
+  console.log('package consumer smoke passed for actual npm pack tarball integrity, ESM, CJS, runtime export parity, warning-free script-enabled npm tarball install with transitive runtime dependencies and optional React, Vite bundler builds for root/core/react, NodeNext/Bundler/CJS TypeScript, package metadata and published docs, package export encapsulation, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
 } finally {
   rmSync(tempRoot, { recursive: true, force: true })
 }
@@ -390,9 +390,58 @@ const runtime = createPatternRuntime({
 if (buttonDefinition.apgPattern !== 'button') throw new Error('button definition was not loaded')
 if (runtime.visibleKeys[0] !== 'primary') throw new Error('runtime did not resolve visible keys')
 if (typeof runtime.getRootKeyboardHandler() !== 'function') throw new Error('runtime keyboard handler missing')
+${runtimeExportParitySmokeSource(moduleKind, smokeKind)}
 ${metadataSmoke}
 ${reactSmoke}
 ${deepImportSmoke}
+`
+}
+
+function runtimeExportParitySmokeSource(moduleKind, smokeKind) {
+  const reactImport = smokeKind === 'react'
+    ? moduleKind === 'esm'
+      ? "const reactApi = await import('@interactive-os/apg-patterns/react')"
+      : "const reactApi = require('@interactive-os/apg-patterns/react')"
+    : ''
+  const reactAssert = smokeKind === 'react'
+    ? `
+assertExportSuperset(reactApi, coreApi, './react runtime exports', './core runtime exports')
+assertNoDefaultExport(reactApi, './react runtime exports')
+`
+    : ''
+  const imports = moduleKind === 'esm'
+    ? `const rootApi = await import('@interactive-os/apg-patterns')
+const coreApi = await import('@interactive-os/apg-patterns/core')
+${reactImport}`
+    : `const rootApi = require('@interactive-os/apg-patterns')
+const coreApi = require('@interactive-os/apg-patterns/core')
+${reactImport}`
+
+  return `
+${imports}
+
+assertExactExportSet(rootApi, coreApi, 'root runtime exports', './core runtime exports')
+assertNoDefaultExport(rootApi, 'root runtime exports')
+assertNoDefaultExport(coreApi, './core runtime exports')
+${reactAssert}
+function assertExactExportSet(actual, expected, actualLabel, expectedLabel) {
+  assertExportSuperset(actual, expected, actualLabel, expectedLabel)
+  assertExportSuperset(expected, actual, expectedLabel, actualLabel)
+}
+
+function assertExportSuperset(actual, expected, actualLabel, expectedLabel) {
+  const actualNames = Object.keys(actual)
+  const missing = Object.keys(expected).filter((name) => !actualNames.includes(name)).sort()
+  if (missing.length > 0) {
+    throw new Error(actualLabel + ' must include every ' + expectedLabel + ': ' + missing.join(', '))
+  }
+}
+
+function assertNoDefaultExport(api, label) {
+  if (Object.prototype.hasOwnProperty.call(api, 'default')) {
+    throw new Error(label + ' must not expose a default export')
+  }
+}
 `
 }
 
