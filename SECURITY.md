@@ -6,7 +6,7 @@ Security fixes are prepared for the latest published version of `@interactive-os
 
 ## Reporting a Vulnerability
 
-Report suspected vulnerabilities through the package maintainers' private npm owner contact channel or the private security advisory channel of the public repository once repository metadata is configured.
+Report suspected vulnerabilities through the package maintainers' private npm owner contact channel.
 
 Do not include access tokens, private keys, production data, or exploitable proof-of-concept details in public issues.
 

@@ -100,6 +100,16 @@ const packedSensitiveTextPatterns = [
   },
 ]
 const packedSensitiveAssignmentPattern = /(?:^|[\s"'`{,])([A-Z0-9_]*(?:SECRET|PASSWORD|TOKEN|API[_-]?KEY|AUTH[_-]?TOKEN)[A-Z0-9_]*)\s*[:=]\s*["']?([A-Za-z0-9_./+=:-]{20,})/gi
+const packedMarkdownDeferredPlaceholderPatterns = [
+  {
+    label: 'deferred repository metadata placeholder',
+    pattern: /\bonce repository metadata is configured\b/i,
+  },
+  {
+    label: 'unfinished release-note placeholder',
+    pattern: /\b(?:TODO|FIXME|TBD|coming soon)\b/i,
+  },
+]
 const allowedDeclarationExternalSpecifiers = {
   'dist/index.d.ts': new Set(['zod']),
   'dist/index.d.cts': new Set(['zod']),
@@ -201,6 +211,7 @@ for (const requiredPath of requiredPackedPaths) {
 
 assertRuntimeExternalImports(packedPaths)
 assertPackedMarkdownLinks(packedPaths)
+assertPackedMarkdownHasNoDeferredPlaceholders(packedPaths)
 
 for (const declarationPath of requiredPackedPaths.filter(isPublicDeclarationPath)) {
   if (declarationByteBudgets[declarationPath] === undefined) {
@@ -1007,6 +1018,16 @@ function assertPackedMarkdownLinks(packedPaths) {
       if (!packedPaths.has(targetPath)) {
         failures.push(`${markdownPath} links to ${target}, but ${targetPath} is not packed`)
       }
+    }
+  }
+}
+
+function assertPackedMarkdownHasNoDeferredPlaceholders(packedPaths) {
+  const markdownPaths = [...packedPaths].filter((path) => /\.md$/i.test(path))
+  for (const markdownPath of markdownPaths) {
+    const source = readFileSync(markdownPath, 'utf8')
+    for (const { label, pattern } of packedMarkdownDeferredPlaceholderPatterns) {
+      if (pattern.test(source)) failures.push(`${markdownPath} contains ${label}`)
     }
   }
 }
