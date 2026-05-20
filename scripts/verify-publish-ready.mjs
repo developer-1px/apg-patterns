@@ -49,6 +49,7 @@ if (!existsSync('CHANGELOG.md')) failures.push('CHANGELOG.md is required')
 if (!existsSync('LICENSE')) failures.push('LICENSE is required')
 assertDocumentationMetadata()
 assertReadmeCommandExamples()
+assertPackageScripts()
 assertDependencyNames('dependencies', packageJson.dependencies, ['zod'])
 assertDependencyNames('peerDependencies', packageJson.peerDependencies, ['react'])
 assertDependencyNames('optionalDependencies', packageJson.optionalDependencies, [])
@@ -219,6 +220,31 @@ function assertReadmeCommandExamples() {
   if (/\bnpm\s+test\b/.test(readme) && !scripts.has('test')) {
     failures.push('README command references missing package script "test"')
   }
+}
+
+function assertPackageScripts() {
+  const scripts = packageJson.scripts ?? {}
+  if (scripts.prepublishOnly !== 'npm run check') {
+    failures.push('prepublishOnly must run npm run check')
+  }
+
+  for (const script of forbiddenLifecycleScripts()) {
+    if (Object.hasOwn(scripts, script)) failures.push(`package script "${script}" must not run during install or pack`)
+  }
+}
+
+function forbiddenLifecycleScripts() {
+  return [
+    'preinstall',
+    'install',
+    'postinstall',
+    'prepare',
+    'prepack',
+    'postpack',
+    'prepublish',
+    'publish',
+    'postpublish',
+  ]
 }
 
 function readTextIfExists(path) {
