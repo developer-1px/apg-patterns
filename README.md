@@ -275,6 +275,7 @@ npm run check:demo
 npm run check:package
 npm run build
 npm run check:exports
+npm run check:readme
 npm run check:publish
 npm run smoke:package
 npm run demo:smoke
@@ -285,6 +286,8 @@ To compare the demo's APG example coverage against the currently linked examples
 ```bash
 npm run check:apg
 ```
+
+`check:readme` type-checks the Quick Start examples against the built package.
 
 `check:publish` validates package metadata, local-only dependency specs, packed tarball contents, and production source imports that would create public-entry circular initialization.
 
