@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process'
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -11,11 +11,11 @@ const tempRoot = mkdtempSync(join(tmpdir(), 'apg-patterns-readme-'))
 try {
   assertBuildOutputExists()
   const examples = readReadmeExamples()
+  const tarballPath = packCurrentPackage(tempRoot)
   const consumerRoot = join(tempRoot, 'consumer')
   const nodeModules = join(consumerRoot, 'node_modules')
 
-  mkdirSync(join(nodeModules, '@interactive-os'), { recursive: true })
-  symlinkSync(repoRoot, join(nodeModules, '@interactive-os', 'apg-patterns'), 'dir')
+  installPackedPackage(tarballPath, nodeModules)
   linkPackageDependency(nodeModules, 'zod')
   linkPackageDependency(nodeModules, 'react')
   linkPackageDependency(nodeModules, '@types/react')
@@ -49,7 +49,7 @@ try {
 
   runRootQuickStartExample(consumerRoot, examples)
 
-  console.log(`README type-checks ${examples.length} TypeScript examples under NodeNext and Bundler module resolution and executes the root Quick Start.`)
+  console.log(`README type-checks ${examples.length} TypeScript examples against the packed package under NodeNext and Bundler module resolution and executes the root Quick Start.`)
 } finally {
   rmSync(tempRoot, { recursive: true, force: true })
 }
@@ -60,6 +60,26 @@ function assertBuildOutputExists() {
       throw new Error(`Missing ${packagePath}; run npm run build before npm run check:readme`)
     }
   }
+}
+
+function packCurrentPackage(destination) {
+  const stdout = execFileSync('npm', ['pack', '--pack-destination', destination, '--json'], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+  })
+  const result = JSON.parse(stdout)
+  const filename = result[0]?.filename
+  if (!filename) throw new Error('npm pack did not return a tarball filename')
+  const tarballPath = join(destination, filename)
+  if (!existsSync(tarballPath)) throw new Error(`npm pack did not create ${tarballPath}`)
+  return tarballPath
+}
+
+function installPackedPackage(tarballPath, nodeModules) {
+  const packageScopeRoot = join(nodeModules, '@interactive-os')
+  mkdirSync(packageScopeRoot, { recursive: true })
+  execFileSync('tar', ['-xzf', tarballPath, '-C', packageScopeRoot], { cwd: repoRoot })
+  renameSync(join(packageScopeRoot, 'package'), join(packageScopeRoot, 'apg-patterns'))
 }
 
 function readReadmeExamples() {
