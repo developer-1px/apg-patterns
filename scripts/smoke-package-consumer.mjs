@@ -29,11 +29,18 @@ try {
   })
   runNpmInstalledConsumerSmoke({
     tarballPath,
+    consumerRoot: join(tempRoot, 'consumer-npm-install-root'),
+    includeReact: false,
+    smokeKind: 'root',
+  })
+  runNpmInstalledConsumerSmoke({
+    tarballPath,
     consumerRoot: join(tempRoot, 'consumer-npm-install-react'),
+    includeReact: true,
     smokeKind: 'react',
   })
 
-  console.log('package consumer smoke passed for ESM, CJS, npm tarball install, Vite bundler build, NodeNext/Bundler/CJS TypeScript, package metadata, package export encapsulation, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
+  console.log('package consumer smoke passed for ESM, CJS, npm tarball install with and without React, Vite bundler build, NodeNext/Bundler/CJS TypeScript, package metadata, package export encapsulation, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
 } finally {
   rmSync(tempRoot, { recursive: true, force: true })
 }
@@ -62,22 +69,27 @@ function runConsumerSmoke({ tarballPath, consumerRoot, includeReact, smokeKind }
   execFileSync(join(repoRoot, 'node_modules/.bin/tsc'), ['--project', 'tsconfig.cjs-nodenext.json', '--noEmit'], { cwd: consumerRoot, stdio: 'pipe' })
 }
 
-function runNpmInstalledConsumerSmoke({ tarballPath, consumerRoot, smokeKind }) {
+function runNpmInstalledConsumerSmoke({ tarballPath, consumerRoot, includeReact, smokeKind }) {
   mkdirSync(consumerRoot, { recursive: true })
+  const dependencies = {
+    '@interactive-os/apg-patterns': localFileSpec(tarballPath),
+    zod: localFileSpec(join(repoRoot, 'node_modules', 'zod')),
+  }
+  const devDependencies = {}
+
+  if (includeReact) {
+    dependencies.react = localFileSpec(join(repoRoot, 'node_modules', 'react'))
+    dependencies['react-dom'] = localFileSpec(join(repoRoot, 'node_modules', 'react-dom'))
+    devDependencies['@types/react'] = localFileSpec(join(repoRoot, 'node_modules', '@types/react'))
+    devDependencies['@types/react-dom'] = localFileSpec(join(repoRoot, 'node_modules', '@types/react-dom'))
+    devDependencies.csstype = localFileSpec(join(repoRoot, 'node_modules', 'csstype'))
+  }
+
   writeFileSync(join(consumerRoot, 'package.json'), JSON.stringify({
     private: true,
     type: 'module',
-    dependencies: {
-      '@interactive-os/apg-patterns': localFileSpec(tarballPath),
-      zod: localFileSpec(join(repoRoot, 'node_modules', 'zod')),
-      react: localFileSpec(join(repoRoot, 'node_modules', 'react')),
-      'react-dom': localFileSpec(join(repoRoot, 'node_modules', 'react-dom')),
-    },
-    devDependencies: {
-      '@types/react': localFileSpec(join(repoRoot, 'node_modules', '@types/react')),
-      '@types/react-dom': localFileSpec(join(repoRoot, 'node_modules', '@types/react-dom')),
-      csstype: localFileSpec(join(repoRoot, 'node_modules', 'csstype')),
-    },
+    dependencies,
+    devDependencies,
   }, null, 2))
 
   execFileSync('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock=false'], {
@@ -91,7 +103,7 @@ function runNpmInstalledConsumerSmoke({ tarballPath, consumerRoot, smokeKind }) 
   execFileSync(join(repoRoot, 'node_modules/.bin/tsc'), ['--project', 'tsconfig.nodenext.json', '--noEmit'], { cwd: consumerRoot, stdio: 'pipe' })
   execFileSync(join(repoRoot, 'node_modules/.bin/tsc'), ['--project', 'tsconfig.bundler.json', '--noEmit'], { cwd: consumerRoot, stdio: 'pipe' })
   execFileSync(join(repoRoot, 'node_modules/.bin/tsc'), ['--project', 'tsconfig.cjs-nodenext.json', '--noEmit'], { cwd: consumerRoot, stdio: 'pipe' })
-  runViteBundlerSmoke(consumerRoot)
+  if (includeReact) runViteBundlerSmoke(consumerRoot)
 }
 
 function packCurrentPackage(destination) {
