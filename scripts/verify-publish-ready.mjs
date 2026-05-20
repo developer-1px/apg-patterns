@@ -114,6 +114,8 @@ for (const requiredPath of requiredPackedPaths) {
   if (!packedPaths.has(requiredPath)) failures.push(`packed tarball missing ${requiredPath}`)
 }
 
+assertRuntimeExternalImports(packedPaths)
+
 for (const declarationPath of requiredPackedPaths.filter(isPublicDeclarationPath)) {
   if (declarationByteBudgets[declarationPath] === undefined) {
     failures.push(`${declarationPath} is missing a declaration size budget`)
@@ -464,6 +466,40 @@ function isAllowedPackedPath(path) {
 
 function isPublicDeclarationPath(path) {
   return /^dist\/(?:index|core|react)\.d\.(ts|cts)$/.test(path)
+}
+
+function assertRuntimeExternalImports(packedPaths) {
+  const allowedRuntimePackages = new Set([
+    ...Object.keys(packageJson.dependencies ?? {}),
+    ...Object.keys(packageJson.peerDependencies ?? {}),
+  ])
+  const seenRuntimePackages = new Set()
+
+  for (const runtimePath of packedPaths) {
+    if (!/^dist\/.*\.(?:js|cjs)$/.test(runtimePath)) continue
+
+    const source = stripComments(readFileSync(runtimePath, 'utf8'))
+    for (const specifier of runtimeImportSpecifiers(source)) {
+      if (specifier.startsWith('.') || specifier.startsWith('node:')) continue
+
+      const packageName = packageNameFromSpecifier(specifier)
+      seenRuntimePackages.add(packageName)
+      if (!allowedRuntimePackages.has(packageName)) {
+        failures.push(`${runtimePath} imports undeclared runtime package ${specifier}`)
+      }
+    }
+  }
+
+  for (const packageName of allowedRuntimePackages) {
+    if (!seenRuntimePackages.has(packageName)) {
+      failures.push(`runtime output does not keep ${packageName} as an external package import`)
+    }
+  }
+}
+
+function packageNameFromSpecifier(specifier) {
+  if (specifier.startsWith('@')) return specifier.split('/').slice(0, 2).join('/')
+  return specifier.split('/')[0]
 }
 
 function assertDeclarationSizeBudget(file) {
