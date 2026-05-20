@@ -214,7 +214,7 @@ if (failures.length > 0) {
   process.exit(1)
 }
 
-console.log(`Publish readiness covers ${pack.files.length} packed files and npm publish dry-run metadata.`)
+console.log(`Publish readiness covers ${pack.files.length} packed files and npm provenance publish dry-run metadata.`)
 
 function dependencySections(pkg) {
   return {
@@ -686,10 +686,12 @@ function readPackManifest() {
 }
 
 function readPublishDryRunManifest() {
-  const stdout = execFileSync('npm', ['publish', '--dry-run', '--ignore-scripts', '--json'], { encoding: 'utf8' })
+  const stdout = execFileSync('npm', ['publish', '--dry-run', '--ignore-scripts', '--provenance', '--json'], {
+    encoding: 'utf8',
+  })
   const result = JSON.parse(stdout)
   if (!result || typeof result !== 'object' || Array.isArray(result) || !Array.isArray(result.files)) {
-    throw new Error('npm publish --dry-run did not return file metadata')
+    throw new Error('npm publish --dry-run --provenance did not return file metadata')
   }
   return result
 }
@@ -712,17 +714,19 @@ function assertPackMetadata(pack) {
 function assertPublishDryRunMatchesPack(publishDryRun, pack) {
   for (const field of ['id', 'name', 'version', 'size', 'unpackedSize', 'shasum', 'integrity', 'filename', 'entryCount']) {
     if (publishDryRun[field] !== pack[field]) {
-      failures.push(`npm publish --dry-run ${field} must match npm pack --dry-run`)
+      failures.push(`npm publish --dry-run --provenance ${field} must match npm pack --dry-run`)
     }
   }
 
   if (!Array.isArray(publishDryRun.bundled) || publishDryRun.bundled.length > 0) {
-    failures.push('npm publish --dry-run must not bundle dependencies')
+    failures.push('npm publish --dry-run --provenance must not bundle dependencies')
   }
 
   const packFiles = JSON.stringify(normalizePackFiles(pack.files))
   const publishFiles = JSON.stringify(normalizePackFiles(publishDryRun.files))
-  if (publishFiles !== packFiles) failures.push('npm publish --dry-run file list must match npm pack --dry-run')
+  if (publishFiles !== packFiles) {
+    failures.push('npm publish --dry-run --provenance file list must match npm pack --dry-run')
+  }
 }
 
 function normalizePackFiles(files) {
