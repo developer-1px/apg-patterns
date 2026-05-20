@@ -5,6 +5,8 @@ const trackedFiles = gitFiles(['ls-files'])
 const ignoredTrackedFiles = gitFiles(['ls-files', '-i', '--exclude-standard', '-c'])
 const releaseCheckWorkflowPath = '.github/workflows/release-check.yml'
 const publishWorkflowPath = '.github/workflows/publish.yml'
+const checkoutActionRef = 'actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd'
+const setupNodeActionRef = 'actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e'
 const forbiddenTrackedRules = [
   {
     label: 'coverage output',
@@ -103,8 +105,8 @@ function assertReleaseCheckWorkflow() {
     'pull_request:',
     'branches:',
     '- main',
-    'actions/checkout@v6',
-    'actions/setup-node@v6',
+    checkoutActionRef,
+    setupNodeActionRef,
     'node-version: 24',
     'registry-url: https://registry.npmjs.org',
     'package-manager-cache: false',
@@ -122,8 +124,8 @@ function assertPublishWorkflow() {
     'contents: read',
     'id-token: write',
     'environment: npm',
-    'actions/checkout@v6',
-    'actions/setup-node@v6',
+    checkoutActionRef,
+    setupNodeActionRef,
     'node-version: 24',
     'registry-url: https://registry.npmjs.org',
     'package-manager-cache: false',
@@ -147,7 +149,17 @@ function readTrackedWorkflow(path, purpose) {
 }
 
 function assertWorkflowIncludes(path, source, requiredMarkers) {
+  assertWorkflowActionsPinned(path, source)
   for (const marker of requiredMarkers) {
     if (!source.includes(marker)) failures.push(`${path} must include ${marker}`)
+  }
+}
+
+function assertWorkflowActionsPinned(path, source) {
+  for (const match of source.matchAll(/^\s*uses:\s*([^@\s]+)@([^\s#]+)/gm)) {
+    const [, action, ref] = match
+    if (!/^[a-f0-9]{40}$/.test(ref)) {
+      failures.push(`${path} must pin ${action} to a full commit SHA, not ${ref}`)
+    }
   }
 }
