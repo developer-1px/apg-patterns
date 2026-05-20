@@ -289,7 +289,7 @@ npm run check:apg
 
 `check:readme` type-checks the Quick Start examples against the built package.
 
-`check:publish` validates package metadata, local-only dependency specs, packed tarball contents, and production source imports that would create public-entry circular initialization.
+`check:publish` validates package metadata, package-lock root consistency, local-only dependency specs, packed tarball contents, and production source imports that would create public-entry circular initialization.
 
 ## Design Notes
 

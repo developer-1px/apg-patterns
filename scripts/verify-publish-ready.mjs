@@ -50,6 +50,7 @@ if (!existsSync('LICENSE')) failures.push('LICENSE is required')
 assertDocumentationMetadata()
 assertReadmeCommandExamples()
 assertPackageScripts()
+assertPackageLock()
 assertDependencyNames('dependencies', packageJson.dependencies, ['zod'])
 assertDependencyNames('peerDependencies', packageJson.peerDependencies, ['react'])
 assertDependencyNames('optionalDependencies', packageJson.optionalDependencies, [])
@@ -247,8 +248,61 @@ function forbiddenLifecycleScripts() {
   ]
 }
 
+function assertPackageLock() {
+  const packageLock = readJsonIfExists('package-lock.json')
+  if (!packageLock) {
+    failures.push('package-lock.json is required for reproducible publish checks')
+    return
+  }
+
+  if (packageLock.lockfileVersion !== 3) failures.push('package-lock.json must use lockfileVersion 3')
+  assertJsonEqual('package-lock name', packageLock.name, packageJson.name)
+  assertJsonEqual('package-lock version', packageLock.version, packageJson.version)
+
+  const rootPackage = packageLock.packages?.['']
+  if (!rootPackage || typeof rootPackage !== 'object' || Array.isArray(rootPackage)) {
+    failures.push('package-lock.json must contain packages[""] root metadata')
+    return
+  }
+
+  assertJsonEqual('package-lock root name', rootPackage.name, packageJson.name)
+  assertJsonEqual('package-lock root version', rootPackage.version, packageJson.version)
+  assertJsonEqual('package-lock root license', rootPackage.license, packageJson.license)
+  assertJsonEqual('package-lock root engines', rootPackage.engines ?? {}, packageJson.engines ?? {})
+  assertJsonEqual('package-lock root dependencies', rootPackage.dependencies ?? {}, packageJson.dependencies ?? {})
+  assertJsonEqual('package-lock root devDependencies', rootPackage.devDependencies ?? {}, packageJson.devDependencies ?? {})
+  assertJsonEqual('package-lock root peerDependencies', rootPackage.peerDependencies ?? {}, packageJson.peerDependencies ?? {})
+  assertJsonEqual(
+    'package-lock root peerDependenciesMeta',
+    rootPackage.peerDependenciesMeta ?? {},
+    packageJson.peerDependenciesMeta ?? {},
+  )
+}
+
 function readTextIfExists(path) {
   return existsSync(path) ? readFileSync(path, 'utf8') : ''
+}
+
+function readJsonIfExists(path) {
+  if (!existsSync(path)) return null
+  try {
+    return JSON.parse(readFileSync(path, 'utf8'))
+  } catch (error) {
+    failures.push(`${path} must contain valid JSON: ${error.message}`)
+    return null
+  }
+}
+
+function assertJsonEqual(label, actual, expected) {
+  const actualSource = JSON.stringify(sortJson(actual))
+  const expectedSource = JSON.stringify(sortJson(expected))
+  if (actualSource !== expectedSource) failures.push(`${label} must match package.json`)
+}
+
+function sortJson(value) {
+  if (Array.isArray(value)) return value.map(sortJson)
+  if (!value || typeof value !== 'object') return value
+  return Object.fromEntries(Object.keys(value).sort().map((key) => [key, sortJson(value[key])]))
 }
 
 function escapeRegExp(value) {
