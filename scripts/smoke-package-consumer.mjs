@@ -49,7 +49,7 @@ try {
     smokeKind: 'react',
   })
 
-  console.log('package consumer smoke passed for actual npm pack tarball integrity, ESM, CJS, runtime export parity, warning-free script-enabled npm tarball install with exact installed file tree, package-lock integrity, transitive runtime dependencies and optional React, Vite bundler builds for root/core/react, NodeNext/Bundler/CJS TypeScript, package metadata and published docs, package export encapsulation, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
+  console.log('package consumer smoke passed for actual npm pack tarball integrity, ESM, CJS, runtime export parity, warning-free script-enabled npm tarball install with exact installed file tree, package-lock integrity, transitive runtime dependencies and optional React, install-lifecycle-free package metadata, Vite bundler builds for root/core/react, NodeNext/Bundler/CJS TypeScript, package metadata and published docs, package export encapsulation, React-free root/core imports, root/core React API boundaries, and React TSX subpath imports.')
 } finally {
   rmSync(tempRoot, { recursive: true, force: true })
 }
@@ -440,6 +440,8 @@ function runtimeSmokeSource(moduleKind, smokeKind) {
     'README.md',
     'API.md',
     'CHANGELOG.md',
+    'CONTRIBUTING.md',
+    'SECURITY.md',
     'LICENSE',
     'docs/proposals/2026-05-18-llm-friendly-apg-react-api.md',
     'docs/proposals/2026-05-18-react-facade-zod-blind-loop.md',
@@ -580,6 +582,7 @@ function packageMetadataSmokeSource() {
     packageManager: packageJson.packageManager,
     engines: packageJson.engines,
     files: packageJson.files,
+    scripts: packageJson.scripts,
     sideEffects: packageJson.sideEffects,
     main: packageJson.main,
     module: packageJson.module,
@@ -606,6 +609,7 @@ for (const key of ['name', 'version', 'description', 'license', 'author', 'type'
 }
 assertJsonEqual('keywords', packageMetadata.keywords, expectedMetadata.keywords)
 assertJsonEqual('files', packageMetadata.files, expectedMetadata.files)
+assertJsonEqual('scripts', packageMetadata.scripts, expectedMetadata.scripts)
 assertJsonEqual('sideEffects', packageMetadata.sideEffects, expectedMetadata.sideEffects)
 assertJsonEqual('engines', packageMetadata.engines, expectedMetadata.engines)
 assertJsonEqual('dependencies', packageMetadata.dependencies, expectedMetadata.dependencies)
@@ -614,6 +618,14 @@ assertJsonEqual('peerDependenciesMeta', packageMetadata.peerDependenciesMeta, ex
 assertJsonEqual('exports', packageMetadata.exports, expectedMetadata.exports)
 assertJsonEqual('publishConfig', packageMetadata.publishConfig, expectedMetadata.publishConfig)
 if (packageMetadata.private === true) throw new Error('package metadata export marked the package private')
+if (packageMetadata.scripts?.prepublishOnly !== 'npm run release:check') {
+  throw new Error('package metadata export did not retain the release prepublishOnly guard')
+}
+for (const script of ['preinstall', 'install', 'postinstall', 'prepare', 'prepack', 'postpack', 'prepublish', 'publish', 'postpublish']) {
+  if (Object.prototype.hasOwnProperty.call(packageMetadata.scripts ?? {}, script)) {
+    throw new Error('package metadata export exposes install or pack lifecycle script ' + script)
+  }
+}
 
 function assertJsonEqual(label, actual, expected) {
   if (JSON.stringify(sortJson(actual)) !== JSON.stringify(sortJson(expected))) {
@@ -631,6 +643,8 @@ const expectedDocs = {
   'README.md': '# ' + expectedMetadata.name + '\\n',
   'API.md': '# ' + expectedMetadata.name + ' API Reference\\n',
   'CHANGELOG.md': '## ' + expectedMetadata.version,
+  'CONTRIBUTING.md': '# Contributing',
+  'SECURITY.md': '# Security Policy',
   'LICENSE': 'MIT License',
   'docs/proposals/2026-05-18-llm-friendly-apg-react-api.md': '# LLM-Friendly APG React API',
   'docs/proposals/2026-05-18-react-facade-zod-blind-loop.md': '# React Facade Zod Descriptor Blind Loop',

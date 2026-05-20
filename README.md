@@ -296,7 +296,7 @@ npm run demo
 npm run check
 ```
 
-`check` runs repository hygiene validation, package independence validation, TypeScript validation, the Vitest suite, APG coverage validation, demo/source consistency checks, package manifest checks, React peer compatibility validation, the package build, API reference validation, export validation, publish-readiness validation, package consumer smoke tests including actual npm pack tarball integrity, runtime export parity, published docs, npm tarball installation and Vite bundling, and the production demo smoke test:
+`check` runs repository hygiene validation, package independence validation, TypeScript validation, the Vitest suite, APG coverage validation, demo/source consistency checks, package manifest checks, React peer compatibility validation, the package build, API reference validation, export validation, publish-readiness validation, package consumer smoke tests including actual npm pack tarball integrity, runtime export parity, published docs, install-lifecycle-free package metadata, npm tarball installation and Vite bundling, and the production demo smoke test:
 
 ```bash
 npm run check:repo
