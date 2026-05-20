@@ -436,12 +436,33 @@ function runtimeSmokeSource(moduleKind, smokeKind) {
       ? "\nconst { Button } = await import('@interactive-os/apg-patterns/react')\nif (typeof Button !== 'function') throw new Error('react subpath did not expose Button')\n"
       : "\nconst { Button } = require('@interactive-os/apg-patterns/react')\nif (typeof Button !== 'function') throw new Error('react subpath did not expose Button')\n"
   const metadataSmoke = moduleKind === 'cjs' ? packageMetadataSmokeSource() : ''
+  const unexportedSubpaths = [
+    'README.md',
+    'API.md',
+    'CHANGELOG.md',
+    'LICENSE',
+    'docs/proposals/2026-05-18-llm-friendly-apg-react-api.md',
+    'docs/proposals/2026-05-18-react-facade-zod-blind-loop.md',
+    'dist/index.js',
+    'dist/core.js',
+    'dist/react.js',
+    'dist/index.cjs',
+    'dist/core.cjs',
+    'dist/react.cjs',
+    'dist/index.d.ts',
+    'dist/core.d.ts',
+    'dist/react.d.ts',
+  ]
   const deepImportSmoke = moduleKind === 'esm'
     ? `
-await assertPackagePathNotExported(
-  () => import('@interactive-os/apg-patterns/dist/core.js'),
-  'ESM dist deep import',
-)
+const unexportedSubpaths = ${JSON.stringify(unexportedSubpaths, null, 2)}
+
+for (const subpath of unexportedSubpaths) {
+  await assertPackagePathNotExported(
+    () => import(\`@interactive-os/apg-patterns/\${subpath}\`),
+    \`ESM unexported package subpath \${subpath}\`,
+  )
+}
 
 async function assertPackagePathNotExported(load, label) {
   try {
@@ -454,10 +475,14 @@ async function assertPackagePathNotExported(load, label) {
 }
 `
     : `
-assertPackagePathNotExported(
-  () => require('@interactive-os/apg-patterns/dist/core.cjs'),
-  'CJS dist deep import',
-)
+const unexportedSubpaths = ${JSON.stringify(unexportedSubpaths, null, 2)}
+
+for (const subpath of unexportedSubpaths) {
+  assertPackagePathNotExported(
+    () => require(\`@interactive-os/apg-patterns/\${subpath}\`),
+    \`CJS unexported package subpath \${subpath}\`,
+  )
+}
 
 function assertPackagePathNotExported(load, label) {
   try {
