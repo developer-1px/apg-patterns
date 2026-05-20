@@ -489,6 +489,8 @@ const expectedDocs = {
   'API.md': '# ' + expectedMetadata.name + ' API Reference\\n',
   'CHANGELOG.md': '## ' + expectedMetadata.version,
   'LICENSE': 'MIT License',
+  'docs/proposals/2026-05-18-llm-friendly-apg-react-api.md': '# LLM-Friendly APG React API',
+  'docs/proposals/2026-05-18-react-facade-zod-blind-loop.md': '# React Facade Zod Descriptor Blind Loop',
 }
 
 for (const [filename, marker] of Object.entries(expectedDocs)) {

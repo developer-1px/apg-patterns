@@ -64,6 +64,7 @@
   },
   "files": [
     "dist",
+    "docs/proposals",
     "README.md",
     "API.md",
     "CHANGELOG.md",

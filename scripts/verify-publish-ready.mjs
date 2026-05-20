@@ -48,7 +48,7 @@ const expectedExportEntries = {
   },
 }
 const expectedExportSubpaths = [...Object.keys(expectedExportEntries), './package.json']
-const expectedPackageFiles = ['dist', 'README.md', 'API.md', 'CHANGELOG.md', 'LICENSE']
+const expectedPackageFiles = ['dist', 'docs/proposals', 'README.md', 'API.md', 'CHANGELOG.md', 'LICENSE']
 const allowedDeclarationExternalSpecifiers = {
   'dist/index.d.ts': new Set(['zod']),
   'dist/index.d.cts': new Set(['zod']),
@@ -118,6 +118,8 @@ const requiredPackedPaths = [
   'API.md',
   'CHANGELOG.md',
   'LICENSE',
+  'docs/proposals/2026-05-18-llm-friendly-apg-react-api.md',
+  'docs/proposals/2026-05-18-react-facade-zod-blind-loop.md',
   'dist/index.js',
   'dist/index.js.map',
   'dist/index.cjs',
@@ -143,6 +145,7 @@ for (const requiredPath of requiredPackedPaths) {
 }
 
 assertRuntimeExternalImports(packedPaths)
+assertPackedMarkdownLinks(packedPaths)
 
 for (const declarationPath of requiredPackedPaths.filter(isPublicDeclarationPath)) {
   if (declarationByteBudgets[declarationPath] === undefined) {
@@ -166,7 +169,7 @@ for (const [label, packagePath] of manifestRuntimePaths(packageJson)) {
 
 for (const file of pack.files) {
   if (!isAllowedPackedPath(file.path)) failures.push(`packed tarball includes unexpected path ${file.path}`)
-  if (/^(src|demo|scripts|docs|coverage)\//.test(file.path)) failures.push(`packed tarball includes non-runtime path ${file.path}`)
+  if (/^(src|demo|scripts|coverage)\//.test(file.path)) failures.push(`packed tarball includes non-runtime path ${file.path}`)
   if (/\.test\.[cm]?[jt]sx?$/.test(file.path)) failures.push(`packed tarball includes test file ${file.path}`)
   if (/^dist\/.*\.(?:js|cjs)$/.test(file.path)) assertRuntimeSourceMapReference(file.path, packedPaths)
   if (/^dist\/.*\.map$/.test(file.path)) assertPortableSourceMap(file.path)
@@ -656,6 +659,38 @@ function expectedPackFilename() {
 
 function isAllowedPackedPath(path) {
   return requiredPackedPaths.includes(path) || /^dist\/chunk-[A-Z0-9]+\.(?:js|cjs)(?:\.map)?$/.test(path)
+}
+
+function assertPackedMarkdownLinks(packedPaths) {
+  const markdownPaths = [...packedPaths].filter((path) => /\.md$/i.test(path))
+  for (const markdownPath of markdownPaths) {
+    const source = readFileSync(markdownPath, 'utf8')
+    for (const target of markdownLinkTargets(source)) {
+      if (isExternalMarkdownTarget(target)) continue
+      const targetPath = normalizeMarkdownTarget(markdownPath, target)
+      if (!targetPath) continue
+      if (!packedPaths.has(targetPath)) {
+        failures.push(`${markdownPath} links to ${target}, but ${targetPath} is not packed`)
+      }
+    }
+  }
+}
+
+function markdownLinkTargets(source) {
+  return [...source.matchAll(/\[[^\]]+\]\(([^)\s]+)(?:\s+["'][^)]*["'])?\)/g)]
+    .map((match) => match[1].trim())
+    .filter(Boolean)
+}
+
+function isExternalMarkdownTarget(target) {
+  return /^(?:https?:|mailto:|#)/i.test(target)
+}
+
+function normalizeMarkdownTarget(fromPath, target) {
+  const withoutHash = target.split('#')[0]
+  if (!withoutHash || /^(?:https?:|mailto:)/i.test(withoutHash)) return null
+  const normalized = relativePath(resolve(dirname(fromPath), decodeURI(withoutHash))).replace(/\\/g, '/')
+  return normalized.startsWith('..') ? null : normalized
 }
 
 function isPublicDeclarationPath(path) {
