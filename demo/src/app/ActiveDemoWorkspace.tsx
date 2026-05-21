@@ -26,8 +26,7 @@ export function ActiveDemoWorkspace({
     }))
     dispatch({ type: 'recordEvent', event })
   })
-  const sourceNames = activeDemo.sourceNames
-  const activeSourceName = sourceNames.includes(state.sourceName as SourceName) ? state.sourceName as SourceName : sourceNames[0]
+  const activeSourceName = activeDemo.sourceNames.includes(state.sourceName as SourceName) ? state.sourceName as SourceName : activeDemo.sourceNames[0]
   const previewKeyboardShortcuts = activeDemo.keyboardShortcuts.join(' ') || undefined
 
   useEffect(() => {
