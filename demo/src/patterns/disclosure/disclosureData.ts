@@ -2,42 +2,31 @@ import type { PatternData } from '../../../../src/react'
 
 export type DisclosureVariantKey = 'simple' | 'image' | 'faq' | 'navMenu' | 'navMenuTopLinks'
 
-export const initialDisclosureData: PatternData = {
-  items: {
-    trigger: { label: 'Shipping details' },
-    panel: { label: 'Shipping details panel' },
-  },
-  relations: {
-    rootKeys: ['trigger'],
-    controlsByKey: { trigger: ['panel'] },
-    ownerByKey: { panel: 'trigger' },
-  },
-  state: {
-    activeKey: 'trigger',
-    expandedKeys: [],
-    variant: 'simple',
-  },
+function buildSingleDisclosureData(triggerLabel: string, panelLabel: string, variant: 'simple' | 'image'): PatternData {
+  return {
+    items: {
+      trigger: { label: triggerLabel },
+      panel: { label: panelLabel },
+    },
+    relations: {
+      rootKeys: ['trigger'],
+      controlsByKey: { trigger: ['panel'] },
+      ownerByKey: { panel: 'trigger' },
+    },
+    state: {
+      activeKey: 'trigger',
+      expandedKeys: [],
+      variant,
+    },
+  }
 }
+
+export const initialDisclosureData = buildSingleDisclosureData('Shipping details', 'Shipping details panel', 'simple')
 
 export const disclosurePanelText =
   'Orders before 2pm ship today. Tracking arrives by email.'
 
-export const initialImageDisclosureData: PatternData = {
-  items: {
-    trigger: { label: 'Show description' },
-    panel: { label: 'Image description' },
-  },
-  relations: {
-    rootKeys: ['trigger'],
-    controlsByKey: { trigger: ['panel'] },
-    ownerByKey: { panel: 'trigger' },
-  },
-  state: {
-    activeKey: 'trigger',
-    expandedKeys: [],
-    variant: 'image',
-  },
-}
+export const initialImageDisclosureData = buildSingleDisclosureData('Show description', 'Image description', 'image')
 
 export const imageDisclosureContent = {
   imageUrl:
@@ -76,7 +65,12 @@ export const initialFaqDisclosureData: PatternData = (() => {
   }
 })()
 
-type NavGroup = { key: string; label: string; links: readonly { href: string; label: string }[] }
+type NavLink = { href: string; label: string }
+type NavGroup = { key: string; label: string; links: readonly NavLink[] }
+type NavMixed =
+  | { kind: 'link'; key: string; label: string; href: string }
+  | { kind: 'group'; key: string; label: string; links: readonly NavLink[] }
+
 const navGroups: readonly NavGroup[] = [
   {
     key: 'about',
@@ -107,46 +101,14 @@ const navGroups: readonly NavGroup[] = [
   },
 ]
 
-export const navMenuContent = navGroups
-export const initialNavMenuDisclosureData: PatternData = (() => {
+export const navMenuContent: readonly NavMixed[] = navGroups.map((group) => ({ kind: 'group', ...group }))
+
+function buildNavDisclosureData(entries: readonly NavMixed[], variant: 'navMenu' | 'navMenuTopLinks'): PatternData {
   const items: Record<string, { label: string }> = {}
   const controlsByKey: Record<string, string[]> = {}
   const ownerByKey: Record<string, string> = {}
   const rootKeys: string[] = []
-  for (const group of navGroups) {
-    const panelKey = `${group.key}-panel`
-    items[group.key] = { label: group.label }
-    items[panelKey] = { label: `${group.label} submenu` }
-    rootKeys.push(group.key)
-    controlsByKey[group.key] = [panelKey]
-    ownerByKey[panelKey] = group.key
-  }
-  return {
-    items,
-    relations: { rootKeys, controlsByKey, ownerByKey },
-    state: { activeKey: rootKeys[0], expandedKeys: [], variant: 'navMenu' },
-  }
-})()
-
-type NavMixed =
-  | { kind: 'link'; key: string; label: string; href: string }
-  | { kind: 'group'; key: string; label: string; links: readonly { href: string; label: string }[] }
-
-const navTopLinks: readonly NavMixed[] = [
-  { kind: 'link', key: 'home', label: 'Home', href: '#home' },
-  { kind: 'group', key: navGroups[0]!.key, label: navGroups[0]!.label, links: navGroups[0]!.links },
-  { kind: 'group', key: navGroups[1]!.key, label: navGroups[1]!.label, links: navGroups[1]!.links },
-  { kind: 'group', key: navGroups[2]!.key, label: navGroups[2]!.label, links: navGroups[2]!.links },
-  { kind: 'link', key: 'contact', label: 'Contact', href: '#contact' },
-]
-
-export const navMenuTopLinksContent = navTopLinks
-export const initialNavMenuTopLinksDisclosureData: PatternData = (() => {
-  const items: Record<string, { label: string }> = {}
-  const controlsByKey: Record<string, string[]> = {}
-  const ownerByKey: Record<string, string> = {}
-  const rootKeys: string[] = []
-  for (const entry of navTopLinks) {
+  for (const entry of entries) {
     if (entry.kind === 'link') {
       items[entry.key] = { label: entry.label }
       continue
@@ -161,6 +123,15 @@ export const initialNavMenuTopLinksDisclosureData: PatternData = (() => {
   return {
     items,
     relations: { rootKeys, controlsByKey, ownerByKey },
-    state: { activeKey: rootKeys[0], expandedKeys: [], variant: 'navMenuTopLinks' },
+    state: { activeKey: rootKeys[0], expandedKeys: [], variant },
   }
-})()
+}
+
+export const initialNavMenuDisclosureData = buildNavDisclosureData(navMenuContent, 'navMenu')
+
+export const navMenuTopLinksContent: readonly NavMixed[] = [
+  { kind: 'link', key: 'home', label: 'Home', href: '#home' },
+  ...navMenuContent,
+  { kind: 'link', key: 'contact', label: 'Contact', href: '#contact' },
+]
+export const initialNavMenuTopLinksDisclosureData = buildNavDisclosureData(navMenuTopLinksContent, 'navMenuTopLinks')

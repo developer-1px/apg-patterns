@@ -33,18 +33,20 @@ function NavMenuBase({
   const disclosure = useDisclosurePattern(data, onEvent)
   const expandedKeys = disclosure.state.expandedKeys
   const containerRef = useRef<HTMLDivElement>(null)
-  const entries = mixed ? navMenuTopLinksContent : navMenuContent.map((group) => ({ kind: 'group' as const, ...group }))
+  const entries = mixed ? navMenuTopLinksContent : navMenuContent
   const { closeOthers, onButtonKey, onLinkKey } = useNavMenuKeyboard({ containerRef, expandedKeys, onEvent })
 
   return (
     <nav ref={containerRef} aria-label="Mythical University">
       <ul className="flex flex-wrap items-start gap-2">
-        {entries.map((entry) => entry.kind === 'link'
-          ? <TopLink key={entry.key} entry={entry} />
-          : <TopGroup key={entry.key} entry={entry} expanded={expandedKeys.includes(entry.key)} trigger={disclosure.items.find((item) => item.key === entry.key)?.triggerProps ?? {}} panel={disclosure.items.find((item) => item.key === entry.key)?.panelProps ?? {}} onToggle={() => {
+        {entries.map((entry) => {
+          if (entry.kind === 'link') return <TopLink key={entry.key} entry={entry} />
+          const item = disclosure.items.find((candidate) => candidate.key === entry.key)
+          return <TopGroup key={entry.key} entry={entry} expanded={expandedKeys.includes(entry.key)} trigger={item?.triggerProps ?? {}} panel={item?.panelProps ?? {}} onToggle={() => {
             closeOthers(entry.key)
             onEvent({ type: 'expand', key: entry.key, expanded: !expandedKeys.includes(entry.key) })
-          }} onButtonKey={onButtonKey(entry.key)} onLinkKey={onLinkKey(entry.key)} />)}
+          }} onButtonKey={onButtonKey(entry.key)} onLinkKey={onLinkKey(entry.key)} />
+        })}
       </ul>
     </nav>
   )
