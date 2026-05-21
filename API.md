@@ -45,15 +45,9 @@ CarouselDefinitionSchema
 checkboxDefinition
 comboboxDefinition
 comboboxRootKey
-createDisclosureRuntime
-CreateDisclosureRuntimeInput
 createParentByKey
 createPatternRuntime
 CreatePatternRuntimeInput
-createTabsRuntime
-CreateTabsRuntimeInput
-createTreeviewRuntime
-CreateTreeviewRuntimeInput
 defineAriaSource
 defineDomEvent
 defineKeyToken
@@ -65,7 +59,6 @@ dialogDefinition
 DialogDefinitionSchema
 disclosureDefinition
 DisclosureDefinitionSchema
-DisclosureRuntime
 DomEventName
 DomEventNameSchema
 EffectDefinition
@@ -85,7 +78,6 @@ FocusModel
 FocusModelSchema
 FocusProjection
 FocusProjectionSchema
-getTreeItemState
 gridDefinition
 IdRefListSchema
 isRegisteredAriaSource
@@ -173,7 +165,6 @@ ReactSemanticDefaultProp
 ReactSemanticDefaultPropSchema
 ReactSemanticDefaults
 ReactSemanticDefaultsSchema
-reduceDisclosureData
 reducePatternData
 reduceTabsData
 resolveAriaSource
@@ -181,10 +172,6 @@ resolveEventTemplate
 resolveKeyToken
 resolveNavigationTarget
 resolveStateProjection
-resolveTreeviewKeyboardBinding
-resolveTreeviewNavigationTarget
-resolveTreeviewVisibleKeys
-resolveTypeaheadTarget
 resolveVisibleOrder
 sliderDefinition
 SliderItemSchema
@@ -203,7 +190,6 @@ switchDefinition
 tableDefinition
 tabsDefinition
 TabsDefinitionSchema
-TabsRuntime
 toolbarDefinition
 ToolbarDefinitionSchema
 tooltipDefinition
@@ -217,9 +203,6 @@ treegridVisibleCells
 treegridVisibleRowKeys
 treeviewDefinition
 TreeviewDefinitionSchema
-TreeviewRenderItem
-TreeviewRenderState
-TreeviewRuntime
 unknownTokenError
 VisibleOrderKind
 VisibleOrderKindSchema
@@ -252,11 +235,8 @@ CarouselDefinitionSchema
 checkboxDefinition
 comboboxDefinition
 comboboxRootKey
-createDisclosureRuntime
 createParentByKey
 createPatternRuntime
-createTabsRuntime
-createTreeviewRuntime
 defineAriaSource
 defineDomEvent
 defineKeyToken
@@ -280,7 +260,6 @@ FocusEffectTargetSchema
 FocusEffectTriggerSchema
 FocusModelSchema
 FocusProjectionSchema
-getTreeItemState
 gridDefinition
 IdRefListSchema
 isRegisteredAriaSource
@@ -334,7 +313,6 @@ ReactRenderVariantSchema
 ReactRenderVariantWhenSchema
 ReactSemanticDefaultPropSchema
 ReactSemanticDefaultsSchema
-reduceDisclosureData
 reducePatternData
 reduceTabsData
 resolveAriaSource
@@ -342,10 +320,6 @@ resolveEventTemplate
 resolveKeyToken
 resolveNavigationTarget
 resolveStateProjection
-resolveTreeviewKeyboardBinding
-resolveTreeviewNavigationTarget
-resolveTreeviewVisibleKeys
-resolveTypeaheadTarget
 resolveVisibleOrder
 sliderDefinition
 SliderItemSchema

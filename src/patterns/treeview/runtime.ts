@@ -34,7 +34,7 @@ export interface TreeviewRuntime {
   emit(event: PatternEvent): void
 }
 
-export interface CreateTreeviewRuntimeInput {
+interface CreateTreeviewRuntimeInput {
   data: unknown
   onEvent: (event: PatternEvent) => void
   options?: unknown

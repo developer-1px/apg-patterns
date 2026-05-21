@@ -22,7 +22,7 @@ export interface TabsRuntime {
   emit(event: PatternEvent): void
 }
 
-export interface CreateTabsRuntimeInput {
+interface CreateTabsRuntimeInput {
   data: unknown
   onEvent: (event: PatternEvent) => void
   options?: unknown

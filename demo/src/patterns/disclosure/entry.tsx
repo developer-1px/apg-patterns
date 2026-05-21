@@ -1,4 +1,4 @@
-import { reduceDisclosureData, type PatternData, type PatternEvent } from '../../../../src/react'
+import { disclosureDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { Disclosure } from './Disclosure'
 import {
@@ -65,7 +65,7 @@ export const entry = defineDemoPattern({
       'simple',
       initialDisclosureData,
       (variant) => variants[variant],
-      (_variant, data, event) => reduceDisclosureData(data, event),
+      (_variant, data, event) => reducePatternData(disclosureDefinition, data, event),
     )
     return {
       inspect: renderDataInspect(host.data),

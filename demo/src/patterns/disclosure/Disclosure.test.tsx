@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { useRef, useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { createDisclosureRuntime, reduceDisclosureData, type PatternData, type PatternEvent } from '../../../../src/react'
+import { createPatternRuntime, disclosureDefinition, reducePatternData, type Key, type PatternData, type PatternEvent } from '../../../../src/react'
 import { Disclosure } from './Disclosure'
 import {
   initialFaqDisclosureData,
@@ -14,25 +14,33 @@ import { useNavMenuKeyboard } from './useNavMenuKeyboard'
 
 function DisclosureDemo({ initial }: { variant: DisclosureVariantKey; initial: PatternData }) {
   const [data, setData] = useState(initial)
-  const handleEvent = (event: PatternEvent) => setData((current) => reduceDisclosureData(current, event))
+  const handleEvent = (event: PatternEvent) => setData((current) => reducePatternData(disclosureDefinition, current, event))
   return <Disclosure data={data} onEvent={handleEvent} />
 }
 
-function DisclosureRuntimeDemo() {
+function GenericDisclosureRuntimeDemo() {
   const [data, setData] = useState(initialImageDisclosureData)
-  const runtime = createDisclosureRuntime({
+  const runtime = createPatternRuntime({
+    definition: disclosureDefinition,
     data,
-    options: { elementIdPrefix: 'runtime-disclosure-' },
-    onEvent: (event) => setData((current) => reduceDisclosureData(current, event)),
+    keyToElementId: createRuntimeDisclosureElementId,
+    onEvent: (event) => setData((current) => reducePatternData(disclosureDefinition, current, event)),
   })
+  const triggerKey = data.relations?.rootKeys?.[0] ?? null
+  const panelKey = triggerKey ? data.relations?.controlsByKey?.[triggerKey]?.[0] ?? null : null
+  const expanded = triggerKey ? data.state?.expandedKeys?.includes(triggerKey) ?? false : false
   return (
     <div onKeyDown={runtime.getRootKeyboardHandler()}>
-      <button {...runtime.getTriggerProps()}>
-        {data.items[runtime.triggerKey ?? '']?.label ?? 'Details'}
+      <button {...(triggerKey ? runtime.getItemProps('trigger', triggerKey) : {})}>
+        {data.items[triggerKey ?? '']?.label ?? 'Details'}
       </button>
-      {runtime.expanded ? <section {...runtime.getPanelProps()}>Runtime panel</section> : null}
+      {expanded && panelKey ? <section {...runtime.getItemProps('panel', panelKey)}>Runtime panel</section> : null}
     </div>
   )
+}
+
+function createRuntimeDisclosureElementId(key: Key): string {
+  return `runtime-disclosure-${key.toLowerCase().replace(/[^a-z0-9_-]+/g, '-')}`
 }
 
 function NavMenuKeyboardEdgesDemo() {
@@ -100,8 +108,8 @@ describe('Disclosure demo (image)', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
   })
 
-  it('standalone runtime exposes trigger and panel props for keyboard and pointer input', () => {
-    render(<DisclosureRuntimeDemo />)
+  it('generic runtime exposes trigger and panel props for keyboard and pointer input', () => {
+    render(<GenericDisclosureRuntimeDemo />)
     const trigger = screen.getByRole('button')
 
     expect(trigger.id).toMatch(/^runtime-disclosure-/)
