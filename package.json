@@ -75,6 +75,7 @@
     "docs/proposals",
     "README.md",
     "API.md",
+    "INTERFACE_STABILITY.md",
     "CHANGELOG.md",
     "CONTRIBUTING.md",
     "RELEASE.md",

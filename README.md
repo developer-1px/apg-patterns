@@ -7,6 +7,8 @@ Runtime dependencies are limited to `zod`. The root entry is React-free. React i
 The package models APG behavior as serializable `PatternDefinition` data, validates it with Zod, and projects it into runtime props, state, effects, and React-facing render items.
 
 See [API.md](API.md) for the published entrypoints and export names.
+See [INTERFACE_STABILITY.md](INTERFACE_STABILITY.md) for the interface contracts
+this package treats as permanent.
 
 ## Install
 

@@ -5,6 +5,7 @@
 - Initial publish-ready package surface for APG pattern definitions, runtime helpers, and React adapters.
 - Root and `./core` entries are React-free; React hooks and preset components are exposed from `./react`.
 - React is an optional peer for React 18 and React 19 consumers.
+- Published package includes an interface stability guide for permanent package contracts and cleanup decisions.
 - Published package includes a checked and regenerable API reference for root, `./core`, and `./react` exports.
 - README documents the source, demo, and release-script code structure for external consumers and contributors.
 - Published package includes a contributing guide for local checks, API updates, release preflight, and public surface boundaries.

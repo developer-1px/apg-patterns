@@ -54,6 +54,7 @@ const expectedPackageFiles = [
   'docs/proposals',
   'README.md',
   'API.md',
+  'INTERFACE_STABILITY.md',
   'CHANGELOG.md',
   'CONTRIBUTING.md',
   'RELEASE.md',
@@ -138,6 +139,7 @@ assertPublishConfig()
 assertPublicRepositoryMetadata()
 if (!existsSync('README.md')) failures.push('README.md is required')
 if (!existsSync('API.md')) failures.push('API.md is required')
+if (!existsSync('INTERFACE_STABILITY.md')) failures.push('INTERFACE_STABILITY.md is required')
 if (!existsSync('CHANGELOG.md')) failures.push('CHANGELOG.md is required')
 if (!existsSync('CONTRIBUTING.md')) failures.push('CONTRIBUTING.md is required')
 if (!existsSync('RELEASE.md')) failures.push('RELEASE.md is required')
@@ -182,6 +184,7 @@ const requiredPackedPaths = [
   'package.json',
   'README.md',
   'API.md',
+  'INTERFACE_STABILITY.md',
   'CHANGELOG.md',
   'CONTRIBUTING.md',
   'RELEASE.md',
@@ -304,6 +307,7 @@ function assertPackageVersion() {
 function assertDocumentationMetadata() {
   const readme = readTextIfExists('README.md')
   const apiReference = readTextIfExists('API.md')
+  const interfaceStabilityGuide = readTextIfExists('INTERFACE_STABILITY.md')
   const changelog = readTextIfExists('CHANGELOG.md')
   const contributingGuide = readTextIfExists('CONTRIBUTING.md')
   const releaseGuide = readTextIfExists('RELEASE.md')
@@ -319,8 +323,14 @@ function assertDocumentationMetadata() {
   if (packageName && apiReference && !apiReference.startsWith(`# ${packageName} API Reference\n`)) {
     failures.push('API.md title must match package name')
   }
+  if (packageName && interfaceStabilityGuide && !interfaceStabilityGuide.startsWith(`# ${packageName} Interface Stability\n`)) {
+    failures.push('INTERFACE_STABILITY.md title must match package name')
+  }
   if (readme && !/\bAPI\.md\b/.test(readme)) {
     failures.push('README must link to API.md')
+  }
+  if (interfaceStabilityGuide && readme && !/\bINTERFACE_STABILITY\.md\b/.test(readme)) {
+    failures.push('README must link to INTERFACE_STABILITY.md')
   }
   if (changelog && readme && !/\bCHANGELOG\.md\b/.test(readme)) {
     failures.push('README must link to CHANGELOG.md')
@@ -339,6 +349,7 @@ function assertDocumentationMetadata() {
   }
   assertReadmeCompatibility(readme)
   assertReadmeCodeStructure(readme)
+  assertInterfaceStabilityGuide(interfaceStabilityGuide)
   if (packageName && readme && !new RegExp(`\\bnpm\\s+install\\s+${escapeRegExp(packageName)}\\b`).test(readme)) {
     failures.push('README must document installing the package by its package name')
   }
@@ -368,6 +379,28 @@ function assertDocumentationMetadata() {
   assertContributingGuide(contributingGuide)
   assertReleaseGuide(releaseGuide)
   assertSecurityPolicy(securityPolicy)
+}
+
+function assertInterfaceStabilityGuide(source) {
+  if (!source) return
+  const requiredMarkers = [
+    '## Permanent Contract',
+    '## Not A Stability Contract',
+    '## Breaking Change Rule',
+    '## Cleanup Rule',
+    '## Validation Gates',
+    '@interactive-os/apg-patterns/core',
+    '@interactive-os/apg-patterns/react',
+    'PatternData',
+    'PatternEvent',
+    'PatternDefinition',
+    'createPatternRuntime',
+    'useXPattern(data, onEvent, options?)',
+    'React-free',
+  ]
+  for (const marker of requiredMarkers) {
+    if (!source.includes(marker)) failures.push(`INTERFACE_STABILITY.md must mention ${marker}`)
+  }
 }
 
 function assertContributingGuide(contributingGuide) {
