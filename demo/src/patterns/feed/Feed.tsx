@@ -21,7 +21,7 @@ export function Feed({ data, onEvent }: FeedProps) {
             key={article.key}
             {...article.articleProps}
             data-active={article.state.active ? '' : undefined}
-            className={cx('rounded-xl bg-white/70 p-3 shadow-[0_10px_28px_rgba(24,24,27,0.06)] transition ui-active:bg-white ui-active:shadow-[0_16px_40px_rgba(24,24,27,0.1)] dark:bg-white/[0.045] dark:shadow-black/15 dark:ui-active:bg-white/[0.07]', ds.focusRing)}
+            className={cx('rounded-md border border-zinc-200 p-3 transition ui-active:bg-zinc-100 dark:border-white/10 dark:ui-active:bg-white/[0.07]', ds.focusRing)}
           >
             <h3 id={titleId} className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
               {article.label}

@@ -13,7 +13,7 @@ export function Toolbar({
   return (
     <div
       {...toolbar.rootProps}
-      className="inline-flex gap-1 rounded-xl bg-zinc-100/75 p-1 shadow-inner shadow-zinc-200/50 dark:bg-white/[0.045] dark:shadow-black/10"
+      className="inline-flex gap-1 rounded-md border border-zinc-200 p-1 dark:border-white/10"
     >
       {toolbar.renderItems.map((item) => {
         return (

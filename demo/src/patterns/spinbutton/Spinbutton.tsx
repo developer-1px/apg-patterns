@@ -48,7 +48,7 @@ function SpinField({
           <div
             {...item.spinbuttonProps}
             data-testid={`spinbutton-${item.key}`}
-            className={cx('min-w-[2.75rem] rounded-lg bg-white/80 px-2.5 py-1 text-center shadow-[0_6px_18px_rgba(24,24,27,0.06)] dark:bg-white/[0.065] dark:shadow-black/20', ds.focusRing)}
+            className={cx('min-w-[2.75rem] rounded-md border border-zinc-200 bg-white px-2.5 py-1 text-center dark:border-white/10 dark:bg-white/[0.04]', ds.focusRing)}
           >
             {item.value}
           </div>

@@ -46,22 +46,22 @@ const defaultSections: readonly AccordionSectionSpec[] = [
   {
     key: 'personal',
     label: 'Personal Information',
-    content: 'Name, contact details, and date of birth. Used to set up your profile.',
+    content: 'Name and contact details.',
   },
   {
     key: 'billing',
     label: 'Billing Address',
-    content: 'Street, city, postal code, and country for invoices and receipts.',
+    content: 'Invoice address.',
   },
   {
     key: 'shipping',
     label: 'Shipping Address',
-    content: 'Where physical goods will be delivered. Optional if you only buy digital items.',
+    content: 'Delivery address.',
   },
   {
     key: 'preferences',
     label: 'Preferences',
-    content: 'Notification settings, language, and theme.',
+    content: 'Notification and display settings.',
   },
 ]
 

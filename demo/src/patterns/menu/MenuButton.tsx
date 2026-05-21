@@ -20,7 +20,7 @@ export function MenuButton({ data, onEvent }: MenuProps) {
       {menuButton.expanded ? (
         <ul
           {...menuButton.menuProps}
-          className={cx('absolute top-10 z-10 grid w-56 gap-0.5 rounded-[6px] bg-white/96 p-1 text-sm shadow-[0_20px_56px_rgba(24,24,27,0.15)] backdrop-blur dark:bg-zinc-950/96 dark:shadow-black/35', ds.focusRing)}
+          className={cx('absolute top-10 z-10 grid w-56 gap-0.5 rounded-[6px] border border-zinc-200 bg-white p-1 text-sm dark:border-white/10 dark:bg-zinc-950', ds.focusRing)}
         >
           {menuButton.items.map((item) => (
             <li

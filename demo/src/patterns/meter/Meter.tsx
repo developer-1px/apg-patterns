@@ -32,7 +32,7 @@ function MeterBar({ item }: { item: ReactMeterRenderItem }) {
       </div>
       <div
         {...item.meterProps}
-        className="relative h-2 overflow-hidden rounded-full bg-zinc-100/80 shadow-inner shadow-zinc-200/60 dark:bg-white/[0.06] dark:shadow-black/10"
+        className="relative h-2 overflow-hidden rounded-full bg-zinc-100/80 dark:bg-white/[0.06]"
       >
         <div className="absolute inset-y-0 left-0 rounded-full bg-zinc-900 dark:bg-zinc-100" style={{ width: `${item.percent}%` }} />
       </div>

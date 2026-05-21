@@ -24,12 +24,12 @@ export function Accordion({ data, onEvent, options }: AccordionProps) {
   return (
     <div
       {...accordion.rootProps}
-      className="grid max-w-xl gap-1 rounded-xl bg-zinc-100/70 p-1 shadow-inner shadow-zinc-200/50 dark:bg-white/[0.045] dark:shadow-black/10"
+      className="grid max-w-xl gap-px overflow-hidden rounded-md border border-zinc-200 dark:border-white/10"
     >
       {accordion.renderItems.map((section) => {
         const panelContent = section.panelKey ? data.items[section.panelKey]?.content ?? '' : ''
         return (
-          <div key={section.key} className="overflow-hidden rounded-lg">
+          <div key={section.key} className="overflow-hidden">
             <h3 className="m-0">
               <button
                 {...section.headerProps}
@@ -42,7 +42,7 @@ export function Accordion({ data, onEvent, options }: AccordionProps) {
             {section.state.expanded && section.panelProps ? (
               <div
                 {...section.panelProps}
-                className="bg-white/55 px-3 pb-3 pt-1 text-sm leading-relaxed text-zinc-700 dark:bg-white/[0.035] dark:text-zinc-300"
+                className="border-t border-zinc-200 px-3 py-2 text-sm leading-relaxed text-zinc-700 dark:border-white/10 dark:text-zinc-300"
               >
                 {panelContent}
               </div>

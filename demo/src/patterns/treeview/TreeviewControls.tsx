@@ -26,7 +26,7 @@ export function FollowFocusControl({ value, onChange }: { value: boolean; onChan
     <label className="inline-flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-400">
       <input
         type="checkbox"
-        className={`size-4 rounded bg-white text-zinc-900 accent-zinc-900 shadow-sm dark:bg-white/[0.08] dark:accent-zinc-100 ${ds.focusRing}`}
+        className={`size-4 rounded border border-zinc-300 bg-white text-zinc-900 accent-zinc-900 dark:border-white/20 dark:bg-white/[0.08] dark:accent-zinc-100 ${ds.focusRing}`}
         checked={value}
         onChange={(event) => onChange(event.currentTarget.checked)}
       />

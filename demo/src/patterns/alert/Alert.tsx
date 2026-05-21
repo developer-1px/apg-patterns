@@ -3,7 +3,7 @@ import { cx, ds } from '../../shared/designSystem'
 import type { AlertDomainEvent } from './alertData'
 
 const alertClass =
-  'flex items-center justify-between gap-3 rounded-xl bg-amber-50/90 p-3 text-sm text-amber-950 shadow-[0_12px_32px_rgba(146,64,14,0.12)] ring-1 ring-amber-900/[0.04] dark:bg-amber-500/12 dark:text-amber-100 dark:ring-amber-100/[0.06]'
+  'flex items-center justify-between gap-3 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950 dark:border-amber-100/10 dark:bg-amber-500/12 dark:text-amber-100'
 
 interface AlertProps {
   data: PatternData

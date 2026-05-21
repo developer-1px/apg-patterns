@@ -56,7 +56,7 @@ function ThumbSlider({
       {isVertical ? (
         <div
           data-testid={`slider-track-${item.key}`}
-          className="relative h-32 w-2 rounded-full bg-zinc-100/80 shadow-inner shadow-zinc-200/70 dark:bg-white/[0.06] dark:shadow-black/20"
+          className="relative h-32 w-2 rounded-full bg-zinc-100/80 dark:bg-white/[0.06]"
           onPointerDown={(event) => {
             event.currentTarget.setPointerCapture?.(event.pointerId)
             event.currentTarget.parentElement?.focus({ preventScroll: true })
@@ -69,14 +69,14 @@ function ThumbSlider({
         >
           <div className="absolute inset-x-0 bottom-0 rounded-full bg-zinc-900 dark:bg-zinc-100" style={{ height: `${item.position}%` }} />
           <div
-            className={`absolute left-1/2 size-4 -translate-x-1/2 translate-y-1/2 rounded-full bg-white shadow-[0_5px_16px_rgba(24,24,27,0.24),inset_0_1px_1px_rgba(255,255,255,0.7)] dark:bg-zinc-100 ${thumbColorClass[String(item.key)] ?? ''}`}
+            className={`absolute left-1/2 size-4 -translate-x-1/2 translate-y-1/2 rounded-full border border-zinc-300 bg-white dark:border-white/20 dark:bg-zinc-100 ${thumbColorClass[String(item.key)] ?? ''}`}
             style={{ bottom: `${item.position}%` }}
           />
         </div>
       ) : (
         <div
           data-testid={`slider-track-${item.key}`}
-          className="relative h-2 rounded-full bg-zinc-100/80 shadow-inner shadow-zinc-200/70 dark:bg-white/[0.06] dark:shadow-black/20"
+          className="relative h-2 rounded-full bg-zinc-100/80 dark:bg-white/[0.06]"
           onPointerDown={(event) => {
             event.currentTarget.setPointerCapture?.(event.pointerId)
             event.currentTarget.parentElement?.focus({ preventScroll: true })
@@ -89,7 +89,7 @@ function ThumbSlider({
         >
           <div className={`absolute inset-y-0 left-0 rounded-full ${thumbColorClass[String(item.key)] ?? 'bg-zinc-900 dark:bg-zinc-100'}`} style={{ width: `${item.position}%` }} />
           <div
-            className="absolute top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_5px_16px_rgba(24,24,27,0.24),inset_0_1px_1px_rgba(255,255,255,0.7)] dark:bg-zinc-100"
+            className="absolute top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border border-zinc-300 bg-white dark:border-white/20 dark:bg-zinc-100"
             style={{ left: `${item.position}%` }}
           />
         </div>

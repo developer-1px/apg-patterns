@@ -5,7 +5,7 @@ export const initialAlertDialogData: PatternData = {
     trigger: { label: 'Discard draft', kind: 'dialog' },
     dialog: { label: 'Discard draft?', kind: 'true' },
     title: { label: 'Discard draft?' },
-    description: { label: 'Your changes will be lost. This action cannot be undone.' },
+    description: { label: 'Changes will be lost.' },
     confirm: { label: 'Discard' },
     cancel: { label: 'Cancel' },
   },

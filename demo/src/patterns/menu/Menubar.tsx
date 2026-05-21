@@ -10,7 +10,7 @@ export function Menubar({ data, onEvent }: MenuProps) {
 
   return (
     <div className="relative grid gap-2">
-      <div {...menubar.rootProps} className="flex items-center gap-0.5 rounded-[6px] bg-zinc-100/70 p-1 outline-none shadow-inner shadow-zinc-200/50 dark:bg-white/[0.045] dark:shadow-black/10">
+      <div {...menubar.rootProps} className="flex items-center gap-0.5 rounded-[6px] border border-zinc-200 p-1 outline-none dark:border-white/10">
         {menubar.rootItems.map((item) => (
           <RootMenuItem key={item.key} item={item} />
         ))}
@@ -43,7 +43,7 @@ function Submenu({ data, ids, ownerKey, rootKeys, onEvent }: { data: PatternData
   const onSubmenuKeyDown = useMenubarSubmenuKeyboard({ data, ownerKey, rootKeys, children, activeKey, onEvent, close })
   const popupLeft = `${rootKeys.indexOf(ownerKey) * 4.25}rem`
   return (
-    <ul role="menu" aria-labelledby={ids.forKey(ownerKey)} style={{ left: popupLeft }} className="absolute top-10 z-10 grid w-56 gap-0.5 rounded-[6px] bg-white/96 p-1 text-sm shadow-[0_20px_56px_rgba(24,24,27,0.15)] outline-none backdrop-blur dark:bg-zinc-950/96 dark:shadow-black/35" onKeyDown={onSubmenuKeyDown}>
+    <ul role="menu" aria-labelledby={ids.forKey(ownerKey)} style={{ left: popupLeft }} className="absolute top-10 z-10 grid w-56 gap-0.5 rounded-[6px] border border-zinc-200 bg-white p-1 text-sm outline-none dark:border-white/10 dark:bg-zinc-950" onKeyDown={onSubmenuKeyDown}>
       {children.map((key) => <SubmenuItem key={key} ids={ids} itemKey={key} data={data} active={key === activeKey} radioGroup={radioGroup} onEvent={onEvent} onClose={close} />)}
     </ul>
   )

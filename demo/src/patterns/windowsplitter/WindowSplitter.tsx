@@ -15,7 +15,7 @@ export function WindowSplitter({
   if (!splitter.key) return null
 
   return (
-    <div className="flex h-32 w-full overflow-hidden rounded-xl bg-white/65 shadow-[0_14px_36px_rgba(24,24,27,0.08)] dark:bg-white/[0.045] dark:shadow-black/20">
+    <div className="flex h-32 w-full overflow-hidden rounded-md border border-zinc-200 dark:border-white/10">
       <div
         id={splitter.controlledKey ? splitter.ids.forKey(splitter.controlledKey) : undefined}
         className="bg-zinc-100/80 dark:bg-white/[0.06]"

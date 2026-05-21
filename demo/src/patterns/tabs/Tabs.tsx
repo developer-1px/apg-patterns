@@ -37,14 +37,14 @@ export function Tabs({
     ? 'grid max-w-2xl gap-3 sm:grid-cols-[minmax(120px,auto)_minmax(0,1fr)] sm:gap-4'
     : 'grid max-w-2xl gap-4'
   const tablistClass = isVertical
-    ? 'flex gap-1 overflow-x-auto rounded-xl bg-zinc-100/70 p-1 dark:bg-white/[0.045] sm:flex-col sm:overflow-visible'
-    : 'flex gap-1 overflow-x-auto rounded-xl bg-zinc-100/70 p-1 dark:bg-white/[0.045]'
+    ? 'flex gap-1 overflow-x-auto rounded-md border border-zinc-200 p-1 dark:border-white/10 sm:flex-col sm:overflow-visible'
+    : 'flex gap-1 overflow-x-auto rounded-md border border-zinc-200 p-1 dark:border-white/10'
   const tabClass = isVertical
     ? cx(ds.option, 'h-8 shrink-0 px-3 text-sm sm:w-full')
     : cx(ds.option, 'h-8 shrink-0 px-3 text-sm')
   const panelClass = scrollable
-    ? cx('max-h-48 overflow-auto rounded-xl bg-zinc-100/70 p-3 text-sm leading-relaxed text-zinc-700 shadow-inner shadow-zinc-200/50 dark:bg-white/[0.045] dark:text-zinc-300 dark:shadow-black/10', ds.focusRing)
-    : 'min-h-32 rounded-xl bg-zinc-100/70 p-3 text-sm leading-relaxed text-zinc-700 shadow-inner shadow-zinc-200/50 outline-none dark:bg-white/[0.045] dark:text-zinc-300 dark:shadow-black/10'
+    ? cx('max-h-48 overflow-auto rounded-md border border-zinc-200 p-3 text-sm leading-relaxed text-zinc-700 dark:border-white/10 dark:text-zinc-300', ds.focusRing)
+    : 'min-h-32 rounded-md border border-zinc-200 p-3 text-sm leading-relaxed text-zinc-700 outline-none dark:border-white/10 dark:text-zinc-300'
 
   return (
     <div className={containerClass}>

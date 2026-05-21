@@ -7,7 +7,7 @@ import { NavMenuDisclosure, NavMenuTopLinksDisclosure } from './NavMenuDisclosur
 
 const buttonClass = cx(ds.button, ds.expandable, 'justify-between')
 const panelClass =
-  'rounded-xl bg-zinc-100/70 p-3 text-sm leading-relaxed text-zinc-700 shadow-inner shadow-zinc-200/50 dark:bg-white/[0.045] dark:text-zinc-300 dark:shadow-black/10'
+  'rounded-md border border-zinc-200 p-3 text-sm leading-relaxed text-zinc-700 dark:border-white/10 dark:text-zinc-300'
 
 interface DisclosureProps {
   data: PatternData
@@ -42,7 +42,7 @@ function ImageDisclosure({ data, onEvent }: { data: PatternData; onEvent: (event
 
   return (
     <div className="grid max-w-md gap-3">
-      <img src={imageDisclosureContent.imageUrl} alt={imageDisclosureContent.imageAlt} className="h-40 w-full rounded-xl object-cover shadow-[0_12px_32px_rgba(24,24,27,0.08)]" />
+      <img src={imageDisclosureContent.imageUrl} alt={imageDisclosureContent.imageAlt} className="h-40 w-full object-cover" />
       <button type="button" {...disclosure.triggerProps} className={buttonClass}>
         <span>{disclosure.expanded ? 'Hide description' : 'Show description'}</span>
         <Chevron expanded={disclosure.expanded} />

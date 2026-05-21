@@ -20,7 +20,7 @@ export const initialDisclosureData: PatternData = {
 }
 
 export const disclosurePanelText =
-  'Orders placed before 2pm ship the same business day. Tracking numbers are sent by email once your package leaves our warehouse.'
+  'Orders before 2pm ship today. Tracking arrives by email.'
 
 export const initialImageDisclosureData: PatternData = {
   items: {
@@ -42,17 +42,17 @@ export const initialImageDisclosureData: PatternData = {
 export const imageDisclosureContent = {
   imageUrl:
     'https://picsum.photos/id/237/900/520',
-  imageAlt: 'Portrait of a black dog',
+  imageAlt: 'Dog portrait',
   description:
-    'A close portrait of a black dog against a dark, softly blurred background.',
+    'Close portrait on a dark background.',
 }
 
 type FaqRow = { key: string; question: string; answer: string }
 const faqRows: readonly FaqRow[] = [
-  { key: 'faq1', question: 'What is the cost of a basic membership?', answer: 'Basic membership is free for everyone and includes access to community discussions.' },
-  { key: 'faq2', question: 'Can I become a member without a credit card?', answer: 'Yes. Bank transfer and PayPal are supported for paid tiers; basic tier requires no payment method.' },
-  { key: 'faq3', question: 'How do I cancel my membership?', answer: 'Open Account Settings → Membership → Cancel. Cancellation takes effect at the end of the current billing period.' },
-  { key: 'faq4', question: 'Where do I send suggestions or feedback?', answer: 'Send product suggestions from Account Settings so they stay attached to your workspace.' },
+  { key: 'faq1', question: 'What is the cost of a basic membership?', answer: 'Basic membership is free.' },
+  { key: 'faq2', question: 'Can I become a member without a credit card?', answer: 'Yes. Basic is free; paid tiers support bank transfer and PayPal.' },
+  { key: 'faq3', question: 'How do I cancel my membership?', answer: 'Open Account Settings -> Membership -> Cancel.' },
+  { key: 'faq4', question: 'Where do I send suggestions or feedback?', answer: 'Send suggestions from Account Settings.' },
 ]
 
 export const faqDisclosureContent = faqRows

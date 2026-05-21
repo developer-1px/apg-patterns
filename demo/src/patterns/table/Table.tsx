@@ -10,7 +10,7 @@ export function Table({
   const table = useTablePattern(data, onEvent)
 
   return (
-    <div className="max-w-full overflow-x-auto rounded-xl shadow-[0_12px_32px_rgba(24,24,27,0.06)] dark:shadow-black/20">
+    <div className="max-w-full overflow-x-auto rounded-md border border-zinc-200 dark:border-white/10">
       <table {...table.tableProps} className="min-w-max bg-white/55 text-sm text-zinc-800 dark:bg-white/[0.04] dark:text-zinc-300">
         {table.headerRow ? (
           <thead>

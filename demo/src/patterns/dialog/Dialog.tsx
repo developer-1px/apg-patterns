@@ -1,11 +1,11 @@
 import { useDialogPattern, type PatternData, type PatternEvent } from '../../../../src/react'
 import { ds } from '../../shared/designSystem'
-import { dialogContent } from './dialogData'
+import { dialogFields } from './dialogData'
 
 const overlayClass =
-  'fixed inset-0 z-40 bg-black/45 backdrop-blur-sm'
+  'fixed inset-0 z-40 bg-black/45'
 const panelClass =
-  'fixed left-1/2 top-1/2 z-50 w-[28rem] max-w-[90vw] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white/96 p-5 text-sm text-zinc-800 shadow-[0_28px_88px_rgba(0,0,0,0.26)] outline-none backdrop-blur dark:bg-zinc-950/96 dark:text-zinc-200'
+  'fixed left-1/2 top-1/2 z-50 w-[28rem] max-w-[90vw] -translate-x-1/2 -translate-y-1/2 rounded-md border border-zinc-200 bg-white p-5 text-sm text-zinc-800 outline-none dark:border-white/10 dark:bg-zinc-950 dark:text-zinc-200'
 
 interface DialogProps {
   data: PatternData
@@ -27,7 +27,7 @@ export function Dialog({ data, onEvent }: DialogProps) {
             <h2 {...dialog.titleProps} className="mb-1 text-base font-medium">{dialog.labelOf('title')}</h2>
             <p {...dialog.descriptionProps} className="mb-4 text-zinc-600 dark:text-zinc-400">{dialog.labelOf('description')}</p>
             <div className="grid gap-2">
-              {dialogContent.fields.map((field) => (
+              {dialogFields.map((field) => (
                 <label key={field.id} className="grid grid-cols-[5rem_1fr] items-center gap-2">
                   <span>{field.label}</span>
                   <input id={`dialog-${field.id}`} type="text" className={ds.field} />

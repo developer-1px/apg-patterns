@@ -16,7 +16,7 @@ export function Treegrid({
     <div className="max-w-full overflow-x-auto pb-1">
       <div
         {...treegrid.treegridProps}
-        className={cx('grid min-w-max overflow-hidden rounded-xl bg-white/82 text-sm text-zinc-800 shadow-[0_12px_32px_rgba(24,24,27,0.06)] dark:bg-white/[0.045] dark:text-zinc-300 dark:shadow-black/20', ds.focusRing)}
+        className={cx('grid min-w-max overflow-hidden rounded-md border border-zinc-200 text-sm text-zinc-800 dark:border-white/10 dark:text-zinc-300', ds.focusRing)}
         style={{ gridTemplateColumns: `repeat(${treegrid.columnCount}, minmax(120px, 1fr))` }}
       >
         {treegrid.rows.map((row) => (

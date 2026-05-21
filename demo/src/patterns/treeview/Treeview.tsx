@@ -18,7 +18,7 @@ export function Treeview({
   const tree = useTreeviewPattern(data, onEvent, options ?? {})
 
   return (
-    <div {...tree.rootProps} className={cx('min-h-56 rounded-xl bg-white/40 py-1 dark:bg-transparent', ds.focusRing)}>
+    <div {...tree.rootProps} className={cx('min-h-56 py-1', ds.focusRing)}>
       {tree.renderItems.map((item) => {
         const href = data.items[item.key]?.href
         const indent = item.level * 18

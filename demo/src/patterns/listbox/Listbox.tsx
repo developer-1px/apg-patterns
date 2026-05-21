@@ -49,7 +49,7 @@ export function Listbox({
   }
 
   const containerClass = [
-    cx('grid max-w-sm gap-0.5 rounded-xl bg-white/82 p-1 shadow-[0_12px_32px_rgba(24,24,27,0.06)] ui-focus:outline-offset-4 dark:bg-white/[0.045] dark:shadow-black/20', ds.focusRing),
+    cx('grid max-w-sm gap-0.5 rounded-md border border-zinc-200 p-1 ui-focus:outline-offset-4 dark:border-white/10', ds.focusRing),
     scrollable ? 'max-h-48 overflow-y-auto' : '',
   ]
     .filter(Boolean)

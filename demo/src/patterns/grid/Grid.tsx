@@ -15,7 +15,7 @@ export function Grid({
     <div className="max-w-full overflow-x-auto pb-1">
       <div
         {...grid.gridProps}
-        className={cx('grid min-w-max overflow-hidden rounded-xl bg-white/82 text-sm text-zinc-800 shadow-[0_12px_32px_rgba(24,24,27,0.06)] dark:bg-white/[0.045] dark:text-zinc-300 dark:shadow-black/20', ds.focusRing)}
+        className={cx('grid min-w-max overflow-hidden rounded-md border border-zinc-200 text-sm text-zinc-800 dark:border-white/10 dark:text-zinc-300', ds.focusRing)}
         style={{ gridTemplateColumns: `repeat(${grid.columnCount}, minmax(120px, 1fr))` }}
       >
         {grid.rows.map((row) => (
@@ -43,7 +43,7 @@ function GridCell({ cell }: { cell: ReactGridCell }) {
       {cell.editing ? (
         <input
           {...cell.editInputProps}
-          className={cx('w-full rounded-md bg-white/85 px-1 shadow-inner shadow-zinc-200/60 dark:bg-white/[0.07] dark:shadow-black/20', ds.focusRing)}
+          className={cx('w-full rounded-md border border-zinc-200 bg-white px-1 dark:border-white/10 dark:bg-white/[0.04]', ds.focusRing)}
         />
       ) : (
         <>{cell.value}{sortIcon ? <Icon name={sortIcon} className="ml-1 text-xs text-zinc-500" /> : null}</>

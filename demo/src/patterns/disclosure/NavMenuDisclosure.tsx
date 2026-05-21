@@ -8,9 +8,9 @@ import { useNavMenuKeyboard } from './useNavMenuKeyboard'
 
 type Props = HTMLAttributes<HTMLElement>
 
-const buttonClass = cx(ds.button, ds.expandable, 'justify-between rounded-lg shadow-zinc-200/60 dark:shadow-black/20')
+const buttonClass = cx(ds.button, ds.expandable, 'justify-between rounded-lg')
 const panelClass =
-  'rounded-xl bg-white/96 p-2 text-sm text-zinc-700 shadow-[0_20px_56px_rgba(24,24,27,0.15)] backdrop-blur dark:bg-zinc-950/96 dark:text-zinc-300 dark:shadow-black/35'
+  'rounded-md border border-zinc-200 bg-white p-2 text-sm text-zinc-700 dark:border-white/10 dark:bg-zinc-950 dark:text-zinc-300'
 const linkClass = cx(ds.option, 'block py-1 text-sm')
 
 export function NavMenuDisclosure({ data, onEvent }: { data: PatternData; onEvent: (event: PatternEvent) => void }) {

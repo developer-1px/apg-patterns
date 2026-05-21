@@ -7,7 +7,7 @@ const addressDialogData: PatternData = {
     trigger: { label: 'Add delivery address', kind: 'dialog' },
     dialog: { label: 'Add Delivery Address' },
     title: { label: 'Add Delivery Address' },
-    description: { label: 'Provide an address where you would like your order delivered.' },
+    description: { label: 'Provide a delivery address.' },
     cancel: { label: 'Cancel' },
     submit: { label: 'Add' },
   },
@@ -27,7 +27,7 @@ const datepickerDialogData: PatternData = {
     trigger: { label: 'Choose date', kind: 'dialog' },
     dialog: { label: 'Choose Date' },
     title: { label: 'Choose Date' },
-    description: { label: 'Select an available delivery date.' },
+    description: { label: 'Select a delivery date.' },
     cancel: { label: 'Cancel' },
     submit: { label: 'Choose' },
   },
@@ -50,17 +50,9 @@ export const dialogVariants: Record<DialogVariantKey, { label: string; data: Pat
 export const dialogVariantItems = Object.entries(dialogVariants).map(([key, value]) => ({ key: key as DialogVariantKey, label: value.label }))
 export const initialDialogData = dialogVariants.dialog.data
 
-export const dialogContent = {
-  triggerLabel: 'Add delivery address',
-  title: 'Add Delivery Address',
-  description:
-    'Please provide an address where you would like your order delivered. All fields are required.',
-  fields: [
-    { id: 'street', label: 'Street:' },
-    { id: 'city', label: 'City:' },
-    { id: 'state', label: 'State:' },
-    { id: 'zip', label: 'Zip:' },
-  ],
-  cancelLabel: 'Cancel',
-  submitLabel: 'Add',
-}
+export const dialogFields = [
+  { id: 'street', label: 'Street:' },
+  { id: 'city', label: 'City:' },
+  { id: 'state', label: 'State:' },
+  { id: 'zip', label: 'Zip:' },
+]
