@@ -1,6 +1,6 @@
 import type { InputHTMLAttributes, KeyboardEvent } from 'react'
 import type { PatternEvent } from '../../schema'
-import { comboboxRootKey } from './definition'
+import { comboboxRootKey } from './navigation'
 
 type ComboboxVariant =
   | 'selectOnly'

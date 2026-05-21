@@ -9,12 +9,15 @@ export const PatternOptionsSchema = z
     typeaheadEnabled: z.boolean().optional(),
     elementIdPrefix: z.string().optional(),
     orientation: z.enum(['horizontal', 'vertical', 'both']).optional(),
+    min: z.number().optional(),
+    max: z.number().optional(),
+    step: z.number().optional(),
   })
   .passthrough()
   .superRefine((value, ctx) =>
     validateJsonExtensionFields(
       value,
-      ['selectionMode', 'focusStrategy', 'followFocus', 'typeaheadEnabled', 'elementIdPrefix', 'orientation'],
+      ['selectionMode', 'focusStrategy', 'followFocus', 'typeaheadEnabled', 'elementIdPrefix', 'orientation', 'min', 'max', 'step'],
       ctx,
     ),
   )

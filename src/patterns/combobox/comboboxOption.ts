@@ -2,7 +2,7 @@ import type { MouseEvent } from 'react'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent } from '../../schema'
 import { reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
-import { comboboxRootKey } from './definition'
+import { comboboxRootKey } from './navigation'
 
 export interface ReactComboboxOption {
   key: Key

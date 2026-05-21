@@ -39,7 +39,6 @@ buttonDefinition
 carouselDefinition
 checkboxDefinition
 comboboxDefinition
-comboboxRootKey
 createParentByKey
 createPatternRuntime
 CreatePatternRuntimeInput
@@ -130,8 +129,6 @@ Predicate
 PredicateResolver
 PredicateSchema
 radioGroupDefinition
-ReactFacade
-ReactFacadeSchema
 reducePatternData
 reduceTabsData
 resolveAriaSource
@@ -141,8 +138,6 @@ resolveNavigationTarget
 resolveStateProjection
 resolveVisibleOrder
 sliderDefinition
-SliderOptions
-SliderOptionsSchema
 SlotProps
 spinbuttonDefinition
 StateAction
@@ -189,7 +184,6 @@ buttonDefinition
 carouselDefinition
 checkboxDefinition
 comboboxDefinition
-comboboxRootKey
 createParentByKey
 createPatternRuntime
 defineAriaSource
@@ -250,7 +244,6 @@ PatternStateSchema
 PatternValueStepDirectionSchema
 PredicateSchema
 radioGroupDefinition
-ReactFacadeSchema
 reducePatternData
 reduceTabsData
 resolveAriaSource
@@ -260,7 +253,6 @@ resolveNavigationTarget
 resolveStateProjection
 resolveVisibleOrder
 sliderDefinition
-SliderOptionsSchema
 spinbuttonDefinition
 StateActionSchema
 StateFieldSchema

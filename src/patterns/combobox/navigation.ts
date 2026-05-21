@@ -8,6 +8,12 @@ import {
 export const comboboxRootKey = 'combobox'
 export const COMBOBOX_TOKEN = '$combobox'
 
+let comboboxNavigationRegistered = false
+
+export function registerComboboxNavigation() {
+  if (comboboxNavigationRegistered) return
+  comboboxNavigationRegistered = true
+
 defineKeyToken(COMBOBOX_TOKEN, () => comboboxRootKey)
 
 defineAriaSource('combobox.popupOpen', (ctx) => ctx.data.state?.expandedKeys?.includes(comboboxRootKey) ?? false)
@@ -25,3 +31,6 @@ defineNavigationTarget('optionLinear', (target, ctx) => {
   if (direction === 'last') return options[options.length - 1]
   return null
 })
+}
+
+registerComboboxNavigation()

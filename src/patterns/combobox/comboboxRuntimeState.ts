@@ -1,5 +1,5 @@
 import type { Key, PatternData, PatternItem, PatternOptions, PatternState } from '../../schema'
-import { comboboxRootKey } from './definition'
+import { comboboxRootKey } from './navigation'
 
 export type ComboboxVariant =
   | 'selectOnly'

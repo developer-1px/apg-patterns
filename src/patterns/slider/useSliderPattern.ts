@@ -1,7 +1,6 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
-import { PatternDataSchema, type Key, type PatternData, type PatternEvent, type PatternItem } from '../../schema'
+import { PatternDataSchema, PatternOptionsSchema, type Key, type PatternData, type PatternEvent, type PatternItem, type PatternOptions } from '../../schema'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
-import { SliderOptionsSchema, type SliderOptions } from './contract'
 import { sliderDefinition } from './definition'
 import { createSliderRenderItem, type ReactSliderRenderItem } from './sliderRenderItem'
 import { getSliderRuntimeState, isMultiThumbSlider } from './sliderRuntimeState'
@@ -29,9 +28,9 @@ export interface ReactSliderRuntime {
   keyToElementId(key: Key): string
 }
 
-export function useSliderPattern(data: SliderPatternData, onEvent: (event: PatternEvent) => void, options?: SliderOptions): ReactSliderRuntime {
+export function useSliderPattern(data: SliderPatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactSliderRuntime {
   const parsedData = PatternDataSchema.parse(data) as SliderPatternData
-  const runtimeOptions = SliderOptionsSchema.parse(options ?? {})
+  const runtimeOptions = PatternOptionsSchema.parse(options ?? {})
   const keyToElementId = usePatternElementId(runtimeOptions, 'slider-')
   const runtime = createPatternRuntime({
     definition: sliderDefinition,

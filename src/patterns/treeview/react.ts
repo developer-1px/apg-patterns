@@ -1,4 +1,4 @@
-import type { ReactFacade } from '../../schema'
+import type { ReactFacade } from '../../schema/reactFacade'
 
 export const treeviewReact = {
   hook: 'useTreeviewPattern',

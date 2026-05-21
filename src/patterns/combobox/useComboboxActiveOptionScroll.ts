@@ -1,7 +1,7 @@
 import { useLayoutEffect } from 'react'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key } from '../../schema'
-import { comboboxRootKey } from './definition'
+import { comboboxRootKey } from './navigation'
 
 export function useComboboxActiveOptionScroll({
   activeKey,

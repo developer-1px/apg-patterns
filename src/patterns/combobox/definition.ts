@@ -14,9 +14,10 @@
  */
 import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { comboboxKeyboard } from './keyboard'
+import { registerComboboxNavigation } from './navigation'
 import { comboboxParts } from './parts'
 
-export { comboboxRootKey } from './navigation'
+registerComboboxNavigation()
 
 export const comboboxDefinition: PatternDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'combobox',

@@ -12,7 +12,6 @@ export * from './patternEffects'
 export * from './patternNavigation'
 export * from './patternPredicate'
 export * from './patternTransition'
-export * from './reactFacade'
 
 export const KeyboardCaseSchema = z.discriminatedUnion('case', [
   z.object({ case: z.literal('when'), when: PredicateSchema, events: z.array(EventTemplateSchema).readonly() }).strict(),

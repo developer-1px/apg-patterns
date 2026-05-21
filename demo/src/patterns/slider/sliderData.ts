@@ -1,4 +1,4 @@
-import { PatternDataSchema, type Key, type PatternData, type PatternEvent, type PatternItem, type SliderOptions } from '../../../../src/react'
+import { PatternDataSchema, type Key, type PatternData, type PatternEvent, type PatternItem, type PatternOptions } from '../../../../src/react'
 
 export type SliderVariantKey = 'color' | 'temperature' | 'rating' | 'seek' | 'range'
 
@@ -81,7 +81,7 @@ export interface SliderVariant {
   key: SliderVariantKey
   label: string
   data: SliderDemoData
-  options: SliderOptions
+  options: PatternOptions
 }
 
 export const sliderVariants: Record<SliderVariantKey, SliderVariant> = {
@@ -144,7 +144,7 @@ const valuetextFor = (data: SliderDemoData, key: Key, next: number): string | un
 export function reduceSliderData(
   data: SliderDemoData,
   event: PatternEvent,
-  options: SliderOptions,
+  options: PatternOptions,
 ): SliderDemoData {
   if (event.type === 'focus' && event.key) {
     return { ...data, state: { ...data.state, activeKey: event.key } }
