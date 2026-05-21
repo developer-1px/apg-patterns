@@ -1,6 +1,6 @@
 import { PatternDataSchema, reducePatternData, tabsDefinition, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src/react'
 
-type TabSpec = { key: string; label: string; panelLabel: string; content: string }
+type TabSpec = { key: string; label: string; panelLabel: string; content?: string }
 
 type TabsViewOptions = PatternOptions & {
   activationMode: 'automatic' | 'manual'
@@ -12,7 +12,7 @@ const buildTabsData = (tabs: readonly TabSpec[], activeKey: string, label = 'Sec
   const items: Record<string, { label: string; content?: string }> = {}
   for (const tab of tabs) {
     items[tab.key] = { label: tab.label }
-    items[`${tab.key}Panel`] = { label: tab.panelLabel, content: tab.content }
+    items[`${tab.key}Panel`] = tab.content ? { label: tab.panelLabel, content: tab.content } : { label: tab.panelLabel }
   }
   return PatternDataSchema.parse({
     items,
@@ -30,44 +30,46 @@ const buildTabsData = (tabs: readonly TabSpec[], activeKey: string, label = 'Sec
 }
 
 const docsTabs: readonly TabSpec[] = [
-  { key: 'overview', label: 'Overview', panelLabel: 'Overview panel', content: 'Pattern status, owner notes, and the current implementation scope.' },
-  { key: 'code', label: 'Code', panelLabel: 'Code panel', content: 'Tracked source files and integration checkpoints for this pattern.' },
-  { key: 'audit', label: 'Audit', panelLabel: 'Audit panel', content: 'Recent accessibility findings, open risks, and verification status.' },
+  { key: 'overview', label: 'Overview', panelLabel: 'Overview panel' },
+  { key: 'code', label: 'Code', panelLabel: 'Code panel' },
+  { key: 'audit', label: 'Audit', panelLabel: 'Audit panel' },
 ]
 
 const planetsTabs: readonly TabSpec[] = [
-  { key: 'mercury', label: 'Mercury', panelLabel: 'Mercury panel', content: 'Mercury is the smallest and innermost planet in the Solar System.' },
-  { key: 'venus', label: 'Venus', panelLabel: 'Venus panel', content: 'Venus is the second planet from the Sun and the hottest planet.' },
-  { key: 'earth', label: 'Earth', panelLabel: 'Earth panel', content: 'Earth is the third planet from the Sun and the only known inhabited planet.' },
-  { key: 'mars', label: 'Mars', panelLabel: 'Mars panel', content: 'Mars is the fourth planet, often called the Red Planet.' },
+  { key: 'mercury', label: 'Mercury', panelLabel: 'Mercury panel' },
+  { key: 'venus', label: 'Venus', panelLabel: 'Venus panel' },
+  { key: 'earth', label: 'Earth', panelLabel: 'Earth panel' },
+  { key: 'mars', label: 'Mars', panelLabel: 'Mars panel' },
 ]
+
+const scrollablePanelContent = 'Scrollable panel content. '.repeat(24)
 
 const longTabs: readonly TabSpec[] = [
   {
     key: 'danish',
     label: 'Danish',
     panelLabel: 'Danish panel',
-    content: 'Laminated dough needs a cold bench, even pressure, and a rest between folds. The panel intentionally includes enough operational notes to require scrolling while still reading like real product content. Review butter temperature, fold count, proofing time, bake color, cooling rack capacity, and packaging handoff before the morning run. '.repeat(4),
+    content: scrollablePanelContent,
   },
   {
     key: 'cinnamon',
     label: 'Cinnamon Roll',
     panelLabel: 'Cinnamon Roll panel',
-    content: 'Cinnamon roll batches move through mixing, bulk rest, rolling, filling, proofing, baking, glazing, and holding. Keep the filling edge clean so the roll seals correctly, and stage trays by bake time so the front counter receives a steady flow instead of one large handoff. '.repeat(5),
+    content: scrollablePanelContent,
   },
   {
     key: 'donut',
     label: 'Donut',
     panelLabel: 'Donut panel',
-    content: 'Donut prep depends on oil temperature, rack spacing, glaze viscosity, and finish timing. Log the first batch color, adjust proofing if the crumb tightens, and keep filled varieties separated until labels are applied. '.repeat(6),
+    content: scrollablePanelContent,
   },
 ]
 
 const closeableTabs: readonly TabSpec[] = [
-  { key: 'inbox', label: 'Inbox', panelLabel: 'Inbox panel', content: 'New requests awaiting triage.' },
-  { key: 'drafts', label: 'Drafts', panelLabel: 'Drafts panel', content: 'Unsent updates that need review.' },
-  { key: 'sent', label: 'Sent', panelLabel: 'Sent panel', content: 'Recently delivered conversations.' },
-  { key: 'trash', label: 'Trash', panelLabel: 'Trash panel', content: 'Removed items retained for recovery.' },
+  { key: 'inbox', label: 'Inbox', panelLabel: 'Inbox panel' },
+  { key: 'drafts', label: 'Drafts', panelLabel: 'Drafts panel' },
+  { key: 'sent', label: 'Sent', panelLabel: 'Sent panel' },
+  { key: 'trash', label: 'Trash', panelLabel: 'Trash panel' },
 ]
 
 export type TabsVariantKey = 'automatic' | 'manual' | 'vertical' | 'scrollable' | 'closeable'

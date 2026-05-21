@@ -47,40 +47,38 @@ export function Tabs({
     : 'min-h-32 rounded-xl bg-zinc-100/70 p-3 text-sm leading-relaxed text-zinc-700 shadow-inner shadow-zinc-200/50 outline-none dark:bg-white/[0.045] dark:text-zinc-300 dark:shadow-black/10'
 
   return (
-    <div className="grid gap-3">
-      <div className={containerClass}>
-        <div {...(tabs.getTablistProps() as Props)} className={tablistClass}>
-          {tabs.tabs.map((key) => {
-            const tabProps = tabs.getTabProps(key) as Props
-            return (
-              <span key={key} className={isVertical ? 'flex items-center' : 'inline-flex items-center'}>
-                <button type="button" {...tabProps} className={tabClass}>
-                  {data.items[key]?.label}
+    <div className={containerClass}>
+      <div {...(tabs.getTablistProps() as Props)} className={tablistClass}>
+        {tabs.tabs.map((key) => {
+          const tabProps = tabs.getTabProps(key) as Props
+          return (
+            <span key={key} className={isVertical ? 'flex items-center' : 'inline-flex items-center'}>
+              <button type="button" {...tabProps} className={tabClass}>
+                {data.items[key]?.label}
+              </button>
+              {closeable ? (
+                <button
+                  type="button"
+                  aria-label={`Close ${data.items[key]?.label ?? key}`}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    onEvent({ type: 'close', key })
+                  }}
+                  className={cx(ds.iconButton, 'ml-1 size-5 bg-transparent shadow-none')}
+                >
+                  <Icon name="x" />
                 </button>
-                {closeable ? (
-                  <button
-                    type="button"
-                    aria-label={`Close ${data.items[key]?.label ?? key}`}
-                    onClick={(event) => {
-                      event.stopPropagation()
-                      onEvent({ type: 'close', key })
-                    }}
-                    className={cx(ds.iconButton, 'ml-1 size-5 bg-transparent shadow-none')}
-                  >
-                    <Icon name="x" />
-                  </button>
-                ) : null}
-              </span>
-            )
-          })}
-        </div>
-        {panelKey ? (
-          <div {...(tabs.getTabPanelProps(panelKey) as Props)} className={panelClass}>
-            <div className="font-semibold mb-1">{data.items[panelKey]?.label}</div>
-            <div>{data.items[panelKey]?.content}</div>
-          </div>
-        ) : null}
+              ) : null}
+            </span>
+          )
+        })}
       </div>
+      {panelKey ? (
+        <div {...(tabs.getTabPanelProps(panelKey) as Props)} className={panelClass}>
+          <div className={data.items[panelKey]?.content ? 'mb-1 font-semibold' : 'font-semibold'}>{data.items[panelKey]?.label}</div>
+          {data.items[panelKey]?.content ? <div>{data.items[panelKey]?.content}</div> : null}
+        </div>
+      ) : null}
     </div>
   )
 }

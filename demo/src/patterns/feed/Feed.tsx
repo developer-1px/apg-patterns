@@ -1,6 +1,5 @@
 import { useFeedPattern, type PatternData, type PatternEvent } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
-import { feedArticles } from './feedData'
 
 interface FeedProps {
   data: PatternData
@@ -16,7 +15,6 @@ export function Feed({ data, onEvent }: FeedProps) {
       className={cx('grid max-w-2xl gap-3', ds.focusRing)}
     >
       {feed.articles.map((article) => {
-        const content = feedArticles.find((item) => item.key === article.key)
         const titleId = `feed-article-${article.key}-title`
         return (
           <article
@@ -26,9 +24,8 @@ export function Feed({ data, onEvent }: FeedProps) {
             className={cx('rounded-xl bg-white/70 p-3 shadow-[0_10px_28px_rgba(24,24,27,0.06)] transition ui-active:bg-white ui-active:shadow-[0_16px_40px_rgba(24,24,27,0.1)] dark:bg-white/[0.045] dark:shadow-black/15 dark:ui-active:bg-white/[0.07]', ds.focusRing)}
           >
             <h3 id={titleId} className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-              {content?.title ?? article.label}
+              {article.label}
             </h3>
-            <p className="mt-1 text-sm text-zinc-700 dark:text-zinc-300">{content?.body}</p>
           </article>
         )
       })}

@@ -1,4 +1,4 @@
-import type { PatternData, PatternEvent, PatternOptions } from '../../../../src/react'
+import type { PatternEvent } from '../../../../src/react'
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { renderDataInspect } from '../../shared/inspect/genericInspect'
 import { Tabs } from './Tabs'
@@ -27,7 +27,7 @@ const tabsDemoDefinition = {
   },
   view: {
     kind: 'component',
-    component: 'TabsPreview',
+    component: 'Tabs',
     props: {
       data: '$state.data',
       onEvent: '$actions.dispatchEvent',
@@ -62,16 +62,8 @@ export const entry = defineDemoPattern({
           selectVariant: host.selectVariant,
           dispatchEvent: handleEvent,
         },
-        components: { TabsPreview },
+        components: { Tabs },
       },
     }
   },
 })
-
-function TabsPreview({ data, onEvent, options }: { data: PatternData; onEvent: (event: PatternEvent) => void; options?: PatternOptions }) {
-  return (
-    <div className="grid gap-3">
-      <Tabs data={data} onEvent={onEvent} options={options} />
-    </div>
-  )
-}
