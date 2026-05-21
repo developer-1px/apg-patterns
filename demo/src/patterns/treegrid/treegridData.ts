@@ -83,7 +83,6 @@ const buildTree = (): Built => {
     built.items[col] = { label: COLUMN_LABELS[col] }
   })
 
-  // Column header row: rowKey 'headerRow' at rowIndex 1.
   built.rowKeys.push('headerRow')
   built.rowIndexByKey['headerRow'] = 1
   built.items['headerRow'] = { label: 'Header row' }

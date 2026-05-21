@@ -1,10 +1,3 @@
-// Auto-collected source files for the source viewer.
-// Uses Vite's import.meta.glob to gather raw text contents of:
-//   - Top-level src files (src/*.ts — e.g. index.ts)
-//   - Layered kernel files (src/schema/*.ts, src/kernel/*.ts, src/adapters/*.ts)
-//   - All pattern definition/runtime files (src/patterns/<name>/*.ts)
-//   - All demo files in demo/src (*.tsx, *Data.ts, plus a few helpers)
-
 type SourceLoader = () => Promise<string>
 type SourceCollision = {
   name: string
@@ -48,19 +41,16 @@ function registerSource(name: string, path: string, load: SourceLoader) {
   collectedLoadersByPath.set(path, load)
 }
 
-// src root: keep filename only (e.g. index.ts)
 for (const [path, load] of Object.entries(rootModules)) {
   const name = path.split('/').pop()!
   registerSource(name, path, load)
 }
-// schema/kernel/adapters: keep <folder>/<file>.ts to preserve concept map
 for (const [path, load] of Object.entries(layerModules)) {
   const parts = path.split('/')
   const file = parts.pop()!
   const dir = parts.pop()!
   registerSource(`${dir}/${file}`, path, load)
 }
-// patterns: keep <patternName>/<file>.ts
 for (const [path, load] of Object.entries(patternModules)) {
   const parts = path.split('/')
   const file = parts.pop()!
