@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import { PatternDataSchema, type PatternEvent } from '../../../../src/react'
 import { Spinbutton } from './Spinbutton'
-import { formatTime, reduceSpinbuttonData, spinbuttonVariants } from './spinbuttonData'
+import { reduceSpinbuttonData, spinbuttonVariants } from './spinbuttonData'
 import { SpinbuttonDemo } from './testing/SpinbuttonTestHost'
 
 const numericSpinbutton = spinbuttonVariants.numeric
@@ -41,7 +41,6 @@ function SpinbuttonReducerEdgesDemo() {
       <output data-testid="spin-loose">{String(data.state?.valueByKey?.loose ?? '')}</output>
       <output data-testid="spin-hour-text">{String(data.items.hours?.valuetext ?? '')}</output>
       <output data-testid="spin-minute-text">{String(data.items.minutes?.valuetext ?? '')}</output>
-      <output data-testid="spin-time">{formatTime(3, 4)}</output>
     </div>
   )
 }
@@ -195,7 +194,6 @@ describe('Spinbutton — time picker variant', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Singular minute' }))
     expect(screen.getByTestId('spin-minute-text').textContent).toBe('1 minute')
-    expect(screen.getByTestId('spin-time').textContent).toBe('03:04')
 
     fireEvent.click(screen.getByRole('button', { name: 'Fallback range' }))
     expect(screen.getByTestId('spin-loose').textContent).toBe('1')

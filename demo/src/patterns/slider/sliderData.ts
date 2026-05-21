@@ -122,11 +122,6 @@ const computeDelta = (direction: unknown, step: number, large: number): number =
   return 0
 }
 
-const itemRange = (data: SliderDemoData, key: Key, fallbackMin: number, fallbackMax: number): [number, number] => {
-  const item = data.items[key]
-  return [item?.valuemin ?? fallbackMin, item?.valuemax ?? fallbackMax]
-}
-
 const valuetextFor = (data: SliderDemoData, key: Key, next: number): string | undefined => {
   const item = data.items[key]
   if (!item?.valuetext) return undefined
@@ -150,7 +145,9 @@ export function reduceSliderData(
   const defaultMax = Number(options.max ?? 100)
   const step = Number(options.step ?? 1)
   const large = Math.max(step, Math.round((defaultMax - defaultMin) / 10))
-  const [min, max] = itemRange(data, key, defaultMin, defaultMax)
+  const item = data.items[key]
+  const min = item?.valuemin ?? defaultMin
+  const max = item?.valuemax ?? defaultMax
   const current = Number(data.state?.valueByKey?.[key] ?? min)
 
   let nextValue: number

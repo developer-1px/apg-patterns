@@ -11,8 +11,6 @@ type SpinbuttonDemoData = PatternData<SpinbuttonDemoItem>
 
 export type SpinbuttonVariantKey = 'numeric' | 'time'
 
-const pad2 = (n: number) => n.toString().padStart(2, '0')
-
 const timeValuetext = (key: Key, value: number): string => {
   if (key === 'hours') return `${value} hour${value === 1 ? '' : 's'}`
   if (key === 'minutes') return `${value} minute${value === 1 ? '' : 's'}`
@@ -65,11 +63,6 @@ const computeDelta = (direction: unknown, step: number, large: number): number =
   return 0
 }
 
-const itemRange = (data: SpinbuttonDemoData, key: Key, fallbackMin: number, fallbackMax: number): [number, number] => {
-  const item = data.items[key]
-  return [item?.valuemin ?? fallbackMin, item?.valuemax ?? fallbackMax]
-}
-
 export function reduceSpinbuttonData(
   data: SpinbuttonDemoData,
   event: PatternEvent,
@@ -84,7 +77,9 @@ export function reduceSpinbuttonData(
   const defaultMax = Number(options.max ?? 100)
   const step = Number(options.step ?? 1)
   const large = Math.max(step, Math.round((defaultMax - defaultMin) / 10))
-  const [min, max] = itemRange(data, key, defaultMin, defaultMax)
+  const item = data.items[key]
+  const min = item?.valuemin ?? defaultMin
+  const max = item?.valuemax ?? defaultMax
   const current = Number(data.state?.valueByKey?.[key] ?? min)
 
   let nextValue: number
@@ -98,7 +93,6 @@ export function reduceSpinbuttonData(
 
   const valueByKey = { ...data.state?.valueByKey, [key]: clamped }
   let items = data.items
-  const item = items[key]
   if (item?.valuetext !== undefined) {
     items = { ...items, [key]: { ...items[key], valuetext: timeValuetext(key, clamped) } }
   }
@@ -109,5 +103,3 @@ export function reduceSpinbuttonData(
     state: { ...data.state, activeKey: key, valueByKey },
   }
 }
-
-export const formatTime = (h: number, m: number) => `${pad2(h)}:${pad2(m)}`
