@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { createTypeaheadBuffer } from '../../internal/keyboard'
+import { createApgTypeaheadBuffer } from '../../internal/keyboard'
 import { listboxDefinition } from './definition'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { useReactPatternRuntime } from '../../adapters/reactPatternEffects'
@@ -9,7 +9,7 @@ import { createListboxRootProps } from './createListboxRootProps'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 
 export function useListboxPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactListboxRuntime {
-  const typeaheadBufferRef = useRef(createTypeaheadBuffer())
+  const typeaheadBufferRef = useRef(createApgTypeaheadBuffer())
   const mergedOptions: PatternOptions = { focusStrategy: 'rovingTabIndex', selectionMode: 'single', ...options }
   const keyToElementId = usePatternElementId(mergedOptions, 'option-')
   const runtime = useReactPatternRuntime({

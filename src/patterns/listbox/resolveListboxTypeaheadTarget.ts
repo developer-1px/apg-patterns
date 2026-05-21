@@ -1,10 +1,10 @@
-import { findTypeaheadMatch } from '../../internal/collectionNavigation'
+import { findApgTypeaheadMatch } from '../../internal/collectionNavigation'
 import type { Key, PatternData } from '../../schema'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 
 export function resolveListboxTypeaheadTarget(query: string | null, runtime: PatternRuntime): Key | null {
   if (!query || runtime.options.typeaheadEnabled === false) return null
-  return findTypeaheadMatch(
+  return findApgTypeaheadMatch(
     runtime.visibleKeys.map((key) => ({
       item: key,
       label: getTextValue(runtime.data, key),

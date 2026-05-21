@@ -1,4 +1,4 @@
-import type { KeyInput, TypeaheadBuffer } from '../../internal/keyboard'
+import type { KeyInput, ApgTypeaheadBuffer } from '../../internal/keyboard'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { resolveTypeaheadTarget } from './typeahead'
@@ -14,7 +14,7 @@ export function createTreeProps({
   runtime: PatternRuntime
   data: PatternData
   options: PatternOptions
-  typeahead: TypeaheadBuffer
+  typeahead: ApgTypeaheadBuffer
   emit: (event: PatternEvent) => void
 }): TreeviewSlotProps {
   const props = runtime.getPartProps('tree')

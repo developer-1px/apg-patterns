@@ -1,4 +1,4 @@
-import { findTypeaheadMatch } from '../../internal/collectionNavigation'
+import { findApgTypeaheadMatch } from '../../internal/collectionNavigation'
 import type { Key, PatternData, PatternOptions } from '../../schema'
 import { treeviewDefinition } from './definition'
 import { resolveVisibleOrder } from '../../kernel/patternKernel'
@@ -11,7 +11,7 @@ export function resolveTypeaheadTarget(query: string | null, data: PatternData, 
   if (options.typeaheadEnabled === false) return null
   if (!query) return null
 
-  return findTypeaheadMatch(
+  return findApgTypeaheadMatch(
     resolveTreeviewVisibleKeys(data).map((key) => ({
       item: key,
       label: data.state?.typeaheadTextByKey?.[key] ?? data.items[key]?.textValue ?? data.items[key]?.label ?? key,

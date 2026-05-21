@@ -1,4 +1,4 @@
-import { moveGrid } from '../../internal/collectionNavigation'
+import { moveApgGrid } from '../../internal/collectionNavigation'
 import { defineNavigationTarget, defineVisibleOrder } from '../../kernel/patternKernel'
 import type { Key, PatternData } from '../../schema'
 
@@ -35,7 +35,7 @@ defineNavigationTarget('gridCell', (target, ctx) => {
   ) {
     throw new Error(`Unsupported grid action: ${String(action)}`)
   }
-  return moveGrid(gridRows(ctx.data), ctx.activeKey, action as GridAction)
+  return moveApgGrid(gridRows(ctx.data), ctx.activeKey, action as GridAction)
 })
 
 defineNavigationTarget('gridPage', (target, ctx) => {

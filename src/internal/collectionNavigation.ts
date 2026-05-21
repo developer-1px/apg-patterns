@@ -1,11 +1,11 @@
-export type LinearNavigationAction = 'previous' | 'next' | 'first' | 'last'
+export type ApgLinearNavigationAction = 'previous' | 'next' | 'first' | 'last'
 
-export interface LinearNavigationOptions<T> {
+export interface ApgLinearNavigationOptions<T> {
   wrap?: boolean
   isAvailable?: (item: T) => boolean
 }
 
-export type GridNavigationAction =
+export type ApgGridNavigationAction =
   | 'left'
   | 'right'
   | 'up'
@@ -15,39 +15,39 @@ export type GridNavigationAction =
   | 'gridStart'
   | 'gridEnd'
 
-export interface GridLocation {
+export interface ApgGridLocation {
   rowIndex: number
   columnIndex: number
 }
 
-export interface GridNavigationOptions<T> {
+export interface ApgGridNavigationOptions<T> {
   wrapColumns?: boolean
   wrapRows?: boolean
   isAvailable?: (item: T) => boolean
 }
 
-export interface VisibleTreeOptions<T> {
+export interface ApgVisibleTreeOptions<T> {
   roots: readonly T[]
   children: (item: T) => readonly T[]
   isExpanded: (item: T) => boolean
 }
 
-export interface TypeaheadItem<T> {
+export interface ApgTypeaheadItem<T> {
   item: T
   label: string
 }
 
-export interface TypeaheadMatchOptions<T> {
+export interface ApgTypeaheadMatchOptions<T> {
   current?: T
   locale?: string | string[]
   matches?: (label: string, query: string) => boolean
 }
 
-export function moveLinear<T>(
+export function moveApgLinear<T>(
   items: readonly T[],
   current: T,
-  action: LinearNavigationAction,
-  options: LinearNavigationOptions<T> = {},
+  action: ApgLinearNavigationAction,
+  options: ApgLinearNavigationOptions<T> = {},
 ): T | null {
   if (items.length === 0) return null
   if (action === 'first') return firstAvailable(items, options)
@@ -69,13 +69,13 @@ export function moveLinear<T>(
   return null
 }
 
-export function moveGrid<T>(
+export function moveApgGrid<T>(
   rows: readonly (readonly T[])[],
   current: T,
-  action: GridNavigationAction,
-  options: GridNavigationOptions<T> = {},
+  action: ApgGridNavigationAction,
+  options: ApgGridNavigationOptions<T> = {},
 ): T | null {
-  const location = findGridLocation(rows, current)
+  const location = findApgGridLocation(rows, current)
   if (!location) return null
 
   const row = rows[location.rowIndex] ?? []
@@ -102,7 +102,7 @@ export function moveGrid<T>(
   return moveAcrossRows(rows, location, action === 'down' ? 1 : -1, options)
 }
 
-export function visibleTreeItems<T>(options: VisibleTreeOptions<T>): T[] {
+export function visibleApgTreeItems<T>(options: ApgVisibleTreeOptions<T>): T[] {
   const out: T[] = []
   const visit = (items: readonly T[]): void => {
     for (const item of items) {
@@ -114,10 +114,10 @@ export function visibleTreeItems<T>(options: VisibleTreeOptions<T>): T[] {
   return out
 }
 
-export function findTypeaheadMatch<T>(
-  items: readonly TypeaheadItem<T>[],
+export function findApgTypeaheadMatch<T>(
+  items: readonly ApgTypeaheadItem<T>[],
   query: string,
-  options: TypeaheadMatchOptions<T> = {},
+  options: ApgTypeaheadMatchOptions<T> = {},
 ): T | null {
   const normalized = query.toLocaleLowerCase(options.locale)
   if (!normalized) return null
@@ -138,15 +138,15 @@ export function findTypeaheadMatch<T>(
 
 const modulo = (n: number, m: number): number => ((n % m) + m) % m
 
-function isLinearAvailable<T>(item: T, options: LinearNavigationOptions<T>): boolean {
+function isLinearAvailable<T>(item: T, options: ApgLinearNavigationOptions<T>): boolean {
   return options.isAvailable?.(item) ?? true
 }
 
-function firstAvailable<T>(items: readonly T[], options: LinearNavigationOptions<T>): T | null {
+function firstAvailable<T>(items: readonly T[], options: ApgLinearNavigationOptions<T>): T | null {
   return items.find((item) => isLinearAvailable(item, options)) ?? null
 }
 
-function lastAvailable<T>(items: readonly T[], options: LinearNavigationOptions<T>): T | null {
+function lastAvailable<T>(items: readonly T[], options: ApgLinearNavigationOptions<T>): T | null {
   for (let index = items.length - 1; index >= 0; index -= 1) {
     const item = items[index]
     if (item !== undefined && isLinearAvailable(item, options)) return item
@@ -154,14 +154,14 @@ function lastAvailable<T>(items: readonly T[], options: LinearNavigationOptions<
   return null
 }
 
-function isGridAvailable<T>(item: T, options: GridNavigationOptions<T>): boolean {
+function isGridAvailable<T>(item: T, options: ApgGridNavigationOptions<T>): boolean {
   return options.isAvailable?.(item) ?? true
 }
 
-function findGridLocation<T>(
+function findApgGridLocation<T>(
   rows: readonly (readonly T[])[],
   current: T,
-): GridLocation | null {
+): ApgGridLocation | null {
   for (let rowIndex = 0; rowIndex < rows.length; rowIndex += 1) {
     const columnIndex = rows[rowIndex]!.indexOf(current)
     if (columnIndex >= 0) return { rowIndex, columnIndex }
@@ -171,14 +171,14 @@ function findGridLocation<T>(
 
 function firstAvailableCell<T>(
   row: readonly T[],
-  options: GridNavigationOptions<T>,
+  options: ApgGridNavigationOptions<T>,
 ): T | null {
   return row.find((item) => isGridAvailable(item, options)) ?? null
 }
 
 function lastAvailableCell<T>(
   row: readonly T[],
-  options: GridNavigationOptions<T>,
+  options: ApgGridNavigationOptions<T>,
 ): T | null {
   for (let columnIndex = row.length - 1; columnIndex >= 0; columnIndex -= 1) {
     const item = row[columnIndex]
@@ -191,7 +191,7 @@ function moveInRow<T>(
   row: readonly T[],
   columnIndex: number,
   delta: 1 | -1,
-  options: GridNavigationOptions<T>,
+  options: ApgGridNavigationOptions<T>,
 ): T | null {
   const maxSteps = options.wrapColumns ? row.length - 1 : row.length
 
@@ -209,7 +209,7 @@ function moveInRow<T>(
 function findAvailableInRow<T>(
   row: readonly T[],
   columnIndex: number,
-  options: GridNavigationOptions<T>,
+  options: ApgGridNavigationOptions<T>,
 ): T | null {
   if (row.length === 0) return null
   const clampedColumnIndex = Math.min(columnIndex, row.length - 1)
@@ -227,9 +227,9 @@ function findAvailableInRow<T>(
 
 function moveAcrossRows<T>(
   rows: readonly (readonly T[])[],
-  location: GridLocation,
+  location: ApgGridLocation,
   delta: 1 | -1,
-  options: GridNavigationOptions<T>,
+  options: ApgGridNavigationOptions<T>,
 ): T | null {
   const maxSteps = options.wrapRows ? rows.length - 1 : rows.length
 

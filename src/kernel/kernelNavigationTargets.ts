@@ -1,4 +1,4 @@
-import { moveLinear } from '../internal/collectionNavigation'
+import { moveApgLinear } from '../internal/collectionNavigation'
 import { defineKeyToken, defineNavigationTarget, defineVisibleOrder } from './patternKernel'
 
 let kernelNavigationTargetsRegistered = false
@@ -11,7 +11,7 @@ defineVisibleOrder('flat', (_v, data) => data.relations?.rootKeys ?? [])
 
 defineNavigationTarget('linear', (target, ctx) => {
   const action = target.action as 'next' | 'previous' | 'first' | 'last'
-  return moveLinear(ctx.visibleKeys, ctx.activeKey, action)
+  return moveApgLinear(ctx.visibleKeys, ctx.activeKey, action)
 })
 defineNavigationTarget('linearWrap', (target, ctx) => {
   if (ctx.visibleKeys.length === 0) return null

@@ -1,4 +1,4 @@
-import { moveGrid } from '../../internal/collectionNavigation'
+import { moveApgGrid } from '../../internal/collectionNavigation'
 import {
   defineNavigationTarget,
   defineVisibleOrder,
@@ -17,7 +17,7 @@ defineVisibleOrder('treegridVisibleCells', (_v, data) => visibleCells(data).flat
 
 defineNavigationTarget('treegridCell', (target, ctx) => {
   const action = target.action as TreegridAction
-  return moveGrid(visibleCells(ctx.data), ctx.activeKey, action)
+  return moveApgGrid(visibleCells(ctx.data), ctx.activeKey, action)
 })
 
 const PAGE_STEP = 10

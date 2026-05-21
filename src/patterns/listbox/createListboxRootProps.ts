@@ -1,10 +1,10 @@
-import { createTypeaheadBuffer } from '../../internal/keyboard'
+import { createApgTypeaheadBuffer } from '../../internal/keyboard'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactTypes'
 import { handleListboxMultiKeyDown } from './handleListboxMultiSelect'
 import { resolveListboxTypeaheadTarget } from './resolveListboxTypeaheadTarget'
 
-export function createListboxRootProps(runtime: PatternRuntime, typeahead: ReturnType<typeof createTypeaheadBuffer>): ReactPatternProps {
+export function createListboxRootProps(runtime: PatternRuntime, typeahead: ReturnType<typeof createApgTypeaheadBuffer>): ReactPatternProps {
   const props = reactProps(runtime.getPartProps('listbox'))
   const baseKeyDown = props.onKeyDown
   return {

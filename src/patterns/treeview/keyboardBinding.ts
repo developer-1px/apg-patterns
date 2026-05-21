@@ -1,4 +1,4 @@
-import { matchesShortcut, type KeyInput } from '../../internal/keyboard'
+import { matchesApgShortcut, type KeyInput } from '../../internal/keyboard'
 import type { Key, KeyboardBinding, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { evaluatePredicate, resolveEventTemplate } from '../../kernel/patternKernel'
 import { treeviewDefinition } from './definition'
@@ -22,7 +22,7 @@ export function resolveTreeKeyboardBinding({
   keyboard?: readonly KeyboardBinding[]
 }): ResolvedKeyboardBinding | null {
   for (const binding of keyboard) {
-    if (!matchesShortcut(input, binding.shortcut)) continue
+    if (!matchesApgShortcut(input, binding.shortcut)) continue
     for (const item of binding.cases) {
       if (item.case === 'otherwise' || item.case === 'always' || evaluatePredicate(item.when, { data, options, activeKey })) {
         return {

@@ -30,7 +30,7 @@ export interface KeyInput {
   timeStamp?: number
 }
 
-export interface ParsedShortcut {
+export interface ApgParsedShortcut {
   control: boolean
   shift: boolean
   alt: boolean
@@ -39,29 +39,29 @@ export interface ParsedShortcut {
   key: string
 }
 
-export interface TypeaheadBuffer {
+export interface ApgTypeaheadBuffer {
   feed(e: KeyInput): string | null
   value(): string
   reset(): void
-  snapshot(): TypeaheadSnapshot
+  snapshot(): ApgTypeaheadSnapshot
 }
 
-export interface TypeaheadSnapshot {
+export interface ApgTypeaheadSnapshot {
   timeoutMs: number
   query: string
   lastTime: number
 }
 
-export interface TypeaheadOptions {
+export interface ApgTypeaheadOptions {
   timeoutMs?: number
-  initial?: Pick<TypeaheadSnapshot, 'query' | 'lastTime'>
+  initial?: Pick<ApgTypeaheadSnapshot, 'query' | 'lastTime'>
 }
 
-export function matchesShortcut(e: KeyInput, shortcuts: string): boolean {
+export function matchesApgShortcut(e: KeyInput, shortcuts: string): boolean {
   return parseShortcut(shortcuts).some((shortcut) => matchOne(e, shortcut))
 }
 
-export function createTypeaheadBuffer(options: TypeaheadOptions = {}): TypeaheadBuffer {
+export function createApgTypeaheadBuffer(options: ApgTypeaheadOptions = {}): ApgTypeaheadBuffer {
   const timeoutMs = options.timeoutMs ?? 500
   let query = options.initial?.query ?? ''
   let lastTime = options.initial?.lastTime ?? 0
@@ -80,14 +80,14 @@ export function createTypeaheadBuffer(options: TypeaheadOptions = {}): Typeahead
     return query
   }
 
-  function snapshot(): TypeaheadSnapshot {
+  function snapshot(): ApgTypeaheadSnapshot {
     return { timeoutMs, query, lastTime }
   }
 
   return { feed, value: () => query, reset, snapshot }
 }
 
-function parseShortcut(input: string): ParsedShortcut[] {
+function parseShortcut(input: string): ApgParsedShortcut[] {
   return input
     .trim()
     .split(/\s+/)
@@ -95,12 +95,12 @@ function parseShortcut(input: string): ParsedShortcut[] {
     .map(parseSingle)
 }
 
-function parseSingle(token: string): ParsedShortcut {
+function parseSingle(token: string): ApgParsedShortcut {
   const parts = token.split('+')
   if (parts.length === 0 || parts[parts.length - 1] === '') {
     throw new Error(`Invalid shortcut: "${token}"`)
   }
-  const out: ParsedShortcut = {
+  const out: ApgParsedShortcut = {
     control: false,
     shift: false,
     alt: false,
@@ -122,7 +122,7 @@ function parseSingle(token: string): ParsedShortcut {
   return out
 }
 
-function matchOne(e: KeyInput, shortcut: ParsedShortcut): boolean {
+function matchOne(e: KeyInput, shortcut: ApgParsedShortcut): boolean {
   if (shortcut.key !== 'Control' && e.ctrlKey !== shortcut.control) return false
   if (shortcut.key !== 'Shift' && e.shiftKey !== shortcut.shift) return false
   if (shortcut.key !== 'Alt' && e.altKey !== shortcut.alt) return false

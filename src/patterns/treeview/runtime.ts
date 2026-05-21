@@ -1,4 +1,4 @@
-import { createTypeaheadBuffer, type TypeaheadBuffer } from '../../internal/keyboard'
+import { createApgTypeaheadBuffer, type ApgTypeaheadBuffer } from '../../internal/keyboard'
 import {
   PatternDataSchema,
   PatternEventSchema,
@@ -38,7 +38,7 @@ export interface CreateTreeviewRuntimeInput {
   data: unknown
   onEvent: (event: PatternEvent) => void
   options?: unknown
-  typeaheadBuffer?: TypeaheadBuffer
+  typeaheadBuffer?: ApgTypeaheadBuffer
   keyToElementId?: (key: Key) => string
 }
 
@@ -47,7 +47,7 @@ export function createTreeviewRuntime(input: CreateTreeviewRuntimeInput): Treevi
   const options = { ...treeviewDefaultOptions, ...PatternOptionsSchema.parse(input.options ?? {}) }
   const emit = (event: PatternEvent) => input.onEvent(withNonEnumerableMeta(PatternEventSchema.parse(event)))
   const keyToElementId = input.keyToElementId ?? ((key: Key) => createElementId(options.elementIdPrefix ?? treeviewDefaultOptions.elementIdPrefix, key))
-  const typeahead = input.typeaheadBuffer ?? createTypeaheadBuffer()
+  const typeahead = input.typeaheadBuffer ?? createApgTypeaheadBuffer()
   const runtime = createPatternRuntime({
     definition: treeviewDefinition,
     data,

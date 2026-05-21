@@ -1,4 +1,4 @@
-import { matchesShortcut, type KeyInput } from '../internal/keyboard'
+import { matchesApgShortcut, type KeyInput } from '../internal/keyboard'
 import type { Key, PatternData, PatternDefinition, PatternEvent, PatternOptions } from '../schema'
 import { evaluatePredicate, resolveEventTemplate } from './patternKernel'
 
@@ -25,7 +25,7 @@ export function resolveRuntimeKeyboardBinding({
   activeKey,
 }: RuntimeKeyboardInput): RuntimeKeyboardBindingResult | null {
   for (const binding of definition.keyboard) {
-    if (!matchesShortcut(input, binding.shortcut)) continue
+    if (!matchesApgShortcut(input, binding.shortcut)) continue
 
     for (const item of binding.cases) {
       const ctx = { data, options, activeKey, parentByKey }

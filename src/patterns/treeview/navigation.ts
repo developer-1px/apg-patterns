@@ -1,4 +1,4 @@
-import { visibleTreeItems } from '../../internal/collectionNavigation'
+import { visibleApgTreeItems } from '../../internal/collectionNavigation'
 import { defineNavigationTarget, defineVisibleOrder, resolveKeyToken } from '../../kernel/patternKernel'
 
 let treeviewNavigationRegistered = false
@@ -19,7 +19,7 @@ defineNavigationTarget('parentKey', (target, ctx) => {
 
 defineVisibleOrder('treeVisibleDepthFirst', (_v, data) => {
   const expanded = new Set(data.state?.expandedKeys ?? [])
-  return visibleTreeItems({
+  return visibleApgTreeItems({
     roots: data.relations?.rootKeys ?? [],
     children: (key) => data.relations?.childrenByKey?.[key] ?? [],
     isExpanded: (key) => expanded.has(key),

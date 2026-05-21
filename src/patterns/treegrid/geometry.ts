@@ -1,10 +1,10 @@
-import { visibleTreeItems } from '../../internal/collectionNavigation'
+import { visibleApgTreeItems } from '../../internal/collectionNavigation'
 import type { Key, PatternData } from '../../schema'
 
 export const visibleRowKeys = (data: PatternData): readonly Key[] => {
   const rootKeys = data.relations?.rootKeys ?? data.relations?.rowKeys ?? []
   const expanded = new Set(data.state?.expandedKeys ?? [])
-  return visibleTreeItems({
+  return visibleApgTreeItems({
     roots: rootKeys,
     children: (key) => data.relations?.childrenByKey?.[key] ?? [],
     isExpanded: (key) => expanded.has(key),
