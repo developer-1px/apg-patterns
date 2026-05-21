@@ -26,15 +26,13 @@ export function ActiveDemoRightPanel({
 
   return (
     <section className={`${scrollPanelClass} flex min-h-0 flex-col`}>
-      <header className="mb-3 grid gap-2">
-        <div {...rightModeTabs.getTablistProps()} className={cx('flex items-center gap-1', ds.controlGroup)}>
-          {rightModes.map((mode) => (
-            <button {...rightModeTabs.getTabProps(mode)} key={mode} type="button" className={cx('inline-flex h-8 items-center', ds.option)}>
-              {rightModeLabels[mode]}
-            </button>
-          ))}
-        </div>
-      </header>
+      <div {...rightModeTabs.getTablistProps()} className={cx('mb-3 flex items-center gap-1', ds.controlGroup)}>
+        {rightModes.map((mode) => (
+          <button {...rightModeTabs.getTabProps(mode)} key={mode} type="button" className={cx('inline-flex h-8 items-center', ds.option)}>
+            {rightModeLabels[mode]}
+          </button>
+        ))}
+      </div>
       <div {...rightModeTabs.getPanelProps()} className="flex min-h-0 flex-col gap-3">
         {state.rightMode === 'source' ? (
           <SourceTabs tabs={activeDemo.sourceNames} getTablistProps={sourceTabs.getTablistProps} getTabProps={sourceTabs.getTabProps} />

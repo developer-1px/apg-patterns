@@ -52,21 +52,17 @@ export function ActiveDemoWorkspace({
     <VariantRouteProvider patternKey={activeDemo.key}>
       <section className={scrollPanelClass}>
         <header className="mb-4 flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <h2 className="truncate text-sm font-semibold text-zinc-950 dark:text-zinc-50">{activeDemo.label}</h2>
-          </div>
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              className={ds.textButton}
-              aria-pressed={state.rightPanelOpen}
-              onClick={() => dispatch({ type: 'toggleRightPanel' })}
-            >
-              code
-            </button>
-          </div>
+          <h2 className="min-w-0 truncate text-sm font-semibold text-zinc-950 dark:text-zinc-50">{activeDemo.label}</h2>
+          <button
+            type="button"
+            className={ds.textButton}
+            aria-pressed={state.rightPanelOpen}
+            onClick={() => dispatch({ type: 'toggleRightPanel' })}
+          >
+            code
+          </button>
         </header>
-        {activeDemo.variants ? <div className="mb-4 rounded-xl bg-zinc-100/70 p-2 dark:bg-white/[0.045]">{activeDemo.variants}</div> : null}
+        {activeDemo.variants ? <div className="mb-4">{activeDemo.variants}</div> : null}
         <div
           data-demo-preview={activeDemo.key}
           aria-label={previewKeyboardShortcuts ? `${activeDemo.label} preview keyboard shortcuts` : undefined}
