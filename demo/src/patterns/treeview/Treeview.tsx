@@ -27,7 +27,7 @@ export function Treeview({
           <button
             {...item.toggleButtonProps}
             aria-label={`toggle ${item.key}`}
-            className="grid size-6 place-items-center rounded-lg p-0 text-xs text-zinc-500 transition hover:bg-zinc-100 dark:text-zinc-500 dark:hover:bg-white/[0.06]"
+            className="grid size-6 place-items-center rounded-md p-0 text-xs text-zinc-500 transition hover:bg-zinc-100 dark:text-zinc-500 dark:hover:bg-white/[0.06]"
           >
             <Icon name="chevron-right" className={item.state.expanded ? 'rotate-90' : ''} />
           </button>

@@ -8,7 +8,7 @@ import { useNavMenuKeyboard } from './useNavMenuKeyboard'
 
 type Props = HTMLAttributes<HTMLElement>
 
-const buttonClass = cx(ds.button, ds.expandable, 'justify-between rounded-lg')
+const buttonClass = cx(ds.button, ds.expandable, 'justify-between')
 const panelClass =
   'rounded-md border border-zinc-200 bg-white p-2 text-sm text-zinc-700 dark:border-white/10 dark:bg-zinc-950 dark:text-zinc-300'
 const linkClass = cx(ds.option, 'block py-1 text-sm')

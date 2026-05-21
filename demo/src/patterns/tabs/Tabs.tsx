@@ -64,7 +64,7 @@ export function Tabs({
                     event.stopPropagation()
                     onEvent({ type: 'close', key })
                   }}
-                  className={cx(ds.iconButton, 'ml-1 size-5 bg-transparent shadow-none')}
+                  className={cx(ds.iconButton, 'ml-1 size-5 bg-transparent')}
                 >
                   <Icon name="x" />
                 </button>

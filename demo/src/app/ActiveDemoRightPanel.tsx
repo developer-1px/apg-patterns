@@ -50,7 +50,7 @@ export function ActiveDemoRightPanel({
           <div className="relative min-h-0">
             <button
               type="button"
-              className={cx(ds.iconButton, 'absolute right-2 top-2 z-10 size-8 bg-transparent text-zinc-400 shadow-none hover:bg-white/10 hover:text-zinc-100 disabled:cursor-not-allowed')}
+              className={cx(ds.iconButton, 'absolute right-2 top-2 z-10 size-8 bg-transparent text-zinc-400 hover:bg-white/10 hover:text-zinc-100 disabled:cursor-not-allowed')}
               aria-label={copyState === 'idle' ? 'copy' : 'copied'}
               aria-live="polite"
               onClick={copySource}

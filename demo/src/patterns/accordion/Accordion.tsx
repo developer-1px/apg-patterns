@@ -33,7 +33,7 @@ export function Accordion({ data, onEvent, options }: AccordionProps) {
             <h3 className="m-0">
               <button
                 {...section.headerProps}
-                className={cx(ds.button, ds.expandable, 'w-full justify-between rounded-none bg-transparent shadow-none')}
+                className={cx(ds.button, ds.expandable, 'w-full justify-between rounded-none bg-transparent')}
               >
                 <span>{section.label}</span>
                 <Icon name={section.state.expanded ? 'minus' : 'plus'} className="text-xs text-zinc-500 dark:text-zinc-400" />
