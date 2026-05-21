@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { JsonValueSchema, validateJsonExtensionFields } from './jsonValue'
+import { JsonValueSchema, validateJsonExtensionFields, type JsonValue } from './jsonValue'
 import { IdRefListSchema, KeySchema, KeyTokenSchema, type Key } from './keys'
 import { validatePatternDataRefs } from './patternDataValidation'
 import { PatternStateSchema, type PatternState } from './patternState'
@@ -7,7 +7,16 @@ import { PatternStateSchema, type PatternState } from './patternState'
 export { IdRefListSchema, KeySchema, KeyTokenSchema }
 export type { Key }
 
-export const PatternItemSchema = z
+export interface PatternItem {
+  label?: string
+  labelledBy?: string | readonly string[]
+  textValue?: string
+  itemValue?: JsonValue
+  kind?: string
+  [key: string]: unknown
+}
+
+export const PatternItemSchema: z.ZodType<PatternItem> = z
   .object({
     label: z.string().optional(),
     labelledBy: IdRefListSchema.optional(),
@@ -18,9 +27,17 @@ export const PatternItemSchema = z
   .passthrough()
   .superRefine((value, ctx) => validateJsonExtensionFields(value, ['label', 'labelledBy', 'textValue', 'itemValue', 'kind'], ctx))
 
-export type PatternItem = z.infer<typeof PatternItemSchema>
+interface PatternRelations {
+  rootKeys?: readonly Key[]
+  childrenByKey?: Record<Key, readonly Key[]>
+  ownerByKey?: Record<Key, Key>
+  controlsByKey?: Record<Key, readonly Key[]>
+  rowKeys?: readonly Key[]
+  columnKeys?: readonly Key[]
+  cells?: readonly { rowKey: Key; columnKey: Key; cellKey: Key }[]
+}
 
-export const PatternRelationsSchema = z
+export const PatternRelationsSchema: z.ZodType<PatternRelations> = z
   .object({
     rootKeys: z.array(KeySchema).readonly().optional(),
     childrenByKey: z.record(KeySchema, z.array(KeySchema).readonly()).optional(),
@@ -38,7 +55,15 @@ export const PatternRelationsSchema = z
 export { PatternStateSchema }
 export type { PatternState }
 
-export const PatternRefsSchema = z
+interface PatternRefs {
+  label?: string
+  labelledBy?: string | readonly string[]
+  initialFocusKey?: Key
+  domainIdByKey?: Record<Key, string>
+  pointerByKey?: Record<Key, string>
+}
+
+export const PatternRefsSchema: z.ZodType<PatternRefs> = z
   .object({
     label: z.string().optional(),
     labelledBy: IdRefListSchema.optional(),
@@ -48,7 +73,17 @@ export const PatternRefsSchema = z
   })
   .strict()
 
-export const PatternDataSchema = z
+export type PatternData<
+  TItem extends PatternItem = PatternItem,
+  TState extends PatternState = PatternState,
+> = {
+  items: Record<Key, TItem>
+  relations?: PatternRelations
+  state?: TState
+  refs?: PatternRefs
+}
+
+export const PatternDataSchema: z.ZodType<PatternData> = z
   .object({
     items: z.record(KeySchema, PatternItemSchema),
     relations: PatternRelationsSchema.optional(),
@@ -57,11 +92,3 @@ export const PatternDataSchema = z
   })
   .strict()
   .superRefine(validatePatternDataRefs)
-
-export type PatternData<
-  TItem extends PatternItem = PatternItem,
-  TState extends PatternState = PatternState,
-> = Omit<z.infer<typeof PatternDataSchema>, 'items' | 'state'> & {
-  items: Record<Key, TItem>
-  state?: TState
-}
