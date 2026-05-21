@@ -11,7 +11,6 @@ export const rightModeLabels: Record<(typeof rightModes)[number], string> = {
 
 const rightModesByLabel = {
   code: 'source',
-  aria: 'inspect',
   state: 'inspect',
   events: 'log',
 } as const satisfies Record<string, (typeof rightModes)[number]>
@@ -99,14 +98,9 @@ function coercePatternKey(value: string | null): PatternKey | null {
 
 export function coerceRightMode(value: string | null): AppState['rightMode'] | null {
   if (!value || value === 'off') return null
-  if (isRightModeLabel(value)) return rightModesByLabel[value]
-  return isRightMode(value) ? value : null
+  return isRightModeLabel(value) ? rightModesByLabel[value] : null
 }
 
 function isRightModeLabel(value: string): value is keyof typeof rightModesByLabel {
   return value in rightModesByLabel
-}
-
-function isRightMode(value: string): value is AppState['rightMode'] {
-  return rightModes.some((mode) => mode === value)
 }

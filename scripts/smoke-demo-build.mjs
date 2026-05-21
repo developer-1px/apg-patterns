@@ -185,14 +185,6 @@ async function runSmoke() {
     if (entrySourceName) await verifyPatternPanelRoutes({ key, label, sourceName: entrySourceName })
   }
 
-  await verifyHashRoute('#pattern=accordion&panel=aria&source=Accordion.tsx', (text) =>
-    currentHashParam('pattern') === 'accordion'
-    && currentHashParam('panel') === 'state'
-    && hasActiveDemoHeading('Accordion')
-    && text.includes('state'),
-    'legacy aria panel route did not normalize to state',
-  )
-
   await verifyHashRoute('#pattern=accordion&panel=events&source=Accordion.tsx', (text) =>
     currentHashParam('pattern') === 'accordion'
     && currentHashParam('panel') === 'events'

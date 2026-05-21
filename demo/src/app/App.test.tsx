@@ -33,13 +33,18 @@ describe('formatEvent', () => {
 })
 
 describe('coerceRightMode', () => {
-  it('keeps legacy aria panel links working as state links', () => {
-    expect(coerceRightMode('aria')).toBe('inspect')
+  it('maps canonical panel labels to internal modes', () => {
+    expect(coerceRightMode('code')).toBe('source')
     expect(coerceRightMode('state')).toBe('inspect')
+    expect(coerceRightMode('events')).toBe('log')
   })
 
-  it('treats off and unknown panels as no right panel', () => {
+  it('treats off, unknown panels, and internal mode names as no right panel', () => {
     expect(coerceRightMode('off')).toBeNull()
+    expect(coerceRightMode('aria')).toBeNull()
+    expect(coerceRightMode('source')).toBeNull()
+    expect(coerceRightMode('inspect')).toBeNull()
+    expect(coerceRightMode('log')).toBeNull()
     expect(coerceRightMode('missing')).toBeNull()
   })
 })
@@ -165,16 +170,6 @@ describe('source copy', () => {
 })
 
 describe('App route state', () => {
-  it('normalizes legacy aria panel deep links to the state panel', async () => {
-    replaceHash('#pattern=accordion&panel=aria&source=Accordion.tsx')
-
-    render(<App />)
-
-    expect(screen.getByRole('heading', { name: 'Accordion' })).toBeTruthy()
-    await waitFor(() => expect(currentHashParam('panel')).toBe('state'))
-    expect(screen.getByRole('tab', { name: 'state', selected: true })).toBeTruthy()
-  })
-
   it('keeps panel=off deep links closed while preserving pattern and source state', async () => {
     replaceHash('#pattern=accordion&panel=off&source=Accordion.tsx')
 
