@@ -12,10 +12,6 @@ export const initialData = {
     rootKeys: ['docs', 'demo'],
     childrenByKey: {
       docs: ['adr', 'runtime', 'schema'],
-      adr: [],
-      runtime: [],
-      schema: [],
-      demo: [],
     },
   },
   state: {

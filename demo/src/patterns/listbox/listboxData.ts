@@ -8,7 +8,6 @@ export const initialListboxData = PatternDataSchema.parse({
   },
   relations: {
     rootKeys: ['a', 'b', 'c'],
-    childrenByKey: { a: [], b: [], c: [] },
   },
   state: {
     activeKey: 'b',
@@ -34,7 +33,6 @@ export const initialScrollableListboxData = PatternDataSchema.parse({
   ),
   relations: {
     rootKeys: scrollableLabels.map((_l, index) => `s${index}`),
-    childrenByKey: Object.fromEntries(scrollableLabels.map((_l, index) => [`s${index}`, []])),
   },
   state: {
     activeKey: 's0',
@@ -72,9 +70,6 @@ export const initialGroupedListboxData = PatternDataSchema.parse({
   ),
   relations: {
     rootKeys: groupedListboxStructure.flatMap((g) => g.optionKeys),
-    childrenByKey: Object.fromEntries(
-      groupedListboxStructure.flatMap((g) => g.optionKeys).map((key) => [key, []]),
-    ),
   },
   state: {
     activeKey: 'v-asparagus',
@@ -94,7 +89,6 @@ export const initialRearrangeableListboxData = PatternDataSchema.parse({
   ),
   relations: {
     rootKeys: rearrangeableLabels.map((_l, index) => `r${index}`),
-    childrenByKey: Object.fromEntries(rearrangeableLabels.map((_l, index) => [`r${index}`, []])),
   },
   state: {
     activeKey: 'r0',

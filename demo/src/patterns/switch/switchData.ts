@@ -9,7 +9,6 @@ const switchData = PatternDataSchema.parse({
   },
   relations: {
     rootKeys: ['wifi'],
-    childrenByKey: { wifi: [] },
   },
   state: {
     activeKey: 'wifi',

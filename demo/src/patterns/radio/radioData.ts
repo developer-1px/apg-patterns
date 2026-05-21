@@ -10,7 +10,6 @@ const deliveryRadioData = PatternDataSchema.parse({
   },
   relations: {
     rootKeys: ['pickup', 'courier', 'locker'],
-    childrenByKey: { pickup: [], courier: [], locker: [] },
   },
   state: {
     activeKey: 'pickup',
@@ -31,7 +30,6 @@ const ratingRadioData = PatternDataSchema.parse({
   },
   relations: {
     rootKeys: ['star1', 'star2', 'star3', 'star4', 'star5'],
-    childrenByKey: { star1: [], star2: [], star3: [], star4: [], star5: [] },
   },
   state: {
     activeKey: 'star3',

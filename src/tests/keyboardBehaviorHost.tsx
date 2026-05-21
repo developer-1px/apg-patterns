@@ -12,7 +12,7 @@ const initialData = {
   },
   relations: {
     rootKeys: ['docs', 'demo'],
-    childrenByKey: { docs: ['adr', 'runtime', 'schema'], adr: [], runtime: [], schema: [], demo: [] },
+    childrenByKey: { docs: ['adr', 'runtime', 'schema'] },
   },
   state: {
     activeKey: 'docs',

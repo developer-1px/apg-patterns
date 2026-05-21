@@ -26,7 +26,6 @@ export const initialFeedData = PatternDataSchema.parse({
   ),
   relations: {
     rootKeys: feedArticles.map((a) => a.key),
-    childrenByKey: Object.fromEntries(feedArticles.map((a) => [a.key, []])),
   },
   state: {
     activeKey: feedArticles[0]!.key,

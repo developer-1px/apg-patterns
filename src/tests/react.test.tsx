@@ -11,7 +11,6 @@ const data = {
     rootKeys: ['a'],
     childrenByKey: {
       a: ['b'],
-      b: [],
     },
   },
   state: {

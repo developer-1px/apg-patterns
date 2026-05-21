@@ -14,9 +14,6 @@ const formattingToolbarData = PatternDataSchema.parse({
   },
   relations: {
     rootKeys: ['bold', 'italic', 'underline', 'alignLeft', 'alignCenter', 'alignRight'],
-    childrenByKey: {
-      bold: [], italic: [], underline: [], alignLeft: [], alignCenter: [], alignRight: [],
-    },
   },
   state: {
     activeKey: 'bold',
@@ -37,9 +34,6 @@ const helpToolbarData = PatternDataSchema.parse({
   },
   relations: {
     rootKeys: ['back', 'contents', 'index', 'search', 'next'],
-    childrenByKey: {
-      back: [], contents: [], index: [], search: [], next: [],
-    },
   },
   state: {
     activeKey: 'contents',

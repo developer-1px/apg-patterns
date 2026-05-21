@@ -15,7 +15,6 @@ const twoStateInitial = PatternDataSchema.parse({
   },
   relations: {
     rootKeys: ['updates'],
-    childrenByKey: { updates: [] },
   },
   state: {
     activeKey: 'updates',

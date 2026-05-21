@@ -28,8 +28,10 @@ function flattenTree(roots: readonly Node[]) {
       posInSetByKey[node.key] = index + 1
       setSizeByKey[node.key] = nodes.length
       const children = node.children ?? []
-      childrenByKey[node.key] = children.map((child) => child.key)
-      if (children.length) visit(children, level + 1)
+      if (children.length) {
+        childrenByKey[node.key] = children.map((child) => child.key)
+        visit(children, level + 1)
+      }
     })
   }
   visit(roots, 1)
