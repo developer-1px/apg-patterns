@@ -1,7 +1,7 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData } from '../../schema'
 import { reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
-import { treegridVisibleCells, treegridVisibleRowKeys } from './definition'
+import { visibleCells, visibleRowKeys } from './geometry'
 
 export interface ReactTreegridCell {
   key: Key
@@ -26,8 +26,8 @@ export function createTreegridRows({
   runtime: ReturnType<typeof createPatternRuntime>
   data: PatternData
 }): readonly ReactTreegridRow[] {
-  const rowKeys = treegridVisibleRowKeys(data)
-  const cells = treegridVisibleCells(data)
+  const rowKeys = visibleRowKeys(data)
+  const cells = visibleCells(data)
   return rowKeys.map((rowKey, rowIndex) => ({
     key: rowKey,
     rowProps: reactProps(runtime.getPartProps('row', rowKey)),

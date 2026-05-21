@@ -2,7 +2,7 @@ import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { registerTreegridAriaSources } from './ariaSources'
 import { treegridEffects } from './effects'
 import { treegridKeyboard } from './keyboard'
-import { registerTreegridNavigation, treegridVisibleCells, treegridVisibleRowKeys } from './navigation'
+import { registerTreegridNavigation } from './navigation'
 import { treegridParts } from './parts'
 import { registerTreegridPredicates } from './predicates'
 import { registerTreegridRowNavigation } from './rowNavigation'
@@ -11,8 +11,6 @@ registerTreegridAriaSources()
 registerTreegridNavigation()
 registerTreegridPredicates()
 registerTreegridRowNavigation()
-
-export { treegridVisibleRowKeys, treegridVisibleCells }
 
 export const treegridDefinition: PatternDefinition = PatternDefinitionSchema.parse({
   apgPattern: 'treegrid',

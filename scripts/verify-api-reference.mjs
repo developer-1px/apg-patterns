@@ -48,6 +48,8 @@ const forbiddenPublicExports = new Map([
   ['TabsRuntime', 'keep tabs runtime construction internal to useTabsPattern'],
   ['Tree', 'use Treeview to match the APG pattern name'],
   ['TreeProps', 'use TreeviewProps to match the APG pattern name'],
+  ['treegridVisibleCells', 'keep treegrid cell derivation internal to treegrid rendering and navigation'],
+  ['treegridVisibleRowKeys', 'keep treegrid row derivation internal to treegrid rendering and navigation'],
   ['TreeviewRenderItem', 'use ReactTreeviewRenderItem from the React entrypoint'],
   ['TreeviewRenderState', 'use ReactTreeviewRenderItem state from the React entrypoint'],
   ['TreeviewRuntime', 'keep treeview runtime construction internal to useTreeviewPattern'],

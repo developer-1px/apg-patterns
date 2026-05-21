@@ -56,6 +56,4 @@ defineNavigationTarget('treegridParentRowFirstCell', (_target, ctx) => {
 })
 }
 
-export { visibleRowKeys as treegridVisibleRowKeys, visibleCells as treegridVisibleCells }
-
 registerTreegridNavigation()

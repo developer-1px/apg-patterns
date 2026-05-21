@@ -199,8 +199,6 @@ TransitionSchema
 TransitionValue
 TransitionValueSchema
 treegridDefinition
-treegridVisibleCells
-treegridVisibleRowKeys
 treeviewDefinition
 TreeviewDefinitionSchema
 unknownTokenError
@@ -339,8 +337,6 @@ TooltipDefinitionSchema
 TransitionSchema
 TransitionValueSchema
 treegridDefinition
-treegridVisibleCells
-treegridVisibleRowKeys
 treeviewDefinition
 TreeviewDefinitionSchema
 unknownTokenError
