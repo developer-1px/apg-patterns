@@ -1,6 +1,5 @@
 import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { registerTreegridAriaSources } from './ariaSources'
-import { treegridEffects } from './effects'
 import { treegridKeyboard } from './keyboard'
 import { registerTreegridNavigation } from './navigation'
 import { treegridParts } from './parts'
@@ -17,7 +16,7 @@ export const treegridDefinition: PatternDefinition = PatternDefinitionSchema.par
   rootRole: 'treegrid',
   containedRoles: ['row', 'gridcell', 'columnheader', 'rowheader'],
   focusModel: 'rovingTabIndex',
-  effects: treegridEffects,
+  effects: [{ kind: 'focus', on: { state: 'activeKey', reasons: ['keyboard'] }, scope: { kind: 'focusWithin' }, target: { kind: 'activeKeyElement' }, preventScroll: true }],
   parts: treegridParts,
   navigation: {
     visibleOrder: { kind: 'treegridVisibleCells' },

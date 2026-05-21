@@ -6,9 +6,7 @@ export function registerGridAriaSources() {
   if (gridAriaSourcesRegistered) return
   gridAriaSourcesRegistered = true
 
-defineAriaSource('state.multiselectable', (ctx) =>
-  ctx.options?.selectionMode === 'multiple' || ctx.data.state?.multiselectable === true || undefined,
-)
+  defineAriaSource('state.multiselectable', (ctx) =>
+    ctx.options?.selectionMode === 'multiple' || ctx.data.state?.multiselectable === true || undefined,
+  )
 }
-
-registerGridAriaSources()

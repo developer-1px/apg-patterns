@@ -32,5 +32,3 @@ defineNavigationTarget('optionLinear', (target, ctx) => {
   return null
 })
 }
-
-registerComboboxNavigation()

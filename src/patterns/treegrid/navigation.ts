@@ -55,5 +55,3 @@ defineNavigationTarget('treegridParentRowFirstCell', (_target, ctx) => {
   return ctx.data.relations?.cells?.find((c) => c.rowKey === parent && c.columnKey === firstCol)?.cellKey ?? null
 })
 }
-
-registerTreegridNavigation()

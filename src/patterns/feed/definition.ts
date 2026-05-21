@@ -1,5 +1,4 @@
 import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
-import { feedEffects } from './effects'
 import { feedKeyboard } from './keyboard'
 import { feedParts } from './parts'
 
@@ -14,7 +13,7 @@ export const feedDefinition: PatternDefinition = PatternDefinitionSchema.parse({
   rootRole: 'feed',
   containedRoles: ['article'],
   focusModel: 'rovingTabIndex',
-  effects: feedEffects,
+  effects: [{ kind: 'focus', on: { state: 'activeKey', reasons: ['keyboard'] }, scope: { kind: 'focusWithin' }, target: { kind: 'activeKeyElement' }, preventScroll: true }],
   parts: feedParts,
   navigation: {
     visibleOrder: { kind: 'flat' },

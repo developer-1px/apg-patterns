@@ -59,5 +59,3 @@ defineNavigationTarget('gridPage', (target, ctx) => {
   return targetRow[Math.min(location.columnIndex, targetRow.length - 1)] ?? null
 })
 }
-
-registerGridNavigation()

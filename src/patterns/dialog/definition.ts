@@ -2,7 +2,6 @@ import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { dialogEffects } from './effects'
 import { dialogKeyboard } from './keyboard'
 import { dialogParts } from './parts'
-import { dialogTransitions } from './transitions'
 
 export const dialogDefinition: PatternDefinition = PatternDefinitionSchema.superRefine((value, ctx) => {
   if (value.apgPattern !== 'dialog') ctx.addIssue({ code: 'custom', path: ['apgPattern'], message: 'expected "dialog"' })
@@ -22,6 +21,19 @@ export const dialogDefinition: PatternDefinition = PatternDefinitionSchema.super
     targets: {},
   },
   keyboard: dialogKeyboard,
-  transitions: dialogTransitions,
+  transitions: [
+    {
+      on: 'expand',
+      actions: [
+        { kind: 'set', field: 'activeKey', value: { from: '$event.key' } },
+        {
+          kind: 'setMembership',
+          field: 'expandedKeys',
+          value: { from: '$event.key' },
+          present: { from: '$event.expanded' },
+        },
+      ],
+    },
+  ],
   effects: dialogEffects,
 })

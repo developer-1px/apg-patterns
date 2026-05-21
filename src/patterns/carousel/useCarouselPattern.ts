@@ -1,7 +1,6 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions, PatternState } from '../../schema'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
-import { getCarouselRuntimeState } from './carouselRuntimeState'
 import { createCarouselSlides, type ReactCarouselSlide } from './carouselSlide'
 import { carouselDefinition } from './definition'
 import { usePatternElementId } from '../../adapters/reactDomIds'
@@ -46,7 +45,9 @@ export function useCarouselPattern(data: PatternData<CarouselItem, CarouselState
     onEvent,
     keyToElementId,
   })
-  const { activeKey, showDots, slideKeys } = getCarouselRuntimeState(data)
+  const slideKeys = data.relations?.rootKeys ?? []
+  const activeKey = data.state?.activeKey ?? slideKeys[0] ?? null
+  const showDots = (data.state?.showDots ?? true) === true
 
   return {
     get rootProps() {

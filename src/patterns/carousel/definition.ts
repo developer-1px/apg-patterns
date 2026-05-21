@@ -1,6 +1,5 @@
 import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { carouselParts } from './parts'
-import { carouselTransitions } from './transitions'
 
 export const carouselDefinition: PatternDefinition = PatternDefinitionSchema.superRefine((value, ctx) => {
   if (value.apgPattern !== 'carousel') ctx.addIssue({ code: 'custom', path: ['apgPattern'], message: 'expected "carousel"' })
@@ -23,5 +22,13 @@ export const carouselDefinition: PatternDefinition = PatternDefinitionSchema.sup
     },
   },
   keyboard: [],
-  transitions: carouselTransitions,
+  transitions: [
+    {
+      on: 'select',
+      actions: [
+        { kind: 'set', field: 'activeKey', value: { from: '$event.extentKey' } },
+        { kind: 'replaceSet', field: 'selectedKeys', values: [{ from: '$event.extentKey' }] },
+      ],
+    },
+  ],
 })

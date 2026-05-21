@@ -1,5 +1,4 @@
 import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
-import { toolbarEffects } from './effects'
 import { toolbarKeyboard } from './keyboard'
 import { toolbarParts } from './parts'
 
@@ -21,7 +20,7 @@ export const toolbarDefinition: PatternDefinition = PatternDefinitionSchema.supe
   rootRole: 'toolbar',
   containedRoles: ['button'],
   focusModel: 'rovingTabIndex',
-  effects: toolbarEffects,
+  effects: [{ kind: 'focus', on: { state: 'activeKey', reasons: ['keyboard'] }, scope: { kind: 'focusWithin' }, target: { kind: 'activeKeyElement' }, preventScroll: true }],
   parts: toolbarParts,
   navigation: {
     visibleOrder: { kind: 'flat' },

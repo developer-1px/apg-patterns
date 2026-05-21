@@ -1,7 +1,6 @@
 import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { tooltipKeyboard } from './keyboard'
 import { tooltipParts } from './parts'
-import { tooltipTransitions } from './transitions'
 
 export const tooltipDefinition: PatternDefinition = PatternDefinitionSchema.superRefine((value, ctx) => {
   if (value.apgPattern !== 'tooltip') ctx.addIssue({ code: 'custom', path: ['apgPattern'], message: 'expected "tooltip"' })
@@ -19,5 +18,18 @@ export const tooltipDefinition: PatternDefinition = PatternDefinitionSchema.supe
     targets: {},
   },
   keyboard: tooltipKeyboard,
-  transitions: tooltipTransitions,
+  transitions: [
+    {
+      on: 'expand',
+      actions: [
+        { kind: 'set', field: 'activeKey', value: { from: '$event.key' } },
+        {
+          kind: 'setMembership',
+          field: 'expandedKeys',
+          value: { from: '$event.key' },
+          present: { from: '$event.expanded' },
+        },
+      ],
+    },
+  ],
 })

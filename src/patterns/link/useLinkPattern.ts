@@ -1,10 +1,8 @@
+import type { KeyboardEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { linkDefinition } from './definition'
-import { createLinkActions } from './linkActions'
-import { createLinkProps } from './linkProps'
-import { getLinkRuntimeState } from './linkRuntimeState'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 
 interface LinkItem extends PatternItem {
@@ -44,7 +42,13 @@ export function useLinkPattern(data: PatternData<LinkItem>, onEvent: (event: Pat
 
   return {
     get linkProps() {
-      return createLinkProps(runtime, key)
+      if (!key) return {}
+      const rootKeyboard = runtime.getRootKeyboardHandler()
+      const { onKeyDown: _onKeyDown, ...props } = reactProps(runtime.getPartProps('link', key))
+      return {
+        ...props,
+        onKeyDown: (event: KeyboardEvent<HTMLElement>) => rootKeyboard(reactKeyInput(event)),
+      }
     },
     key,
     get label() {
@@ -57,10 +61,18 @@ export function useLinkPattern(data: PatternData<LinkItem>, onEvent: (event: Pat
       return key ? data.items[key]?.variant ?? 'anchor' : 'anchor'
     },
     get state() {
-      return getLinkRuntimeState(runtime, key)
+      const state = key ? runtime.getItemState(key, 'link') : {}
+      return {
+        active: Boolean(state.active),
+        disabled: Boolean(state.disabled),
+      }
     },
     get actions() {
-      return createLinkActions(runtime, key)
+      return {
+        activate: () => {
+          if (key) runtime.emit({ type: 'activate', key })
+        },
+      }
     },
     get ids() {
       return { forKey: runtime.keyToElementId }

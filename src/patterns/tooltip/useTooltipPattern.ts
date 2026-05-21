@@ -1,10 +1,8 @@
+import type { KeyboardEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { tooltipDefinition } from './definition'
-import { createTooltipActions } from './tooltipActions'
-import { getTooltipLabel, getTooltipRuntimeState } from './tooltipRuntimeState'
-import { createTooltipTriggerProps } from './tooltipTriggerProps'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 
 export interface ReactTooltipRuntime {
@@ -41,7 +39,14 @@ export function useTooltipPattern(data: PatternData, onEvent: (event: PatternEve
 
   return {
     get triggerProps() {
-      return createTooltipTriggerProps(runtime, triggerKey)
+      if (!triggerKey) return {}
+      const rootKeyDown = runtime.getRootKeyboardHandler()
+      const { onKeyDown: _onKeyDown, ...props } = reactProps(runtime.getPartProps('trigger', triggerKey))
+      return reactProps({
+        ...props,
+        type: 'button',
+        onKeyDown: (event: KeyboardEvent<HTMLElement>) => rootKeyDown(reactKeyInput(event)),
+      })
     },
     get tooltipProps() {
       return tooltipKey ? reactProps(runtime.getPartProps('tooltip', tooltipKey)) : {}
@@ -49,16 +54,25 @@ export function useTooltipPattern(data: PatternData, onEvent: (event: PatternEve
     triggerKey,
     tooltipKey,
     get triggerLabel() {
-      return getTooltipLabel(data, triggerKey)
+      return triggerKey ? data.items[triggerKey]?.label ?? triggerKey : ''
     },
     get tooltipLabel() {
-      return getTooltipLabel(data, tooltipKey)
+      return tooltipKey ? data.items[tooltipKey]?.label ?? tooltipKey : ''
     },
     get state() {
-      return getTooltipRuntimeState(data, triggerKey)
+      return {
+        open: triggerKey ? data.state?.expandedKeys?.includes(triggerKey) ?? false : false,
+      }
     },
     get actions() {
-      return createTooltipActions(runtime, triggerKey)
+      return {
+        open: () => {
+          if (triggerKey) runtime.emit({ type: 'expand', key: triggerKey, expanded: true })
+        },
+        close: () => {
+          if (triggerKey) runtime.emit({ type: 'expand', key: triggerKey, expanded: false })
+        },
+      }
     },
     get ids() {
       return { forKey: runtime.keyToElementId }

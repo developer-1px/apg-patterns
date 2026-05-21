@@ -1,5 +1,4 @@
 import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
-import { listboxEffects } from './effects'
 import { listboxKeyboard } from './keyboard'
 import { listboxParts } from './parts'
 import { listboxReact } from './react'
@@ -9,7 +8,7 @@ export const listboxDefinition: PatternDefinition = PatternDefinitionSchema.pars
   rootRole: 'listbox',
   containedRoles: ['option'],
   focusModel: 'rovingTabIndex',
-  effects: listboxEffects,
+  effects: [{ kind: 'focus', on: { state: 'activeKey', reasons: ['keyboard', 'typeahead'] }, scope: { kind: 'focusWithin' }, target: { kind: 'activeKeyElement' }, preventScroll: true }],
   parts: listboxParts,
   navigation: {
     visibleOrder: { kind: 'flat' },

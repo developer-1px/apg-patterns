@@ -2,7 +2,6 @@ import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { alertDialogEffects } from './effects'
 import { alertDialogKeyboard } from './keyboard'
 import { alertDialogParts } from './parts'
-import { alertDialogTransitions } from './transitions'
 
 export const alertDialogDefinition: PatternDefinition = PatternDefinitionSchema.superRefine((value, ctx) => {
   if (value.apgPattern !== 'alertdialog') ctx.addIssue({ code: 'custom', path: ['apgPattern'], message: 'expected "alertdialog"' })
@@ -22,6 +21,19 @@ export const alertDialogDefinition: PatternDefinition = PatternDefinitionSchema.
     targets: {},
   },
   keyboard: alertDialogKeyboard,
-  transitions: alertDialogTransitions,
+  transitions: [
+    {
+      on: 'expand',
+      actions: [
+        { kind: 'set', field: 'activeKey', value: { from: '$event.key' } },
+        {
+          kind: 'setMembership',
+          field: 'expandedKeys',
+          value: { from: '$event.key' },
+          present: { from: '$event.expanded' },
+        },
+      ],
+    },
+  ],
   effects: alertDialogEffects,
 })

@@ -47,5 +47,3 @@ defineNavigationTarget('treegridRowPage', (target, ctx) => {
   return rows[next] ?? null
 })
 }
-
-registerTreegridRowNavigation()

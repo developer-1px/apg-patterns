@@ -26,5 +26,3 @@ defineVisibleOrder('treeVisibleDepthFirst', (_v, data) => {
   })
 })
 }
-
-registerTreeviewNavigation()

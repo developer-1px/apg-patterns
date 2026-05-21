@@ -1,5 +1,4 @@
 import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
-import { tabsEffects } from './effects'
 import { tabsKeyboard } from './keyboard'
 import { registerTabsNavigation } from './navigation'
 import { tabsParts } from './parts'
@@ -21,7 +20,7 @@ export const tabsDefinition: PatternDefinition = PatternDefinitionSchema.superRe
   rootRole: 'tablist',
   containedRoles: ['tab', 'tabpanel'],
   focusModel: 'rovingTabIndex',
-  effects: tabsEffects,
+  effects: [{ kind: 'focus', on: { state: 'activeKey', reasons: ['keyboard'] }, scope: { kind: 'focusWithin' }, target: { kind: 'activeKeyElement' }, preventScroll: true }],
   parts: tabsParts,
   navigation: {
     visibleOrder: { kind: 'flat' },
