@@ -455,40 +455,25 @@ function runtimeSmokeSource(moduleKind, smokeKind) {
     'dist/core.d.ts',
     'dist/react.d.ts',
   ]
-  const deepImportSmoke = moduleKind === 'esm'
-    ? `
+  const loadUnexportedSubpath = moduleKind === 'esm'
+    ? 'import(`@interactive-os/aria/${subpath}`)'
+    : 'require(`@interactive-os/aria/${subpath}`)'
+  const awaitUnexportedSubpathAssertion = moduleKind === 'esm' ? 'await ' : ''
+  const callUnexportedSubpathLoader = moduleKind === 'esm' ? 'await load()' : 'load()'
+  const assertPackagePathNotExportedFunction = moduleKind === 'esm' ? 'async function' : 'function'
+  const deepImportSmoke = `
 const unexportedSubpaths = ${JSON.stringify(unexportedSubpaths, null, 2)}
 
 for (const subpath of unexportedSubpaths) {
-  await assertPackagePathNotExported(
-    () => import(\`@interactive-os/aria/\${subpath}\`),
-    \`ESM unexported package subpath \${subpath}\`,
+  ${awaitUnexportedSubpathAssertion}assertPackagePathNotExported(
+    () => ${loadUnexportedSubpath},
+    \`${moduleKind.toUpperCase()} unexported package subpath \${subpath}\`,
   )
 }
 
-async function assertPackagePathNotExported(load, label) {
+${assertPackagePathNotExportedFunction} assertPackagePathNotExported(load, label) {
   try {
-    await load()
-  } catch (error) {
-    if (error?.code === 'ERR_PACKAGE_PATH_NOT_EXPORTED') return
-    throw new Error(\`\${label} failed with unexpected error \${error?.code ?? error}\`)
-  }
-  throw new Error(\`\${label} was unexpectedly exported\`)
-}
-`
-    : `
-const unexportedSubpaths = ${JSON.stringify(unexportedSubpaths, null, 2)}
-
-for (const subpath of unexportedSubpaths) {
-  assertPackagePathNotExported(
-    () => require(\`@interactive-os/aria/\${subpath}\`),
-    \`CJS unexported package subpath \${subpath}\`,
-  )
-}
-
-function assertPackagePathNotExported(load, label) {
-  try {
-    load()
+    ${callUnexportedSubpathLoader}
   } catch (error) {
     if (error?.code === 'ERR_PACKAGE_PATH_NOT_EXPORTED') return
     throw new Error(\`\${label} failed with unexpected error \${error?.code ?? error}\`)

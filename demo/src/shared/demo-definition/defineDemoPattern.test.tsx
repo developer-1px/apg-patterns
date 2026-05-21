@@ -24,6 +24,10 @@ const definition = {
   },
 } as const satisfies DemoPatternDefinition
 
+const unusedRuntime = () => {
+  throw new Error('useRuntime should not be called')
+}
+
 class ErrorBoundary extends Component<{ children: ReactNode }, { message: string | null }> {
   state = { message: null }
 
@@ -192,9 +196,7 @@ describe('defineDemoPattern', () => {
     expect(() =>
       defineDemoPattern({
         definition: { ...definition, key: 'Bad Key' },
-        useRuntime: () => {
-          throw new Error('unused')
-        },
+        useRuntime: unusedRuntime,
       }),
     ).toThrow()
   })
@@ -203,9 +205,7 @@ describe('defineDemoPattern', () => {
     expect(() =>
       defineDemoPattern({
         definition: { ...definition, keyboardShortcuts: ['Enter', 'Enter'] },
-        useRuntime: () => {
-          throw new Error('unused')
-        },
+        useRuntime: unusedRuntime,
       }),
     ).toThrow('[defineDemoPattern] duplicate example keyboardShortcuts: Enter')
   })
@@ -220,9 +220,7 @@ describe('defineDemoPattern', () => {
             data: ['Example.tsx'],
           },
         },
-        useRuntime: () => {
-          throw new Error('unused')
-        },
+        useRuntime: unusedRuntime,
       }),
     ).toThrow('[defineDemoPattern] duplicate example sources: Example.tsx')
   })
@@ -242,9 +240,7 @@ describe('defineDemoPattern', () => {
             ...sourceOverride,
           },
         },
-        useRuntime: () => {
-          throw new Error('unused')
-        },
+        useRuntime: unusedRuntime,
       }),
     ).toThrow(`[defineDemoPattern] ${message}`)
   })
@@ -298,9 +294,7 @@ describe('defineDemoPattern', () => {
             ...sourceOverride,
           },
         },
-        useRuntime: () => {
-          throw new Error('unused')
-        },
+        useRuntime: unusedRuntime,
       }),
     ).toThrow(`[defineDemoPattern] ${message}`)
   })
