@@ -479,7 +479,7 @@ describe('event log', () => {
     await waitFor(() => expect(currentHashParam('panel')).toBe('events'))
 
     expect(screen.getByText('0 events')).toBeTruthy()
-    expect(screen.getByText('none')).toBeTruthy()
+    expect(getLogPanel().textContent).toBe('')
   })
 
   it('records pattern events and clears them explicitly', async () => {
@@ -495,7 +495,7 @@ describe('event log', () => {
     fireEvent.click(screen.getByRole('button', { name: 'clear' }))
 
     expect(screen.getByText('0 events')).toBeTruthy()
-    expect(screen.getByText('none')).toBeTruthy()
+    expect(getLogPanel().textContent).toBe('')
   })
 
   it('keeps the event log bounded to the newest 12 entries', async () => {
@@ -508,7 +508,7 @@ describe('event log', () => {
 
     await waitFor(() => expect(screen.getByText('12 events')).toBeTruthy())
 
-    const eventLogText = getVisibleLogPanel().textContent ?? ''
+    const eventLogText = getLogPanel().textContent ?? ''
     const eventRows = eventLogText.split('\n').filter(Boolean)
 
     expect(eventRows).toHaveLength(12)
@@ -528,7 +528,7 @@ describe('event log', () => {
 
     await waitFor(() => expect(screen.getByRole('heading', { name: 'Checkbox' })).toBeTruthy())
     expect(screen.getByText('0 events')).toBeTruthy()
-    expect(screen.getByText('none')).toBeTruthy()
+    expect(getLogPanel().textContent).toBe('')
   })
 
   it('resets stale source state when switching patterns', async () => {
@@ -1073,9 +1073,8 @@ function getSourcePanel() {
   return sourcePanel
 }
 
-function getVisibleLogPanel() {
-  const logPanel = Array.from(document.querySelectorAll('pre'))
-    .find((panel) => panel.textContent?.includes('expand key='))
+function getLogPanel() {
+  const logPanel = document.querySelector('pre')
   if (!logPanel) throw new Error('missing log panel')
   return logPanel
 }

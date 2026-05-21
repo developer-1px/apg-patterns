@@ -46,7 +46,6 @@ export function Carousel({ data, onEvent }: CarouselProps) {
             {slide.imageUrl ? <img src={slide.imageUrl} alt={slide.imageAlt} className="h-56 w-full object-cover" /> : null}
             <div className="absolute inset-x-0 bottom-0 bg-black/62 p-4 text-white backdrop-blur-sm">
               <div className="text-sm font-semibold">{slide.title}</div>
-              <div className="mt-0.5 text-sm text-white/78">{slide.caption}</div>
             </div>
           </div>
         ))}

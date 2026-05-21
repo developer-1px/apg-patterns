@@ -21,7 +21,7 @@ export function ActiveDemoRightPanel({
 }) {
   const sourceTabs = useSourceTabs({ label: 'source files', tabs: activeDemo.sourceNames, value: activeSourceName, onChange: (sourceName) => dispatch({ type: 'selectSource', sourceName }) })
   const rightModeTabs = useSourceTabs({ label: 'right panel', tabs: rightModes, value: state.rightMode, onChange: (rightMode) => dispatch({ type: 'selectRightMode', rightMode }) })
-  const eventLog = state.events.map(formatEvent).join('\n') || 'none'
+  const eventLog = state.events.map(formatEvent).join('\n')
   const { canCopySource, copySource, copyState, displayedSource } = useSourcePreviewState(activeSourceName)
 
   return (
