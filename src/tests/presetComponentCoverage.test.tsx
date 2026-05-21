@@ -27,7 +27,7 @@ import {
   Tabs,
   Toolbar,
   Tooltip,
-  Tree,
+  Treeview,
   Treegrid,
   WindowSplitter,
   type PatternData,
@@ -52,7 +52,7 @@ describe('preset React components', () => {
       },
     }
 
-    render(<Tree data={data} onEvent={(event) => events.push(event)} />)
+    render(<Treeview data={data} onEvent={(event) => events.push(event)} />)
 
     expect(screen.getByRole('tree')).toBeTruthy()
     expect(screen.getByRole('treeitem', { name: /Root/ })).toBeTruthy()

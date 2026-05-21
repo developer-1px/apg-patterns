@@ -224,9 +224,9 @@ describe('App route state', () => {
     render(<App />)
 
     expect(screen.getByRole('heading', { name: 'Treeview' })).toBeTruthy()
-    await waitFor(() => expect(window.location.hash).toBe('#pattern=treeview&panel=code&source=Tree.tsx'))
+    await waitFor(() => expect(window.location.hash).toBe('#pattern=treeview&panel=code&source=Treeview.tsx'))
     expect(screen.getByRole('tab', { name: 'code', selected: true })).toBeTruthy()
-    expect(screen.getByTitle('Tree.tsx')).toBeTruthy()
+    expect(screen.getByTitle('Treeview.tsx')).toBeTruthy()
     expect(screen.queryByText('missing source: Missing.tsx')).toBeNull()
   })
 
@@ -375,7 +375,7 @@ describe('App route state', () => {
   })
 
   it('opens custom treeview variant deep links on the requested variant', async () => {
-    replaceHash('#pattern=treeview&panel=code&source=Tree.tsx&variant=navigation')
+    replaceHash('#pattern=treeview&panel=code&source=Treeview.tsx&variant=navigation')
 
     render(<App />)
 
@@ -696,7 +696,7 @@ describe('demo source wiring', () => {
   it('loads the default source as real source text', async () => {
     const source = await sourceLoaders[defaultSourceName]?.()
 
-    expect(source).toContain('export function Tree')
+    expect(source).toContain('export function Treeview')
   })
 
   it('opens each pattern on a real demo component source by default', async () => {

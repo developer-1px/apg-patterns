@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { useTreeviewPattern, type PatternData, type PatternEvent } from '../react'
+import { useTreeviewPattern, type PatternData, type PatternEvent, type PatternOptions } from '../react'
 
 const data = {
   items: {
@@ -22,15 +22,11 @@ const data = {
 
 function TreeviewDemo(props: {
   data?: PatternData
-  options?: Parameters<typeof useTreeviewPattern>[0]['options']
+  options?: PatternOptions
   onEvent: (event: PatternEvent) => void
   exposeActions?: boolean
 }) {
-  const tree = useTreeviewPattern({
-    data: props.data ?? data,
-    options: props.options,
-    onEvent: props.onEvent,
-  })
+  const tree = useTreeviewPattern(props.data ?? data, props.onEvent, props.options)
 
   return (
     <div {...tree.getTreeProps()} data-testid="tree">

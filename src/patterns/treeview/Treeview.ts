@@ -12,7 +12,7 @@ type ButtonProps = ComponentPropsWithoutRef<'button'>
 type AnchorProps = ComponentPropsWithoutRef<'a'>
 type SpanProps = ComponentPropsWithoutRef<'span'>
 
-export interface TreeProps<TItem extends TreeDataItem = TreeDataItem> {
+export interface TreeviewProps<TItem extends TreeDataItem = TreeDataItem> {
   data: PatternData<TItem>
   onEvent: (event: PatternEvent) => void
   options?: PatternOptions
@@ -22,7 +22,7 @@ export interface TreeProps<TItem extends TreeDataItem = TreeDataItem> {
   renderIcon?: (item: ReactTreeviewRenderItem, dataItem: TItem) => ReactNode
 }
 
-export function Tree<TItem extends TreeDataItem = TreeDataItem>({
+export function Treeview<TItem extends TreeDataItem = TreeDataItem>({
   data,
   onEvent,
   options,
@@ -30,7 +30,7 @@ export function Tree<TItem extends TreeDataItem = TreeDataItem>({
   indent = 18,
   renderLabel,
   renderIcon,
-}: TreeProps<TItem>) {
+}: TreeviewProps<TItem>) {
   const tree = useTreeviewPattern(data, onEvent, options)
 
   return createElement(

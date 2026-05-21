@@ -11,13 +11,13 @@ import {
 import { treeviewDefinition } from './definition'
 import { treeviewDefaultOptions } from './defaultOptions'
 import { withNonEnumerableMeta } from './eventMeta'
-import { createPatternRuntime, type CreatePatternRuntimeInput } from '../../kernel/patternRuntime'
-import { createTreeviewRenderItems, type TreeviewRenderItem, type TreeviewSlotProps } from './renderItem'
+import { createPatternRuntime, type CreatePatternRuntimeInput, type SlotProps } from '../../kernel/patternRuntime'
+import { createTreeviewRenderItems, type TreeviewRenderItem } from './renderItem'
 import { createTreeProps } from './treeProps'
 import { createElementId } from '../../kernel/domIds'
 
 export type { TreeviewRenderState } from './renderState'
-export type { TreeviewRenderItem, TreeviewSlotProps } from './renderItem'
+export type { TreeviewRenderItem } from './renderItem'
 
 export interface TreeviewRuntime {
   definition: typeof treeviewDefinition
@@ -25,11 +25,11 @@ export interface TreeviewRuntime {
   options: PatternOptions
   items: readonly TreeviewRenderItem[]
   slotProps: {
-    tree: TreeviewSlotProps
+    tree: SlotProps
   }
-  getTreeProps(): TreeviewSlotProps
-  getTreeItemProps(key: Key): TreeviewSlotProps
-  getIndicatorProps(key: Key): TreeviewSlotProps
+  getTreeProps(): SlotProps
+  getTreeItemProps(key: Key): SlotProps
+  getIndicatorProps(key: Key): SlotProps
   keyToElementId(key: Key): string
   emit(event: PatternEvent): void
 }
@@ -56,13 +56,13 @@ export function createTreeviewRuntime(input: CreateTreeviewRuntimeInput): Treevi
     onEvent: emit,
   } satisfies CreatePatternRuntimeInput)
 
-  const getTreeProps = (): TreeviewSlotProps => createTreeProps({ runtime, data, options, typeahead, emit })
+  const getTreeProps = (): SlotProps => createTreeProps({ runtime, data, options, typeahead, emit })
 
-  const getTreeItemProps = (key: Key): TreeviewSlotProps => {
+  const getTreeItemProps = (key: Key): SlotProps => {
     return runtime.getPartProps('treeitem', key)
   }
 
-  const getIndicatorProps = (key: Key): TreeviewSlotProps => {
+  const getIndicatorProps = (key: Key): SlotProps => {
     const { role: _role, id: _id, ...props } = runtime.getPartProps('indicator', key)
     return props
   }

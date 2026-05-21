@@ -22,14 +22,14 @@ export function useSourceTabs<T extends SourceTabKey>({ label, tabs, value, onCh
   const keyToTab = new Map(tabEntries.map(({ tab, key }) => [key, tab]))
   const data = createSourceTabsData(label, tabEntries, tabKey(value))
 
-  const runtime = useTabsPattern({
+  const runtime = useTabsPattern(
     data,
-    options: { orientation: 'horizontal', activationMode: 'automatic' },
-    onEvent: (event) => {
+    (event) => {
       if (event.type === 'select') selectTab(event.keys[0], keyToTab, onChange)
       if (event.type === 'navigate') selectTab(resolveSelectedTab(reduceTabsData(data, event), event), keyToTab, onChange)
     },
-  })
+    { orientation: 'horizontal', activationMode: 'automatic' },
+  )
 
   return {
     tabs,

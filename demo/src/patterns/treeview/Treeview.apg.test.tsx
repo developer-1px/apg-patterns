@@ -6,7 +6,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import type { PatternData, PatternEvent } from '../../../../src/react'
-import { Tree } from './Tree'
+import { Treeview } from './Treeview'
 import { entry } from './entry'
 import { initialData, reduceData, resolveTarget } from './treeContract'
 import { navigation } from './treeVariantData'
@@ -14,13 +14,13 @@ import { navigation } from './treeVariantData'
 function TreeDemo() {
   const [data, setData] = useState<PatternData>(initialData as PatternData)
   const handleEvent = (event: PatternEvent) => setData((current) => reduceTreeDemoData(current, event))
-  return <Tree data={data} onEvent={handleEvent} />
+  return <Treeview data={data} onEvent={handleEvent} />
 }
 
 function NavigationTreeDemo() {
   const [data, setData] = useState<PatternData>(navigation as PatternData)
   const handleEvent = (event: PatternEvent) => setData((current) => reduceTreeDemoData(current, event))
-  return <Tree data={data} onEvent={handleEvent} />
+  return <Treeview data={data} onEvent={handleEvent} />
 }
 
 function TreeReducerEdgesDemo() {

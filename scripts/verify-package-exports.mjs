@@ -75,7 +75,7 @@ const reactAdapterExports = [
   'Tabs',
   'Toolbar',
   'Tooltip',
-  'Tree',
+  'Treeview',
   'Treegrid',
   'WindowSplitter',
   'useAccordionPattern',

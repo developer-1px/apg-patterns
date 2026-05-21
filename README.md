@@ -126,7 +126,7 @@ Descriptor-backed preset components are available for patterns that can fully ow
 <Tabs data={data} onEvent={onEvent} />
 <Toolbar data={data} onEvent={onEvent} />
 <Tooltip data={data} onEvent={onEvent} />
-<Tree data={data} onEvent={onEvent} />
+<Treeview data={data} onEvent={onEvent} />
 <Treegrid data={data} onEvent={onEvent} />
 <WindowSplitter data={data} onEvent={onEvent} />
 ```
@@ -163,13 +163,6 @@ useTooltipPattern(data, onEvent, options?)
 useTreeviewPattern(data, onEvent, options?)
 useTreegridPattern(data, onEvent, options?)
 useWindowSplitterPattern(data, onEvent, options?)
-```
-
-`useTreeviewPattern` and `useTabsPattern` also accept their legacy object inputs for compatibility:
-
-```ts
-useTreeviewPattern({ data, onEvent, options })
-useTabsPattern({ data, onEvent, options })
 ```
 
 Pattern hooks return semantic props, state, actions, and stable id helpers. Collection patterns also expose an LLM-oriented render surface:

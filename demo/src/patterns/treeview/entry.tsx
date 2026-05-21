@@ -2,7 +2,7 @@ import { useReducer } from 'react'
 import type { PatternEvent, PatternOptions } from '../../../../src/react'
 import { resolveTarget } from './treeContract'
 import { renderAriaTree, renderHtmlTree } from './inspect'
-import { Tree } from './Tree'
+import { Treeview } from './Treeview'
 import { treeVariantItems, treeVariants, type TreeVariantKey } from './treeVariants'
 import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 import {
@@ -22,7 +22,7 @@ const treeviewDemoDefinition = {
   label: 'Treeview',
   keyboardShortcuts: ['ArrowDown', 'ArrowUp', 'Home', 'End', 'ArrowRight', 'ArrowLeft', 'Enter', 'Space'],
   sources: {
-    main: 'Tree.tsx',
+    main: 'Treeview.tsx',
     entry: 'treeview/entry.tsx',
     data: ['treeVariants.ts'],
     hooks: ['treeview/useTreeviewPattern.ts'],
@@ -69,7 +69,7 @@ const treeviewDemoDefinition = {
   },
   view: {
     kind: 'component',
-    component: 'Tree',
+    component: 'Treeview',
     props: {
       data: '$state.data',
       onEvent: '$actions.dispatchEvent',
@@ -121,7 +121,7 @@ export const entry = defineDemoPattern({
           dispatchEvent: handleTreeEvent,
         },
         components: {
-          Tree,
+          Treeview,
           FollowFocusControl,
           ItemClickActionControl,
           FocusStrategyControl,

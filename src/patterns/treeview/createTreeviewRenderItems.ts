@@ -1,13 +1,13 @@
 import { createParentByKey, resolveVisibleOrder } from '../../kernel/patternKernel'
 import type { Key, PatternData } from '../../schema'
-import type { ReactTreeviewProps, ReactTreeviewRenderItem } from '../../adapters/reactTypes'
-import type { ReactRenderItemState } from '../../adapters/reactBaseTypes'
+import type { ReactPatternProps, ReactRenderItemState } from '../../adapters/reactBaseTypes'
+import type { ReactTreeviewRenderItem } from './reactTypes'
 import type { TreeviewRuntime } from './runtime'
 
 export function createTreeviewRenderItems(
   runtime: TreeviewRuntime,
-  getTreeItemProps: (key: Key) => ReactTreeviewProps,
-  getIndicatorProps: (key: Key) => ReactTreeviewProps,
+  getTreeItemProps: (key: Key) => ReactPatternProps,
+  getIndicatorProps: (key: Key) => ReactPatternProps,
 ): readonly ReactTreeviewRenderItem[] {
   const parentByKey = createParentByKey(runtime.data)
   const visibleKeys = resolveVisibleOrder(runtime.definition.navigation.visibleOrder, runtime.data)

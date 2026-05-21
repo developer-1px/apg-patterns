@@ -40,7 +40,7 @@ server.stderr.on('data', (chunk) => {
 try {
   await waitForServer()
   await verifyServedIndex(origin)
-  await verifyServedIndex(`${origin}/#pattern=treeview&panel=code&source=Tree.tsx`)
+  await verifyServedIndex(`${origin}/#pattern=treeview&panel=code&source=Treeview.tsx`)
   await verifyServedAssets()
   await verifyMissingAsset(`${origin}/assets/__missing-demo-asset__.js`)
   await verifyStaticSubpathServing()
@@ -127,7 +127,7 @@ async function verifyStaticSubpathServing() {
 
   try {
     await verifyStaticSubpathIndex(`${subpathOrigin}${prefix}`)
-    await verifyStaticSubpathIndex(`${subpathOrigin}${prefix}#pattern=treeview&panel=code&source=Tree.tsx`)
+    await verifyStaticSubpathIndex(`${subpathOrigin}${prefix}#pattern=treeview&panel=code&source=Treeview.tsx`)
     await verifyMissingAsset(`${subpathOrigin}${prefix}assets/__missing-demo-asset__.js`)
 
     const indexResponse = await fetch(`${subpathOrigin}${prefix}`)

@@ -52,20 +52,20 @@ export function renderHost(options: HostOptions = {}) {
 function Host({ options = {}, onEmit }: { options?: HostOptions; onEmit?: (event: PatternEvent) => void }) {
   const seed: PatternData = options.initialActiveKey === undefined ? initialData : { ...initialData, state: { ...initialData.state, activeKey: options.initialActiveKey } }
   const [data, dispatch] = useReducer(reduce, seed)
-  const treeRuntime = useTreeviewPattern({
+  const treeRuntime = useTreeviewPattern(
     data,
-    options: {
+    (event) => {
+      onEmit?.(event)
+      dispatch(event)
+    },
+    {
       followFocus: options.followFocus ?? false,
       focusStrategy: options.focusStrategy ?? 'rovingTabIndex',
       itemClickAction: options.itemClickAction ?? 'select',
       indicatorClickAction: 'toggleExpand',
       typeaheadEnabled: options.typeaheadEnabled ?? true,
     },
-    onEvent: (event) => {
-      onEmit?.(event)
-      dispatch(event)
-    },
-  })
+  )
   useLayoutEffect(() => {
     const active = data.state?.activeKey
     if (!active) return

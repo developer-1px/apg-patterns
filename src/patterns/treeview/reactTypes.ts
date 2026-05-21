@@ -1,9 +1,6 @@
-import type { HTMLAttributes } from 'react'
 import type { Key } from '../../schema'
 import type { TreeviewRuntime } from './runtime'
 import type { ReactPatternProps, ReactRenderItemState } from '../../adapters/reactBaseTypes'
-
-export type ReactTreeviewProps = HTMLAttributes<HTMLElement>
 
 export type ReactTreeviewRenderItem =
   | {
@@ -33,14 +30,14 @@ export type ReactTreeviewRenderItem =
 export interface ReactTreeviewRuntime extends Omit<TreeviewRuntime, 'getTreeProps' | 'getTreeItemProps' | 'getIndicatorProps' | 'slotProps' | 'items'> {
   items: readonly (Omit<TreeviewRuntime['items'][number], 'slotProps'> & {
     slotProps: {
-      treeitem: ReactTreeviewProps
-      indicator?: ReactTreeviewProps
+      treeitem: ReactPatternProps
+      indicator?: ReactPatternProps
     }
   })[]
   slotProps: {
-    tree: ReactTreeviewProps
+    tree: ReactPatternProps
   }
-  rootProps: ReactTreeviewProps
+  rootProps: ReactPatternProps
   renderItems: readonly ReactTreeviewRenderItem[]
   state: {
     activeKey: Key | null
@@ -56,7 +53,7 @@ export interface ReactTreeviewRuntime extends Omit<TreeviewRuntime, 'getTreeProp
   ids: {
     forKey(key: Key): string
   }
-  getTreeProps(): ReactTreeviewProps
-  getTreeItemProps(key: string): ReactTreeviewProps
-  getIndicatorProps(key: string): ReactTreeviewProps
+  getTreeProps(): ReactPatternProps
+  getTreeItemProps(key: string): ReactPatternProps
+  getIndicatorProps(key: string): ReactPatternProps
 }

@@ -6,7 +6,7 @@ type TreeItem = PatternItem & {
   href?: string
 }
 
-export function Tree({
+export function Treeview({
   data,
   onEvent,
   options,

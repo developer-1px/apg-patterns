@@ -27,7 +27,7 @@ const surface = [
   pattern('tabs', 'Tabs', 'useTabsPattern', 'tabs'),
   pattern('toolbar', 'Toolbar', 'useToolbarPattern', 'toolbar'),
   pattern('tooltip', 'Tooltip', 'useTooltipPattern', 'tooltip'),
-  pattern('treeview', 'Tree', 'useTreeviewPattern', 'treeview'),
+  pattern('treeview', 'Treeview', 'useTreeviewPattern', 'treeview'),
   pattern('treegrid', 'Treegrid', 'useTreegridPattern', 'treegrid'),
   pattern('windowsplitter', 'WindowSplitter', 'useWindowSplitterPattern', 'windowsplitter'),
 ]

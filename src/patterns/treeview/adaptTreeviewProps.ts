@@ -1,11 +1,11 @@
-import type { TreeviewSlotProps } from './runtime'
-import type { ReactTreeviewProps } from '../../adapters/reactTypes'
+import type { SlotProps } from '../../kernel/patternRuntime'
+import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 
-export function adaptTreeviewProps(props: TreeviewSlotProps): ReactTreeviewProps {
-  return props as ReactTreeviewProps
+export function adaptTreeviewProps(props: SlotProps): ReactPatternProps {
+  return props as ReactPatternProps
 }
 
-export function adaptTreeviewIndicatorProps(props: TreeviewSlotProps): ReactTreeviewProps {
+export function adaptTreeviewIndicatorProps(props: SlotProps): ReactPatternProps {
   const reactProps = adaptTreeviewProps(props)
   const onClick = reactProps.onClick
   return {
@@ -16,5 +16,5 @@ export function adaptTreeviewIndicatorProps(props: TreeviewSlotProps): ReactTree
       event.stopPropagation()
       onClick?.(event)
     },
-  } as ReactTreeviewProps
+  } as ReactPatternProps
 }

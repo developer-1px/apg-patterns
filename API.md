@@ -234,7 +234,6 @@ TreeviewDefinitionSchema
 TreeviewRenderItem
 TreeviewRenderState
 TreeviewRuntime
-TreeviewSlotProps
 unknownTokenError
 VisibleOrderKind
 VisibleOrderKindSchema
@@ -486,7 +485,6 @@ ReactSwitchRuntime
 ReactTableCell
 ReactTableRow
 ReactTableRuntime
-ReactTabsProps
 ReactTabsRuntime
 ReactToolbarRenderItem
 ReactToolbarRuntime
@@ -494,7 +492,6 @@ ReactTooltipRuntime
 ReactTreegridCell
 ReactTreegridRow
 ReactTreegridRuntime
-ReactTreeviewProps
 ReactTreeviewRenderItem
 ReactTreeviewRuntime
 ReactWindowSplitterRuntime
@@ -512,10 +509,10 @@ Toolbar
 ToolbarProps
 Tooltip
 TooltipProps
-Tree
 Treegrid
 TreegridProps
-TreeProps
+Treeview
+TreeviewProps
 useAccordionPattern
 useAlertDialogPattern
 useAlertPattern
@@ -580,8 +577,8 @@ Table
 Tabs
 Toolbar
 Tooltip
-Tree
 Treegrid
+Treeview
 useAccordionPattern
 useAlertDialogPattern
 useAlertPattern

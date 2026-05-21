@@ -13,7 +13,7 @@ const keyByPatternFolder: Readonly<Record<string, string>> = {
   menu: 'menuAndMenubar',
 }
 export const defaultPatternKey: PatternKey = 'treeview'
-export const defaultSourceName: SourceName = 'Tree.tsx'
+export const defaultSourceName: SourceName = 'Treeview.tsx'
 
 const collected = collectPatternEntries(modules)
 validatePatternEntries(collected, { defaultPatternKey })

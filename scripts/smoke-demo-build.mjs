@@ -238,9 +238,9 @@ async function runSmoke() {
   )
 
   await verifyHashRoute('#pattern=missing&panel=missing&source=Missing.tsx', (text) =>
-    window.location.hash === '#pattern=treeview&panel=code&source=Tree.tsx'
+    window.location.hash === '#pattern=treeview&panel=code&source=Treeview.tsx'
     && hasActiveDemoHeading('Treeview')
-    && sourceFilenameIs('Tree.tsx')
+    && sourceFilenameIs('Treeview.tsx')
     && !text.includes('missing source: Missing.tsx'),
     'invalid deep link did not recover to the default demo route',
   )
@@ -619,11 +619,11 @@ async function verifyPatternMenuKeyboardNavigation(patternOptions) {
 }
 
 async function verifyTreeviewInspectControls() {
-  window.location.hash = '#pattern=treeview&panel=state&source=Tree.tsx'
+  window.location.hash = '#pattern=treeview&panel=state&source=Treeview.tsx'
   window.dispatchEvent(new dom.window.HashChangeEvent('hashchange'))
 
   try {
-    await waitForPatternRoute({ pattern: 'treeview', panel: 'state', source: 'Tree.tsx', label: 'Treeview' })
+    await waitForPatternRoute({ pattern: 'treeview', panel: 'state', source: 'Treeview.tsx', label: 'Treeview' })
     const inspectModeSelect = await waitFor(() => {
       const select = Array.from(document.querySelectorAll('select'))
         .find((candidate) => Array.from(candidate.options).some((option) => option.value === 'html'))
