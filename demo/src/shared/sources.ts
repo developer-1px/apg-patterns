@@ -67,16 +67,12 @@ for (const [path, load] of Object.entries(patternModules)) {
   const dir = parts.pop()!
   registerSource(`${dir}/${file}`, path, load)
 }
-// demo *.tsx
 for (const [path, load] of Object.entries(demoTsxModules)) {
   const name = path.split('/').pop()!
-  if (name.endsWith('.test.tsx')) continue
   registerSource(name, path, load)
 }
-// demo *.ts (data files and helpers)
 for (const [path, load] of Object.entries(demoDataModules)) {
   const name = path.split('/').pop()!
-  if (name.endsWith('.test.ts')) continue
   registerSource(name, path, load)
 }
 

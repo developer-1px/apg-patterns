@@ -2,8 +2,6 @@ import type { PatternData, PatternEvent } from '../../../../src/react'
 import { reducePatternData } from '../../../../src/react'
 import { alertDefinition } from '../../../../src/patterns/alert/definition'
 
-// Single-alert demo: one alert key, one dismiss-button key.
-// Visibility is encoded in state.expandedKeys (true iff 'alert' ∈ expandedKeys).
 export const initialAlertData: PatternData = {
   items: {
     alert: { label: 'Status alert', message: '' },
@@ -19,8 +17,6 @@ export const initialAlertData: PatternData = {
   },
 }
 
-// Custom event: 'spawn' (a non-pattern domain event) carries the message text.
-// Pattern reducer handles expand; alertData reducer additionally tracks message text.
 export type AlertSpawnEvent = { type: 'spawn'; key: string; message: string }
 export type AlertDomainEvent = PatternEvent | AlertSpawnEvent
 
