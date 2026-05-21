@@ -1,6 +1,7 @@
 import type { HTMLAttributes } from 'react'
 import { listboxDefinition, reducePatternData, useListboxPattern, type PatternData } from '../../../src/react'
-import { patternItems, type PatternKey } from '../shared/demoPatterns'
+import { patternItems } from '../shared/demoPatterns'
+import type { PatternKey } from '../shared/demoPatternTypes'
 import { cx, ds } from '../shared/designSystem'
 
 type Props = HTMLAttributes<HTMLElement>

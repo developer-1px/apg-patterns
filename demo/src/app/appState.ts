@@ -1,6 +1,7 @@
 import { z } from 'zod'
-import { defaultPatternKey, defaultSourceName, patternItems, type PatternKey } from '../shared/demoPatterns'
+import { defaultPatternKey, defaultSourceName, patternItems } from '../shared/demoPatterns'
 import type { PatternEvent } from '../../../src/react'
+import type { PatternKey } from '../shared/demoPatternTypes'
 
 export const rightModes = ['source', 'inspect', 'log'] as const
 export const rightModeLabels: Record<(typeof rightModes)[number], string> = {

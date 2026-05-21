@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import { PatternMenu } from './PatternMenu'
 import { patternItems } from '../shared/demoPatterns'
-import type { PatternKey } from '../shared/demoPatterns'
+import type { PatternKey } from '../shared/demoPatternTypes'
 
 function PatternMenuDemo() {
   const [value, setValue] = useState<PatternKey>('treeview')

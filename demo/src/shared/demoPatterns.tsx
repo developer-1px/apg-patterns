@@ -2,8 +2,6 @@ import type { PatternEvent } from '../../../src/react'
 import { type DemoPattern, type PatternEntry, type PatternKey } from './demoPatternTypes'
 import type { SourceName } from './sources'
 
-export type { PatternKey } from './demoPatternTypes'
-
 type ValidatedPatternEntry = Pick<PatternEntry, 'key' | 'label'> & { sourcePath?: string }
 type PatternEntryModule = { entry?: PatternEntry }
 
