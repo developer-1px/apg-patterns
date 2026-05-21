@@ -6,8 +6,6 @@ import { VariantRouteProvider } from '../shared/variantRoute'
 import { ds } from '../shared/designSystem'
 import { ActiveDemoRightPanel } from './ActiveDemoRightPanel'
 
-export const scrollPanelClass = `${ds.panel} overflow-auto`
-
 export function ActiveDemoWorkspace({
   state,
   dispatch,
@@ -50,7 +48,7 @@ export function ActiveDemoWorkspace({
 
   return (
     <VariantRouteProvider patternKey={activeDemo.key}>
-      <section className={scrollPanelClass}>
+      <section className={`${ds.panel} overflow-auto`}>
         <header className="mb-4 flex items-center justify-between gap-3">
           <h2 className="min-w-0 truncate text-sm font-semibold text-zinc-950 dark:text-zinc-50">{activeDemo.label}</h2>
           <button

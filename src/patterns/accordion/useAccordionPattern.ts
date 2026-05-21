@@ -6,11 +6,9 @@ import type { ReactAccordionRuntime } from '../../adapters/reactTypes'
 import { createAccordionRenderItem, toReactProps } from './accordionRenderItem'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 
-const DEFAULT_ID_PREFIX = 'accordion-'
-
 export function useAccordionPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactAccordionRuntime {
   const mergedOptions: PatternOptions = { ...options }
-  const keyToElementId = usePatternElementId(mergedOptions, DEFAULT_ID_PREFIX)
+  const keyToElementId = usePatternElementId(mergedOptions, 'accordion-')
   const runtime = createPatternRuntime({
     definition: accordionDefinition,
     data,

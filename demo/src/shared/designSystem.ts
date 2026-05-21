@@ -1,6 +1,5 @@
 export const ds = {
   focusRing: 'outline-none ui-focus:outline ui-focus:outline-2 ui-focus:outline-offset-2 ui-focus:outline-zinc-400 dark:ui-focus:outline-zinc-500',
-  focusRingInset: 'outline-none ui-focus:outline ui-focus:outline-2 ui-focus:outline-offset-[-2px] ui-focus:outline-zinc-400 dark:ui-focus:outline-zinc-500',
   panel: 'min-h-0 rounded-md border border-zinc-200 bg-white p-3 dark:border-white/10 dark:bg-zinc-950',
   field: 'h-8 w-full rounded-md border border-zinc-200 bg-zinc-100/75 px-2.5 text-sm outline-none transition focus:bg-white ui-focus:outline ui-focus:outline-2 ui-focus:outline-offset-2 ui-focus:outline-zinc-400 dark:border-white/10 dark:bg-white/[0.06] dark:focus:bg-white/[0.08] dark:ui-focus:outline-zinc-500',
   codeBlock: 'max-h-[44dvh] min-h-0 overflow-auto rounded-md bg-zinc-950 p-4 pr-12 font-mono text-[11px] leading-5 text-zinc-200 lg:h-full lg:max-h-none',

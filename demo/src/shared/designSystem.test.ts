@@ -11,7 +11,6 @@ const demoSources = import.meta.glob('../**/*.{ts,tsx}', {
 describe('design system interactive states', () => {
   it.each([
     ['focusRing', ['ui-focus:']],
-    ['focusRingInset', ['ui-focus:']],
     ['field', ['focus:', 'ui-focus:']],
     ['iconButton', ['hover:', 'ui-active:', 'ui-focus:', 'ui-disabled:']],
     ['button', ['hover:', 'ui-active:', 'ui-focus:', 'ui-pressed:', 'ui-disabled:']],

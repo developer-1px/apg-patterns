@@ -6,7 +6,6 @@ import { SourceTabs, useSourceTabs } from './SourceTabs'
 import { formatEvent } from './eventLog'
 import { useSourcePreviewState } from './useSourcePreviewState'
 import { rightModeLabels, rightModes, type AppAction, type AppState } from './appState'
-import { scrollPanelClass } from './ActiveDemoWorkspace'
 
 export function ActiveDemoRightPanel({
   activeDemo,
@@ -25,7 +24,7 @@ export function ActiveDemoRightPanel({
   const { canCopySource, copySource, copyState, displayedSource } = useSourcePreviewState(activeSourceName)
 
   return (
-    <section className={`${scrollPanelClass} flex min-h-0 flex-col`}>
+    <section className={`${ds.panel} overflow-auto flex min-h-0 flex-col`}>
       <div {...rightModeTabs.getTablistProps()} className={cx('mb-3 flex items-center gap-1', ds.controlGroup)}>
         {rightModes.map((mode) => (
           <button {...rightModeTabs.getTabProps(mode)} key={mode} type="button" className={cx('inline-flex h-8 items-center', ds.option)}>

@@ -1,4 +1,4 @@
-import { createTabsRuntime, type TabsRuntime } from './runtime'
+import { createTabsRuntime } from './runtime'
 import type { ReactTabsRuntime } from '../../adapters/reactTypes'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { useReactPatternRuntime } from '../../adapters/reactPatternEffects'
@@ -17,10 +17,6 @@ export function useTabsPattern(data: PatternData, onEvent: (event: PatternEvent)
     onEvent,
   })
   const runtime = createTabsRuntime({ data, onEvent, options, runtime: patternRuntime })
-  return adaptTabsRuntime(runtime)
-}
-
-function adaptTabsRuntime(runtime: TabsRuntime): ReactTabsRuntime {
   return {
     ...runtime,
     getTablistProps: () => toReactProps(runtime.getTablistProps()),

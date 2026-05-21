@@ -28,20 +28,19 @@ interface CreateTabsRuntimeInput {
   runtime?: PatternRuntime
 }
 
-const defaultOptions = {
-  orientation: 'horizontal',
-  activationMode: 'automatic',
-} satisfies PatternOptions
-
 export function createTabsRuntime(input: CreateTabsRuntimeInput): TabsRuntime {
   const data = PatternDataSchema.parse(input.data)
-  const options = { ...defaultOptions, ...PatternOptionsSchema.parse(input.options ?? {}) }
+  const options = {
+    orientation: 'horizontal',
+    activationMode: 'automatic',
+    ...PatternOptionsSchema.parse(input.options ?? {}),
+  } satisfies PatternOptions
   const emit = (event: PatternEvent) => input.onEvent(PatternEventSchema.parse(event))
   const runtime = input.runtime ?? createPatternRuntime({
     definition: tabsDefinition,
     data,
     options,
-    keyToElementId: (key) => createTabsElementId(options.elementIdPrefix ?? 'tab-', key),
+    keyToElementId: (key) => createElementId(options.elementIdPrefix ?? 'tab-', key),
     onEvent: emit,
   } satisfies CreatePatternRuntimeInput) as PatternRuntime
 
@@ -62,8 +61,4 @@ export function createTabsRuntime(input: CreateTabsRuntimeInput): TabsRuntime {
     getTabPanelProps: (key) => runtime.getPartProps('tabpanel', key),
     emit: runtime.emit,
   }
-}
-
-function createTabsElementId(prefix: string, key: Key) {
-  return createElementId(prefix, key)
 }

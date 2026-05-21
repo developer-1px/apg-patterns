@@ -4,12 +4,10 @@ import type { ReactGridCell } from './gridCell'
 import type { GridData } from './gridRuntimeState'
 import { useGridPattern } from './useGridPattern'
 
-type GridDataItem = PatternItem
-
 type DivProps = ComponentPropsWithoutRef<'div'>
 type InputProps = ComponentPropsWithoutRef<'input'>
 
-export interface GridProps<TItem extends GridDataItem = GridDataItem> {
+export interface GridProps<TItem extends PatternItem = PatternItem> {
   data: GridData & { items: Record<Key, TItem> }
   onEvent: (event: PatternEvent) => void
   options?: PatternOptions
@@ -17,7 +15,7 @@ export interface GridProps<TItem extends GridDataItem = GridDataItem> {
   renderCell?: (cell: ReactGridCell, dataItem: TItem) => ReactNode
 }
 
-export function Grid<TItem extends GridDataItem = GridDataItem>({ data, onEvent, options, className, renderCell }: GridProps<TItem>) {
+export function Grid<TItem extends PatternItem = PatternItem>({ data, onEvent, options, className, renderCell }: GridProps<TItem>) {
   const grid = useGridPattern(data, onEvent, options)
 
   return createElement(
