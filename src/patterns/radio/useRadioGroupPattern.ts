@@ -1,11 +1,9 @@
+import type { KeyboardEvent } from 'react'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { useReactPatternRuntime } from '../../adapters/reactPatternEffects'
 import { radioGroupDefinition } from './definition'
-import { createRadioGroupActions } from './radioGroupActions'
 import { createRadioRenderItem, type ReactRadioRenderItem } from './radioRenderItem'
-import { createRadioGroupRootProps } from './radioGroupRootProps'
-import { getRadioGroupRuntimeState } from './radioGroupRuntimeState'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 export type { ReactRadioRenderItem } from './radioRenderItem'
 
@@ -39,15 +37,29 @@ export function useRadioGroupPattern(data: PatternData, onEvent: (event: Pattern
   })
 
   return {
-    rootProps: createRadioGroupRootProps(runtime),
+    get rootProps() {
+      const rootProps = reactProps(runtime.getPartProps('radiogroup'))
+      const onKeyDown = runtime.getRootKeyboardHandler()
+      return {
+        ...rootProps,
+        onKeyDown: (event: KeyboardEvent<HTMLElement>) => onKeyDown(reactKeyInput(event)),
+      }
+    },
     get renderItems() {
       return runtime.visibleKeys.map((key) => createRadioRenderItem(runtime, key))
     },
     get state() {
-      return getRadioGroupRuntimeState(runtime.data)
+      return {
+        activeKey: runtime.data.state?.activeKey ?? null,
+        selectedKeys: runtime.data.state?.selectedKeys ?? [],
+        disabledKeys: runtime.data.state?.disabledKeys ?? [],
+      }
     },
     get actions() {
-      return createRadioGroupActions(runtime)
+      return {
+        focus: (key: Key) => runtime.emit({ type: 'focus', key }),
+        select: (key: Key) => runtime.emit({ type: 'select', keys: [key], anchorKey: key, extentKey: key }),
+      }
     },
     get ids() {
       return { forKey: runtime.keyToElementId }

@@ -4,26 +4,20 @@ import { describe, expect, it } from 'vitest'
 import '../kernel/kernelBuiltins'
 import { defineDomEvent, resolvePartEventBindings, withDefaultReason } from '../kernel/domEventBindings'
 import { useAccordionPattern } from '../patterns/accordion/useAccordionPattern'
-import { createAlertActions } from '../patterns/alert/alertActions'
 import { useAlertPattern } from '../patterns/alert/useAlertPattern'
 import { createButtonRootProps } from '../patterns/button/buttonRootProps'
 import { useButtonPattern } from '../patterns/button/useButtonPattern'
-import { createCheckboxActions } from '../patterns/checkbox/checkboxActions'
 import { useCheckboxPattern } from '../patterns/checkbox/useCheckboxPattern'
 import { createGridEditInputProps } from '../patterns/grid/gridEditInputProps'
 import { useLinkPattern } from '../patterns/link/useLinkPattern'
 import { createMenuButtonTriggerProps } from '../patterns/menu/menuButtonTriggerProps'
 import { getMenuButtonRuntimeState } from '../patterns/menu/menuButtonRuntimeState'
-import { createRadioGroupActions } from '../patterns/radio/radioGroupActions'
 import { useRadioGroupPattern } from '../patterns/radio/useRadioGroupPattern'
 import { getSliderRuntimeState, isMultiThumbSlider } from '../patterns/slider/sliderRuntimeState'
-import { createSpinbuttonActions } from '../patterns/spinbutton/spinbuttonActions'
 import { getSpinbuttonRuntimeState } from '../patterns/spinbutton/spinbuttonRuntimeState'
 import { useSpinbuttonPattern } from '../patterns/spinbutton/useSpinbuttonPattern'
-import { createSwitchActions } from '../patterns/switch/switchActions'
 import { useSwitchPattern } from '../patterns/switch/useSwitchPattern'
 import { useTablePattern } from '../patterns/table/useTablePattern'
-import { createToolbarActions } from '../patterns/toolbar/toolbarActions'
 import { useToolbarPattern } from '../patterns/toolbar/useToolbarPattern'
 import type { PatternData, PatternEvent } from '../index'
 
@@ -258,33 +252,6 @@ function HelperHost() {
         type="button"
         onClick={() => {
           const events: PatternEvent[] = []
-          const runtime = { emit: (event: PatternEvent) => events.push(event) }
-          createAlertActions(runtime as never, null).dismiss()
-          createAlertActions(runtime as never, 'alert').dismiss()
-          const spin = createSpinbuttonActions(runtime as never)
-          spin.focus('spin')
-          spin.step('spin', 'increment')
-          const checkbox = createCheckboxActions(runtime as never)
-          checkbox.focus('check')
-          checkbox.check('check', 'mixed')
-          const radio = createRadioGroupActions(runtime as never)
-          radio.focus('radio')
-          radio.select('radio')
-          const switchActions = createSwitchActions(runtime as never)
-          switchActions.focus('switch')
-          switchActions.check('switch', true)
-          const toolbar = createToolbarActions(runtime as never)
-          toolbar.focus('tool')
-          toolbar.select('tool')
-          setResult(events.map((event) => `${event.type}:${'key' in event ? event.key ?? '' : ''}`).join('|'))
-        }}
-      >
-        Run action helpers
-      </button>
-      <button
-        type="button"
-        onClick={() => {
-          const events: PatternEvent[] = []
           const runtime = {
             getPartProps: () => ({ role: 'button', id: 'runtime-button' }),
             emit: (event: PatternEvent) => events.push(event),
@@ -430,9 +397,6 @@ function HelperHost() {
 describe('action and prop helper coverage from pointer input', () => {
   it('covers action, prop, and dom binding helpers through input events', () => {
     render(<HelperHost />)
-
-    fireEvent.click(screen.getByRole('button', { name: 'Run action helpers' }))
-    expect(screen.getByText('dismiss:alert|focus:spin|focus:spin|valueStep:spin|focus:check|check:check|focus:radio|select:|focus:switch|check:switch|focus:tool|select:')).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Run button props' }))
     expect(screen.getByText('0|focus|activate')).toBeTruthy()

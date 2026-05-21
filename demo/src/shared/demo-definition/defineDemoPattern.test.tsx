@@ -272,7 +272,6 @@ describe('defineDemoPattern', () => {
 
     const demo = entry.useDemoPattern(() => undefined)
 
-    expect(demo.sourceNames).toContain('button/buttonActions.ts')
     expect(demo.sourceNames).toContain('button/keyboard.ts')
     expect(demo.sourceNames.filter((sourceName) => sourceName === 'button/useButtonPattern.ts')).toHaveLength(1)
   })

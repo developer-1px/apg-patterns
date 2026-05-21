@@ -25,7 +25,6 @@ import {
 	  type Predicate,
 		} from '../index'
 import { predicateRegistry } from '../kernel/kernelRegistries'
-import { isDialogOpen, labelDialogItem } from '../patterns/dialog/dialogRuntimeKeys'
 import { treegridDefinition } from '../patterns/treegrid/definition'
 import { createTreeviewRenderItems } from '../patterns/treeview/createTreeviewRenderItems'
 import { treeviewDefinition } from '../patterns/treeview/definition'
@@ -641,17 +640,6 @@ function KernelResolverHost() {
         type="button"
         onClick={() => {
           setResult([
-            String(isDialogOpen({ items: {}, state: {} })),
-            String(labelDialogItem({ items: {}, state: {} }, 'fallback')),
-          ].join('|'))
-        }}
-      >
-        Resolve dialog runtime keys
-      </button>
-      <button
-        type="button"
-        onClick={() => {
-          setResult([
             isRegisteredAriaSource('state.activeKey.elementId'),
             isRegisteredStateProjection('state.activeKey'),
             isRegisteredPredicate('isChecked'),
@@ -743,9 +731,6 @@ describe('kernel resolver coverage from pointer input', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Resolve grid navigation edges' }))
     expect(screen.getByText('|null|Unsupported grid action: sideways|Unsupported grid page action: sideways')).toBeTruthy()
-
-    fireEvent.click(screen.getByRole('button', { name: 'Resolve dialog runtime keys' }))
-    expect(screen.getByText('false|fallback')).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Check registry status' }))
     expect(screen.getByText('true|true|true|true|true')).toBeTruthy()

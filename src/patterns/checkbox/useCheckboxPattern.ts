@@ -1,9 +1,7 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
-import { createCheckboxActions } from './checkboxActions'
 import { createCheckboxRenderItem, type ReactCheckboxRenderItem } from './checkboxRenderItem'
-import { getCheckboxRuntimeState } from './checkboxRuntimeState'
 import { checkboxDefinition } from './definition'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 export type { ReactCheckboxRenderItem } from './checkboxRenderItem'
@@ -42,10 +40,17 @@ export function useCheckboxPattern(data: PatternData, onEvent: (event: PatternEv
       return runtime.visibleKeys.map((key) => createCheckboxRenderItem(runtime, key))
     },
     get state() {
-      return getCheckboxRuntimeState(runtime.data)
+      return {
+        activeKey: runtime.data.state?.activeKey ?? null,
+        checkedByKey: runtime.data.state?.checkedByKey ?? {},
+        disabledKeys: runtime.data.state?.disabledKeys ?? [],
+      }
     },
     get actions() {
-      return createCheckboxActions(runtime)
+      return {
+        focus: (key: Key) => runtime.emit({ type: 'focus', key }),
+        check: (key: Key, checked: boolean | 'mixed') => runtime.emit({ type: 'check', key, checked }),
+      }
     },
     get ids() {
       return { forKey: runtime.keyToElementId }

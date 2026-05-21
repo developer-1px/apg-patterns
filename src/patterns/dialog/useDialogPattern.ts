@@ -4,7 +4,6 @@ import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schem
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { dialogDefinition } from './definition'
 import { createDialogProps } from './dialogProps'
-import { isDialogOpen, labelDialogItem } from './dialogRuntimeKeys'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 
 export interface ReactDialogRuntime {
@@ -31,7 +30,7 @@ export function useDialogPattern(data: PatternData, onEvent: (event: PatternEven
   usePatternEffects({ definition: dialogDefinition, data: runtime.data, keyToElementId })
 
   return {
-    open: isDialogOpen(data),
+    open: data.state?.expandedKeys?.includes('trigger') ?? false,
     get triggerProps() {
       return reactProps(runtime.getPartProps('trigger', 'trigger'))
     },
@@ -53,7 +52,7 @@ export function useDialogPattern(data: PatternData, onEvent: (event: PatternEven
     get submitProps() {
       return reactProps(runtime.getPartProps('submit', 'submit'))
     },
-    labelOf: (key) => labelDialogItem(data, key),
+    labelOf: (key) => data.items[key]?.label ?? key,
     get ids() {
       return { forKey: keyToElementId }
     },

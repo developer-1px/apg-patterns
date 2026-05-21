@@ -1,9 +1,7 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
-import { createButtonActions } from './buttonActions'
 import { createButtonRootProps } from './buttonRootProps'
-import { getButtonRuntimeState } from './buttonRuntimeState'
 import { buttonDefinition } from './definition'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 
@@ -45,10 +43,25 @@ export function useButtonPattern(data: PatternData, onEvent: (event: PatternEven
     key,
     label: key ? data.items[key]?.label ?? '' : '',
     get state() {
-      return getButtonRuntimeState(data, key)
+      const pressed = key ? data.state?.pressedByKey?.[key] : undefined
+      return {
+        activeKey: data.state?.activeKey ?? null,
+        pressed: pressed === undefined ? null : Boolean(pressed),
+        disabled: key ? data.state?.disabledKeys?.includes(key) ?? false : false,
+      }
     },
     get actions() {
-      return createButtonActions(runtime, key)
+      return {
+        focus: () => {
+          if (key) runtime.emit({ type: 'focus', key })
+        },
+        press: (pressed: boolean) => {
+          if (key) runtime.emit({ type: 'press', key, pressed })
+        },
+        activate: () => {
+          if (key) runtime.emit({ type: 'activate', key })
+        },
+      }
     },
     get ids() {
       return { forKey: runtime.keyToElementId }

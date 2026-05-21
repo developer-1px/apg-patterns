@@ -1,11 +1,9 @@
+import type { KeyboardEvent } from 'react'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { useReactPatternRuntime } from '../../adapters/reactPatternEffects'
 import { toolbarDefinition } from './definition'
-import { createToolbarActions } from './toolbarActions'
 import { createToolbarRenderItem, type ReactToolbarRenderItem } from './toolbarRenderItem'
-import { createToolbarRootProps } from './toolbarRootProps'
-import { getToolbarRuntimeState } from './toolbarRuntimeState'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 export type { ReactToolbarRenderItem } from './toolbarRenderItem'
 
@@ -39,15 +37,29 @@ export function useToolbarPattern(data: PatternData, onEvent: (event: PatternEve
   })
 
   return {
-    rootProps: createToolbarRootProps(runtime),
+    get rootProps() {
+      const rootProps = reactProps(runtime.getPartProps('toolbar'))
+      const onKeyDown = runtime.getRootKeyboardHandler()
+      return {
+        ...rootProps,
+        onKeyDown: (event: KeyboardEvent<HTMLElement>) => onKeyDown(reactKeyInput(event)),
+      }
+    },
     get renderItems() {
       return runtime.visibleKeys.map((key) => createToolbarRenderItem(runtime, key))
     },
     get state() {
-      return getToolbarRuntimeState(runtime.data)
+      return {
+        activeKey: runtime.data.state?.activeKey ?? null,
+        selectedKeys: runtime.data.state?.selectedKeys ?? [],
+        disabledKeys: runtime.data.state?.disabledKeys ?? [],
+      }
     },
     get actions() {
-      return createToolbarActions(runtime)
+      return {
+        focus: (key: Key) => runtime.emit({ type: 'focus', key }),
+        select: (key: Key) => runtime.emit({ type: 'select', keys: [key], anchorKey: key, extentKey: key }),
+      }
     },
     get ids() {
       return { forKey: runtime.keyToElementId }
