@@ -17,9 +17,7 @@ export function useSourcePreviewState(activeSourceName: SourceName) {
   }))
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle')
   const copyRequestId = useRef(0)
-  const source = sourcePreview.text
-  const sourceLoadedForActiveTab = sourcePreview.name === activeSourceName
-  const displayedSource = sourceLoadedForActiveTab ? source : pendingSourceText
+  const displayedSource = sourcePreview.name === activeSourceName ? sourcePreview.text : pendingSourceText
   const canCopySource = isCopyableSource(displayedSource)
 
   useEffect(() => {
