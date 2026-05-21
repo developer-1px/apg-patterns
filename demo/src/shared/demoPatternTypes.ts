@@ -23,6 +23,14 @@ export function variantItemsFrom<Variant extends string>(
   return (Object.keys(variants) as Variant[]).map((key) => ({ key, label: variants[key].label }))
 }
 
+export function valueStepDelta(direction: unknown, step: number, large: number): number {
+  if (direction === 'increment') return step
+  if (direction === 'decrement') return -step
+  if (direction === 'incrementLarge') return large
+  if (direction === 'decrementLarge') return -large
+  return 0
+}
+
 const KERNEL_SIDE_EFFECT_SOURCES = [
   'kernel/kernelAriaSources.ts',
   'kernel/kernelBuiltins.ts',

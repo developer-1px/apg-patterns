@@ -1,4 +1,5 @@
 import { PatternDataSchema, type PatternData, type PatternEvent, type PatternItem, type PatternOptions, type PatternState } from '../../../../src/react'
+import { valueStepDelta } from '../../shared/demoPatternTypes'
 
 interface WindowSplitterDemoState extends PatternState {
   previousValueByKey?: Record<string, number>
@@ -27,14 +28,6 @@ export const windowSplitterOptions: PatternOptions = {
   max: 100,
   step: 1,
   orientation: 'horizontal',
-}
-
-const computeDelta = (direction: unknown, step: number, large: number): number => {
-  if (direction === 'increment') return step
-  if (direction === 'decrement') return -step
-  if (direction === 'incrementLarge') return large
-  if (direction === 'decrementLarge') return -large
-  return 0
 }
 
 export function reduceWindowSplitterData(
@@ -77,7 +70,7 @@ export function reduceWindowSplitterData(
   let nextValue: number
   if (event.direction === 'min') nextValue = min
   else if (event.direction === 'max') nextValue = max
-  else nextValue = current + computeDelta(event.direction, step, large)
+  else nextValue = current + valueStepDelta(event.direction, step, large)
   const clamped = Math.min(max, Math.max(min, nextValue))
   if (clamped === current) return { ...data, state: { ...data.state, activeKey: key } }
   return {

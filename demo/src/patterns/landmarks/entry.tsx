@@ -1,7 +1,4 @@
-import type { PatternEvent } from '../../../../src/react'
-import { useVariantPatternDataHost } from '../../shared/demoHostState'
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
-import { renderDataInspect } from '../../shared/inspect/genericInspect'
+import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 import { Landmarks } from './Landmarks'
 import {
   buildLandmarkData,
@@ -45,35 +42,13 @@ const landmarksDemoDefinition = {
   },
 } as const satisfies DemoPatternDefinition
 
-export const entry = defineDemoPattern({
+export const entry = defineVariantDemoPattern<LandmarkVariantKey>({
   definition: landmarksDemoDefinition,
-  useRuntime: (onEvent) => {
-    const host = useVariantPatternDataHost<LandmarkVariantKey>(
-      initialLandmarkVariant,
-      buildLandmarkData(initialLandmarkVariant, landmarkVariants[initialLandmarkVariant]),
-      (variant) => buildLandmarkData(variant, landmarkVariants[variant]),
-      (_variant, data) => data,
-    )
-
-    return {
-      inspect: renderDataInspect(host.data),
-      context: {
-        values: {
-          state: {
-            variant: host.variant,
-            data: host.data,
-          },
-          model: { variantItems: landmarkVariantItems },
-        },
-        actions: {
-          selectVariant: host.selectVariant,
-          dispatchEvent: (event: PatternEvent) => {
-            onEvent(event)
-            host.dispatchEvent(event)
-          },
-        },
-        components: { Landmarks },
-      },
-    }
-  },
+  initialVariant: initialLandmarkVariant,
+  initialData: buildLandmarkData(initialLandmarkVariant, landmarkVariants[initialLandmarkVariant]),
+  dataByVariant: (variant) => buildLandmarkData(variant, landmarkVariants[variant]),
+  reduce: (_variant, data) => data,
+  variantItems: landmarkVariantItems,
+  componentName: 'Landmarks',
+  component: Landmarks,
 })

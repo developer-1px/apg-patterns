@@ -1,5 +1,5 @@
 import { PatternDataSchema, type Key, type PatternData, type PatternEvent, type PatternItem, type PatternOptions } from '../../../../src/react'
-import { variantItemsFrom } from '../../shared/demoPatternTypes'
+import { valueStepDelta, variantItemsFrom } from '../../shared/demoPatternTypes'
 
 interface SpinbuttonDemoItem extends PatternItem {
   valuemin?: number
@@ -55,14 +55,6 @@ export const spinbuttonVariants: Record<SpinbuttonVariantKey, SpinbuttonVariant>
 
 export const spinbuttonVariantItems = variantItemsFrom(spinbuttonVariants)
 
-const computeDelta = (direction: unknown, step: number, large: number): number => {
-  if (direction === 'increment') return step
-  if (direction === 'decrement') return -step
-  if (direction === 'incrementLarge') return large
-  if (direction === 'decrementLarge') return -large
-  return 0
-}
-
 export function reduceSpinbuttonData(
   data: SpinbuttonDemoData,
   event: PatternEvent,
@@ -86,7 +78,7 @@ export function reduceSpinbuttonData(
   if (event.type === 'value') nextValue = typeof event.value === 'number' ? event.value : current
   else if (event.direction === 'min') nextValue = min
   else if (event.direction === 'max') nextValue = max
-  else nextValue = current + computeDelta(event.direction, step, large)
+  else nextValue = current + valueStepDelta(event.direction, step, large)
 
   const clamped = Math.min(max, Math.max(min, Math.round(nextValue / step) * step))
   if (clamped === current) return { ...data, state: { ...data.state, activeKey: key } }

@@ -1,9 +1,6 @@
-import type { PatternEvent } from '../../../../src/react'
-import { useVariantPatternDataHost } from '../../shared/demoHostState'
-import { renderDataInspect } from '../../shared/inspect/genericInspect'
 import { Tabs } from './Tabs'
 import { closeTabInData, initialTabsVariant, reduceTabsDemoData, tabsVariantItems, tabsVariants, type TabsVariantKey } from './tabsData'
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
+import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const tabsDemoDefinition = {
   key: 'tabs',
@@ -36,34 +33,16 @@ const tabsDemoDefinition = {
   },
 } as const satisfies DemoPatternDefinition
 
-export const entry = defineDemoPattern({
+export const entry = defineVariantDemoPattern<TabsVariantKey>({
   definition: tabsDemoDefinition,
-  useRuntime: (onEvent) => {
-    const host = useVariantPatternDataHost<TabsVariantKey>(
-      initialTabsVariant,
-      tabsVariants[initialTabsVariant].data,
-      (variant) => tabsVariants[variant].data,
-      (variant, data, event) => event.type === 'close'
-        ? closeTabInData(data, event.key)
-        : reduceTabsDemoData(data, event, tabsVariants[variant].options),
-    )
-    const handleEvent = (event: PatternEvent) => {
-      onEvent(event)
-      host.dispatchEvent(event)
-    }
-    return {
-      inspect: renderDataInspect(host.data),
-      context: {
-        values: {
-          state: { variant: host.variant, data: host.data, options: tabsVariants[host.variant].options },
-          model: { variantItems: tabsVariantItems },
-        },
-        actions: {
-          selectVariant: host.selectVariant,
-          dispatchEvent: handleEvent,
-        },
-        components: { Tabs },
-      },
-    }
-  },
+  initialVariant: initialTabsVariant,
+  initialData: tabsVariants[initialTabsVariant].data,
+  dataByVariant: (variant) => tabsVariants[variant].data,
+  reduce: (variant, data, event) => event.type === 'close'
+    ? closeTabInData(data, event.key)
+    : reduceTabsDemoData(data, event, tabsVariants[variant].options),
+  variantItems: tabsVariantItems,
+  componentName: 'Tabs',
+  component: Tabs,
+  getStateValues: (variant) => ({ options: tabsVariants[variant].options }),
 })

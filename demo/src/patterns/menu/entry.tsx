@@ -1,10 +1,7 @@
 import { menubarDefinition, menuButtonDefinition, reducePatternData } from '../../../../src/react'
-import { useVariantPatternDataHost } from '../../shared/demoHostState'
-import { renderDataInspect } from '../../shared/inspect/genericInspect'
 import { Menu } from './Menu'
 import { menuVariantItems, menuVariants, type MenuVariantKey } from './menuData'
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
-import type { PatternEvent } from '../../../../src/react'
+import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const menuDemoDefinition = {
   key: 'menu',
@@ -37,35 +34,18 @@ const menuDemoDefinition = {
   },
 } as const satisfies DemoPatternDefinition
 
-export const entry = defineDemoPattern({
+export const entry = defineVariantDemoPattern<MenuVariantKey>({
   definition: menuDemoDefinition,
-  useRuntime: (onEvent) => {
-    const host = useVariantPatternDataHost<MenuVariantKey>(
-      'editorMenubar',
-      menuVariants.editorMenubar.data,
-      (variant) => menuVariants[variant].data,
-      (variant, data, event) => reducePatternData(menuVariants[variant].apgPattern === 'menubar' ? menubarDefinition : menuButtonDefinition, data, event),
-    )
-    const apgPattern = menuVariants[host.variant].apgPattern
-    const focusStrategy = menuVariants[host.variant].focusStrategy
-    const data = { ...host.data, state: { ...host.data.state, apgPattern, focusStrategy } }
-    return {
-      inspect: renderDataInspect(host.data),
-      context: {
-        values: {
-          state: { variant: host.variant, data },
-          model: { variantItems: menuVariantItems },
-        },
-        actions: {
-          selectVariant: host.selectVariant,
-          dispatchEvent: (event: PatternEvent) => {
-            onEvent(event)
-            host.dispatchEvent(event)
-          },
-        },
-        components: { MenuPreview },
-      },
-    }
+  initialVariant: 'editorMenubar',
+  initialData: menuVariants.editorMenubar.data,
+  dataByVariant: (variant) => menuVariants[variant].data,
+  reduce: (variant, data, event) => reducePatternData(menuVariants[variant].apgPattern === 'menubar' ? menubarDefinition : menuButtonDefinition, data, event),
+  variantItems: menuVariantItems,
+  componentName: 'MenuPreview',
+  component: MenuPreview,
+  getStateValues: (variant, data) => {
+    const { apgPattern, focusStrategy } = menuVariants[variant]
+    return { data: { ...data, state: { ...data.state, apgPattern, focusStrategy } } }
   },
 })
 

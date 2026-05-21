@@ -1,19 +1,5 @@
 import { useReducer } from 'react'
-import { z } from 'zod'
 import { PatternDataSchema, type PatternData, type PatternEvent } from '../../../src/react'
-
-const DemoPatternHostStateSchema = z
-  .object({
-    variant: z.string().optional(),
-    data: PatternDataSchema,
-  })
-  .strict()
-
-type DemoPatternHostState = z.infer<typeof DemoPatternHostStateSchema>
-
-type HostAction =
-  | { type: 'event'; event: PatternEvent }
-  | { type: 'selectVariant'; variant: string; data: PatternData }
 
 type VariantHostAction<Variant extends string> =
   | { type: 'event'; event: PatternEvent }
@@ -28,14 +14,13 @@ export function usePatternDataHost(
   initialData: PatternData,
   reduce: (data: PatternData, event: PatternEvent) => PatternData,
 ) {
-  const [state, dispatch] = useReducer((current: DemoPatternHostState, action: HostAction): DemoPatternHostState => {
-    if (action.type === 'selectVariant') return DemoPatternHostStateSchema.parse({ variant: action.variant, data: action.data })
-    return DemoPatternHostStateSchema.parse({ ...current, data: reduce(current.data, action.event) })
-  }, DemoPatternHostStateSchema.parse({ data: initialData }))
+  const [data, dispatchEvent] = useReducer((current: PatternData, event: PatternEvent): PatternData => {
+    return PatternDataSchema.parse(reduce(current, event))
+  }, PatternDataSchema.parse(initialData))
 
   return {
-    data: state.data,
-    dispatchEvent: (event: PatternEvent) => dispatch({ type: 'event', event }),
+    data,
+    dispatchEvent,
   }
 }
 

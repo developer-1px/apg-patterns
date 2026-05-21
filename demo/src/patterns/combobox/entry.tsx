@@ -1,9 +1,6 @@
-import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { Combobox } from './Combobox'
 import { buildComboboxData, comboboxVariantItems, reduceComboboxData, type ComboboxVariantKey } from './comboboxData'
-import { renderDataInspect } from '../../shared/inspect/genericInspect'
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
-import type { PatternEvent } from '../../../../src/react'
+import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const comboboxDemoDefinition = {
   key: 'combobox',
@@ -35,31 +32,13 @@ const comboboxDemoDefinition = {
   },
 } as const satisfies DemoPatternDefinition
 
-export const entry = defineDemoPattern({
+export const entry = defineVariantDemoPattern<ComboboxVariantKey>({
   definition: comboboxDemoDefinition,
-  useRuntime: (onEvent) => {
-    const host = useVariantPatternDataHost<ComboboxVariantKey>(
-      'listAutocomplete',
-      buildComboboxData(undefined, 'listAutocomplete'),
-      (variant) => buildComboboxData(undefined, variant),
-      (_variant, data, event) => reduceComboboxData(data, event),
-    )
-    return {
-      inspect: renderDataInspect(host.data),
-      context: {
-        values: {
-          state: { variant: host.variant, data: host.data },
-          model: { variantItems: comboboxVariantItems },
-        },
-        actions: {
-          selectVariant: host.selectVariant,
-          dispatchEvent: (event: PatternEvent) => {
-            onEvent(event)
-            host.dispatchEvent(event)
-          },
-        },
-        components: { Combobox },
-      },
-    }
-  },
+  initialVariant: 'listAutocomplete',
+  initialData: buildComboboxData(undefined, 'listAutocomplete'),
+  dataByVariant: (variant) => buildComboboxData(undefined, variant),
+  reduce: (_variant, data, event) => reduceComboboxData(data, event),
+  variantItems: comboboxVariantItems,
+  componentName: 'Combobox',
+  component: Combobox,
 })

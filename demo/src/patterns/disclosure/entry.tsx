@@ -1,5 +1,4 @@
-import { disclosureDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
-import { useVariantPatternDataHost } from '../../shared/demoHostState'
+import { disclosureDefinition, reducePatternData, type PatternData } from '../../../../src/react'
 import { variantItemsFrom } from '../../shared/demoPatternTypes'
 import { Disclosure } from './Disclosure'
 import {
@@ -10,8 +9,7 @@ import {
   initialNavMenuTopLinksDisclosureData,
   type DisclosureVariantKey,
 } from './disclosureData'
-import { renderDataInspect } from '../../shared/inspect/genericInspect'
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
+import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const variants: Record<DisclosureVariantKey, { label: string; data: PatternData }> = {
   simple: { label: 'simple', data: initialDisclosureData },
@@ -53,31 +51,13 @@ const disclosureDemoDefinition = {
   },
 } as const satisfies DemoPatternDefinition
 
-export const entry = defineDemoPattern({
+export const entry = defineVariantDemoPattern<DisclosureVariantKey>({
   definition: disclosureDemoDefinition,
-  useRuntime: (onEvent) => {
-    const host = useVariantPatternDataHost<DisclosureVariantKey>(
-      'simple',
-      initialDisclosureData,
-      (variant) => variants[variant].data,
-      (_variant, data, event) => reducePatternData(disclosureDefinition, data, event),
-    )
-    return {
-      inspect: renderDataInspect(host.data),
-      context: {
-        values: {
-          state: { variant: host.variant, data: host.data },
-          model: { variantItems: disclosureVariantItems },
-        },
-        actions: {
-          selectVariant: host.selectVariant,
-          dispatchEvent: (event: PatternEvent) => {
-            onEvent(event)
-            host.dispatchEvent(event)
-          },
-        },
-        components: { Disclosure },
-      },
-    }
-  },
+  initialVariant: 'simple',
+  initialData: initialDisclosureData,
+  dataByVariant: (variant) => variants[variant].data,
+  reduce: (_variant, data, event) => reducePatternData(disclosureDefinition, data, event),
+  variantItems: disclosureVariantItems,
+  componentName: 'Disclosure',
+  component: Disclosure,
 })

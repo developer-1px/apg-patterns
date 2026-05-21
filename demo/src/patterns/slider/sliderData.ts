@@ -1,5 +1,5 @@
 import { PatternDataSchema, type Key, type PatternData, type PatternEvent, type PatternItem, type PatternOptions } from '../../../../src/react'
-import { variantItemsFrom } from '../../shared/demoPatternTypes'
+import { valueStepDelta, variantItemsFrom } from '../../shared/demoPatternTypes'
 
 export type SliderVariantKey = 'color' | 'temperature' | 'rating' | 'seek' | 'range'
 
@@ -114,14 +114,6 @@ export const sliderVariants: Record<SliderVariantKey, SliderVariant> = {
 
 export const sliderVariantItems = variantItemsFrom(sliderVariants)
 
-const computeDelta = (direction: unknown, step: number, large: number): number => {
-  if (direction === 'increment') return step
-  if (direction === 'decrement') return -step
-  if (direction === 'incrementLarge') return large
-  if (direction === 'decrementLarge') return -large
-  return 0
-}
-
 const valuetextFor = (data: SliderDemoData, key: Key, next: number): string | undefined => {
   const item = data.items[key]
   if (!item?.valuetext) return undefined
@@ -154,7 +146,7 @@ export function reduceSliderData(
   if (event.type === 'value') nextValue = typeof event.value === 'number' ? event.value : current
   else if (event.direction === 'min') nextValue = min
   else if (event.direction === 'max') nextValue = max
-  else nextValue = current + computeDelta(event.direction, step, large)
+  else nextValue = current + valueStepDelta(event.direction, step, large)
 
   const clamped = Math.min(max, Math.max(min, Math.round(nextValue / step) * step))
   if (clamped === current) return { ...data, state: { ...data.state, activeKey: key } }

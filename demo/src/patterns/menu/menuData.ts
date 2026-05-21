@@ -1,5 +1,4 @@
-import { PatternDataSchema } from '../../../../src/react'
-import type { PatternData } from '../../../../src/react'
+import { PatternDataSchema, type PatternData } from '../../../../src/react'
 import { variantItemsFrom } from '../../shared/demoPatternTypes'
 
 export type MenuVariantKey =

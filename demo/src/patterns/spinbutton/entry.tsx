@@ -1,9 +1,6 @@
-import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { Spinbutton } from './Spinbutton'
 import { reduceSpinbuttonData, spinbuttonVariantItems, spinbuttonVariants, type SpinbuttonVariantKey } from './spinbuttonData'
-import { renderDataInspect } from '../../shared/inspect/genericInspect'
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
-import type { PatternEvent } from '../../../../src/react'
+import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const spinbuttonDemoDefinition = {
   key: 'spinbutton',
@@ -36,31 +33,14 @@ const spinbuttonDemoDefinition = {
   },
 } as const satisfies DemoPatternDefinition
 
-export const entry = defineDemoPattern({
+export const entry = defineVariantDemoPattern<SpinbuttonVariantKey>({
   definition: spinbuttonDemoDefinition,
-  useRuntime: (onEvent) => {
-    const host = useVariantPatternDataHost<SpinbuttonVariantKey>(
-      'numeric',
-      spinbuttonVariants.numeric.data,
-      (variant) => spinbuttonVariants[variant].data,
-      (variant, data, event) => reduceSpinbuttonData(data, event, spinbuttonVariants[variant].options),
-    )
-    return {
-      inspect: renderDataInspect(host.data),
-      context: {
-        values: {
-          state: { variant: host.variant, data: host.data, options: spinbuttonVariants[host.variant].options },
-          model: { variantItems: spinbuttonVariantItems },
-        },
-        actions: {
-          selectVariant: host.selectVariant,
-          dispatchEvent: (event: PatternEvent) => {
-            onEvent(event)
-            host.dispatchEvent(event)
-          },
-        },
-        components: { Spinbutton },
-      },
-    }
-  },
+  initialVariant: 'numeric',
+  initialData: spinbuttonVariants.numeric.data,
+  dataByVariant: (variant) => spinbuttonVariants[variant].data,
+  reduce: (variant, data, event) => reduceSpinbuttonData(data, event, spinbuttonVariants[variant].options),
+  variantItems: spinbuttonVariantItems,
+  componentName: 'Spinbutton',
+  component: Spinbutton,
+  getStateValues: (variant) => ({ options: spinbuttonVariants[variant].options }),
 })

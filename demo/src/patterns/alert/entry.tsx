@@ -5,11 +5,8 @@ import { type AlertDomainEvent, initialAlertData, reduceAlertState } from './ale
 import { renderDataInspect } from '../../shared/inspect/genericInspect'
 import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
-type AlertDemoAction =
-  | { type: 'event'; event: AlertDomainEvent }
-
-const reduceAlertDemoState = (data: typeof initialAlertData, action: AlertDemoAction) => {
-  return PatternDataSchema.parse(reduceAlertState({ data }, action.event).data)
+const reduceAlertDemoData = (data: typeof initialAlertData, event: AlertDomainEvent) => {
+  return PatternDataSchema.parse(reduceAlertState({ data }, event).data)
 }
 
 const alertDemoDefinition = {
@@ -36,7 +33,7 @@ const alertDemoDefinition = {
 export const entry = defineDemoPattern({
   definition: alertDemoDefinition,
   useRuntime: (onEvent) => {
-    const [data, dispatch] = useReducer(reduceAlertDemoState, PatternDataSchema.parse(initialAlertData))
+    const [data, dispatch] = useReducer(reduceAlertDemoData, PatternDataSchema.parse(initialAlertData))
     return {
       inspect: renderDataInspect(data),
       context: {
@@ -44,7 +41,7 @@ export const entry = defineDemoPattern({
         actions: {
           dispatchEvent: (event: AlertDomainEvent) => {
             if (event.type !== 'spawn') onEvent(event)
-            dispatch({ type: 'event', event })
+            dispatch(event)
           },
         },
         components: { Alert },

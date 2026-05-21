@@ -1,9 +1,7 @@
 import { gridDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
-import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { Grid } from './Grid'
 import { gridVariantItems, gridVariants, type GridVariantKey } from './gridData'
-import { renderDataInspect } from '../../shared/inspect/genericInspect'
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
+import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const reduceGridDemoData = (data: PatternData, event: PatternEvent): PatternData => {
   if (event.type === 'sort') {
@@ -41,31 +39,13 @@ const gridDemoDefinition = {
   },
 } as const satisfies DemoPatternDefinition
 
-export const entry = defineDemoPattern({
+export const entry = defineVariantDemoPattern<GridVariantKey>({
   definition: gridDemoDefinition,
-  useRuntime: (onEvent) => {
-    const host = useVariantPatternDataHost<GridVariantKey>(
-      'dataTransactions',
-      gridVariants.dataTransactions.data,
-      (variant) => gridVariants[variant].data,
-      (_variant, data, event) => reduceGridDemoData(data, event),
-    )
-    return {
-      inspect: renderDataInspect(host.data),
-      context: {
-        values: {
-          state: { variant: host.variant, data: host.data },
-          model: { variantItems: gridVariantItems },
-        },
-        actions: {
-          selectVariant: host.selectVariant,
-          dispatchEvent: (event: PatternEvent) => {
-            onEvent(event)
-            host.dispatchEvent(event)
-          },
-        },
-        components: { Grid },
-      },
-    }
-  },
+  initialVariant: 'dataTransactions',
+  initialData: gridVariants.dataTransactions.data,
+  dataByVariant: (variant) => gridVariants[variant].data,
+  reduce: (_variant, data, event) => reduceGridDemoData(data, event),
+  variantItems: gridVariantItems,
+  componentName: 'Grid',
+  component: Grid,
 })

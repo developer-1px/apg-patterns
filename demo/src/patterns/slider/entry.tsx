@@ -1,9 +1,6 @@
-import { useVariantPatternDataHost } from '../../shared/demoHostState'
-import { renderDataInspect } from '../../shared/inspect/genericInspect'
 import { Slider } from './Slider'
 import { reduceSliderData, sliderVariantItems, sliderVariants, type SliderVariantKey } from './sliderData'
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
-import type { PatternEvent } from '../../../../src/react'
+import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const sliderDemoDefinition = {
   key: 'slider',
@@ -36,31 +33,14 @@ const sliderDemoDefinition = {
   },
 } as const satisfies DemoPatternDefinition
 
-export const entry = defineDemoPattern({
+export const entry = defineVariantDemoPattern<SliderVariantKey>({
   definition: sliderDemoDefinition,
-  useRuntime: (onEvent) => {
-    const host = useVariantPatternDataHost<SliderVariantKey>(
-      'color',
-      sliderVariants.color.data,
-      (variant) => sliderVariants[variant].data,
-      (variant, data, event) => reduceSliderData(data, event, sliderVariants[variant].options),
-    )
-    return {
-      inspect: renderDataInspect(host.data),
-      context: {
-        values: {
-          state: { variant: host.variant, data: host.data, options: sliderVariants[host.variant].options },
-          model: { variantItems: sliderVariantItems },
-        },
-        actions: {
-          selectVariant: host.selectVariant,
-          dispatchEvent: (event: PatternEvent) => {
-            onEvent(event)
-            host.dispatchEvent(event)
-          },
-        },
-        components: { Slider },
-      },
-    }
-  },
+  initialVariant: 'color',
+  initialData: sliderVariants.color.data,
+  dataByVariant: (variant) => sliderVariants[variant].data,
+  reduce: (variant, data, event) => reduceSliderData(data, event, sliderVariants[variant].options),
+  variantItems: sliderVariantItems,
+  componentName: 'Slider',
+  component: Slider,
+  getStateValues: (variant) => ({ options: sliderVariants[variant].options }),
 })
