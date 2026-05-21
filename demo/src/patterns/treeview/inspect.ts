@@ -1,5 +1,4 @@
 import type { PatternData, PatternOptions } from '../../../../src/react'
-import { attrLine, htmlAttrs } from '../../shared/inspect/utils'
 
 export function renderAriaTree(data: PatternData, options: PatternOptions) {
   const activeKey = data.state?.activeKey
@@ -73,4 +72,22 @@ function isExpanded(data: PatternData, key: string) {
 
 function elementId(key: string, options: PatternOptions) {
   return `${options.elementIdPrefix ?? 'treeitem-'}${key}`
+}
+
+function attrLine(props: Record<string, unknown>, names: readonly string[]) {
+  return names
+    .filter((name) => props[name] !== undefined)
+    .map((name) => `${name}=${JSON.stringify(props[name])}`)
+    .join(' ')
+}
+
+function htmlAttrs(props: Record<string, unknown>, names: readonly string[]) {
+  return names
+    .filter((name) => props[name] !== undefined)
+    .map((name) => ` ${htmlAttrName(name)}="${String(props[name])}"`)
+    .join('')
+}
+
+function htmlAttrName(name: string) {
+  return name === 'tabIndex' ? 'tabindex' : name
 }
