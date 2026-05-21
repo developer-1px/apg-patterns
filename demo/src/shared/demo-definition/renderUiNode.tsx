@@ -36,7 +36,7 @@ export function renderUiNode(node: UiNode, context: UiRenderContext): ReactNode 
   return <Component {...props} />
 }
 
-export function resolveBinding(context: UiRenderContext, binding: string): unknown {
+function resolveBinding(context: UiRenderContext, binding: string): unknown {
   if (!binding.startsWith('$')) throw new Error(`[uiSchema] invalid binding: ${binding}`)
   const [root, ...segments] = binding.slice(1).split('.')
   const source = root === 'actions' ? context.actions : context.values[root]

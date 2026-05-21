@@ -3,7 +3,7 @@ import {
   defineNavigationTarget,
   defineVisibleOrder,
 } from '../../kernel/patternKernel'
-import { cellRowKey, visibleCells, visibleRowKeys } from './geometry'
+import { cellRowKey, visibleCells } from './geometry'
 
 type TreegridAction = 'left' | 'right' | 'up' | 'down' | 'rowStart' | 'rowEnd' | 'gridStart' | 'gridEnd'
 

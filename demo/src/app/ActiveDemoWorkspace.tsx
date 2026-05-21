@@ -4,7 +4,7 @@ import type { SourceName } from '../shared/sources'
 import { defaultAppState, readInitialAppState, type AppAction, type AppState, writeAppHash } from './appState'
 import { ShortcutIndicator } from './ShortcutIndicator'
 import { VariantRouteProvider } from '../shared/variantRoute'
-import { cx, ds } from '../shared/designSystem'
+import { ds } from '../shared/designSystem'
 import { ActiveDemoRightPanel } from './ActiveDemoRightPanel'
 
 const panelClass = ds.panel

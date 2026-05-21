@@ -19,9 +19,9 @@ function SliderReducerEdgesDemo() {
   const [data, setData] = useState(sliderVariants.range.data)
   const apply = (event: PatternEvent) => setData((current) => reduceSliderData(current, event, sliderVariants.range.options))
   const applyTemperature = (event: PatternEvent) =>
-    setData((current) => reduceSliderData(sliderVariants.temperature.data, event, sliderVariants.temperature.options))
+    setData(() => reduceSliderData(sliderVariants.temperature.data, event, sliderVariants.temperature.options))
   const applyFallback = (event: PatternEvent) =>
-    setData((current) =>
+    setData(() =>
       reduceSliderData(
         {
           items: { loose: { label: 'Loose value' } },

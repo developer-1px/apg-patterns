@@ -3,7 +3,7 @@ import type { PatternEvent, PatternOptions } from '../../../../src/react'
 import { resolveTarget } from './treeContract'
 import { renderAriaTree, renderHtmlTree } from './inspect'
 import { Treeview } from './Treeview'
-import { treeVariantItems, treeVariants, type TreeVariantKey } from './treeVariants'
+import { treeVariantItems, type TreeVariantKey } from './treeVariants'
 import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 import {
   FocusStrategyControl,

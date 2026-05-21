@@ -4,7 +4,6 @@ import type { SourceName } from './sources'
 
 export type { DemoPattern, PatternKey } from './demoPatternTypes'
 
-type CollectedPatternEntry = PatternEntry & { sourcePath: string }
 type ValidatedPatternEntry = Pick<PatternEntry, 'key' | 'label'> & { sourcePath?: string }
 type PatternEntryModule = { entry?: PatternEntry }
 

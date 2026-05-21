@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { extname } from 'node:path'
 
 const forbiddenTokens = [
@@ -62,6 +62,7 @@ for (const field of dependencyFields) {
 const scannedFiles = []
 for (const path of gitFiles(['ls-files'])) {
   if (!shouldScanFile(path)) continue
+  if (!existsSync(path)) continue
   scannedFiles.push(path)
   checkText(path, readFileSync(path, 'utf8'))
 }

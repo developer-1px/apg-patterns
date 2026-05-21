@@ -1,11 +1,8 @@
-import type { HTMLAttributes } from 'react'
 import { useMenubarPattern, type PatternData, type PatternEvent } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 import { Icon } from '../../shared/Icon'
 import type { MenuProps } from './menuTypes'
 import { useMenubarSubmenuKeyboard } from './useMenubarSubmenuKeyboard'
-
-type Props = HTMLAttributes<HTMLElement>
 
 export function Menubar({ data, onEvent }: MenuProps) {
   const menubar = useMenubarPattern(data, onEvent)
