@@ -1,30 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 
-import { reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
-import { tableDefinition } from '../../../../src/patterns/table/definition'
-import { Table } from './Table'
-import { tableVariants, type TableVariantKey } from './tableData'
-
-function TableDemo({ variant }: { variant: TableVariantKey }) {
-  const [data, setData] = useState<PatternData>(tableVariants[variant].data)
-  return (
-    <Table
-      data={data}
-      onEvent={(event: PatternEvent) => {
-        if (event.type === 'sort') {
-          setData((current) => ({
-            ...current,
-            state: { ...current.state, sortByKey: { ...current.state?.sortByKey, [event.key]: event.sort } },
-          }))
-          return
-        }
-        setData((current) => reducePatternData(tableDefinition, current, event))
-      }}
-    />
-  )
-}
+import { TableDemo } from './testing/TableTestHost'
 
 const cellOf = (key: string) => document.getElementById(`tablecell-${key}`)!
 

@@ -1,15 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import type { PatternEvent } from '../../../../src/react'
-import { initialToolbarData, reduceToolbarData } from './toolbarData'
-import { Toolbar } from './Toolbar'
-
-function ToolbarDemo() {
-  const [data, setData] = useState(initialToolbarData)
-  const handleEvent = (event: PatternEvent) => setData((current) => reduceToolbarData(current, event))
-  return <Toolbar data={data} onEvent={handleEvent} />
-}
+import { ToolbarDemo } from './testing/ToolbarTestHost'
 
 function tabIndexes() {
   return screen.getAllByRole('button').map((el) => el.getAttribute('tabindex'))

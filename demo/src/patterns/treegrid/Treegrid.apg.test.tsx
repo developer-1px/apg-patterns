@@ -12,49 +12,9 @@
  * 구현 수정은 별도로 처리한다. 이 파일에서 코드를 우회하거나 `it.skip` 처리하지 않는다.
  */
 import { fireEvent, render, screen } from '@testing-library/react'
-import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-
-if (typeof globalThis.CSS === 'undefined') {
-  ;(globalThis as { CSS?: { escape: (value: string) => string } }).CSS = { escape: (value: string) => value }
-}
-
-import { reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
-import { treegridDefinition } from '../../../../src/patterns/treegrid/definition'
-import { Treegrid } from './Treegrid'
 import { initialTreegridData } from './treegridData'
-
-function TreegridDemo() {
-  const [data, setData] = useState<PatternData>(initialTreegridData)
-  return (
-    <Treegrid
-      data={data}
-      onEvent={(event: PatternEvent) => {
-        setData((current) => reducePatternData(treegridDefinition, current, event))
-      }}
-    />
-  )
-}
-
-function RowFocusTreegridDemo({ activeKey = 'src' }: { activeKey?: string }) {
-  const [data, setData] = useState<PatternData>({
-    ...initialTreegridData,
-    state: {
-      ...initialTreegridData.state,
-      activeKey,
-      selectedKeys: [activeKey],
-    },
-  })
-  return (
-    <Treegrid
-      data={data}
-      options={{ focusMode: 'row' }}
-      onEvent={(event: PatternEvent) => {
-        setData((current) => reducePatternData(treegridDefinition, current, event))
-      }}
-    />
-  )
-}
+import { RowFocusTreegridDemo, TreegridDemo } from './testing/TreegridTestHost'
 
 const cellOf = (key: string) => document.getElementById(`treegridcell-${key}`)!
 const treegridFirstCell = (rowKey: string) => `${rowKey}:name`

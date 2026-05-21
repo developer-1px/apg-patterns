@@ -3,37 +3,8 @@
  * 출처: https://www.w3.org/WAI/ARIA/apg/patterns/menubar/
  */
 import { fireEvent, render, screen } from '@testing-library/react'
-import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import {
-  menubarDefinition,
-  menuButtonDefinition,
-  reducePatternData,
-  type PatternData,
-  type PatternEvent,
-} from '../../../../src/react'
-import { Menu } from './Menu'
-import { menuVariants } from './menuData'
-
-function MenuDemo({ variant }: { variant: keyof typeof menuVariants }) {
-  const v = menuVariants[variant]
-  const definition = v.apgPattern === 'menubar' ? menubarDefinition : menuButtonDefinition
-  const [data, setData] = useState<PatternData>({
-    ...v.data,
-    state: { ...v.data.state, apgPattern: v.apgPattern, focusStrategy: v.focusStrategy },
-  })
-  return (
-    <Menu
-      data={data}
-      onEvent={(event: PatternEvent) =>
-        setData((current) => {
-          const next = reducePatternData(definition, current, event)
-          return { ...next, state: { ...next.state, apgPattern: v.apgPattern, focusStrategy: v.focusStrategy } }
-        })
-      }
-    />
-  )
-}
+import { MenuDemo } from './testing/MenuTestHost'
 
 describe('APG §Roles, States, Properties — Menubar', () => {
   it('container has role="menubar"', () => {

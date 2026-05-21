@@ -7,17 +7,8 @@
  *   3) Properties (Optional): aria-controls
  */
 import { fireEvent, render, screen } from '@testing-library/react'
-import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { disclosureDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
-import { Disclosure } from './Disclosure'
-import { initialImageDisclosureData } from './disclosureData'
-
-function DisclosureDemo() {
-  const [data, setData] = useState<PatternData>(initialImageDisclosureData)
-  const handleEvent = (event: PatternEvent) => setData((current) => reducePatternData(disclosureDefinition, current, event))
-  return <Disclosure data={data} onEvent={handleEvent} />
-}
+import { DisclosureDemo } from './testing/DisclosureTestHost'
 
 describe('APG §Roles, States, Properties', () => {
   it('trigger has role="button"', () => {

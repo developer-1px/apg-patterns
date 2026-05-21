@@ -3,19 +3,8 @@
  * 출처: https://www.w3.org/WAI/ARIA/apg/patterns/slider/
  */
 import { fireEvent, render, screen } from '@testing-library/react'
-import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import type { PatternEvent } from '../../../../src/react'
-import { Slider } from './Slider'
-import { reduceSliderData, sliderVariants } from './sliderData'
-
-function SliderDemo() {
-  const variant = sliderVariants.seek
-  const [data, setData] = useState(variant.data)
-  const handleEvent = (event: PatternEvent) =>
-    setData((current) => reduceSliderData(current, event, variant.options))
-  return <Slider data={data} onEvent={handleEvent} options={variant.options} />
-}
+import { SliderDemo } from './testing/SliderTestHost'
 
 const sl = () => screen.getAllByRole('slider')[0]!
 

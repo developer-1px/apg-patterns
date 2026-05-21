@@ -3,18 +3,8 @@
  * 출처: https://www.w3.org/WAI/ARIA/apg/patterns/tabs/
  */
 import { fireEvent, render, screen } from '@testing-library/react'
-import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import type { PatternData, PatternEvent } from '../../../../src/react'
-import { Tabs } from './Tabs'
-import { reduceTabsDemoData, tabsVariants } from './tabsData'
-
-function TabsDemo() {
-  const spec = tabsVariants[Object.keys(tabsVariants)[0] as keyof typeof tabsVariants]
-  const [data, setData] = useState<PatternData>(spec.data)
-  const handleEvent = (event: PatternEvent) => setData((current) => reduceTabsDemoData(current, event, spec.options))
-  return <Tabs data={data} onEvent={handleEvent} options={spec.options} />
-}
+import { TabsDemo } from './testing/TabsTestHost'
 
 describe('APG §Roles, States, Properties', () => {
   it('container has role="tablist"', () => {

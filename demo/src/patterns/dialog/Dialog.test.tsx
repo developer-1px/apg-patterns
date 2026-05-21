@@ -1,15 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { dialogDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
-import { Dialog } from './Dialog'
-import { initialDialogData } from './dialogData'
-
-function DialogDemo() {
-  const [data, setData] = useState<PatternData>(initialDialogData)
-  const handleEvent = (event: PatternEvent) => setData((current) => reducePatternData(dialogDefinition, current, event))
-  return <Dialog data={data} onEvent={handleEvent} />
-}
+import { DialogDemo } from './testing/DialogTestHost'
 
 describe('Dialog demo (modal)', () => {
   it('opens on trigger click with role=dialog and aria-modal=true', () => {

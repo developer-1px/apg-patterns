@@ -3,20 +3,8 @@
  * 출처: https://www.w3.org/WAI/ARIA/apg/patterns/spinbutton/
  */
 import { fireEvent, render, screen } from '@testing-library/react'
-import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import type { PatternEvent } from '../../../../src/react'
-import { Spinbutton } from './Spinbutton'
-import { reduceSpinbuttonData, spinbuttonVariants } from './spinbuttonData'
-
-const numericSpinbutton = spinbuttonVariants.numeric
-
-function SpinbuttonDemo() {
-  const [data, setData] = useState(numericSpinbutton.data)
-  const handleEvent = (event: PatternEvent) =>
-    setData((current) => reduceSpinbuttonData(current, event, numericSpinbutton.options))
-  return <Spinbutton data={data} onEvent={handleEvent} />
-}
+import { SpinbuttonDemo } from './testing/SpinbuttonTestHost'
 
 const sb = () => screen.getByRole('spinbutton')
 

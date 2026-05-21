@@ -3,17 +3,8 @@
  * 출처: https://www.w3.org/WAI/ARIA/apg/patterns/combobox/
  */
 import { fireEvent, render, screen } from '@testing-library/react'
-import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import type { PatternData, PatternEvent } from '../../../../src/react'
-import { Combobox } from './Combobox'
-import { buildComboboxData, reduceComboboxData } from './comboboxData'
-
-function ComboboxDemo() {
-  const [data, setData] = useState<PatternData>(() => buildComboboxData(undefined, 'listAutocomplete'))
-  const handleEvent = (event: PatternEvent) => setData((current) => reduceComboboxData(current, event))
-  return <Combobox data={data} onEvent={handleEvent} />
-}
+import { ComboboxDemo } from './testing/ComboboxTestHost'
 
 const cb = () => screen.getByRole('combobox')
 

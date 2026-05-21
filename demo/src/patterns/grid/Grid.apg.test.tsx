@@ -3,26 +3,8 @@
  * 출처: https://www.w3.org/WAI/ARIA/apg/patterns/grid/
  */
 import { fireEvent, render, screen } from '@testing-library/react'
-import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-
-if (typeof globalThis.CSS === 'undefined') {
-  ;(globalThis as { CSS?: { escape: (s: string) => string } }).CSS = { escape: (s: string) => s }
-}
-
-import { gridDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
-import { Grid } from './Grid'
-import { gridVariants } from './gridData'
-
-function GridDemo() {
-  const [data, setData] = useState<PatternData>(gridVariants.dataTransactions.data)
-  return (
-    <Grid
-      data={data}
-      onEvent={(event: PatternEvent) => setData((current) => reducePatternData(gridDefinition, current, event))}
-    />
-  )
-}
+import { GridDemo } from './testing/GridTestHost'
 
 const g = () => screen.getByRole('grid')
 

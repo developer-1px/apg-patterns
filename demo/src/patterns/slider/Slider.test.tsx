@@ -4,16 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { PatternDataSchema, type PatternEvent } from '../../../../src/react'
 import { Slider } from './Slider'
 import { reduceSliderData, sliderVariants } from './sliderData'
-
-function SliderDemo({ onEvent, variant }: { onEvent?: (event: PatternEvent) => void; variant?: keyof typeof sliderVariants }) {
-  const init = sliderVariants[variant ?? 'seek']
-  const [data, setData] = useState(init.data)
-  const handleEvent = (event: PatternEvent) => {
-    onEvent?.(event)
-    setData((current) => reduceSliderData(current, event, init.options))
-  }
-  return <Slider data={data} onEvent={handleEvent} options={init.options} />
-}
+import { SliderDemo } from './testing/SliderTestHost'
 
 function SliderReducerEdgesDemo() {
   const [data, setData] = useState(sliderVariants.range.data)

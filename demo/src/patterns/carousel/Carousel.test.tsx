@@ -1,15 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { carouselDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
-import { Carousel } from './Carousel'
-import { carouselSlides, initialCarouselData } from './carouselData'
-
-function CarouselDemo() {
-  const [data, setData] = useState<PatternData>(initialCarouselData)
-  const handleEvent = (event: PatternEvent) => setData((current) => reducePatternData(carouselDefinition, current, event))
-  return <Carousel data={data} onEvent={handleEvent} />
-}
+import { carouselSlides } from './carouselData'
+import { CarouselDemo } from './testing/CarouselTestHost'
 
 function activeSlideKey(): string | null {
   for (const slide of carouselSlides) {

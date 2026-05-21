@@ -3,20 +3,8 @@
  * 출처: https://www.w3.org/WAI/ARIA/apg/patterns/table/
  */
 import { render, screen } from '@testing-library/react'
-import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
-import { tableDefinition } from '../../../../src/patterns/table/definition'
-import { Table } from './Table'
-import { tableVariants } from './tableData'
-
-function TableDemo() {
-  const key = Object.keys(tableVariants)[0] as keyof typeof tableVariants
-  const [data, setData] = useState<PatternData>(tableVariants[key].data)
-  return (
-    <Table data={data} onEvent={(event: PatternEvent) => setData((current) => reducePatternData(tableDefinition, current, event))} />
-  )
-}
+import { TableDemo } from './testing/TableTestHost'
 
 describe('APG §Roles, States, Properties', () => {
   it('container has role="table"', () => {

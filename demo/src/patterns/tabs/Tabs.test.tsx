@@ -1,23 +1,9 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import type { PatternData, PatternEvent } from '../../../../src/react'
-import { Tabs } from './Tabs'
-import { closeTabInData, reduceTabsDemoData, tabsVariants, type TabsVariantKey } from './tabsData'
-
-function TabsDemo({ variant, onEvent: onEventOuter }: { variant: TabsVariantKey; onEvent?: (e: PatternEvent) => void }) {
-  const spec = tabsVariants[variant]
-  const [data, setData] = useState<PatternData>(spec.data)
-  const handleEvent = (event: PatternEvent) => {
-    onEventOuter?.(event)
-    if (event.type === 'close') {
-      setData((current) => closeTabInData(current, event.key))
-      return
-    }
-    setData((current) => reduceTabsDemoData(current, event, spec.options))
-  }
-  return <Tabs data={data} onEvent={handleEvent} options={spec.options} />
-}
+import type { PatternData } from '../../../../src/react'
+import { closeTabInData, tabsVariants } from './tabsData'
+import { TabsDemo } from './testing/TabsTestHost'
 
 function TabsReducerEdgesDemo() {
   const [data, setData] = useState<PatternData>(tabsVariants.closeable.data)

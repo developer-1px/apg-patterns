@@ -1,22 +1,16 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { useRef, useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { createPatternRuntime, disclosureDefinition, reducePatternData, type Key, type PatternData, type PatternEvent } from '../../../../src/react'
+import { createPatternRuntime, disclosureDefinition, reducePatternData, type Key, type PatternData } from '../../../../src/react'
 import { Disclosure } from './Disclosure'
 import {
   initialFaqDisclosureData,
   initialImageDisclosureData,
   initialNavMenuDisclosureData,
   initialNavMenuTopLinksDisclosureData,
-  type DisclosureVariantKey,
 } from './disclosureData'
+import { DisclosureDemo } from './testing/DisclosureTestHost'
 import { useNavMenuKeyboard } from './useNavMenuKeyboard'
-
-function DisclosureDemo({ initial }: { variant: DisclosureVariantKey; initial: PatternData }) {
-  const [data, setData] = useState(initial)
-  const handleEvent = (event: PatternEvent) => setData((current) => reducePatternData(disclosureDefinition, current, event))
-  return <Disclosure data={data} onEvent={handleEvent} />
-}
 
 function GenericDisclosureRuntimeDemo() {
   const [data, setData] = useState(initialImageDisclosureData)
@@ -83,7 +77,7 @@ function NavMenuKeyboardEdgesDemo() {
 
 describe('Disclosure demo (image)', () => {
   it('toggles aria-expanded and panel visibility on click', () => {
-    render(<DisclosureDemo variant="image" initial={initialImageDisclosureData} />)
+    render(<DisclosureDemo initial={initialImageDisclosureData} />)
     const trigger = screen.getByRole('button')
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
     expect(screen.queryByRole('region')).toBeNull()
@@ -98,7 +92,7 @@ describe('Disclosure demo (image)', () => {
   })
 
   it('toggles via Enter and Space keyboard', () => {
-    render(<DisclosureDemo variant="image" initial={initialImageDisclosureData} />)
+    render(<DisclosureDemo initial={initialImageDisclosureData} />)
     const trigger = screen.getByRole('button')
 
     fireEvent.keyDown(trigger, { key: 'Enter', code: 'Enter' })
@@ -139,7 +133,7 @@ describe('Disclosure demo (faq)', () => {
   })
 
   it('renders 4 independent triggers with aria-controls', () => {
-    render(<DisclosureDemo variant="faq" initial={initialFaqDisclosureData} />)
+    render(<DisclosureDemo initial={initialFaqDisclosureData} />)
     const triggers = screen.getAllByRole('button')
     expect(triggers).toHaveLength(4)
     for (const trigger of triggers) {
@@ -149,7 +143,7 @@ describe('Disclosure demo (faq)', () => {
   })
 
   it('toggles each FAQ independently', () => {
-    render(<DisclosureDemo variant="faq" initial={initialFaqDisclosureData} />)
+    render(<DisclosureDemo initial={initialFaqDisclosureData} />)
     const [first, second] = screen.getAllByRole('button')
 
     fireEvent.click(first!)
@@ -168,7 +162,7 @@ describe('Disclosure demo (faq)', () => {
   })
 
   it('panel id matches trigger aria-controls', () => {
-    render(<DisclosureDemo variant="faq" initial={initialFaqDisclosureData} />)
+    render(<DisclosureDemo initial={initialFaqDisclosureData} />)
     const [first] = screen.getAllByRole('button')
     fireEvent.click(first!)
     const panelId = first!.getAttribute('aria-controls')!
@@ -182,7 +176,7 @@ describe('Disclosure demo (faq)', () => {
       relations: { ...initialFaqDisclosureData.relations, rootKeys: [...(initialFaqDisclosureData.relations?.rootKeys ?? []), 'unknown'] },
     }
 
-    render(<DisclosureDemo variant="faq" initial={data} />)
+    render(<DisclosureDemo initial={data} />)
     const [first] = screen.getAllByRole('button')
 
     fireEvent.keyDown(first!, { key: 'ArrowDown', code: 'ArrowDown' })
@@ -194,13 +188,13 @@ describe('Disclosure demo (faq)', () => {
 
 describe('Disclosure demo (navMenu)', () => {
   it('renders nav landmark and 3 top-level disclosure triggers', () => {
-    render(<DisclosureDemo variant="navMenu" initial={initialNavMenuDisclosureData} />)
+    render(<DisclosureDemo initial={initialNavMenuDisclosureData} />)
     expect(screen.getByRole('navigation')).toBeTruthy()
     expect(screen.getAllByRole('button')).toHaveLength(3)
   })
 
   it('Enter opens submenu and ArrowDown focuses first link; Escape closes and returns focus', () => {
-    render(<DisclosureDemo variant="navMenu" initial={initialNavMenuDisclosureData} />)
+    render(<DisclosureDemo initial={initialNavMenuDisclosureData} />)
     const [about] = screen.getAllByRole('button')
 
     fireEvent.keyDown(about!, { key: 'Enter', code: 'Enter' })
@@ -217,7 +211,7 @@ describe('Disclosure demo (navMenu)', () => {
   })
 
   it('opening a different top-level closes the previously open one (mutual exclusion)', () => {
-    render(<DisclosureDemo variant="navMenu" initial={initialNavMenuDisclosureData} />)
+    render(<DisclosureDemo initial={initialNavMenuDisclosureData} />)
     const [about, admissions] = screen.getAllByRole('button')
 
     fireEvent.click(about!)
@@ -229,7 +223,7 @@ describe('Disclosure demo (navMenu)', () => {
   })
 
   it('ArrowRight/ArrowLeft move focus across top-level siblings', () => {
-    render(<DisclosureDemo variant="navMenu" initial={initialNavMenuDisclosureData} />)
+    render(<DisclosureDemo initial={initialNavMenuDisclosureData} />)
     const [about, admissions, academics] = screen.getAllByRole('button')
     about!.focus()
 
@@ -244,7 +238,7 @@ describe('Disclosure demo (navMenu)', () => {
   })
 
   it('ArrowDown/ArrowUp navigate sibling links within open submenu', () => {
-    render(<DisclosureDemo variant="navMenu" initial={initialNavMenuDisclosureData} />)
+    render(<DisclosureDemo initial={initialNavMenuDisclosureData} />)
     const [about] = screen.getAllByRole('button')
     fireEvent.click(about!)
 
@@ -264,7 +258,7 @@ describe('Disclosure demo (navMenu)', () => {
   })
 
   it('ArrowDown opens a closed submenu and moves focus to its first link', async () => {
-    render(<DisclosureDemo variant="navMenu" initial={initialNavMenuDisclosureData} />)
+    render(<DisclosureDemo initial={initialNavMenuDisclosureData} />)
     const [about] = screen.getAllByRole('button')
 
     fireEvent.keyDown(about!, { key: 'ArrowDown', code: 'ArrowDown' })
@@ -274,7 +268,7 @@ describe('Disclosure demo (navMenu)', () => {
   })
 
   it('ArrowUp on an open trigger focuses the last submenu link', () => {
-    render(<DisclosureDemo variant="navMenu" initial={initialNavMenuDisclosureData} />)
+    render(<DisclosureDemo initial={initialNavMenuDisclosureData} />)
     const [about] = screen.getAllByRole('button')
 
     fireEvent.click(about!)
@@ -284,7 +278,7 @@ describe('Disclosure demo (navMenu)', () => {
   })
 
   it('Spacebar toggles a trigger and Escape on a collapsed trigger keeps focus there', () => {
-    render(<DisclosureDemo variant="navMenu" initial={initialNavMenuDisclosureData} />)
+    render(<DisclosureDemo initial={initialNavMenuDisclosureData} />)
     const [about] = screen.getAllByRole('button')
 
     fireEvent.keyDown(about!, { key: 'Spacebar', code: 'Space' })
@@ -298,7 +292,7 @@ describe('Disclosure demo (navMenu)', () => {
   })
 
   it('ArrowRight closes an open trigger before moving to the next top-level item', () => {
-    render(<DisclosureDemo variant="navMenu" initial={initialNavMenuDisclosureData} />)
+    render(<DisclosureDemo initial={initialNavMenuDisclosureData} />)
     const [about, admissions] = screen.getAllByRole('button')
 
     fireEvent.click(about!)
@@ -355,7 +349,7 @@ describe('Disclosure demo (navMenu)', () => {
 
 describe('Disclosure demo (navMenuTopLinks)', () => {
   it('plain Home/Contact are anchors without aria-expanded; groups have disclosure buttons', () => {
-    render(<DisclosureDemo variant="navMenuTopLinks" initial={initialNavMenuTopLinksDisclosureData} />)
+    render(<DisclosureDemo initial={initialNavMenuTopLinksDisclosureData} />)
     const nav = screen.getByRole('navigation')
 
     const home = within(nav).getByRole('link', { name: 'Home' })
@@ -372,7 +366,7 @@ describe('Disclosure demo (navMenuTopLinks)', () => {
   })
 
   it('group trigger still toggles submenu while plain links remain plain', () => {
-    render(<DisclosureDemo variant="navMenuTopLinks" initial={initialNavMenuTopLinksDisclosureData} />)
+    render(<DisclosureDemo initial={initialNavMenuTopLinksDisclosureData} />)
     const [about] = screen.getAllByRole('button')
     fireEvent.click(about!)
     expect(about!.getAttribute('aria-expanded')).toBe('true')

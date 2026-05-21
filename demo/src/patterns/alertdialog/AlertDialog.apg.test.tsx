@@ -3,19 +3,8 @@
  * 출처: https://www.w3.org/WAI/ARIA/apg/patterns/alertdialog/
  */
 import { fireEvent, render, screen } from '@testing-library/react'
-import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
-import { alertDialogDefinition } from '../../../../src/patterns/alertdialog/definition'
-import { AlertDialog } from './AlertDialog'
-import { initialAlertDialogData } from './alertdialogData'
-
-function AlertDialogDemo() {
-  const [data, setData] = useState<PatternData>(initialAlertDialogData)
-  const handleEvent = (event: PatternEvent) =>
-    setData((current) => reducePatternData(alertDialogDefinition, current, event))
-  return <AlertDialog data={data} onEvent={handleEvent} />
-}
+import { AlertDialogDemo } from './testing/AlertDialogTestHost'
 
 const open = () => fireEvent.click(screen.getByRole('button', { name: 'Discard draft' }))
 

@@ -4,14 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { comboboxDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { Combobox } from './Combobox'
 import { buildComboboxData, FRUITS, reduceComboboxData } from './comboboxData'
-
-type Variant = 'selectOnly' | 'listAutocomplete' | 'listWithInlineAutocomplete' | 'datepicker' | 'gridPopup'
-
-function ComboboxDemo({ variant }: { variant: Variant }) {
-  const [data, setData] = useState<PatternData>(() => buildComboboxData(undefined, variant))
-  const handleEvent = (event: PatternEvent) => setData((current) => reduceComboboxData(current, event))
-  return <Combobox data={data} onEvent={handleEvent} />
-}
+import { ComboboxDemo } from './testing/ComboboxTestHost'
 
 function KernelComboboxDemo({ activeKey }: { activeKey?: string | null }) {
   const [data, setData] = useState<PatternData>(() => {

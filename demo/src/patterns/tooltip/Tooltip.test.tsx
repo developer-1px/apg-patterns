@@ -3,14 +3,8 @@ import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import { reducePatternData, useTooltipPattern, type PatternData, type PatternEvent } from '../../../../src/react'
 import { tooltipDefinition } from '../../../../src/patterns/tooltip/definition'
-import { Tooltip } from './Tooltip'
 import { initialTooltipData } from './tooltipData'
-
-function TooltipDemo() {
-  const [data, setData] = useState<PatternData>(initialTooltipData)
-  const handleEvent = (event: PatternEvent) => setData((current) => reducePatternData(tooltipDefinition, current, event))
-  return <Tooltip data={data} onEvent={handleEvent} />
-}
+import { TooltipDemo } from './testing/TooltipTestHost'
 
 function TooltipActionsDemo({ empty = false }: { empty?: boolean }) {
   const [data, setData] = useState<PatternData>(empty ? { items: {}, relations: { rootKeys: [] }, state: {} } : initialTooltipData)

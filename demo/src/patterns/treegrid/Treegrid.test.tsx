@@ -1,27 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-
-if (typeof globalThis.CSS === 'undefined') {
-  ;(globalThis as { CSS?: { escape: (value: string) => string } }).CSS = { escape: (value: string) => value }
-}
-
-import { reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
-import { treegridDefinition } from '../../../../src/patterns/treegrid/definition'
-import { Treegrid } from './Treegrid'
 import { initialTreegridData } from './treegridData'
-
-function TreegridDemo() {
-  const [data, setData] = useState<PatternData>(initialTreegridData)
-  return (
-    <Treegrid
-      data={data}
-      onEvent={(event: PatternEvent) => {
-        setData((current) => reducePatternData(treegridDefinition, current, event))
-      }}
-    />
-  )
-}
+import { TreegridDemo } from './testing/TreegridTestHost'
 
 const cellOf = (key: string) => document.getElementById(`treegridcell-${key}`)!
 const treegridFirstCell = (rowKey: string) => `${rowKey}:name`

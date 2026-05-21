@@ -6,25 +6,10 @@ import { describe, expect, it } from 'vitest'
 if (typeof globalThis.CSS === 'undefined') {
   ;(globalThis as { CSS?: { escape: (value: string) => string } }).CSS = { escape: (value: string) => value }
 }
-import { gridDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
+import { gridDefinition, reducePatternData, type PatternData } from '../../../../src/react'
 import { Grid } from './Grid'
-import { gridVariants, type GridVariantKey } from './gridData'
-
-function GridDemo({ variant }: { variant: GridVariantKey }) {
-  const [data, setData] = useState<PatternData>(gridVariants[variant].data)
-  return (
-    <Grid
-      data={data}
-      onEvent={(event: PatternEvent) => {
-        if (event.type === 'sort') {
-          setData((current) => ({ ...current, state: { ...current.state, sortByKey: { ...current.state?.sortByKey, [event.key]: event.sort } } }))
-          return
-        }
-        setData((current) => reducePatternData(gridDefinition, current, event))
-      }}
-    />
-  )
-}
+import { gridVariants } from './gridData'
+import { GridDemo } from './testing/GridTestHost'
 
 function GridDataDemo({ initialData }: { initialData: PatternData }) {
   const [data, setData] = useState<PatternData>(initialData)

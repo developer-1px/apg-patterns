@@ -3,17 +3,8 @@
  * 출처: https://www.w3.org/WAI/ARIA/apg/patterns/feed/
  */
 import { fireEvent, render, screen } from '@testing-library/react'
-import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { feedDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
-import { Feed } from './Feed'
-import { initialFeedData } from './feedData'
-
-function FeedDemo() {
-  const [data, setData] = useState<PatternData>(initialFeedData)
-  const handleEvent = (event: PatternEvent) => setData((current) => reducePatternData(feedDefinition, current, event))
-  return <Feed data={data} onEvent={handleEvent} />
-}
+import { FeedDemo } from './testing/FeedTestHost'
 
 describe('APG §Roles, States, Properties', () => {
   it('container has role="feed"', () => {

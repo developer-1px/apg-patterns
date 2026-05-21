@@ -4,18 +4,9 @@ import { describe, expect, it } from 'vitest'
 import { PatternDataSchema, type PatternEvent } from '../../../../src/react'
 import { Spinbutton } from './Spinbutton'
 import { formatTime, reduceSpinbuttonData, spinbuttonVariants } from './spinbuttonData'
+import { SpinbuttonDemo } from './testing/SpinbuttonTestHost'
 
 const numericSpinbutton = spinbuttonVariants.numeric
-
-function SpinbuttonDemo({ onEvent, variant }: { onEvent?: (event: PatternEvent) => void; variant?: keyof typeof spinbuttonVariants }) {
-  const init = variant ? spinbuttonVariants[variant] : numericSpinbutton
-  const [data, setData] = useState(init.data)
-  const handleEvent = (event: PatternEvent) => {
-    onEvent?.(event)
-    setData((current) => reduceSpinbuttonData(current, event, init.options))
-  }
-  return <Spinbutton data={data} onEvent={handleEvent} />
-}
 
 function SpinbuttonReducerEdgesDemo() {
   const [data, setData] = useState(spinbuttonVariants.time.data)
