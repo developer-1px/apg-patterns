@@ -1,6 +1,5 @@
 import { z } from 'zod'
-import { definePatternContract, PatternItemSchema, PatternOptionsSchema, PatternStateSchema, type PatternDataOf, type PatternOptionsOf } from '../../schema'
-import { sliderDefinition } from './definition'
+import { PatternItemSchema, PatternOptionsSchema, PatternStateSchema, type PatternData } from '../../schema'
 
 export const SliderItemSchema = PatternItemSchema.safeExtend({
   valuemin: z.number().optional(),
@@ -18,12 +17,8 @@ export const SliderStateSchema = PatternStateSchema.safeExtend({
   options: SliderOptionsSchema.optional(),
 })
 
-export const sliderContract = definePatternContract({
-  definition: sliderDefinition,
-  itemSchema: SliderItemSchema,
-  stateSchema: SliderStateSchema,
-  optionsSchema: SliderOptionsSchema,
-})
+type SliderItem = z.infer<typeof SliderItemSchema>
+type SliderState = z.infer<typeof SliderStateSchema>
 
-export type SliderData = PatternDataOf<typeof sliderContract>
-export type SliderOptions = PatternOptionsOf<typeof sliderContract>
+export type SliderData = PatternData<SliderItem, SliderState>
+export type SliderOptions = z.infer<typeof SliderOptionsSchema>

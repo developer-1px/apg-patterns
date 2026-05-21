@@ -60,13 +60,11 @@ defineDomEvent
 defineDomEventHandlerProp
 defineKeyToken
 defineNavigationTarget
-definePatternContract
 definePredicate
 defineStateProjection
 defineVisibleOrder
 dialogDefinition
 DialogDefinitionSchema
-Directions
 disclosureDefinition
 DisclosureDefinitionSchema
 DisclosureRuntime
@@ -125,15 +123,12 @@ NavigationTargetContext
 NavigationTargetKind
 NavigationTargetKindSchema
 NavigationTargetResolver
-NavigationTargets
 NavigationTargetSchema
 PartEventBinding
 PartEventBindingSchema
 PartSchema
-PatternContract
 PatternData
 PatternDataBase
-PatternDataOf
 PatternDataSchema
 PatternDataWithOptions
 PatternDefinition
@@ -150,7 +145,6 @@ PatternEventTypeSchema
 PatternItem
 PatternItemSchema
 PatternOptions
-PatternOptionsOf
 PatternOptionsSchema
 PatternRefsSchema
 PatternRelationsSchema
@@ -204,7 +198,6 @@ resolveTreeviewNavigationTarget
 resolveTreeviewVisibleKeys
 resolveTypeaheadTarget
 resolveVisibleOrder
-sliderContract
 SliderData
 sliderDefinition
 SliderItemSchema
@@ -220,7 +213,6 @@ StateFieldSchema
 StateProjection
 StateProjectionResolver
 StateProjectionSchema
-StateSources
 switchDefinition
 tableDefinition
 tabsDefinition
@@ -247,7 +239,6 @@ unknownTokenError
 VisibleOrderKind
 VisibleOrderKindSchema
 VisibleOrderResolver
-VisibleOrders
 VisibleOrderSchema
 windowSplitterDefinition
 ```
@@ -287,13 +278,11 @@ defineDomEvent
 defineDomEventHandlerProp
 defineKeyToken
 defineNavigationTarget
-definePatternContract
 definePredicate
 defineStateProjection
 defineVisibleOrder
 dialogDefinition
 DialogDefinitionSchema
-Directions
 disclosureDefinition
 DisclosureDefinitionSchema
 DomEventNameSchema
@@ -337,7 +326,6 @@ menuButtonDefinition
 meterDefinition
 NavigationSchema
 NavigationTargetKindSchema
-NavigationTargets
 NavigationTargetSchema
 PartEventBindingSchema
 PartSchema
@@ -383,7 +371,6 @@ resolveTreeviewNavigationTarget
 resolveTreeviewVisibleKeys
 resolveTypeaheadTarget
 resolveVisibleOrder
-sliderContract
 sliderDefinition
 SliderItemSchema
 SliderOptionsSchema
@@ -392,7 +379,6 @@ spinbuttonDefinition
 StateActionSchema
 StateFieldSchema
 StateProjectionSchema
-StateSources
 switchDefinition
 tableDefinition
 tabsDefinition
@@ -410,7 +396,6 @@ treeviewDefinition
 TreeviewDefinitionSchema
 unknownTokenError
 VisibleOrderKindSchema
-VisibleOrders
 VisibleOrderSchema
 windowSplitterDefinition
 ```

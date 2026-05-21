@@ -8,7 +8,16 @@ const shouldWrite = process.argv.includes('--write')
 const failures = []
 const forbiddenPublicExports = new Map([
   ['COMBOBOX_KEY', 'use comboboxRootKey'],
+  ['definePatternContract', 'use pattern schemas and createPatternRuntime directly'],
+  ['Directions', 'avoid unused vocabulary aliases'],
   ['gridRows', 'keep grid row derivation internal'],
+  ['NavigationTargets', 'avoid unused vocabulary aliases'],
+  ['PatternContract', 'use pattern schemas and createPatternRuntime directly'],
+  ['PatternDataOf', 'use PatternData<TItem, TState> directly'],
+  ['PatternOptionsOf', 'infer options from the pattern options schema directly'],
+  ['sliderContract', 'use sliderDefinition and slider schemas directly'],
+  ['StateSources', 'avoid unused vocabulary aliases'],
+  ['VisibleOrders', 'avoid unused vocabulary aliases'],
   ['windowsplitterDefinition', 'use windowSplitterDefinition'],
 ])
 

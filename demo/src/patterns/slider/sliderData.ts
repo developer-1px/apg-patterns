@@ -1,15 +1,8 @@
-import { sliderContract, type Key, type PatternEvent, type SliderData, type SliderOptions } from '../../../../src/react'
-
-// ── Variant definitions ─────────────────────────────────────────────
-//
-// Each variant maps 1:1 to a W3C APG slider example:
-//   - color:       Color Viewer Slider (3 horizontal R/G/B)
-//   - temperature: Vertical Temperature Slider (aria-valuetext + aria-orientation=vertical)
-//   - rating:      Rating Slider (10-point scale, aria-valuetext)
-//   - seek:        Media Seek Slider (time → mm:ss valuetext)
-//   - range:       Multi-Thumb Slider (two thumbs with mutual valuemin/max constraints)
+import { PatternDataSchema, type Key, type PatternEvent, type SliderData, type SliderOptions } from '../../../../src/react'
 
 export type SliderVariantKey = 'color' | 'temperature' | 'rating' | 'seek' | 'range'
+
+const parseSliderData = (data: unknown): SliderData => PatternDataSchema.parse(data) as SliderData
 
 const formatTime = (seconds: number) => {
   const total = Math.max(0, Math.round(seconds))
@@ -28,9 +21,8 @@ const ratingLabel = (n: number) => ratingLabels[Math.max(0, Math.min(ratingLabel
 
 const tempLabel = (n: number) => `${n} degrees Celsius`
 
-// ── Color (3 thumbs, independent) ────────────────────────────────
 const colorData = (): SliderData =>
-  sliderContract.parseData({
+  parseSliderData({
     items: {
       red: { label: 'Red color value' },
       green: { label: 'Green color value' },
@@ -43,33 +35,29 @@ const colorData = (): SliderData =>
     },
   })
 
-// ── Temperature (vertical, single thumb, valuetext) ──────────────
 const temperatureData = (): SliderData =>
-  sliderContract.parseData({
+  parseSliderData({
     items: { temp: { label: 'Thermostat', valuetext: tempLabel(21) } },
     relations: { rootKeys: ['temp'] },
     state: { activeKey: 'temp', valueByKey: { temp: 21 } },
   })
 
-// ── Rating (single thumb, valuetext from label table) ────────────
 const ratingData = (): SliderData =>
-  sliderContract.parseData({
+  parseSliderData({
     items: { rating: { label: 'Rate your experience', valuetext: ratingLabel(5) } },
     relations: { rootKeys: ['rating'] },
     state: { activeKey: 'rating', valueByKey: { rating: 5 } },
   })
 
-// ── Seek (media position with mm:ss valuetext) ───────────────────
 const seekData = (): SliderData =>
-  sliderContract.parseData({
+  parseSliderData({
     items: { seek: { label: 'Playback position', valuetext: formatTime(45) } },
     relations: { rootKeys: ['seek'] },
     state: { activeKey: 'seek', valueByKey: { seek: 45 } },
   })
 
-// ── Range (two thumbs with mutual constraint) ────────────────────
 const rangeData = (): SliderData =>
-  sliderContract.parseData({
+  parseSliderData({
     items: {
       min: { label: 'Minimum price', valuemin: 0, valuemax: 200 },
       max: { label: 'Maximum price', valuemin: 200, valuemax: 500 },
@@ -128,8 +116,7 @@ export const sliderVariants: Record<SliderVariantKey, SliderVariant> = {
 
 export const sliderVariantItems = Object.values(sliderVariants).map((v) => ({ key: v.key, label: v.label }))
 
-// Back-compat exports — test suite uses these (single-thumb volume slider).
-export const initialSliderData: SliderData = sliderContract.parseData({
+export const initialSliderData: SliderData = parseSliderData({
   items: { volume: { label: 'Volume' } },
   relations: { rootKeys: ['volume'] },
   state: { activeKey: 'volume', valueByKey: { volume: 50 }, options: { focusStrategy: 'rovingTabIndex', min: 0, max: 100, step: 5, orientation: 'horizontal' } },
@@ -141,14 +128,6 @@ export const sliderOptions: SliderOptions = {
   step: 5,
   orientation: 'horizontal',
 }
-
-// ── Reducer ──────────────────────────────────────────────────────
-//
-// Direction tokens emitted by the kernel keyboard bindings:
-//   increment / decrement       — ±1 step
-//   incrementLarge / decrementLarge — ±10% of range (PageUp/Down or Shift+Arrow)
-//   min / max                   — Home / End
-// Plus pointer-driven { value } payloads.
 
 const computeDelta = (direction: unknown, step: number, large: number): number => {
   if (direction === 'increment') return step
@@ -164,7 +143,6 @@ const itemRange = (data: SliderData, key: Key, fallbackMin: number, fallbackMax:
 }
 
 const valuetextFor = (data: SliderData, key: Key, next: number): string | undefined => {
-  // Heuristic: if item already had a valuetext, refresh it using its shape.
   const item = data.items[key]
   if (!item?.valuetext) return undefined
   if (key === 'temp') return tempLabel(next)
@@ -199,7 +177,6 @@ export function reduceSliderData(
   const clamped = Math.min(max, Math.max(min, Math.round(nextValue / step) * step))
   if (clamped === current) return { ...data, state: { ...data.state, activeKey: key } }
 
-  // Multi-thumb constraint propagation: 'min' thumb's max == 'max' thumb's current; vice versa.
   const valueByKey = { ...data.state?.valueByKey, [key]: clamped }
   let items = data.items
   if (key === 'min' && items.max && typeof items.max.valuemin === 'number') {
