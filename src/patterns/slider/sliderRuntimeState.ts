@@ -1,8 +1,12 @@
-import type { Key } from '../../schema'
+import type { Key, PatternData, PatternItem } from '../../schema'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
-import type { SliderData } from './contract'
 
-export function getSliderRuntimeState(runtime: PatternRuntime<SliderData>): {
+type SliderPatternData = PatternData<PatternItem & {
+  valuemin?: number
+  valuemax?: number
+}>
+
+export function getSliderRuntimeState(runtime: PatternRuntime<SliderPatternData>): {
   activeKey: Key | null
   valueByKey: Readonly<Record<Key, string | number | boolean | null>>
 } {
@@ -12,7 +16,7 @@ export function getSliderRuntimeState(runtime: PatternRuntime<SliderData>): {
   }
 }
 
-export function isMultiThumbSlider(runtime: PatternRuntime<SliderData>): boolean {
+export function isMultiThumbSlider(runtime: PatternRuntime<SliderPatternData>): boolean {
   return runtime.visibleKeys.length >= 2 && runtime.visibleKeys.every((key) => {
     const item = runtime.data.items[key]
     return typeof item?.valuemin === 'number' || typeof item?.valuemax === 'number'

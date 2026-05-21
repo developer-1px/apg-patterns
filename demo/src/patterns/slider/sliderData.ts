@@ -1,8 +1,16 @@
-import { PatternDataSchema, type Key, type PatternEvent, type SliderData, type SliderOptions } from '../../../../src/react'
+import { PatternDataSchema, type Key, type PatternData, type PatternEvent, type PatternItem, type SliderOptions } from '../../../../src/react'
 
 export type SliderVariantKey = 'color' | 'temperature' | 'rating' | 'seek' | 'range'
 
-const parseSliderData = (data: unknown): SliderData => PatternDataSchema.parse(data) as SliderData
+interface SliderDemoItem extends PatternItem {
+  valuemin?: number
+  valuemax?: number
+  valuetext?: string
+}
+
+type SliderDemoData = PatternData<SliderDemoItem>
+
+const parseSliderData = (data: unknown): SliderDemoData => PatternDataSchema.parse(data) as SliderDemoData
 
 const formatTime = (seconds: number) => {
   const total = Math.max(0, Math.round(seconds))
@@ -21,7 +29,7 @@ const ratingLabel = (n: number) => ratingLabels[Math.max(0, Math.min(ratingLabel
 
 const tempLabel = (n: number) => `${n} degrees Celsius`
 
-const colorData = (): SliderData =>
+const colorData = (): SliderDemoData =>
   parseSliderData({
     items: {
       red: { label: 'Red color value' },
@@ -35,28 +43,28 @@ const colorData = (): SliderData =>
     },
   })
 
-const temperatureData = (): SliderData =>
+const temperatureData = (): SliderDemoData =>
   parseSliderData({
     items: { temp: { label: 'Thermostat', valuetext: tempLabel(21) } },
     relations: { rootKeys: ['temp'] },
     state: { activeKey: 'temp', valueByKey: { temp: 21 } },
   })
 
-const ratingData = (): SliderData =>
+const ratingData = (): SliderDemoData =>
   parseSliderData({
     items: { rating: { label: 'Rate your experience', valuetext: ratingLabel(5) } },
     relations: { rootKeys: ['rating'] },
     state: { activeKey: 'rating', valueByKey: { rating: 5 } },
   })
 
-const seekData = (): SliderData =>
+const seekData = (): SliderDemoData =>
   parseSliderData({
     items: { seek: { label: 'Playback position', valuetext: formatTime(45) } },
     relations: { rootKeys: ['seek'] },
     state: { activeKey: 'seek', valueByKey: { seek: 45 } },
   })
 
-const rangeData = (): SliderData =>
+const rangeData = (): SliderDemoData =>
   parseSliderData({
     items: {
       min: { label: 'Minimum price', valuemin: 0, valuemax: 200 },
@@ -72,7 +80,7 @@ const rangeData = (): SliderData =>
 export interface SliderVariant {
   key: SliderVariantKey
   label: string
-  data: SliderData
+  data: SliderDemoData
   options: SliderOptions
 }
 
@@ -111,7 +119,7 @@ export const sliderVariants: Record<SliderVariantKey, SliderVariant> = {
 
 export const sliderVariantItems = Object.values(sliderVariants).map((v) => ({ key: v.key, label: v.label }))
 
-export const initialSliderData: SliderData = parseSliderData({
+export const initialSliderData: SliderDemoData = parseSliderData({
   items: { volume: { label: 'Volume' } },
   relations: { rootKeys: ['volume'] },
   state: { activeKey: 'volume', valueByKey: { volume: 50 } },
@@ -132,12 +140,12 @@ const computeDelta = (direction: unknown, step: number, large: number): number =
   return 0
 }
 
-const itemRange = (data: SliderData, key: Key, fallbackMin: number, fallbackMax: number): [number, number] => {
+const itemRange = (data: SliderDemoData, key: Key, fallbackMin: number, fallbackMax: number): [number, number] => {
   const item = data.items[key]
   return [item?.valuemin ?? fallbackMin, item?.valuemax ?? fallbackMax]
 }
 
-const valuetextFor = (data: SliderData, key: Key, next: number): string | undefined => {
+const valuetextFor = (data: SliderDemoData, key: Key, next: number): string | undefined => {
   const item = data.items[key]
   if (!item?.valuetext) return undefined
   if (key === 'temp') return tempLabel(next)
@@ -147,10 +155,10 @@ const valuetextFor = (data: SliderData, key: Key, next: number): string | undefi
 }
 
 export function reduceSliderData(
-  data: SliderData,
+  data: SliderDemoData,
   event: PatternEvent,
   options: SliderOptions = sliderOptions,
-): SliderData {
+): SliderDemoData {
   if (event.type === 'focus' && event.key) {
     return { ...data, state: { ...data.state, activeKey: event.key } }
   }

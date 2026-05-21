@@ -1,9 +1,14 @@
 import type { KeyboardEvent, PointerEvent } from 'react'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
-import type { Key } from '../../schema'
+import type { Key, PatternData, PatternItem } from '../../schema'
 import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
-import type { SliderData } from './contract'
 import { valueFromSliderPointer } from './sliderPointerValue'
+
+type SliderPatternData = PatternData<PatternItem & {
+  valuemin?: number
+  valuemax?: number
+  valuetext?: string
+}>
 
 export interface ReactSliderRenderItem {
   key: Key
@@ -18,7 +23,7 @@ export interface ReactSliderRenderItem {
   updateFromPointer(event: PointerEvent<HTMLElement>): void
 }
 
-export function createSliderRenderItem(runtime: PatternRuntime<SliderData>, key: Key, orientation: 'horizontal' | 'vertical'): ReactSliderRenderItem {
+export function createSliderRenderItem(runtime: PatternRuntime<SliderPatternData>, key: Key, orientation: 'horizontal' | 'vertical'): ReactSliderRenderItem {
   const { onKeyDown: _onKeyDown, ...props } = reactProps(runtime.getPartProps('slider', key))
   const item = runtime.data.items[key]
   const min = Number(item?.valuemin ?? runtime.options.min ?? 0)

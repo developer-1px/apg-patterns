@@ -1,7 +1,7 @@
 import { createElement, type ComponentPropsWithoutRef, type PointerEvent, type ReactNode } from 'react'
-import type { Key, PatternEvent, PatternItem } from '../../schema'
+import type { Key, PatternData, PatternEvent, PatternItem } from '../../schema'
 import type { ReactSliderRenderItem } from './sliderRenderItem'
-import type { SliderData, SliderOptions } from './contract'
+import type { SliderOptions } from './contract'
 import { useSliderPattern } from './useSliderPattern'
 
 type SliderDataItem = PatternItem & {
@@ -13,7 +13,7 @@ type SliderDataItem = PatternItem & {
 type DivProps = ComponentPropsWithoutRef<'div'>
 
 export interface SliderProps<TItem extends SliderDataItem = SliderDataItem> {
-  data: SliderData & { items: Record<Key, TItem> }
+  data: PatternData<TItem>
   onEvent: (event: PatternEvent) => void
   options?: SliderOptions
   className?: string

@@ -128,7 +128,6 @@ PartEventBinding
 PartEventBindingSchema
 PartSchema
 PatternData
-PatternDataBase
 PatternDataSchema
 PatternDefinition
 PatternDefinitionSchema
@@ -196,7 +195,6 @@ resolveTreeviewNavigationTarget
 resolveTreeviewVisibleKeys
 resolveTypeaheadTarget
 resolveVisibleOrder
-SliderData
 sliderDefinition
 SliderItemSchema
 SliderOptions

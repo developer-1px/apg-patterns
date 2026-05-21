@@ -58,12 +58,10 @@ export const PatternDataSchema = z
   .strict()
   .superRefine(validatePatternDataRefs)
 
-export type PatternDataBase = z.infer<typeof PatternDataSchema>
-
 export type PatternData<
   TItem extends PatternItem = PatternItem,
   TState extends PatternState = PatternState,
-> = Omit<PatternDataBase, 'items' | 'state'> & {
+> = Omit<z.infer<typeof PatternDataSchema>, 'items' | 'state'> & {
   items: Record<Key, TItem>
   state?: TState
 }

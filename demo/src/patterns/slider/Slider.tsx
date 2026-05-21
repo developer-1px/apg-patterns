@@ -1,4 +1,4 @@
-import { useSliderPattern, type PatternEvent, type ReactSliderRenderItem, type SliderData, type SliderOptions } from '../../../../src/react'
+import { useSliderPattern, type PatternData, type PatternEvent, type ReactSliderRenderItem, type SliderOptions } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 import { MultiThumbSlider } from './MultiThumbSlider'
 
@@ -13,7 +13,7 @@ export function Slider({
   onEvent,
   options,
 }: {
-  data: SliderData
+  data: PatternData
   onEvent: (event: PatternEvent) => void
   options?: SliderOptions
 }) {

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { PatternItemSchema, PatternOptionsSchema, type PatternData } from '../../schema'
+import { PatternItemSchema, PatternOptionsSchema } from '../../schema'
 
 export const SliderItemSchema = PatternItemSchema.safeExtend({
   valuemin: z.number().optional(),
@@ -13,7 +13,4 @@ export const SliderOptionsSchema = PatternOptionsSchema.safeExtend({
   step: z.number().optional(),
 })
 
-type SliderItem = z.infer<typeof SliderItemSchema>
-
-export type SliderData = PatternData<SliderItem>
 export type SliderOptions = z.infer<typeof SliderOptionsSchema>
