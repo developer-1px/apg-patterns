@@ -4,11 +4,6 @@ import { Icon } from '../../shared/Icon'
 import { ds } from '../../shared/designSystem'
 import { Listbox } from './Listbox'
 
-/**
- * APG `examples/listbox-rearrangeable` 변형 — 툴바로 Up/Down (Alt+Arrow) 이동 +
- * Remove (Delete) 동작을 제공한다. 패턴 정의는 그대로 두고 demo 레이어가
- * data 를 재구성한다.
- */
 export function RearrangeableListbox({
   data,
   onEvent,
@@ -42,7 +37,6 @@ export function RearrangeableListbox({
     onEvent({ type: 'remove', key: activeKey, keys: nextKeys, activeKey: nextActive, selectedKeys: nextSelected })
   }
 
-  // Alt+ArrowUp/Down 키 처리 — Listbox 외부 wrapper 에서 capture.
   const handleKeyDown = (event: ReactKeyboardEvent) => {
     if (event.altKey && event.key === 'ArrowUp') {
       event.preventDefault()

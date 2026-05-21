@@ -17,7 +17,6 @@ export const initialListboxData = PatternDataSchema.parse({
   refs: { label: 'Fruits' },
 })
 
-// ── Scrollable Listbox (APG: examples/listbox-scrollable) ──
 const scrollableLabels = [
   'Aardvark', 'Albatross', 'Alligator', 'Anteater', 'Antelope', 'Armadillo',
   'Baboon', 'Badger', 'Barracuda', 'Bear', 'Beaver', 'Bison',
@@ -46,8 +45,6 @@ export const initialScrollableListboxData = PatternDataSchema.parse({
   refs: { label: 'Animals' },
 })
 
-// ── Grouped Listbox (APG: examples/listbox-grouped) ──
-// 그룹은 data.items 의 kind='group' + childrenByKey 로 표현. visibleOrder 는 옵션만 평탄화.
 const groupedOptions: ReadonlyArray<{ key: string; label: string }> = [
   { key: 'v-asparagus', label: 'Asparagus' },
   { key: 'v-broccoli', label: 'Broccoli' },
@@ -86,7 +83,6 @@ export const initialGroupedListboxData = PatternDataSchema.parse({
   refs: { label: 'Grocery' },
 })
 
-// ── Rearrangeable Listbox (APG: examples/listbox-rearrangeable) ──
 const rearrangeableLabels = ['Leonardo', 'Donatello', 'Raphael', 'Michelangelo', 'Splinter', 'April']
 
 export const initialRearrangeableListboxData = PatternDataSchema.parse({

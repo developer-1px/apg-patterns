@@ -1,11 +1,5 @@
 import { PatternDataSchema, type PatternData, type PatternOptions } from '../../../../src/react'
 
-// Each variant maps to a common APG meter scenario.
-//   - disk:    Disk usage percentage (0–100, percent valuetext)
-//   - battery: Battery charge level (0–100, percent valuetext)
-//   - cpu:     CPU load with per-item range override
-//   - storage: Storage (GB used / GB total, custom valuetext)
-
 export type MeterVariantKey = 'disk' | 'battery' | 'cpu' | 'storage'
 
 const pctText = (n: number) => `${n}%`

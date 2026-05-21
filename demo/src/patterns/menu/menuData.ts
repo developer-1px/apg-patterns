@@ -9,26 +9,21 @@ export type MenuVariantKey =
   | 'actionMenuButtonActiveDescendant'
   | 'linkMenuButton'
 
-// ── Variant 1: Editor Menubar (APG: examples/menubar-editor) ────────────────
-// File / Edit / View — each with submenu children.
 export const initialEditorMenubarData: PatternData = PatternDataSchema.parse({
   items: {
     file: { label: 'File' },
     edit: { label: 'Edit' },
     view: { label: 'View' },
-    // File submenu
     fileNew: { label: 'New' },
     fileOpen: { label: 'Open…' },
     fileSave: { label: 'Save' },
     fileSaveAs: { label: 'Save As…' },
     fileClose: { label: 'Close' },
-    // Edit submenu
     editUndo: { label: 'Undo' },
     editRedo: { label: 'Redo' },
     editCut: { label: 'Cut' },
     editCopy: { label: 'Copy' },
     editPaste: { label: 'Paste' },
-    // View submenu — checkbox + radios for theme.
     viewWrap: { label: 'Word Wrap', kind: 'menuitemcheckbox' },
     viewMini: { label: 'Minimap', kind: 'menuitemcheckbox' },
     viewLight: { label: 'Light', kind: 'menuitemradio' },
@@ -51,7 +46,6 @@ export const initialEditorMenubarData: PatternData = PatternDataSchema.parse({
   refs: { label: 'Editor' },
 })
 
-// ── Variant 2: Navigation Menubar (APG: examples/menubar-navigation) ────────
 export const initialNavMenubarData: PatternData = PatternDataSchema.parse({
   items: {
     about: { label: 'About' },
@@ -79,12 +73,6 @@ export const initialNavMenubarData: PatternData = PatternDataSchema.parse({
   refs: { label: 'Mythical University' },
 })
 
-// ── Variant 3+4+5: Action Menu Button (APG: examples/menu-button-actions* ) ─
-//
-// All three share the same data; what differs is focus management in <Menu>.
-//   - actionMenuButton                : default (roving tab-index)
-//   - actionMenuButtonFocus           : uses element.focus() via roving tab-index (same as default)
-//   - actionMenuButtonActiveDescendant: focus stays on the menu, aria-activedescendant marks the active item
 export const initialActionMenuData: PatternData = PatternDataSchema.parse({
   items: {
     trigger: { label: 'Actions' },

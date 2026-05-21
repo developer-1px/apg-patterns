@@ -22,7 +22,6 @@ export const initialDisclosureData: PatternData = {
 export const disclosurePanelText =
   'Orders placed before 2pm ship the same business day. Tracking numbers are sent by email once your package leaves our warehouse.'
 
-// ── APG variant: Disclosure of Image Description ────────────────────────────
 export const initialImageDisclosureData: PatternData = {
   items: {
     trigger: { label: 'Show description' },
@@ -48,7 +47,6 @@ export const imageDisclosureContent = {
     'A close portrait of a black dog against a dark, softly blurred background.',
 }
 
-// ── APG variant: Disclosure of Answers to FAQs ──────────────────────────────
 type FaqRow = { key: string; question: string; answer: string }
 const faqRows: readonly FaqRow[] = [
   { key: 'faq1', question: 'What is the cost of a basic membership?', answer: 'Basic membership is free for everyone and includes access to community discussions.' },
@@ -78,7 +76,6 @@ export const initialFaqDisclosureData: PatternData = (() => {
   }
 })()
 
-// ── APG variant: Disclosure Navigation Menu ─────────────────────────────────
 type NavGroup = { key: string; label: string; links: readonly { href: string; label: string }[] }
 const navGroups: readonly NavGroup[] = [
   {
@@ -131,8 +128,6 @@ export const initialNavMenuDisclosureData: PatternData = (() => {
   }
 })()
 
-// ── APG variant: Disclosure Navigation Menu with Top-Level Links ────────────
-// 'home' and 'contact' are plain links (no submenu); rest are disclosure buttons.
 type NavMixed =
   | { kind: 'link'; key: string; label: string; href: string }
   | { kind: 'group'; key: string; label: string; links: readonly { href: string; label: string }[] }
@@ -153,7 +148,6 @@ export const initialNavMenuTopLinksDisclosureData: PatternData = (() => {
   const rootKeys: string[] = []
   for (const entry of navTopLinks) {
     if (entry.kind === 'link') {
-      // Plain links are not part of disclosure rootKeys, but include in items for inspect labels.
       items[entry.key] = { label: entry.label }
       continue
     }

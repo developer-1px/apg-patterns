@@ -8,8 +8,6 @@ import { useSourcePreviewState } from './useSourcePreviewState'
 import { rightModeLabels, rightModes, type AppAction, type AppState } from './appState'
 import { scrollPanelClass } from './ActiveDemoWorkspace'
 
-const optionButtonClass = cx('inline-flex h-8 items-center', ds.option)
-
 export function ActiveDemoRightPanel({
   activeDemo,
   activeSourceName,
@@ -31,7 +29,7 @@ export function ActiveDemoRightPanel({
       <header className="mb-3 grid gap-2">
         <div {...rightModeTabs.getTablistProps()} className={cx('flex items-center gap-1', ds.controlGroup)}>
           {rightModes.map((mode) => (
-            <button {...rightModeTabs.getTabProps(mode)} key={mode} type="button" className={optionButtonClass}>
+            <button {...rightModeTabs.getTabProps(mode)} key={mode} type="button" className={cx('inline-flex h-8 items-center', ds.option)}>
               {rightModeLabels[mode]}
             </button>
           ))}
