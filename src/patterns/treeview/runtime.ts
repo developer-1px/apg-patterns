@@ -16,9 +16,6 @@ import { createTreeviewRenderItems, type TreeviewRenderItem } from './renderItem
 import { createTreeProps } from './treeProps'
 import { createElementId } from '../../kernel/domIds'
 
-export type { TreeviewRenderState } from './renderState'
-export type { TreeviewRenderItem } from './renderItem'
-
 export interface TreeviewRuntime {
   definition: typeof treeviewDefinition
   data: PatternData
@@ -84,10 +81,3 @@ export function createTreeviewRuntime(input: CreateTreeviewRuntimeInput): Treevi
     emit,
   }
 }
-
-export { getTreeItemState } from './renderState'
-export { resolveTreeviewKeyboardBinding, resolveTreeviewNavigationTarget } from './runtimeCompatibility'
-
-// Compatibility re-export for existing import paths.
-export { resolveEventTemplate, evaluatePredicate, createParentByKey } from '../../kernel/patternKernel'
-export { resolveTypeaheadTarget, resolveTreeviewVisibleKeys } from './typeahead'
