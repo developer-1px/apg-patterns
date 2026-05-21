@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import { comboboxDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { Combobox } from './Combobox'
-import { buildComboboxData, filterFruits, firstMatch, FRUITS, reduceComboboxData } from './comboboxData'
+import { buildComboboxData, FRUITS, reduceComboboxData } from './comboboxData'
 
 type Variant = 'selectOnly' | 'listAutocomplete' | 'listWithInlineAutocomplete' | 'datepicker' | 'gridPopup'
 
@@ -41,8 +41,6 @@ function ComboboxReducerEdgesDemo() {
       <button type="button" onClick={() => apply({ type: 'dismiss' })}>Ignored event</button>
       <output data-testid="combobox-active">{String(data.state?.activeKey ?? '')}</output>
       <output data-testid="combobox-query">{String(data.state?.query ?? '')}</output>
-      <output data-testid="combobox-filter">{filterFruits('').join(',')}</output>
-      <output data-testid="combobox-first-match">{String(firstMatch(FRUITS, ''))}</output>
     </div>
   )
 }
@@ -199,8 +197,7 @@ describe('Combobox demo — selectOnly', () => {
     expect(screen.getByTestId('combobox-query').textContent).toBe('')
 
     fireEvent.click(screen.getByRole('button', { name: 'Ignored event' }))
-    expect(screen.getByTestId('combobox-filter').textContent).toContain('apple')
-    expect(screen.getByTestId('combobox-first-match').textContent).toBe('null')
+    expect(screen.getByTestId('combobox-query').textContent).toBe('')
   })
 })
 

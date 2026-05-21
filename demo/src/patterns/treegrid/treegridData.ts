@@ -148,5 +148,3 @@ export const initialTreegridData = PatternDataSchema.parse({
   },
   refs: { label: 'File browser' },
 })
-
-export const treegridFirstCell = (rowKey: string) => cellKey(rowKey, 'name')

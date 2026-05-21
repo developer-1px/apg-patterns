@@ -57,9 +57,6 @@ export const spinbuttonVariants: Record<SpinbuttonVariantKey, SpinbuttonVariant>
   },
 }
 
-export const initialSpinbuttonData = spinbuttonVariants.numeric.data
-export const spinbuttonOptions: PatternOptions = spinbuttonVariants.numeric.options
-
 const computeDelta = (direction: unknown, step: number, large: number): number => {
   if (direction === 'increment') return step
   if (direction === 'decrement') return -step
@@ -76,7 +73,7 @@ const itemRange = (data: SpinbuttonDemoData, key: Key, fallbackMin: number, fall
 export function reduceSpinbuttonData(
   data: SpinbuttonDemoData,
   event: PatternEvent,
-  options: PatternOptions = spinbuttonOptions,
+  options: PatternOptions = spinbuttonVariants.numeric.options,
 ): SpinbuttonDemoData {
   if (event.type === 'focus' && event.key) {
     return { ...data, state: { ...data.state, activeKey: event.key } }

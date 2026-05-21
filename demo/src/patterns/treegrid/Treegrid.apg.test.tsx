@@ -22,7 +22,7 @@ if (typeof globalThis.CSS === 'undefined') {
 import { reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { treegridDefinition } from '../../../../src/patterns/treegrid/definition'
 import { Treegrid } from './Treegrid'
-import { initialTreegridData, treegridFirstCell } from './treegridData'
+import { initialTreegridData } from './treegridData'
 
 function TreegridDemo() {
   const [data, setData] = useState<PatternData>(initialTreegridData)
@@ -57,6 +57,7 @@ function RowFocusTreegridDemo({ activeKey = 'src' }: { activeKey?: string }) {
 }
 
 const cellOf = (key: string) => document.getElementById(`treegridcell-${key}`)!
+const treegridFirstCell = (rowKey: string) => `${rowKey}:name`
 const rowOf = (rowKey: string) =>
   Array.from(document.querySelectorAll('[role="row"]')).find(
     (el) => cellOf(treegridFirstCell(rowKey)) && el.contains(cellOf(treegridFirstCell(rowKey))),

@@ -131,11 +131,7 @@ export function reduceComboboxData(current: PatternData, event: PatternEvent): P
   return current
 }
 
-export function filterFruits(query: string): readonly string[] {
-  return filterComboboxItems(FRUITS, query)
-}
-
-export function firstMatch(sourceItems: readonly ComboboxItem[], query: string): string | null {
+function firstMatch(sourceItems: readonly ComboboxItem[], query: string): string | null {
   const q = query.trim().toLowerCase()
   if (!q) return null
   const item = sourceItems.find((item) => item.label.toLowerCase().startsWith(q))

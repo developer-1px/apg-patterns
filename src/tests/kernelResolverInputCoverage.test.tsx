@@ -25,7 +25,7 @@ import {
 	  type Predicate,
 		} from '../index'
 import { predicateRegistry } from '../kernel/kernelRegistries'
-import { createDialogElementId, isDialogOpen, labelDialogItem } from '../patterns/dialog/dialogRuntimeKeys'
+import { isDialogOpen, labelDialogItem } from '../patterns/dialog/dialogRuntimeKeys'
 import { treegridDefinition } from '../patterns/treegrid/definition'
 import { createTreeviewRenderItems } from '../patterns/treeview/createTreeviewRenderItems'
 import { treeviewDefinition } from '../patterns/treeview/definition'
@@ -640,11 +640,7 @@ function KernelResolverHost() {
       <button
         type="button"
         onClick={() => {
-          const keyToDefaultId = createDialogElementId({})
-          const keyToCustomId = createDialogElementId({ elementIdPrefix: 'custom-' })
           setResult([
-            keyToDefaultId('trigger'),
-            keyToCustomId('trigger'),
             String(isDialogOpen({ items: {}, state: {} })),
             String(labelDialogItem({ items: {}, state: {} }, 'fallback')),
           ].join('|'))
@@ -749,7 +745,7 @@ describe('kernel resolver coverage from pointer input', () => {
     expect(screen.getByText('|null|Unsupported grid action: sideways|Unsupported grid page action: sideways')).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Resolve dialog runtime keys' }))
-    expect(screen.getByText('dialog-trigger|custom-trigger|false|fallback')).toBeTruthy()
+    expect(screen.getByText('false|fallback')).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Check registry status' }))
     expect(screen.getByText('true|true|true|true|true')).toBeTruthy()

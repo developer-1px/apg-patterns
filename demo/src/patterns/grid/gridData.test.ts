@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { gridVariantItems, gridVariants, initialGridData, type GridVariantKey } from './gridData'
+import { gridVariantItems, gridVariants, type GridVariantKey } from './gridData'
 
 const variantKeys = Object.keys(gridVariants) as GridVariantKey[]
 
@@ -13,10 +13,6 @@ describe('grid variant specs', () => {
       { key: 'dataEditable', label: 'Data: editable' },
       { key: 'dataAdvanced', label: 'Data: advanced' },
     ])
-  })
-
-  it('starts the grid demo on the read-only data grid variant', () => {
-    expect(initialGridData).toBe(gridVariants.dataTransactions.data)
   })
 
   it.each(variantKeys)('%s has valid grid dimensions and active cell metadata', (key) => {

@@ -3,10 +3,12 @@ import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import { PatternDataSchema, type PatternEvent } from '../../../../src/react'
 import { Spinbutton } from './Spinbutton'
-import { formatTime, initialSpinbuttonData, reduceSpinbuttonData, spinbuttonOptions, spinbuttonVariants } from './spinbuttonData'
+import { formatTime, reduceSpinbuttonData, spinbuttonVariants } from './spinbuttonData'
+
+const numericSpinbutton = spinbuttonVariants.numeric
 
 function SpinbuttonDemo({ onEvent, variant }: { onEvent?: (event: PatternEvent) => void; variant?: keyof typeof spinbuttonVariants }) {
-  const init = variant ? spinbuttonVariants[variant] : { data: initialSpinbuttonData, options: spinbuttonOptions }
+  const init = variant ? spinbuttonVariants[variant] : numericSpinbutton
   const [data, setData] = useState(init.data)
   const handleEvent = (event: PatternEvent) => {
     onEvent?.(event)
@@ -22,7 +24,7 @@ function SpinbuttonReducerEdgesDemo() {
     setData(() =>
       reduceSpinbuttonData(
         {
-          ...initialSpinbuttonData,
+          ...numericSpinbutton.data,
           items: { loose: { label: 'Loose value' } },
           relations: { rootKeys: ['loose'] },
           state: { activeKey: 'loose', valueByKey: {} },
@@ -108,11 +110,11 @@ describe('Spinbutton — numeric variant', () => {
 
   it('uses item-level value range and labelledby when provided', () => {
     const data = {
-      ...initialSpinbuttonData,
+      ...numericSpinbutton.data,
       items: {
-        ...initialSpinbuttonData.items,
+        ...numericSpinbutton.data.items,
         count: {
-          ...initialSpinbuttonData.items.count,
+          ...numericSpinbutton.data.items.count,
           labelledBy: 'quantity-label',
           valuemin: 2,
           valuemax: 8,

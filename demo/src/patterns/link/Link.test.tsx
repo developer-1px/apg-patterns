@@ -3,9 +3,12 @@ import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { useLinkPattern, type PatternData, type PatternEvent } from '../../../../src/react'
 import { Link } from './Link'
-import { initialAnchorLinkData, initialSpanLinkData } from './linkData'
+import { linkVariants } from './linkData'
 
-const linkHref = (data: typeof initialAnchorLinkData | typeof initialSpanLinkData) => {
+const initialAnchorLinkData = linkVariants.anchor.data
+const initialSpanLinkData = linkVariants.spanRole.data
+
+const linkHref = (data: PatternData) => {
   const key = data.relations?.rootKeys?.[0]!
   return String((data.items[key] as { href?: unknown }).href)
 }

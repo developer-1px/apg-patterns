@@ -9,9 +9,11 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import type { PatternEvent } from '../../../../src/react'
 import { Link } from './Link'
-import { initialAnchorLinkData, initialSpanLinkData } from './linkData'
+import { linkVariants } from './linkData'
 
 const ignoreEvent = () => undefined
+const initialAnchorLinkData = linkVariants.anchor.data
+const initialSpanLinkData = linkVariants.spanRole.data
 
 describe('APG §Roles, States, Properties', () => {
   it('anchor variant has role="link"', () => {

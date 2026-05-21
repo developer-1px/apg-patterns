@@ -158,4 +158,3 @@ export const gridVariants = {
 
 export type GridVariantKey = keyof typeof gridVariants
 export const gridVariantItems = Object.entries(gridVariants).map(([key, value]) => ({ key: key as GridVariantKey, label: value.label }))
-export const initialGridData = gridVariants.dataTransactions.data

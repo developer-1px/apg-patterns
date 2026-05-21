@@ -7,12 +7,14 @@ import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import type { PatternEvent } from '../../../../src/react'
 import { Spinbutton } from './Spinbutton'
-import { initialSpinbuttonData, reduceSpinbuttonData, spinbuttonOptions } from './spinbuttonData'
+import { reduceSpinbuttonData, spinbuttonVariants } from './spinbuttonData'
+
+const numericSpinbutton = spinbuttonVariants.numeric
 
 function SpinbuttonDemo() {
-  const [data, setData] = useState(initialSpinbuttonData)
+  const [data, setData] = useState(numericSpinbutton.data)
   const handleEvent = (event: PatternEvent) =>
-    setData((current) => reduceSpinbuttonData(current, event, spinbuttonOptions))
+    setData((current) => reduceSpinbuttonData(current, event, numericSpinbutton.options))
   return <Spinbutton data={data} onEvent={handleEvent} />
 }
 
