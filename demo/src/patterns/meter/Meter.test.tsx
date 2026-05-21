@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { useMeterPattern, type PatternData } from '../../../../src/react'
 import { Meter } from './Meter'
-import { initialMeterData, meterVariants } from './meterData'
+import { meterVariants } from './meterData'
 
 function MeterRuntimeEdgeDemo({ data }: { data: PatternData }) {
   const meter = useMeterPattern(data, () => undefined, { elementIdPrefix: 'edge-meter-' })
@@ -28,9 +28,10 @@ function MeterRuntimeEdgeDemo({ data }: { data: PatternData }) {
   )
 }
 
-describe('Meter demo — back-compat (single disk meter)', () => {
+describe('Meter demo — variant: Disk Usage', () => {
   it('renders role=meter with aria-valuemin/max/now/valuetext', () => {
-    render(<Meter data={initialMeterData} onEvent={() => {}} />)
+    const v = meterVariants.disk
+    render(<Meter data={v.data} onEvent={() => {}} options={v.options} />)
     const meter = screen.getByRole('meter')
     expect(meter.getAttribute('aria-valuemin')).toBe('0')
     expect(meter.getAttribute('aria-valuemax')).toBe('100')
@@ -39,7 +40,8 @@ describe('Meter demo — back-compat (single disk meter)', () => {
   })
 
   it('exposes the label', () => {
-    render(<Meter data={initialMeterData} onEvent={() => {}} />)
+    const v = meterVariants.disk
+    render(<Meter data={v.data} onEvent={() => {}} options={v.options} />)
     expect(screen.getByText('Disk usage')).toBeTruthy()
   })
 })
@@ -81,13 +83,14 @@ describe('Meter demo — variant: Storage', () => {
 
 describe('Meter demo — no keyboard interaction', () => {
   it('does not expose a tabIndex (read-only display)', () => {
-    render(<Meter data={initialMeterData} onEvent={() => {}} />)
+    const v = meterVariants.disk
+    render(<Meter data={v.data} onEvent={() => {}} options={v.options} />)
     const meter = screen.getByRole('meter')
     expect(meter.getAttribute('tabindex')).toBeNull()
   })
 
   it('exposes meter runtime getters from pointer input', () => {
-    render(<MeterRuntimeEdgeDemo data={initialMeterData} />)
+    render(<MeterRuntimeEdgeDemo data={meterVariants.disk.data} />)
 
     fireEvent.click(screen.getByRole('button', { name: 'Read meter runtime' }))
 

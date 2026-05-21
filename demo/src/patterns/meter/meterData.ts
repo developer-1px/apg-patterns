@@ -53,7 +53,3 @@ export const meterVariants: Record<MeterVariantKey, MeterVariant> = {
 }
 
 export const meterVariantItems = Object.values(meterVariants).map((v) => ({ key: v.key, label: v.label }))
-
-// Back-compat — simple single-meter exports.
-export const initialMeterData = meterVariants.disk.data
-export const meterOptions: PatternOptions = { min: 0, max: 100 }

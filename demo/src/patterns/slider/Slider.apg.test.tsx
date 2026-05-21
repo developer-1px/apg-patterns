@@ -7,13 +7,14 @@ import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import type { PatternEvent } from '../../../../src/react'
 import { Slider } from './Slider'
-import { initialSliderData, reduceSliderData, sliderOptions } from './sliderData'
+import { reduceSliderData, sliderVariants } from './sliderData'
 
 function SliderDemo() {
-  const [data, setData] = useState(initialSliderData)
+  const variant = sliderVariants.seek
+  const [data, setData] = useState(variant.data)
   const handleEvent = (event: PatternEvent) =>
-    setData((current) => reduceSliderData(current, event, sliderOptions))
-  return <Slider data={data} onEvent={handleEvent} options={sliderOptions} />
+    setData((current) => reduceSliderData(current, event, variant.options))
+  return <Slider data={data} onEvent={handleEvent} options={variant.options} />
 }
 
 const sl = () => screen.getAllByRole('slider')[0]!

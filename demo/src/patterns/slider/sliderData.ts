@@ -119,19 +119,6 @@ export const sliderVariants: Record<SliderVariantKey, SliderVariant> = {
 
 export const sliderVariantItems = Object.values(sliderVariants).map((v) => ({ key: v.key, label: v.label }))
 
-export const initialSliderData: SliderDemoData = parseSliderData({
-  items: { volume: { label: 'Volume' } },
-  relations: { rootKeys: ['volume'] },
-  state: { activeKey: 'volume', valueByKey: { volume: 50 } },
-})
-export const sliderOptions: SliderOptions = {
-  focusStrategy: 'rovingTabIndex',
-  min: 0,
-  max: 100,
-  step: 5,
-  orientation: 'horizontal',
-}
-
 const computeDelta = (direction: unknown, step: number, large: number): number => {
   if (direction === 'increment') return step
   if (direction === 'decrement') return -step
@@ -157,7 +144,7 @@ const valuetextFor = (data: SliderDemoData, key: Key, next: number): string | un
 export function reduceSliderData(
   data: SliderDemoData,
   event: PatternEvent,
-  options: SliderOptions = sliderOptions,
+  options: SliderOptions,
 ): SliderDemoData {
   if (event.type === 'focus' && event.key) {
     return { ...data, state: { ...data.state, activeKey: event.key } }

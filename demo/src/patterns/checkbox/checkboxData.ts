@@ -87,9 +87,3 @@ export const checkboxVariantItems: readonly { key: CheckboxVariantKey; label: st
   { key: 'twoState', label: 'Two-State' },
   { key: 'triState', label: 'Tri-State (Mixed)' },
 ]
-
-// Backwards-compatible exports (existing tests/demos consume these).
-export const initialCheckboxData = twoStateInitial
-export function reduceCheckboxData(data: PatternData, event: PatternEvent): PatternData {
-  return reducePatternData(checkboxDefinition, data, event)
-}

@@ -7,11 +7,12 @@ import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import type { PatternEvent } from '../../../../src/react'
 import { Checkbox } from './Checkbox'
-import { checkboxVariants, initialCheckboxData, reduceCheckboxData } from './checkboxData'
+import { checkboxVariants } from './checkboxData'
 
 function TwoStateDemo() {
-  const [data, setData] = useState(initialCheckboxData)
-  const handleEvent = (event: PatternEvent) => setData((current) => reduceCheckboxData(current, event))
+  const variant = checkboxVariants.twoState
+  const [data, setData] = useState(variant.data)
+  const handleEvent = (event: PatternEvent) => setData((current) => variant.reduce(current, event))
   return <Checkbox data={data} onEvent={handleEvent} />
 }
 

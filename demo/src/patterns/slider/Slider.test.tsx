@@ -3,10 +3,10 @@ import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import { PatternDataSchema, type PatternEvent } from '../../../../src/react'
 import { Slider } from './Slider'
-import { initialSliderData, reduceSliderData, sliderOptions, sliderVariants } from './sliderData'
+import { reduceSliderData, sliderVariants } from './sliderData'
 
 function SliderDemo({ onEvent, variant }: { onEvent?: (event: PatternEvent) => void; variant?: keyof typeof sliderVariants }) {
-  const init = variant ? sliderVariants[variant] : { data: initialSliderData, options: sliderOptions }
+  const init = sliderVariants[variant ?? 'seek']
   const [data, setData] = useState(init.data)
   const handleEvent = (event: PatternEvent) => {
     onEvent?.(event)
@@ -24,7 +24,6 @@ function SliderReducerEdgesDemo() {
     setData((current) =>
       reduceSliderData(
         {
-          ...initialSliderData,
           items: { loose: { label: 'Loose value' } },
           relations: { rootKeys: ['loose'] },
           state: { activeKey: 'loose', valueByKey: {} },
@@ -37,12 +36,12 @@ function SliderReducerEdgesDemo() {
     setData(() =>
       reduceSliderData(
         {
-          ...initialSliderData,
           items: { custom: { label: 'Custom', valuetext: 'Custom text' } },
           relations: { rootKeys: ['custom'] },
           state: { activeKey: 'custom', valueByKey: { custom: 1 } },
         },
         event,
+        sliderVariants.seek.options,
       ),
     )
   const applyMin = (event: PatternEvent) =>
@@ -82,7 +81,7 @@ function SliderReducerEdgesDemo() {
   )
 }
 
-describe('Slider demo — back-compat (single thumb volume)', () => {
+describe('Slider demo — variant: Media Seek', () => {
   it('renders nothing when no slider thumb is present', () => {
     const emptyData = PatternDataSchema.parse({ items: {}, relations: { rootKeys: [] }, state: {} })
     render(<Slider data={emptyData} onEvent={() => undefined} />)
@@ -94,12 +93,12 @@ describe('Slider demo — back-compat (single thumb volume)', () => {
     render(<SliderDemo />)
 
     fireEvent.keyDown(screen.getByRole('slider'), { key: 'F13', code: 'F13' })
-    expect(screen.getByRole('slider').getAttribute('aria-valuenow')).toBe('50')
+    expect(screen.getByRole('slider').getAttribute('aria-valuenow')).toBe('45')
 
     fireEvent.keyDown(screen.getByRole('slider'), { key: 'ArrowRight', code: 'ArrowRight' })
 
-    expect(screen.getByRole('slider').getAttribute('aria-valuenow')).toBe('55')
-    expect(screen.getByText('55')).toBeTruthy()
+    expect(screen.getByRole('slider').getAttribute('aria-valuenow')).toBe('46')
+    expect(screen.getByText('0:46')).toBeTruthy()
   })
 
   it('updates value from pointer position', () => {
@@ -109,8 +108,8 @@ describe('Slider demo — back-compat (single thumb volume)', () => {
 
     fireEvent.pointerDown(track, { clientX: 150, pointerId: 1 })
 
-    expect(screen.getByRole('slider').getAttribute('aria-valuenow')).toBe('75')
-    expect(screen.getByText('75')).toBeTruthy()
+    expect(screen.getByRole('slider').getAttribute('aria-valuenow')).toBe('225')
+    expect(screen.getByText('3:45')).toBeTruthy()
   })
 
   it('ignores horizontal pointer move unless dragging', () => {
@@ -120,14 +119,14 @@ describe('Slider demo — back-compat (single thumb volume)', () => {
 
     fireEvent.pointerMove(track, { clientX: 180, buttons: 0, pointerId: 1 })
 
-    expect(screen.getByRole('slider').getAttribute('aria-valuenow')).toBe('50')
+    expect(screen.getByRole('slider').getAttribute('aria-valuenow')).toBe('45')
   })
 
   it('Home/End jump to min/max', () => {
     render(<SliderDemo />)
     const slider = screen.getByRole('slider')
     fireEvent.keyDown(slider, { key: 'End', code: 'End' })
-    expect(slider.getAttribute('aria-valuenow')).toBe('100')
+    expect(slider.getAttribute('aria-valuenow')).toBe('300')
     fireEvent.keyDown(slider, { key: 'Home', code: 'Home' })
     expect(slider.getAttribute('aria-valuenow')).toBe('0')
   })
@@ -135,18 +134,18 @@ describe('Slider demo — back-compat (single thumb volume)', () => {
   it('PageUp/PageDown change by ~10% of range', () => {
     render(<SliderDemo />)
     const slider = screen.getByRole('slider')
-    // 50 → +10 = 60
+    // 45 -> +30 = 75
     fireEvent.keyDown(slider, { key: 'PageUp', code: 'PageUp' })
-    expect(slider.getAttribute('aria-valuenow')).toBe('60')
+    expect(slider.getAttribute('aria-valuenow')).toBe('75')
     fireEvent.keyDown(slider, { key: 'PageDown', code: 'PageDown' })
-    expect(slider.getAttribute('aria-valuenow')).toBe('50')
+    expect(slider.getAttribute('aria-valuenow')).toBe('45')
   })
 
   it('Shift+ArrowRight applies large step', () => {
     render(<SliderDemo />)
     const slider = screen.getByRole('slider')
     fireEvent.keyDown(slider, { key: 'ArrowRight', code: 'ArrowRight', shiftKey: true })
-    expect(slider.getAttribute('aria-valuenow')).toBe('60')
+    expect(slider.getAttribute('aria-valuenow')).toBe('75')
   })
 
   it('handles a zero range slider without moving its position', () => {
