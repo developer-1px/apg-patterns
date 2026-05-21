@@ -845,7 +845,7 @@ function SourceTabsCollisionProbe() {
     onChange: () => undefined,
   })
 
-  return <SourceTabs tabs={sourceTabs.tabs} getTablistProps={sourceTabs.getTablistProps} getTabProps={sourceTabs.getTabProps} />
+  return <SourceTabs tabs={tabs} getTablistProps={sourceTabs.getTablistProps} getTabProps={sourceTabs.getTabProps} />
 }
 
 function SourceTabsFocusProbe() {
@@ -858,7 +858,7 @@ function SourceTabsFocusProbe() {
     onChange: setValue,
   })
 
-  return <SourceTabs tabs={sourceTabs.tabs} getTablistProps={sourceTabs.getTablistProps} getTabProps={sourceTabs.getTabProps} />
+  return <SourceTabs tabs={tabs} getTablistProps={sourceTabs.getTablistProps} getTabProps={sourceTabs.getTabProps} />
 }
 
 function DemoSourceProbeItem({

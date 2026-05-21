@@ -2,22 +2,20 @@ import type { HTMLAttributes } from 'react'
 import { useTabsPattern, type PatternData, type PatternEvent } from '../../../src/react'
 import { cx, ds } from '../shared/designSystem'
 
-type SourceTabKey = string
-
-interface UseSourceTabsInput<T extends SourceTabKey> {
+interface UseSourceTabsInput<T extends string> {
   label: string
   tabs: readonly T[]
   value: T
   onChange: (value: T) => void
 }
 
-interface SourceTabsViewProps<T extends SourceTabKey> {
+interface SourceTabsViewProps<T extends string> {
   tabs: readonly T[]
   getTablistProps: () => HTMLAttributes<HTMLElement>
   getTabProps: (tab: T) => HTMLAttributes<HTMLElement>
 }
 
-export function useSourceTabs<T extends SourceTabKey>({ label, tabs, value, onChange }: UseSourceTabsInput<T>) {
+export function useSourceTabs<T extends string>({ label, tabs, value, onChange }: UseSourceTabsInput<T>) {
   const tabEntries = tabs.map((tab) => ({ tab, key: tabKey(tab) }))
   const keyToTab = new Map(tabEntries.map(({ tab, key }) => [key, tab]))
   const data = createSourceTabsData(label, tabEntries, tabKey(value))
@@ -33,14 +31,13 @@ export function useSourceTabs<T extends SourceTabKey>({ label, tabs, value, onCh
   )
 
   return {
-    tabs,
     getTablistProps: runtime.getTablistProps,
     getTabProps: (tab: T) => runtime.getTabProps(tabKey(tab)),
     getPanelProps: () => runtime.getTabPanelProps(panelKey(tabKey(value))),
   }
 }
 
-export function SourceTabs<T extends SourceTabKey>({ tabs, getTablistProps, getTabProps }: SourceTabsViewProps<T>) {
+export function SourceTabs<T extends string>({ tabs, getTablistProps, getTabProps }: SourceTabsViewProps<T>) {
   return (
     <div {...getTablistProps()} className={cx('flex min-w-0 gap-1 overflow-x-auto whitespace-nowrap', ds.controlGroup)}>
       {tabs.map((tab) => (
@@ -57,7 +54,7 @@ export function SourceTabs<T extends SourceTabKey>({ tabs, getTablistProps, getT
   )
 }
 
-function createSourceTabsData(label: string, tabs: readonly { tab: SourceTabKey; key: SourceTabKey }[], value: SourceTabKey): PatternData {
+function createSourceTabsData(label: string, tabs: readonly { tab: string; key: string }[], value: string): PatternData {
   return {
     items: Object.fromEntries(tabs.flatMap(({ tab, key }) => [[key, { label: tab }], [panelKey(key), { label: `${tab} source` }]])),
     relations: {
@@ -75,7 +72,7 @@ function createSourceTabsData(label: string, tabs: readonly { tab: SourceTabKey;
   }
 }
 
-function resolveNavigatedTab<T extends SourceTabKey>(tabs: readonly T[], value: T, event: Extract<PatternEvent, { type: 'navigate' }>): T {
+function resolveNavigatedTab<T extends string>(tabs: readonly T[], value: T, event: Extract<PatternEvent, { type: 'navigate' }>): T {
   if (tabs.length === 0) return value
   if (event.direction === 'first') return tabs[0] ?? value
   if (event.direction === 'last') return tabs[tabs.length - 1] ?? value
@@ -87,7 +84,7 @@ function resolveNavigatedTab<T extends SourceTabKey>(tabs: readonly T[], value: 
   return value
 }
 
-function selectTab<T extends SourceTabKey>(key: string | null | undefined, keyToTab: ReadonlyMap<SourceTabKey, T>, onChange: (value: T) => void) {
+function selectTab<T extends string>(key: string | null | undefined, keyToTab: ReadonlyMap<string, T>, onChange: (value: T) => void) {
   const tab = key ? keyToTab.get(key) : undefined
   if (tab) onChange(tab)
 }
