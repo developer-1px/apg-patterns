@@ -1,19 +1,19 @@
-# @interactive-os/apg-patterns API Reference
+# @interactive-os/aria API Reference
 
 This file lists the published entrypoints and export names included in the npm package.
 
 ## Entrypoints
 
 ```ts
-import { createPatternRuntime } from '@interactive-os/apg-patterns'
-import { createPatternRuntime } from '@interactive-os/apg-patterns/core'
-import { Button, useButtonPattern } from '@interactive-os/apg-patterns/react'
-import type { PatternData, PatternEvent } from '@interactive-os/apg-patterns'
+import { createPatternRuntime } from '@interactive-os/aria'
+import { createPatternRuntime } from '@interactive-os/aria/core'
+import { Button, useButtonPattern } from '@interactive-os/aria/react'
+import type { PatternData, PatternEvent } from '@interactive-os/aria'
 ```
 
-- `@interactive-os/apg-patterns`: React-free root entry.
-- `@interactive-os/apg-patterns/core`: React-free core entry with the same export surface as the root entry.
-- `@interactive-os/apg-patterns/react`: core exports plus React hooks, runtimes, render items, and preset components.
+- `@interactive-os/aria`: React-free root entry.
+- `@interactive-os/aria/core`: React-free core entry with the same export surface as the root entry.
+- `@interactive-os/aria/react`: core exports plus React hooks, runtimes, render items, and preset components.
 
 The export lists include runtime values and TypeScript type-only names. The runtime value sections list names that JavaScript consumers can import at runtime.
 

@@ -42,7 +42,7 @@ Both release workflows verify and upload `release-artifacts/` with the `npm pack
 
 ## Public Surface
 
-Keep runtime dependencies small and declared in `package.json`. The root entry and `@interactive-os/apg-patterns/core` must stay React-free; React-only APIs belong under `@interactive-os/apg-patterns/react`.
+Keep runtime dependencies small and declared in `package.json`. The root entry and `@interactive-os/aria/core` must stay React-free; React-only APIs belong under `@interactive-os/aria/react`.
 
 Package contents are controlled by the `files` whitelist in `package.json` and verified by `npm run check:publish`.
 

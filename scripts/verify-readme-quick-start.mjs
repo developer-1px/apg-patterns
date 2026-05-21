@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 import ts from 'typescript'
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const tempRoot = mkdtempSync(join(tmpdir(), 'apg-patterns-readme-'))
+const tempRoot = mkdtempSync(join(tmpdir(), 'aria-readme-'))
 
 try {
   assertBuildOutputExists()
@@ -79,7 +79,7 @@ function installPackedPackage(tarballPath, nodeModules) {
   const packageScopeRoot = join(nodeModules, '@interactive-os')
   mkdirSync(packageScopeRoot, { recursive: true })
   execFileSync('tar', ['-xzf', tarballPath, '-C', packageScopeRoot], { cwd: repoRoot })
-  renameSync(join(packageScopeRoot, 'package'), join(packageScopeRoot, 'apg-patterns'))
+  renameSync(join(packageScopeRoot, 'package'), join(packageScopeRoot, 'aria'))
 }
 
 function readReadmeExamples() {
@@ -166,7 +166,7 @@ function tsxCodeBlocks(source) {
 function reactPresetComponentExampleSource(snippet) {
   const componentNames = [...snippet.matchAll(/<([A-Z][A-Za-z0-9]*)\b/g)].map((match) => match[1])
   const uniqueComponentNames = [...new Set(componentNames)]
-  return `import { ${uniqueComponentNames.join(', ')}, type PatternData, type PatternEvent } from '@interactive-os/apg-patterns/react'
+  return `import { ${uniqueComponentNames.join(', ')}, type PatternData, type PatternEvent } from '@interactive-os/aria/react'
 
 const data: PatternData = {
   items: { primary: { label: 'Primary' } },
@@ -186,7 +186,7 @@ ${indent(snippet, 6)}
 }
 
 function reactRenderItemsExampleSource({ hook, name, snippet }) {
-  return `import { ${hook}, type PatternData, type PatternEvent, type PatternOptions } from '@interactive-os/apg-patterns/react'
+  return `import { ${hook}, type PatternData, type PatternEvent, type PatternOptions } from '@interactive-os/aria/react'
 
 const data: PatternData = {
   items: { primary: { label: 'Primary' } },

@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-Security fixes are prepared for the latest published version of `@interactive-os/apg-patterns`.
+Security fixes are prepared for the latest published version of `@interactive-os/aria`.
 
 ## Reporting a Vulnerability
 

@@ -192,10 +192,10 @@ function assertDeclarationExportSurface() {
 }
 
 async function assertConditionalDeclarationResolution() {
-  const tempRoot = await mkdtemp(join(tmpdir(), 'apg-patterns-resolution-'))
+  const tempRoot = await mkdtemp(join(tmpdir(), 'aria-resolution-'))
   try {
     await mkdir(join(tempRoot, 'node_modules', '@interactive-os'), { recursive: true })
-    await symlink(repoRootPath, join(tempRoot, 'node_modules', '@interactive-os', 'apg-patterns'), 'dir')
+    await symlink(repoRootPath, join(tempRoot, 'node_modules', '@interactive-os', 'aria'), 'dir')
 
     for (const scenario of declarationResolutionScenarios()) {
       const resolved = resolvePackageSpecifier(tempRoot, scenario.specifier, scenario.resolutionMode)
@@ -217,37 +217,37 @@ function declarationResolutionScenarios() {
   return [
     {
       label: 'ESM root declaration',
-      specifier: '@interactive-os/apg-patterns',
+      specifier: '@interactive-os/aria',
       resolutionMode: ts.ModuleKind.ESNext,
       expected: 'dist/index.d.ts',
     },
     {
       label: 'CJS root declaration',
-      specifier: '@interactive-os/apg-patterns',
+      specifier: '@interactive-os/aria',
       resolutionMode: ts.ModuleKind.CommonJS,
       expected: 'dist/index.d.cts',
     },
     {
       label: 'ESM ./core declaration',
-      specifier: '@interactive-os/apg-patterns/core',
+      specifier: '@interactive-os/aria/core',
       resolutionMode: ts.ModuleKind.ESNext,
       expected: 'dist/core.d.ts',
     },
     {
       label: 'CJS ./core declaration',
-      specifier: '@interactive-os/apg-patterns/core',
+      specifier: '@interactive-os/aria/core',
       resolutionMode: ts.ModuleKind.CommonJS,
       expected: 'dist/core.d.cts',
     },
     {
       label: 'ESM ./react declaration',
-      specifier: '@interactive-os/apg-patterns/react',
+      specifier: '@interactive-os/aria/react',
       resolutionMode: ts.ModuleKind.ESNext,
       expected: 'dist/react.d.ts',
     },
     {
       label: 'CJS ./react declaration',
-      specifier: '@interactive-os/apg-patterns/react',
+      specifier: '@interactive-os/aria/react',
       resolutionMode: ts.ModuleKind.CommonJS,
       expected: 'dist/react.d.cts',
     },

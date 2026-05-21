@@ -55,7 +55,7 @@ async function fetchLinkedExamples() {
   const linkedExamples = []
   for (const pattern of patterns) {
     const response = await fetch(`https://www.w3.org/WAI/ARIA/apg/patterns/${pattern}/`, {
-      headers: { 'User-Agent': 'apg-patterns coverage verifier' },
+      headers: { 'User-Agent': 'aria coverage verifier' },
     })
     if (!response.ok) throw new Error(`Failed to fetch ${pattern}: ${response.status}`)
 

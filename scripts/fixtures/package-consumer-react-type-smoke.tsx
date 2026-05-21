@@ -4,9 +4,9 @@ import {
   type KeyInput,
   type PatternData,
   type PatternEvent,
-} from '@interactive-os/apg-patterns'
-import { buttonDefinition as coreButtonDefinition } from '@interactive-os/apg-patterns/core'
-import { Button, useButtonPattern, type ButtonProps } from '@interactive-os/apg-patterns/react'
+} from '@interactive-os/aria'
+import { buttonDefinition as coreButtonDefinition } from '@interactive-os/aria/core'
+import { Button, useButtonPattern, type ButtonProps } from '@interactive-os/aria/react'
 import type { ReactElement } from 'react'
 
 const data: PatternData = {

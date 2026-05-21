@@ -1,5 +1,5 @@
 {
-  "name": "@interactive-os/apg-patterns",
+  "name": "@interactive-os/aria",
   "version": "0.1.0",
   "description": "Serializable WAI-ARIA APG pattern definitions, runtime, and React adapters.",
   "keywords": [
@@ -15,12 +15,12 @@
   "author": "Interactive OS",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/developer-1px/apg-patterns.git"
+    "url": "git+https://github.com/developer-1px/aria.git"
   },
   "bugs": {
-    "url": "https://github.com/developer-1px/apg-patterns/issues"
+    "url": "https://github.com/developer-1px/aria/issues"
   },
-  "homepage": "https://developer-1px.github.io/apg-patterns/",
+  "homepage": "https://developer-1px.github.io/aria/",
   "type": "module",
   "packageManager": "npm@11.6.2",
   "engines": {

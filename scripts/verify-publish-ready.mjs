@@ -389,8 +389,8 @@ function assertInterfaceStabilityGuide(source) {
     '## Breaking Change Rule',
     '## Cleanup Rule',
     '## Validation Gates',
-    '@interactive-os/apg-patterns/core',
-    '@interactive-os/apg-patterns/react',
+    '@interactive-os/aria/core',
+    '@interactive-os/aria/react',
     'PatternData',
     'PatternEvent',
     'PatternDefinition',
@@ -423,8 +423,8 @@ function assertContributingGuide(contributingGuide) {
     'release-artifacts/',
     'npm-pack.json',
     'npm run check:release-artifacts',
-    '@interactive-os/apg-patterns/core',
-    '@interactive-os/apg-patterns/react',
+    '@interactive-os/aria/core',
+    '@interactive-os/aria/react',
     'npm run check:publish',
   ]
   for (const marker of requiredMarkers) {

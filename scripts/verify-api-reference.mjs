@@ -82,10 +82,10 @@ if (wroteApiReference) {
   apiReference = nextApiReference
 }
 
-assertContains("import { createPatternRuntime } from '@interactive-os/apg-patterns'")
-assertContains("import { createPatternRuntime } from '@interactive-os/apg-patterns/core'")
-assertContains("import { Button, useButtonPattern } from '@interactive-os/apg-patterns/react'")
-assertContains("import type { PatternData, PatternEvent } from '@interactive-os/apg-patterns'")
+assertContains("import { createPatternRuntime } from '@interactive-os/aria'")
+assertContains("import { createPatternRuntime } from '@interactive-os/aria/core'")
+assertContains("import { Button, useButtonPattern } from '@interactive-os/aria/react'")
+assertContains("import type { PatternData, PatternEvent } from '@interactive-os/aria'")
 assertExportBlock('root-core', coreExports)
 assertExportBlock('root-core-runtime', rootRuntimeExports)
 assertExportBlock('react-only', reactOnlyExports)

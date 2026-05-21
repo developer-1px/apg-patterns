@@ -4,7 +4,7 @@ import { extname } from 'node:path'
 
 const forbiddenTokens = [
   ['legacy kernel package import', '@interactive-os/' + 'aria-kernel'],
-  ['legacy pattern facade import', '@interactive-os/' + 'apg-patterns-legacy'],
+  ['legacy pattern facade import', '@interactive-os/' + 'aria-legacy'],
   ['sibling legacy workspace path', '../aria-' + 'kernel'],
   ['legacy workspace path', 'aria-' + 'kernel/'],
   ['legacy pattern facade path', 'legacy/' + 'apg-patterns'],
@@ -37,8 +37,8 @@ const textExtensions = new Set([
 const failures = []
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
 
-if (packageJson.name !== '@interactive-os/apg-patterns') {
-  failures.push(`package.json name must stay @interactive-os/apg-patterns; found ${JSON.stringify(packageJson.name)}`)
+if (packageJson.name !== '@interactive-os/aria') {
+  failures.push(`package.json name must stay @interactive-os/aria; found ${JSON.stringify(packageJson.name)}`)
 }
 
 for (const field of dependencyFields) {

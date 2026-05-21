@@ -1,4 +1,4 @@
-# @interactive-os/apg-patterns Interface Stability
+# @interactive-os/aria Interface Stability
 
 This file defines the interface surface that the package treats as stable.
 Use it as the cleanup filter: keep code that is necessary to preserve these
@@ -13,14 +13,14 @@ identity from implementation shape.
 
 ### Package Identity
 
-- The package name is `@interactive-os/apg-patterns`.
-- The public entrypoints are `@interactive-os/apg-patterns`,
-  `@interactive-os/apg-patterns/core`, `@interactive-os/apg-patterns/react`, and
-  `@interactive-os/apg-patterns/package.json`.
-- The root entry and `@interactive-os/apg-patterns/core` are React-free.
-- The root entry and `@interactive-os/apg-patterns/core` expose the same public
+- The package name is `@interactive-os/aria`.
+- The public entrypoints are `@interactive-os/aria`,
+  `@interactive-os/aria/core`, `@interactive-os/aria/react`, and
+  `@interactive-os/aria/package.json`.
+- The root entry and `@interactive-os/aria/core` are React-free.
+- The root entry and `@interactive-os/aria/core` expose the same public
   surface.
-- `@interactive-os/apg-patterns/react` is additive over core and is the only
+- `@interactive-os/aria/react` is additive over core and is the only
   entrypoint that may require the React peer.
 - Published builds provide ESM, CommonJS, and TypeScript declarations for every
   public runtime entrypoint.
@@ -106,7 +106,7 @@ These details may change without being treated as package identity:
 A change requires a major version when it does any of the following:
 
 - Removes or renames a public entrypoint.
-- Makes the root entry or `@interactive-os/apg-patterns/core` depend on React.
+- Makes the root entry or `@interactive-os/aria/core` depend on React.
 - Changes the meaning or required fields of an existing `PatternEvent`.
 - Changes the accepted compatible top-level `PatternData` shape.
 - Mutates caller-owned `PatternData` directly.

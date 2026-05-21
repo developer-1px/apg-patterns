@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url'
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const packageJson = JSON.parse(readFileSync(join(repoRoot, 'package.json'), 'utf8'))
-const tempRoot = mkdtempSync(join(tmpdir(), 'apg-patterns-consumer-'))
+const tempRoot = mkdtempSync(join(tmpdir(), 'aria-consumer-'))
 
 try {
   const tarballPath = packCurrentPackage(tempRoot)
@@ -56,7 +56,7 @@ try {
 
 function runConsumerSmoke({ tarballPath, consumerRoot, includeReact, smokeKind }) {
   const nodeModules = join(consumerRoot, 'node_modules')
-  const packageRoot = join(nodeModules, '@interactive-os', 'apg-patterns')
+  const packageRoot = join(nodeModules, '@interactive-os', 'aria')
 
   mkdirSync(join(nodeModules, '@interactive-os'), { recursive: true })
   execFileSync('tar', ['-xzf', tarballPath, '-C', join(nodeModules, '@interactive-os')], { cwd: repoRoot })
@@ -81,7 +81,7 @@ function runConsumerSmoke({ tarballPath, consumerRoot, includeReact, smokeKind }
 function runNpmInstalledConsumerSmoke({ tarballPath, consumerRoot, includeReact, smokeKind }) {
   mkdirSync(consumerRoot, { recursive: true })
   const dependencies = {
-    '@interactive-os/apg-patterns': localFileSpec(tarballPath),
+    '@interactive-os/aria': localFileSpec(tarballPath),
   }
   const devDependencies = {}
   const overrides = {
@@ -195,7 +195,7 @@ function runNpmInstall(consumerRoot) {
 }
 
 function assertNpmInstalledPackageFiles(consumerRoot, tarballPath) {
-  const packageRoot = packageInstallPath(consumerRoot, '@interactive-os/apg-patterns')
+  const packageRoot = packageInstallPath(consumerRoot, '@interactive-os/aria')
   const expectedPaths = packedTarballFilePaths(tarballPath)
   const actualPaths = packageFilePaths(packageRoot).sort((left, right) => left.localeCompare(right))
 
@@ -256,11 +256,11 @@ function assertNpmInstallLockfile(consumerRoot, tarballPath, includeReact) {
 
   const rootPackage = packageLock.packages?.['']
   if (!rootPackage) throw new Error('npm consumer package-lock is missing root package metadata')
-  if (rootPackage.dependencies?.['@interactive-os/apg-patterns'] !== localFileSpec(tarballPath)) {
+  if (rootPackage.dependencies?.['@interactive-os/aria'] !== localFileSpec(tarballPath)) {
     throw new Error('npm consumer package-lock did not retain the tarball dependency spec')
   }
 
-  const installedPackage = packageLock.packages?.['node_modules/@interactive-os/apg-patterns']
+  const installedPackage = packageLock.packages?.['node_modules/@interactive-os/aria']
   if (!installedPackage) throw new Error('npm consumer package-lock is missing the installed package entry')
   if (installedPackage.version !== packageJson.version) throw new Error('npm consumer package-lock recorded the wrong package version')
   if (installedPackage.license !== packageJson.license) throw new Error('npm consumer package-lock recorded the wrong package license')
@@ -303,7 +303,7 @@ function assertRuntimeDependencyInstallState(consumerRoot) {
   const consumerPackageJson = JSON.parse(readFileSync(join(consumerRoot, 'package.json'), 'utf8'))
   if (consumerPackageJson.dependencies?.zod) throw new Error('npm consumer must not install zod as a direct dependency')
 
-  const packageRoot = packageInstallPath(consumerRoot, '@interactive-os/apg-patterns')
+  const packageRoot = packageInstallPath(consumerRoot, '@interactive-os/aria')
   const packageRequire = createRequire(join(packageRoot, 'package.json'))
   const zodPath = packageRequire.resolve('zod')
   if (!existsSync(zodPath)) throw new Error('Installed package could not resolve its zod runtime dependency')
@@ -337,7 +337,7 @@ function writeConsumerFiles(consumerRoot, smokeKind, options = {}) {
     include: [cjsTypeSmokeFilename],
   }))
   const typeSmoke = smokeKind === 'core' || smokeKind === 'root'
-    ? coreTypeSmokeSource(smokeKind === 'core' ? '@interactive-os/apg-patterns/core' : '@interactive-os/apg-patterns')
+    ? coreTypeSmokeSource(smokeKind === 'core' ? '@interactive-os/aria/core' : '@interactive-os/aria')
     : readFileSync(new URL('./fixtures/package-consumer-react-type-smoke.tsx', import.meta.url), 'utf8')
   writeFileSync(join(consumerRoot, typeSmokeFilename), typeSmoke)
   writeFileSync(join(consumerRoot, cjsTypeSmokeFilename), cjsTypeSmokeSource(smokeKind))
@@ -360,8 +360,8 @@ function viteConsumerSource(smokeKind) {
   if (smokeKind === 'react') {
     return `import { createElement } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Button, type PatternData, type PatternEvent } from '@interactive-os/apg-patterns/react'
-import { buttonDefinition, createPatternRuntime } from '@interactive-os/apg-patterns/core'
+import { Button, type PatternData, type PatternEvent } from '@interactive-os/aria/react'
+import { buttonDefinition, createPatternRuntime } from '@interactive-os/aria/core'
 
 const data: PatternData = {
   items: { primary: { label: 'Primary' } },
@@ -388,7 +388,7 @@ createRoot(root).render(createElement(Button, {
 `
   }
 
-  const packagePath = smokeKind === 'core' ? '@interactive-os/apg-patterns/core' : '@interactive-os/apg-patterns'
+  const packagePath = smokeKind === 'core' ? '@interactive-os/aria/core' : '@interactive-os/aria'
   return `import { buttonDefinition, createPatternRuntime, type PatternData, type PatternEvent } from '${packagePath}'
 
 const data: PatternData = {
@@ -426,15 +426,15 @@ function tsconfigSource({ module, moduleResolution, include }) {
 }
 
 function runtimeSmokeSource(moduleKind, smokeKind) {
-  const packagePath = smokeKind === 'core' ? '@interactive-os/apg-patterns/core' : '@interactive-os/apg-patterns'
+  const packagePath = smokeKind === 'core' ? '@interactive-os/aria/core' : '@interactive-os/aria'
   const importLine = moduleKind === 'esm'
     ? `import { buttonDefinition, createPatternRuntime } from '${packagePath}'`
     : `const { buttonDefinition, createPatternRuntime } = require('${packagePath}')`
   const reactSmoke = smokeKind !== 'react'
     ? ''
     : moduleKind === 'esm'
-      ? "\nconst { Button } = await import('@interactive-os/apg-patterns/react')\nif (typeof Button !== 'function') throw new Error('react subpath did not expose Button')\n"
-      : "\nconst { Button } = require('@interactive-os/apg-patterns/react')\nif (typeof Button !== 'function') throw new Error('react subpath did not expose Button')\n"
+      ? "\nconst { Button } = await import('@interactive-os/aria/react')\nif (typeof Button !== 'function') throw new Error('react subpath did not expose Button')\n"
+      : "\nconst { Button } = require('@interactive-os/aria/react')\nif (typeof Button !== 'function') throw new Error('react subpath did not expose Button')\n"
   const metadataSmoke = moduleKind === 'cjs' ? packageMetadataSmokeSource() : ''
   const unexportedSubpaths = [
     'README.md',
@@ -461,7 +461,7 @@ const unexportedSubpaths = ${JSON.stringify(unexportedSubpaths, null, 2)}
 
 for (const subpath of unexportedSubpaths) {
   await assertPackagePathNotExported(
-    () => import(\`@interactive-os/apg-patterns/\${subpath}\`),
+    () => import(\`@interactive-os/aria/\${subpath}\`),
     \`ESM unexported package subpath \${subpath}\`,
   )
 }
@@ -481,7 +481,7 @@ const unexportedSubpaths = ${JSON.stringify(unexportedSubpaths, null, 2)}
 
 for (const subpath of unexportedSubpaths) {
   assertPackagePathNotExported(
-    () => require(\`@interactive-os/apg-patterns/\${subpath}\`),
+    () => require(\`@interactive-os/aria/\${subpath}\`),
     \`CJS unexported package subpath \${subpath}\`,
   )
 }
@@ -525,8 +525,8 @@ ${deepImportSmoke}
 function runtimeExportParitySmokeSource(moduleKind, smokeKind) {
   const reactImport = smokeKind === 'react'
     ? moduleKind === 'esm'
-      ? "const reactApi = await import('@interactive-os/apg-patterns/react')"
-      : "const reactApi = require('@interactive-os/apg-patterns/react')"
+      ? "const reactApi = await import('@interactive-os/aria/react')"
+      : "const reactApi = require('@interactive-os/aria/react')"
     : ''
   const reactAssert = smokeKind === 'react'
     ? `
@@ -535,11 +535,11 @@ assertNoDefaultExport(reactApi, './react runtime exports')
 `
     : ''
   const imports = moduleKind === 'esm'
-    ? `const rootApi = await import('@interactive-os/apg-patterns')
-const coreApi = await import('@interactive-os/apg-patterns/core')
+    ? `const rootApi = await import('@interactive-os/aria')
+const coreApi = await import('@interactive-os/aria/core')
 ${reactImport}`
-    : `const rootApi = require('@interactive-os/apg-patterns')
-const coreApi = require('@interactive-os/apg-patterns/core')
+    : `const rootApi = require('@interactive-os/aria')
+const coreApi = require('@interactive-os/aria/core')
 ${reactImport}`
 
   return `
@@ -599,11 +599,11 @@ function packageMetadataSmokeSource() {
   }
 
   return `
-const packageMetadata = require('@interactive-os/apg-patterns/package.json')
+const packageMetadata = require('@interactive-os/aria/package.json')
 const { existsSync, readFileSync } = require('node:fs')
 const { dirname, join } = require('node:path')
 const expectedMetadata = ${JSON.stringify(expectedMetadata, null, 2)}
-const packageRoot = dirname(require.resolve('@interactive-os/apg-patterns/package.json'))
+const packageRoot = dirname(require.resolve('@interactive-os/aria/package.json'))
 
 for (const key of ['name', 'version', 'description', 'license', 'author', 'type', 'packageManager', 'main', 'module', 'types']) {
   if (packageMetadata[key] !== expectedMetadata[key]) {
@@ -682,7 +682,7 @@ import { useButtonPattern } from '${packagePath}'
 // @ts-expect-error React preset components must stay behind the /react subpath.
 import { Button } from '${packagePath}'
 // @ts-expect-error Package exports must not expose dist ESM deep imports.
-import { buttonDefinition as deepButtonDefinition } from '@interactive-os/apg-patterns/dist/core.js'
+import { buttonDefinition as deepButtonDefinition } from '@interactive-os/aria/dist/core.js'
 
 const data: PatternData = {
   items: { primary: { label: 'Primary' } },
@@ -712,10 +712,10 @@ void runtime
 }
 
 function cjsTypeSmokeSource(smokeKind) {
-  const packagePath = smokeKind === 'core' ? '@interactive-os/apg-patterns/core' : '@interactive-os/apg-patterns'
+  const packagePath = smokeKind === 'core' ? '@interactive-os/aria/core' : '@interactive-os/aria'
   const reactSmoke = smokeKind === 'react'
     ? `
-import reactApi = require('@interactive-os/apg-patterns/react')
+import reactApi = require('@interactive-os/aria/react')
 
 const Component: typeof reactApi.Button = reactApi.Button
 const button = reactApi.useButtonPattern(data, (event: coreApi.PatternEvent) => events.push(event))
@@ -726,7 +726,7 @@ void Component
 
   return `import coreApi = require('${packagePath}')
 // @ts-expect-error Package exports must not expose dist CJS deep imports.
-import deepCoreApi = require('@interactive-os/apg-patterns/dist/core.cjs')
+import deepCoreApi = require('@interactive-os/aria/dist/core.cjs')
 
 const data: coreApi.PatternData = {
   items: { primary: { label: 'Primary' } },
