@@ -1,4 +1,4 @@
-import { COMBOBOX_KEY, PatternDataSchema, type PatternData, type PatternEvent } from '../../../../src/react'
+import { comboboxRootKey, PatternDataSchema, type PatternData, type PatternEvent } from '../../../../src/react'
 
 export type ComboboxVariantKey =
   | 'selectOnly'
@@ -39,14 +39,14 @@ export function buildComboboxData(
   const sourceItems = variant === 'datepicker' ? DATES : variant === 'gridPopup' ? PEOPLE : FRUITS
   const label = variant === 'datepicker' ? 'Date' : variant === 'gridPopup' ? 'Recipient' : 'Fruit'
   const keys = visibleKeys.length === FRUITS.length && sourceItems !== FRUITS ? sourceItems.map((item) => item.key) : visibleKeys
-  const items: PatternData['items'] = { [COMBOBOX_KEY]: { label } }
+  const items: PatternData['items'] = { [comboboxRootKey]: { label } }
   for (const item of sourceItems) items[item.key] = { label: item.label }
   // Only the keys that pass the current filter are exposed as options (visible in popup).
   // We keep all items in the registry so reducers can still resolve labels, but the
   // pattern's `comboboxOptions` visibleOrder iterates Object.keys(items) excluding
   // the synthetic combobox key — so we trim items to the visible subset.
-  const filteredItems: PatternData['items'] = { [COMBOBOX_KEY]: { label: 'Fruit' } }
-  filteredItems[COMBOBOX_KEY] = { label }
+  const filteredItems: PatternData['items'] = { [comboboxRootKey]: { label: 'Fruit' } }
+  filteredItems[comboboxRootKey] = { label }
   for (const k of keys) if (items[k]) filteredItems[k] = items[k]
   return PatternDataSchema.parse({
     items: filteredItems,
@@ -62,10 +62,10 @@ export function reduceComboboxData(current: PatternData, event: PatternEvent): P
   // a thin local override for navigate so we can move activeKey through the
   // current visible list (the kernel reducer expects relations.rootKeys).
   if (event.type === 'navigate') {
-    const visible = Object.keys(current.items).filter((k) => k !== COMBOBOX_KEY)
+    const visible = Object.keys(current.items).filter((k) => k !== comboboxRootKey)
     if (visible.length === 0) return current
     const active = current.state?.activeKey ?? null
-    const idx = active && active !== COMBOBOX_KEY ? visible.indexOf(active) : -1
+    const idx = active && active !== comboboxRootKey ? visible.indexOf(active) : -1
     let nextIdx = idx
     if (event.direction === 'first') nextIdx = 0
     else if (event.direction === 'last') nextIdx = visible.length - 1
@@ -73,8 +73,8 @@ export function reduceComboboxData(current: PatternData, event: PatternEvent): P
     else if (event.direction === 'previous') nextIdx = idx <= 0 ? 0 : idx - 1
     return { ...current, state: { ...current.state, activeKey: visible[nextIdx] ?? null } }
   }
-  if (event.type === 'expand' && event.key === COMBOBOX_KEY) {
-    const expandedKeys = event.expanded ? [COMBOBOX_KEY] : []
+  if (event.type === 'expand' && event.key === comboboxRootKey) {
+    const expandedKeys = event.expanded ? [comboboxRootKey] : []
     return { ...current, state: { ...current.state, expandedKeys } }
   }
   if (event.type === 'select') {
@@ -99,7 +99,7 @@ export function reduceComboboxData(current: PatternData, event: PatternEvent): P
         ...current.state,
         query: shouldComplete ? matchLabel : raw,
         inlineCompletion: shouldComplete ? { start: raw.length, end: matchLabel.length } : null,
-        expandedKeys: [COMBOBOX_KEY],
+        expandedKeys: [comboboxRootKey],
         activeKey: shouldComplete ? match : filtered[0] ?? null,
       },
     }

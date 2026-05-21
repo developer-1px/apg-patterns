@@ -1,6 +1,6 @@
 import type { InputHTMLAttributes, KeyboardEvent } from 'react'
 import type { PatternEvent } from '../../schema'
-import { COMBOBOX_KEY } from './definition'
+import { comboboxRootKey } from './definition'
 
 type ComboboxVariant =
   | 'selectOnly'
@@ -37,7 +37,7 @@ export function createComboboxInputProps({
     placeholder: editable ? `Search ${label.toLowerCase()}` : `Select ${label.toLowerCase()}`,
     'aria-controls': listboxId,
     onChange: (event) => {
-      if (editable) onEvent({ type: 'inputValue', key: COMBOBOX_KEY, value: event.currentTarget.value, inline: variant === 'listWithInlineAutocomplete' })
+      if (editable) onEvent({ type: 'inputValue', key: comboboxRootKey, value: event.currentTarget.value, inline: variant === 'listWithInlineAutocomplete' })
     },
     onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => {
       if (variant === 'selectOnly' && event.key.length === 1 && handleSelectOnlyTypeahead(event.key, onEvent)) {
@@ -47,7 +47,7 @@ export function createComboboxInputProps({
       rootProps.onKeyDown?.(event)
     },
     onClick: () => {
-      if (!open) onEvent({ type: 'expand', key: COMBOBOX_KEY, expanded: true })
+      if (!open) onEvent({ type: 'expand', key: comboboxRootKey, expanded: true })
     },
   }
 }

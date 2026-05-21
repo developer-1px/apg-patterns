@@ -1,4 +1,4 @@
-export const windowsplitterParts = {
+export const windowSplitterParts = {
   separator: {
     role: 'separator',
     aria: [

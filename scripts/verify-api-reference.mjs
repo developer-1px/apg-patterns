@@ -6,6 +6,11 @@ const repoRoot = new URL('../', import.meta.url)
 const apiReferencePath = new URL('API.md', repoRoot)
 const shouldWrite = process.argv.includes('--write')
 const failures = []
+const forbiddenPublicExports = new Map([
+  ['COMBOBOX_KEY', 'use comboboxRootKey'],
+  ['gridRows', 'keep grid row derivation internal'],
+  ['windowsplitterDefinition', 'use windowSplitterDefinition'],
+])
 
 if (!existsSync(apiReferencePath)) {
   throw new Error('API.md is required')
@@ -23,6 +28,10 @@ expectExactExportSet(rootExports, coreExports, 'root exports', './core exports')
 expectExactExportSet(rootRuntimeExports, coreRuntimeExports, 'root runtime exports', './core runtime exports')
 expectExportSuperset(rootExports, rootRuntimeExports, 'root declaration exports', 'root runtime exports')
 expectExportSuperset(reactExports, reactRuntimeExports, './react declaration exports', './react runtime exports')
+assertNoForbiddenPublicExports('root/core declaration exports', coreExports)
+assertNoForbiddenPublicExports('root/core runtime exports', rootRuntimeExports)
+assertNoForbiddenPublicExports('./react declaration exports', reactExports)
+assertNoForbiddenPublicExports('./react runtime exports', reactRuntimeExports)
 
 const reactOnlyExports = reactExports.filter((name) => !coreExports.includes(name))
 const reactOnlyRuntimeExports = reactRuntimeExports.filter((name) => !coreRuntimeExports.includes(name))
@@ -113,6 +122,13 @@ function expectExportSuperset(actual, expected, actualLabel, expectedLabel) {
 
 function assertContains(text) {
   if (!apiReference.includes(text)) failures.push(`API.md must include ${text}`)
+}
+
+function assertNoForbiddenPublicExports(label, exports) {
+  for (const name of exports) {
+    const reason = forbiddenPublicExports.get(name)
+    if (reason) failures.push(`${label} must not expose ${name}: ${reason}`)
+  }
 }
 
 function assertExportBlock(name, exports) {

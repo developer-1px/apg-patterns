@@ -6,7 +6,7 @@ const collapse = {
   events: [{ type: 'collapse', key: '$activeKey' }],
 }
 
-export const windowsplitterKeyboard = [
+export const windowSplitterKeyboard = [
   { shortcut: 'ArrowRight', preventDefault: true, cases: [{ case: 'always', ...change('increment') }] },
   { shortcut: 'ArrowLeft', preventDefault: true, cases: [{ case: 'always', ...change('decrement') }] },
   { shortcut: 'ArrowUp', preventDefault: true, cases: [{ case: 'always', ...change('increment') }] },

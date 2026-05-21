@@ -2,7 +2,7 @@ import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent } from '../../schema'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { createGridCell, type ReactGridCell } from './gridCell'
-import { gridRows } from './definition'
+import { gridRows } from './navigation'
 
 export interface ReactGridRow {
   key: Key

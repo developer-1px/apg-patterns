@@ -44,8 +44,8 @@ buttonDefinition
 carouselDefinition
 CarouselDefinitionSchema
 checkboxDefinition
-COMBOBOX_KEY
 comboboxDefinition
+comboboxRootKey
 createDisclosureRuntime
 CreateDisclosureRuntimeInput
 createParentByKey
@@ -92,7 +92,6 @@ FocusProjection
 FocusProjectionSchema
 getTreeItemState
 gridDefinition
-gridRows
 hasAriaSource
 hasKeyToken
 hasNavigationTarget
@@ -250,7 +249,7 @@ VisibleOrderKindSchema
 VisibleOrderResolver
 VisibleOrders
 VisibleOrderSchema
-windowsplitterDefinition
+windowSplitterDefinition
 ```
 <!-- apg-api:root-core:end -->
 
@@ -276,8 +275,8 @@ buttonDefinition
 carouselDefinition
 CarouselDefinitionSchema
 checkboxDefinition
-COMBOBOX_KEY
 comboboxDefinition
+comboboxRootKey
 createDisclosureRuntime
 createParentByKey
 createPatternRuntime
@@ -312,7 +311,6 @@ FocusModelSchema
 FocusProjectionSchema
 getTreeItemState
 gridDefinition
-gridRows
 hasAriaSource
 hasKeyToken
 hasNavigationTarget
@@ -414,7 +412,7 @@ unknownTokenError
 VisibleOrderKindSchema
 VisibleOrders
 VisibleOrderSchema
-windowsplitterDefinition
+windowSplitterDefinition
 ```
 <!-- apg-api:root-core-runtime:end -->
 

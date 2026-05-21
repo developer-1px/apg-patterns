@@ -2,7 +2,7 @@ import type { MouseEvent } from 'react'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent } from '../../schema'
 import { reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
-import { COMBOBOX_KEY } from './definition'
+import { comboboxRootKey } from './definition'
 
 export interface ReactComboboxOption {
   key: Key
@@ -43,7 +43,7 @@ export function createComboboxOption({
       onMouseDown: (event: MouseEvent<HTMLElement>) => {
         event.preventDefault()
         onEvent({ type: 'select', keys: [key], anchorKey: key, extentKey: key })
-        onEvent({ type: 'expand', key: COMBOBOX_KEY, expanded: false })
+        onEvent({ type: 'expand', key: comboboxRootKey, expanded: false })
         if (editable) onEvent({ type: 'commitValue', key, value: data.items[key]?.label ?? '' })
       },
     },

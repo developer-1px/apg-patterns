@@ -1,5 +1,5 @@
 import type { Key, PatternData, PatternItem, PatternOptions, PatternState } from '../../schema'
-import { COMBOBOX_KEY } from './definition'
+import { comboboxRootKey } from './definition'
 
 export type ComboboxVariant =
   | 'selectOnly'
@@ -37,11 +37,11 @@ export function getComboboxRuntimeState(data: ComboboxData, options?: PatternOpt
   const listboxId = options?.listboxId ? String(options.listboxId) : 'combobox-popup'
   const query = data.state?.query ?? ''
   const inlineCompletion = data.state?.inlineCompletion ?? null
-  const open = data.state?.expandedKeys?.includes(COMBOBOX_KEY) ?? false
+  const open = data.state?.expandedKeys?.includes(comboboxRootKey) ?? false
   const selectedKey = data.state?.selectedKeys?.[0]
   const selectedLabel = selectedKey ? data.items[selectedKey]?.label ?? '' : ''
   const displayValue = editable ? (selectedKey && !open ? selectedLabel : query) : selectedLabel
-  const label = typeof data.refs?.label === 'string' ? data.refs.label : data.items[COMBOBOX_KEY]?.label ?? 'Option'
+  const label = typeof data.refs?.label === 'string' ? data.refs.label : data.items[comboboxRootKey]?.label ?? 'Option'
 
   return {
     runtimeOptions: { focusStrategy: 'ariaActiveDescendant', haspopup: 'listbox', autocomplete, ...(options ?? {}) },

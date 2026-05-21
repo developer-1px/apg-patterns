@@ -4,7 +4,7 @@ import type { PatternEvent, PatternOptions } from '../../schema'
 import { createComboboxInputProps } from './comboboxInputProps'
 import { createComboboxOption, type ReactComboboxOption } from './comboboxOption'
 import { getComboboxRuntimeState, type ComboboxData } from './comboboxRuntimeState'
-import { COMBOBOX_KEY, comboboxDefinition } from './definition'
+import { comboboxRootKey, comboboxDefinition } from './definition'
 import { useComboboxActiveOptionScroll } from './useComboboxActiveOptionScroll'
 import { useComboboxInlineCompletionInputRef } from './useComboboxInlineCompletionInputRef'
 import { usePatternElementId } from '../../adapters/reactDomIds'
@@ -41,7 +41,7 @@ export function useComboboxPattern(data: ComboboxData, onEvent: (event: PatternE
     listboxProps: runtime.getPartProps('listbox') as HTMLAttributes<HTMLElement>,
     get options() {
       return Object.keys(data.items)
-        .filter((key) => key !== COMBOBOX_KEY)
+        .filter((key) => key !== comboboxRootKey)
         .map((key) => createComboboxOption({ runtime, data, key, open, editable, onEvent }))
     },
     open,

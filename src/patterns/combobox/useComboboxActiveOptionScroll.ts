@@ -1,7 +1,7 @@
 import { useLayoutEffect } from 'react'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key } from '../../schema'
-import { COMBOBOX_KEY } from './definition'
+import { comboboxRootKey } from './definition'
 
 export function useComboboxActiveOptionScroll({
   activeKey,
@@ -13,7 +13,7 @@ export function useComboboxActiveOptionScroll({
   runtime: PatternRuntime
 }): void {
   useLayoutEffect(() => {
-    if (!open || !activeKey || activeKey === COMBOBOX_KEY) return
+    if (!open || !activeKey || activeKey === comboboxRootKey) return
     const activeOption = document.getElementById(runtime.keyToElementId(activeKey))
     if (typeof activeOption?.scrollIntoView !== 'function') return
     activeOption.scrollIntoView({ block: 'nearest' })
