@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from 'react'
-import { reduceTabsData, useTabsPattern, type PatternData, type PatternEvent } from '../../../src/react'
+import { useTabsPattern, type PatternData, type PatternEvent } from '../../../src/react'
 import { cx, ds } from '../shared/designSystem'
 
 type SourceTabKey = string
@@ -27,7 +27,7 @@ export function useSourceTabs<T extends SourceTabKey>({ label, tabs, value, onCh
     data,
     (event) => {
       if (event.type === 'select') selectTab(event.keys[0], keyToTab, onChange)
-      if (event.type === 'navigate') selectTab(resolveSelectedTab(reduceTabsData(data, event, options), event), keyToTab, onChange)
+      if (event.type === 'navigate') onChange(resolveNavigatedTab(tabs, value, event))
     },
     options,
   )
@@ -75,9 +75,16 @@ function createSourceTabsData(label: string, tabs: readonly { tab: SourceTabKey;
   }
 }
 
-function resolveSelectedTab(data: PatternData, event: PatternEvent) {
-  if (event.type === 'navigate') return data.state?.activeKey
-  return data.state?.selectedKeys?.[0]
+function resolveNavigatedTab<T extends SourceTabKey>(tabs: readonly T[], value: T, event: Extract<PatternEvent, { type: 'navigate' }>): T {
+  if (tabs.length === 0) return value
+  if (event.direction === 'first') return tabs[0] ?? value
+  if (event.direction === 'last') return tabs[tabs.length - 1] ?? value
+
+  const index = tabs.indexOf(value)
+  if (index === -1) return tabs[0] ?? value
+  if (event.direction === 'next') return tabs[(index + 1) % tabs.length] ?? value
+  if (event.direction === 'previous') return tabs[(index - 1 + tabs.length) % tabs.length] ?? value
+  return value
 }
 
 function selectTab<T extends SourceTabKey>(key: string | null | undefined, keyToTab: ReadonlyMap<SourceTabKey, T>, onChange: (value: T) => void) {

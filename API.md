@@ -33,7 +33,6 @@ AriaRoleSchema
 AriaSourcePath
 AriaSourcePathSchema
 AriaSourceResolver
-AriaSourceSchema
 breadcrumbDefinition
 buttonDefinition
 carouselDefinition
@@ -130,7 +129,6 @@ PredicateResolver
 PredicateSchema
 radioGroupDefinition
 reducePatternData
-reduceTabsData
 resolveAriaSource
 resolveEventTemplate
 resolveKeyToken
@@ -158,7 +156,6 @@ TransitionValue
 TransitionValueSchema
 treegridDefinition
 treeviewDefinition
-unknownTokenError
 VisibleOrderKind
 VisibleOrderKindSchema
 VisibleOrderResolver
@@ -178,7 +175,6 @@ AriaAttributeSchema
 AriaProjectionSchema
 AriaRoleSchema
 AriaSourcePathSchema
-AriaSourceSchema
 breadcrumbDefinition
 buttonDefinition
 carouselDefinition
@@ -245,7 +241,6 @@ PatternValueStepDirectionSchema
 PredicateSchema
 radioGroupDefinition
 reducePatternData
-reduceTabsData
 resolveAriaSource
 resolveEventTemplate
 resolveKeyToken
@@ -266,7 +261,6 @@ TransitionSchema
 TransitionValueSchema
 treegridDefinition
 treeviewDefinition
-unknownTokenError
 VisibleOrderKindSchema
 VisibleOrderSchema
 windowSplitterDefinition

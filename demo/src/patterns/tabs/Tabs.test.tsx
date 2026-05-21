@@ -1,9 +1,9 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { reduceTabsData, type PatternData, type PatternEvent } from '../../../../src/react'
+import type { PatternData, PatternEvent } from '../../../../src/react'
 import { Tabs } from './Tabs'
-import { closeTabInData, tabsVariants, type TabsVariantKey } from './tabsData'
+import { closeTabInData, reduceTabsDemoData, tabsVariants, type TabsVariantKey } from './tabsData'
 
 function TabsDemo({ variant, onEvent: onEventOuter }: { variant: TabsVariantKey; onEvent?: (e: PatternEvent) => void }) {
   const spec = tabsVariants[variant]
@@ -14,7 +14,7 @@ function TabsDemo({ variant, onEvent: onEventOuter }: { variant: TabsVariantKey;
       setData((current) => closeTabInData(current, event.key))
       return
     }
-    setData((current) => reduceTabsData(current, event, spec.options))
+    setData((current) => reduceTabsDemoData(current, event, spec.options))
   }
   return <Tabs data={data} onEvent={handleEvent} options={spec.options} />
 }

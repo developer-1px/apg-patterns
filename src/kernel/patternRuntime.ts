@@ -23,7 +23,7 @@ export interface PatternRuntime<TData extends PatternData = PatternData> {
   getRootProps(): SlotProps
   /** Slot props for an item part. Requires an item key. */
   getItemProps(partName: string, key: Key): SlotProps
-  /** Deprecated: use getRootProps()/getItemProps() directly. */
+  /** Slot props for any named part. */
   getPartProps(partName: string, key?: Key): SlotProps
   getRootKeyboardHandler(): (event: KeyInput & { preventDefault?: () => void }) => void
   resolveKeyboardBinding(input: KeyInput, activeKey: Key): { events: readonly PatternEvent[]; preventDefault: boolean } | null

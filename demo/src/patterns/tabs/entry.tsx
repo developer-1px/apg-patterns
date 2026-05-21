@@ -1,8 +1,8 @@
-import { reduceTabsData, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src/react'
+import type { PatternData, PatternEvent, PatternOptions } from '../../../../src/react'
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { renderDataInspect } from '../../shared/inspect/index'
 import { Tabs } from './Tabs'
-import { closeTabInData, initialTabsVariant, tabsVariantItems, tabsVariants, type TabsVariantKey } from './tabsData'
+import { closeTabInData, initialTabsVariant, reduceTabsDemoData, tabsVariantItems, tabsVariants, type TabsVariantKey } from './tabsData'
 import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const tabsDemoDefinition = {
@@ -45,7 +45,7 @@ export const entry = defineDemoPattern({
       (variant) => tabsVariants[variant].data,
       (variant, data, event) => event.type === 'close'
         ? closeTabInData(data, event.key)
-        : reduceTabsData(data, event, tabsVariants[variant].options),
+        : reduceTabsDemoData(data, event, tabsVariants[variant].options),
     )
     const handleEvent = (event: PatternEvent) => {
       onEvent(event)

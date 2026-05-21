@@ -1,8 +1,8 @@
-import { PatternDataSchema, type PatternData, type PatternOptions } from '../../../../src/react'
+import { PatternDataSchema, reducePatternData, tabsDefinition, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src/react'
 
 type TabSpec = { key: string; label: string; panelLabel: string; content: string }
 
-type TabsViewOptions = PatternOptions & {
+export type TabsViewOptions = PatternOptions & {
   activationMode: 'automatic' | 'manual'
   closeable?: boolean
   scrollable?: boolean
@@ -116,6 +116,15 @@ export const tabsVariantItems = Object.entries(tabsVariants).map(([key, value]) 
 
 export const initialTabsVariant: TabsVariantKey = 'automatic'
 export const initialTabsData = tabsVariants.automatic.data
+
+export function reduceTabsDemoData(data: PatternData, event: PatternEvent, options: TabsViewOptions): PatternData {
+  const next = reducePatternData(tabsDefinition, data, event)
+  const activeKey = next.state?.activeKey
+  if (event.type === 'navigate' && options.activationMode === 'automatic' && activeKey) {
+    return reducePatternData(tabsDefinition, next, { type: 'select', keys: [activeKey], anchorKey: activeKey, extentKey: activeKey })
+  }
+  return next
+}
 
 export function closeTabInData(data: PatternData, tabKey: string): PatternData {
   const rootKeys = data.relations?.rootKeys ?? []

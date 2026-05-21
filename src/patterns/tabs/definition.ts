@@ -6,8 +6,6 @@ import { tabsParts } from './parts'
 
 registerTabsNavigation()
 
-// The old flatTabs alias was removed; tabs now reuse the kernel 'flat' token.
-
 export const tabsDefinition: PatternDefinition = PatternDefinitionSchema.superRefine((value, ctx) => {
   const containedRoles = value.containedRoles ?? []
   if (value.apgPattern !== 'tabs') ctx.addIssue({ code: 'custom', path: ['apgPattern'], message: 'expected "tabs"' })

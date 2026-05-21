@@ -14,7 +14,7 @@
 import type { KeyInput, ModifierKeyName } from '../internal/keyboard'
 import type { Key, PatternData, PatternOptions } from '../schema'
 import { defineKeyToken, resolveKeyToken } from './keyTokenRegistry'
-import { resolveAriaSource, resolveNavigationTarget, resolveStateProjection, resolveVisibleOrder, unknownTokenError } from './kernelResolvers'
+import { resolveAriaSource, resolveNavigationTarget, resolveStateProjection, resolveVisibleOrder } from './kernelResolvers'
 import { evaluatePredicate } from './predicateEvaluation'
 import {
   defineAriaSource,
@@ -53,7 +53,6 @@ export {
   resolveNavigationTarget,
   resolveStateProjection,
   resolveVisibleOrder,
-  unknownTokenError,
   evaluatePredicate,
 }
 export type {

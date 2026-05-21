@@ -22,11 +22,10 @@ export const KeyboardCaseSchema = z.discriminatedUnion('case', [
 export const KeyboardBindingSchema = z.object({ shortcut: z.string().min(1), preventDefault: z.boolean().optional(), cases: z.array(KeyboardCaseSchema).readonly() }).strict()
 export type KeyboardBinding = z.infer<typeof KeyboardBindingSchema>
 
-export const AriaSourceSchema = AriaSourcePathSchema
-export const AriaProjectionSchema = z.object({ attribute: AriaAttributeSchema, from: AriaSourceSchema, when: PredicateSchema.optional() }).strict()
+export const AriaProjectionSchema = z.object({ attribute: AriaAttributeSchema, from: AriaSourcePathSchema, when: PredicateSchema.optional() }).strict()
 export type AriaProjection = z.infer<typeof AriaProjectionSchema>
 
-export const StateProjectionSchema = z.object({ name: z.string().min(1), from: AriaSourceSchema }).strict()
+export const StateProjectionSchema = z.object({ name: z.string().min(1), from: AriaSourcePathSchema }).strict()
 export type StateProjection = z.infer<typeof StateProjectionSchema>
 
 export const FocusProjectionSchema = z.object({ tabIndex: z.object({ when: PredicateSchema, active: z.number().optional(), inactive: z.number().optional(), value: z.number().optional() }).strict() }).strict()
