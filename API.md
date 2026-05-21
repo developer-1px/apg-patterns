@@ -428,7 +428,6 @@ Feed
 FeedProps
 Grid
 GridProps
-LandmarkKind
 Landmarks
 LandmarksProps
 Link

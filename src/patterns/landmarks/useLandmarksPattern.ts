@@ -4,7 +4,7 @@ import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseType
 import { usePatternElementId } from '../../adapters/reactDomIds'
 import { landmarksDefinition } from './definition'
 
-export type LandmarkKind = 'banner' | 'complementary' | 'contentinfo' | 'form' | 'main' | 'navigation' | 'region' | 'search'
+type LandmarkKind = 'banner' | 'complementary' | 'contentinfo' | 'form' | 'main' | 'navigation' | 'region' | 'search'
 
 interface LandmarkItem extends PatternItem {
   kind?: string

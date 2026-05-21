@@ -12,6 +12,7 @@ const forbiddenPublicExports = new Map([
   ['Directions', 'avoid unused vocabulary aliases'],
   ['gridRows', 'keep grid row derivation internal'],
   ['handlePatternTrapFocus', 'keep React focus trap handling internal'],
+  ['LandmarkKind', 'keep landmark item details on ReactLandmarkItem'],
   ['NavigationTargets', 'avoid unused vocabulary aliases'],
   ['PatternContract', 'use pattern schemas and createPatternRuntime directly'],
   ['PatternDataOf', 'use PatternData<TItem, TState> directly'],
