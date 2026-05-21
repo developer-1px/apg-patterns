@@ -31,7 +31,6 @@ const treeviewDemoDefinition = {
   },
   controls: {
     kind: 'stack',
-    gap: 'md',
     children: [
       {
         kind: 'listbox',

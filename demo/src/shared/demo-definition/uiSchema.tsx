@@ -7,7 +7,6 @@ export const UiNodeSchema: z.ZodType<UiNode> = z.lazy(() =>
   z.discriminatedUnion('kind', [
     z.object({
       kind: z.literal('stack'),
-      gap: z.enum(['sm', 'md']).optional(),
       children: z.array(UiNodeSchema).readonly(),
     }).strict(),
     z.object({
@@ -30,7 +29,6 @@ export const UiNodeSchema: z.ZodType<UiNode> = z.lazy(() =>
 export type UiNode =
   | {
     kind: 'stack'
-    gap?: 'sm' | 'md'
     children: readonly UiNode[]
   }
   | {

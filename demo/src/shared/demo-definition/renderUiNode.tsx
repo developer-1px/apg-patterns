@@ -8,7 +8,7 @@ export function renderUiNode(node: UiNode, context: UiRenderContext): ReactNode 
   const parsed = UiNodeSchema.parse(node)
   if (parsed.kind === 'stack') {
     return (
-      <div className={parsed.gap === 'sm' ? 'grid gap-2' : 'grid gap-3'}>
+      <div className="grid gap-3">
         {parsed.children.map((child, index) => (
           <div key={index}>{renderUiNode(child, context)}</div>
         ))}
