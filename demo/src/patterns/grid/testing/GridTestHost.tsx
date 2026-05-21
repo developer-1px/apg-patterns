@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { gridDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../../src/react'
+import { reduceSortEvent } from '../../../shared/demoPatternTypes'
 import { Grid } from '../Grid'
 import { gridVariants, type GridVariantKey } from '../gridData'
 
@@ -14,10 +15,7 @@ export function GridDemo({ variant = 'dataTransactions' }: { variant?: GridVaria
       data={data}
       onEvent={(event: PatternEvent) => {
         if (event.type === 'sort') {
-          setData((current) => ({
-            ...current,
-            state: { ...current.state, sortByKey: { ...current.state?.sortByKey, [event.key]: event.sort } },
-          }))
+          setData((current) => reduceSortEvent(current, event))
           return
         }
         setData((current) => reducePatternData(gridDefinition, current, event))

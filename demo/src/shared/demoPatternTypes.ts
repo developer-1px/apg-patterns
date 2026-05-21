@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import type { PatternEvent } from '../../../src/react'
+import type { PatternData, PatternEvent } from '../../../src/react'
 import type { SourceName } from './sources'
 
 export type PatternKey = string
@@ -29,6 +29,10 @@ export function valueStepDelta(direction: unknown, step: number, large: number):
   if (direction === 'incrementLarge') return large
   if (direction === 'decrementLarge') return -large
   return 0
+}
+
+export function reduceSortEvent(data: PatternData, event: Extract<PatternEvent, { type: 'sort' }>): PatternData {
+  return { ...data, state: { ...data.state, sortByKey: { ...data.state?.sortByKey, [event.key]: event.sort } } }
 }
 
 const KERNEL_SIDE_EFFECT_SOURCES = [
