@@ -130,11 +130,11 @@ describe('source copy', () => {
     await waitFor(() => expect(copyButton).toHaveProperty('disabled', false))
     fireEvent.click(copyButton)
 
-    await waitFor(() => expect(copyButton.getAttribute('title')).toBe('Copied'))
+    await waitFor(() => expect(copyButton.getAttribute('aria-label')).toBe('copied'))
     await act(async () => {
       await new Promise((resolve) => window.setTimeout(resolve, 1250))
     })
-    expect(copyButton.getAttribute('title')).toBe('Copy source')
+    expect(copyButton.getAttribute('aria-label')).toBe('copy')
   }, 15000)
 
   it('does not keep stale source text while switching source tabs', async () => {

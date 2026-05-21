@@ -62,7 +62,6 @@ export function ActiveDemoWorkspace({
               className={ds.textButton}
               aria-pressed={state.rightPanelOpen}
               onClick={() => dispatch({ type: 'toggleRightPanel' })}
-              title={state.rightPanelOpen ? 'Hide source panel' : 'Show source panel'}
             >
               code
             </button>
