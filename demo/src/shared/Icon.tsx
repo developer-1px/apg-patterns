@@ -13,7 +13,6 @@ const iconUrlByName = {
   folder: new URL('lucide-static/icons/folder.svg', import.meta.url).href,
   'grip-vertical': new URL('lucide-static/icons/grip-vertical.svg', import.meta.url).href,
   minus: new URL('lucide-static/icons/minus.svg', import.meta.url).href,
-  'move-horizontal': new URL('lucide-static/icons/move-horizontal.svg', import.meta.url).href,
   plus: new URL('lucide-static/icons/plus.svg', import.meta.url).href,
   square: new URL('lucide-static/icons/square.svg', import.meta.url).href,
   'square-check': new URL('lucide-static/icons/square-check.svg', import.meta.url).href,
@@ -23,12 +22,10 @@ const iconUrlByName = {
 
 export type IconName = keyof typeof iconUrlByName
 
-export function Icon({ name, className, label }: { name: IconName; className?: string; label?: string }) {
+export function Icon({ name, className }: { name: IconName; className?: string }) {
   return (
     <span
-      aria-hidden={label ? undefined : 'true'}
-      aria-label={label}
-      role={label ? 'img' : undefined}
+      aria-hidden="true"
       className={['demo-icon', className].filter(Boolean).join(' ')}
       style={{ '--icon-url': `url("${iconUrlByName[name]}")` } as CSSProperties}
     />
