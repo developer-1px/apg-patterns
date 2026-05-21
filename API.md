@@ -36,7 +36,6 @@ AriaRoleSchema
 AriaSourcePath
 AriaSourcePathSchema
 AriaSourceResolver
-AriaSources
 AriaSourceSchema
 breadcrumbDefinition
 BreadcrumbDefinitionSchema
@@ -69,7 +68,6 @@ DisclosureDefinitionSchema
 DisclosureRuntime
 DomEventName
 DomEventNameSchema
-DomEvents
 EffectDefinition
 EffectSchema
 ElementTarget
@@ -101,7 +99,6 @@ KeyboardBindingSchema
 KeyboardCaseSchema
 KeyInput
 KeySchema
-KeyTokens
 KeyTokenSchema
 landmarksDefinition
 LandmarksDefinitionSchema
@@ -246,7 +243,6 @@ AriaAttributeSchema
 AriaProjectionSchema
 AriaRoleSchema
 AriaSourcePathSchema
-AriaSources
 AriaSourceSchema
 breadcrumbDefinition
 BreadcrumbDefinitionSchema
@@ -273,7 +269,6 @@ DialogDefinitionSchema
 disclosureDefinition
 DisclosureDefinitionSchema
 DomEventNameSchema
-DomEvents
 EffectSchema
 ElementTargetSchema
 evaluatePredicate
@@ -296,7 +291,6 @@ isRegisteredVisibleOrder
 KeyboardBindingSchema
 KeyboardCaseSchema
 KeySchema
-KeyTokens
 KeyTokenSchema
 landmarksDefinition
 LandmarksDefinitionSchema

@@ -1,4 +1,3 @@
-import { KeyTokens } from '../../kernel/kernelVocabulary'
 import type { KeyboardBinding } from '../../schema'
 import { COMBOBOX_TOKEN } from './navigation'
 
@@ -63,7 +62,7 @@ export const comboboxKeyboard = [
         case: 'when',
         when: { kind: 'isPopupOpen' },
         events: [
-          { type: 'select', key: KeyTokens.activeKey },
+          { type: 'select', key: '$activeKey' },
           { type: 'expand', key: COMBOBOX_TOKEN, expanded: false },
         ],
       },

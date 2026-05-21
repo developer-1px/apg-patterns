@@ -8,9 +8,11 @@ const shouldWrite = process.argv.includes('--write')
 const failures = []
 const forbiddenPublicExports = new Map([
   ['COMBOBOX_KEY', 'use comboboxRootKey'],
+  ['AriaSources', 'use serializable aria source strings directly'],
   ['definePatternContract', 'use pattern schemas and createPatternRuntime directly'],
   ['defineDomEventHandlerProp', 'use defineDomEvent with a handlerProp descriptor'],
   ['Directions', 'avoid unused vocabulary aliases'],
+  ['DomEvents', 'use serializable DOM event strings directly'],
   ['gridRows', 'keep grid row derivation internal'],
   ['hasAriaSource', 'use isRegisteredAriaSource'],
   ['hasNavigationTarget', 'use isRegisteredNavigationTarget'],
@@ -19,6 +21,7 @@ const forbiddenPublicExports = new Map([
   ['hasKeyToken', 'resolveKeyToken already fails on unknown key tokens'],
   ['handlePatternTrapFocus', 'keep React focus trap handling internal'],
   ['LandmarkKind', 'keep landmark item details on ReactLandmarkItem'],
+  ['KeyTokens', 'use serializable key token strings directly'],
   ['NavigationTargets', 'avoid unused vocabulary aliases'],
   ['PatternContract', 'use pattern schemas and createPatternRuntime directly'],
   ['PatternDataBase', 'use PatternData directly'],
