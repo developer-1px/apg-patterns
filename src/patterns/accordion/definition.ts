@@ -1,18 +1,15 @@
-import type { ZodType } from 'zod'
 import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { accordionKeyboard } from './keyboard'
 import { accordionParts } from './parts'
 import { accordionReact } from './react'
 
-export const AccordionDefinitionSchema: ZodType<PatternDefinition> = PatternDefinitionSchema.superRefine((value, ctx) => {
+export const accordionDefinition: PatternDefinition = PatternDefinitionSchema.superRefine((value, ctx) => {
   if (value.apgPattern !== 'accordion') ctx.addIssue({ code: 'custom', path: ['apgPattern'], message: 'expected "accordion"' })
   if (value.rootRole !== 'group') ctx.addIssue({ code: 'custom', path: ['rootRole'], message: 'expected "group"' })
   if (!value.parts.accordion) ctx.addIssue({ code: 'custom', path: ['parts', 'accordion'], message: 'accordion requires parts.accordion' })
   if (!value.parts.header) ctx.addIssue({ code: 'custom', path: ['parts', 'header'], message: 'accordion requires parts.header' })
   if (!value.parts.panel) ctx.addIssue({ code: 'custom', path: ['parts', 'panel'], message: 'accordion requires parts.panel' })
-})
-
-export const accordionDefinition: PatternDefinition = AccordionDefinitionSchema.parse({
+}).parse({
   apgPattern: 'accordion',
   rootRole: 'group',
   containedRoles: ['button', 'region'],

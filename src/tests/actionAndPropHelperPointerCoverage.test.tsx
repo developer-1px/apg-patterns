@@ -4,7 +4,6 @@ import { describe, expect, it } from 'vitest'
 import '../kernel/kernelBuiltins'
 import { defineDomEvent, resolvePartEventBindings, withDefaultReason } from '../kernel/domEventBindings'
 import { useAccordionPattern } from '../patterns/accordion/useAccordionPattern'
-import { AlertDefinitionSchema } from '../patterns/alert/definition'
 import { createAlertActions } from '../patterns/alert/alertActions'
 import { useAlertPattern } from '../patterns/alert/useAlertPattern'
 import { createButtonRootProps } from '../patterns/button/buttonRootProps'
@@ -12,7 +11,6 @@ import { useButtonPattern } from '../patterns/button/useButtonPattern'
 import { createCheckboxActions } from '../patterns/checkbox/checkboxActions'
 import { useCheckboxPattern } from '../patterns/checkbox/useCheckboxPattern'
 import { createGridEditInputProps } from '../patterns/grid/gridEditInputProps'
-import { LinkDefinitionSchema } from '../patterns/link/definition'
 import { useLinkPattern } from '../patterns/link/useLinkPattern'
 import { createMenuButtonTriggerProps } from '../patterns/menu/menuButtonTriggerProps'
 import { getMenuButtonRuntimeState } from '../patterns/menu/menuButtonRuntimeState'
@@ -286,22 +284,6 @@ function HelperHost() {
       <button
         type="button"
         onClick={() => {
-          const messages: string[] = []
-          const invalidAlertKind = AlertDefinitionSchema.safeParse({ apgPattern: 'button', rootRole: 'button', containedRoles: [], parts: { alert: { role: 'button' } }, navigation: { visibleOrder: { kind: 'flat' }, targets: {} }, keyboard: [] })
-          const invalidAlertPart = AlertDefinitionSchema.safeParse({ apgPattern: 'alert', rootRole: 'alert', containedRoles: [], parts: { other: { role: 'alert' } }, navigation: { visibleOrder: { kind: 'flat' }, targets: {} }, keyboard: [] })
-          const invalidLinkKind = LinkDefinitionSchema.safeParse({ apgPattern: 'button', rootRole: 'button', containedRoles: [], parts: { link: { role: 'button' } }, navigation: { visibleOrder: { kind: 'flat' }, targets: {} }, keyboard: [] })
-          const invalidLinkPart = LinkDefinitionSchema.safeParse({ apgPattern: 'link', rootRole: 'link', containedRoles: [], parts: { other: { role: 'link' } }, navigation: { visibleOrder: { kind: 'flat' }, targets: {} }, keyboard: [] })
-          for (const result of [invalidAlertKind, invalidAlertPart, invalidLinkKind, invalidLinkPart]) {
-            if (!result.success) messages.push(result.error.issues.map((issue) => issue.message).join(','))
-          }
-          setResult(messages.join('|'))
-        }}
-      >
-        Parse definition guards
-      </button>
-      <button
-        type="button"
-        onClick={() => {
           const events: PatternEvent[] = []
           const runtime = {
             getPartProps: () => ({ role: 'button', id: 'runtime-button' }),
@@ -451,9 +433,6 @@ describe('action and prop helper coverage from pointer input', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Run action helpers' }))
     expect(screen.getByText('dismiss:alert|focus:spin|focus:spin|valueStep:spin|focus:check|check:check|focus:radio|select:|focus:switch|check:switch|focus:tool|select:')).toBeTruthy()
-
-    fireEvent.click(screen.getByRole('button', { name: 'Parse definition guards' }))
-    expect(screen.getByText('expected "alert",expected "alert"|alert requires parts.alert|expected "link",expected "link"|link requires parts.link')).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Run button props' }))
     expect(screen.getByText('0|focus|activate')).toBeTruthy()

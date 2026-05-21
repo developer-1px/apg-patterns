@@ -1,4 +1,3 @@
-import type { ZodType } from 'zod'
 import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { treeviewKeyboard } from './keyboard'
 import { registerTreeviewNavigation } from './navigation'
@@ -7,7 +6,7 @@ import { treeviewReact } from './react'
 
 registerTreeviewNavigation()
 
-export const TreeviewDefinitionSchema: ZodType<PatternDefinition> = PatternDefinitionSchema.superRefine((value, ctx) => {
+export const treeviewDefinition: PatternDefinition = PatternDefinitionSchema.superRefine((value, ctx) => {
   const containedRoles = value.containedRoles ?? []
   if (value.apgPattern !== 'treeview') ctx.addIssue({ code: 'custom', path: ['apgPattern'], message: 'expected "treeview"' })
   if (value.rootRole !== 'tree') ctx.addIssue({ code: 'custom', path: ['rootRole'], message: 'expected "tree"' })
@@ -16,9 +15,7 @@ export const TreeviewDefinitionSchema: ZodType<PatternDefinition> = PatternDefin
   }
   if (!value.parts.tree) ctx.addIssue({ code: 'custom', path: ['parts', 'tree'], message: 'treeview requires parts.tree' })
   if (!value.parts.treeitem) ctx.addIssue({ code: 'custom', path: ['parts', 'treeitem'], message: 'treeview requires parts.treeitem' })
-})
-
-export const treeviewDefinition: PatternDefinition = TreeviewDefinitionSchema.parse({
+}).parse({
   apgPattern: 'treeview',
   rootRole: 'tree',
   containedRoles: ['treeitem'],

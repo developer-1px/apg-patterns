@@ -1,4 +1,3 @@
-import type { ZodType } from 'zod'
 import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { tabsEffects } from './effects'
 import { tabsKeyboard } from './keyboard'
@@ -9,7 +8,7 @@ registerTabsNavigation()
 
 // The old flatTabs alias was removed; tabs now reuse the kernel 'flat' token.
 
-export const TabsDefinitionSchema: ZodType<PatternDefinition> = PatternDefinitionSchema.superRefine((value, ctx) => {
+export const tabsDefinition: PatternDefinition = PatternDefinitionSchema.superRefine((value, ctx) => {
   const containedRoles = value.containedRoles ?? []
   if (value.apgPattern !== 'tabs') ctx.addIssue({ code: 'custom', path: ['apgPattern'], message: 'expected "tabs"' })
   if (value.rootRole !== 'tablist') ctx.addIssue({ code: 'custom', path: ['rootRole'], message: 'expected "tablist"' })
@@ -19,9 +18,7 @@ export const TabsDefinitionSchema: ZodType<PatternDefinition> = PatternDefinitio
   if (!value.parts.tablist) ctx.addIssue({ code: 'custom', path: ['parts', 'tablist'], message: 'tabs requires parts.tablist' })
   if (!value.parts.tab) ctx.addIssue({ code: 'custom', path: ['parts', 'tab'], message: 'tabs requires parts.tab' })
   if (!value.parts.tabpanel) ctx.addIssue({ code: 'custom', path: ['parts', 'tabpanel'], message: 'tabs requires parts.tabpanel' })
-})
-
-export const tabsDefinition: PatternDefinition = TabsDefinitionSchema.parse({
+}).parse({
   apgPattern: 'tabs',
   rootRole: 'tablist',
   containedRoles: ['tab', 'tabpanel'],

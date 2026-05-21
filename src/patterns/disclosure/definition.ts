@@ -1,16 +1,13 @@
-import type { ZodType } from 'zod'
 import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { disclosureKeyboard } from './keyboard'
 import { disclosureParts } from './parts'
 
-export const DisclosureDefinitionSchema: ZodType<PatternDefinition> = PatternDefinitionSchema.superRefine((value, ctx) => {
+export const disclosureDefinition: PatternDefinition = PatternDefinitionSchema.superRefine((value, ctx) => {
   if (value.apgPattern !== 'disclosure') ctx.addIssue({ code: 'custom', path: ['apgPattern'], message: 'expected "disclosure"' })
   if (value.rootRole !== 'button') ctx.addIssue({ code: 'custom', path: ['rootRole'], message: 'expected "button"' })
   if (!value.parts.trigger) ctx.addIssue({ code: 'custom', path: ['parts', 'trigger'], message: 'disclosure requires parts.trigger' })
   if (!value.parts.panel) ctx.addIssue({ code: 'custom', path: ['parts', 'panel'], message: 'disclosure requires parts.panel' })
-})
-
-export const disclosureDefinition: PatternDefinition = DisclosureDefinitionSchema.parse({
+}).parse({
   apgPattern: 'disclosure',
   rootRole: 'button',
   containedRoles: ['region'],
