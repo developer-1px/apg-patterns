@@ -76,7 +76,6 @@ interface TabsVariantSpec {
   label: string
   data: PatternData
   options: TabsViewOptions
-  hint?: string
 }
 
 export const tabsVariants: Record<TabsVariantKey, TabsVariantSpec> = {
@@ -84,31 +83,26 @@ export const tabsVariants: Record<TabsVariantKey, TabsVariantSpec> = {
     label: 'Automatic activation',
     options: { activationMode: 'automatic', orientation: 'horizontal' },
     data: buildTabsData(docsTabs, 'overview', 'Documentation'),
-    hint: 'Arrow keys activate immediately on focus.',
   },
   manual: {
     label: 'Manual activation',
     options: { activationMode: 'manual', orientation: 'horizontal' },
     data: buildTabsData(docsTabs, 'overview', 'Documentation'),
-    hint: 'Arrow keys move focus only. Press Enter or Space to activate.',
   },
   vertical: {
     label: 'Vertical (automatic)',
     options: { activationMode: 'automatic', orientation: 'vertical' },
     data: buildTabsData(planetsTabs, 'earth', 'Planets'),
-    hint: 'Up/Down arrows navigate between tabs.',
   },
   scrollable: {
     label: 'Scrollable panels',
     options: { activationMode: 'automatic', orientation: 'horizontal', scrollable: true },
     data: buildTabsData(longTabs, 'danish', 'Pastries'),
-    hint: 'Tabpanel is keyboard-focusable and scrollable (tabIndex=0).',
   },
   closeable: {
     label: 'Closeable tabs',
     options: { activationMode: 'manual', orientation: 'horizontal', closeable: true },
     data: buildTabsData(closeableTabs, 'inbox', 'Mailboxes'),
-    hint: 'Press Delete to close the focused tab.',
   },
 }
 

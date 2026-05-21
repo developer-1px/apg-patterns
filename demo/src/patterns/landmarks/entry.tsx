@@ -51,8 +51,8 @@ export const entry = defineDemoPattern({
   useRuntime: (onEvent) => {
     const host = useVariantPatternDataHost<LandmarkVariantKey>(
       initialLandmarkVariant,
-      buildLandmarkData(landmarkVariants[initialLandmarkVariant]),
-      (variant) => buildLandmarkData(landmarkVariants[variant]),
+      buildLandmarkData(initialLandmarkVariant, landmarkVariants[initialLandmarkVariant]),
+      (variant) => buildLandmarkData(variant, landmarkVariants[variant]),
       (_variant, data) => data,
     )
 

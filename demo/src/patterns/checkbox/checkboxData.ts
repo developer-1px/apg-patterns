@@ -3,7 +3,6 @@ import { checkboxDefinition, PatternDataSchema, reducePatternData, type PatternD
 export type CheckboxVariantKey = 'twoState' | 'triState'
 
 interface CheckboxVariant {
-  key: CheckboxVariantKey
   label: string
   data: PatternData
   reduce: (data: PatternData, event: PatternEvent) => PatternData
@@ -68,13 +67,11 @@ function reduceTriState(data: PatternData, event: PatternEvent): PatternData {
 
 export const checkboxVariants: Record<CheckboxVariantKey, CheckboxVariant> = {
   twoState: {
-    key: 'twoState',
     label: 'Two-State',
     data: twoStateInitial,
     reduce: (data, event) => reducePatternData(checkboxDefinition, data, event),
   },
   triState: {
-    key: 'triState',
     label: 'Tri-State (Mixed)',
     data: triStateInitial,
     reduce: reduceTriState,
@@ -82,7 +79,7 @@ export const checkboxVariants: Record<CheckboxVariantKey, CheckboxVariant> = {
   },
 }
 
-export const checkboxVariantItems: readonly { key: CheckboxVariantKey; label: string }[] = [
-  { key: 'twoState', label: 'Two-State' },
-  { key: 'triState', label: 'Tri-State (Mixed)' },
-]
+export const checkboxVariantItems: readonly { key: CheckboxVariantKey; label: string }[] = Object.entries(checkboxVariants).map(([key, value]) => ({
+  key: key as CheckboxVariantKey,
+  label: value.label,
+}))

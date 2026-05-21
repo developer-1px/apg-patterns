@@ -4,7 +4,6 @@ import { buttonDefinition } from '../../../../src/patterns/button/definition'
 export type ButtonVariantKey = 'action' | 'toggle'
 
 interface ButtonVariant {
-  key: ButtonVariantKey
   label: string
   data: PatternData
   reduce: (data: PatternData, event: PatternEvent) => PatternData
@@ -42,20 +41,18 @@ function reduceAction(data: PatternData, event: PatternEvent): PatternData {
 
 export const buttonVariants: Record<ButtonVariantKey, ButtonVariant> = {
   action: {
-    key: 'action',
     label: 'Action',
     data: actionInitial,
     reduce: reduceAction,
   },
   toggle: {
-    key: 'toggle',
     label: 'Toggle (aria-pressed)',
     data: toggleInitial,
     reduce: (data, event) => reducePatternData(buttonDefinition, data, event),
   },
 }
 
-export const buttonVariantItems: readonly { key: ButtonVariantKey; label: string }[] = [
-  { key: 'action', label: 'Action' },
-  { key: 'toggle', label: 'Toggle (aria-pressed)' },
-]
+export const buttonVariantItems: readonly { key: ButtonVariantKey; label: string }[] = Object.entries(buttonVariants).map(([key, value]) => ({
+  key: key as ButtonVariantKey,
+  label: value.label,
+}))

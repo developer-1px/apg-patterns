@@ -33,17 +33,16 @@ const storageData = (): PatternData =>
   })
 
 interface MeterVariant {
-  key: MeterVariantKey
   label: string
   data: PatternData
   options: PatternOptions
 }
 
 export const meterVariants: Record<MeterVariantKey, MeterVariant> = {
-  disk: { key: 'disk', label: 'Disk Usage', options: { min: 0, max: 100 }, data: diskData() },
-  battery: { key: 'battery', label: 'Battery', options: { min: 0, max: 100 }, data: batteryData() },
-  cpu: { key: 'cpu', label: 'CPU Load', options: { min: 0, max: 100 }, data: cpuData() },
-  storage: { key: 'storage', label: 'Storage', options: { min: 0, max: 256 }, data: storageData() },
+  disk: { label: 'Disk Usage', options: { min: 0, max: 100 }, data: diskData() },
+  battery: { label: 'Battery', options: { min: 0, max: 100 }, data: batteryData() },
+  cpu: { label: 'CPU Load', options: { min: 0, max: 100 }, data: cpuData() },
+  storage: { label: 'Storage', options: { min: 0, max: 256 }, data: storageData() },
 }
 
-export const meterVariantItems = Object.values(meterVariants).map((v) => ({ key: v.key, label: v.label }))
+export const meterVariantItems = Object.entries(meterVariants).map(([key, value]) => ({ key: key as MeterVariantKey, label: value.label }))

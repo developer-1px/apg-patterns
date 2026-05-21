@@ -36,7 +36,6 @@ const timeData = (): SpinbuttonDemoData =>
   })
 
 interface SpinbuttonVariant {
-  key: SpinbuttonVariantKey
   label: string
   data: SpinbuttonDemoData
   options: PatternOptions
@@ -44,13 +43,11 @@ interface SpinbuttonVariant {
 
 export const spinbuttonVariants: Record<SpinbuttonVariantKey, SpinbuttonVariant> = {
   numeric: {
-    key: 'numeric',
     label: 'Numeric',
     options: { focusStrategy: 'rovingTabIndex', min: 0, max: 100, step: 1 },
     data: numericData(),
   },
   time: {
-    key: 'time',
     label: 'Time Picker',
     options: { focusStrategy: 'rovingTabIndex', min: 0, max: 59, step: 1 },
     data: timeData(),

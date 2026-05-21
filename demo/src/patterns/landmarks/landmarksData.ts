@@ -37,7 +37,6 @@ export type LandmarkDataItem = PatternItem & {
 }
 
 interface LandmarkVariant {
-  readonly key: LandmarkVariantKey
   readonly label: string
   readonly regions: readonly LandmarkRegion[]
 }
@@ -53,12 +52,10 @@ const fullPage: readonly LandmarkRegion[] = [
 
 export const landmarkVariants: Record<LandmarkVariantKey, LandmarkVariant> = {
   html5: {
-    key: 'html5',
     label: 'HTML5',
     regions: fullPage,
   },
   all: {
-    key: 'all',
     label: 'All landmarks',
     regions: [
       ...fullPage,
@@ -67,37 +64,30 @@ export const landmarkVariants: Record<LandmarkVariantKey, LandmarkVariant> = {
     ],
   },
   banner: {
-    key: 'banner',
     label: 'Banner',
     regions: [{ key: 'banner', role: 'banner', label: 'Site header', content: 'Header' }],
   },
   complementary: {
-    key: 'complementary',
     label: 'Complementary',
     regions: [{ key: 'aside', role: 'complementary', label: 'Related', content: 'Related links' }],
   },
   contentinfo: {
-    key: 'contentinfo',
     label: 'Contentinfo',
     regions: [{ key: 'footer', role: 'contentinfo', label: 'Footer', content: 'Copyright' }],
   },
   form: {
-    key: 'form',
     label: 'Form',
     regions: [{ key: 'form', role: 'form', label: 'Contact', content: 'Name  Email  Message' }],
   },
   general: {
-    key: 'general',
     label: 'General principles',
     regions: fullPage,
   },
   main: {
-    key: 'main',
     label: 'Main',
     regions: [{ key: 'main', role: 'main', label: 'Main', content: 'Main content' }],
   },
   navigation: {
-    key: 'navigation',
     label: 'Navigation',
     regions: [
       { key: 'nav-primary', role: 'navigation', label: 'Primary', content: 'Home  Patterns  About' },
@@ -105,12 +95,10 @@ export const landmarkVariants: Record<LandmarkVariantKey, LandmarkVariant> = {
     ],
   },
   region: {
-    key: 'region',
     label: 'Region',
     regions: [{ key: 'region', role: 'region', label: 'Status', content: 'Saved' }],
   },
   resources: {
-    key: 'resources',
     label: 'Resources',
     regions: [
       { key: 'main', role: 'main', label: 'Main', content: 'Resources' },
@@ -118,19 +106,19 @@ export const landmarkVariants: Record<LandmarkVariantKey, LandmarkVariant> = {
     ],
   },
   search: {
-    key: 'search',
     label: 'Search',
     regions: [{ key: 'search', role: 'search', label: 'Site', content: 'Search' }],
   },
 }
 
-export const landmarkVariantItems: readonly { key: LandmarkVariantKey; label: string }[] = Object.values(
-  landmarkVariants,
-).map(({ key, label }) => ({ key, label }))
+export const landmarkVariantItems: readonly { key: LandmarkVariantKey; label: string }[] = Object.entries(landmarkVariants).map(([key, value]) => ({
+  key: key as LandmarkVariantKey,
+  label: value.label,
+}))
 
 export const initialLandmarkVariant: LandmarkVariantKey = 'html5'
 
-export function buildLandmarkData(variant: LandmarkVariant): PatternData<LandmarkDataItem> {
+export function buildLandmarkData(key: LandmarkVariantKey, variant: LandmarkVariant): PatternData<LandmarkDataItem> {
   return {
     items: Object.fromEntries(
       variant.regions.map((region) => [
@@ -140,6 +128,6 @@ export function buildLandmarkData(variant: LandmarkVariant): PatternData<Landmar
     ),
     relations: { rootKeys: variant.regions.map((region) => region.key) },
     refs: { label: variant.label },
-    state: { variant: variant.key },
+    state: { variant: key },
   }
 }

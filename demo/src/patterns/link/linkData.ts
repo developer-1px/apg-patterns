@@ -3,7 +3,6 @@ import { PatternDataSchema, type PatternData } from '../../../../src/react'
 export type LinkVariantKey = 'anchor' | 'spanRole'
 
 interface LinkVariant {
-  key: LinkVariantKey
   label: string
   data: PatternData
 }
@@ -26,15 +25,13 @@ const spanRoleInitial = PatternDataSchema.parse({
 
 export const linkVariants: Record<LinkVariantKey, LinkVariant> = {
   anchor: {
-    key: 'anchor',
     label: 'Anchor <a href>',
     data: anchorInitial,
   },
   spanRole: {
-    key: 'spanRole',
     label: 'Span role="link"',
     data: spanRoleInitial,
   },
 }
 
-export const linkVariantItems = Object.values(linkVariants).map((variant) => ({ key: variant.key, label: variant.label }))
+export const linkVariantItems = Object.entries(linkVariants).map(([key, value]) => ({ key: key as LinkVariantKey, label: value.label }))
