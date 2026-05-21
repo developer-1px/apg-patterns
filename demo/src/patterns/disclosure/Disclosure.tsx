@@ -9,7 +9,7 @@ const buttonClass = cx(ds.button, ds.expandable, 'justify-between')
 const panelClass =
   'rounded-xl bg-zinc-100/70 p-3 text-sm leading-relaxed text-zinc-700 shadow-inner shadow-zinc-200/50 dark:bg-white/[0.045] dark:text-zinc-300 dark:shadow-black/10'
 
-export interface DisclosureProps {
+interface DisclosureProps {
   data: PatternData
   onEvent: (event: PatternEvent) => void
 }

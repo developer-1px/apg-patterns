@@ -4,7 +4,7 @@ import { cx, ds } from '../../shared/designSystem'
 
 const linkClass = cx(ds.focusRing, 'inline-flex items-center rounded-md text-sm text-blue-700 underline underline-offset-2 transition hover:text-blue-900 dark:text-blue-300 dark:hover:text-blue-100')
 
-export interface LinkProps {
+interface LinkProps {
   data: PatternData
   onEvent: (event: PatternEvent) => void
 }

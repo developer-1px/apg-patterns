@@ -1,6 +1,6 @@
 import type { PatternKey } from './demoPatternTypes'
 
-export interface ApgExampleCoverage {
+interface ApgExampleCoverage {
   readonly apgPattern: string
   readonly example: string
   readonly demoPattern: PatternKey

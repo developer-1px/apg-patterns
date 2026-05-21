@@ -7,7 +7,7 @@ export interface ListboxGroup {
   optionKeys: readonly string[]
 }
 
-export interface ListboxOptionRenderer {
+interface ListboxOptionRenderer {
   renderOption(key: string, posIndex?: number, setSize?: number): ReactNode
 }
 

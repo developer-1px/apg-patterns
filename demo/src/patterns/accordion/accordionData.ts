@@ -5,7 +5,7 @@ type AccordionItem = PatternItem & {
   content?: string
 }
 
-export type AccordionSectionSpec = {
+type AccordionSectionSpec = {
   key: string
   label: string
   content: string

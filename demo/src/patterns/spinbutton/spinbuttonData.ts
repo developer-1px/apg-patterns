@@ -35,7 +35,7 @@ const timeData = (): SpinbuttonDemoData =>
     state: { activeKey: 'hours', valueByKey: { hours: 9, minutes: 30 } },
   })
 
-export interface SpinbuttonVariant {
+interface SpinbuttonVariant {
   key: SpinbuttonVariantKey
   label: string
   data: SpinbuttonDemoData

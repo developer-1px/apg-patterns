@@ -18,6 +18,6 @@ export function isCopyableSource(source: string): boolean {
   return source.length > 0 && !isSourceLoadFailure(source)
 }
 
-export function isSourceLoadFailure(source: string): boolean {
+function isSourceLoadFailure(source: string): boolean {
   return source.startsWith('missing source:') || source.startsWith('failed source:') || source.startsWith('empty source:')
 }

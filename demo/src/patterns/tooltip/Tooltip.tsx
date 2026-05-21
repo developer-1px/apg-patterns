@@ -1,6 +1,6 @@
 import { useTooltipPattern, type PatternData, type PatternEvent } from '../../../../src/react'
 
-export interface TooltipProps {
+interface TooltipProps {
   data: PatternData
   onEvent: (event: PatternEvent) => void
 }

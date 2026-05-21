@@ -3,7 +3,7 @@ import { buttonDefinition } from '../../../../src/patterns/button/definition'
 
 export type ButtonVariantKey = 'action' | 'toggle'
 
-export interface ButtonVariant {
+interface ButtonVariant {
   key: ButtonVariantKey
   label: string
   data: PatternData

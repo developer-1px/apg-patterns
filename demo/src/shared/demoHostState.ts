@@ -9,7 +9,7 @@ const DemoPatternHostStateSchema = z
   })
   .strict()
 
-export type DemoPatternHostState = z.infer<typeof DemoPatternHostStateSchema>
+type DemoPatternHostState = z.infer<typeof DemoPatternHostStateSchema>
 
 type HostAction =
   | { type: 'event'; event: PatternEvent }

@@ -1,6 +1,6 @@
 import { PatternDataSchema } from '../../../../src/react'
 
-export interface FeedArticle {
+interface FeedArticle {
   key: string
   title: string
   body: string

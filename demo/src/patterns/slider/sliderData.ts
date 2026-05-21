@@ -77,7 +77,7 @@ const rangeData = (): SliderDemoData =>
     },
   })
 
-export interface SliderVariant {
+interface SliderVariant {
   key: SliderVariantKey
   label: string
   data: SliderDemoData

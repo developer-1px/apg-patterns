@@ -14,7 +14,7 @@ export type LandmarkVariantKey =
   | 'resources'
   | 'search'
 
-export type LandmarkRegionRole =
+type LandmarkRegionRole =
   | 'banner'
   | 'complementary'
   | 'contentinfo'
@@ -24,7 +24,7 @@ export type LandmarkRegionRole =
   | 'region'
   | 'search'
 
-export interface LandmarkRegion {
+interface LandmarkRegion {
   readonly key: string
   readonly role: LandmarkRegionRole
   readonly label: string
@@ -36,7 +36,7 @@ export type LandmarkDataItem = PatternItem & {
   content: string
 }
 
-export interface LandmarkVariant {
+interface LandmarkVariant {
   readonly key: LandmarkVariantKey
   readonly label: string
   readonly regions: readonly LandmarkRegion[]

@@ -38,7 +38,7 @@ const storageData = (): PatternData =>
     state: { valueByKey: { storage: 180 } },
   })
 
-export interface MeterVariant {
+interface MeterVariant {
   key: MeterVariantKey
   label: string
   data: PatternData

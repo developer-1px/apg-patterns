@@ -2,7 +2,7 @@ import { PatternDataSchema, type PatternData } from '../../../../src/react'
 
 export type LinkVariantKey = 'anchor' | 'spanRole'
 
-export interface LinkVariant {
+interface LinkVariant {
   key: LinkVariantKey
   label: string
   data: PatternData

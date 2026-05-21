@@ -1,6 +1,6 @@
 import type { PatternEvent } from '../../../../src/schema/patternEvent'
 import { diffARIATree, findRoleContainer, serializeARIATree } from './reproARIATree'
-import { formatTimelineAsText, type ReproEvent, type ReproMeta, type StateEntry } from './reproRecorderFormat'
+import { formatTimelineAsText, type ReproEvent, type ReproMeta } from './reproRecorderFormat'
 
 type PatternEventDetail = {
   event: PatternEvent
@@ -174,7 +174,7 @@ export function createReproRecorder() {
 
   function onPatternEvent(event: CustomEvent<PatternEventDetail>) {
     if (!active) return
-    const entry: StateEntry = {
+    const entry: ReproEvent = {
       seq: nextSeq(),
       time: elapsed(),
       ch: 'state',

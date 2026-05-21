@@ -5,7 +5,7 @@ export interface ReproMeta {
   eventCount: number
 }
 
-export type InputEntry = {
+type InputEntry = {
   seq: number
   time: string
   ch: 'input'
@@ -18,7 +18,7 @@ export type InputEntry = {
   ariaTree: string
 }
 
-export type StateEntry = {
+type StateEntry = {
   seq: number
   time: string
   ch: 'state'
@@ -28,7 +28,7 @@ export type StateEntry = {
   context?: string
 }
 
-export type RouteEntry = {
+type RouteEntry = {
   seq: number
   time: string
   ch: 'route'
@@ -37,7 +37,7 @@ export type RouteEntry = {
   method: 'pushState' | 'replaceState' | 'popstate' | 'hashchange'
 }
 
-export type ConsoleEntry = {
+type ConsoleEntry = {
   seq: number
   time: string
   ch: 'console'

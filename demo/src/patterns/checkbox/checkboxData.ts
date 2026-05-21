@@ -2,7 +2,7 @@ import { checkboxDefinition, PatternDataSchema, reducePatternData, type PatternD
 
 export type CheckboxVariantKey = 'twoState' | 'triState'
 
-export interface CheckboxVariant {
+interface CheckboxVariant {
   key: CheckboxVariantKey
   label: string
   data: PatternData

@@ -12,7 +12,7 @@ type AccordionItem = PatternItem & {
   content?: string
 }
 
-export interface AccordionProps {
+interface AccordionProps {
   data: PatternData<AccordionItem>
   onEvent: (event: PatternEvent) => void
   options?: PatternOptions

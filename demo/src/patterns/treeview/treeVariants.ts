@@ -3,7 +3,7 @@ import { fileDirectoryComputed, fileDirectoryDeclared, navigation } from './tree
 
 export type TreeVariantKey = 'fileDirectoryComputed' | 'fileDirectoryDeclared' | 'navigation'
 
-export interface TreeVariantSpec {
+interface TreeVariantSpec {
   readonly key: TreeVariantKey
   readonly label: string
   readonly description: string

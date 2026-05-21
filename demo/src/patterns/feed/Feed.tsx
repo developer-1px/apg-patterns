@@ -2,7 +2,7 @@ import { useFeedPattern, type PatternData, type PatternEvent } from '../../../..
 import { cx, ds } from '../../shared/designSystem'
 import { feedArticles } from './feedData'
 
-export interface FeedProps {
+interface FeedProps {
   data: PatternData
   onEvent: (event: PatternEvent) => void
 }

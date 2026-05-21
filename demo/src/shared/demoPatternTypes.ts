@@ -15,7 +15,7 @@ export interface DemoPattern {
   inspectControls?: ReactNode
 }
 
-export type EmitPatternEvent = (event: PatternEvent) => void
+type EmitPatternEvent = (event: PatternEvent) => void
 
 /** Kernel source keys included in every pattern's sourceNames list. */
 const KERNEL_SIDE_EFFECT_SOURCES = [

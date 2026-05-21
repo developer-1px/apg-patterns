@@ -2,7 +2,7 @@ import { PatternDataSchema, reducePatternData, tabsDefinition, type PatternData,
 
 type TabSpec = { key: string; label: string; panelLabel: string; content: string }
 
-export type TabsViewOptions = PatternOptions & {
+type TabsViewOptions = PatternOptions & {
   activationMode: 'automatic' | 'manual'
   closeable?: boolean
   scrollable?: boolean
@@ -72,7 +72,7 @@ const closeableTabs: readonly TabSpec[] = [
 
 export type TabsVariantKey = 'automatic' | 'manual' | 'vertical' | 'scrollable' | 'closeable'
 
-export interface TabsVariantSpec {
+interface TabsVariantSpec {
   label: string
   data: PatternData
   options: TabsViewOptions

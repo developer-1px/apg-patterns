@@ -1,6 +1,6 @@
 import type { PatternData } from '../../../../src/react'
 
-export type BreadcrumbItem = { key: string; label: string; href: string }
+type BreadcrumbItem = { key: string; label: string; href: string }
 
 export const breadcrumbItems: ReadonlyArray<BreadcrumbItem> = [
   { key: 'home', label: 'WAI', href: 'https://www.w3.org/WAI/' },

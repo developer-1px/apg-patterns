@@ -3,7 +3,7 @@ import { ds } from '../../shared/designSystem'
 
 const buttonClass = ds.button
 
-export interface ButtonProps {
+interface ButtonProps {
   data: PatternData
   onEvent: (event: PatternEvent) => void
   options?: PatternOptions

@@ -90,7 +90,7 @@ function coercePatternKey(value: string | null): PatternKey | null {
   return patternItems.some((item) => item.key === value) ? value : null
 }
 
-export function coerceRightMode(value: string | null): AppState['rightMode'] | null {
+function coerceRightMode(value: string | null): AppState['rightMode'] | null {
   if (!value || value === 'off') return null
   return rightModes.find((mode) => rightModeLabels[mode] === value) ?? null
 }

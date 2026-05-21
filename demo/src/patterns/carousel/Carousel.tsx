@@ -2,7 +2,7 @@ import { useCarouselPattern, type PatternData, type PatternEvent } from '../../.
 import { cx, ds } from '../../shared/designSystem'
 import { Icon } from '../../shared/Icon'
 
-export interface CarouselProps {
+interface CarouselProps {
   data: PatternData
   onEvent: (event: PatternEvent) => void
 }

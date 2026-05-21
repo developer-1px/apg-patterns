@@ -1,6 +1,6 @@
 import type { PatternData } from '../../../../src/react'
 
-export type CarouselSlide = {
+type CarouselSlide = {
   key: string
   title: string
   caption: string

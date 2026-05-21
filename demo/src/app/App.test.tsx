@@ -1,10 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { act, useState } from 'react'
-import { coerceRightMode } from './appState'
 import { App } from './App'
 import { formatEvent } from './eventLog'
-import { isCopyableSource, isSourceLoadFailure, loadSourcePreview } from './sourcePreview'
+import { isCopyableSource, loadSourcePreview } from './sourcePreview'
 import { SourceTabs, useSourceTabs } from './SourceTabs'
 import { collectPatternEntries, defaultPatternKey, defaultSourceName, patternEntries, useDemoPattern, validatePatternEntries } from '../shared/demoPatterns'
 import { KERNEL_SOURCES } from '../shared/demoPatternTypes'
@@ -32,23 +31,6 @@ describe('formatEvent', () => {
   })
 })
 
-describe('coerceRightMode', () => {
-  it('maps canonical panel labels to internal modes', () => {
-    expect(coerceRightMode('code')).toBe('source')
-    expect(coerceRightMode('state')).toBe('inspect')
-    expect(coerceRightMode('events')).toBe('log')
-  })
-
-  it('treats off, unknown panels, and internal mode names as no right panel', () => {
-    expect(coerceRightMode('off')).toBeNull()
-    expect(coerceRightMode('aria')).toBeNull()
-    expect(coerceRightMode('source')).toBeNull()
-    expect(coerceRightMode('inspect')).toBeNull()
-    expect(coerceRightMode('log')).toBeNull()
-    expect(coerceRightMode('missing')).toBeNull()
-  })
-})
-
 describe('loadSourcePreview', () => {
   it('returns a readable missing-source marker instead of throwing', async () => {
     await expect(loadSourcePreview('__missing__.tsx')).resolves.toBe('missing source: __missing__.tsx')
@@ -68,13 +50,8 @@ describe('source copy', () => {
     expect(isCopyableSource('')).toBe(false)
     expect(isCopyableSource('missing source: Missing.tsx')).toBe(false)
     expect(isCopyableSource('failed source: Broken.tsx')).toBe(false)
+    expect(isCopyableSource('empty source: Empty.tsx')).toBe(false)
     expect(isCopyableSource('export function Demo() {}')).toBe(true)
-  })
-
-  it('classifies source load failures by prefix', () => {
-    expect(isSourceLoadFailure('missing source: Missing.tsx')).toBe(true)
-    expect(isSourceLoadFailure('failed source: Broken.tsx')).toBe(true)
-    expect(isSourceLoadFailure('export function Demo() {}')).toBe(false)
   })
 
   it('copies the loaded source text instead of transient loader text', async () => {

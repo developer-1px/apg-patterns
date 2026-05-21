@@ -10,7 +10,7 @@ const panelClass =
 const inputClass = ds.field
 const buttonClass = ds.button
 
-export interface DialogProps {
+interface DialogProps {
   data: PatternData
   onEvent: (event: PatternEvent) => void
 }
