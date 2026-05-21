@@ -784,7 +784,7 @@ function normalizeSource(source) {
 }
 
 function expectedEntrySourceName(patternKey) {
-  return `${patternKey === 'menuAndMenubar' ? 'menu' : patternKey}/entry.tsx`
+  return `${patternKey}/entry.tsx`
 }
 
 function findSourceTab(sourceName) {

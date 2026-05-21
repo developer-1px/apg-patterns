@@ -4,7 +4,6 @@ import ts from 'typescript'
 
 const demoPatternDir = 'demo/src/patterns'
 const srcPatternDir = 'src/patterns'
-const folderKeyOverrides = { menu: 'menuAndMenubar' }
 const failures = []
 
 const demoEntries = readDemoEntries()
@@ -14,14 +13,13 @@ const srcFolders = readdirSync(srcPatternDir, { withFileTypes: true })
   .sort((a, b) => a.localeCompare(b))
 
 for (const folder of srcFolders) {
-  const expectedKey = folderKeyOverrides[folder] ?? folder
   const demoEntry = demoEntries.get(folder)
   if (!demoEntry) {
     failures.push(`missing demo entry for src pattern folder: ${folder}`)
     continue
   }
-  if (demoEntry.key !== expectedKey) {
-    failures.push(`${folder}: demo key ${demoEntry.key} does not match expected ${expectedKey}`)
+  if (demoEntry.key !== folder) {
+    failures.push(`${folder}: demo key ${demoEntry.key} does not match expected ${folder}`)
   }
 
   const mainSourcePath = path.join(demoPatternDir, folder, demoEntry.sources.main)

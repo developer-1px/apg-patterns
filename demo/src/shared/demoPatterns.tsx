@@ -9,9 +9,6 @@ type ValidatedPatternEntry = Pick<PatternEntry, 'key' | 'label'> & { sourcePath?
 type PatternEntryModule = { entry?: PatternEntry }
 
 const modules = import.meta.glob<PatternEntryModule>('../patterns/*/entry.tsx', { eager: true })
-const keyByPatternFolder: Readonly<Record<string, string>> = {
-  menu: 'menuAndMenubar',
-}
 export const defaultPatternKey: PatternKey = 'treeview'
 export const defaultSourceName: SourceName = 'Treeview.tsx'
 
@@ -56,8 +53,7 @@ export function validatePatternEntries(
     if (!entry.sourcePath) return []
     const folder = entry.sourcePath.match(/\/patterns\/([^/]+)\/entry\.tsx$/)?.[1]
     if (!folder) return [`${entry.key}: invalid source path ${entry.sourcePath}`]
-    const expectedKey = keyByPatternFolder[folder] ?? folder
-    return entry.key === expectedKey ? [] : [`${entry.key}: expected key ${expectedKey} for ${entry.sourcePath}`]
+    return entry.key === folder ? [] : [`${entry.key}: expected key ${folder} for ${entry.sourcePath}`]
   })
   if (mismatchedFolders.length > 0) {
     throw new Error(`[demoPatterns] pattern folder/key mismatch: ${mismatchedFolders.join(', ')}`)

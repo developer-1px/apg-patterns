@@ -648,12 +648,6 @@ describe('demo pattern registry', () => {
     ])).toThrow('[demoPatterns] pattern folder/key mismatch: wrongAccordion: expected key accordion for ../patterns/accordion/entry.tsx')
   })
 
-  it('allows explicit folder/key aliases for combined APG patterns', () => {
-    expect(() => validatePatternEntries([
-      { key: 'menuAndMenubar', label: 'Menu and Menubar', sourcePath: '../patterns/menu/entry.tsx' },
-    ])).not.toThrow()
-  })
-
   it('fails fast when the configured default pattern is not registered', () => {
     expect(() => validatePatternEntries([
       { key: 'accordion', label: 'Accordion' },
@@ -1004,15 +998,15 @@ function expectedHookSources(patternKey: string) {
 }
 
 function expectedEntrySource(patternKey: string) {
-  return `${patternKey === 'menuAndMenubar' ? 'menu' : patternKey}/entry.tsx`
+  return `${patternKey}/entry.tsx`
 }
 
 function expectedDefinitionSource(patternKey: string) {
-  return `${patternKey === 'menuAndMenubar' ? 'menu' : patternKey}/definition.ts`
+  return `${patternKey}/definition.ts`
 }
 
 function expectedImplementationSources(patternKey: string) {
-  const sourcePrefix = `${patternKey === 'menuAndMenubar' ? 'menu' : patternKey}/`
+  const sourcePrefix = `${patternKey}/`
   return Object.keys(sourceLoaders).filter((sourceName) => (
     sourceName.startsWith(sourcePrefix)
     && !/\/definition\.ts$/.test(sourceName)

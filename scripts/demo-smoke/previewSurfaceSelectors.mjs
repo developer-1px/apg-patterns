@@ -14,7 +14,7 @@ export const previewSurfaceSelectors = {
   landmarks: 'header,main,nav,[role="navigation"],[role="region"],[role="search"]',
   link: 'a,[role="link"]',
   listbox: '[role="listbox"]',
-  menuAndMenubar: '[role="menubar"],button',
+  menu: '[role="menubar"],button',
   meter: '[role="meter"]',
   radio: '[role="radiogroup"]',
   slider: '[role="slider"]',

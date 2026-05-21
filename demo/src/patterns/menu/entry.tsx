@@ -7,7 +7,7 @@ import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo
 import type { PatternEvent } from '../../../../src/react'
 
 const menuDemoDefinition = {
-  key: 'menuAndMenubar',
+  key: 'menu',
   label: 'Menu and Menubar',
   keyboardShortcuts: ['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Space', 'Escape'],
   sources: {
