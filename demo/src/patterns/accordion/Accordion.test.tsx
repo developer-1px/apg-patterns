@@ -1,15 +1,9 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { useAccordionPattern, type PatternData, type PatternEvent } from '../../../../src/react'
-import { Accordion } from './Accordion'
+import { useAccordionPattern } from '../../../../src/react'
 import { initialAccordionData, reduceAccordionData } from './accordionData'
-
-function AccordionDemo({ initial = initialAccordionData }: { initial?: PatternData }) {
-  const [data, setData] = useState(initial)
-  const handleEvent = (event: PatternEvent) => setData((current) => reduceAccordionData(current, event))
-  return <Accordion data={data} onEvent={handleEvent} />
-}
+import { AccordionDemo } from './testing/AccordionTestHost'
 
 function AccordionActionsDemo() {
   const [data, setData] = useState(initialAccordionData)

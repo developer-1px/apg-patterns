@@ -6,16 +6,8 @@
  * 2) Roles: role=alert
  */
 import { fireEvent, render, screen } from '@testing-library/react'
-import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { Alert } from './Alert'
-import { initialAlertData, reduceAlertState, type AlertDomainEvent, type AlertReducerState } from './alertData'
-
-function AlertDemo() {
-  const [state, setState] = useState<AlertReducerState>({ data: initialAlertData })
-  const handleEvent = (event: AlertDomainEvent) => setState((current) => reduceAlertState(current, event))
-  return <Alert data={state.data} onEvent={handleEvent} />
-}
+import { AlertDemo } from './testing/AlertTestHost'
 
 describe('APG §Roles, States, Properties', () => {
   it('rendered alert has role="alert"', () => {
@@ -36,11 +28,5 @@ describe('APG §Roles, States, Properties', () => {
     trigger.focus()
     fireEvent.click(trigger)
     expect(document.activeElement).not.toBe(screen.getByRole('alert'))
-  })
-})
-
-describe('APG §Keyboard — Not applicable', () => {
-  it('alert role has no keyboard interactions (informational)', () => {
-    expect(true).toBe(true)
   })
 })

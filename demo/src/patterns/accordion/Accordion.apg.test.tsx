@@ -3,17 +3,8 @@
  * 출처: https://www.w3.org/WAI/ARIA/apg/patterns/accordion/
  */
 import { fireEvent, render, screen } from '@testing-library/react'
-import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import type { PatternEvent } from '../../../../src/react'
-import { Accordion } from './Accordion'
-import { initialAccordionData, reduceAccordionData } from './accordionData'
-
-function AccordionDemo() {
-  const [data, setData] = useState(initialAccordionData)
-  const handleEvent = (event: PatternEvent) => setData((current) => reduceAccordionData(current, event))
-  return <Accordion data={data} onEvent={handleEvent} />
-}
+import { AccordionDemo } from './testing/AccordionTestHost'
 
 describe('APG §Roles, States, Properties', () => {
   it('each header is a button (role=button)', () => {

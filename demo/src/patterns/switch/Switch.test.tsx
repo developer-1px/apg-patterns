@@ -1,15 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import type { PatternEvent } from '../../../../src/react'
-import { Switch } from './Switch'
-import { initialSwitchData, reduceSwitchData } from './switchData'
-
-function SwitchDemo() {
-  const [data, setData] = useState(initialSwitchData)
-  const handleEvent = (event: PatternEvent) => setData((current) => reduceSwitchData(current, event))
-  return <Switch data={data} onEvent={handleEvent} />
-}
+import { SwitchDemo } from './testing/SwitchTestHost'
 
 describe('Switch demo', () => {
   it('toggles aria-checked on Space', () => {

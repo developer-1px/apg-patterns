@@ -1,19 +1,12 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { Alert } from './Alert'
 import {
   initialAlertData,
   reduceAlertState,
-  type AlertDomainEvent,
   type AlertReducerState,
 } from './alertData'
-
-function AlertDemo() {
-  const [state, setState] = useState<AlertReducerState>({ data: initialAlertData })
-  const handleEvent = (event: AlertDomainEvent) => setState((current) => reduceAlertState(current, event))
-  return <Alert data={state.data} onEvent={handleEvent} />
-}
+import { AlertDemo } from './testing/AlertTestHost'
 
 function AlertDataEdgesDemo() {
   const [state, setState] = useState<AlertReducerState>({ data: { ...initialAlertData, state: { activeKey: null, expandedKeys: [] } } })

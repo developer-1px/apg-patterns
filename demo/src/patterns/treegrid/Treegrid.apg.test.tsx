@@ -155,19 +155,6 @@ describe('APG §Roles, States, Properties', () => {
     expect(cellOf('src:name').getAttribute('aria-selected')).toBe('true')
   })
 
-  it('non-selected cells expose aria-selected="false" when treegrid is multiselectable', () => {
-    // APG: "If the treegrid is multi-selectable, every selectable cell or row has aria-selected".
-    // Single-select treegrid may omit aria-selected on non-selected cells.
-    render(<TreegridDemo />)
-    const grid = screen.getByRole('treegrid')
-    if (grid.getAttribute('aria-multiselectable') === 'true') {
-      expect(cellOf('docs:name').getAttribute('aria-selected')).toBe('false')
-    } else {
-      // Single-select: at minimum the selected one is true; this branch is informational.
-      expect(cellOf('src:name').getAttribute('aria-selected')).toBe('true')
-    }
-  })
-
   it('treegrid declares aria-multiselectable when supporting multiple selection', () => {
     render(<TreegridDemo />)
     const grid = screen.getByRole('treegrid')

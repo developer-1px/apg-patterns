@@ -1,15 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import type { PatternEvent } from '../../../../src/react'
-import { initialRadioData, reduceRadioData } from './radioData'
-import { RadioGroup } from './RadioGroup'
-
-function RadioDemo() {
-  const [data, setData] = useState(initialRadioData)
-  const handleEvent = (event: PatternEvent) => setData((current) => reduceRadioData(current, event))
-  return <RadioGroup data={data} onEvent={handleEvent} />
-}
+import { RadioDemo } from './testing/RadioTestHost'
 
 describe('RadioGroup demo', () => {
   it('moves and checks the next radio with arrow keys', () => {
