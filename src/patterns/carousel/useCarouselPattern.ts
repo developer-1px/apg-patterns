@@ -17,8 +17,6 @@ interface CarouselState extends PatternState {
   showDots?: boolean
 }
 
-type CarouselData = PatternData<CarouselItem, CarouselState>
-
 export type { ReactCarouselSlide } from './carouselSlide'
 
 export interface ReactCarouselRuntime {
@@ -34,7 +32,7 @@ export interface ReactCarouselRuntime {
   keyToElementId(key: Key): string
 }
 
-export function useCarouselPattern(data: CarouselData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactCarouselRuntime {
+export function useCarouselPattern(data: PatternData<CarouselItem, CarouselState>, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactCarouselRuntime {
   const runtimeOptions = {
     roledescription: 'carousel',
     slideRoledescription: 'slide',

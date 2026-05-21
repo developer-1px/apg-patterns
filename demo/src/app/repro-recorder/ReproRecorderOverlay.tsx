@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { createReproRecorder } from './createReproRecorder'
+import { createReproRecorder, isReproRecorderShortcut } from './createReproRecorder'
 
 const buttonStyle = {
   position: 'fixed',
@@ -44,12 +44,6 @@ const panelStyle = {
   lineHeight: 1.45,
   boxShadow: '0 16px 48px rgba(24,24,27,0.16)',
 } as const
-
-function shortcutMatches(event: KeyboardEvent): boolean {
-  const modShiftSlash = (event.metaKey || event.ctrlKey) && event.shiftKey && (event.key === '\\' || event.code === 'Backslash')
-  const altShiftR = event.altKey && event.shiftKey && event.code === 'KeyR'
-  return modShiftSlash || altShiftR
-}
 
 export function ReproRecorderOverlay() {
   const recorder = useMemo(() => createReproRecorder(), [])
@@ -98,7 +92,7 @@ export function ReproRecorderOverlay() {
 
   useEffect(() => {
     const onShortcut = (event: KeyboardEvent) => {
-      if (!shortcutMatches(event)) return
+      if (!isReproRecorderShortcut(event)) return
       event.preventDefault()
       event.stopPropagation()
       toggle()

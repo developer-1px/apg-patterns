@@ -57,7 +57,7 @@ function currentUrl(): string {
   return `${window.location.pathname}${window.location.search}${window.location.hash}`
 }
 
-function shortcutMatches(event: KeyboardEvent): boolean {
+export function isReproRecorderShortcut(event: KeyboardEvent): boolean {
   const modShiftSlash = (event.metaKey || event.ctrlKey) && event.shiftKey && (event.key === '\\' || event.code === 'Backslash')
   const altShiftR = event.altKey && event.shiftKey && event.code === 'KeyR'
   return modShiftSlash || altShiftR
@@ -152,7 +152,7 @@ export function createReproRecorder() {
 
   function onKeydown(event: KeyboardEvent) {
     if (!active) return
-    if (shortcutMatches(event)) return
+    if (isReproRecorderShortcut(event)) return
     if (isModifierOnlyKey(event)) return
     const key = `${event.ctrlKey || event.metaKey ? 'Mod+' : ''}${event.shiftKey ? 'Shift+' : ''}${event.altKey ? 'Alt+' : ''}${event.key === ' ' ? 'Space' : event.key}`
     pushInputEntry('keydown', event.target instanceof Element ? event.target : null, event.defaultPrevented, key)

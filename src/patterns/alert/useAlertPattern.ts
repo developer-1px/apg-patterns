@@ -11,8 +11,6 @@ interface AlertItem extends PatternItem {
   message?: unknown
 }
 
-type AlertData = PatternData<AlertItem>
-
 export interface ReactAlertRuntime {
   rootProps: ReactPatternProps
   dismissProps: ReactPatternProps
@@ -30,7 +28,7 @@ export interface ReactAlertRuntime {
   keyToElementId(key: Key): string
 }
 
-export function useAlertPattern(data: AlertData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactAlertRuntime {
+export function useAlertPattern(data: PatternData<AlertItem>, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactAlertRuntime {
   const keyToElementId = usePatternElementId(options, 'alert-')
   const runtime = createPatternRuntime({
     definition: alertDefinition,

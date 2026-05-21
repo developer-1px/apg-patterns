@@ -1,18 +1,25 @@
 import type { ReactNode } from 'react'
-import type { ListboxLayoutInput } from './listboxTypes'
 
-type ListboxLayout = {
-  matches(input: ListboxLayoutInput): boolean
-  render(input: ListboxLayoutInput): ReactNode
+export type ListboxGroup = {
+  groupKey: string
+  groupLabel: string
+  optionKeys: readonly string[]
 }
 
-const listboxLayouts: readonly ListboxLayout[] = [
-  {
-    matches: ({ groups }) => groups.length > 0,
-    render: ({ groups, visibleKeys, renderOption }) => {
-      const setSize = visibleKeys.length
-      let runningIndex = 0
-      return groups.map((group) => {
+type ListboxContentProps = {
+  groups: readonly ListboxGroup[]
+  visibleKeys: readonly string[]
+  renderOption(key: string, posIndex?: number, setSize?: number): ReactNode
+}
+
+export function ListboxContent({ groups, visibleKeys, renderOption }: ListboxContentProps) {
+  if (groups.length === 0) return <>{visibleKeys.map((key) => renderOption(key))}</>
+
+  const setSize = visibleKeys.length
+  let runningIndex = 0
+  return (
+    <>
+      {groups.map((group) => {
         const labelId = `group-${group.groupKey}-label`
         return (
           <div key={group.groupKey} role="group" aria-labelledby={labelId} className="mt-1 first:mt-0">
@@ -25,15 +32,7 @@ const listboxLayouts: readonly ListboxLayout[] = [
             })}
           </div>
         )
-      })
-    },
-  },
-  {
-    matches: () => true,
-    render: ({ visibleKeys, renderOption }) => visibleKeys.map((key) => renderOption(key)),
-  },
-]
-
-export function ListboxContent(input: ListboxLayoutInput) {
-  return <>{listboxLayouts.find((layout) => layout.matches(input))!.render(input)}</>
+      })}
+    </>
+  )
 }

@@ -9,8 +9,6 @@ interface BreadcrumbItem extends PatternItem {
   href?: unknown
 }
 
-type BreadcrumbData = PatternData<BreadcrumbItem>
-
 export type { ReactBreadcrumbItem } from './breadcrumbItem'
 
 export interface ReactBreadcrumbRuntime {
@@ -23,7 +21,7 @@ export interface ReactBreadcrumbRuntime {
   keyToElementId(key: Key): string
 }
 
-export function useBreadcrumbPattern(data: BreadcrumbData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactBreadcrumbRuntime {
+export function useBreadcrumbPattern(data: PatternData<BreadcrumbItem>, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactBreadcrumbRuntime {
   const runtimeOptions = {
     label: data.refs?.label,
     ...(options ?? {}),

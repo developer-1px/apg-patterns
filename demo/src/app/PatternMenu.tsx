@@ -4,8 +4,6 @@ import { patternItems } from '../shared/demoPatterns'
 import type { PatternKey } from '../shared/demoPatternTypes'
 import { cx, ds } from '../shared/designSystem'
 
-type Props = HTMLAttributes<HTMLElement>
-
 const patternMenuKeyboardShortcuts = listboxDefinition.keyboard.map((binding) => binding.shortcut)
 
 export function PatternMenu({ value, onChange }: { value: PatternKey; onChange: (value: PatternKey) => void }) {
@@ -26,7 +24,7 @@ export function PatternMenu({ value, onChange }: { value: PatternKey; onChange: 
       className={cx('flex gap-1 overflow-x-auto whitespace-nowrap pb-1 lg:grid lg:gap-0.5 lg:overflow-visible lg:whitespace-normal lg:pb-0', ds.focusRing)}
     >
       {listbox.renderItems.map((item) => {
-        const optionProps = item.optionProps as Props
+        const optionProps = item.optionProps as HTMLAttributes<HTMLElement>
         return (
           <button
             {...optionProps}

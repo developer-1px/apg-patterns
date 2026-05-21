@@ -12,8 +12,6 @@ interface LinkItem extends PatternItem {
   variant?: string
 }
 
-type LinkData = PatternData<LinkItem>
-
 export interface ReactLinkRuntime {
   linkProps: ReactPatternProps
   key: Key | null
@@ -33,7 +31,7 @@ export interface ReactLinkRuntime {
   keyToElementId(key: Key): string
 }
 
-export function useLinkPattern(data: LinkData, onEvent: (event: PatternEvent) => void = () => undefined, options?: PatternOptions): ReactLinkRuntime {
+export function useLinkPattern(data: PatternData<LinkItem>, onEvent: (event: PatternEvent) => void = () => undefined, options?: PatternOptions): ReactLinkRuntime {
   const keyToElementId = usePatternElementId(options, 'link-')
   const runtime = createPatternRuntime({
     definition: linkDefinition,
