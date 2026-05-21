@@ -41,15 +41,9 @@ export function buildComboboxData(
   const sourceItems = variant === 'datepicker' ? DATES : variant === 'gridPopup' ? PEOPLE : FRUITS
   const label = variant === 'datepicker' ? 'Date' : variant === 'gridPopup' ? 'Recipient' : 'Fruit'
   const keys = visibleKeys.length === FRUITS.length && sourceItems !== FRUITS ? sourceItems.map((item) => item.key) : visibleKeys
-  const items: PatternData['items'] = { [comboboxRootKey]: { label } }
-  for (const item of sourceItems) items[item.key] = { label: item.label }
-  // Only the keys that pass the current filter are exposed as options (visible in popup).
-  // We keep all items in the registry so reducers can still resolve labels, but the
-  // pattern's `comboboxOptions` visibleOrder iterates Object.keys(items) excluding
-  // the synthetic combobox key — so we trim items to the visible subset.
-  const filteredItems: PatternData['items'] = { [comboboxRootKey]: { label: 'Fruit' } }
-  filteredItems[comboboxRootKey] = { label }
-  for (const k of keys) if (items[k]) filteredItems[k] = items[k]
+  const visible = new Set(keys)
+  const filteredItems: PatternData['items'] = { [comboboxRootKey]: { label } }
+  for (const item of sourceItems) if (visible.has(item.key)) filteredItems[item.key] = { label: item.label }
   return PatternDataSchema.parse({
     items: filteredItems,
     state: { activeKey: null, expandedKeys: [], selectedKeys: [], query: '', inlineCompletion: null, variant },
@@ -58,9 +52,6 @@ export function buildComboboxData(
 }
 
 export function reduceComboboxData(current: PatternData, event: PatternEvent): PatternData {
-  // Use the kernel's pattern reducer for navigate/select/expand events, but keep
-  // a thin local override for navigate so we can move activeKey through the
-  // current visible list (the kernel reducer expects relations.rootKeys).
   if (event.type === 'navigate') {
     const visible = Object.keys(current.items).filter((k) => k !== comboboxRootKey)
     if (visible.length === 0) return current

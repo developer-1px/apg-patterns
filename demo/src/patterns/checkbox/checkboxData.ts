@@ -53,7 +53,6 @@ function syncTriState(data: PatternData): PatternData {
 }
 
 function reduceTriState(data: PatternData, event: PatternEvent): PatternData {
-  // Parent toggle: APG — if currently checked or mixed → uncheck all; else → check all.
   if (event.type === 'check' && event.key === 'parent') {
     const children = data.relations?.childrenByKey?.parent ?? []
     const current = data.state?.checkedByKey?.parent

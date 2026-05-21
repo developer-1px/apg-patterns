@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { cleanup, render, within } from '@testing-library/react'
 import { createElement } from 'react'
-import { apgExampleCoverage, exampleId, officialApgExamples } from './apgExampleCoverage'
+import { apgExampleCoverage, officialApgExamples } from './apgExampleCoverage'
 import { patternEntries, useDemoPattern } from './demoPatterns'
 import { buttonVariantItems } from '../patterns/button/buttonData'
 import { carouselVariantItems } from '../patterns/carousel/carouselData'
@@ -122,6 +122,10 @@ describe('APG example coverage', () => {
 
 function DemoControlsProbe({ patternKey }: { patternKey: string }) {
   return useDemoPattern(patternKey, () => undefined).variants
+}
+
+function exampleId(apgPattern: string, example: string) {
+  return `${apgPattern}/${example}`
 }
 
 function labelsByKey<T extends string>(items: readonly { key: T; label: string }[]) {

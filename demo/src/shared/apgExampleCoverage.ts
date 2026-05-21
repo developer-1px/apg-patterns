@@ -141,7 +141,3 @@ export const apgExampleCoverage: readonly ApgExampleCoverage[] = [
   { apgPattern: 'treeview', example: 'treeview-1b', demoPattern: 'treeview', variant: 'fileDirectoryDeclared' },
   { apgPattern: 'treeview', example: 'treeview-navigation', demoPattern: 'treeview', variant: 'navigation' },
 ] as const
-
-export function exampleId(apgPattern: string, example: string) {
-  return `${apgPattern}/${example}`
-}

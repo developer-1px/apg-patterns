@@ -36,7 +36,6 @@ const toggleInitial = PatternDataSchema.parse({
 })
 
 function reduceAction(data: PatternData, event: PatternEvent): PatternData {
-  // Action button has no toggle state — drop `press` events so aria-pressed never appears.
   if (event.type === 'press') return data
   return reducePatternData(buttonDefinition, data, event)
 }
