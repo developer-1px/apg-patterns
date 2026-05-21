@@ -1,5 +1,5 @@
 import type { PatternRuntime } from '../../kernel/patternRuntime'
-import type { ReactPatternProps } from '../../adapters/reactTypes'
+import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { rangeBetween, stepKey } from './listboxMultiSelectionRange'
 
 export function handleListboxMultiKeyDown(runtime: PatternRuntime, event: Parameters<NonNullable<ReactPatternProps['onKeyDown']>>[0]): boolean {

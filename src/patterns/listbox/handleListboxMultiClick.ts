@@ -1,5 +1,5 @@
 import type { PatternRuntime } from '../../kernel/patternRuntime'
-import type { ReactPatternProps } from '../../adapters/reactTypes'
+import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 import type { Key } from '../../schema'
 import { rangeBetween } from './listboxMultiSelectionRange'
 

@@ -429,7 +429,6 @@ Feed
 FeedProps
 Grid
 GridProps
-handlePatternTrapFocus
 LandmarkKind
 Landmarks
 LandmarksProps
@@ -466,7 +465,6 @@ ReactFeedRuntime
 ReactGridCell
 ReactGridRow
 ReactGridRuntime
-reactKeyInput
 ReactLandmarkItem
 ReactLandmarksRuntime
 ReactLinkRuntime
@@ -477,11 +475,8 @@ ReactMenubarRuntime
 ReactMenuButtonRuntime
 ReactMeterRenderItem
 ReactMeterRuntime
-ReactPatternProps
-reactProps
 ReactRadioGroupRuntime
 ReactRadioRenderItem
-ReactRenderItemState
 ReactSliderRenderItem
 ReactSliderRuntime
 ReactSpinbuttonRenderItem
@@ -539,10 +534,7 @@ useListboxPattern
 useMenubarPattern
 useMenuButtonPattern
 useMeterPattern
-usePatternEffects
 useRadioGroupPattern
-useReactPatternRuntime
-useRovingFocusEventHandler
 useSliderPattern
 useSpinbuttonPattern
 useSwitchPattern
@@ -574,7 +566,6 @@ Dialog
 Disclosure
 Feed
 Grid
-handlePatternTrapFocus
 Landmarks
 Link
 Listbox
@@ -582,8 +573,6 @@ Menubar
 MenuButton
 Meter
 RadioGroup
-reactKeyInput
-reactProps
 Slider
 Spinbutton
 Switch
@@ -611,10 +600,7 @@ useListboxPattern
 useMenubarPattern
 useMenuButtonPattern
 useMeterPattern
-usePatternEffects
 useRadioGroupPattern
-useReactPatternRuntime
-useRovingFocusEventHandler
 useSliderPattern
 useSpinbuttonPattern
 useSwitchPattern

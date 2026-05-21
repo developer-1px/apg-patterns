@@ -1,6 +1,7 @@
 import type { Key, PatternData } from '../../schema'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
-import { reactProps, type ReactListboxRenderItem, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactTypes'
+import type { ReactListboxRenderItem } from '../../adapters/reactTypes'
+import { reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
 import { handleListboxMultiClick } from './handleListboxMultiSelect'
 
 export function createListboxRenderItem(runtime: PatternRuntime, key: Key): ReactListboxRenderItem {
