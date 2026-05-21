@@ -1,7 +1,5 @@
 import { listboxDefinition, reducePatternData, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src/react'
-import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { variantItemsFrom } from '../../shared/demoPatternTypes'
-import { renderDataInspect } from '../../shared/inspect/genericInspect'
 import { Listbox } from './Listbox'
 import {
   groupedListboxStructure,
@@ -12,9 +10,9 @@ import {
 } from './listboxData'
 import { RearrangeableListbox } from './RearrangeableListbox'
 
-type ListboxVariantKey = 'basic' | 'collapsible' | 'scrollable' | 'grouped' | 'rearrangeable' | 'rearrangeableMulti'
+export type ListboxVariantKey = 'basic' | 'collapsible' | 'scrollable' | 'grouped' | 'rearrangeable' | 'rearrangeableMulti'
 
-const listboxVariants: Record<ListboxVariantKey, { label: string; data: PatternData }> = {
+export const listboxVariants: Record<ListboxVariantKey, { label: string; data: PatternData }> = {
   basic: { label: 'Basic', data: initialListboxData },
   collapsible: { label: 'Collapsible', data: initialListboxData },
   scrollable: { label: 'Scrollable', data: initialScrollableListboxData },
@@ -25,46 +23,28 @@ const listboxVariants: Record<ListboxVariantKey, { label: string; data: PatternD
 
 export const listboxVariantItems = variantItemsFrom(listboxVariants)
 
-export function useListboxDemoRuntime(onEvent: (event: PatternEvent) => void) {
-  const host = useVariantPatternDataHost<ListboxVariantKey>(
-    'basic',
-    initialListboxData,
-    (variant) => listboxVariants[variant].data,
-    (_variant, data, event) => reduceListboxDemoData(data, event),
-  )
-  const options: PatternOptions = host.variant === 'rearrangeableMulti'
+export function listboxDemoOptions(variant: ListboxVariantKey): PatternOptions {
+  return variant === 'rearrangeableMulti'
     ? { focusStrategy: 'rovingTabIndex', selectionMode: 'multiple' }
-    : { focusStrategy: 'rovingTabIndex', selectionMode: 'single', followFocus: host.variant === 'scrollable' }
-  const handleEvent = (event: PatternEvent) => {
-    onEvent(event)
-    host.dispatchEvent(event)
-  }
-  const state = {
-    ...host.data.state,
-    scrollable: host.variant === 'scrollable',
-  }
-  const data: PatternData = {
-    ...host.data,
-    state: host.variant === 'grouped' ? { ...state, groups: groupedListboxStructure } : state,
-  }
+    : { focusStrategy: 'rovingTabIndex', selectionMode: 'single', followFocus: variant === 'scrollable' }
+}
 
+export function listboxPreviewData(variant: ListboxVariantKey, data: PatternData): PatternData {
+  const state = {
+    ...data.state,
+    scrollable: variant === 'scrollable',
+  }
   return {
-    inspect: renderDataInspect(host.data),
-    context: {
-      values: {
-        state: { variant: host.variant, data, options },
-        model: { variantItems: listboxVariantItems },
-      },
-      actions: {
-        selectVariant: host.selectVariant,
-        dispatchEvent: handleEvent,
-      },
-      components: { ListboxPreview },
-    },
+    ...data,
+    state: variant === 'grouped' ? { ...state, groups: groupedListboxStructure } : state,
   }
 }
 
-function reduceListboxDemoData(data: PatternData, event: PatternEvent): PatternData {
+export function isRearrangeableListboxVariant(variant: ListboxVariantKey): boolean {
+  return variant === 'rearrangeable' || variant === 'rearrangeableMulti'
+}
+
+export function reduceListboxDemoData(data: PatternData, event: PatternEvent): PatternData {
   if (event.type === 'reorder') {
     return { ...data, relations: { ...data.relations, rootKeys: [...event.keys] } }
   }
@@ -74,7 +54,7 @@ function reduceListboxDemoData(data: PatternData, event: PatternEvent): PatternD
   return reducePatternData(listboxDefinition, data, event)
 }
 
-function ListboxPreview({
+export function ListboxPreview({
   variant,
   data,
   onEvent,
@@ -85,7 +65,7 @@ function ListboxPreview({
   onEvent: (event: PatternEvent) => void
   options: PatternOptions
 }) {
-  return variant === 'rearrangeable' || variant === 'rearrangeableMulti'
+  return isRearrangeableListboxVariant(variant)
     ? <RearrangeableListbox data={data} onEvent={onEvent} options={options} />
     : <Listbox data={data} onEvent={onEvent} options={options} />
 }

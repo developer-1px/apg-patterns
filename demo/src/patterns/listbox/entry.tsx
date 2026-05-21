@@ -1,5 +1,13 @@
-import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
-import { useListboxDemoRuntime } from './listboxDemoRuntime'
+import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
+import {
+  ListboxPreview,
+  listboxDemoOptions,
+  listboxPreviewData,
+  listboxVariantItems,
+  listboxVariants,
+  reduceListboxDemoData,
+  type ListboxVariantKey,
+} from './listboxDemoRuntime'
 
 const listboxDemoDefinition = {
   key: 'listbox',
@@ -33,7 +41,17 @@ const listboxDemoDefinition = {
   },
 } as const satisfies DemoPatternDefinition
 
-export const entry = defineDemoPattern({
+export const entry = defineVariantDemoPattern<ListboxVariantKey>({
   definition: listboxDemoDefinition,
-  useRuntime: useListboxDemoRuntime,
+  initialVariant: 'basic',
+  initialData: listboxVariants.basic.data,
+  dataByVariant: (variant) => listboxVariants[variant].data,
+  reduce: (_variant, data, event) => reduceListboxDemoData(data, event),
+  variantItems: listboxVariantItems,
+  componentName: 'ListboxPreview',
+  component: ListboxPreview,
+  getStateValues: (variant, data) => ({
+    data: listboxPreviewData(variant, data),
+    options: listboxDemoOptions(variant),
+  }),
 })

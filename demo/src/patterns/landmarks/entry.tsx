@@ -20,17 +20,12 @@ const landmarksDemoDefinition = {
     definition: 'landmarks/definition.ts',
   },
   controls: {
-    kind: 'stack',
-    children: [
-      {
-        kind: 'listbox',
-        value: '$state.variant',
-        items: '$model.variantItems',
-        label: 'landmark examples',
-        idPrefix: 'landmarks-variant',
-        onChange: '$actions.selectVariant',
-      },
-    ],
+    kind: 'listbox',
+    value: '$state.variant',
+    items: '$model.variantItems',
+    label: 'landmark examples',
+    idPrefix: 'landmarks-variant',
+    onChange: '$actions.selectVariant',
   },
   view: {
     kind: 'component',
