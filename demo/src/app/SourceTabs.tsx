@@ -19,7 +19,6 @@ export function useSourceTabs<T extends string>({ label, tabs, value, onChange }
   const tabEntries = tabs.map((tab) => ({ tab, key: tabKey(tab) }))
   const keyToTab = new Map(tabEntries.map(({ tab, key }) => [key, tab]))
   const data = createSourceTabsData(label, tabEntries, tabKey(value))
-  const options = { orientation: 'horizontal', activationMode: 'automatic' } as const
 
   const runtime = useTabsPattern(
     data,
@@ -27,7 +26,7 @@ export function useSourceTabs<T extends string>({ label, tabs, value, onChange }
       if (event.type === 'select') selectTab(event.keys[0], keyToTab, onChange)
       if (event.type === 'navigate') onChange(resolveNavigatedTab(tabs, value, event))
     },
-    options,
+    { orientation: 'horizontal', activationMode: 'automatic' },
   )
 
   return {

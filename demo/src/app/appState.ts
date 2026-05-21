@@ -92,6 +92,6 @@ function coercePatternKey(value: string | null): PatternKey | null {
 }
 
 function coerceRightMode(value: string | null): AppState['rightMode'] | null {
-  if (!value || value === 'off') return null
+  if (!value) return null
   return rightModes.find((mode) => rightModeLabels[mode] === value) ?? null
 }
