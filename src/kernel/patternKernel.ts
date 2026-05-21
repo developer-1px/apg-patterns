@@ -12,10 +12,9 @@
  * logic in patternRuntime.ts, and reducer logic in patternReducer.ts.
  */
 import type { KeyInput, ModifierKeyName } from '../internal/keyboard'
-import type { Key, PatternData, PatternOptions } from '../schema'
+import type { Key, PatternData, PatternOptions, Predicate } from '../schema'
 import { defineKeyToken, resolveKeyToken } from './keyTokenRegistry'
 import { resolveAriaSource, resolveNavigationTarget, resolveStateProjection, resolveVisibleOrder } from './kernelResolvers'
-import { evaluatePredicate } from './predicateEvaluation'
 import {
   defineAriaSource,
   defineNavigationTarget,
@@ -27,6 +26,7 @@ import {
   isRegisteredPredicate,
   isRegisteredStateProjection,
   isRegisteredVisibleOrder,
+  predicateRegistry,
   type AriaSourceResolver,
   type NavigationTargetContext,
   type NavigationTargetResolver,
@@ -52,7 +52,6 @@ export {
   resolveNavigationTarget,
   resolveStateProjection,
   resolveVisibleOrder,
-  evaluatePredicate,
 }
 export type {
   AriaSourceResolver,
@@ -85,4 +84,14 @@ export function createParentByKey(data: PatternData): ReadonlyMap<Key, Key> {
     for (const child of children) parentByKey.set(child, parent)
   }
   return parentByKey
+}
+
+export function evaluatePredicate(predicate: Predicate, ctx: PatternRuntimeContext): boolean {
+  if (predicate.kind === 'always') return true
+  if (predicate.kind === 'not') return !evaluatePredicate(predicate.predicate, ctx)
+  if (predicate.kind === 'all') return predicate.predicates.every((p) => evaluatePredicate(p, ctx))
+  if (predicate.kind === 'any') return predicate.predicates.some((p) => evaluatePredicate(p, ctx))
+  const resolver = predicateRegistry.get(predicate.kind)
+  if (!resolver) throw new Error(`[apg-pattern] unknown predicate token: "${predicate.kind}" — register via definePredicate()`)
+  return resolver(predicate, ctx)
 }

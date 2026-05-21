@@ -45,16 +45,11 @@ const KERNEL_SIDE_EFFECT_SOURCES = [
 
 const KERNEL_IMPLEMENTATION_SOURCES = [
   'kernel/patternRuntime.ts',
-  'kernel/rootKeyboardHandler.ts',
   'kernel/runtimeKeyboard.ts',
   'kernel/runtimePartProps.ts',
   'kernel/domEventBindings.ts',
-  'kernel/domEventRegistry.ts',
-  'kernel/slotProps.ts',
-  'kernel/runtimeItemState.ts',
   'kernel/patternReducer.ts',
   'kernel/patternTransitions.ts',
-  'kernel/transitionValue.ts',
   'kernel/patternKernel.ts',
   'kernel/keyTokenRegistry.ts',
   'kernel/kernelRegistries.ts',

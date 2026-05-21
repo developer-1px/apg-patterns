@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import { createPatternRuntime, reducePatternData, type PatternData, type PatternDefinition, type PatternEvent } from '../index'
-import { resolveTransitionValue } from '../kernel/transitionValue'
+import { resolveTransitionValue } from '../kernel/patternTransitions'
 
 const data = {
   items: {

@@ -3,13 +3,13 @@ import { PatternDataSchema, PatternDefinitionSchema, PatternOptionsSchema, type 
 import {
   resolveVisibleOrder,
   createParentByKey,
+  resolveStateProjection,
   type PatternRuntimeContext,
 } from './patternKernel'
 import { resolveRuntimePartProps } from './runtimePartProps'
-import { resolveRuntimeItemState } from './runtimeItemState'
-import { createRootKeyboardHandler } from './rootKeyboardHandler'
-import { resolveRuntimeKeyboardBinding } from './runtimeKeyboard'
+import { resolveRuntimeKeyboardBinding, type RuntimeKeyboardBindingResult } from './runtimeKeyboard'
 import { createElementId } from './domIds'
+import { withDefaultReason } from './domEventBindings'
 export { defineDomEvent } from './domEventBindings'
 
 export type SlotProps = Record<string, unknown>
@@ -83,4 +83,48 @@ export function createPatternRuntime<TData extends PatternData = PatternData>(in
   const getItemProps = (partName: string, key: Key): SlotProps => getPartProps(partName, key)
 
   return { definition, data, options, visibleKeys, getRootProps, getItemProps, getPartProps, getRootKeyboardHandler, resolveKeyboardBinding, getItemState, keyToElementId, emit }
+}
+
+function createRootKeyboardHandler({
+  data,
+  visibleKeys,
+  emit,
+  resolveKeyboardBinding,
+}: {
+  data: PatternData
+  visibleKeys: readonly Key[]
+  emit: (event: PatternEvent) => void
+  resolveKeyboardBinding: (input: KeyInput, activeKey: Key) => RuntimeKeyboardBindingResult | null
+}) {
+  return (event: KeyInput & { preventDefault?: () => void }) => {
+    const active = data.state?.activeKey ?? visibleKeys[0]
+    if (!active) return
+
+    const result = resolveKeyboardBinding(event, active)
+    if (!result) return
+
+    if (result.preventDefault) event.preventDefault?.()
+    for (const next of result.events) emit(withDefaultReason(next, 'keyboard'))
+  }
+}
+
+function resolveRuntimeItemState({
+  definition,
+  partName,
+  key,
+  context,
+}: {
+  definition: PatternDefinition
+  partName: string
+  key: Key
+  context(key?: Key): PatternRuntimeContext
+}): Record<string, unknown> {
+  const part = definition.parts[partName]
+  if (!part) return {}
+  const ctx = context(key)
+  const out: Record<string, unknown> = {}
+  for (const projection of part.state ?? []) {
+    out[projection.name] = resolveStateProjection(projection.from, ctx)
+  }
+  return out
 }

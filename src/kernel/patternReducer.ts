@@ -1,7 +1,5 @@
 import type { PatternData, PatternEvent, PatternDefinition } from '../schema'
 import { reduceDeclarativeTransitions } from './patternTransitions'
-import { reduceExpandActiveRowEvent, reduceExpandEvent } from './expansionEvents'
-import { reduceCheckEvent, reducePressEvent, reduceValueEvent } from './itemStateEvents'
 import { reduceFocusEvent, reduceNavigateEvent } from './navigationEvents'
 import { reduceExtendSelectionEvent, reduceSelectAllEvent, reduceSelectColumnEvent, reduceSelectRowEvent } from './selectionEvents'
 
@@ -71,4 +69,35 @@ export function reducePatternData(definition: PatternDefinition, data: PatternDa
 function withLastEventReason(data: PatternData, event: PatternEvent): PatternData {
   if (!event.meta?.reason) return data
   return { ...data, state: { ...data.state, lastEventReason: event.meta.reason } }
+}
+
+function reduceExpandEvent(data: PatternData, event: Extract<PatternEvent, { type: 'expand' }>): PatternData {
+  const expanded = new Set(data.state?.expandedKeys ?? [])
+  if (event.expanded) expanded.add(event.key)
+  else expanded.delete(event.key)
+  const nextActive = data.state?.activeKey ?? event.key
+  return { ...data, state: { ...data.state, activeKey: nextActive, expandedKeys: [...expanded] } }
+}
+
+function reduceExpandActiveRowEvent(data: PatternData, event: Extract<PatternEvent, { type: 'expandActiveRow' }>): PatternData {
+  const activeKey = data.state?.activeKey
+  const rowKey = activeKey ? data.relations?.cells?.find((cell) => cell.cellKey === activeKey)?.rowKey : undefined
+  if (!rowKey) return data
+
+  const expanded = new Set(data.state?.expandedKeys ?? [])
+  if (event.expanded) expanded.add(rowKey)
+  else expanded.delete(rowKey)
+  return { ...data, state: { ...data.state, expandedKeys: [...expanded] } }
+}
+
+function reduceCheckEvent(data: PatternData, event: Extract<PatternEvent, { type: 'check' }>): PatternData {
+  return { ...data, state: { ...data.state, checkedByKey: { ...data.state?.checkedByKey, [event.key]: event.checked } } }
+}
+
+function reducePressEvent(data: PatternData, event: Extract<PatternEvent, { type: 'press' }>): PatternData {
+  return { ...data, state: { ...data.state, pressedByKey: { ...data.state?.pressedByKey, [event.key]: event.pressed ?? true } } }
+}
+
+function reduceValueEvent(data: PatternData, event: Extract<PatternEvent, { type: 'value' }>): PatternData {
+  return { ...data, state: { ...data.state, valueByKey: { ...data.state?.valueByKey, [event.key]: event.value } } }
 }

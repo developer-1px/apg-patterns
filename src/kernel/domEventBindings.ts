@@ -1,9 +1,31 @@
 import type { PatternEvent, PatternEventReason, PartEventBinding } from '../schema'
 import { evaluatePredicate, resolveEventTemplate, type PatternRuntimeContext } from './patternKernel'
 import type { SlotProps } from './patternRuntime'
-import { defineDomEvent, getDomEventDescriptor } from './domEventRegistry'
 
-export { defineDomEvent }
+type DomEventDescriptor = {
+  handlerProp: string
+  reason?: PatternEventReason
+}
+
+const domEventRegistry = new Map<string, DomEventDescriptor>([
+  ['focus', { handlerProp: 'onFocus', reason: 'focus' }],
+  ['blur', { handlerProp: 'onBlur', reason: 'external' }],
+  ['click', { handlerProp: 'onClick', reason: 'pointer' }],
+  ['dblclick', { handlerProp: 'onDoubleClick', reason: 'pointer' }],
+  ['mousedown', { handlerProp: 'onMouseDown', reason: 'pointer' }],
+  ['keydown', { handlerProp: 'onKeyDown', reason: 'keyboard' }],
+  ['keyup', { handlerProp: 'onKeyUp', reason: 'keyboard' }],
+  ['input', { handlerProp: 'onInput', reason: 'keyboard' }],
+  ['change', { handlerProp: 'onChange', reason: 'external' }],
+  ['pointerdown', { handlerProp: 'onPointerDown', reason: 'pointer' }],
+  ['pointerup', { handlerProp: 'onPointerUp', reason: 'pointer' }],
+  ['pointermove', { handlerProp: 'onPointerMove', reason: 'pointer' }],
+  ['mouseenter', { handlerProp: 'onMouseEnter', reason: 'external' }],
+  ['mouseleave', { handlerProp: 'onMouseLeave', reason: 'external' }],
+])
+
+export const defineDomEvent = (eventName: string, descriptor: DomEventDescriptor) =>
+  void domEventRegistry.set(eventName, descriptor)
 
 export function resolvePartEventBindings(
   bindings: readonly PartEventBinding[],
@@ -39,6 +61,10 @@ function isNoopDomEvent(event: PatternEvent, ctx: PatternRuntimeContext): boolea
   if (event.type === 'focus') return event.key === ctx.data.state?.activeKey
   if (event.type === 'select' && event.keys.length === 1) return ctx.data.state?.selectedKeys?.length === 1 && ctx.data.state.selectedKeys[0] === event.keys[0]
   return false
+}
+
+function getDomEventDescriptor(eventName: string): DomEventDescriptor | undefined {
+  return domEventRegistry.get(eventName)
 }
 
 export function withDefaultReason(event: PatternEvent, reason: PatternEventReason): PatternEvent {

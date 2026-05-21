@@ -1,6 +1,5 @@
-import type { Key, PatternData, PatternDefinition, PatternEvent, StateAction } from '../schema'
+import type { Key, PatternData, PatternDefinition, PatternEvent, StateAction, TransitionValue } from '../schema'
 import { createParentByKey, evaluatePredicate } from './patternKernel'
-import { resolveTransitionValue } from './transitionValue'
 
 export function reduceDeclarativeTransitions(definition: PatternDefinition, data: PatternData, event: PatternEvent): PatternData | null {
   const transitions = definition.transitions?.filter((transition) => {
@@ -57,6 +56,20 @@ function applyStateAction(data: PatternData, event: PatternEvent, action: StateA
   }
 
   return { ...data, state: { ...state, [action.field]: [...set] } }
+}
+
+export function resolveTransitionValue(value: TransitionValue, event: PatternEvent, data: PatternData): unknown {
+  if ('literal' in value) return value.literal
+  if (value.from === '$activeKey') return data.state?.activeKey ?? null
+  if (value.from === '$event.key') return 'key' in event ? event.key : null
+  if (value.from === '$event.keys') return 'keys' in event ? event.keys : []
+  if (value.from === '$event.anchorKey') return 'anchorKey' in event ? event.anchorKey : null
+  if (value.from === '$event.extentKey') return 'extentKey' in event ? event.extentKey : null
+  if (value.from === '$event.expanded') return 'expanded' in event ? event.expanded : null
+  if (value.from === '$event.checked') return 'checked' in event ? event.checked : null
+  if (value.from === '$event.pressed') return 'pressed' in event ? event.pressed : null
+  if (value.from === '$event.value') return 'value' in event ? event.value : null
+  return null
 }
 
 function isKey(value: unknown): value is Key {
