@@ -12,12 +12,10 @@ export const ReactItemFieldNameSchema = z.enum([
   'panelKey',
   'state',
 ])
-export type ReactItemFieldName = z.infer<typeof ReactItemFieldNameSchema>
 
 export const ReactRenderSourceSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('visibleOrder') }).strict(),
 ])
-export type ReactRenderSource = z.infer<typeof ReactRenderSourceSchema>
 
 export const ReactRenderValueSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('literal'), value: z.union([z.string(), z.number(), z.boolean(), z.null()]) }).strict(),
@@ -31,9 +29,8 @@ export const ReactRenderValueSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('treeIndexInParent'), base: z.literal(1) }).strict(),
   z.object({ kind: z.literal('firstControlledKey'), fallback: z.literal(null) }).strict(),
 ])
-export type ReactRenderValue = z.infer<typeof ReactRenderValueSchema>
 
-export type ReactRenderVariantWhen =
+type ReactRenderVariantWhen =
   | { kind: 'always' }
   | { kind: 'hasChildren'; key: '$key' }
   | { kind: 'not'; predicate: { kind: 'hasChildren'; key: '$key' } }
@@ -52,7 +49,6 @@ export const ReactRenderVariantSchema = z
     props: z.record(ReactPropNameSchema, ReactItemPropSchema),
   })
   .strict()
-export type ReactRenderVariant = z.infer<typeof ReactRenderVariantSchema>
 
 export const ReactRenderItemsSchema = z
   .object({
@@ -62,4 +58,3 @@ export const ReactRenderItemsSchema = z
     variants: z.array(ReactRenderVariantSchema).min(1).readonly(),
   })
   .strict()
-export type ReactRenderItems = z.infer<typeof ReactRenderItemsSchema>

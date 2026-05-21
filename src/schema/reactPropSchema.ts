@@ -15,7 +15,6 @@ export const ReactElementNameSchema = z.enum([
   'span',
   'ul',
 ])
-export type ReactElementName = z.infer<typeof ReactElementNameSchema>
 
 export const ReactSemanticDefaultPropSchema = z.enum([
   'aria-label',
@@ -27,16 +26,13 @@ export const ReactSemanticDefaultPropSchema = z.enum([
   'target',
   'type',
 ])
-export type ReactSemanticDefaultProp = z.infer<typeof ReactSemanticDefaultPropSchema>
 
 export const ReactSemanticDefaultsSchema = z.partialRecord(
   ReactSemanticDefaultPropSchema,
   z.union([z.string(), z.number(), z.boolean()]),
 )
-export type ReactSemanticDefaults = z.infer<typeof ReactSemanticDefaultsSchema>
 
 export const ReactPropOwnerSchema = z.enum(['root', 'item', 'toggle', 'panel'])
-export type ReactPropOwner = z.infer<typeof ReactPropOwnerSchema>
 
 export const ReactItemPropSchema = z
   .object({
@@ -48,4 +44,3 @@ export const ReactItemPropSchema = z
     stopsPropagation: z.boolean().optional(),
   })
   .strict()
-export type ReactItemProp = z.infer<typeof ReactItemPropSchema>
