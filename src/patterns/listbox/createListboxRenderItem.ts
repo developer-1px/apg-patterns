@@ -2,7 +2,7 @@ import type { Key, PatternData } from '../../schema'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { ReactListboxRenderItem } from '../../adapters/reactTypes'
 import { reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
-import { handleListboxMultiClick } from './handleListboxMultiSelect'
+import { handleListboxMultiClick } from './handleListboxMultiClick'
 
 export function createListboxRenderItem(runtime: PatternRuntime, key: Key): ReactListboxRenderItem {
   const optionProps = reactProps(runtime.getPartProps('option', key))

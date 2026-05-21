@@ -1,6 +1,6 @@
 import type { PatternEventReason } from '../schema'
 
-export type DomEventDescriptor = {
+type DomEventDescriptor = {
   handlerProp: string
   reason?: PatternEventReason
 }

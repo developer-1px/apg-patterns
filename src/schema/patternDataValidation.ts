@@ -1,5 +1,6 @@
 import type { z } from 'zod'
-import { validateRefsRefs, validateRelationRefs, validateStateRefs } from './patternDataRefValidators'
+import { validateRefsRefs, validateRelationRefs } from './patternDataRefValidators'
+import { validateStateRefs } from './patternStateRefValidators'
 
 /**
  * Cross-field referential integrity checks for PatternData.

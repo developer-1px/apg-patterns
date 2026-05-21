@@ -1,11 +1,11 @@
-export type ApgLinearNavigationAction = 'previous' | 'next' | 'first' | 'last'
+type ApgLinearNavigationAction = 'previous' | 'next' | 'first' | 'last'
 
-export interface ApgLinearNavigationOptions<T> {
+interface ApgLinearNavigationOptions<T> {
   wrap?: boolean
   isAvailable?: (item: T) => boolean
 }
 
-export type ApgGridNavigationAction =
+type ApgGridNavigationAction =
   | 'left'
   | 'right'
   | 'up'
@@ -15,29 +15,29 @@ export type ApgGridNavigationAction =
   | 'gridStart'
   | 'gridEnd'
 
-export interface ApgGridLocation {
+interface ApgGridLocation {
   rowIndex: number
   columnIndex: number
 }
 
-export interface ApgGridNavigationOptions<T> {
+interface ApgGridNavigationOptions<T> {
   wrapColumns?: boolean
   wrapRows?: boolean
   isAvailable?: (item: T) => boolean
 }
 
-export interface ApgVisibleTreeOptions<T> {
+interface ApgVisibleTreeOptions<T> {
   roots: readonly T[]
   children: (item: T) => readonly T[]
   isExpanded: (item: T) => boolean
 }
 
-export interface ApgTypeaheadItem<T> {
+interface ApgTypeaheadItem<T> {
   item: T
   label: string
 }
 
-export interface ApgTypeaheadMatchOptions<T> {
+interface ApgTypeaheadMatchOptions<T> {
   current?: T
   locale?: string | string[]
   matches?: (label: string, query: string) => boolean

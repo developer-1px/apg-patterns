@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export type JsonValue = string | number | boolean | null | readonly JsonValue[] | { readonly [key: string]: JsonValue }
+type JsonValue = string | number | boolean | null | readonly JsonValue[] | { readonly [key: string]: JsonValue }
 
 export const JsonValueSchema: z.ZodType<JsonValue> = z.lazy(() =>
   z.union([
@@ -13,7 +13,7 @@ export const JsonValueSchema: z.ZodType<JsonValue> = z.lazy(() =>
   ]),
 )
 
-export function isJsonValue(value: unknown): value is JsonValue {
+function isJsonValue(value: unknown): value is JsonValue {
   if (value === null) return true
   const type = typeof value
   if (type === 'string' || type === 'boolean') return true
@@ -23,7 +23,7 @@ export function isJsonValue(value: unknown): value is JsonValue {
   return Object.values(value).every(isJsonValue)
 }
 
-export function addJsonValueIssue(ctx: z.RefinementCtx, path: (string | number)[]) {
+function addJsonValueIssue(ctx: z.RefinementCtx, path: (string | number)[]) {
   ctx.addIssue({
     code: 'custom',
     path,

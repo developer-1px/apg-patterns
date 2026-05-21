@@ -12,7 +12,7 @@ interface GridState extends PatternState {
 
 export type GridData = PatternData<PatternItem, GridState>
 
-export interface GridRuntimeState {
+interface GridRuntimeState {
   runtimeOptions: PatternOptions
   editableKeys: readonly string[]
   editingKey: Key | null

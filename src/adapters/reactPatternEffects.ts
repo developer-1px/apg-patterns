@@ -4,7 +4,6 @@ import { createPatternRuntime, type CreatePatternRuntimeInput, type PatternRunti
 import { runPatternEffects } from './reactEffectRunner'
 import { useRovingFocusEventHandler } from './reactRovingFocus'
 export { handlePatternTrapFocus } from './reactPatternTrapFocus'
-export { useRovingFocusEventHandler } from './reactRovingFocus'
 
 export function usePatternEffects({
   definition,

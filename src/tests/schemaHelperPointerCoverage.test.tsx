@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { isJsonValue, validateJsonExtensionFields } from '../schema/jsonValue'
+import { JsonValueSchema, validateJsonExtensionFields } from '../schema/jsonValue'
 import { validatePatternDefinition } from '../schema/patternDefinitionValidation'
 
 function SchemaHelperHost() {
@@ -51,11 +51,11 @@ function SchemaHelperHost() {
             ctx as never,
           )
           setResult([
-            isJsonValue('x'),
-            isJsonValue(1),
-            isJsonValue(Number.NaN),
-            isJsonValue([true, null]),
-            isJsonValue({ nested: ['ok'] }),
+            JsonValueSchema.safeParse('x').success,
+            JsonValueSchema.safeParse(1).success,
+            JsonValueSchema.safeParse(Number.NaN).success,
+            JsonValueSchema.safeParse([true, null]).success,
+            JsonValueSchema.safeParse({ nested: ['ok'] }).success,
             issues.length,
           ].join('|'))
         }}

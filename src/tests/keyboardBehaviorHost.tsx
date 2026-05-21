@@ -26,7 +26,7 @@ const initialData = {
   refs: { label: 'tree' },
 } satisfies PatternData
 
-export type HostOptions = {
+type HostOptions = {
   followFocus?: boolean
   focusStrategy?: 'rovingTabIndex' | 'ariaActiveDescendant'
   itemClickAction?: 'select' | 'toggleExpand' | 'none'

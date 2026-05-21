@@ -3,7 +3,7 @@ import type { Key, PatternData, PatternEvent } from '../schema'
 import { withDefaultReason } from './domEventBindings'
 import type { RuntimeKeyboardBindingResult } from './runtimeKeyboard'
 
-export interface RootKeyboardHandlerInput {
+interface RootKeyboardHandlerInput {
   data: PatternData
   visibleKeys: readonly Key[]
   emit: (event: PatternEvent) => void

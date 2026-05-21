@@ -2,7 +2,7 @@ import { matchesApgShortcut, type KeyInput } from '../internal/keyboard'
 import type { Key, PatternData, PatternDefinition, PatternEvent, PatternOptions } from '../schema'
 import { evaluatePredicate, resolveEventTemplate } from './patternKernel'
 
-export interface RuntimeKeyboardInput {
+interface RuntimeKeyboardInput {
   definition: PatternDefinition
   data: PatternData
   options: PatternOptions

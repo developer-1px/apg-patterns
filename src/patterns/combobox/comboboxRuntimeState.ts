@@ -17,7 +17,7 @@ interface ComboboxState extends PatternState {
 
 export type ComboboxData = PatternData<PatternItem, ComboboxState>
 
-export interface ComboboxRuntimeState {
+interface ComboboxRuntimeState {
   runtimeOptions: PatternOptions
   variant: ComboboxVariant
   editable: boolean

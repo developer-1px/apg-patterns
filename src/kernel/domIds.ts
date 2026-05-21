@@ -1,6 +1,6 @@
 import type { Key, PatternOptions } from '../schema'
 
-export function normalizeDomIdPart(value: Key | string): string {
+function normalizeDomIdPart(value: Key | string): string {
   const normalized = String(value)
     .trim()
     .replace(/[^A-Za-z0-9_.:-]+/g, '-')

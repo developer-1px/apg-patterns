@@ -40,7 +40,7 @@ export function useRovingFocusEventHandler({
   }
 }
 
-export function shouldFocusAfterControlledUpdate(event: PatternEvent, definition: PatternDefinition, options: PatternOptions) {
+function shouldFocusAfterControlledUpdate(event: PatternEvent, definition: PatternDefinition, options: PatternOptions) {
   if (!usesRovingFocus(definition, options)) return false
   const reason = event.meta?.reason
   return (event.type === 'navigate' || event.type === 'focus') && (reason === 'keyboard' || reason === 'typeahead')

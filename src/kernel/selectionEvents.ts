@@ -35,7 +35,7 @@ export function reduceExtendSelectionEvent(definition: PatternDefinition, data: 
   return withSelection(data, keys, anchorKey, extentKey)
 }
 
-export function withSelection(data: PatternData, keys: readonly Key[], anchorKey: Key | null, extentKey: Key | null): PatternData {
+function withSelection(data: PatternData, keys: readonly Key[], anchorKey: Key | null, extentKey: Key | null): PatternData {
   return {
     ...data,
     state: {

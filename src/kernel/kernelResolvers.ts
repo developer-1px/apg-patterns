@@ -8,7 +8,7 @@ import {
 } from './kernelRegistries'
 import type { PatternRuntimeContext } from './patternKernel'
 
-export function unknownTokenError(category: string, token: string): Error {
+function unknownTokenError(category: string, token: string): Error {
   return new Error(`[apg-pattern] unknown ${category} token: "${token}" — register via define${category[0].toUpperCase()}${category.slice(1)}()`)
 }
 

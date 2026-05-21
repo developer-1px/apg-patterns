@@ -30,7 +30,7 @@ export interface KeyInput {
   timeStamp?: number
 }
 
-export interface ApgParsedShortcut {
+interface ApgParsedShortcut {
   control: boolean
   shift: boolean
   alt: boolean
@@ -46,13 +46,13 @@ export interface ApgTypeaheadBuffer {
   snapshot(): ApgTypeaheadSnapshot
 }
 
-export interface ApgTypeaheadSnapshot {
+interface ApgTypeaheadSnapshot {
   timeoutMs: number
   query: string
   lastTime: number
 }
 
-export interface ApgTypeaheadOptions {
+interface ApgTypeaheadOptions {
   timeoutMs?: number
   initial?: Pick<ApgTypeaheadSnapshot, 'query' | 'lastTime'>
 }

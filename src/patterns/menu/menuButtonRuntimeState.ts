@@ -1,6 +1,6 @@
 import type { Key, PatternData, PatternOptions } from '../../schema'
 
-export interface MenuButtonRuntimeState {
+interface MenuButtonRuntimeState {
   focusStrategy: 'rovingTabIndex' | 'ariaActiveDescendant'
   runtimeOptions: PatternOptions
   triggerKey: Key | null

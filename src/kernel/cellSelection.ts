@@ -1,7 +1,7 @@
 import type { Key, PatternData, PatternDefinition } from '../schema'
 import { resolveVisibleOrder } from './patternKernel'
 
-export type CellRows = readonly (readonly Key[])[]
+type CellRows = readonly (readonly Key[])[]
 
 export function visibleCellRows(definition: PatternDefinition, data: PatternData): CellRows {
   const visibleKeys = new Set(resolveVisibleOrder(definition.navigation.visibleOrder, data))
