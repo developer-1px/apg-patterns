@@ -9,7 +9,7 @@ if (typeof (globalThis as { CSS?: unknown }).CSS === 'undefined') {
   ;(globalThis as { CSS: { escape: (s: string) => string } }).CSS = { escape: (s: string) => s }
 }
 
-import { ListboxDemo } from './ListboxTestHost'
+import { ListboxDemo } from './testing/ListboxTestHost'
 
 const lb = () => screen.getByRole('listbox')
 

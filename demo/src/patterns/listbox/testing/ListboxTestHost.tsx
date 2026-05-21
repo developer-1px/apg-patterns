@@ -1,14 +1,14 @@
-import { listboxDefinition, reducePatternData, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src/react'
-import { usePatternDataHost } from '../../shared/demoHostState'
-import { Listbox } from './Listbox'
+import { listboxDefinition, reducePatternData, type PatternData, type PatternEvent, type PatternOptions } from '../../../../../src/react'
+import { usePatternDataHost } from '../../../shared/demoHostState'
+import { Listbox } from '../Listbox'
 import {
   groupedListboxStructure,
   initialGroupedListboxData,
   initialListboxData,
   initialRearrangeableListboxData,
   initialScrollableListboxData,
-} from './listboxData'
-import { RearrangeableListbox } from './RearrangeableListbox'
+} from '../listboxData'
+import { RearrangeableListbox } from '../RearrangeableListbox'
 
 type ListboxTestVariant = 'basic' | 'scrollable' | 'grouped' | 'rearrangeable' | 'rearrangeableMulti'
 

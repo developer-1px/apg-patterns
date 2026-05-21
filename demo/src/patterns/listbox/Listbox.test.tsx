@@ -14,7 +14,7 @@ if (typeof Element.prototype.scrollIntoView !== 'function') {
   Element.prototype.scrollIntoView = () => {}
 }
 
-import { ListboxDemo } from './ListboxTestHost'
+import { ListboxDemo } from './testing/ListboxTestHost'
 import { Listbox } from './Listbox'
 import { RearrangeableListbox } from './RearrangeableListbox'
 import { entry } from './entry'
