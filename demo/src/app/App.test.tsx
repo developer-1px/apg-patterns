@@ -170,7 +170,7 @@ describe('App route state', () => {
     render(<App />)
 
     await waitFor(() => expect(currentHashParam('source')).toBe('accordionData.ts'))
-    expect(screen.getByTitle('accordionData.ts')).toBeTruthy()
+    expectSelectedSourceTab('accordionData.ts')
 
     fireEvent.click(screen.getByRole('button', { name: 'code' }))
     await waitFor(() => expect(currentHashParam('panel')).toBe('off'))
@@ -179,7 +179,7 @@ describe('App route state', () => {
     fireEvent.click(screen.getByRole('button', { name: 'code' }))
     await waitFor(() => expect(currentHashParam('panel')).toBe('code'))
     expect(currentHashParam('source')).toBe('accordionData.ts')
-    expect(screen.getByTitle('accordionData.ts')).toBeTruthy()
+    expectSelectedSourceTab('accordionData.ts')
   })
 
   it('replaces invalid source deep links with the active pattern default source', async () => {
@@ -189,7 +189,7 @@ describe('App route state', () => {
 
     expect(screen.getByRole('heading', { name: 'Checkbox' })).toBeTruthy()
     await waitFor(() => expect(currentHashParam('source')).toBe('Checkbox.tsx'))
-    expect(screen.getByTitle('Checkbox.tsx')).toBeTruthy()
+    expectSelectedSourceTab('Checkbox.tsx')
     expect(screen.queryByText('missing source: Missing.tsx')).toBeNull()
   })
 
@@ -201,7 +201,7 @@ describe('App route state', () => {
     expect(screen.getByRole('heading', { name: 'Treeview' })).toBeTruthy()
     await waitFor(() => expect(window.location.hash).toBe('#pattern=treeview&panel=code&source=Treeview.tsx'))
     expect(screen.getByRole('tab', { name: 'code', selected: true })).toBeTruthy()
-    expect(screen.getByTitle('Treeview.tsx')).toBeTruthy()
+    expectSelectedSourceTab('Treeview.tsx')
     expect(screen.queryByText('missing source: Missing.tsx')).toBeNull()
   })
 
@@ -229,7 +229,7 @@ describe('App route state', () => {
       expect(screen.getByRole('heading', { name: route.label })).toBeTruthy()
       await waitFor(() => expect(currentHashParam('pattern')).toBe(route.key))
       expect(currentHashParam('source')).toBe(route.sourceName)
-      expect(screen.getByTitle(route.sourceName)).toBeTruthy()
+      expectSelectedSourceTab(route.sourceName)
       expect(screen.queryByText(`missing source: ${route.sourceName}`)).toBeNull()
       const preview = document.querySelector(`[data-demo-preview="${route.key}"]`)
       expect(preview?.getAttribute('aria-keyshortcuts')).toBe(route.keyboardShortcuts.join(' ') || null)
@@ -254,7 +254,7 @@ describe('App route state', () => {
       await waitFor(() => expect(currentHashParam('pattern')).toBe(route.key))
       expect(window.location.hash).toContain(`source=${encodeURIComponent(route.sourceName)}`)
       expect(currentHashParam('source')).toBe(route.sourceName)
-      expect(screen.getByTitle(route.sourceName)).toBeTruthy()
+      expectSelectedSourceTab(route.sourceName)
       await expectActiveSourceText(route.sourceName)
 
       unmount()
@@ -541,7 +541,7 @@ describe('event log', () => {
 
     await waitFor(() => expect(currentHashParam('pattern')).toBe('checkbox'))
     expect(currentHashParam('source')).toBe('Checkbox.tsx')
-    expect(screen.getByTitle('Checkbox.tsx')).toBeTruthy()
+    expectSelectedSourceTab('Checkbox.tsx')
     expect(screen.queryByText('missing source: accordionData.ts')).toBeNull()
   })
 })
@@ -1057,6 +1057,10 @@ async function expectActiveSourceText(sourceName: string) {
   await waitFor(() => {
     expect(getSourcePanel().textContent).toBe(expectedSource)
   })
+}
+
+function expectSelectedSourceTab(sourceName: string) {
+  expect(screen.getByRole('tab', { name: sourceName, selected: true })).toBeTruthy()
 }
 
 function getSourcePanel() {

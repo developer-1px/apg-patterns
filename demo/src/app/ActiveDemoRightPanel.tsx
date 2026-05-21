@@ -37,14 +37,7 @@ export function ActiveDemoRightPanel({
       </header>
       <div {...rightModeTabs.getPanelProps()} className="flex min-h-0 flex-col gap-3">
         {state.rightMode === 'source' ? (
-          <div className="grid gap-1">
-            <div className="flex min-w-0 items-start gap-2">
-              <SourceTabs tabs={sourceTabs.tabs} getTablistProps={sourceTabs.getTablistProps} getTabProps={sourceTabs.getTabProps} />
-            </div>
-            <div className="truncate px-1 font-mono text-[11px] text-zinc-400 dark:text-zinc-600" title={activeSourceName}>
-              {activeSourceName}
-            </div>
-          </div>
+          <SourceTabs tabs={sourceTabs.tabs} getTablistProps={sourceTabs.getTablistProps} getTabProps={sourceTabs.getTabProps} />
         ) : null}
         {state.rightMode === 'inspect' ? activeDemo.inspectControls : null}
         {state.rightMode === 'log' ? (
