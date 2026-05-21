@@ -1,4 +1,3 @@
-import { selectClass } from '../../shared/demoPatternTypes'
 import { ds } from '../../shared/designSystem'
 import {
   parseFocusStrategy,
@@ -15,7 +14,7 @@ export function InspectModeControl({
   onChange: (value: TreeviewDemoState['inspectMode']) => void
 }) {
   return (
-    <select className={selectClass} value={value} onChange={(event) => onChange(parseInspectMode(event.currentTarget.value))}>
+    <select className={ds.field} value={value} onChange={(event) => onChange(parseInspectMode(event.currentTarget.value))}>
       <option value="aria">aria</option>
       <option value="html">html</option>
     </select>
@@ -46,7 +45,7 @@ export function ItemClickActionControl({
   return (
     <label className="grid gap-1 text-xs text-zinc-600 dark:text-zinc-400">
       itemClickAction
-      <select className={selectClass} value={value} onChange={(event) => onChange(parseItemClickAction(event.currentTarget.value))}>
+      <select className={ds.field} value={value} onChange={(event) => onChange(parseItemClickAction(event.currentTarget.value))}>
         <option value="select">select</option>
         <option value="toggleExpand">toggleExpand</option>
         <option value="none">none</option>
@@ -65,7 +64,7 @@ export function FocusStrategyControl({
   return (
     <label className="grid gap-1 text-xs text-zinc-600 dark:text-zinc-400">
       focusStrategy
-      <select className={selectClass} value={value} onChange={(event) => onChange(parseFocusStrategy(event.currentTarget.value))}>
+      <select className={ds.field} value={value} onChange={(event) => onChange(parseFocusStrategy(event.currentTarget.value))}>
         <option value="rovingTabIndex">rovingTabIndex</option>
         <option value="ariaActiveDescendant">ariaActiveDescendant</option>
       </select>

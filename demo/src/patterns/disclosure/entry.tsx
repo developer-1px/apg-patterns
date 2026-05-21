@@ -9,7 +9,7 @@ import {
   initialNavMenuTopLinksDisclosureData,
   type DisclosureVariantKey,
 } from './disclosureData'
-import { renderDataInspect } from '../../shared/inspect/index'
+import { renderDataInspect } from '../../shared/inspect/genericInspect'
 import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const variants: Record<DisclosureVariantKey, PatternData> = {

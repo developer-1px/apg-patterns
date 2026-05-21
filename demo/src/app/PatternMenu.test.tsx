@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { PatternMenu, patternMenuKeyboardShortcuts } from './PatternMenu'
+import { PatternMenu } from './PatternMenu'
 import { patternItems } from '../shared/demoPatterns'
 import type { PatternKey } from '../shared/demoPatterns'
 
@@ -14,9 +14,9 @@ describe('PatternMenu', () => {
   it('uses the listbox APG keyboard surface', () => {
     render(<PatternMenuDemo />)
     const listbox = screen.getByRole('listbox', { name: /APG patterns/i })
+    const expectedShortcuts = ['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Space']
 
-    expect(listbox.getAttribute('aria-keyshortcuts')).toBe(patternMenuKeyboardShortcuts.join(' '))
-    expect(patternMenuKeyboardShortcuts).toEqual(['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Space'])
+    expect(listbox.getAttribute('aria-keyshortcuts')).toBe(expectedShortcuts.join(' '))
   })
 
   it('ArrowDown selects the next pattern', () => {

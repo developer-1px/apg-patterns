@@ -1,7 +1,7 @@
 import type { PatternEvent } from '../../../../src/react'
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
-import { renderDataInspect } from '../../shared/inspect'
+import { renderDataInspect } from '../../shared/inspect/genericInspect'
 import { Landmarks } from './Landmarks'
 import {
   buildLandmarkData,

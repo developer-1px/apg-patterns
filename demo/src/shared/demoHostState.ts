@@ -2,7 +2,7 @@ import { useReducer } from 'react'
 import { z } from 'zod'
 import { PatternDataSchema, type PatternData, type PatternEvent } from '../../../src/react'
 
-export const DemoPatternHostStateSchema = z
+const DemoPatternHostStateSchema = z
   .object({
     variant: z.string().optional(),
     data: PatternDataSchema,

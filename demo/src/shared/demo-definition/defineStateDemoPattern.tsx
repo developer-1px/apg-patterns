@@ -4,7 +4,7 @@ import { usePatternDataHost } from '../demoHostState'
 import type { PatternEntry } from '../demoPatternTypes'
 import type { DemoPatternDefinition } from './demoPatternDefinition'
 import { defineDemoPattern } from './defineDemoPatternCore'
-import { renderDataInspect } from '../inspect/index'
+import { renderDataInspect } from '../inspect/genericInspect'
 
 export function defineStateDemoPattern({
   definition,

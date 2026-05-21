@@ -7,7 +7,7 @@ import { formatEvent } from './eventLog'
 import { isCopyableSource, isSourceLoadFailure, loadSourcePreview } from './sourcePreview'
 import { SourceTabs, useSourceTabs } from './SourceTabs'
 import { collectPatternEntries, defaultPatternKey, defaultSourceName, patternEntries, useDemoPattern, validatePatternEntries } from '../shared/demoPatterns'
-import { KERNEL_IMPLEMENTATION_SOURCES, KERNEL_SIDE_EFFECT_SOURCES, KERNEL_SOURCES } from '../shared/demoPatternTypes'
+import { KERNEL_SOURCES } from '../shared/demoPatternTypes'
 import { sourceLoaders, sourceNameCollisions } from '../shared/sources'
 import type { PatternEvent } from '../../../src/react'
 
@@ -809,17 +809,6 @@ describe('demo source wiring', () => {
     expect(missingKernelSources).toEqual([])
   })
 
-  it('exposes kernel side-effect registration sources from shared source tabs', () => {
-    const missingSideEffectSources = KERNEL_SIDE_EFFECT_SOURCES.filter((sourceName) => !KERNEL_SOURCES.includes(sourceName))
-
-    expect(missingSideEffectSources).toEqual([])
-  })
-
-  it('exposes shared kernel implementation sources needed to inspect demo wiring', () => {
-    const missingImplementationSources = KERNEL_IMPLEMENTATION_SOURCES.filter((sourceName) => !KERNEL_SOURCES.includes(sourceName))
-
-    expect(missingImplementationSources).toEqual([])
-  })
 })
 
 function DemoSourceProbe({

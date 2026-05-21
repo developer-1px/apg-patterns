@@ -2,7 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { registerKernelBuiltins } from '../../../src/kernel/kernelBuiltins'
 import { App } from './App'
-import { ReproRecorderOverlay } from './repro-recorder'
+import { ReproRecorderOverlay } from './repro-recorder/ReproRecorderOverlay'
 import '../style.css'
 
 registerKernelBuiltins()

@@ -1,5 +1,5 @@
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
-import { renderDataInspect } from '../../shared/inspect/index'
+import { renderDataInspect } from '../../shared/inspect/genericInspect'
 import { Slider } from './Slider'
 import { reduceSliderData, sliderVariantItems, sliderVariants, type SliderVariantKey } from './sliderData'
 import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'

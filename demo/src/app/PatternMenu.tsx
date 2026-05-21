@@ -5,7 +5,7 @@ import { cx, ds } from '../shared/designSystem'
 
 type Props = HTMLAttributes<HTMLElement>
 
-export const patternMenuKeyboardShortcuts = listboxDefinition.keyboard.map((binding) => binding.shortcut)
+const patternMenuKeyboardShortcuts = listboxDefinition.keyboard.map((binding) => binding.shortcut)
 
 export function PatternMenu({ value, onChange }: { value: PatternKey; onChange: (value: PatternKey) => void }) {
   const data = createPatternMenuData(value)

@@ -1,6 +1,6 @@
 import { listboxDefinition, reducePatternData, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src/react'
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
-import { renderDataInspect } from '../../shared/inspect/index'
+import { renderDataInspect } from '../../shared/inspect/genericInspect'
 import { Listbox } from './Listbox'
 import {
   groupedListboxStructure,

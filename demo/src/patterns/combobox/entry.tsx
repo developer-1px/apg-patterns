@@ -1,7 +1,7 @@
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { Combobox } from './Combobox'
 import { buildComboboxData, comboboxVariants, reduceComboboxData, type ComboboxVariantKey } from './comboboxData'
-import { renderDataInspect } from '../../shared/inspect/index'
+import { renderDataInspect } from '../../shared/inspect/genericInspect'
 import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 import type { PatternEvent } from '../../../../src/react'
 

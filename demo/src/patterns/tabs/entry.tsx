@@ -1,6 +1,6 @@
 import type { PatternData, PatternEvent, PatternOptions } from '../../../../src/react'
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
-import { renderDataInspect } from '../../shared/inspect/index'
+import { renderDataInspect } from '../../shared/inspect/genericInspect'
 import { Tabs } from './Tabs'
 import { closeTabInData, initialTabsVariant, reduceTabsDemoData, tabsVariantItems, tabsVariants, type TabsVariantKey } from './tabsData'
 import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'

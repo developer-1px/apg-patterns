@@ -9,13 +9,7 @@ export const rightModeLabels: Record<(typeof rightModes)[number], string> = {
   log: 'events',
 }
 
-const rightModesByLabel = {
-  code: 'source',
-  state: 'inspect',
-  events: 'log',
-} as const satisfies Record<string, (typeof rightModes)[number]>
-
-export const AppStateSchema = z.object({
+const AppStateSchema = z.object({
   patternKey: z.string(),
   events: z.array(z.custom<PatternEvent>()),
   sourceName: z.string(),
@@ -98,9 +92,5 @@ function coercePatternKey(value: string | null): PatternKey | null {
 
 export function coerceRightMode(value: string | null): AppState['rightMode'] | null {
   if (!value || value === 'off') return null
-  return isRightModeLabel(value) ? rightModesByLabel[value] : null
-}
-
-function isRightModeLabel(value: string): value is keyof typeof rightModesByLabel {
-  return value in rightModesByLabel
+  return rightModes.find((mode) => rightModeLabels[mode] === value) ?? null
 }

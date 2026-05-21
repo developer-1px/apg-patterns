@@ -2,7 +2,7 @@ import { gridDefinition, reducePatternData, type PatternData, type PatternEvent 
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { Grid } from './Grid'
 import { gridVariantItems, gridVariants, type GridVariantKey } from './gridData'
-import { renderDataInspect } from '../../shared/inspect/index'
+import { renderDataInspect } from '../../shared/inspect/genericInspect'
 import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const reduceGridDemoData = (data: PatternData, event: PatternEvent): PatternData => {

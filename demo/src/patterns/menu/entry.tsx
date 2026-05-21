@@ -1,6 +1,6 @@
 import { menubarDefinition, menuButtonDefinition, reducePatternData } from '../../../../src/react'
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
-import { renderDataInspect } from '../../shared/inspect/index'
+import { renderDataInspect } from '../../shared/inspect/genericInspect'
 import { Menu } from './Menu'
 import { menuVariantItems, menuVariants, type MenuVariantKey } from './menuData'
 import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
