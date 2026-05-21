@@ -4,23 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { useButtonPattern, type PatternEvent } from '../../../../src/react'
 import { Button } from './Button'
 import { buttonVariants } from './buttonData'
-
-function ActionDemo({ onActivate }: { onActivate?: () => void }) {
-  const variant = buttonVariants.action
-  const [data, setData] = useState(variant.data)
-  const handleEvent = (event: PatternEvent) => {
-    if (event.type === 'activate') onActivate?.()
-    setData((current) => variant.reduce(current, event))
-  }
-  return <Button data={data} onEvent={handleEvent} />
-}
-
-function ToggleDemo() {
-  const variant = buttonVariants.toggle
-  const [data, setData] = useState(variant.data)
-  const handleEvent = (event: PatternEvent) => setData((current) => variant.reduce(current, event))
-  return <Button data={data} onEvent={handleEvent} />
-}
+import { ActionButtonDemo, ToggleButtonDemo } from './testing/ButtonTestHost'
 
 function ButtonActionsDemo() {
   const variant = buttonVariants.toggle
@@ -41,27 +25,27 @@ function ButtonActionsDemo() {
 describe('Button demo (action)', () => {
   it('activates on click', () => {
     let count = 0
-    render(<ActionDemo onActivate={() => count++} />)
+    render(<ActionButtonDemo onActivate={() => count++} />)
     fireEvent.click(screen.getByRole('button'))
     expect(count).toBe(1)
   })
 
   it('activates on Enter', () => {
     let count = 0
-    render(<ActionDemo onActivate={() => count++} />)
+    render(<ActionButtonDemo onActivate={() => count++} />)
     fireEvent.keyDown(screen.getByRole('button'), { key: 'Enter', code: 'Enter' })
     expect(count).toBe(1)
   })
 
   it('activates on Space', () => {
     let count = 0
-    render(<ActionDemo onActivate={() => count++} />)
+    render(<ActionButtonDemo onActivate={() => count++} />)
     fireEvent.keyDown(screen.getByRole('button'), { key: ' ', code: 'Space' })
     expect(count).toBe(1)
   })
 
   it('never sets aria-pressed (no toggle state)', () => {
-    render(<ActionDemo />)
+    render(<ActionButtonDemo />)
     const btn = screen.getByRole('button')
     fireEvent.click(btn)
     expect(btn.getAttribute('aria-pressed')).toBe(null)
@@ -70,12 +54,12 @@ describe('Button demo (action)', () => {
 
 describe('Button demo (toggle, aria-pressed)', () => {
   it('starts unpressed', () => {
-    render(<ToggleDemo />)
+    render(<ToggleButtonDemo />)
     expect(screen.getByRole('button').getAttribute('aria-pressed')).toBe('false')
   })
 
   it('toggles aria-pressed on click', () => {
-    render(<ToggleDemo />)
+    render(<ToggleButtonDemo />)
     const btn = screen.getByRole('button')
     fireEvent.click(btn)
     expect(btn.getAttribute('aria-pressed')).toBe('true')
@@ -84,14 +68,14 @@ describe('Button demo (toggle, aria-pressed)', () => {
   })
 
   it('toggles aria-pressed on Enter', () => {
-    render(<ToggleDemo />)
+    render(<ToggleButtonDemo />)
     const btn = screen.getByRole('button')
     fireEvent.keyDown(btn, { key: 'Enter', code: 'Enter' })
     expect(btn.getAttribute('aria-pressed')).toBe('true')
   })
 
   it('toggles aria-pressed on Space', () => {
-    render(<ToggleDemo />)
+    render(<ToggleButtonDemo />)
     const btn = screen.getByRole('button')
     fireEvent.keyDown(btn, { key: ' ', code: 'Space' })
     expect(btn.getAttribute('aria-pressed')).toBe('true')

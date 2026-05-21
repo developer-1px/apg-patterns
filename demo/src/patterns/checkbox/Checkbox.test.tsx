@@ -1,23 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import type { PatternEvent } from '../../../../src/react'
-import { Checkbox } from './Checkbox'
 import { checkboxVariants } from './checkboxData'
-
-function CheckboxDemo() {
-  const variant = checkboxVariants.twoState
-  const [data, setData] = useState(variant.data)
-  const handleEvent = (event: PatternEvent) => setData((current) => variant.reduce(current, event))
-  return <Checkbox data={data} onEvent={handleEvent} />
-}
-
-function TriStateDemo() {
-  const variant = checkboxVariants.triState
-  const [data, setData] = useState(variant.data)
-  const handleEvent = (event: PatternEvent) => setData((current) => variant.reduce(current, event))
-  return <Checkbox data={data} onEvent={handleEvent} />
-}
+import { TriStateCheckboxDemo, TwoStateCheckboxDemo } from './testing/CheckboxTestHost'
 
 function CheckboxDataEdgesDemo() {
   const [data, setData] = useState(checkboxVariants.triState.data)
@@ -51,7 +36,7 @@ function CheckboxDataEdgesDemo() {
 
 describe('Checkbox demo (two-state)', () => {
   it('toggles checked state from Space', () => {
-    render(<CheckboxDemo />)
+    render(<TwoStateCheckboxDemo />)
 
     fireEvent.keyDown(screen.getByRole('checkbox'), { key: ' ', code: 'Space' })
 
@@ -59,7 +44,7 @@ describe('Checkbox demo (two-state)', () => {
   })
 
   it('toggles checked state from click', () => {
-    render(<CheckboxDemo />)
+    render(<TwoStateCheckboxDemo />)
 
     fireEvent.click(screen.getByRole('checkbox'))
     fireEvent.click(screen.getByRole('checkbox'))
@@ -70,7 +55,7 @@ describe('Checkbox demo (two-state)', () => {
 
 describe('Checkbox demo (tri-state / mixed)', () => {
   it('parent reflects mixed when only one child is checked', () => {
-    render(<TriStateDemo />)
+    render(<TriStateCheckboxDemo />)
     const [parent, terms] = screen.getAllByRole('checkbox')
 
     fireEvent.click(terms!)
@@ -80,7 +65,7 @@ describe('Checkbox demo (tri-state / mixed)', () => {
   })
 
   it('parent reflects true when all children are checked', () => {
-    render(<TriStateDemo />)
+    render(<TriStateCheckboxDemo />)
     const [parent, terms, privacy] = screen.getAllByRole('checkbox')
 
     fireEvent.click(terms!)
@@ -90,7 +75,7 @@ describe('Checkbox demo (tri-state / mixed)', () => {
   })
 
   it('Space on parent checks all children when mixed/unchecked', () => {
-    render(<TriStateDemo />)
+    render(<TriStateCheckboxDemo />)
     const [parent, terms, privacy] = screen.getAllByRole('checkbox')
 
     fireEvent.click(terms!) // mixed
@@ -102,7 +87,7 @@ describe('Checkbox demo (tri-state / mixed)', () => {
   })
 
   it('Space on parent unchecks all children when fully checked', () => {
-    render(<TriStateDemo />)
+    render(<TriStateCheckboxDemo />)
     const [parent, terms, privacy] = screen.getAllByRole('checkbox')
 
     fireEvent.click(terms!)
@@ -115,7 +100,7 @@ describe('Checkbox demo (tri-state / mixed)', () => {
   })
 
   it('exposes a group with aria-labelledby', () => {
-    render(<TriStateDemo />)
+    render(<TriStateCheckboxDemo />)
     const group = screen.getByRole('group')
     expect(group.getAttribute('aria-labelledby')).toBeTruthy()
     const labelId = group.getAttribute('aria-labelledby')!
