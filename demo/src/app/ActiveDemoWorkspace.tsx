@@ -7,10 +7,7 @@ import { VariantRouteProvider } from '../shared/variantRoute'
 import { ds } from '../shared/designSystem'
 import { ActiveDemoRightPanel } from './ActiveDemoRightPanel'
 
-const panelClass = ds.panel
-export const scrollPanelClass = `${panelClass} overflow-auto`
-const headerClass = 'mb-4 flex items-center justify-between gap-3'
-const buttonClass = ds.textButton
+export const scrollPanelClass = `${ds.panel} overflow-auto`
 
 export function ActiveDemoWorkspace({
   state,
@@ -56,14 +53,14 @@ export function ActiveDemoWorkspace({
   return (
     <VariantRouteProvider patternKey={activeDemo.key}>
       <section className={scrollPanelClass}>
-        <header className={headerClass}>
+        <header className="mb-4 flex items-center justify-between gap-3">
           <div className="min-w-0">
             <h2 className="truncate text-sm font-semibold text-zinc-950 dark:text-zinc-50">{activeDemo.label}</h2>
           </div>
           <div className="flex items-center gap-1">
             <button
               type="button"
-              className={buttonClass}
+              className={ds.textButton}
               aria-pressed={state.rightPanelOpen}
               onClick={() => dispatch({ type: 'toggleRightPanel' })}
               title={state.rightPanelOpen ? 'Hide source panel' : 'Show source panel'}

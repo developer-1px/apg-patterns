@@ -8,9 +8,6 @@ import { useSourcePreviewState } from './useSourcePreviewState'
 import { rightModeLabels, rightModes, type AppAction, type AppState } from './appState'
 import { scrollPanelClass } from './ActiveDemoWorkspace'
 
-const buttonClass = ds.textButton
-const preClass = ds.dataBlock
-const sourcePreClass = ds.codeBlock
 const optionButtonClass = cx('inline-flex h-8 items-center', ds.option)
 
 export function ActiveDemoRightPanel({
@@ -55,7 +52,7 @@ export function ActiveDemoRightPanel({
         {state.rightMode === 'log' ? (
           <div className="flex items-center justify-between gap-2 px-1">
             <div className="font-mono text-[11px] text-zinc-400 dark:text-zinc-600">{state.events.length} events</div>
-            <button type="button" className={buttonClass} onClick={() => dispatch({ type: 'clearEvents' })}>
+            <button type="button" className={ds.textButton} onClick={() => dispatch({ type: 'clearEvents' })}>
               clear
             </button>
           </div>
@@ -73,13 +70,13 @@ export function ActiveDemoRightPanel({
             >
               <Icon name={copyState === 'idle' ? 'copy' : 'check'} className="size-4" />
             </button>
-            <pre {...sourceTabs.getPanelProps()} className={`${sourcePreClass} select-text cursor-text`}>
+            <pre {...sourceTabs.getPanelProps()} className={`${ds.codeBlock} select-text cursor-text`}>
               {displayedSource}
             </pre>
           </div>
         ) : null}
-        {state.rightMode === 'inspect' ? <pre className={preClass}>{activeDemo.inspect}</pre> : null}
-        {state.rightMode === 'log' ? <pre className={preClass}>{eventLog}</pre> : null}
+        {state.rightMode === 'inspect' ? <pre className={ds.dataBlock}>{activeDemo.inspect}</pre> : null}
+        {state.rightMode === 'log' ? <pre className={ds.dataBlock}>{eventLog}</pre> : null}
       </div>
     </section>
   )

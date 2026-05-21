@@ -2,13 +2,10 @@ import { useDialogPattern, type PatternData, type PatternEvent } from '../../../
 import { ds } from '../../shared/designSystem'
 import { dialogContent } from './dialogData'
 
-const triggerClass = ds.button
 const overlayClass =
   'fixed inset-0 z-40 bg-black/45 backdrop-blur-sm'
 const panelClass =
   'fixed left-1/2 top-1/2 z-50 w-[28rem] max-w-[90vw] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white/96 p-5 text-sm text-zinc-800 shadow-[0_28px_88px_rgba(0,0,0,0.26)] outline-none backdrop-blur dark:bg-zinc-950/96 dark:text-zinc-200'
-const inputClass = ds.field
-const buttonClass = ds.button
 
 interface DialogProps {
   data: PatternData
@@ -20,7 +17,7 @@ export function Dialog({ data, onEvent }: DialogProps) {
 
   return (
     <div className="grid gap-3">
-      <button {...dialog.triggerProps} type="button" className={triggerClass}>
+      <button {...dialog.triggerProps} type="button" className={ds.button}>
         {dialog.labelOf('trigger')}
       </button>
       {dialog.open ? (
@@ -33,13 +30,13 @@ export function Dialog({ data, onEvent }: DialogProps) {
               {dialogContent.fields.map((field) => (
                 <label key={field.id} className="grid grid-cols-[5rem_1fr] items-center gap-2">
                   <span>{field.label}</span>
-                  <input id={`dialog-${field.id}`} type="text" className={inputClass} />
+                  <input id={`dialog-${field.id}`} type="text" className={ds.field} />
                 </label>
               ))}
             </div>
             <div className="mt-4 flex justify-end gap-2">
-              <button {...dialog.cancelProps} type="button" className={buttonClass}>{dialog.labelOf('cancel')}</button>
-              <button {...dialog.submitProps} type="button" className={buttonClass}>{dialog.labelOf('submit')}</button>
+              <button {...dialog.cancelProps} type="button" className={ds.button}>{dialog.labelOf('cancel')}</button>
+              <button {...dialog.submitProps} type="button" className={ds.button}>{dialog.labelOf('submit')}</button>
             </div>
           </div>
         </>
