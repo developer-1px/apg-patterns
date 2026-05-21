@@ -4,7 +4,7 @@ import { extname } from 'node:path'
 
 const forbiddenTokens = [
   ['legacy kernel package import', '@interactive-os/' + 'aria-kernel'],
-  ['legacy pattern facade import', '@interactive-os/' + 'aria-legacy'],
+  ['legacy pattern facade import', '@interactive-os/' + 'apg-patterns-legacy'],
   ['sibling legacy workspace path', '../aria-' + 'kernel'],
   ['legacy workspace path', 'aria-' + 'kernel/'],
   ['legacy pattern facade path', 'legacy/' + 'apg-patterns'],

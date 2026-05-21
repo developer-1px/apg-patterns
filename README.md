@@ -281,7 +281,7 @@ scripts/
 
 ## Demo
 
-https://developer-1px.github.io/aria/
+https://developer-1px.github.io/apg-patterns/
 
 ```bash
 npm run demo
