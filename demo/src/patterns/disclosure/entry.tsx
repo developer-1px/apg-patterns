@@ -12,21 +12,18 @@ import {
 import { renderDataInspect } from '../../shared/inspect/genericInspect'
 import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
-const variants: Record<DisclosureVariantKey, PatternData> = {
-  simple: initialDisclosureData,
-  image: initialImageDisclosureData,
-  faq: initialFaqDisclosureData,
-  navMenu: initialNavMenuDisclosureData,
-  navMenuTopLinks: initialNavMenuTopLinksDisclosureData,
+const variants: Record<DisclosureVariantKey, { label: string; data: PatternData }> = {
+  simple: { label: 'simple', data: initialDisclosureData },
+  image: { label: 'image description', data: initialImageDisclosureData },
+  faq: { label: 'FAQ', data: initialFaqDisclosureData },
+  navMenu: { label: 'navigation menu', data: initialNavMenuDisclosureData },
+  navMenuTopLinks: { label: 'navigation menu (top-level links)', data: initialNavMenuTopLinksDisclosureData },
 }
 
-export const disclosureVariantItems: readonly { key: DisclosureVariantKey; label: string }[] = [
-  { key: 'simple', label: 'simple' },
-  { key: 'image', label: 'image description' },
-  { key: 'faq', label: 'FAQ' },
-  { key: 'navMenu', label: 'navigation menu' },
-  { key: 'navMenuTopLinks', label: 'navigation menu (top-level links)' },
-]
+export const disclosureVariantItems: readonly { key: DisclosureVariantKey; label: string }[] = Object.entries(variants).map(([key, value]) => ({
+  key: key as DisclosureVariantKey,
+  label: value.label,
+}))
 
 const disclosureDemoDefinition = {
   key: 'disclosure',
@@ -64,7 +61,7 @@ export const entry = defineDemoPattern({
     const host = useVariantPatternDataHost<DisclosureVariantKey>(
       'simple',
       initialDisclosureData,
-      (variant) => variants[variant],
+      (variant) => variants[variant].data,
       (_variant, data, event) => reducePatternData(disclosureDefinition, data, event),
     )
     return {

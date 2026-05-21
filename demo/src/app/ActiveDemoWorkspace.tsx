@@ -2,7 +2,6 @@ import { useEffect } from 'react'
 import { useDemoPattern } from '../shared/demoPatterns'
 import type { SourceName } from '../shared/sources'
 import { defaultAppState, readInitialAppState, type AppAction, type AppState, writeAppHash } from './appState'
-import { ShortcutIndicator } from './ShortcutIndicator'
 import { VariantRouteProvider } from '../shared/variantRoute'
 import { ds } from '../shared/designSystem'
 import { ActiveDemoRightPanel } from './ActiveDemoRightPanel'
@@ -70,18 +69,6 @@ export function ActiveDemoWorkspace({
           </div>
         </header>
         {activeDemo.variants ? <div className="mb-4 rounded-xl bg-zinc-100/70 p-2 dark:bg-white/[0.045]">{activeDemo.variants}</div> : null}
-        {activeDemo.keyboardShortcuts.length > 0 ? (
-          <div className="mb-5">
-            <div className="mb-1.5 text-[10px] font-semibold uppercase text-zinc-400 dark:text-zinc-600">keys</div>
-            <div className="flex flex-wrap gap-1">
-              {activeDemo.keyboardShortcuts.map((shortcut) => (
-                <kbd key={shortcut} className={ds.keycap}>
-                  <ShortcutIndicator shortcut={shortcut} />
-                </kbd>
-              ))}
-            </div>
-          </div>
-        ) : null}
         <div
           data-demo-preview={activeDemo.key}
           aria-label={previewKeyboardShortcuts ? `${activeDemo.label} preview keyboard shortcuts` : undefined}

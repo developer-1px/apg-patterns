@@ -1,14 +1,9 @@
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { Spinbutton } from './Spinbutton'
-import { reduceSpinbuttonData, spinbuttonVariants, type SpinbuttonVariantKey } from './spinbuttonData'
+import { reduceSpinbuttonData, spinbuttonVariantItems, spinbuttonVariants, type SpinbuttonVariantKey } from './spinbuttonData'
 import { renderDataInspect } from '../../shared/inspect/genericInspect'
 import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 import type { PatternEvent } from '../../../../src/react'
-
-export const spinbuttonVariantItems: readonly { key: SpinbuttonVariantKey; label: string }[] = [
-  { key: 'numeric', label: 'Numeric' },
-  { key: 'time', label: 'Time' },
-]
 
 const spinbuttonDemoDefinition = {
   key: 'spinbutton',

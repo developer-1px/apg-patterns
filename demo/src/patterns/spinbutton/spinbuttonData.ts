@@ -48,11 +48,16 @@ export const spinbuttonVariants: Record<SpinbuttonVariantKey, SpinbuttonVariant>
     data: numericData(),
   },
   time: {
-    label: 'Time Picker',
+    label: 'Time',
     options: { focusStrategy: 'rovingTabIndex', min: 0, max: 59, step: 1 },
     data: timeData(),
   },
 }
+
+export const spinbuttonVariantItems: readonly { key: SpinbuttonVariantKey; label: string }[] = Object.entries(spinbuttonVariants).map(([key, value]) => ({
+  key: key as SpinbuttonVariantKey,
+  label: value.label,
+}))
 
 const computeDelta = (direction: unknown, step: number, large: number): number => {
   if (direction === 'increment') return step

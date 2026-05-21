@@ -13,29 +13,25 @@ import { RearrangeableListbox } from './RearrangeableListbox'
 
 type ListboxVariantKey = 'basic' | 'collapsible' | 'scrollable' | 'grouped' | 'rearrangeable' | 'rearrangeableMulti'
 
-export const listboxVariantItems: readonly { key: ListboxVariantKey; label: string }[] = [
-  { key: 'basic', label: 'Basic' },
-  { key: 'collapsible', label: 'Collapsible' },
-  { key: 'scrollable', label: 'Scrollable' },
-  { key: 'grouped', label: 'Grouped' },
-  { key: 'rearrangeable', label: 'Rearrangeable (single-select)' },
-  { key: 'rearrangeableMulti', label: 'Rearrangeable (multi-select)' },
-]
-
-const initialByVariant: Record<ListboxVariantKey, PatternData> = {
-  basic: initialListboxData,
-  collapsible: initialListboxData,
-  scrollable: initialScrollableListboxData,
-  grouped: initialGroupedListboxData,
-  rearrangeable: initialRearrangeableListboxData,
-  rearrangeableMulti: initialRearrangeableListboxData,
+const listboxVariants: Record<ListboxVariantKey, { label: string; data: PatternData }> = {
+  basic: { label: 'Basic', data: initialListboxData },
+  collapsible: { label: 'Collapsible', data: initialListboxData },
+  scrollable: { label: 'Scrollable', data: initialScrollableListboxData },
+  grouped: { label: 'Grouped', data: initialGroupedListboxData },
+  rearrangeable: { label: 'Rearrangeable (single-select)', data: initialRearrangeableListboxData },
+  rearrangeableMulti: { label: 'Rearrangeable (multi-select)', data: initialRearrangeableListboxData },
 }
+
+export const listboxVariantItems: readonly { key: ListboxVariantKey; label: string }[] = Object.entries(listboxVariants).map(([key, value]) => ({
+  key: key as ListboxVariantKey,
+  label: value.label,
+}))
 
 export function useListboxDemoRuntime(onEvent: (event: PatternEvent) => void) {
   const host = useVariantPatternDataHost<ListboxVariantKey>(
     'basic',
     initialListboxData,
-    (variant) => initialByVariant[variant],
+    (variant) => listboxVariants[variant].data,
     (_variant, data, event) => reduceListboxDemoData(data, event),
   )
   const options: PatternOptions = host.variant === 'rearrangeableMulti'
