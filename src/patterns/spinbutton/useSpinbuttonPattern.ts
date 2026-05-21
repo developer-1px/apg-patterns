@@ -1,7 +1,6 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternEvent, PatternOptions } from '../../schema'
+import type { Key, PatternEvent, PatternOptions, PatternValueStepDirection } from '../../schema'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
-import { createSpinbuttonActions, type ReactSpinbuttonActions } from './spinbuttonActions'
 import { createSpinbuttonRenderItem, type ReactSpinbuttonRenderItem, type SpinbuttonData } from './spinbuttonRenderItem'
 import { getSpinbuttonRuntimeState, type SpinbuttonRuntimeState } from './spinbuttonRuntimeState'
 import { spinbuttonDefinition } from './definition'
@@ -13,7 +12,10 @@ export interface ReactSpinbuttonRuntime {
   rootProps: ReactPatternProps
   renderItems: readonly ReactSpinbuttonRenderItem[]
   state: SpinbuttonRuntimeState
-  actions: ReactSpinbuttonActions
+  actions: {
+    focus(key: Key): void
+    step(key: Key, direction: PatternValueStepDirection): void
+  }
   ids: {
     forKey(key: Key): string
   }
@@ -40,7 +42,13 @@ export function useSpinbuttonPattern(data: SpinbuttonData, onEvent: (event: Patt
       return getSpinbuttonRuntimeState(runtime.data)
     },
     get actions() {
-      return createSpinbuttonActions(runtime)
+      return {
+        focus: (key: Key) => runtime.emit({ type: 'focus', key }),
+        step: (key: Key, direction: PatternValueStepDirection) => {
+          runtime.emit({ type: 'focus', key })
+          runtime.emit({ type: 'valueStep', key, direction })
+        },
+      }
     },
     get ids() {
       return { forKey: runtime.keyToElementId }

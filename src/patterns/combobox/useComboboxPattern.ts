@@ -1,13 +1,11 @@
-import type { HTMLAttributes, InputHTMLAttributes } from 'react'
-import { createPatternRuntime } from '../../kernel/patternRuntime'
-import type { PatternEvent, PatternOptions } from '../../schema'
+import { useLayoutEffect, useRef, type HTMLAttributes, type InputHTMLAttributes } from 'react'
+import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
+import type { Key, PatternEvent, PatternOptions } from '../../schema'
 import { createComboboxInputProps } from './comboboxInputProps'
 import { createComboboxOption, type ReactComboboxOption } from './comboboxOption'
-import { getComboboxRuntimeState, type ComboboxData } from './comboboxRuntimeState'
+import { getComboboxRuntimeState, type ComboboxData, type ComboboxVariant } from './comboboxRuntimeState'
 import { comboboxDefinition } from './definition'
 import { comboboxRootKey } from './navigation'
-import { useComboboxActiveOptionScroll } from './useComboboxActiveOptionScroll'
-import { useComboboxInlineCompletionInputRef } from './useComboboxInlineCompletionInputRef'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 
 export type { ReactComboboxOption } from './comboboxOption'
@@ -50,4 +48,37 @@ export function useComboboxPattern(data: ComboboxData, onEvent: (event: PatternE
     listboxId,
     setInputRef,
   }
+}
+
+function useComboboxInlineCompletionInputRef({
+  inlineCompletion,
+  variant,
+}: {
+  inlineCompletion: { start: number; end: number } | null
+  variant: ComboboxVariant
+}): (node: HTMLInputElement | null) => void {
+  const inputRef = useRef<HTMLInputElement>(null)
+  return (node) => {
+    inputRef.current = node
+    if (variant === 'listWithInlineAutocomplete' && inlineCompletion && node) {
+      node.setSelectionRange(inlineCompletion.start, inlineCompletion.end)
+    }
+  }
+}
+
+function useComboboxActiveOptionScroll({
+  activeKey,
+  open,
+  runtime,
+}: {
+  activeKey: Key | null | undefined
+  open: boolean
+  runtime: PatternRuntime
+}): void {
+  useLayoutEffect(() => {
+    if (!open || !activeKey || activeKey === comboboxRootKey) return
+    const activeOption = document.getElementById(runtime.keyToElementId(activeKey))
+    if (typeof activeOption?.scrollIntoView !== 'function') return
+    activeOption.scrollIntoView({ block: 'nearest' })
+  }, [activeKey, open, runtime])
 }

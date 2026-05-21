@@ -2,10 +2,15 @@ import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions, PatternValueStepDirection } from '../../schema'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { windowSplitterDefinition } from './definition'
-import { createWindowSplitterActions } from './windowSplitterActions'
 import { createWindowSplitterSeparatorProps } from './windowSplitterSeparatorProps'
-import { getWindowSplitterState, type ReactWindowSplitterState } from './windowSplitterState'
 import { usePatternElementId } from '../../adapters/reactDomIds'
+
+interface ReactWindowSplitterState {
+  value: number
+  min: number
+  max: number
+  position: number
+}
 
 export interface ReactWindowSplitterRuntime {
   rootProps: ReactPatternProps
@@ -47,11 +52,29 @@ export function useWindowSplitterPattern(data: PatternData, onEvent: (event: Pat
     controlledKey,
     state,
     get actions() {
-      return createWindowSplitterActions({ key, runtime })
+      return {
+        focus: () => {
+          if (key) runtime.emit({ type: 'focus', key })
+        },
+        step: (direction: PatternValueStepDirection) => {
+          if (key) runtime.emit({ type: 'valueStep', key, direction })
+        },
+        collapse: () => {
+          if (key) runtime.emit({ type: 'collapse', key })
+        },
+      }
     },
     get ids() {
       return { forKey: runtime.keyToElementId }
     },
     keyToElementId: runtime.keyToElementId,
   }
+}
+
+function getWindowSplitterState({ data, key, options }: { data: PatternData; key: Key | null; options: PatternOptions }): ReactWindowSplitterState {
+  const min = Number(options.min ?? 0)
+  const max = Number(options.max ?? 100)
+  const value = key ? Number(data.state?.valueByKey?.[key] ?? min) : min
+  const position = max === min ? 0 : ((value - min) / (max - min)) * 100
+  return { value, min, max, position }
 }

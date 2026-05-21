@@ -1,9 +1,9 @@
+import type { SlotProps } from '../../kernel/patternRuntime'
 import type { ReactTreeviewRuntime } from '../../adapters/reactTypes'
+import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import type { Key } from '../../schema'
 import type { TreeviewRuntime } from './runtime'
-import { adaptTreeviewIndicatorProps, adaptTreeviewProps } from './adaptTreeviewProps'
 import { createTreeviewRenderItems } from './createTreeviewRenderItems'
-import { createTreeviewReactActions } from './treeviewReactActions'
-import { getTreeviewReactState } from './treeviewReactState'
 
 export function adaptTreeviewRuntime(runtime: TreeviewRuntime): ReactTreeviewRuntime {
   const getTreeProps = () => adaptTreeviewProps(runtime.getTreeProps())
@@ -42,5 +42,40 @@ export function adaptTreeviewRuntime(runtime: TreeviewRuntime): ReactTreeviewRun
     getTreeProps,
     getTreeItemProps,
     getIndicatorProps,
+  }
+}
+
+function adaptTreeviewProps(props: SlotProps): ReactPatternProps {
+  return props as ReactPatternProps
+}
+
+function adaptTreeviewIndicatorProps(props: SlotProps): ReactPatternProps {
+  const reactProps = adaptTreeviewProps(props)
+  const onClick = reactProps.onClick
+  return {
+    ...reactProps,
+    type: 'button',
+    tabIndex: -1,
+    onClick: (event) => {
+      event.stopPropagation()
+      onClick?.(event)
+    },
+  } as ReactPatternProps
+}
+
+function getTreeviewReactState(runtime: TreeviewRuntime): ReactTreeviewRuntime['state'] {
+  return {
+    activeKey: runtime.data.state?.activeKey ?? null,
+    selectedKeys: runtime.data.state?.selectedKeys ?? [],
+    disabledKeys: runtime.data.state?.disabledKeys ?? [],
+    expandedKeys: runtime.data.state?.expandedKeys ?? [],
+  }
+}
+
+function createTreeviewReactActions(runtime: TreeviewRuntime): ReactTreeviewRuntime['actions'] {
+  return {
+    focus: (key: Key) => runtime.emit({ type: 'focus', key }),
+    select: (key: Key) => runtime.emit({ type: 'select', keys: [key], anchorKey: key, extentKey: key }),
+    toggle: (key: Key) => runtime.emit({ type: 'expand', key, expanded: !(runtime.data.state?.expandedKeys ?? []).includes(key) }),
   }
 }

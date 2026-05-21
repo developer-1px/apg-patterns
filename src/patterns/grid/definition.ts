@@ -3,7 +3,6 @@ import { registerGridAriaSources } from './ariaSources'
 import { gridKeyboard } from './keyboard'
 import { registerGridNavigation } from './navigation'
 import { gridParts } from './parts'
-import { gridTransitions } from './transitions'
 
 registerGridAriaSources()
 registerGridNavigation()
@@ -31,5 +30,23 @@ export const gridDefinition: PatternDefinition = PatternDefinitionSchema.parse({
     },
   },
   keyboard: gridKeyboard,
-  transitions: gridTransitions,
+  transitions: [
+    {
+      on: 'editStart',
+      actions: [
+        { kind: 'set', field: 'editingKey', value: { from: '$event.key' } },
+        { kind: 'setRecordValue', field: 'editDraftByKey', key: { from: '$event.key' }, value: { from: '$event.value' } },
+      ],
+    },
+    {
+      on: 'editDraft',
+      actions: [
+        { kind: 'setRecordValue', field: 'editDraftByKey', key: { from: '$event.key' }, value: { from: '$event.value' } },
+      ],
+    },
+    {
+      on: 'editEnd',
+      actions: [{ kind: 'set', field: 'editingKey', value: { literal: null } }],
+    },
+  ],
 })

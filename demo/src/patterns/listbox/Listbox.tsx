@@ -1,8 +1,7 @@
 import { useLayoutEffect, useRef } from 'react'
-import { useListboxPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src/react'
+import { useListboxPattern, type PatternData, type PatternEvent, type PatternOptions, type ReactListboxRenderItem } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 import { ListboxContent, type ListboxGroup } from './ListboxContent'
-import { ListboxOption } from './ListboxOption'
 
 export function Listbox({
   data,
@@ -57,6 +56,32 @@ export function Listbox({
   return (
     <div {...listbox.rootProps} ref={rootRef} aria-labelledby={ariaLabelledBy} className={containerClass}>
       <ListboxContent groups={groups} visibleKeys={visibleKeys} renderOption={renderOption} />
+    </div>
+  )
+}
+
+function ListboxOption({
+  item,
+  isMulti,
+  posIndex,
+  setSize,
+}: {
+  item: ReactListboxRenderItem
+  isMulti: boolean
+  posIndex?: number
+  setSize?: number
+}) {
+  return (
+    <div
+      key={item.key}
+      {...item.optionProps}
+      aria-posinset={posIndex}
+      aria-setsize={setSize}
+      data-active={item.state.active ? '' : undefined}
+      data-multiselectable={isMulti ? '' : undefined}
+      className={ds.listOption}
+    >
+      {item.label}
     </div>
   )
 }

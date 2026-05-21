@@ -1,14 +1,13 @@
-import { createPatternRuntime } from '../../kernel/patternRuntime'
+import { useLayoutEffect } from 'react'
+import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { menuButtonDefinition } from './definition'
-import { createMenuButtonActions } from './menuButtonActions'
 import { createMenuButtonItem, type ReactMenuButtonItem } from './menuButtonItem'
 import { createMenuButtonMenuProps } from './menuButtonMenuProps'
 import { createMenuButtonTriggerProps } from './menuButtonTriggerProps'
 import { getMenuButtonRuntimeState } from './menuButtonRuntimeState'
-import { useMenuButtonActiveDescendantFocus } from './useMenuButtonActiveDescendantFocus'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 
 export interface ReactMenuButtonRuntime {
@@ -39,7 +38,17 @@ export function useMenuButtonPattern(data: PatternData, onEvent: (event: Pattern
   usePatternEffects({ definition: menuButtonDefinition, data: runtime.data, keyToElementId: runtime.keyToElementId })
   useMenuButtonActiveDescendantFocus({ data, expanded, focusStrategy, menuKey, runtime })
 
-  const { closeAndFocusTrigger, activateActiveItem } = createMenuButtonActions({ data, itemKeys, triggerKey, runtime, onEvent })
+  const closeAndFocusTrigger = () => {
+    if (!triggerKey) return
+    onEvent({ type: 'expand', key: triggerKey, expanded: false })
+    document.getElementById(runtime.keyToElementId(triggerKey))?.focus({ preventScroll: true })
+  }
+  const activateActiveItem = () => {
+    const activeKey = data.state?.activeKey && itemKeys.includes(data.state.activeKey) ? data.state.activeKey : itemKeys[0]
+    if (!activeKey) return
+    onEvent({ type: 'activate', key: activeKey })
+    closeAndFocusTrigger()
+  }
 
   return {
     triggerKey,
@@ -60,4 +69,25 @@ export function useMenuButtonPattern(data: PatternData, onEvent: (event: Pattern
     },
     keyToElementId: runtime.keyToElementId,
   }
+}
+
+function useMenuButtonActiveDescendantFocus({
+  data,
+  expanded,
+  focusStrategy,
+  menuKey,
+  runtime,
+}: {
+  data: PatternData
+  expanded: boolean
+  focusStrategy: 'rovingTabIndex' | 'ariaActiveDescendant'
+  menuKey: Key | null
+  runtime: PatternRuntime
+}): void {
+  useLayoutEffect(() => {
+    if (focusStrategy !== 'ariaActiveDescendant' || !expanded || !menuKey) return
+    const reason = data.state?.lastEventReason
+    if (reason !== 'open' && reason !== 'keyboard' && reason !== 'typeahead') return
+    document.getElementById(runtime.keyToElementId(menuKey))?.focus({ preventScroll: true })
+  }, [data.state?.activeKey, data.state?.lastEventReason, expanded, focusStrategy, menuKey, runtime])
 }

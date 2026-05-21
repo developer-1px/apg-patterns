@@ -1,5 +1,4 @@
 import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
-import { alertDialogEffects } from './effects'
 import { alertDialogKeyboard } from './keyboard'
 import { alertDialogParts } from './parts'
 
@@ -35,5 +34,23 @@ export const alertDialogDefinition: PatternDefinition = PatternDefinitionSchema.
       ],
     },
   ],
-  effects: alertDialogEffects,
+  effects: [
+    {
+      kind: 'focus',
+      when: { kind: 'isExpanded', key: '$triggerKey' },
+      target: { kind: 'key', key: '$initialFocusKey' },
+      preventScroll: true,
+    },
+    {
+      kind: 'restoreFocus',
+      when: { kind: 'not', predicate: { kind: 'isExpanded', key: '$triggerKey' } },
+      target: { kind: 'key', key: '$triggerKey' },
+      preventScroll: true,
+    },
+    {
+      kind: 'trapFocus',
+      when: { kind: 'isExpanded', key: '$triggerKey' },
+      root: { kind: 'controlledBy', key: '$triggerKey' },
+    },
+  ] as const,
 })
