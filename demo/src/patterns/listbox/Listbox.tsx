@@ -1,7 +1,12 @@
-import { useLayoutEffect, useRef } from 'react'
+import { useLayoutEffect, useRef, type ReactNode } from 'react'
 import { useListboxPattern, type PatternData, type PatternEvent, type PatternOptions, type ReactListboxRenderItem } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
-import { ListboxContent, type ListboxGroup } from './ListboxContent'
+
+type ListboxGroup = {
+  groupKey: string
+  groupLabel: string
+  optionKeys: readonly string[]
+}
 
 export function Listbox({
   data,
@@ -83,5 +88,38 @@ function ListboxOption({
     >
       {item.label}
     </div>
+  )
+}
+
+function ListboxContent({
+  groups,
+  visibleKeys,
+  renderOption,
+}: {
+  groups: readonly ListboxGroup[]
+  visibleKeys: readonly string[]
+  renderOption(key: string, posIndex?: number, setSize?: number): ReactNode
+}) {
+  if (groups.length === 0) return <>{visibleKeys.map((key) => renderOption(key))}</>
+
+  const setSize = visibleKeys.length
+  let runningIndex = 0
+  return (
+    <>
+      {groups.map((group) => {
+        const labelId = `group-${group.groupKey}-label`
+        return (
+          <div key={group.groupKey} role="group" aria-labelledby={labelId} className="mt-1 first:mt-0">
+            <div id={labelId} className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+              {group.groupLabel}
+            </div>
+            {group.optionKeys.map((key) => {
+              runningIndex += 1
+              return renderOption(key, runningIndex, setSize)
+            })}
+          </div>
+        )
+      })}
+    </>
   )
 }

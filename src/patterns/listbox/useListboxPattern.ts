@@ -5,9 +5,9 @@ import type { PatternRuntime } from '../../kernel/patternRuntime'
 import { listboxDefinition } from './definition'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { useReactPatternRuntime } from '../../adapters/reactPatternEffects'
-import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
-import type { ReactListboxRuntime } from '../../adapters/reactTypes'
-import { createListboxRenderItem } from './createListboxRenderItem'
+import { reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
+import type { ReactListboxRenderItem, ReactListboxRuntime } from '../../adapters/reactTypes'
+import { handleListboxMultiClick } from './handleListboxMultiClick'
 import { handleListboxMultiKeyDown } from './handleListboxMultiKeyDown'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 
@@ -48,6 +48,42 @@ export function useListboxPattern(data: PatternData, onEvent: (event: PatternEve
       return { forKey: runtime.keyToElementId }
     },
     keyToElementId: runtime.keyToElementId,
+  }
+}
+
+function createListboxRenderItem(runtime: PatternRuntime, key: Key): ReactListboxRenderItem {
+  const optionProps = reactProps(runtime.getPartProps('option', key))
+  return {
+    kind: 'option',
+    key,
+    label: getLabel(runtime.data, key),
+    textValue: getTextValue(runtime.data, key),
+    state: getItemState(runtime, key, 'option'),
+    optionProps: withListboxOptionClick(runtime, key, optionProps),
+  }
+}
+
+function withListboxOptionClick(runtime: PatternRuntime, key: Key, props: ReactPatternProps): ReactPatternProps {
+  const onClick = props.onClick
+  return {
+    ...props,
+    onClick: (event) => {
+      if (handleListboxMultiClick(runtime, key, event)) return
+      onClick?.(event)
+    },
+  }
+}
+
+function getLabel(data: PatternData, key: Key): string {
+  return data.items[key]?.label ?? key
+}
+
+function getItemState(runtime: PatternRuntime, key: Key, part: string): ReactRenderItemState {
+  const state = runtime.getItemState(key, part)
+  return {
+    active: Boolean(state.active),
+    selected: Boolean(state.selected),
+    disabled: Boolean(state.disabled),
   }
 }
 

@@ -1,4 +1,4 @@
-import { createApgTypeaheadBuffer, type ApgTypeaheadBuffer } from '../../internal/keyboard'
+import { createApgTypeaheadBuffer, type ApgTypeaheadBuffer, type KeyInput } from '../../internal/keyboard'
 import {
   PatternDataSchema,
   PatternEventSchema,
@@ -10,9 +10,9 @@ import {
 } from '../../schema'
 import { treeviewDefinition } from './definition'
 import { treeviewDefaultOptions } from './defaultOptions'
-import { createPatternRuntime, type CreatePatternRuntimeInput, type SlotProps } from '../../kernel/patternRuntime'
+import { createPatternRuntime, type CreatePatternRuntimeInput, type PatternRuntime, type SlotProps } from '../../kernel/patternRuntime'
 import { createTreeviewRenderItems, type TreeviewRenderItem } from './renderItem'
-import { createTreeProps } from './treeProps'
+import { resolveTypeaheadTarget } from './typeahead'
 import { createElementId } from '../../kernel/domIds'
 
 export interface TreeviewRuntime {
@@ -90,4 +90,35 @@ function withNonEnumerableMeta(event: PatternEvent): PatternEvent {
     configurable: true,
   })
   return next
+}
+
+function createTreeProps({
+  runtime,
+  data,
+  options,
+  typeahead,
+  emit,
+}: {
+  runtime: PatternRuntime
+  data: PatternData
+  options: PatternOptions
+  typeahead: ApgTypeaheadBuffer
+  emit: (event: PatternEvent) => void
+}): SlotProps {
+  const props = runtime.getPartProps('tree')
+  return {
+    ...props,
+    onKeyDown: (event: KeyInput & { preventDefault?: () => void }) => {
+      const active = data.state?.activeKey ?? runtime.visibleKeys[0]
+      if (!active) return
+      const typeaheadQuery = options.typeaheadEnabled === false ? null : typeahead.feed(event)
+      const typeaheadTarget = resolveTypeaheadTarget(typeaheadQuery, data, options)
+      if (typeaheadTarget) {
+        event.preventDefault?.()
+        emit({ type: 'focus', key: typeaheadTarget as Key, meta: { reason: 'typeahead' } })
+        return
+      }
+      runtime.getRootKeyboardHandler()(event)
+    },
+  }
 }

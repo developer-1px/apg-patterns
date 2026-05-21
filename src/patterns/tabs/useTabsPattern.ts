@@ -1,10 +1,15 @@
 import { createTabsRuntime } from './runtime'
-import type { ReactTabsRuntime } from '../../adapters/reactTypes'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { useReactPatternRuntime } from '../../adapters/reactPatternEffects'
 import type { PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { tabsDefinition } from './definition'
 import { usePatternElementId } from '../../adapters/reactDomIds'
+
+export interface ReactTabsRuntime extends Omit<ReturnType<typeof createTabsRuntime>, 'getTablistProps' | 'getTabProps' | 'getTabPanelProps'> {
+  getTablistProps(): ReactPatternProps
+  getTabProps(key: string): ReactPatternProps
+  getTabPanelProps(key: string): ReactPatternProps
+}
 
 export function useTabsPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactTabsRuntime {
   const patternOptions = options ?? {}

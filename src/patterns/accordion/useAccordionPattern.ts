@@ -2,8 +2,8 @@ import { accordionDefinition } from './definition'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
-import type { ReactAccordionRuntime } from '../../adapters/reactTypes'
-import { createAccordionRenderItem, toReactProps } from './accordionRenderItem'
+import { reactProps } from '../../adapters/reactBaseTypes'
+import type { ReactAccordionRenderItem, ReactAccordionRuntime } from '../../adapters/reactTypes'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 
 export function useAccordionPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactAccordionRuntime {
@@ -21,7 +21,7 @@ export function useAccordionPattern(data: PatternData, onEvent: (event: PatternE
 
   return {
     get rootProps() {
-      return toReactProps(runtime.getRootProps())
+      return reactProps(runtime.getRootProps())
     },
     get renderItems() {
       return runtime.visibleKeys.map((key) => createAccordionRenderItem(runtime, key))
@@ -46,4 +46,34 @@ export function useAccordionPattern(data: PatternData, onEvent: (event: PatternE
     },
     keyToElementId: runtime.keyToElementId,
   }
+}
+
+function createAccordionRenderItem(runtime: ReturnType<typeof createPatternRuntime>, key: Key): ReactAccordionRenderItem {
+  const panelKey = runtime.data.relations?.controlsByKey?.[key]?.[0] ?? null
+  const state = runtime.getItemState(key, 'header')
+  return {
+    kind: 'section',
+    key,
+    label: getLabel(runtime.data, key),
+    textValue: getTextValue(runtime.data, key),
+    panelKey,
+    state: {
+      active: Boolean(state.active),
+      expanded: Boolean(state.expanded),
+      disabled: runtime.data.state?.disabledKeys?.includes(key) ?? false,
+    },
+    headerProps: reactProps({
+      type: 'button',
+      ...runtime.getItemProps('header', key),
+    }),
+    panelProps: panelKey ? reactProps(runtime.getItemProps('panel', panelKey)) : null,
+  }
+}
+
+function getLabel(data: PatternData, key: Key): string {
+  return data.items[key]?.label ?? key
+}
+
+function getTextValue(data: PatternData, key: Key): string {
+  return data.state?.typeaheadTextByKey?.[key] ?? data.items[key]?.textValue ?? data.items[key]?.label ?? key
 }
