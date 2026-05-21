@@ -1,4 +1,3 @@
-import { sourceIdentityNeedles } from './sourceIdentity.mjs'
 import { previewSurfaceIsMounted } from './verifyPreviewSurfaces.mjs'
 
 export async function verifyPatternPanelRoutes({
@@ -14,6 +13,7 @@ export async function verifyPatternPanelRoutes({
   activePreText,
   hasSourceLoadFailure,
   sourcePanelElement,
+  sourceTextMatches,
 }) {
   const stateHash = buildHash({ pattern: key, panel: 'state', source: sourceName })
   await verifyHashRoute(stateHash, () => {
@@ -66,8 +66,6 @@ export async function verifyPatternPanelRoutes({
   const codeHash = buildHash({ pattern: key, panel: 'code', source: sourceName })
   await verifyHashRoute(codeHash, () => {
     const sourceText = sourcePanelText()
-    const missingNeedles = sourceIdentityNeedles(sourceName, key)
-      .filter((needle) => !sourceText.includes(needle))
     return (
       window.location.hash === codeHash
       && currentHashParam('pattern') === key
@@ -79,7 +77,7 @@ export async function verifyPatternPanelRoutes({
       && sourceText.trim().length > 0
       && sourceText !== 'loading'
       && !hasSourceLoadFailure(sourceText)
-      && missingNeedles.length === 0
+      && sourceTextMatches(sourceName, sourceText)
     )
   },
     `${label}: code panel route did not restore after panel route checks`,

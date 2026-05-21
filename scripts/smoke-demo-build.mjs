@@ -1,7 +1,6 @@
-import { readdir } from 'node:fs/promises'
+import { readFile, readdir } from 'node:fs/promises'
 import { JSDOM } from 'jsdom'
 import { readDemoEntryKeyboardShortcuts } from './demo-smoke/readDemoEntryKeyboardShortcuts.mjs'
-import { sourceIdentityNeedles } from './demo-smoke/sourceIdentity.mjs'
 import { verifyDistIndexAssets } from './demo-smoke/verifyDistIndexAssets.mjs'
 import { verifyPatternPanelRoutes as verifyPatternPanelRoutesBase } from './demo-smoke/verifyPatternPanelRoutes.mjs'
 import {
@@ -18,6 +17,7 @@ const assetsDir = new URL('../demo/dist/assets/', import.meta.url)
 const demoPatternsDir = new URL('../demo/src/patterns/', import.meta.url)
 const entryFile = (await readdir(assetsDir)).find((file) => /^index-.*\.js$/.test(file))
 const expectedKeyboardShortcutsByPattern = await readDemoEntryKeyboardShortcuts(demoPatternsDir)
+const expectedSourceByName = await collectExpectedSourceByName()
 
 if (!entryFile) throw new Error('demo build smoke failed: missing built entry chunk')
 
@@ -174,11 +174,7 @@ async function runSmoke() {
         })
         const duplicate = Array.from(renderedSourceByName.entries()).find(([, previousSource]) => previousSource === renderedSource)
         if (duplicate) patternFailures.push(`${label}: source tab reused rendered code for ${duplicate[0]} and ${sourceName}`)
-        const missingNeedles = sourceIdentityNeedles(sourceName, key)
-          .filter((needle) => !renderedSource.includes(needle))
-        if (missingNeedles.length > 0) {
-          patternFailures.push(`${label}: source tab ${sourceName} rendered code missing ${missingNeedles.join(', ')}`)
-        }
+        verifyRenderedSource(label, sourceName, renderedSource)
         renderedSourceByName.set(sourceName, renderedSource)
       } catch {
         patternFailures.push(`${label}: source tab failed: ${sourceName}`)
@@ -778,6 +774,23 @@ function hasSourceLoadFailure(text) {
   return text.includes('missing source:') || text.includes('failed source:')
 }
 
+function verifyRenderedSource(label, sourceName, renderedSource) {
+  const expectedSource = expectedSourceByName.get(sourceName)
+  if (expectedSource === undefined) {
+    patternFailures.push(`${label}: source tab has no source fixture: ${sourceName}`)
+  } else if (!sameSource(renderedSource, expectedSource)) {
+    patternFailures.push(`${label}: source tab ${sourceName} rendered different source text`)
+  }
+}
+
+function sameSource(left, right) {
+  return normalizeSource(left) === normalizeSource(right)
+}
+
+function normalizeSource(source) {
+  return source.replace(/\r\n/g, '\n')
+}
+
 function expectedEntrySourceName(patternKey) {
   return `${patternKey === 'menuAndMenubar' ? 'menu' : patternKey}/entry.tsx`
 }
@@ -815,6 +828,10 @@ async function verifyPatternPanelRoutes({ key, label, sourceName }) {
     activePreText,
     hasSourceLoadFailure,
     sourcePanelElement,
+    sourceTextMatches: (sourceName, sourceText) => {
+      const expectedSource = expectedSourceByName.get(sourceName)
+      return expectedSource !== undefined && sameSource(sourceText, expectedSource)
+    },
   })
 }
 
@@ -832,6 +849,75 @@ async function verifyVariantControls(key, label) {
 
 function verifyPreviewSurfaceRegistry(patternKeys) {
   verifyPreviewSurfaceRegistryBase({ patternKeys, expectedKeyboardShortcutsByPattern, patternFailures })
+}
+
+async function collectExpectedSourceByName() {
+  const collected = new Map()
+  const pathsByName = new Map()
+  const sourceByPath = new Map()
+
+  const registerSource = async (name, path, url) => {
+    const source = await readFile(url, 'utf8')
+    collected.set(name, source)
+    pathsByName.set(name, [...(pathsByName.get(name) ?? []), path])
+    sourceByPath.set(path, source)
+  }
+
+  const srcFiles = await listFiles(new URL('../src/', import.meta.url))
+  const demoFiles = await listFiles(new URL('../demo/src/', import.meta.url))
+
+  for (const path of srcFiles.filter((path) => /^[^/]+\.ts$/.test(path))) {
+    await registerSource(path, `src/${path}`, new URL(`../src/${path}`, import.meta.url))
+  }
+  for (const path of srcFiles.filter((path) => /^(schema|kernel|adapters)\/[^/]+\.ts$/.test(path))) {
+    await registerSource(path, `src/${path}`, new URL(`../src/${path}`, import.meta.url))
+  }
+  for (const path of srcFiles.filter((path) => /^patterns\/[^/]+\/[^/]+\.ts$/.test(path))) {
+    await registerSource(path.replace(/^patterns\//, ''), `src/${path}`, new URL(`../src/${path}`, import.meta.url))
+  }
+  for (const path of demoFiles.filter((path) => isDemoSourcePath(path, 'tsx'))) {
+    await registerSource(path.split('/').pop(), `demo/src/${path}`, new URL(`../demo/src/${path}`, import.meta.url))
+  }
+  for (const path of demoFiles.filter((path) => isDemoSourcePath(path, 'ts'))) {
+    await registerSource(path.split('/').pop(), `demo/src/${path}`, new URL(`../demo/src/${path}`, import.meta.url))
+  }
+
+  for (const [name, paths] of pathsByName.entries()) {
+    if (paths.length <= 1) continue
+    collected.delete(name)
+    for (const path of paths) {
+      const qualifiedName = qualifyCollisionSourceName(path)
+      const source = sourceByPath.get(path)
+      if (qualifiedName && source !== undefined) collected.set(qualifiedName, source)
+    }
+  }
+
+  return collected
+}
+
+async function listFiles(rootUrl, prefix = '') {
+  const entries = await readdir(rootUrl, { withFileTypes: true })
+  const files = []
+  for (const entry of entries) {
+    const entryPrefix = `${prefix}${entry.name}`
+    if (entry.isDirectory()) {
+      files.push(...await listFiles(new URL(`${entry.name}/`, rootUrl), `${entryPrefix}/`))
+    } else {
+      files.push(entryPrefix)
+    }
+  }
+  return files
+}
+
+function isDemoSourcePath(path, extension) {
+  if (!path.endsWith(`.${extension}`)) return false
+  if (path.includes('.test.') || path.includes('.apg.test.')) return false
+  return new RegExp(`^(patterns/[^/]+/[^/]+|app/[^/]+|shared/[^/]+|shared/inspect/[^/]+)\\.${extension}$`).test(path)
+}
+
+function qualifyCollisionSourceName(path) {
+  const match = path.match(/\/patterns\/([^/]+)\/([^/]+)$/)
+  return match ? `${match[1]}/${match[2]}` : null
 }
 
 function duplicates(values) {
