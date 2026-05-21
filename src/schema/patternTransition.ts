@@ -1,7 +1,7 @@
 import { z } from 'zod'
-import { JsonValueSchema } from './jsonValue'
-import { PatternEventTypeSchema } from './patternEvent'
-import { PredicateSchema } from './patternPredicate'
+import { JsonValueSchema, type JsonValue } from './jsonValue'
+import { PatternEventTypeSchema, type PatternEventType } from './patternEvent'
+import { PredicateSchema, type Predicate } from './patternPredicate'
 
 export const StateFieldSchema = z.enum([
   'activeKey', 'anchorKey', 'extentKey', 'selectedKeys', 'expandedKeys', 'disabledKeys',
@@ -26,13 +26,30 @@ export const EventValueSourceSchema = z.enum([
 ])
 export type EventValueSource = z.infer<typeof EventValueSourceSchema>
 
-export const TransitionValueSchema = z.union([
+export type TransitionValue = { from: EventValueSource } | { literal: JsonValue }
+
+export type StateAction =
+  | { kind: 'set'; field: StateField; value: TransitionValue }
+  | { kind: 'add'; field: StateField; value: TransitionValue }
+  | { kind: 'remove'; field: StateField; value: TransitionValue }
+  | { kind: 'setMembership'; field: StateField; value: TransitionValue; present: TransitionValue }
+  | { kind: 'setRecordValue'; field: StateField; key: TransitionValue; value: TransitionValue }
+  | { kind: 'toggleInSet'; field: StateField; value: TransitionValue }
+  | { kind: 'replaceSet'; field: StateField; values: readonly TransitionValue[] }
+
+export interface Transition {
+  on: PatternEventType
+  name?: string
+  when?: Predicate
+  actions: readonly StateAction[]
+}
+
+export const TransitionValueSchema: z.ZodType<TransitionValue> = z.union([
   z.object({ from: EventValueSourceSchema }).strict(),
   z.object({ literal: JsonValueSchema }).strict(),
 ])
-export type TransitionValue = z.infer<typeof TransitionValueSchema>
 
-export const StateActionSchema = z.discriminatedUnion('kind', [
+export const StateActionSchema: z.ZodType<StateAction> = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('set'), field: StateFieldSchema, value: TransitionValueSchema }).strict(),
   z.object({ kind: z.literal('add'), field: StateFieldSchema, value: TransitionValueSchema }).strict(),
   z.object({ kind: z.literal('remove'), field: StateFieldSchema, value: TransitionValueSchema }).strict(),
@@ -41,9 +58,8 @@ export const StateActionSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('toggleInSet'), field: StateFieldSchema, value: TransitionValueSchema }).strict(),
   z.object({ kind: z.literal('replaceSet'), field: StateFieldSchema, values: z.array(TransitionValueSchema).readonly() }).strict(),
 ])
-export type StateAction = z.infer<typeof StateActionSchema>
 
-export const TransitionSchema = z
+export const TransitionSchema: z.ZodType<Transition> = z
   .object({
     on: PatternEventTypeSchema,
     name: z.string().min(1).optional(),
@@ -51,4 +67,3 @@ export const TransitionSchema = z
     actions: z.array(StateActionSchema).readonly(),
   })
   .strict()
-export type Transition = z.infer<typeof TransitionSchema>

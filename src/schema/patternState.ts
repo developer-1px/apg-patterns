@@ -1,8 +1,51 @@
 import { z } from 'zod'
 import { validateJsonExtensionFields } from './jsonValue'
-import { KeySchema } from './keys'
+import { KeySchema, type Key } from './keys'
 
-export const PatternStateSchema = z
+type ItemToggleState = boolean | 'mixed'
+type ItemCurrentState = boolean | string
+type ItemInvalidState = boolean | 'grammar' | 'spelling'
+type ItemValue = string | number | boolean | null
+
+interface RangeValue {
+  min?: number
+  max?: number
+  now: number
+  text?: string
+}
+
+export interface PatternState {
+  activeKey?: Key | null
+  anchorKey?: Key | null
+  extentKey?: Key | null
+  selectedKeys?: readonly Key[]
+  expandedKeys?: readonly Key[]
+  disabledKeys?: readonly Key[]
+  checkedByKey?: Record<Key, ItemToggleState>
+  pressedByKey?: Record<Key, ItemToggleState>
+  currentByKey?: Record<Key, ItemCurrentState>
+  invalidByKey?: Record<Key, ItemInvalidState>
+  requiredKeys?: readonly Key[]
+  busyKeys?: readonly Key[]
+  modalKeys?: readonly Key[]
+  levelByKey?: Record<Key, number>
+  posInSetByKey?: Record<Key, number>
+  setSizeByKey?: Record<Key, number>
+  rowIndexByKey?: Record<Key, number>
+  columnIndexByKey?: Record<Key, number>
+  sortByKey?: Record<Key, 'ascending' | 'descending' | 'other'>
+  valueByKey?: Record<Key, ItemValue>
+  rangeValueByKey?: Record<Key, RangeValue>
+  typeaheadTextByKey?: Record<Key, string>
+  rowCount?: number
+  colCount?: number
+  editingKey?: Key | null
+  editDraftByKey?: Record<Key, ItemValue>
+  lastEventReason?: string
+  [key: string]: unknown
+}
+
+export const PatternStateSchema: z.ZodType<PatternState> = z
   .object({
     activeKey: KeySchema.nullish(),
     anchorKey: KeySchema.nullish(),
@@ -68,5 +111,3 @@ export const PatternStateSchema = z
       ctx,
     ),
   )
-
-export type PatternState = z.infer<typeof PatternStateSchema>

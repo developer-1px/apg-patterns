@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { KeySchema } from './patternData'
+import { KeySchema, type Key } from './patternData'
 
 export const PatternDirectionSchema = z.enum([
   'child', 'down', 'first', 'gridEnd', 'gridStart', 'last', 'left', 'next',
@@ -25,10 +25,46 @@ export type PatternEventType = z.infer<typeof PatternEventTypeSchema>
 export const PatternEventReasonSchema = z.enum(['keyboard', 'typeahead', 'pointer', 'focus', 'external', 'open'])
 export type PatternEventReason = z.infer<typeof PatternEventReasonSchema>
 
-export const PatternEventMetaSchema = z.object({ reason: PatternEventReasonSchema.optional() }).strict()
+interface PatternEventMeta {
+  reason?: PatternEventReason
+}
+
+type EventWithMeta = { meta?: PatternEventMeta }
+type EventValue = string | number | boolean | null
+type ToggleState = boolean | 'mixed'
+
+export type PatternEvent =
+  | ({ type: 'focus'; key: Key } & EventWithMeta)
+  | ({ type: 'navigate'; direction: PatternDirection } & EventWithMeta)
+  | ({ type: 'select'; keys: readonly Key[]; anchorKey?: Key | null; extentKey?: Key | null } & EventWithMeta)
+  | ({ type: 'selectAll' } & EventWithMeta)
+  | ({ type: 'selectColumn' } & EventWithMeta)
+  | ({ type: 'selectRow' } & EventWithMeta)
+  | ({ type: 'extendSelection'; direction: PatternDirection } & EventWithMeta)
+  | ({ type: 'expand'; key: Key; expanded: boolean } & EventWithMeta)
+  | ({ type: 'expandActiveRow'; expanded: boolean } & EventWithMeta)
+  | ({ type: 'activate'; key: Key } & EventWithMeta)
+  | ({ type: 'check'; key: Key; checked: ToggleState } & EventWithMeta)
+  | ({ type: 'press'; key: Key; pressed?: ToggleState } & EventWithMeta)
+  | ({ type: 'value'; key: Key; value: EventValue } & EventWithMeta)
+  | ({ type: 'valueStep'; key: Key; direction: PatternValueStepDirection } & EventWithMeta)
+  | ({ type: 'collapse'; key: Key } & EventWithMeta)
+  | ({ type: 'close'; key: Key } & EventWithMeta)
+  | ({ type: 'inputValue'; key?: Key; value: string; inline?: boolean } & EventWithMeta)
+  | ({ type: 'commitValue'; key?: Key; value: string } & EventWithMeta)
+  | ({ type: 'typeahead'; query: string } & EventWithMeta)
+  | ({ type: 'dismiss'; key?: Key } & EventWithMeta)
+  | ({ type: 'sort'; key: Key; sort: 'ascending' | 'descending' | 'other' } & EventWithMeta)
+  | ({ type: 'editStart'; key: Key; value?: EventValue } & EventWithMeta)
+  | ({ type: 'editDraft'; key: Key; value: EventValue } & EventWithMeta)
+  | ({ type: 'editEnd'; key?: Key } & EventWithMeta)
+  | ({ type: 'reorder'; key?: Key; keys: readonly Key[] } & EventWithMeta)
+  | ({ type: 'remove'; key?: Key; keys?: readonly Key[]; activeKey?: Key | null; selectedKeys?: readonly Key[] } & EventWithMeta)
+
+export const PatternEventMetaSchema: z.ZodType<PatternEventMeta> = z.object({ reason: PatternEventReasonSchema.optional() }).strict()
 const EventMetaFieldSchema = { meta: PatternEventMetaSchema.optional() }
 
-export const PatternEventSchema = z.discriminatedUnion('type', [
+export const PatternEventSchema: z.ZodType<PatternEvent> = z.discriminatedUnion('type', [
   z.object({ type: z.literal('focus'), key: KeySchema, ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('navigate'), direction: PatternDirectionSchema, ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('select'), keys: z.array(KeySchema).readonly(), anchorKey: KeySchema.nullish(), extentKey: KeySchema.nullish(), ...EventMetaFieldSchema }).strict(),
@@ -56,5 +92,3 @@ export const PatternEventSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('reorder'), key: KeySchema.optional(), keys: z.array(KeySchema).readonly(), ...EventMetaFieldSchema }).strict(),
   z.object({ type: z.literal('remove'), key: KeySchema.optional(), keys: z.array(KeySchema).readonly().optional(), activeKey: KeySchema.nullish(), selectedKeys: z.array(KeySchema).readonly().optional(), ...EventMetaFieldSchema }).strict(),
 ])
-
-export type PatternEvent = z.infer<typeof PatternEventSchema>

@@ -18,7 +18,41 @@ const GridActionSchema = z.enum(['left', 'right', 'up', 'down', 'rowStart', 'row
 const GridPageActionSchema = z.enum(['pageUp', 'pageDown'])
 const TreegridPageDirectionSchema = z.enum(['up', 'down'])
 
-export const NavigationTargetSchema = z.discriminatedUnion('kind', [
+type LinearAction = 'next' | 'previous' | 'first' | 'last'
+type GridAction = 'left' | 'right' | 'up' | 'down' | 'rowStart' | 'rowEnd' | 'gridStart' | 'gridEnd'
+type GridPageAction = 'pageUp' | 'pageDown'
+type TreegridPageDirection = 'up' | 'down'
+type KeyToken = string
+
+type NavigationTarget =
+  | { kind: 'linear'; action: LinearAction }
+  | { kind: 'linearWrap'; action: 'next' | 'previous' }
+  | { kind: 'firstChild'; key?: KeyToken }
+  | { kind: 'gridCell'; action: GridAction }
+  | { kind: 'gridPage'; action: GridPageAction }
+  | { kind: 'optionLinear'; direction: LinearAction }
+  | { kind: 'parentKey'; key: KeyToken }
+  | { kind: 'tabsLinear'; action: LinearAction }
+  | { kind: 'treegridCell'; action: GridAction }
+  | { kind: 'treegridPage'; direction: TreegridPageDirection }
+  | { kind: 'treegridParentRowFirstCell' }
+  | { kind: 'treegridRow'; action: 'up' | 'down' | 'gridStart' | 'gridEnd' }
+  | { kind: 'treegridRowPage'; direction: TreegridPageDirection }
+
+type VisibleOrder =
+  | { kind: 'flat' }
+  | { kind: 'comboboxOptions' }
+  | { kind: 'gridRows' }
+  | { kind: 'treeVisibleDepthFirst' }
+  | { kind: 'treegridVisibleCells' }
+  | { kind: 'treegridVisibleRows' }
+
+interface Navigation {
+  visibleOrder: VisibleOrder
+  targets: Record<string, NavigationTarget>
+}
+
+export const NavigationTargetSchema: z.ZodType<NavigationTarget> = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('linear'), action: LinearActionSchema }).strict(),
   z.object({ kind: z.literal('linearWrap'), action: z.enum(['next', 'previous']) }).strict(),
   z.object({ kind: z.literal('firstChild'), key: KeyTokenSchema.optional() }).strict(),
@@ -34,7 +68,7 @@ export const NavigationTargetSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('treegridRowPage'), direction: TreegridPageDirectionSchema }).strict(),
 ])
 
-export const VisibleOrderSchema = z.discriminatedUnion('kind', [
+export const VisibleOrderSchema: z.ZodType<VisibleOrder> = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('flat') }).strict(),
   z.object({ kind: z.literal('comboboxOptions') }).strict(),
   z.object({ kind: z.literal('gridRows') }).strict(),
@@ -43,7 +77,7 @@ export const VisibleOrderSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('treegridVisibleRows') }).strict(),
 ])
 
-export const NavigationSchema = z
+export const NavigationSchema: z.ZodType<Navigation> = z
   .object({
     visibleOrder: VisibleOrderSchema,
     targets: z.record(z.string().min(1), NavigationTargetSchema),

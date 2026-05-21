@@ -1,7 +1,20 @@
 import { z } from 'zod'
 import { validateJsonExtensionFields } from './jsonValue'
 
-export const PatternOptionsSchema = z
+export interface PatternOptions {
+  selectionMode?: 'none' | 'single' | 'multiple'
+  focusStrategy?: 'rovingTabIndex' | 'ariaActiveDescendant'
+  followFocus?: boolean
+  typeaheadEnabled?: boolean
+  elementIdPrefix?: string
+  orientation?: 'horizontal' | 'vertical' | 'both'
+  min?: number
+  max?: number
+  step?: number
+  [key: string]: unknown
+}
+
+export const PatternOptionsSchema: z.ZodType<PatternOptions> = z
   .object({
     selectionMode: z.enum(['none', 'single', 'multiple']).optional(),
     focusStrategy: z.enum(['rovingTabIndex', 'ariaActiveDescendant']).optional(),
@@ -21,5 +34,3 @@ export const PatternOptionsSchema = z
       ctx,
     ),
   )
-
-export type PatternOptions = z.infer<typeof PatternOptionsSchema>
