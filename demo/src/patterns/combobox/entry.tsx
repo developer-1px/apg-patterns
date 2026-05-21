@@ -1,14 +1,9 @@
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { Combobox } from './Combobox'
-import { buildComboboxData, comboboxVariants, reduceComboboxData, type ComboboxVariantKey } from './comboboxData'
+import { buildComboboxData, comboboxVariantItems, reduceComboboxData, type ComboboxVariantKey } from './comboboxData'
 import { renderDataInspect } from '../../shared/inspect/genericInspect'
 import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 import type { PatternEvent } from '../../../../src/react'
-
-const comboboxVariantItems = (Object.keys(comboboxVariants) as ComboboxVariantKey[]).map((key) => ({
-  key,
-  label: comboboxVariants[key].label,
-}))
 
 const comboboxDemoDefinition = {
   key: 'combobox',

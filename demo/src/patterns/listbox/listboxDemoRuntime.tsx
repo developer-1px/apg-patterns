@@ -1,5 +1,6 @@
 import { listboxDefinition, reducePatternData, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src/react'
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
+import { variantItemsFrom } from '../../shared/demoPatternTypes'
 import { renderDataInspect } from '../../shared/inspect/genericInspect'
 import { Listbox } from './Listbox'
 import {
@@ -22,10 +23,7 @@ const listboxVariants: Record<ListboxVariantKey, { label: string; data: PatternD
   rearrangeableMulti: { label: 'Rearrangeable (multi-select)', data: initialRearrangeableListboxData },
 }
 
-export const listboxVariantItems: readonly { key: ListboxVariantKey; label: string }[] = Object.entries(listboxVariants).map(([key, value]) => ({
-  key: key as ListboxVariantKey,
-  label: value.label,
-}))
+export const listboxVariantItems = variantItemsFrom(listboxVariants)
 
 export function useListboxDemoRuntime(onEvent: (event: PatternEvent) => void) {
   const host = useVariantPatternDataHost<ListboxVariantKey>(

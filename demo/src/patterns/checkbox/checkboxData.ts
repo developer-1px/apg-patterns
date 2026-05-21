@@ -1,4 +1,5 @@
 import { checkboxDefinition, PatternDataSchema, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
+import { variantItemsFrom } from '../../shared/demoPatternTypes'
 
 export type CheckboxVariantKey = 'twoState' | 'triState'
 
@@ -78,7 +79,4 @@ export const checkboxVariants: Record<CheckboxVariantKey, CheckboxVariant> = {
   },
 }
 
-export const checkboxVariantItems: readonly { key: CheckboxVariantKey; label: string }[] = Object.entries(checkboxVariants).map(([key, value]) => ({
-  key: key as CheckboxVariantKey,
-  label: value.label,
-}))
+export const checkboxVariantItems = variantItemsFrom(checkboxVariants)

@@ -6,7 +6,7 @@ import { patternEntries, useDemoPattern } from './demoPatterns'
 import { buttonVariantItems } from '../patterns/button/buttonData'
 import { carouselVariantItems } from '../patterns/carousel/carouselData'
 import { checkboxVariantItems } from '../patterns/checkbox/checkboxData'
-import { comboboxVariants } from '../patterns/combobox/comboboxData'
+import { comboboxVariantItems } from '../patterns/combobox/comboboxData'
 import { dialogVariantItems } from '../patterns/dialog/dialogData'
 import { disclosureVariantItems } from '../patterns/disclosure/entry'
 import { gridVariantItems } from '../patterns/grid/gridData'
@@ -18,54 +18,40 @@ import { radioVariantItems } from '../patterns/radio/radioData'
 import { sliderVariantItems } from '../patterns/slider/sliderData'
 import { spinbuttonVariantItems } from '../patterns/spinbutton/spinbuttonData'
 import { switchVariantItems } from '../patterns/switch/switchData'
-import { tableVariants } from '../patterns/table/tableData'
+import { tableVariantItems } from '../patterns/table/tableData'
 import { tabsVariantItems } from '../patterns/tabs/tabsData'
 import { toolbarVariantItems } from '../patterns/toolbar/toolbarData'
 import { treeVariantItems } from '../patterns/treeview/treeVariants'
 
-const implementedVariants: Record<string, readonly string[]> = {
-  button: buttonVariantItems.map((item) => item.key),
-  carousel: carouselVariantItems.map((item) => item.key),
-  checkbox: checkboxVariantItems.map((item) => item.key),
-  combobox: Object.keys(comboboxVariants),
-  dialog: dialogVariantItems.map((item) => item.key),
-  disclosure: disclosureVariantItems.map((item) => item.key),
-  grid: gridVariantItems.map((item) => item.key),
-  landmarks: landmarkVariantItems.map((item) => item.key),
-  link: linkVariantItems.map((item) => item.key),
-  listbox: listboxVariantItems.map((item) => item.key),
-  menu: menuVariantItems.map((item) => item.key),
-  radio: radioVariantItems.map((item) => item.key),
-  slider: sliderVariantItems.map((item) => item.key),
-  spinbutton: spinbuttonVariantItems.map((item) => item.key),
-  switch: switchVariantItems.map((item) => item.key),
-  table: Object.keys(tableVariants),
-  tabs: tabsVariantItems.map((item) => item.key),
-  toolbar: toolbarVariantItems.map((item) => item.key),
-  treeview: treeVariantItems.map((item) => item.key),
-}
+const implementedVariantItems = {
+  button: buttonVariantItems,
+  carousel: carouselVariantItems,
+  checkbox: checkboxVariantItems,
+  combobox: comboboxVariantItems,
+  dialog: dialogVariantItems,
+  disclosure: disclosureVariantItems,
+  grid: gridVariantItems,
+  landmarks: landmarkVariantItems,
+  link: linkVariantItems,
+  listbox: listboxVariantItems,
+  menu: menuVariantItems,
+  radio: radioVariantItems,
+  slider: sliderVariantItems,
+  spinbutton: spinbuttonVariantItems,
+  switch: switchVariantItems,
+  table: tableVariantItems,
+  tabs: tabsVariantItems,
+  toolbar: toolbarVariantItems,
+  treeview: treeVariantItems,
+} satisfies Record<string, readonly { key: string; label: string }[]>
 
-const implementedVariantLabels: Record<string, Readonly<Record<string, string>>> = {
-  button: labelsByKey(buttonVariantItems),
-  carousel: labelsByKey(carouselVariantItems),
-  checkbox: labelsByKey(checkboxVariantItems),
-  combobox: Object.fromEntries(Object.entries(comboboxVariants).map(([key, value]) => [key, value.label])),
-  dialog: labelsByKey(dialogVariantItems),
-  disclosure: labelsByKey(disclosureVariantItems),
-  grid: labelsByKey(gridVariantItems),
-  landmarks: labelsByKey(landmarkVariantItems),
-  link: labelsByKey(linkVariantItems),
-  listbox: labelsByKey(listboxVariantItems),
-  menu: labelsByKey(menuVariantItems),
-  radio: labelsByKey(radioVariantItems),
-  slider: labelsByKey(sliderVariantItems),
-  spinbutton: labelsByKey(spinbuttonVariantItems),
-  switch: labelsByKey(switchVariantItems),
-  table: Object.fromEntries(Object.entries(tableVariants).map(([key, value]) => [key, value.label])),
-  tabs: labelsByKey(tabsVariantItems),
-  toolbar: labelsByKey(toolbarVariantItems),
-  treeview: labelsByKey(treeVariantItems),
-}
+const implementedVariants: Record<string, readonly string[]> = Object.fromEntries(
+  Object.entries(implementedVariantItems).map(([pattern, items]) => [pattern, items.map((item) => item.key)]),
+)
+
+const implementedVariantLabels: Record<string, Readonly<Record<string, string>>> = Object.fromEntries(
+  Object.entries(implementedVariantItems).map(([pattern, items]) => [pattern, labelsByKey(items)]),
+)
 
 afterEach(() => {
   cleanup()

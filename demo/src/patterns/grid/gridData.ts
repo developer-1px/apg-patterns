@@ -1,4 +1,5 @@
 import { PatternDataSchema } from '../../../../src/react'
+import { variantItemsFrom } from '../../shared/demoPatternTypes'
 
 type GridCellSpec = {
   key: string
@@ -157,4 +158,4 @@ export const gridVariants = {
 } as const
 
 export type GridVariantKey = keyof typeof gridVariants
-export const gridVariantItems = Object.entries(gridVariants).map(([key, value]) => ({ key: key as GridVariantKey, label: value.label }))
+export const gridVariantItems = variantItemsFrom(gridVariants)

@@ -1,4 +1,5 @@
 import { PatternDataSchema, reducePatternData, tabsDefinition, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src/react'
+import { variantItemsFrom } from '../../shared/demoPatternTypes'
 
 type TabSpec = { key: string; label: string; panelLabel: string; content?: string }
 
@@ -108,7 +109,7 @@ export const tabsVariants: Record<TabsVariantKey, TabsVariantSpec> = {
   },
 }
 
-export const tabsVariantItems = Object.entries(tabsVariants).map(([key, value]) => ({ key: key as TabsVariantKey, label: value.label }))
+export const tabsVariantItems = variantItemsFrom(tabsVariants)
 
 export const initialTabsVariant: TabsVariantKey = 'automatic'
 

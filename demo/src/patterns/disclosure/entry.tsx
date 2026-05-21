@@ -1,5 +1,6 @@
 import { disclosureDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
+import { variantItemsFrom } from '../../shared/demoPatternTypes'
 import { Disclosure } from './Disclosure'
 import {
   initialDisclosureData,
@@ -20,10 +21,7 @@ const variants: Record<DisclosureVariantKey, { label: string; data: PatternData 
   navMenuTopLinks: { label: 'navigation menu (top-level links)', data: initialNavMenuTopLinksDisclosureData },
 }
 
-export const disclosureVariantItems: readonly { key: DisclosureVariantKey; label: string }[] = Object.entries(variants).map(([key, value]) => ({
-  key: key as DisclosureVariantKey,
-  label: value.label,
-}))
+export const disclosureVariantItems = variantItemsFrom(variants)
 
 const disclosureDemoDefinition = {
   key: 'disclosure',

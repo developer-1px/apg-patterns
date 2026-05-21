@@ -1,4 +1,5 @@
 import type { PatternData } from '../../../../src/react'
+import { variantItemsFrom } from '../../shared/demoPatternTypes'
 import { fileDirectoryComputed, fileDirectoryDeclared, navigation } from './treeVariantData'
 
 export type TreeVariantKey = 'fileDirectoryComputed' | 'fileDirectoryDeclared' | 'navigation'
@@ -23,7 +24,4 @@ export const treeVariants: Record<TreeVariantKey, TreeVariantSpec> = {
   },
 }
 
-export const treeVariantItems: readonly { key: TreeVariantKey; label: string }[] = Object.entries(treeVariants).map(([key, value]) => ({
-  key: key as TreeVariantKey,
-  label: value.label,
-}))
+export const treeVariantItems = variantItemsFrom(treeVariants)

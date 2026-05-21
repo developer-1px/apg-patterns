@@ -17,6 +17,12 @@ export interface DemoPattern {
 
 type EmitPatternEvent = (event: PatternEvent) => void
 
+export function variantItemsFrom<Variant extends string>(
+  variants: Readonly<Record<Variant, { label: string }>>,
+) {
+  return (Object.keys(variants) as Variant[]).map((key) => ({ key, label: variants[key].label }))
+}
+
 const KERNEL_SIDE_EFFECT_SOURCES = [
   'kernel/kernelAriaSources.ts',
   'kernel/kernelBuiltins.ts',

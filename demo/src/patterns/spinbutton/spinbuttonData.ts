@@ -1,4 +1,5 @@
 import { PatternDataSchema, type Key, type PatternData, type PatternEvent, type PatternItem, type PatternOptions } from '../../../../src/react'
+import { variantItemsFrom } from '../../shared/demoPatternTypes'
 
 interface SpinbuttonDemoItem extends PatternItem {
   valuemin?: number
@@ -54,10 +55,7 @@ export const spinbuttonVariants: Record<SpinbuttonVariantKey, SpinbuttonVariant>
   },
 }
 
-export const spinbuttonVariantItems: readonly { key: SpinbuttonVariantKey; label: string }[] = Object.entries(spinbuttonVariants).map(([key, value]) => ({
-  key: key as SpinbuttonVariantKey,
-  label: value.label,
-}))
+export const spinbuttonVariantItems = variantItemsFrom(spinbuttonVariants)
 
 const computeDelta = (direction: unknown, step: number, large: number): number => {
   if (direction === 'increment') return step

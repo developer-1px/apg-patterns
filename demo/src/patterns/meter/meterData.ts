@@ -1,4 +1,5 @@
 import { PatternDataSchema, type PatternData, type PatternOptions } from '../../../../src/react'
+import { variantItemsFrom } from '../../shared/demoPatternTypes'
 
 export type MeterVariantKey = 'disk' | 'battery' | 'cpu' | 'storage'
 
@@ -45,4 +46,4 @@ export const meterVariants: Record<MeterVariantKey, MeterVariant> = {
   storage: { label: 'Storage', options: { min: 0, max: 256 }, data: storageData() },
 }
 
-export const meterVariantItems = Object.entries(meterVariants).map(([key, value]) => ({ key: key as MeterVariantKey, label: value.label }))
+export const meterVariantItems = variantItemsFrom(meterVariants)

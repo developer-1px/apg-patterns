@@ -1,4 +1,5 @@
 import type { PatternData } from '../../../../src/react'
+import { variantItemsFrom } from '../../shared/demoPatternTypes'
 
 export type DialogVariantKey = 'dialog' | 'datepicker'
 
@@ -47,7 +48,7 @@ export const dialogVariants: Record<DialogVariantKey, { label: string; data: Pat
   datepicker: { label: 'Date Picker Dialog', data: datepickerDialogData },
 }
 
-export const dialogVariantItems = Object.entries(dialogVariants).map(([key, value]) => ({ key: key as DialogVariantKey, label: value.label }))
+export const dialogVariantItems = variantItemsFrom(dialogVariants)
 export const initialDialogData = dialogVariants.dialog.data
 
 export const dialogFields = [

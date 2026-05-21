@@ -1,4 +1,5 @@
 import { PatternDataSchema, type PatternData } from '../../../../src/react'
+import { variantItemsFrom } from '../../shared/demoPatternTypes'
 
 export type LinkVariantKey = 'anchor' | 'spanRole'
 
@@ -34,4 +35,4 @@ export const linkVariants: Record<LinkVariantKey, LinkVariant> = {
   },
 }
 
-export const linkVariantItems = Object.entries(linkVariants).map(([key, value]) => ({ key: key as LinkVariantKey, label: value.label }))
+export const linkVariantItems = variantItemsFrom(linkVariants)

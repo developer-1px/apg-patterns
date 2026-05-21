@@ -1,4 +1,5 @@
 import type { PatternData, PatternItem } from '../../../../src/react'
+import { variantItemsFrom } from '../../shared/demoPatternTypes'
 
 export type LandmarkVariantKey =
   | 'html5'
@@ -111,10 +112,7 @@ export const landmarkVariants: Record<LandmarkVariantKey, LandmarkVariant> = {
   },
 }
 
-export const landmarkVariantItems: readonly { key: LandmarkVariantKey; label: string }[] = Object.entries(landmarkVariants).map(([key, value]) => ({
-  key: key as LandmarkVariantKey,
-  label: value.label,
-}))
+export const landmarkVariantItems = variantItemsFrom(landmarkVariants)
 
 export const initialLandmarkVariant: LandmarkVariantKey = 'html5'
 

@@ -1,4 +1,5 @@
 import type { PatternData } from '../../../../src/react'
+import { variantItemsFrom } from '../../shared/demoPatternTypes'
 
 type CarouselSlide = {
   key: string
@@ -71,4 +72,4 @@ export const carouselVariants: Record<CarouselVariantKey, { label: string; data:
   },
 }
 
-export const carouselVariantItems = Object.entries(carouselVariants).map(([key, value]) => ({ key: key as CarouselVariantKey, label: value.label }))
+export const carouselVariantItems = variantItemsFrom(carouselVariants)

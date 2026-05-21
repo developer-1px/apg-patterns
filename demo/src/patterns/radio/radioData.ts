@@ -1,4 +1,5 @@
 import { radioGroupDefinition, PatternDataSchema, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
+import { variantItemsFrom } from '../../shared/demoPatternTypes'
 
 export type RadioVariantKey = 'rovingTabindex' | 'ariaActiveDescendant' | 'rating'
 
@@ -46,7 +47,7 @@ export const radioVariants: Record<RadioVariantKey, { label: string; data: Patte
   rating: { label: 'Rating', data: ratingRadioData, focusStrategy: 'rovingTabIndex' },
 }
 
-export const radioVariantItems = Object.entries(radioVariants).map(([key, value]) => ({ key: key as RadioVariantKey, label: value.label }))
+export const radioVariantItems = variantItemsFrom(radioVariants)
 export const initialRadioData = radioVariants.rovingTabindex.data
 
 export function reduceRadioData(data: PatternData, event: PatternEvent): PatternData {

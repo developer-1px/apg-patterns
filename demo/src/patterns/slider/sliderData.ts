@@ -1,4 +1,5 @@
 import { PatternDataSchema, type Key, type PatternData, type PatternEvent, type PatternItem, type PatternOptions } from '../../../../src/react'
+import { variantItemsFrom } from '../../shared/demoPatternTypes'
 
 export type SliderVariantKey = 'color' | 'temperature' | 'rating' | 'seek' | 'range'
 
@@ -111,7 +112,7 @@ export const sliderVariants: Record<SliderVariantKey, SliderVariant> = {
   },
 }
 
-export const sliderVariantItems = Object.entries(sliderVariants).map(([key, value]) => ({ key: key as SliderVariantKey, label: value.label }))
+export const sliderVariantItems = variantItemsFrom(sliderVariants)
 
 const computeDelta = (direction: unknown, step: number, large: number): number => {
   if (direction === 'increment') return step

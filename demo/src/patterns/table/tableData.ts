@@ -1,4 +1,5 @@
 import { PatternDataSchema } from '../../../../src/react'
+import { variantItemsFrom } from '../../shared/demoPatternTypes'
 
 type TableCellSpec = {
   key: string
@@ -87,4 +88,5 @@ export const tableVariants = {
 } as const
 
 export type TableVariantKey = keyof typeof tableVariants
+export const tableVariantItems = variantItemsFrom(tableVariants)
 export const initialTableData = tableVariants.basic.data

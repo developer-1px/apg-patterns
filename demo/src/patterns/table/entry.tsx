@@ -1,7 +1,7 @@
 import { reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { tableDefinition } from '../../../../src/patterns/table/definition'
 import { Table } from './Table'
-import { initialTableData, tableVariants, type TableVariantKey } from './tableData'
+import { initialTableData, tableVariantItems, tableVariants, type TableVariantKey } from './tableData'
 import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 
 const reduceTableDemoData = (data: PatternData, event: PatternEvent): PatternData => {
@@ -47,7 +47,7 @@ export const entry = defineVariantDemoPattern<TableVariantKey>({
   initialData: initialTableData,
   dataByVariant: (variant) => tableVariants[variant].data,
   reduce: (_variant, data, event) => reduceTableDemoData(data, event),
-  variantItems: Object.entries(tableVariants).map(([key, value]) => ({ key: key as TableVariantKey, label: value.label })),
+  variantItems: tableVariantItems,
   componentName: 'Table',
   component: Table,
 })

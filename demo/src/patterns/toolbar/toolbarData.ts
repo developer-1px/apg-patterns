@@ -1,5 +1,6 @@
 import { toolbarDefinition } from '../../../../src/patterns/toolbar/definition'
 import { PatternDataSchema, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
+import { variantItemsFrom } from '../../shared/demoPatternTypes'
 
 export type ToolbarVariantKey = 'toolbar' | 'help'
 
@@ -49,7 +50,7 @@ export const toolbarVariants: Record<ToolbarVariantKey, { label: string; data: P
   help: { label: 'Help', data: helpToolbarData },
 }
 
-export const toolbarVariantItems = Object.entries(toolbarVariants).map(([key, value]) => ({ key: key as ToolbarVariantKey, label: value.label }))
+export const toolbarVariantItems = variantItemsFrom(toolbarVariants)
 export const initialToolbarData = toolbarVariants.toolbar.data
 
 export function reduceToolbarData(data: PatternData, event: PatternEvent): PatternData {

@@ -1,5 +1,6 @@
 import { PatternDataSchema } from '../../../../src/react'
 import type { PatternData } from '../../../../src/react'
+import { variantItemsFrom } from '../../shared/demoPatternTypes'
 
 export type MenuVariantKey =
   | 'editorMenubar'
@@ -124,7 +125,4 @@ export const menuVariants: Record<MenuVariantKey, { label: string; data: Pattern
   linkMenuButton: { label: 'Menu Button (Links)', data: initialLinkMenuData, apgPattern: 'menu-button', focusStrategy: 'rovingTabIndex' },
 }
 
-export const menuVariantItems: ReadonlyArray<{ key: MenuVariantKey; label: string }> = Object.entries(menuVariants).map(([key, value]) => ({
-  key: key as MenuVariantKey,
-  label: value.label,
-}))
+export const menuVariantItems = variantItemsFrom(menuVariants)

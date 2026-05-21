@@ -1,5 +1,6 @@
 import { PatternDataSchema, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { buttonDefinition } from '../../../../src/patterns/button/definition'
+import { variantItemsFrom } from '../../shared/demoPatternTypes'
 
 export type ButtonVariantKey = 'action' | 'toggle'
 
@@ -52,7 +53,4 @@ export const buttonVariants: Record<ButtonVariantKey, ButtonVariant> = {
   },
 }
 
-export const buttonVariantItems: readonly { key: ButtonVariantKey; label: string }[] = Object.entries(buttonVariants).map(([key, value]) => ({
-  key: key as ButtonVariantKey,
-  label: value.label,
-}))
+export const buttonVariantItems = variantItemsFrom(buttonVariants)

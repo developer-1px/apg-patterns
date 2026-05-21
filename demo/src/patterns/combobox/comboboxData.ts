@@ -1,4 +1,5 @@
 import { PatternDataSchema, type PatternData, type PatternEvent } from '../../../../src/react'
+import { variantItemsFrom } from '../../shared/demoPatternTypes'
 
 const comboboxRootKey = 'combobox'
 
@@ -18,6 +19,8 @@ export const comboboxVariants: Record<ComboboxVariantKey, { label: string; autoc
   datepicker: { label: 'Date Picker Combobox', autocomplete: 'none', editable: true },
   gridPopup: { label: 'Grid Popup Combobox', autocomplete: 'list', editable: true },
 }
+
+export const comboboxVariantItems = variantItemsFrom(comboboxVariants)
 
 export const FRUITS = [
   { key: 'apple', label: 'Apple' },

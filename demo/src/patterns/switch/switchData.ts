@@ -1,5 +1,6 @@
 import { PatternDataSchema, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { switchDefinition } from '../../../../src/patterns/switch/definition'
+import { variantItemsFrom } from '../../shared/demoPatternTypes'
 
 export type SwitchVariantKey = 'switch' | 'button' | 'checkbox'
 
@@ -22,7 +23,7 @@ export const switchVariants: Record<SwitchVariantKey, { label: string; data: Pat
   checkbox: { label: 'Checkbox input', data: switchData },
 }
 
-export const switchVariantItems = Object.entries(switchVariants).map(([key, value]) => ({ key: key as SwitchVariantKey, label: value.label }))
+export const switchVariantItems = variantItemsFrom(switchVariants)
 export const initialSwitchData = switchVariants.switch.data
 
 export function reduceSwitchData(data: PatternData, event: PatternEvent): PatternData {
