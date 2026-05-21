@@ -41,10 +41,6 @@ function reduceAction(data: PatternData, event: PatternEvent): PatternData {
   return reducePatternData(buttonDefinition, data, event)
 }
 
-function reduceToggle(data: PatternData, event: PatternEvent): PatternData {
-  return reducePatternData(buttonDefinition, data, event)
-}
-
 export const buttonVariants: Record<ButtonVariantKey, ButtonVariant> = {
   action: {
     key: 'action',
@@ -56,7 +52,7 @@ export const buttonVariants: Record<ButtonVariantKey, ButtonVariant> = {
     key: 'toggle',
     label: 'Toggle (aria-pressed)',
     data: toggleInitial,
-    reduce: reduceToggle,
+    reduce: (data, event) => reducePatternData(buttonDefinition, data, event),
   },
 }
 
@@ -64,8 +60,3 @@ export const buttonVariantItems: readonly { key: ButtonVariantKey; label: string
   { key: 'action', label: 'Action' },
   { key: 'toggle', label: 'Toggle (aria-pressed)' },
 ]
-
-export const initialButtonData = actionInitial
-export function reduceButtonData(data: PatternData, event: PatternEvent): PatternData {
-  return reduceAction(data, event)
-}

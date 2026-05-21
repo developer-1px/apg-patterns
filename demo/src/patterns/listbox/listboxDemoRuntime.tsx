@@ -11,7 +11,7 @@ import {
 } from './listboxData'
 import { RearrangeableListbox } from './RearrangeableListbox'
 
-export type ListboxVariantKey = 'basic' | 'collapsible' | 'scrollable' | 'grouped' | 'rearrangeable' | 'rearrangeableMulti'
+type ListboxVariantKey = 'basic' | 'collapsible' | 'scrollable' | 'grouped' | 'rearrangeable' | 'rearrangeableMulti'
 
 export const listboxVariantItems: readonly { key: ListboxVariantKey; label: string }[] = [
   { key: 'basic', label: 'Basic' },

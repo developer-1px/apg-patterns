@@ -10,7 +10,7 @@ import {
 } from './listboxData'
 import { RearrangeableListbox } from './RearrangeableListbox'
 
-export type ListboxTestVariant = 'basic' | 'scrollable' | 'grouped' | 'rearrangeable' | 'rearrangeableMulti'
+type ListboxTestVariant = 'basic' | 'scrollable' | 'grouped' | 'rearrangeable' | 'rearrangeableMulti'
 
 const reduceListboxDemoData = (data: PatternData, event: PatternEvent): PatternData => {
   if (event.type === 'reorder') {

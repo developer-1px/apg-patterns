@@ -11,7 +11,7 @@ type AccordionSectionSpec = {
   content: string
 }
 
-export const buildAccordionData = (
+const buildAccordionData = (
   sections: readonly AccordionSectionSpec[],
   initialExpanded: readonly string[] = [],
   label = 'Sections',
@@ -66,5 +66,3 @@ const defaultSections: readonly AccordionSectionSpec[] = [
 ]
 
 export const initialAccordionData: PatternData<AccordionItem> = buildAccordionData(defaultSections, [], 'Account')
-
-export const accordionSections = defaultSections

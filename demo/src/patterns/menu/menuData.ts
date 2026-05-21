@@ -9,7 +9,7 @@ export type MenuVariantKey =
   | 'actionMenuButtonActiveDescendant'
   | 'linkMenuButton'
 
-export const initialEditorMenubarData: PatternData = PatternDataSchema.parse({
+const initialEditorMenubarData: PatternData = PatternDataSchema.parse({
   items: {
     file: { label: 'File' },
     edit: { label: 'Edit' },
@@ -46,7 +46,7 @@ export const initialEditorMenubarData: PatternData = PatternDataSchema.parse({
   refs: { label: 'Editor' },
 })
 
-export const initialNavMenubarData: PatternData = PatternDataSchema.parse({
+const initialNavMenubarData: PatternData = PatternDataSchema.parse({
   items: {
     about: { label: 'About' },
     admissions: { label: 'Admissions' },
@@ -73,7 +73,7 @@ export const initialNavMenubarData: PatternData = PatternDataSchema.parse({
   refs: { label: 'Mythical University' },
 })
 
-export const initialActionMenuData: PatternData = PatternDataSchema.parse({
+const initialActionMenuData: PatternData = PatternDataSchema.parse({
   items: {
     trigger: { label: 'Actions' },
     menu: { label: 'Actions menu' },
@@ -94,7 +94,7 @@ export const initialActionMenuData: PatternData = PatternDataSchema.parse({
   state: { activeKey: 'actAction', expandedKeys: [] },
 })
 
-export const initialLinkMenuData: PatternData = PatternDataSchema.parse({
+const initialLinkMenuData: PatternData = PatternDataSchema.parse({
   items: {
     trigger: { label: 'Links' },
     menu: { label: 'Links menu' },

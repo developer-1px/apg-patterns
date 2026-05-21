@@ -10,7 +10,7 @@ export const breadcrumbItems: ReadonlyArray<BreadcrumbItem> = [
   { key: 'breadcrumb', label: 'Breadcrumb', href: 'https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/' },
 ]
 
-export const breadcrumbLabel = 'Breadcrumb'
+const breadcrumbLabel = 'Breadcrumb'
 
 export const initialBreadcrumbData: PatternData = {
   items: Object.fromEntries(

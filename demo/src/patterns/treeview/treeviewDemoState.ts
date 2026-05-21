@@ -3,12 +3,12 @@ import { PatternDataSchema, type PatternEvent } from '../../../../src/react'
 import { reduceData } from './treeContract'
 import { treeVariants, type TreeVariantKey } from './treeVariants'
 
-export const treeVariantKeys = ['fileDirectoryComputed', 'fileDirectoryDeclared', 'navigation'] as const
-export const focusStrategies = ['rovingTabIndex', 'ariaActiveDescendant'] as const
-export const itemClickActions = ['select', 'toggleExpand', 'none'] as const
-export const inspectModes = ['aria', 'html'] as const
+const treeVariantKeys = ['fileDirectoryComputed', 'fileDirectoryDeclared', 'navigation'] as const
+const focusStrategies = ['rovingTabIndex', 'ariaActiveDescendant'] as const
+const itemClickActions = ['select', 'toggleExpand', 'none'] as const
+const inspectModes = ['aria', 'html'] as const
 
-export const TreeviewDemoStateSchema = z.object({
+const TreeviewDemoStateSchema = z.object({
   variant: z.enum(treeVariantKeys),
   data: PatternDataSchema,
   followFocus: z.boolean(),
@@ -19,7 +19,7 @@ export const TreeviewDemoStateSchema = z.object({
 
 export type TreeviewDemoState = z.infer<typeof TreeviewDemoStateSchema>
 
-export type TreeviewDemoAction =
+type TreeviewDemoAction =
   | { type: 'selectVariant'; variant: TreeVariantKey }
   | { type: 'setFollowFocus'; value: boolean }
   | { type: 'setFocusStrategy'; value: TreeviewDemoState['focusStrategy'] }

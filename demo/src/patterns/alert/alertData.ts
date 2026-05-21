@@ -17,7 +17,7 @@ export const initialAlertData: PatternData = {
   },
 }
 
-export type AlertSpawnEvent = { type: 'spawn'; key: string; message: string }
+type AlertSpawnEvent = { type: 'spawn'; key: string; message: string }
 export type AlertDomainEvent = PatternEvent | AlertSpawnEvent
 
 export interface AlertReducerState {

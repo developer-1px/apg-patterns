@@ -115,7 +115,6 @@ export const tabsVariants: Record<TabsVariantKey, TabsVariantSpec> = {
 export const tabsVariantItems = Object.entries(tabsVariants).map(([key, value]) => ({ key: key as TabsVariantKey, label: value.label }))
 
 export const initialTabsVariant: TabsVariantKey = 'automatic'
-export const initialTabsData = tabsVariants.automatic.data
 
 export function reduceTabsDemoData(data: PatternData, event: PatternEvent, options: TabsViewOptions): PatternData {
   const next = reducePatternData(tabsDefinition, data, event)

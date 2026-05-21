@@ -57,8 +57,6 @@ export function buildComboboxData(
   })
 }
 
-export const initialComboboxData: PatternData = buildComboboxData()
-
 export function reduceComboboxData(current: PatternData, event: PatternEvent): PatternData {
   // Use the kernel's pattern reducer for navigate/select/expand events, but keep
   // a thin local override for navigate so we can move activeKey through the
