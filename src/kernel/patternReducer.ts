@@ -3,7 +3,7 @@ import { reduceDeclarativeTransitions } from './patternTransitions'
 import { reduceExpandActiveRowEvent, reduceExpandEvent } from './expansionEvents'
 import { reduceCheckEvent, reducePressEvent, reduceValueEvent } from './itemStateEvents'
 import { reduceFocusEvent, reduceNavigateEvent } from './navigationEvents'
-import { reduceExtendSelectionEvent, reduceSelectAllEvent, reduceSelectColumnEvent, reduceSelectRowEvent, withSelection } from './selectionEvents'
+import { reduceExtendSelectionEvent, reduceSelectAllEvent, reduceSelectColumnEvent, reduceSelectRowEvent } from './selectionEvents'
 
 export function reducePatternData(definition: PatternDefinition, data: PatternData, event: PatternEvent): PatternData {
   const declarative = reduceDeclarativeTransitions(definition, data, event)

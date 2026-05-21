@@ -1,6 +1,5 @@
 import {
   createPatternRuntime,
-  type CreatePatternRuntimeInput,
   type PatternRuntime,
   type SlotProps,
 } from '../../kernel/patternRuntime'
