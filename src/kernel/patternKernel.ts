@@ -35,7 +35,6 @@ import {
   type VisibleOrderResolver,
 } from './kernelRegistries'
 export { resolveEventTemplate } from './patternEventTemplate'
-export { createParentByKey } from './patternRelations'
 export {
   defineAriaSource,
   defineNavigationTarget,
@@ -78,4 +77,12 @@ export interface PatternRuntimeContext {
   activeKey: Key | null
   keyToElementId?: (key: Key) => string
   parentByKey?: ReadonlyMap<Key, Key>
+}
+
+export function createParentByKey(data: PatternData): ReadonlyMap<Key, Key> {
+  const parentByKey = new Map<Key, Key>()
+  for (const [parent, children] of Object.entries(data.relations?.childrenByKey ?? {})) {
+    for (const child of children) parentByKey.set(child, parent)
+  }
+  return parentByKey
 }

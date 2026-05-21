@@ -88,7 +88,6 @@ describe('defineDemoPattern', () => {
       'kernel/keyTokenRegistry.ts',
       'kernel/kernelRegistries.ts',
       'kernel/patternEventTemplate.ts',
-      'kernel/patternRelations.ts',
       'schema/index.ts',
       'schema/eventTemplate.ts',
       'schema/patternDefinition.ts',
