@@ -21,7 +21,7 @@ export interface ReactSpinbuttonRuntime {
 }
 
 export function useSpinbuttonPattern(data: SpinbuttonData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactSpinbuttonRuntime {
-  const runtimeOptions = options ?? data.state?.options ?? {}
+  const runtimeOptions = options ?? {}
   const keyToElementId = usePatternElementId(runtimeOptions, 'spinbutton-')
   const runtime = createPatternRuntime({
     definition: spinbuttonDefinition,

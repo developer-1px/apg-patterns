@@ -1,7 +1,7 @@
 import type { KeyboardEvent, MouseEvent } from 'react'
 import { handlePatternTrapFocus } from '../../adapters/reactPatternEffects'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternDataWithOptions, PatternEvent } from '../../schema'
+import type { Key, PatternData, PatternEvent } from '../../schema'
 import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { alertDialogDefinition } from './definition'
 
@@ -19,7 +19,7 @@ export function createAlertDialogDialogProps({
   keyToElementId,
 }: {
   runtime: ReturnType<typeof createPatternRuntime>
-  data: PatternDataWithOptions
+  data: PatternData
   onEvent: (event: PatternEvent) => void
   keyToElementId: (key: Key) => string
 }): ReactPatternProps {

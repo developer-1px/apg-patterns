@@ -47,7 +47,7 @@ describe('Meter demo — back-compat (single disk meter)', () => {
 describe('Meter demo — variant: Battery', () => {
   it('renders battery level meter', () => {
     const v = meterVariants.battery
-    render(<Meter data={v.data} onEvent={() => {}} />)
+    render(<Meter data={v.data} onEvent={() => {}} options={v.options} />)
     const meter = screen.getByRole('meter')
     expect(meter.getAttribute('aria-valuenow')).toBe('35')
     expect(meter.getAttribute('aria-valuetext')).toBe('35%')
@@ -70,7 +70,7 @@ describe('Meter demo — variant: CPU (per-item range override)', () => {
 describe('Meter demo — variant: Storage', () => {
   it('renders custom valuetext with options-driven max', () => {
     const v = meterVariants.storage
-    render(<Meter data={v.data} onEvent={() => {}} />)
+    render(<Meter data={v.data} onEvent={() => {}} options={v.options} />)
     const meter = screen.getByRole('meter')
     expect(meter.getAttribute('aria-valuemin')).toBe('0')
     expect(meter.getAttribute('aria-valuemax')).toBe('256')

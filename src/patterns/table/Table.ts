@@ -1,12 +1,12 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
-import type { Key, PatternDataWithOptions, PatternEvent, PatternItem, PatternOptions } from '../../schema'
+import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import type { ReactTableCell } from './tableRow'
 import { useTablePattern } from './useTablePattern'
 
 type DivProps = ComponentPropsWithoutRef<'div'>
 
 export interface TableProps<TItem extends PatternItem = PatternItem> {
-  data: PatternDataWithOptions<TItem>
+  data: PatternData<TItem>
   onEvent?: (event: PatternEvent) => void
   options?: PatternOptions
   className?: string

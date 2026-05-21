@@ -1,5 +1,5 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
-import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions, PatternStateWithOptions } from '../../schema'
+import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import type { ReactBreadcrumbItem } from './breadcrumbItem'
 import { useBreadcrumbPattern } from './useBreadcrumbPattern'
 
@@ -7,7 +7,7 @@ type BreadcrumbDataItem = PatternItem & {
   href?: unknown
 }
 
-type BreadcrumbData<TItem extends BreadcrumbDataItem> = PatternData<TItem, PatternStateWithOptions>
+type BreadcrumbData<TItem extends BreadcrumbDataItem> = PatternData<TItem>
 type AnchorProps = ComponentPropsWithoutRef<'a'>
 type ListItemProps = ComponentPropsWithoutRef<'li'>
 type ListProps = ComponentPropsWithoutRef<'ol'>

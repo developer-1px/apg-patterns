@@ -25,7 +25,7 @@ export interface ReactSliderRuntime {
 
 export function useSliderPattern(data: SliderData, onEvent: (event: PatternEvent) => void, options?: SliderOptions): ReactSliderRuntime {
   const parsedData = PatternDataSchema.parse(data) as SliderData
-  const runtimeOptions = SliderOptionsSchema.parse(options ?? parsedData.state?.options ?? {})
+  const runtimeOptions = SliderOptionsSchema.parse(options ?? {})
   const keyToElementId = usePatternElementId(runtimeOptions, 'slider-')
   const runtime = createPatternRuntime({
     definition: sliderDefinition,

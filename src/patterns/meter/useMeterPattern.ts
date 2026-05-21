@@ -1,5 +1,5 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternDataWithOptions, PatternEvent, PatternOptions } from '../../schema'
+import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { meterDefinition } from './definition'
 import { createMeterRenderItem, type ReactMeterRenderItem } from './meterRenderItem'
@@ -18,8 +18,8 @@ export interface ReactMeterRuntime {
   keyToElementId(key: Key): string
 }
 
-export function useMeterPattern(data: PatternDataWithOptions, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactMeterRuntime {
-  const runtimeOptions = options ?? data.state?.options ?? {}
+export function useMeterPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactMeterRuntime {
+  const runtimeOptions = options ?? {}
   const keyToElementId = usePatternElementId(runtimeOptions, 'meter-')
   const runtime = createPatternRuntime({
     definition: meterDefinition,

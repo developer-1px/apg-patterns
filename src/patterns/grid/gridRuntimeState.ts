@@ -1,9 +1,9 @@
-import type { Key, PatternData, PatternItem, PatternOptions, PatternStateWithOptions } from '../../schema'
+import type { Key, PatternData, PatternItem, PatternOptions, PatternState } from '../../schema'
 
 type GridValue = string | number | boolean | null
 type GridSort = 'ascending' | 'descending' | 'other'
 
-interface GridState extends PatternStateWithOptions {
+interface GridState extends PatternState {
   multiselectable?: boolean
   editableKeys?: readonly string[]
   editingKey?: string | null
@@ -26,7 +26,7 @@ export function getGridRuntimeState(data: GridData, options?: PatternOptions): G
   const runtimeOptions = {
     focusStrategy: 'rovingTabIndex',
     selectionMode: dataState?.multiselectable ? 'multiple' : 'single',
-    ...(options ?? dataState?.options ?? {}),
+    ...(options ?? {}),
   } satisfies PatternOptions
 
   return {

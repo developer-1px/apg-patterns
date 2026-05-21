@@ -1,5 +1,5 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternDataWithOptions, PatternEvent, PatternOptions, PatternValueStepDirection } from '../../schema'
+import type { Key, PatternData, PatternEvent, PatternOptions, PatternValueStepDirection } from '../../schema'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { windowSplitterDefinition } from './definition'
 import { createWindowSplitterActions } from './windowSplitterActions'
@@ -24,8 +24,8 @@ export interface ReactWindowSplitterRuntime {
   keyToElementId(key: Key): string
 }
 
-export function useWindowSplitterPattern(data: PatternDataWithOptions, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactWindowSplitterRuntime {
-  const runtimeOptions = options ?? data.state?.options ?? {}
+export function useWindowSplitterPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactWindowSplitterRuntime {
+  const runtimeOptions = options ?? {}
   const keyToElementId = usePatternElementId(runtimeOptions, 'windowsplitter-')
   const runtime = createPatternRuntime({
     definition: windowSplitterDefinition,

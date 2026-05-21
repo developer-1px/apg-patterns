@@ -1,4 +1,4 @@
-import type { Key, PatternDataWithOptions, PatternOptions } from '../../schema'
+import type { Key, PatternData, PatternOptions } from '../../schema'
 
 export interface ReactWindowSplitterState {
   value: number
@@ -12,7 +12,7 @@ export function getWindowSplitterState({
   key,
   options,
 }: {
-  data: PatternDataWithOptions
+  data: PatternData
   key: Key | null
   options: PatternOptions
 }): ReactWindowSplitterState {

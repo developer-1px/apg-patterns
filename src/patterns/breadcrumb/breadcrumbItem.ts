@@ -1,13 +1,13 @@
 import type { MouseEvent } from 'react'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternData, PatternEvent, PatternItem, PatternStateWithOptions } from '../../schema'
+import type { Key, PatternData, PatternEvent, PatternItem } from '../../schema'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 
 interface BreadcrumbItem extends PatternItem {
   href?: unknown
 }
 
-type BreadcrumbData = PatternData<BreadcrumbItem, PatternStateWithOptions>
+type BreadcrumbData = PatternData<BreadcrumbItem>
 
 export interface ReactBreadcrumbItem {
   key: Key

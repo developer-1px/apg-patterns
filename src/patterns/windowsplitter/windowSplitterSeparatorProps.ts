@@ -1,6 +1,6 @@
 import type { KeyboardEvent } from 'react'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternDataWithOptions, PatternOptions } from '../../schema'
+import type { Key, PatternData, PatternOptions } from '../../schema'
 import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 
 export function createWindowSplitterSeparatorProps({
@@ -10,7 +10,7 @@ export function createWindowSplitterSeparatorProps({
   max,
   options,
 }: {
-  runtime: PatternRuntime<PatternDataWithOptions>
+  runtime: PatternRuntime<PatternData>
   key: Key | null
   min: number
   max: number

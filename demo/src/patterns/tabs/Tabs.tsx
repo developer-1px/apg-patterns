@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from 'react'
-import { useTabsPattern, type PatternData, type PatternEvent, type PatternItem, type PatternOptions, type PatternStateWithOptions } from '../../../../src/react'
+import { useTabsPattern, type PatternData, type PatternEvent, type PatternItem, type PatternOptions } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 import { Icon } from '../../shared/Icon'
 
@@ -9,25 +9,24 @@ interface TabsDemoItem extends PatternItem {
   content?: string
 }
 
-interface TabsDemoState extends PatternStateWithOptions {
-  options?: PatternOptions & {
-    activationMode?: 'automatic' | 'manual'
-    closeable?: boolean
-    scrollable?: boolean
-  }
+type TabsDemoOptions = PatternOptions & {
+  activationMode?: 'automatic' | 'manual'
+  closeable?: boolean
+  scrollable?: boolean
 }
 
-type TabsDemoData = PatternData<TabsDemoItem, TabsDemoState>
+type TabsDemoData = PatternData<TabsDemoItem>
 
 export function Tabs({
   data,
   onEvent,
+  options,
 }: {
   data: TabsDemoData
   onEvent: (event: PatternEvent) => void
+  options?: TabsDemoOptions
 }) {
-  const dataOptions = data.state?.options ?? {}
-  const mergedOptions = { orientation: 'horizontal' as const, activationMode: 'automatic' as const, ...dataOptions }
+  const mergedOptions = { orientation: 'horizontal' as const, activationMode: 'automatic' as const, ...(options ?? {}) }
   const tabs = useTabsPattern(data, onEvent, mergedOptions)
   const panelKey = tabs.selectedPanelKey
   const orientation = mergedOptions.orientation

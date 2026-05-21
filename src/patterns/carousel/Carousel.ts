@@ -1,5 +1,5 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
-import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions, PatternStateWithOptions } from '../../schema'
+import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions, PatternState } from '../../schema'
 import type { ReactCarouselSlide } from './carouselSlide'
 import { useCarouselPattern } from './useCarouselPattern'
 
@@ -10,7 +10,7 @@ type CarouselDataItem = PatternItem & {
   imageAlt?: unknown
 }
 
-type CarouselDataState = PatternStateWithOptions & {
+type CarouselDataState = PatternState & {
   showDots?: boolean
 }
 

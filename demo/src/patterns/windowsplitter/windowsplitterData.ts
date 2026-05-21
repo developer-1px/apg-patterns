@@ -1,6 +1,6 @@
-import { PatternDataSchema, type Key, type PatternData, type PatternEvent, type PatternItem, type PatternOptions, type PatternStateWithOptions } from '../../../../src/react'
+import { PatternDataSchema, type Key, type PatternData, type PatternEvent, type PatternItem, type PatternOptions, type PatternState } from '../../../../src/react'
 
-interface WindowSplitterDemoState extends PatternStateWithOptions {
+interface WindowSplitterDemoState extends PatternState {
   previousValueByKey?: Record<string, number>
 }
 
@@ -18,13 +18,6 @@ export const initialWindowSplitterData: PatternData = PatternDataSchema.parse({
   state: {
     activeKey: 'splitter',
     valueByKey: { splitter: 50 },
-    options: {
-      focusStrategy: 'rovingTabIndex',
-      min: 0,
-      max: 100,
-      step: 1,
-      orientation: 'horizontal',
-    },
   },
 })
 

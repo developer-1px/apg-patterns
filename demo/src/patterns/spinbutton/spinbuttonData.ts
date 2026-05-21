@@ -1,4 +1,4 @@
-import { PatternDataSchema, type Key, type PatternData, type PatternEvent, type PatternItem, type PatternOptions, type PatternState } from '../../../../src/react'
+import { PatternDataSchema, type Key, type PatternData, type PatternEvent, type PatternItem, type PatternOptions } from '../../../../src/react'
 
 interface SpinbuttonDemoItem extends PatternItem {
   valuemin?: number
@@ -6,11 +6,7 @@ interface SpinbuttonDemoItem extends PatternItem {
   valuetext?: string
 }
 
-interface SpinbuttonDemoState extends PatternState {
-  options?: PatternOptions
-}
-
-type SpinbuttonDemoData = PatternData<SpinbuttonDemoItem, SpinbuttonDemoState>
+type SpinbuttonDemoData = PatternData<SpinbuttonDemoItem>
 
 export type SpinbuttonVariantKey = 'numeric' | 'time'
 
@@ -46,23 +42,18 @@ export interface SpinbuttonVariant {
   options: PatternOptions
 }
 
-const withOptions = (data: SpinbuttonDemoData, options: PatternOptions): SpinbuttonDemoData => ({
-  ...data,
-  state: { ...data.state, options },
-})
-
 export const spinbuttonVariants: Record<SpinbuttonVariantKey, SpinbuttonVariant> = {
   numeric: {
     key: 'numeric',
     label: 'Numeric',
     options: { focusStrategy: 'rovingTabIndex', min: 0, max: 100, step: 1 },
-    data: withOptions(numericData(), { focusStrategy: 'rovingTabIndex', min: 0, max: 100, step: 1 }),
+    data: numericData(),
   },
   time: {
     key: 'time',
     label: 'Time Picker',
     options: { focusStrategy: 'rovingTabIndex', min: 0, max: 59, step: 1 },
-    data: withOptions(timeData(), { focusStrategy: 'rovingTabIndex', min: 0, max: 59, step: 1 }),
+    data: timeData(),
   },
 }
 

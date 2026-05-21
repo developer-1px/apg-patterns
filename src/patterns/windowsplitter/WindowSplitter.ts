@@ -1,5 +1,5 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
-import type { PatternDataWithOptions, PatternEvent, PatternItem, PatternOptions } from '../../schema'
+import type { PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import { useWindowSplitterPattern } from './useWindowSplitterPattern'
 
 type WindowSplitterDataItem = PatternItem & {
@@ -9,7 +9,7 @@ type WindowSplitterDataItem = PatternItem & {
 type DivProps = ComponentPropsWithoutRef<'div'>
 
 export interface WindowSplitterProps<TItem extends WindowSplitterDataItem = WindowSplitterDataItem> {
-  data: PatternDataWithOptions<TItem>
+  data: PatternData<TItem>
   onEvent: (event: PatternEvent) => void
   options?: PatternOptions
   className?: string

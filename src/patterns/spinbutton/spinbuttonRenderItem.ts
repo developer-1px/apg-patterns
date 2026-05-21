@@ -1,5 +1,5 @@
 import type { PatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternData, PatternItem, PatternOptions, PatternState } from '../../schema'
+import type { Key, PatternData, PatternItem } from '../../schema'
 import { reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
 import { createSpinbuttonProps, createSpinbuttonStepButtonProps } from './spinbuttonProps'
 
@@ -8,11 +8,7 @@ interface SpinbuttonItem extends PatternItem {
   valuemax?: number
 }
 
-interface SpinbuttonState extends PatternState {
-  options?: PatternOptions
-}
-
-export type SpinbuttonData = PatternData<SpinbuttonItem, SpinbuttonState>
+export type SpinbuttonData = PatternData<SpinbuttonItem>
 
 export interface ReactSpinbuttonRenderItem {
   key: Key

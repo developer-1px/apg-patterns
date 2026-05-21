@@ -12,7 +12,7 @@ function SliderDemo({ onEvent, variant }: { onEvent?: (event: PatternEvent) => v
     onEvent?.(event)
     setData((current) => reduceSliderData(current, event, init.options))
   }
-  return <Slider data={data} onEvent={handleEvent} />
+  return <Slider data={data} onEvent={handleEvent} options={init.options} />
 }
 
 function SliderReducerEdgesDemo() {

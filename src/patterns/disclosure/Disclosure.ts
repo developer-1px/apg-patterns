@@ -1,5 +1,5 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
-import type { Key, PatternDataWithOptions, PatternEvent, PatternItem, PatternOptions } from '../../schema'
+import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import type { ReactDisclosureItem } from './disclosureItem'
 import { useDisclosurePattern } from './useDisclosurePattern'
 
@@ -11,7 +11,7 @@ type DivProps = ComponentPropsWithoutRef<'div'>
 type ButtonProps = ComponentPropsWithoutRef<'button'>
 
 export interface DisclosureProps<TItem extends DisclosureDataItem = DisclosureDataItem> {
-  data: PatternDataWithOptions<TItem>
+  data: PatternData<TItem>
   onEvent: (event: PatternEvent) => void
   options?: PatternOptions
   className?: string

@@ -14,9 +14,9 @@ function TabsDemo({ variant, onEvent: onEventOuter }: { variant: TabsVariantKey;
       setData((current) => closeTabInData(current, event.key))
       return
     }
-    setData((current) => reduceTabsData(current, event))
+    setData((current) => reduceTabsData(current, event, spec.options))
   }
-  return <Tabs data={data} onEvent={handleEvent} />
+  return <Tabs data={data} onEvent={handleEvent} options={spec.options} />
 }
 
 function TabsReducerEdgesDemo() {

@@ -13,7 +13,7 @@ function SliderDemo() {
   const [data, setData] = useState(initialSliderData)
   const handleEvent = (event: PatternEvent) =>
     setData((current) => reduceSliderData(current, event, sliderOptions))
-  return <Slider data={data} onEvent={handleEvent} />
+  return <Slider data={data} onEvent={handleEvent} options={sliderOptions} />
 }
 
 const sl = () => screen.getAllByRole('slider')[0]!

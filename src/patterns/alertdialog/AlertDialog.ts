@@ -1,5 +1,5 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
-import type { PatternDataWithOptions, PatternEvent, PatternItem, PatternOptions } from '../../schema'
+import type { PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import { useAlertDialogPattern } from './useAlertDialogPattern'
 
 type AlertDialogDataItem = PatternItem & {
@@ -12,7 +12,7 @@ type HeadingProps = ComponentPropsWithoutRef<'h2'>
 type ParagraphProps = ComponentPropsWithoutRef<'p'>
 
 export interface AlertDialogProps<TItem extends AlertDialogDataItem = AlertDialogDataItem> {
-  data: PatternDataWithOptions<TItem>
+  data: PatternData<TItem>
   onEvent: (event: PatternEvent) => void
   options?: PatternOptions
   className?: string

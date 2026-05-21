@@ -1,5 +1,5 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternDataWithOptions, PatternEvent, PatternOptions } from '../../schema'
+import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { treegridDefinition } from './definition'
@@ -17,11 +17,11 @@ export interface ReactTreegridRuntime {
   keyToElementId(key: Key): string
 }
 
-export function useTreegridPattern(data: PatternDataWithOptions, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactTreegridRuntime {
+export function useTreegridPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactTreegridRuntime {
   const runtimeOptions = {
     focusStrategy: 'rovingTabIndex',
     selectionMode: 'single',
-    ...(options ?? data.state?.options ?? {}),
+    ...(options ?? {}),
   } satisfies PatternOptions
   const keyToElementId = usePatternElementId(runtimeOptions, 'treegridcell-')
   const runtime = createPatternRuntime({

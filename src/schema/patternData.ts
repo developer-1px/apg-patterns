@@ -3,7 +3,6 @@ import { JsonValueSchema, validateJsonExtensionFields } from './jsonValue'
 import { IdRefListSchema, KeySchema, KeyTokenSchema, type Key } from './keys'
 import { validatePatternDataRefs } from './patternDataValidation'
 import { PatternStateSchema, type PatternState } from './patternState'
-import type { PatternOptions } from './patternOptions'
 
 export { IdRefListSchema, KeySchema, KeyTokenSchema }
 export type { Key }
@@ -68,9 +67,3 @@ export type PatternData<
   items: Record<Key, TItem>
   state?: TState
 }
-
-export type PatternStateWithOptions = PatternState & {
-  options?: PatternOptions
-}
-
-export type PatternDataWithOptions<TItem extends PatternItem = PatternItem> = PatternData<TItem, PatternStateWithOptions>

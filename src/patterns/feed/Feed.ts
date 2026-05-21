@@ -1,5 +1,5 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
-import type { Key, PatternDataWithOptions, PatternEvent, PatternItem, PatternOptions } from '../../schema'
+import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import type { ReactFeedArticle } from './feedArticle'
 import { useFeedPattern } from './useFeedPattern'
 
@@ -11,7 +11,7 @@ type DivProps = ComponentPropsWithoutRef<'div'>
 type ArticleProps = ComponentPropsWithoutRef<'article'>
 
 export interface FeedProps<TItem extends FeedDataItem = FeedDataItem> {
-  data: PatternDataWithOptions<TItem>
+  data: PatternData<TItem>
   onEvent: (event: PatternEvent) => void
   options?: PatternOptions
   className?: string

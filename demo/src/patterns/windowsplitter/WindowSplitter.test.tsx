@@ -11,7 +11,7 @@ function Demo() {
   const handleEvent = (event: PatternEvent) => {
     setData((current) => reduceWindowSplitterData(current, event, windowSplitterOptions))
   }
-  return <WindowSplitter data={data} onEvent={handleEvent} />
+  return <WindowSplitter data={data} onEvent={handleEvent} options={windowSplitterOptions} />
 }
 
 function ActionsDemo() {

@@ -1,4 +1,4 @@
-import { reduceTabsData, type PatternData, type PatternEvent } from '../../../../src/react'
+import { reduceTabsData, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src/react'
 import { useVariantPatternDataHost } from '../../shared/demoHostState'
 import { renderDataInspect } from '../../shared/inspect/index'
 import { Tabs } from './Tabs'
@@ -31,6 +31,7 @@ const tabsDemoDefinition = {
     props: {
       data: '$state.data',
       onEvent: '$actions.dispatchEvent',
+      options: '$state.options',
     },
   },
 } as const satisfies DemoPatternDefinition
@@ -42,9 +43,9 @@ export const entry = defineDemoPattern({
       initialTabsVariant,
       tabsVariants[initialTabsVariant].data,
       (variant) => tabsVariants[variant].data,
-      (_variant, data, event) => event.type === 'close'
+      (variant, data, event) => event.type === 'close'
         ? closeTabInData(data, event.key)
-        : reduceTabsData(data, event),
+        : reduceTabsData(data, event, tabsVariants[variant].options),
     )
     const handleEvent = (event: PatternEvent) => {
       onEvent(event)
@@ -54,7 +55,7 @@ export const entry = defineDemoPattern({
       inspect: renderDataInspect(host.data),
       context: {
         values: {
-          state: { variant: host.variant, data: host.data },
+          state: { variant: host.variant, data: host.data, options: tabsVariants[host.variant].options },
           model: { variantItems: tabsVariantItems },
         },
         actions: {
@@ -67,10 +68,10 @@ export const entry = defineDemoPattern({
   },
 })
 
-function TabsPreview({ data, onEvent }: { data: PatternData; onEvent: (event: PatternEvent) => void }) {
+function TabsPreview({ data, onEvent, options }: { data: PatternData; onEvent: (event: PatternEvent) => void; options?: PatternOptions }) {
   return (
     <div className="grid gap-3">
-      <Tabs data={data} onEvent={onEvent} />
+      <Tabs data={data} onEvent={onEvent} options={options} />
     </div>
   )
 }

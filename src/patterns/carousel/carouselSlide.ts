@@ -1,5 +1,5 @@
 import type { PatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternData, PatternItem, PatternStateWithOptions } from '../../schema'
+import type { Key, PatternData, PatternItem, PatternState } from '../../schema'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 
 interface CarouselItem extends PatternItem {
@@ -9,7 +9,7 @@ interface CarouselItem extends PatternItem {
   imageAlt?: unknown
 }
 
-interface CarouselState extends PatternStateWithOptions {
+interface CarouselState extends PatternState {
   showDots?: boolean
 }
 

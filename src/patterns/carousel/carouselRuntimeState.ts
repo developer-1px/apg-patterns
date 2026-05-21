@@ -1,6 +1,6 @@
-import type { Key, PatternData, PatternItem, PatternStateWithOptions } from '../../schema'
+import type { Key, PatternData, PatternItem, PatternState } from '../../schema'
 
-interface CarouselState extends PatternStateWithOptions {
+interface CarouselState extends PatternState {
   showDots?: boolean
 }
 

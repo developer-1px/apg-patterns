@@ -1,5 +1,5 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternDataWithOptions, PatternEvent, PatternOptions } from '../../schema'
+import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { tableDefinition } from './definition'
 import { createTableRows, type ReactTableRow } from './tableRow'
@@ -17,8 +17,8 @@ export interface ReactTableRuntime {
   keyToElementId(key: Key): string
 }
 
-export function useTablePattern(data: PatternDataWithOptions, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactTableRuntime {
-  const runtimeOptions = options ?? data.state?.options ?? {}
+export function useTablePattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactTableRuntime {
+  const runtimeOptions = options ?? {}
   const keyToElementId = usePatternElementId(runtimeOptions, 'tablecell-')
   const sortByKey = data.state?.sortByKey ?? {}
   const runtime = createPatternRuntime({

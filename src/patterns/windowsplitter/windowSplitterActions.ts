@@ -1,12 +1,12 @@
 import type { PatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternDataWithOptions, PatternValueStepDirection } from '../../schema'
+import type { Key, PatternData, PatternValueStepDirection } from '../../schema'
 
 export function createWindowSplitterActions({
   key,
   runtime,
 }: {
   key: Key | null
-  runtime: PatternRuntime<PatternDataWithOptions>
+  runtime: PatternRuntime<PatternData>
 }): {
   focus(): void
   step(direction: PatternValueStepDirection): void

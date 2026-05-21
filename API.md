@@ -130,7 +130,6 @@ PartSchema
 PatternData
 PatternDataBase
 PatternDataSchema
-PatternDataWithOptions
 PatternDefinition
 PatternDefinitionSchema
 PatternDirection
@@ -152,7 +151,6 @@ PatternRuntime
 PatternRuntimeContext
 PatternState
 PatternStateSchema
-PatternStateWithOptions
 PatternValueStepDirection
 PatternValueStepDirectionSchema
 Predicate
@@ -203,7 +201,6 @@ sliderDefinition
 SliderItemSchema
 SliderOptions
 SliderOptionsSchema
-SliderStateSchema
 SlotProps
 spinbuttonDefinition
 StateAction
@@ -373,7 +370,6 @@ resolveVisibleOrder
 sliderDefinition
 SliderItemSchema
 SliderOptionsSchema
-SliderStateSchema
 spinbuttonDefinition
 StateActionSchema
 StateFieldSchema

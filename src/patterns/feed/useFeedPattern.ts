@@ -1,5 +1,5 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternDataWithOptions, PatternEvent, PatternOptions } from '../../schema'
+import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { feedDefinition } from './definition'
@@ -16,8 +16,8 @@ export interface ReactFeedRuntime {
   keyToElementId(key: Key): string
 }
 
-export function useFeedPattern(data: PatternDataWithOptions, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactFeedRuntime {
-  const runtimeOptions = options ?? data.state?.options ?? {}
+export function useFeedPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactFeedRuntime {
+  const runtimeOptions = options ?? {}
   const keyToElementId = usePatternElementId(runtimeOptions, 'feed-article-')
   const runtime = createPatternRuntime({
     definition: feedDefinition,

@@ -8,7 +8,7 @@ type TabsViewOptions = PatternOptions & {
   scrollable?: boolean
 }
 
-const buildTabsData = (tabs: readonly TabSpec[], activeKey: string, label = 'Sections', options: TabsViewOptions): PatternData => {
+const buildTabsData = (tabs: readonly TabSpec[], activeKey: string, label = 'Sections'): PatternData => {
   const items: Record<string, { label: string; content?: string }> = {}
   for (const tab of tabs) {
     items[tab.key] = { label: tab.label }
@@ -24,7 +24,6 @@ const buildTabsData = (tabs: readonly TabSpec[], activeKey: string, label = 'Sec
     state: {
       activeKey,
       selectedKeys: [activeKey],
-      options,
     },
     refs: { label },
   })
@@ -84,31 +83,31 @@ export const tabsVariants: Record<TabsVariantKey, TabsVariantSpec> = {
   automatic: {
     label: 'Automatic activation',
     options: { activationMode: 'automatic', orientation: 'horizontal' },
-    data: buildTabsData(docsTabs, 'overview', 'Documentation', { activationMode: 'automatic', orientation: 'horizontal' }),
+    data: buildTabsData(docsTabs, 'overview', 'Documentation'),
     hint: 'Arrow keys activate immediately on focus.',
   },
   manual: {
     label: 'Manual activation',
     options: { activationMode: 'manual', orientation: 'horizontal' },
-    data: buildTabsData(docsTabs, 'overview', 'Documentation', { activationMode: 'manual', orientation: 'horizontal' }),
+    data: buildTabsData(docsTabs, 'overview', 'Documentation'),
     hint: 'Arrow keys move focus only. Press Enter or Space to activate.',
   },
   vertical: {
     label: 'Vertical (automatic)',
     options: { activationMode: 'automatic', orientation: 'vertical' },
-    data: buildTabsData(planetsTabs, 'earth', 'Planets', { activationMode: 'automatic', orientation: 'vertical' }),
+    data: buildTabsData(planetsTabs, 'earth', 'Planets'),
     hint: 'Up/Down arrows navigate between tabs.',
   },
   scrollable: {
     label: 'Scrollable panels',
     options: { activationMode: 'automatic', orientation: 'horizontal', scrollable: true },
-    data: buildTabsData(longTabs, 'danish', 'Pastries', { activationMode: 'automatic', orientation: 'horizontal', scrollable: true }),
+    data: buildTabsData(longTabs, 'danish', 'Pastries'),
     hint: 'Tabpanel is keyboard-focusable and scrollable (tabIndex=0).',
   },
   closeable: {
     label: 'Closeable tabs',
     options: { activationMode: 'manual', orientation: 'horizontal', closeable: true },
-    data: buildTabsData(closeableTabs, 'inbox', 'Mailboxes', { activationMode: 'manual', orientation: 'horizontal', closeable: true }),
+    data: buildTabsData(closeableTabs, 'inbox', 'Mailboxes'),
     hint: 'Press Delete to close the focused tab.',
   },
 }

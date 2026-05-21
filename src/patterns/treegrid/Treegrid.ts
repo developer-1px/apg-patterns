@@ -1,12 +1,12 @@
 import { createElement, type ComponentPropsWithoutRef, type CSSProperties, type ReactNode } from 'react'
-import type { Key, PatternDataWithOptions, PatternEvent, PatternItem, PatternOptions } from '../../schema'
+import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import type { ReactTreegridCell } from './treegridRow'
 import { useTreegridPattern } from './useTreegridPattern'
 
 type DivProps = ComponentPropsWithoutRef<'div'>
 
 export interface TreegridProps<TItem extends PatternItem = PatternItem> {
-  data: PatternDataWithOptions<TItem>
+  data: PatternData<TItem>
   onEvent: (event: PatternEvent) => void
   options?: PatternOptions
   className?: string

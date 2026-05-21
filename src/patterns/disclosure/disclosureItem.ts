@@ -1,6 +1,6 @@
 import type { KeyboardEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternDataWithOptions } from '../../schema'
+import type { Key, PatternData } from '../../schema'
 import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 
 export interface ReactDisclosureItem {
@@ -18,7 +18,7 @@ export function createDisclosureItems({
   expandedKeys,
 }: {
   runtime: ReturnType<typeof createPatternRuntime>
-  data: PatternDataWithOptions
+  data: PatternData
   expandedKeys: readonly Key[]
 }): readonly ReactDisclosureItem[] {
   return (data.relations?.rootKeys ?? []).map((key) => {

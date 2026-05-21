@@ -12,8 +12,8 @@ import { tabsVariants } from './tabsData'
 function TabsDemo() {
   const spec = tabsVariants[Object.keys(tabsVariants)[0] as keyof typeof tabsVariants]
   const [data, setData] = useState<PatternData>(spec.data)
-  const handleEvent = (event: PatternEvent) => setData((current) => reduceTabsData(current, event))
-  return <Tabs data={data} onEvent={handleEvent} />
+  const handleEvent = (event: PatternEvent) => setData((current) => reduceTabsData(current, event, spec.options))
+  return <Tabs data={data} onEvent={handleEvent} options={spec.options} />
 }
 
 describe('APG §Roles, States, Properties', () => {

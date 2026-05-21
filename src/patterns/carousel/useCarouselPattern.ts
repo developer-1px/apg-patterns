@@ -1,5 +1,5 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions, PatternStateWithOptions } from '../../schema'
+import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions, PatternState } from '../../schema'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { getCarouselRuntimeState } from './carouselRuntimeState'
 import { createCarouselSlides, type ReactCarouselSlide } from './carouselSlide'
@@ -13,7 +13,7 @@ interface CarouselItem extends PatternItem {
   imageAlt?: unknown
 }
 
-interface CarouselState extends PatternStateWithOptions {
+interface CarouselState extends PatternState {
   showDots?: boolean
 }
 
@@ -38,7 +38,7 @@ export function useCarouselPattern(data: CarouselData, onEvent: (event: PatternE
   const runtimeOptions = {
     roledescription: 'carousel',
     slideRoledescription: 'slide',
-    ...(options ?? data.state?.options ?? {}),
+    ...(options ?? {}),
   } satisfies PatternOptions
   const keyToElementId = usePatternElementId(runtimeOptions, 'carousel-')
   const runtime = createPatternRuntime({
