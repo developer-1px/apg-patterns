@@ -13,7 +13,7 @@
  */
 import type { KeyInput, ModifierKeyName } from '../internal/keyboard'
 import type { Key, PatternData, PatternOptions } from '../schema'
-import { defineKeyToken, hasKeyToken, resolveKeyToken } from './keyTokenRegistry'
+import { defineKeyToken, resolveKeyToken } from './keyTokenRegistry'
 import { resolveAriaSource, resolveNavigationTarget, resolveStateProjection, resolveVisibleOrder, unknownTokenError } from './kernelResolvers'
 import { evaluatePredicate } from './predicateEvaluation'
 import {
@@ -48,7 +48,6 @@ export {
   isRegisteredStateProjection,
   isRegisteredVisibleOrder,
   defineKeyToken,
-  hasKeyToken,
   resolveKeyToken,
   resolveAriaSource,
   resolveNavigationTarget,
@@ -81,8 +80,3 @@ export interface PatternRuntimeContext {
   keyToElementId?: (key: Key) => string
   parentByKey?: ReadonlyMap<Key, Key>
 }
-
-export const hasAriaSource = isRegisteredAriaSource
-export const hasNavigationTarget = isRegisteredNavigationTarget
-export const hasPredicate = (kind: string) => isRegisteredPredicate(kind)
-export const hasVisibleOrder = isRegisteredVisibleOrder

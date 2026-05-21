@@ -12,8 +12,6 @@ const keyTokenRegistry = new Map<string, KeyTokenResolver>([
 
 export const defineKeyToken = (token: string, resolve: KeyTokenResolver) => void keyTokenRegistry.set(token, resolve)
 
-export const hasKeyToken = (token: string) => keyTokenRegistry.has(token)
-
 export function resolveKeyToken(token: string, key: Key | undefined | null, activeKey: Key | undefined | null, ctx?: PatternRuntimeContext): Key {
   const resolver = keyTokenRegistry.get(token)
   if (!resolver) throw new Error(`[apg-pattern] unknown keyToken token: "${token}" — register via defineKeyToken()`)

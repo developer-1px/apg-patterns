@@ -9,7 +9,6 @@ import {
 		  defineStateProjection,
 		  defineVisibleOrder,
 		  evaluatePredicate,
-		  hasKeyToken,
 		  isRegisteredAriaSource,
 		  isRegisteredNavigationTarget,
 		  isRegisteredPredicate,
@@ -519,8 +518,6 @@ function KernelResolverHost() {
         onClick={() => {
           const ctx = { data: { ...treegridData, state: { activeKey: 'parent', anchorKey: 'parent', extentKey: 'child' } }, activeKey: 'parent', key: 'child', parentByKey }
           const values = [
-            String(hasKeyToken('$key')),
-            String(hasKeyToken('$missing')),
             resolveKeyToken('$key', 'child', 'parent', ctx),
             resolveKeyToken('$activeKey', 'child', 'parent', ctx),
             resolveKeyToken('$anchorKey', 'child', 'parent', ctx),
@@ -737,7 +734,7 @@ describe('kernel resolver coverage from pointer input', () => {
     expect(screen.getByText('true|false|false|false|false|undefined|undefined|undefined|undefined|true|mixed|page|3')).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Resolve key tokens' }))
-    expect(screen.getByText('true|false|child|parent|parent|child|[apg-pattern] unknown keyToken token: "$missing" — register via defineKeyToken()|Cannot resolve key token: $key')).toBeTruthy()
+    expect(screen.getByText('child|parent|parent|child|[apg-pattern] unknown keyToken token: "$missing" — register via defineKeyToken()|Cannot resolve key token: $key')).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Resolve registry misses' }))
     expect(screen.getByText('child|parent|parent||[apg-pattern] unknown ariaSource token: "missing.source" — register via defineAriaSource()|[apg-pattern] unknown stateProjection token: "missing.projection" — register via defineStateProjection()|[apg-pattern] unknown visibleOrder token: "missingVisible" — register via defineVisibleOrder()|[apg-pattern] unknown navigationTarget token: "missingTarget" — register via defineNavigationTarget()')).toBeTruthy()

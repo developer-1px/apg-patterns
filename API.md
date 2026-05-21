@@ -57,7 +57,6 @@ createTreeviewRuntime
 CreateTreeviewRuntimeInput
 defineAriaSource
 defineDomEvent
-defineDomEventHandlerProp
 defineKeyToken
 defineNavigationTarget
 definePredicate
@@ -90,11 +89,6 @@ FocusProjection
 FocusProjectionSchema
 getTreeItemState
 gridDefinition
-hasAriaSource
-hasKeyToken
-hasNavigationTarget
-hasPredicate
-hasVisibleOrder
 IdRefListSchema
 isRegisteredAriaSource
 isRegisteredNavigationTarget
@@ -269,7 +263,6 @@ createTabsRuntime
 createTreeviewRuntime
 defineAriaSource
 defineDomEvent
-defineDomEventHandlerProp
 defineKeyToken
 defineNavigationTarget
 definePredicate
@@ -294,11 +287,6 @@ FocusModelSchema
 FocusProjectionSchema
 getTreeItemState
 gridDefinition
-hasAriaSource
-hasKeyToken
-hasNavigationTarget
-hasPredicate
-hasVisibleOrder
 IdRefListSchema
 isRegisteredAriaSource
 isRegisteredNavigationTarget

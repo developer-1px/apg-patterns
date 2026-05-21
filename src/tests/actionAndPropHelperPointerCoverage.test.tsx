@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import '../kernel/kernelBuiltins'
-import { defineDomEvent, defineDomEventHandlerProp, resolvePartEventBindings, withDefaultReason } from '../kernel/domEventBindings'
+import { defineDomEvent, resolvePartEventBindings, withDefaultReason } from '../kernel/domEventBindings'
 import { useAccordionPattern } from '../patterns/accordion/useAccordionPattern'
 import { AlertDefinitionSchema } from '../patterns/alert/definition'
 import { createAlertActions } from '../patterns/alert/alertActions'
@@ -422,7 +422,7 @@ function HelperHost() {
           const data: PatternData = { items: { item: { label: 'Item' } }, relations: { rootKeys: ['item'] }, state: { activeKey: 'item' } }
           const events: PatternEvent[] = []
           defineDomEvent('coverage-unknown-test', { handlerProp: 'onCoverageUnknownTest' })
-          defineDomEventHandlerProp('coverage-known-test', 'onCoverageKnownTest')
+          defineDomEvent('coverage-known-test', { handlerProp: 'onCoverageKnownTest' })
           try {
             resolvePartEventBindings([{ event: 'missing-dom-event' as never, events: [{ type: 'focus', key: '$activeKey' }] }], { data, key: undefined, activeKey: null }, (event) => events.push(event))
           } catch (error) {

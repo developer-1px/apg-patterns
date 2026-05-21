@@ -25,9 +25,6 @@ const domEventRegistry = new Map<string, DomEventDescriptor>([
 export const defineDomEvent = (eventName: string, descriptor: DomEventDescriptor) =>
   void domEventRegistry.set(eventName, descriptor)
 
-export const defineDomEventHandlerProp = (eventName: string, handlerProp: string) =>
-  defineDomEvent(eventName, { handlerProp })
-
 export function getDomEventDescriptor(eventName: string): DomEventDescriptor | undefined {
   return domEventRegistry.get(eventName)
 }

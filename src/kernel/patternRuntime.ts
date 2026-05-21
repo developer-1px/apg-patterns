@@ -10,7 +10,7 @@ import { resolveRuntimeItemState } from './runtimeItemState'
 import { createRootKeyboardHandler } from './rootKeyboardHandler'
 import { resolveRuntimeKeyboardBinding } from './runtimeKeyboard'
 import { createElementId } from './domIds'
-export { defineDomEvent, defineDomEventHandlerProp } from './domEventBindings'
+export { defineDomEvent } from './domEventBindings'
 
 export type SlotProps = Record<string, unknown>
 

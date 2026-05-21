@@ -1,9 +1,9 @@
 import type { PatternEvent, PatternEventReason, PartEventBinding } from '../schema'
 import { evaluatePredicate, resolveEventTemplate, type PatternRuntimeContext } from './patternKernel'
 import type { SlotProps } from './patternRuntime'
-import { defineDomEvent, defineDomEventHandlerProp, getDomEventDescriptor } from './domEventRegistry'
+import { defineDomEvent, getDomEventDescriptor } from './domEventRegistry'
 
-export { defineDomEvent, defineDomEventHandlerProp }
+export { defineDomEvent }
 
 export function resolvePartEventBindings(
   bindings: readonly PartEventBinding[],
