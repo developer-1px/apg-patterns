@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import { createParentByKey, evaluatePredicate, resolveNavigationTarget, type PatternData, type PatternEvent } from '../index'
+import { gridRows } from '../patterns/grid/navigation'
 import { handleListboxMultiKeyDown } from '../patterns/listbox/handleListboxMultiKeyDown'
 import { useListboxPattern } from '../patterns/listbox/useListboxPattern'
 import { cellRowKey, visibleCells, visibleRowKeys } from '../patterns/treegrid/geometry'
@@ -137,6 +138,33 @@ function ListboxTreegridHelperHost() {
 }
 
 describe('listbox and treegrid helper coverage from pointer input', () => {
+  it('keeps sparse grid and treegrid cells in row and column order', () => {
+    const sparseData: PatternData = {
+      items: {
+        rowA: { label: 'A' },
+        rowB: { label: 'B' },
+        colA: { label: 'A' },
+        colB: { label: 'B' },
+        colC: { label: 'C' },
+        a2: { label: 'A2' },
+        b3: { label: 'B3' },
+      },
+      relations: {
+        rootKeys: ['rowA', 'rowB'],
+        rowKeys: ['rowA', 'rowB'],
+        columnKeys: ['colA', 'colB', 'colC'],
+        cells: [
+          { rowKey: 'rowB', columnKey: 'colC', cellKey: 'b3' },
+          { rowKey: 'rowA', columnKey: 'colB', cellKey: 'a2' },
+        ],
+      },
+      state: {},
+    }
+
+    expect(gridRows(sparseData).map((row) => row.join(',')).join('|')).toBe('a2|b3')
+    expect(visibleCells(sparseData, ['rowB', 'rowA']).map((row) => row.join(',')).join('|')).toBe('b3|a2')
+  })
+
   it('covers helper guard branches through clicks', () => {
     render(<ListboxTreegridHelperHost />)
 

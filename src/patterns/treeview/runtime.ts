@@ -42,7 +42,8 @@ interface CreateTreeviewRuntimeInput {
 
 export function createTreeviewRuntime(input: CreateTreeviewRuntimeInput): TreeviewRuntime {
   const data = PatternDataSchema.parse(input.data)
-  const options = { ...treeviewDefaultOptions, ...PatternOptionsSchema.parse(input.options ?? {}) }
+  const parsedOptions = PatternOptionsSchema.parse(input.options ?? {})
+  const options = { ...treeviewDefaultOptions, ...parsedOptions }
   const emit = (event: PatternEvent) => input.onEvent(withNonEnumerableMeta(PatternEventSchema.parse(event)))
   const keyToElementId = input.keyToElementId ?? ((key: Key) => createElementId(options.elementIdPrefix ?? treeviewDefaultOptions.elementIdPrefix, key))
   const typeahead = input.typeaheadBuffer ?? createApgTypeaheadBuffer()

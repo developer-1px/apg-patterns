@@ -6,12 +6,35 @@ type GridAction = 'left' | 'right' | 'up' | 'down' | 'rowStart' | 'rowEnd' | 'gr
 type GridPageAction = 'pageUp' | 'pageDown'
 const PAGE_SIZE = 5
 
-export const gridRows = (data: PatternData): readonly (readonly Key[])[] =>
-  (data.relations?.rowKeys ?? []).map((rowKey) =>
-    (data.relations?.columnKeys ?? [])
-      .map((columnKey) => data.relations?.cells?.find((cell) => cell.rowKey === rowKey && cell.columnKey === columnKey)?.cellKey)
-      .filter((cellKey): cellKey is Key => Boolean(cellKey)),
-  )
+export const gridRows = (data: PatternData): readonly (readonly Key[])[] => {
+  const rowKeys = data.relations?.rowKeys ?? []
+  const columnKeys = data.relations?.columnKeys ?? []
+  const cellKeyByRowAndColumn = createCellKeyByRowAndColumn(data.relations?.cells ?? [])
+  return rowKeys.map((rowKey) => {
+    const cellKeyByColumn = cellKeyByRowAndColumn.get(rowKey)
+    if (!cellKeyByColumn) return []
+    return columnKeys
+      .map((columnKey) => cellKeyByColumn.get(columnKey))
+      .filter((cellKey): cellKey is Key => Boolean(cellKey))
+  })
+}
+
+function createCellKeyByRowAndColumn(
+  cells: readonly { rowKey: Key; columnKey: Key; cellKey: Key }[],
+): ReadonlyMap<Key, ReadonlyMap<Key, Key>> {
+  const cellKeyByRowAndColumn = new Map<Key, Map<Key, Key>>()
+  for (const cell of cells) {
+    let cellKeyByColumn = cellKeyByRowAndColumn.get(cell.rowKey)
+    if (!cellKeyByColumn) {
+      cellKeyByColumn = new Map<Key, Key>()
+      cellKeyByRowAndColumn.set(cell.rowKey, cellKeyByColumn)
+    }
+    if (!cellKeyByColumn.has(cell.columnKey)) {
+      cellKeyByColumn.set(cell.columnKey, cell.cellKey)
+    }
+  }
+  return cellKeyByRowAndColumn
+}
 
 let gridNavigationRegistered = false
 

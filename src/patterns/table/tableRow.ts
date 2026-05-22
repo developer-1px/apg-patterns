@@ -18,15 +18,25 @@ export interface ReactTableRow {
 
 export function createTableRows(runtime: ReturnType<typeof createPatternRuntime>): readonly ReactTableRow[] {
   const rowKeys = runtime.data.relations?.rowKeys ?? []
-  const cells = runtime.data.relations?.cells ?? []
+  const cellKeysByRow = createCellKeysByRow(runtime.data.relations?.cells ?? [])
   return rowKeys.map((rowKey) => {
-    const cellKeys = cells.filter((cell) => cell.rowKey === rowKey).map((cell) => cell.cellKey)
+    const cellKeys = cellKeysByRow.get(rowKey) ?? []
     return {
       key: rowKey,
       rowProps: reactProps(runtime.getPartProps('row', rowKey)),
       cells: cellKeys.map((cellKey) => createTableCell(runtime, cellKey)),
     }
   })
+}
+
+function createCellKeysByRow(cells: readonly { rowKey: Key; cellKey: Key }[]): ReadonlyMap<Key, readonly Key[]> {
+  const cellKeysByRow = new Map<Key, Key[]>()
+  for (const cell of cells) {
+    const cellKeys = cellKeysByRow.get(cell.rowKey)
+    if (cellKeys) cellKeys.push(cell.cellKey)
+    else cellKeysByRow.set(cell.rowKey, [cell.cellKey])
+  }
+  return cellKeysByRow
 }
 
 function createTableCell(runtime: ReturnType<typeof createPatternRuntime>, cellKey: Key): ReactTableCell {

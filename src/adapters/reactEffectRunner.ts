@@ -19,8 +19,9 @@ export function runPatternEffects({
   previousMatches: readonly (boolean | undefined)[]
 }) {
   const nextMatches: boolean[] = []
+  const parentByKey = createParentByKey(data)
   for (const [index, effect] of (definition.effects ?? []).entries()) {
-    const ctx = { data, activeKey: data.state?.activeKey ?? null, parentByKey: createParentByKey(data), keyToElementId }
+    const ctx = { data, activeKey: data.state?.activeKey ?? null, parentByKey, keyToElementId }
     const matches = evaluatePredicate(effect.when ?? { kind: 'always' }, ctx)
     nextMatches[index] = matches
     if (!shouldRunEffect({ effect, matches, previousMatches: previousMatches[index], data, definition, keyToElementId })) continue

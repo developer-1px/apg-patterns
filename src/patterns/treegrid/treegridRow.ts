@@ -27,7 +27,7 @@ export function createTreegridRows({
   data: PatternData
 }): readonly ReactTreegridRow[] {
   const rowKeys = visibleRowKeys(data)
-  const cells = visibleCells(data)
+  const cells = visibleCells(data, rowKeys)
   return rowKeys.map((rowKey, rowIndex) => ({
     key: rowKey,
     rowProps: reactProps(runtime.getPartProps('row', rowKey)),
