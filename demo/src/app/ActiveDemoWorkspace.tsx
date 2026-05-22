@@ -54,7 +54,8 @@ export function ActiveDemoWorkspace({
           <button
             type="button"
             className={ds.textButton}
-            aria-pressed={state.rightPanelOpen}
+            aria-controls="demo-right-panel"
+            aria-expanded={state.rightPanelOpen}
             onClick={() => dispatch({ type: 'toggleRightPanel' })}
           >
             code

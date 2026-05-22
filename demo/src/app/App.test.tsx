@@ -303,6 +303,61 @@ describe('App route state', () => {
     expect(rightPanel?.textContent).toContain('Accordion.tsx')
   })
 
+  it('keeps the code toggle surface separate from the selected right panel tab', async () => {
+    replaceHash('#pattern=combobox&panel=state&source=Combobox.tsx&variant=listNoAutocomplete')
+
+    render(<App />)
+
+    await waitFor(() => expect(currentHashParam('panel')).toBe('state'))
+    const codeToggle = screen.getByRole('button', { name: 'code' })
+
+    expect(codeToggle.getAttribute('aria-expanded')).toBe('true')
+    expect(codeToggle.getAttribute('aria-controls')).toBe('demo-right-panel')
+    expect(codeToggle.hasAttribute('aria-pressed')).toBe(false)
+    expect(screen.getByRole('tab', { name: 'state', selected: true })).toBeTruthy()
+    expect(screen.getByRole('tab', { name: 'code', selected: false })).toBeTruthy()
+  })
+
+  it('keeps every state panel parseable and aligned with preview interactive state after input', async () => {
+    const routes = collectPatternRoutes()
+    const mismatches: string[] = []
+
+    for (const route of routes) {
+      const variantLabels = await collectVariantLabels(route)
+
+      for (const variantLabel of variantLabels) {
+        replaceHash(routeHash(route))
+        const { unmount } = render(<App />)
+
+        await waitFor(() => expect(currentHashParam('pattern')).toBe(route.key))
+        if (variantLabel) {
+          fireEvent.click(screen.getByRole('option', { name: variantLabel }))
+          await waitFor(() => expect(screen.getByRole('option', { name: variantLabel, selected: true })).toBeTruthy())
+        }
+
+        let preview = document.querySelector<HTMLElement>(`[data-demo-preview="${route.key}"]`)
+        if (!preview) throw new Error(`missing preview for ${route.key}`)
+        drivePreview(preview, route.keyboardShortcuts)
+
+        fireEvent.click(screen.getByRole('tab', { name: 'state' }))
+        await waitFor(() => expect(currentHashParam('panel')).toBe('state'))
+
+        preview = document.querySelector<HTMLElement>(`[data-demo-preview="${route.key}"]`)
+        const stateData = parseStatePanelData()
+        mismatches.push(...stateSurfaceIssues({
+          pattern: route.key,
+          variant: variantLabel,
+          data: stateData,
+          preview,
+        }))
+
+        unmount()
+      }
+    }
+
+    expect(mismatches).toEqual([])
+  }, exhaustivePatternTestTimeout)
+
   it('shows the Button aria-pressed variant in the preview after keyboard variant selection', async () => {
     replaceHash('#pattern=button&panel=code&source=Button.tsx')
 

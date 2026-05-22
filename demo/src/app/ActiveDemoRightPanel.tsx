@@ -32,7 +32,7 @@ export function ActiveDemoRightPanel({
   const { canCopySource, copySource, copyState, displayedSource } = useSourcePreviewState(activeSourceName)
 
   return (
-    <section className={`${ds.panel} overflow-auto flex min-h-0 flex-col`}>
+    <section id="demo-right-panel" className={`${ds.panel} overflow-auto flex min-h-0 flex-col`}>
       <div {...rightModeTabs.getTablistProps()} className={cx('mb-3 flex items-center gap-1', ds.controlGroup)}>
         {rightModes.map((mode) => (
           <button {...rightModeTabs.getTabProps(mode)} key={mode} type="button" className={cx('inline-flex h-8 items-center', ds.option)}>

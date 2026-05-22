@@ -1,14 +1,13 @@
 import { useReducer } from 'react'
 import type { PatternEvent, PatternOptions } from '../../../../src/react'
 import { resolveTarget } from './treeContract'
-import { renderAriaTree, renderHtmlTree } from './inspect'
 import { Treeview } from './Treeview'
 import { treeVariantItems, type TreeVariantKey } from './treeVariants'
 import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
+import { renderDataInspect } from '../../shared/inspect/genericInspect'
 import {
   FocusStrategyControl,
   FollowFocusControl,
-  InspectModeControl,
   ItemClickActionControl,
 } from './TreeviewControls'
 import {
@@ -94,10 +93,7 @@ export const entry = defineDemoPattern({
     }
 
     return {
-      inspect: state.inspectMode === 'aria' ? renderAriaTree(state.data, treeOptions) : renderHtmlTree(state.data, treeOptions),
-      inspectControls: (
-        <InspectModeControl value={state.inspectMode} onChange={(value) => dispatch({ type: 'setInspectMode', value })} />
-      ),
+      inspect: renderDataInspect(state.data),
       context: {
         values: {
           state: {

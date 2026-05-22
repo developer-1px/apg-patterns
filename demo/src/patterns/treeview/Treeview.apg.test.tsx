@@ -245,7 +245,7 @@ describe('APG §Activation', () => {
     expect(screen.getByTestId('tree-first-target').textContent).toBe('undefined')
   })
 
-  it('entry runtime controls update inspect, options, variant, and follow-focus navigation', () => {
+  it('entry runtime controls update state, options, variant, and follow-focus navigation', () => {
     const { container } = render(<TreeviewEntryDemo />)
 
     fireEvent.click(screen.getByRole('option', { name: 'File directory · declared' }))
@@ -253,13 +253,13 @@ describe('APG §Activation', () => {
     const selects = Array.from(container.querySelectorAll('select'))
     fireEvent.change(selects[0]!, { target: { value: 'toggleExpand' } })
     fireEvent.change(selects[1]!, { target: { value: 'ariaActiveDescendant' } })
-    fireEvent.change(selects[2]!, { target: { value: 'html' } })
     fireEvent.click(screen.getByLabelText('followFocus'))
 
     fireEvent.keyDown(screen.getByRole('tree'), { key: 'ArrowDown' })
 
     expect(screen.getByTestId('tree-entry-events').textContent).toContain('navigate')
     expect(screen.getByRole('treeitem', { name: 'project-1' }).getAttribute('aria-selected')).toBe('true')
-    expect(screen.getByTestId('tree-entry-inspect').textContent).toContain('aria-activedescendant="treeitem-project-1"')
+    expect(screen.getByTestId('tree-entry-inspect').textContent).toContain('"activeKey": "project-1"')
+    expect(screen.getByTestId('tree-entry-inspect').textContent).toContain('"selectedKeys": [')
   }, 15000)
 })
