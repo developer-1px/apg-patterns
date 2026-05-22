@@ -12,6 +12,7 @@ import { treeviewDefinition } from './definition'
 import { treeviewDefaultOptions } from './defaultOptions'
 import { createPatternRuntime, type CreatePatternRuntimeInput, type PatternRuntime, type SlotProps } from '../../kernel/patternRuntime'
 import { createTreeviewRenderItems, type TreeviewRenderItem } from './renderItem'
+import { toTreeviewRenderState, type TreeviewRenderState } from './renderState'
 import { resolveTypeaheadTarget } from './typeahead'
 import { createElementId } from '../../kernel/domIds'
 
@@ -25,6 +26,7 @@ export interface TreeviewRuntime {
   }
   getTreeProps(): SlotProps
   getTreeItemProps(key: Key): SlotProps
+  getTreeItemState(key: Key): TreeviewRenderState
   getIndicatorProps(key: Key): SlotProps
   keyToElementId(key: Key): string
   emit(event: PatternEvent): void
@@ -58,6 +60,10 @@ export function createTreeviewRuntime(input: CreateTreeviewRuntimeInput): Treevi
     return runtime.getPartProps('treeitem', key)
   }
 
+  const getTreeItemState = (key: Key): TreeviewRenderState => {
+    return toTreeviewRenderState(runtime.getItemState(key, 'treeitem'))
+  }
+
   const getIndicatorProps = (key: Key): SlotProps => {
     const { role: _role, id: _id, ...props } = runtime.getPartProps('indicator', key)
     return props
@@ -68,13 +74,14 @@ export function createTreeviewRuntime(input: CreateTreeviewRuntimeInput): Treevi
     data,
     options,
     get items() {
-      return createTreeviewRenderItems(data, getTreeItemProps, getIndicatorProps)
+      return createTreeviewRenderItems(data, getTreeItemProps, getIndicatorProps, getTreeItemState)
     },
     get slotProps() {
       return { tree: getTreeProps() }
     },
     getTreeProps,
     getTreeItemProps,
+    getTreeItemState,
     getIndicatorProps,
     keyToElementId,
     emit,

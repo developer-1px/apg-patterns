@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+import { PatternDataSchema } from '../schema'
 import { useTreeviewPattern, type PatternData, type PatternEvent, type PatternOptions } from '../react'
 
 const data = {
@@ -49,6 +50,23 @@ function TreeviewDemo(props: {
           ].join('|')}</output>
         </>
       ) : null}
+    </div>
+  )
+}
+
+function TreeviewRenderItemsDemo(props: {
+  data: PatternData
+  onEvent: (event: PatternEvent) => void
+}) {
+  const tree = useTreeviewPattern(props.data, props.onEvent)
+
+  return (
+    <div {...tree.rootProps}>
+      {tree.renderItems.map((item) => (
+        <div key={item.key} {...item.treeitemProps}>
+          {item.label}
+        </div>
+      ))}
     </div>
   )
 }
@@ -106,4 +124,43 @@ describe('useTreeviewPattern', () => {
       { type: 'expand', key: 'a', expanded: false },
     ])
   })
+
+  it('does not reparse tree data for every render item state lookup', () => {
+    const parse = vi.spyOn(PatternDataSchema, 'parse')
+
+    try {
+      render(<TreeviewRenderItemsDemo data={createFlatTreeData(40)} onEvent={() => undefined} />)
+
+      expect(screen.getAllByRole('treeitem')).toHaveLength(40)
+      expect(parse.mock.calls.length).toBeLessThanOrEqual(3)
+    } finally {
+      parse.mockRestore()
+    }
+  })
 })
+
+function createFlatTreeData(size: number): PatternData {
+  const items: PatternData['items'] = {}
+  const rootKeys: string[] = []
+  const levelByKey: NonNullable<PatternData['state']>['levelByKey'] = {}
+  const typeaheadTextByKey: NonNullable<PatternData['state']>['typeaheadTextByKey'] = {}
+
+  for (let index = 0; index < size; index += 1) {
+    const key = `item-${index}`
+    items[key] = { label: `Item ${index}`, textValue: `Item ${index}` }
+    rootKeys.push(key)
+    levelByKey[key] = 1
+    typeaheadTextByKey[key] = `Item ${index}`
+  }
+
+  return {
+    items,
+    relations: { rootKeys },
+    state: {
+      activeKey: rootKeys[0],
+      levelByKey,
+      selectedKeys: rootKeys[0] ? [rootKeys[0]] : [],
+      typeaheadTextByKey,
+    },
+  }
+}

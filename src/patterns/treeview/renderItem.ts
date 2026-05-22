@@ -17,10 +17,11 @@ export function createTreeviewRenderItems(
   data: PatternData,
   getTreeItemProps: (key: Key) => SlotProps,
   getIndicatorProps: (key: Key) => SlotProps,
+  resolveState: (key: Key) => TreeviewRenderState = (key) => getTreeItemState(data, key),
 ): readonly TreeviewRenderItem[] {
   return resolveTreeviewVisibleKeys(data).map((key) => ({
     key,
-    state: getTreeItemState(data, key),
+    state: resolveState(key),
     slotProps: { treeitem: getTreeItemProps(key), indicator: getIndicatorProps(key) },
   }))
 }

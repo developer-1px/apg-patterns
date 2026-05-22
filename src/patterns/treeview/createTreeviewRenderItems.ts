@@ -10,6 +10,7 @@ export function createTreeviewRenderItems(
   getIndicatorProps: (key: Key) => ReactPatternProps,
 ): readonly ReactTreeviewRenderItem[] {
   const parentByKey = createParentByKey(runtime.data)
+  const indexInParentByKey = createIndexInParentByKey(runtime.data)
   const visibleKeys = resolveVisibleOrder(runtime.definition.navigation.visibleOrder, runtime.data)
   return visibleKeys.map((key) => {
     const hasChildren = (runtime.data.relations?.childrenByKey?.[key]?.length ?? 0) > 0
@@ -19,7 +20,7 @@ export function createTreeviewRenderItems(
       textValue: getTextValue(runtime.data, key),
       level: runtime.data.state?.levelByKey?.[key] ?? 1,
       parentKey: parentByKey.get(key) ?? null,
-      indexInParent: getIndexInParent(runtime.data, key),
+      indexInParent: indexInParentByKey.get(key) ?? 1,
       treeitemProps: getTreeItemProps(key),
     }
     if (!hasChildren) {
@@ -49,7 +50,7 @@ function getTextValue(data: PatternData, key: Key): string {
 function getTreeItemRenderState(runtime: TreeviewRuntime, key: Key, branch: false): ReactRenderItemState
 function getTreeItemRenderState(runtime: TreeviewRuntime, key: Key, branch: true): ReactRenderItemState & { expanded: boolean; toggleDisabled: boolean }
 function getTreeItemRenderState(runtime: TreeviewRuntime, key: Key, branch: boolean): ReactRenderItemState | (ReactRenderItemState & { expanded: boolean; toggleDisabled: boolean }) {
-  const state = runtime.items.find((item) => item.key === key)?.state ?? { active: false, selected: false, disabled: false, expanded: false }
+  const state = runtime.getTreeItemState(key)
   const base = {
     active: Boolean(state.active),
     selected: Boolean(state.selected),
@@ -63,9 +64,15 @@ function getTreeItemRenderState(runtime: TreeviewRuntime, key: Key, branch: bool
   }
 }
 
-function getIndexInParent(data: PatternData, key: Key): number {
-  const parentByKey = createParentByKey(data)
-  const parentKey = parentByKey.get(key)
-  const siblings = parentKey ? data.relations?.childrenByKey?.[parentKey] : data.relations?.rootKeys
-  return (siblings?.indexOf(key) ?? 0) + 1
+function createIndexInParentByKey(data: PatternData): ReadonlyMap<Key, number> {
+  const indexInParentByKey = new Map<Key, number>()
+  for (const [index, key] of (data.relations?.rootKeys ?? []).entries()) {
+    indexInParentByKey.set(key, index + 1)
+  }
+  for (const children of Object.values(data.relations?.childrenByKey ?? {})) {
+    for (const [index, key] of children.entries()) {
+      indexInParentByKey.set(key, index + 1)
+    }
+  }
+  return indexInParentByKey
 }

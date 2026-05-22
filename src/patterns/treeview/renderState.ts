@@ -8,14 +8,7 @@ export type TreeviewRenderState = Record<'active' | 'selected' | 'disabled' | 'e
   checked?: boolean | 'mixed'
 }
 
-export function getTreeItemState(data: PatternData, key: Key): TreeviewRenderState {
-  const runtime = createPatternRuntime({
-    definition: treeviewDefinition,
-    data: PatternDataSchema.parse(data),
-    options: treeviewDefaultOptions,
-    onEvent: () => undefined,
-  })
-  const state = runtime.getItemState(key, 'treeitem')
+export function toTreeviewRenderState(state: Record<string, unknown>): TreeviewRenderState {
   const out: TreeviewRenderState = { active: false, selected: false, disabled: false, expanded: false }
   out.active = Boolean(state.active)
   out.selected = Boolean(state.selected)
@@ -23,4 +16,14 @@ export function getTreeItemState(data: PatternData, key: Key): TreeviewRenderSta
   out.expanded = Boolean(state.expanded)
   if (state.checked !== undefined) out.checked = state.checked as boolean | 'mixed'
   return out
+}
+
+export function getTreeItemState(data: PatternData, key: Key): TreeviewRenderState {
+  const runtime = createPatternRuntime({
+    definition: treeviewDefinition,
+    data: PatternDataSchema.parse(data),
+    options: treeviewDefaultOptions,
+    onEvent: () => undefined,
+  })
+  return toTreeviewRenderState(runtime.getItemState(key, 'treeitem'))
 }
