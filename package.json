@@ -98,6 +98,7 @@
     "check:external": "node scripts/verify-external-release-state.mjs",
     "check:independence": "node scripts/verify-package-independence.mjs",
     "check:package": "node scripts/verify-package-side-effects.mjs",
+    "check:performance": "npm run build && node scripts/verify-performance-baseline.mjs",
     "check:publish": "node scripts/verify-publish-ready.mjs",
     "check:react-peer": "node scripts/verify-react-peer-compatibility.mjs",
     "check:release-ref": "node scripts/verify-release-git-ref.mjs",
