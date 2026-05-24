@@ -2,7 +2,7 @@ import type { PatternData } from '../../../../src/react'
 import { variantItemsFrom } from '../../shared/demoPatternTypes'
 import { fileDirectoryComputed, fileDirectoryDeclared, navigation } from './treeVariantData'
 
-export type TreeVariantKey = 'fileDirectoryComputed' | 'fileDirectoryDeclared' | 'navigation'
+export type TreeVariantKey = 'fileDirectoryComputed' | 'fileDirectoryDeclared' | 'navigation' | 'interactionOwnership'
 
 interface TreeVariantSpec {
   readonly label: string
@@ -21,6 +21,10 @@ export const treeVariants: Record<TreeVariantKey, TreeVariantSpec> = {
   navigation: {
     label: 'Navigation',
     data: navigation,
+  },
+  interactionOwnership: {
+    label: 'Interaction ownership',
+    data: fileDirectoryComputed,
   },
 }
 

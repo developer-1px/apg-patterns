@@ -2,6 +2,7 @@ import { useReducer } from 'react'
 import type { PatternEvent, PatternOptions } from '../../../../src/react'
 import { resolveTarget } from './treeContract'
 import { Treeview } from './Treeview'
+import { TreeviewInteractionProviderDemo } from './TreeviewInteractionProviderDemo'
 import { treeVariantItems, type TreeVariantKey } from './treeVariants'
 import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
 import { renderDataInspect } from '../../shared/inspect/genericInspect'
@@ -19,11 +20,11 @@ import {
 const treeviewDemoDefinition = {
   key: 'treeview',
   label: 'Treeview',
-  keyboardShortcuts: ['ArrowDown', 'ArrowUp', 'Home', 'End', 'ArrowRight', 'ArrowLeft', 'Enter', 'Space'],
+  keyboardShortcuts: ['ArrowDown', 'ArrowUp', 'Home', 'End', 'ArrowRight', 'ArrowLeft', 'Enter', 'Space', 'Escape'],
   sources: {
     main: 'Treeview.tsx',
     entry: 'treeview/entry.tsx',
-    data: ['treeVariants.ts'],
+    data: ['treeVariants.ts', 'TreeviewInteractionProviderDemo.tsx'],
     hooks: ['treeview/useTreeviewPattern.ts'],
     definition: 'treeview/definition.ts',
     extra: ['treeContract.ts'],
@@ -69,6 +70,7 @@ const treeviewDemoDefinition = {
     kind: 'component',
     component: 'Treeview',
     props: {
+      variant: '$state.variant',
       data: '$state.data',
       onEvent: '$actions.dispatchEvent',
       options: '$state.options',
@@ -116,7 +118,7 @@ export const entry = defineDemoPattern({
           dispatchEvent: handleTreeEvent,
         },
         components: {
-          Treeview,
+          Treeview: TreeviewDemoPreview,
           FollowFocusControl,
           ItemClickActionControl,
           FocusStrategyControl,
@@ -125,3 +127,18 @@ export const entry = defineDemoPattern({
     }
   },
 })
+
+function TreeviewDemoPreview({
+  variant,
+  data,
+  onEvent,
+  options,
+}: {
+  variant: TreeVariantKey
+  data: Parameters<typeof Treeview>[0]['data']
+  onEvent: Parameters<typeof Treeview>[0]['onEvent']
+  options: Parameters<typeof Treeview>[0]['options']
+}) {
+  if (variant === 'interactionOwnership') return <TreeviewInteractionProviderDemo />
+  return <Treeview data={data} onEvent={onEvent} options={options} />
+}

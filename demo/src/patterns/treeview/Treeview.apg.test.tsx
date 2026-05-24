@@ -262,4 +262,13 @@ describe('APG §Activation', () => {
     expect(screen.getByTestId('tree-entry-inspect').textContent).toContain('"activeKey": "project-1"')
     expect(screen.getByTestId('tree-entry-inspect').textContent).toContain('"selectedKeys": [')
   }, 15000)
+
+  it('entry runtime exposes the interaction ownership demo variant', () => {
+    render(<TreeviewEntryDemo />)
+
+    fireEvent.click(screen.getByRole('option', { name: 'Interaction ownership' }))
+
+    expect(screen.getByRole('region', { name: 'Provider tree scroll container' })).toBeTruthy()
+    expect(screen.getByRole('textbox', { name: 'Provider tree filter' })).toBeTruthy()
+  })
 })
