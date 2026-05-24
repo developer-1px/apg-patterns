@@ -122,3 +122,4 @@ Current signal:
 - Restore targets are semantic descriptors, so route diagnostics can name `active-cursor`, `edited-cell`, `invoker`, or another declared destination without depending on React refs.
 - Focus guard decisions are reported before mutation: incidental and scroll focus can restore the active pattern owner, native controls are allowed, and declared owner targets can request explicit handoff.
 - React shell hooks live behind the `./react` subpath and cover owner registration, keyboard routing, temporary restore, and focus guard decisions without moving React into the package root.
+- `TreeviewInteractionProviderDemo` applies the React hooks to a real APG treeview shell fixture, proving provider-level routing and focus guard behavior outside hook-only tests.

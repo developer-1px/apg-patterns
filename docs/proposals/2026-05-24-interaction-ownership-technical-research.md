@@ -473,6 +473,8 @@ Current incubation slice:
 
 - `TreeviewInteractionOwnershipDemo` renders the real APG treeview inside a shell-level interaction owner.
 - Its tests prove tree keyboard intent survives scroll-container focus, native text input keeps its own keys, `Escape` restores ownership from a temporary input, and only allowed shell shortcuts route globally.
+- `TreeviewInteractionProviderDemo` renders the same APG treeview scenario through `InteractionProvider` and React hooks.
+- Its tests prove the React focus guard restores incidental scroll focus to the active tree item, keyboard routing still moves the tree cursor, temporary input `Escape` restores tree ownership and focus, and shell shortcuts remain opt-in.
 - `ListboxToolbarInteractionOwnershipDemo` renders a real APG listbox next to a real APG toolbar command surface.
 - Its tests prove toolbar focus can own toolbar roving and command keys, vertical movement can restore the listbox cursor, filter input arrows stay native, input `Escape` restores listbox ownership and option focus, and shell shortcuts stay opt-in from the toolbar owner.
 - `GridInteractionOwnershipDemo` renders the real editable APG grid inside the same ownership model.
