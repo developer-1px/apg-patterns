@@ -450,6 +450,13 @@ The React layer can provide:
 - hook for temporary owners
 - diagnostics panel for demos
 
+Current incubation slice:
+
+- `@interactive-os/interaction/react` exposes an optional `InteractionProvider` and keeps React out of the root/core entry.
+- `useInteractionOwner` registers pattern, temporary-control, and shell owners against the provider registry.
+- `useInteractionKeyboardHandler` routes React keyboard events through the core keyboard adapter.
+- `useInteractionFocusGuardHandler` routes React focus events through the pure focus guard decision adapter.
+
 ### Phase 5: APG Demo Integration
 
 Create minimal behavior demos:

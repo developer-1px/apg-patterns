@@ -95,7 +95,10 @@ packages/interaction/
 │  ├─ interactionOwnership.test.ts: focused ownership, restore target, and restore tests
 │  ├─ interactionRouting.ts: pure owner/native/shell route selection
 │  ├─ interactionRouting.test.ts: key routing priority tests
-│  └─ index.ts: package exports
+│  ├─ react/
+│  │  ├─ index.tsx: optional React provider and hooks subpath
+│  │  └─ InteractionProvider.test.tsx: React registration, keyboard, and focus guard tests
+│  └─ index.ts: React-free package root exports
 ├─ tsconfig.json
 └─ vitest.config.ts
 ```
@@ -118,3 +121,4 @@ Current signal:
 - Package-level routing tests cover a non-APG command-palette search owner using the same temporary-owner restore and shell-shortcut policy.
 - Restore targets are semantic descriptors, so route diagnostics can name `active-cursor`, `edited-cell`, `invoker`, or another declared destination without depending on React refs.
 - Focus guard decisions are reported before mutation: incidental and scroll focus can restore the active pattern owner, native controls are allowed, and declared owner targets can request explicit handoff.
+- React shell hooks live behind the `./react` subpath and cover owner registration, keyboard routing, temporary restore, and focus guard decisions without moving React into the package root.
