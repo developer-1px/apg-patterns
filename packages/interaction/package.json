@@ -1,36 +1,98 @@
 {
   "name": "@interactive-os/interaction",
-  "version": "0.0.0",
-  "private": true,
-  "description": "Incubating interaction ownership primitives for Interactive OS keyboard and focus coordination.",
+  "version": "0.1.0",
+  "description": "Keyboard and focus ownership primitives for application shells composed from APG patterns and native controls.",
+  "keywords": [
+    "keyboard",
+    "focus",
+    "aria",
+    "apg",
+    "interaction",
+    "shortcuts",
+    "react"
+  ],
+  "license": "MIT",
+  "author": "Interactive OS",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/developer-1px/apg-patterns.git",
+    "directory": "packages/interaction"
+  },
+  "bugs": {
+    "url": "https://github.com/developer-1px/apg-patterns/issues"
+  },
+  "homepage": "https://developer-1px.github.io/apg-patterns/",
   "type": "module",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "packageManager": "npm@11.6.2",
+  "engines": {
+    "node": ">=18.18"
+  },
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
-      "default": "./src/index.ts"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./react": {
-      "types": "./src/react/index.tsx",
-      "default": "./src/react/index.tsx"
+      "import": {
+        "types": "./dist/react.d.ts",
+        "default": "./dist/react.js"
+      },
+      "require": {
+        "types": "./dist/react.d.cts",
+        "default": "./dist/react.cjs"
+      }
     },
     "./package.json": "./package.json"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "API.md",
+    "INTERFACE_STABILITY.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
   "scripts": {
+    "build": "tsup --config tsup.config.ts",
+    "check": "npm run typecheck && npm test && npm run build && npm run smoke:package",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run check",
+    "smoke:package": "node scripts/smoke-package.mjs",
     "test": "vitest run --config vitest.config.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "peerDependencies": {
-    "@interactive-os/aria": ">=0.1.0",
     "react": "^18.0.0 || ^19.0.0"
   },
   "peerDependenciesMeta": {
-    "@interactive-os/aria": {
-      "optional": true
-    },
     "react": {
       "optional": true
     }
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.3.2",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.2.3",
+    "jsdom": "^29.1.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tsup": "^8.5.1",
+    "typescript": "~6.0.3",
+    "vitest": "^4.1.5"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true,
+    "registry": "https://registry.npmjs.org/"
   }
 }

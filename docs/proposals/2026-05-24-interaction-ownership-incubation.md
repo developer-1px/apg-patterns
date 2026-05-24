@@ -56,7 +56,7 @@ Active cursor state is not enough. A keyboard contract must also define which ow
 Allowed during incubation:
 
 - Proposal docs under `docs/proposals`.
-- A private extraction-ready package under `packages/interaction`.
+- An extraction-ready package under `packages/interaction`.
 - Reproduction demos for tree, scrollbar, input, form, dialog, and inline editing ownership conflicts.
 - Discovering metadata that APG patterns may later expose to an app-level interaction layer.
 
@@ -99,7 +99,7 @@ If a global manager becomes a product, it should live in an app shell or a separ
 
 ```txt
 packages/interaction/
-├─ package.json: private @interactive-os/interaction package identity
+├─ package.json: @interactive-os/interaction package identity
 ├─ src/
 │  ├─ interactionKeyTarget.ts: DOM key target classification
 │  ├─ interactionKeyTarget.test.ts: native, APG, scroll, and incidental target tests
@@ -121,7 +121,7 @@ packages/interaction/
 └─ vitest.config.ts
 ```
 
-This layout is intentionally outside root `src/` so it cannot become part of the `@interactive-os/aria` npm package by accident. The package remains private until the boundary is stable.
+This layout is intentionally outside root `src/` so it cannot become part of the `@interactive-os/aria` npm package by accident. The package builds and packs independently while the boundary is stabilized through APG demo shell and Hub product shell usage.
 
 Verify the incubation package directly:
 
