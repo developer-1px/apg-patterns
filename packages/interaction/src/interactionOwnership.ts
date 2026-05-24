@@ -4,12 +4,25 @@ export type InteractionOwnerKind = 'pattern' | 'temporary-control' | 'shell'
 
 export type InteractionRestoreReason = 'release' | 'cancel' | 'remove'
 
+export type InteractionKeyTargetKind =
+  | 'unknown'
+  | 'pattern'
+  | 'temporary-control'
+  | 'text-input'
+  | 'textarea'
+  | 'select'
+  | 'contenteditable'
+  | 'native-control'
+  | 'scroll-container'
+  | 'incidental'
+
 export interface InteractionKeyInput {
   key: string
   altKey?: boolean
   ctrlKey?: boolean
   metaKey?: boolean
   shiftKey?: boolean
+  targetKind?: InteractionKeyTargetKind
 }
 
 export interface InteractionRestoreInput {
@@ -21,6 +34,8 @@ export interface InteractionOwner {
   id: InteractionOwnerId
   kind: InteractionOwnerKind
   ownsKey?: (input: InteractionKeyInput) => boolean
+  restoreKeys?: (input: InteractionKeyInput) => boolean
+  allowsShellKey?: (input: InteractionKeyInput) => boolean
   restore?: (input: InteractionRestoreInput) => void
 }
 

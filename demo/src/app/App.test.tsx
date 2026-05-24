@@ -8,7 +8,7 @@ import { SourceTabs, useSourceTabs } from './SourceTabs'
 import { collectPatternEntries, defaultPatternKey, defaultSourceName, patternEntries, useDemoPattern, validatePatternEntries } from '../shared/demoPatterns'
 import { KERNEL_SOURCES } from '../shared/demoPatternTypes'
 import { sourceLoaders, sourceNameCollisions } from '../shared/sources'
-import type { PatternEvent } from '../../../src/react'
+import type { PatternData, PatternEvent } from '../../../src/react'
 
 afterEach(() => {
   vi.useRealTimers()
@@ -988,6 +988,78 @@ function collectPatternEntrySourceRoutes() {
   }))
 }
 
+async function collectVariantLabels(route: { key: string; sourceName: string }) {
+  replaceHash(routeHash(route))
+  const { unmount } = render(<App />)
+
+  try {
+    await waitFor(() => expect(currentHashParam('pattern')).toBe(route.key))
+    const preview = document.querySelector(`[data-demo-preview="${route.key}"]`)
+    const workspace = preview?.closest('section')
+    const variantListbox = workspace?.querySelector<HTMLElement>('[role="listbox"]')
+    const labels = variantListbox
+      ? within(variantListbox)
+        .queryAllByRole('option')
+        .map((option) => option.textContent?.trim())
+        .filter(isNonEmptyString)
+      : []
+
+    return labels.length > 0 ? labels : [undefined]
+  } finally {
+    unmount()
+  }
+}
+
+function drivePreview(preview: HTMLElement, keyboardShortcuts: readonly string[]) {
+  preview.focus()
+  for (const shortcut of keyboardShortcuts) {
+    fireEvent.keyDown(preview, keyboardEventInit(shortcut))
+  }
+
+  const previewScope = within(preview)
+  for (const role of ['button', 'option', 'tab', 'link'] as const) {
+    for (const target of previewScope.queryAllByRole(role).slice(0, 3)) {
+      fireEvent.click(target)
+    }
+  }
+}
+
+function parseStatePanelData(): PatternData {
+  const selectedStateTab = screen.getByRole('tab', { name: 'state', selected: true })
+  const panelId = selectedStateTab.getAttribute('aria-controls')
+  const panel = panelId ? document.getElementById(panelId) : null
+  const stateText = panel?.querySelector('pre')?.textContent?.trim()
+
+  if (!stateText) throw new Error('missing state panel data')
+  return JSON.parse(stateText) as PatternData
+}
+
+function stateSurfaceIssues({
+  pattern,
+  variant,
+  data,
+  preview,
+}: {
+  pattern: string
+  variant?: string
+  data: PatternData
+  preview: HTMLElement | null
+}) {
+  const issues: string[] = []
+  if (!preview) return [`${stateSurfaceLabel(pattern, variant)}: missing preview`]
+
+  const context = { label: stateSurfaceLabel(pattern, variant), data, preview }
+  compareKeySetSurface(issues, context, data.state?.selectedKeys, 'aria-selected')
+  compareKeySetSurface(issues, context, data.state?.expandedKeys, 'aria-expanded')
+  if (data.state?.checkedByKey) compareKeyValueSurface(issues, context, data.state.checkedByKey, 'aria-checked')
+  else compareKeySetSurface(issues, context, data.state?.selectedKeys, 'aria-checked')
+  compareKeyValueSurface(issues, context, data.state?.pressedByKey, 'aria-pressed')
+  compareKeyValueSurface(issues, context, data.state?.sortByKey, 'aria-sort')
+  compareKeyValueSurface(issues, context, data.state?.valueByKey, 'aria-valuenow')
+
+  return issues
+}
+
 function PatternRouteProbe({
   onRoute,
 }: {
@@ -1081,6 +1153,68 @@ function keyboardEventInit(shortcut: string) {
     metaKey: parts.includes('Meta'),
     shiftKey: parts.includes('Shift'),
   }
+}
+
+function compareKeySetSurface(
+  issues: string[],
+  context: { label: string; data: PatternData; preview: HTMLElement },
+  keys: readonly string[] | undefined,
+  attribute: string,
+) {
+  const selected = new Set(keys ?? [])
+  for (const key of Object.keys(context.data.items)) {
+    compareElementsForKey(issues, context, key, attribute, selected.has(key))
+  }
+}
+
+function compareKeyValueSurface(
+  issues: string[],
+  context: { label: string; data: PatternData; preview: HTMLElement },
+  values: Record<string, unknown> | undefined,
+  attribute: string,
+) {
+  for (const [key, value] of Object.entries(values ?? {})) {
+    compareElementsForKey(issues, context, key, attribute, value)
+  }
+}
+
+function compareElementsForKey(
+  issues: string[],
+  context: { label: string; preview: HTMLElement },
+  key: string,
+  attribute: string,
+  value: unknown,
+) {
+  const expected = String(value)
+  for (const element of elementsForKey(context.preview, key)) {
+    if (!element.hasAttribute(attribute)) continue
+    const actual = element.getAttribute(attribute)
+    if (actual !== expected) issues.push(`${context.label}: ${key} ${attribute} expected ${expected}, got ${actual ?? 'null'}`)
+  }
+}
+
+function elementsForKey(preview: HTMLElement, key: string) {
+  const idSuffix = normalizeDomIdPart(key)
+  return Array.from(preview.querySelectorAll<HTMLElement>('[id]')).filter((element) => (
+    element.id === idSuffix || element.id.endsWith(`-${idSuffix}`) || element.id.endsWith(`_${idSuffix}`)
+  ))
+}
+
+function normalizeDomIdPart(value: string): string {
+  const normalized = value
+    .trim()
+    .replace(/[^A-Za-z0-9_.:-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+
+  return normalized || 'item'
+}
+
+function stateSurfaceLabel(pattern: string, variant: string | undefined) {
+  return variant ? `${pattern}/${variant}` : pattern
+}
+
+function isNonEmptyString(value: string | undefined): value is string {
+  return typeof value === 'string' && value.length > 0
 }
 
 function duplicates(values: readonly string[]) {
