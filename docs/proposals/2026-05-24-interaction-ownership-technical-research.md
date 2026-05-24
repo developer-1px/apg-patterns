@@ -422,7 +422,7 @@ The result should explain whether an owner handled, yielded, restored, or ignore
 Current incubation slice:
 
 - `routeInteractionKey` chooses between active owner, restore intent, shell owner, protected native target, and browser fallback.
-- `InteractionRouteResult` reports active owner, candidate owners, target kind, route status, and route reason.
+- `InteractionRouteResult` reports active owner, candidate owners, target kind, route status, route reason, restore owner, and declared restore target.
 - It does not install a document listener or mutate focus by default.
 
 ### Phase 3: DOM Focus Guard Adapter

@@ -5,7 +5,9 @@ import type {
   InteractionOwnerId,
   InteractionOwnerKind,
   InteractionOwnershipRegistry,
+  InteractionRestoreTarget,
 } from './interactionOwnership'
+import { resolveInteractionRestoreTarget } from './interactionOwnership'
 
 export type InteractionRouteStatus = 'owner' | 'restore' | 'native' | 'ignored'
 
@@ -27,6 +29,7 @@ export interface InteractionRouteResult {
   ownerId?: InteractionOwnerId
   ownerKind?: InteractionOwnerKind
   restoreOwnerId?: InteractionOwnerId | null
+  restoreTarget?: InteractionRestoreTarget | null
 }
 
 const nativeTextTargetKinds = new Set<InteractionKeyTargetKind>([
@@ -71,6 +74,8 @@ export function routeInteractionKey(
   }
 
   if (activeOwner.kind === 'temporary-control' && activeOwner.restoreKeys?.(input) === true) {
+    const restoreOwnerId = snapshot.returnOwnerIds[snapshot.returnOwnerIds.length - 1] ?? null
+    const restoreOwner = restoreOwnerId ? registry.getOwner(restoreOwnerId) : null
     return {
       status: 'restore',
       reason: 'temporary-owner-restore-requested',
@@ -79,7 +84,10 @@ export function routeInteractionKey(
       targetKind,
       ownerId: activeOwner.id,
       ownerKind: activeOwner.kind,
-      restoreOwnerId: snapshot.returnOwnerIds[snapshot.returnOwnerIds.length - 1] ?? null,
+      restoreOwnerId,
+      restoreTarget: restoreOwner
+        ? resolveInteractionRestoreTarget(restoreOwner, { reason: 'cancel', fromOwnerId: activeOwner.id })
+        : null,
     }
   }
 

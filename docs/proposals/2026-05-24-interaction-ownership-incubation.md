@@ -89,8 +89,8 @@ packages/interaction/
 │  ├─ interactionKeyTarget.test.ts: native, APG, scroll, and incidental target tests
 │  ├─ interactionKeyboardEvent.ts: explicit KeyboardEvent-to-route adapter
 │  ├─ interactionKeyboardEvent.test.ts: event routing and optional restore release tests
-│  ├─ interactionOwnership.ts: owner registry and protocol primitives
-│  ├─ interactionOwnership.test.ts: focused ownership and restore tests
+│  ├─ interactionOwnership.ts: owner registry, restore target, and protocol primitives
+│  ├─ interactionOwnership.test.ts: focused ownership, restore target, and restore tests
 │  ├─ interactionRouting.ts: pure owner/native/shell route selection
 │  ├─ interactionRouting.test.ts: key routing priority tests
 │  └─ index.ts: package exports
@@ -114,3 +114,4 @@ Current signal:
 
 - APG demos now cover tree, listbox + toolbar, grid edit mode, menu + search, and dialog + nested listbox ownership.
 - Package-level routing tests cover a non-APG command-palette search owner using the same temporary-owner restore and shell-shortcut policy.
+- Restore targets are semantic descriptors, so route diagnostics can name `active-cursor`, `edited-cell`, `invoker`, or another declared destination without depending on React refs.

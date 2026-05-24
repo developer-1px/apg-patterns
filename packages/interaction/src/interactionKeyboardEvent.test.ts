@@ -88,7 +88,12 @@ describe('interaction keyboard event adapter', () => {
     const editor = document.createElement('input')
     editor.type = 'text'
 
-    registry.register({ id: 'grid', kind: 'pattern', restore: restoreTree })
+    registry.register({
+      id: 'grid',
+      kind: 'pattern',
+      restoreTarget: { kind: 'edited-cell', elementId: 'gridcell-e11' },
+      restore: restoreTree,
+    })
     registry.register({
       id: 'grid-cell-editor',
       kind: 'temporary-control',
@@ -108,10 +113,15 @@ describe('interaction keyboard event adapter', () => {
       reason: 'temporary-owner-restore-requested',
       ownerId: 'grid-cell-editor',
       restoreOwnerId: 'grid',
+      restoreTarget: { kind: 'edited-cell', ownerId: 'grid', elementId: 'gridcell-e11' },
     })
     expect(preventDefault).toHaveBeenCalledTimes(1)
     expect(registry.getActiveOwner()?.id).toBe('grid')
-    expect(restoreTree).toHaveBeenCalledWith({ reason: 'cancel', fromOwnerId: 'grid-cell-editor' })
+    expect(restoreTree).toHaveBeenCalledWith({
+      reason: 'cancel',
+      fromOwnerId: 'grid-cell-editor',
+      target: { kind: 'edited-cell', ownerId: 'grid', elementId: 'gridcell-e11' },
+    })
   })
 
   it('routes allowed shell shortcuts and leaves disallowed shortcuts to the browser', () => {

@@ -21,7 +21,12 @@ describe('interaction ownership registry', () => {
     const registry = createInteractionOwnershipRegistry()
     const restoreTree = vi.fn()
 
-    registry.register({ id: 'tree', kind: 'pattern', restore: restoreTree })
+    registry.register({
+      id: 'tree',
+      kind: 'pattern',
+      restoreTarget: { kind: 'active-cursor' },
+      restore: restoreTree,
+    })
     registry.register({ id: 'tree-filter-input', kind: 'temporary-control' })
 
     registry.activate('tree')
@@ -31,11 +36,16 @@ describe('interaction ownership registry', () => {
       activeOwnerId: 'tree-filter-input',
       ownerIds: ['tree', 'tree-filter-input'],
       returnOwnerIds: ['tree'],
+      restoreTarget: null,
     })
 
     expect(registry.release('tree-filter-input')?.id).toBe('tree')
     expect(registry.getActiveOwner()?.id).toBe('tree')
-    expect(restoreTree).toHaveBeenCalledWith({ reason: 'release', fromOwnerId: 'tree-filter-input' })
+    expect(restoreTree).toHaveBeenCalledWith({
+      reason: 'release',
+      fromOwnerId: 'tree-filter-input',
+      target: { kind: 'active-cursor', ownerId: 'tree' },
+    })
   })
 
   it('drops an unregistered owner from active and return state', () => {
@@ -52,6 +62,7 @@ describe('interaction ownership registry', () => {
       activeOwnerId: 'tree',
       ownerIds: ['tree'],
       returnOwnerIds: [],
+      restoreTarget: null,
     })
   })
 

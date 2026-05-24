@@ -4,6 +4,22 @@ export type InteractionOwnerKind = 'pattern' | 'temporary-control' | 'shell'
 
 export type InteractionRestoreReason = 'release' | 'cancel' | 'remove'
 
+export type InteractionRestoreTargetKind =
+  | 'invoker'
+  | 'previous-owner'
+  | 'active-cursor'
+  | 'edited-cell'
+  | 'first-invalid-field'
+  | 'next-logical-target'
+  | 'element'
+
+export interface InteractionRestoreTarget {
+  kind: InteractionRestoreTargetKind
+  ownerId?: InteractionOwnerId
+  elementId?: string
+  label?: string
+}
+
 export type InteractionKeyTargetKind =
   | 'unknown'
   | 'pattern'
@@ -28,7 +44,12 @@ export interface InteractionKeyInput {
 export interface InteractionRestoreInput {
   reason: InteractionRestoreReason
   fromOwnerId: InteractionOwnerId
+  target?: InteractionRestoreTarget | null
 }
+
+export type InteractionRestoreTargetResolver = (
+  input: Omit<InteractionRestoreInput, 'target'>,
+) => InteractionRestoreTarget | null
 
 export interface InteractionOwner {
   id: InteractionOwnerId
@@ -36,6 +57,7 @@ export interface InteractionOwner {
   ownsKey?: (input: InteractionKeyInput) => boolean
   restoreKeys?: (input: InteractionKeyInput) => boolean
   allowsShellKey?: (input: InteractionKeyInput) => boolean
+  restoreTarget?: InteractionRestoreTarget | InteractionRestoreTargetResolver
   restore?: (input: InteractionRestoreInput) => void
 }
 
@@ -43,6 +65,7 @@ export interface InteractionOwnershipSnapshot {
   activeOwnerId: InteractionOwnerId | null
   ownerIds: readonly InteractionOwnerId[]
   returnOwnerIds: readonly InteractionOwnerId[]
+  restoreTarget: InteractionRestoreTarget | null
 }
 
 export interface InteractionOwnershipRegistry {
@@ -109,7 +132,13 @@ export function createInteractionOwnershipRegistry(): InteractionOwnershipRegist
 
     activeOwnerId = popReturnOwnerId()
     const restoredOwner = getActiveOwner()
-    restoredOwner?.restore?.({ reason, fromOwnerId: ownerId })
+    if (restoredOwner) {
+      const restoreInput = { reason, fromOwnerId: ownerId }
+      restoredOwner.restore?.({
+        ...restoreInput,
+        target: resolveInteractionRestoreTarget(restoredOwner, restoreInput),
+      })
+    }
     return restoredOwner
   }
 
@@ -136,11 +165,27 @@ export function createInteractionOwnershipRegistry(): InteractionOwnershipRegist
       return owner
     },
     snapshot() {
+      const activeOwner = getActiveOwner()
       return {
         activeOwnerId,
         ownerIds: [...owners.keys()],
         returnOwnerIds,
+        restoreTarget: activeOwner
+          ? resolveInteractionRestoreTarget(activeOwner, { reason: 'release', fromOwnerId: activeOwner.id })
+          : null,
       }
     },
   }
+}
+
+export function resolveInteractionRestoreTarget(
+  owner: Pick<InteractionOwner, 'id' | 'restoreTarget'>,
+  input: Omit<InteractionRestoreInput, 'target'>,
+): InteractionRestoreTarget | null {
+  if (!owner.restoreTarget) return null
+  const target = typeof owner.restoreTarget === 'function'
+    ? owner.restoreTarget(input)
+    : owner.restoreTarget
+  if (!target) return null
+  return { ...target, ownerId: target.ownerId ?? owner.id }
 }

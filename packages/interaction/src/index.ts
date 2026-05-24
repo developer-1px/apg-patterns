@@ -1,5 +1,6 @@
 export {
   createInteractionOwnershipRegistry,
+  resolveInteractionRestoreTarget,
   type InteractionKeyInput,
   type InteractionKeyTargetKind,
   type InteractionOwner,
@@ -9,6 +10,9 @@ export {
   type InteractionOwnershipSnapshot,
   type InteractionRestoreInput,
   type InteractionRestoreReason,
+  type InteractionRestoreTarget,
+  type InteractionRestoreTargetKind,
+  type InteractionRestoreTargetResolver,
 } from './interactionOwnership'
 
 export {

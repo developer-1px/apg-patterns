@@ -47,7 +47,11 @@ describe('interaction key routing', () => {
   it('surfaces restore intent for temporary controls without mutating registry state', () => {
     const registry = createInteractionOwnershipRegistry()
 
-    registry.register({ id: 'grid', kind: 'pattern' })
+    registry.register({
+      id: 'grid',
+      kind: 'pattern',
+      restoreTarget: { kind: 'edited-cell', elementId: 'cell-a1' },
+    })
     registry.register({
       id: 'grid-cell-editor',
       kind: 'temporary-control',
@@ -66,6 +70,7 @@ describe('interaction key routing', () => {
       ownerId: 'grid-cell-editor',
       ownerKind: 'temporary-control',
       restoreOwnerId: 'grid',
+      restoreTarget: { kind: 'edited-cell', ownerId: 'grid', elementId: 'cell-a1' },
     })
     expect(registry.getActiveOwner()?.id).toBe('grid-cell-editor')
   })
@@ -167,6 +172,7 @@ describe('interaction key routing', () => {
       id: 'command-palette',
       kind: 'shell',
       ownsKey: (input) => input.key === 'Escape',
+      restoreTarget: { kind: 'invoker', elementId: 'palette-button' },
     })
     registry.register({
       id: 'palette-search',
@@ -200,6 +206,7 @@ describe('interaction key routing', () => {
       ownerId: 'palette-search',
       ownerKind: 'temporary-control',
       restoreOwnerId: 'command-palette',
+      restoreTarget: { kind: 'invoker', ownerId: 'command-palette', elementId: 'palette-button' },
     })
     expect(routeInteractionKey(registry, { key: 'k', metaKey: true, targetKind: 'text-input' })).toEqual({
       status: 'owner',
