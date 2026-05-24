@@ -34,6 +34,14 @@ export {
 } from './interactionFocusGuard'
 
 export {
+  createInteractionDiagnosticsSnapshot,
+  describeInteractionDomFocus,
+  type InteractionDiagnosticsOptions,
+  type InteractionDiagnosticsSnapshot,
+  type InteractionDomFocusSnapshot,
+} from './interactionDiagnostics'
+
+export {
   handleInteractionKeyboardEvent,
   interactionKeyInputFromKeyboardEvent,
   routeInteractionKeyboardEvent,

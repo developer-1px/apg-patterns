@@ -87,6 +87,8 @@ packages/interaction/
 ├─ src/
 │  ├─ interactionKeyTarget.ts: DOM key target classification
 │  ├─ interactionKeyTarget.test.ts: native, APG, scroll, and incidental target tests
+│  ├─ interactionDiagnostics.ts: owner, route, DOM focus, and focus guard diagnostics snapshot
+│  ├─ interactionDiagnostics.test.ts: diagnostics coverage for restore, fallback, and focus guard cases
 │  ├─ interactionFocusGuard.ts: pure focus guard decision adapter
 │  ├─ interactionFocusGuard.test.ts: focus restore, native allow, and owner handoff tests
 │  ├─ interactionKeyboardEvent.ts: explicit KeyboardEvent-to-route adapter
@@ -123,3 +125,4 @@ Current signal:
 - Focus guard decisions are reported before mutation: incidental and scroll focus can restore the active pattern owner, native controls are allowed, and declared owner targets can request explicit handoff.
 - React shell hooks live behind the `./react` subpath and cover owner registration, keyboard routing, temporary restore, and focus guard decisions without moving React into the package root.
 - `TreeviewInteractionProviderDemo` applies the React hooks to a real APG treeview shell fixture, proving provider-level routing and focus guard behavior outside hook-only tests.
+- Diagnostics snapshots combine active owner, owner stack, DOM focus, route reason, restore target, and focus guard intervention in one React-free helper.

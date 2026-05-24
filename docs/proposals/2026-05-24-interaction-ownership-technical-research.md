@@ -407,6 +407,11 @@ Keep the current extraction-ready package and expand it around:
 - key ownership predicate
 - diagnostics snapshot
 
+Current incubation slice:
+
+- `createInteractionOwnershipRegistry` tracks active owner, registered owners, temporary return stack, and declared restore target.
+- `createInteractionDiagnosticsSnapshot` combines registry state, owner stack, DOM focus metadata, key route result, ignored/native fallback reason, restore target, and focus guard intervention in one inspectable snapshot.
+
 No DOM listener yet.
 
 ### Phase 2: Key Routing Engine
