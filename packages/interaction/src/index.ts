@@ -25,6 +25,15 @@ export {
 export { classifyInteractionKeyTarget } from './interactionKeyTarget'
 
 export {
+  evaluateInteractionFocusGuard,
+  evaluateInteractionFocusTarget,
+  type InteractionFocusGuardAction,
+  type InteractionFocusGuardInput,
+  type InteractionFocusGuardReason,
+  type InteractionFocusGuardResult,
+} from './interactionFocusGuard'
+
+export {
   handleInteractionKeyboardEvent,
   interactionKeyInputFromKeyboardEvent,
   routeInteractionKeyboardEvent,

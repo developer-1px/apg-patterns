@@ -87,6 +87,8 @@ packages/interaction/
 ├─ src/
 │  ├─ interactionKeyTarget.ts: DOM key target classification
 │  ├─ interactionKeyTarget.test.ts: native, APG, scroll, and incidental target tests
+│  ├─ interactionFocusGuard.ts: pure focus guard decision adapter
+│  ├─ interactionFocusGuard.test.ts: focus restore, native allow, and owner handoff tests
 │  ├─ interactionKeyboardEvent.ts: explicit KeyboardEvent-to-route adapter
 │  ├─ interactionKeyboardEvent.test.ts: event routing and optional restore release tests
 │  ├─ interactionOwnership.ts: owner registry, restore target, and protocol primitives
@@ -115,3 +117,4 @@ Current signal:
 - APG demos now cover tree, listbox + toolbar, grid edit mode, menu + search, and dialog + nested listbox ownership.
 - Package-level routing tests cover a non-APG command-palette search owner using the same temporary-owner restore and shell-shortcut policy.
 - Restore targets are semantic descriptors, so route diagnostics can name `active-cursor`, `edited-cell`, `invoker`, or another declared destination without depending on React refs.
+- Focus guard decisions are reported before mutation: incidental and scroll focus can restore the active pattern owner, native controls are allowed, and declared owner targets can request explicit handoff.

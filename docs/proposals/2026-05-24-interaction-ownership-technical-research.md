@@ -434,6 +434,8 @@ This adapter should report intended actions first; direct refocus should be opt-
 Current incubation slice:
 
 - `classifyInteractionKeyTarget` maps DOM targets to `text-input`, `textarea`, `select`, `contenteditable`, `native-control`, `pattern`, `scroll-container`, `incidental`, or `unknown`.
+- `evaluateInteractionFocusGuard` reports whether a focus move should restore the active pattern owner, activate another declared owner, allow native focus, or do nothing.
+- `evaluateInteractionFocusTarget` is a DOM-target adapter around the same pure guard decision and does not mutate focus.
 - `routeInteractionKeyboardEvent` combines KeyboardEvent modifier state with target classification.
 - `handleInteractionKeyboardEvent` can prevent default for handled owner/restore routes and can explicitly release a temporary owner on restore keys when opted in.
 
