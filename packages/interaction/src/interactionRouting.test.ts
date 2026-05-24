@@ -159,4 +159,56 @@ describe('interaction key routing', () => {
       ownerKind: 'shell',
     })
   })
+
+  it('covers a non-APG shell search owner without pattern ownership', () => {
+    const registry = createInteractionOwnershipRegistry()
+
+    registry.register({
+      id: 'command-palette',
+      kind: 'shell',
+      ownsKey: (input) => input.key === 'Escape',
+    })
+    registry.register({
+      id: 'palette-search',
+      kind: 'temporary-control',
+      ownsKey: (input) => input.key === 'Escape',
+      restoreKeys: (input) => input.key === 'Escape',
+      allowsShellKey: (input) => input.metaKey === true && input.key === 'k',
+    })
+    registry.register({
+      id: 'run-command',
+      kind: 'shell',
+      ownsKey: (input) => input.metaKey === true && input.key === 'k',
+    })
+
+    registry.activate('command-palette')
+    registry.activate('palette-search')
+
+    expect(routeInteractionKey(registry, { key: 'ArrowDown', targetKind: 'text-input' })).toEqual({
+      status: 'native',
+      reason: 'browser-fallback',
+      activeOwnerId: 'palette-search',
+      candidateOwnerIds: ['palette-search'],
+      targetKind: 'text-input',
+    })
+    expect(routeInteractionKey(registry, { key: 'Escape', targetKind: 'text-input' })).toEqual({
+      status: 'restore',
+      reason: 'temporary-owner-restore-requested',
+      activeOwnerId: 'palette-search',
+      candidateOwnerIds: ['palette-search'],
+      targetKind: 'text-input',
+      ownerId: 'palette-search',
+      ownerKind: 'temporary-control',
+      restoreOwnerId: 'command-palette',
+    })
+    expect(routeInteractionKey(registry, { key: 'k', metaKey: true, targetKind: 'text-input' })).toEqual({
+      status: 'owner',
+      reason: 'shell-owner-handled',
+      activeOwnerId: 'palette-search',
+      candidateOwnerIds: ['palette-search', 'run-command'],
+      targetKind: 'text-input',
+      ownerId: 'run-command',
+      ownerKind: 'shell',
+    })
+  })
 })

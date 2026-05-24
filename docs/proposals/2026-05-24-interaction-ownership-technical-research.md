@@ -468,6 +468,8 @@ Current incubation slice:
 - Its tests prove toolbar focus can own toolbar roving and command keys, vertical movement can restore the listbox cursor, filter input arrows stay native, input `Escape` restores listbox ownership and option focus, and shell shortcuts stay opt-in from the toolbar owner.
 - `GridInteractionOwnershipDemo` renders the real editable APG grid inside the same ownership model.
 - Its tests prove grid navigation survives scroll-container focus, editor arrow keys stay native, edit-mode `Escape` restores grid ownership and cell focus, and shell shortcuts stay opt-in while editing.
+- `MenuSearchInteractionOwnershipDemo` renders a real APG menu button with a search input as a temporary owner.
+- Its tests prove menu opening and movement can be routed through the menu owner, search input arrows stay native, search `Escape` restores menu ownership and menuitem focus without closing the menu, and shell shortcuts stay opt-in from search.
 - `DialogInteractionOwnershipDemo` renders a dialog with a nested APG listbox and search input.
 - Its tests prove dialog chrome can delegate movement to the nested listbox, search input keeps native text navigation, `Escape` restores from search to listbox without closing the dialog, and allowed shell shortcuts remain opt-in.
 

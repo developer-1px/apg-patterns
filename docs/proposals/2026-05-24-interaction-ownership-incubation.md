@@ -109,3 +109,8 @@ npm run check:interaction
 ## Extraction Signal
 
 Extract to a separate package only after at least two APG demos need the same ownership protocol and one non-APG shell scenario needs the same registry semantics.
+
+Current signal:
+
+- APG demos now cover tree, listbox + toolbar, grid edit mode, menu + search, and dialog + nested listbox ownership.
+- Package-level routing tests cover a non-APG command-palette search owner using the same temporary-owner restore and shell-shortcut policy.
