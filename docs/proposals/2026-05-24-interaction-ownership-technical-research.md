@@ -410,7 +410,7 @@ Keep the current extraction-ready package and expand it around:
 Current incubation slice:
 
 - `createInteractionOwnershipRegistry` tracks active owner, registered owners, temporary return stack, and declared restore target.
-- `createInteractionDiagnosticsSnapshot` combines registry state, owner stack, DOM focus metadata, key route result, ignored/native fallback reason, restore target, and focus guard intervention in one inspectable snapshot.
+- `createInteractionDiagnosticsSnapshot` combines registry state, owner stack, owner diagnostics, DOM focus metadata, key route result, matched key rule, ignored/native fallback reason, restore target, and focus guard intervention in one inspectable snapshot.
 
 No DOM listener yet.
 
@@ -427,7 +427,7 @@ The result should explain whether an owner handled, yielded, restored, or ignore
 Current incubation slice:
 
 - `routeInteractionKey` chooses between active owner, restore intent, shell owner, protected native target, and browser fallback.
-- `InteractionRouteResult` reports active owner, candidate owners, target kind, route status, route reason, restore owner, and declared restore target.
+- `InteractionRouteResult` reports active owner, candidate owners, target kind, route status, route reason, matched key rule when declared, restore owner, and declared restore target.
 - It does not install a document listener or mutate focus by default.
 
 ### Phase 3: DOM Focus Guard Adapter

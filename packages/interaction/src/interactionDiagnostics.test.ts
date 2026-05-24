@@ -19,6 +19,13 @@ describe('interaction diagnostics', () => {
     registry.register({
       id: 'tree',
       kind: 'pattern',
+      diagnostics: {
+        label: 'Repository tree',
+        role: 'tree',
+        activeCursor: 'docs',
+        focusStrategy: 'rovingTabIndex',
+        keyRules: [{ id: 'tree.restore', keys: ['Escape'], kind: 'restore', label: 'Restore tree cursor' }],
+      },
       restoreTarget: { kind: 'active-cursor', elementId: 'treeitem-docs' },
     })
     registry.register({
@@ -51,6 +58,41 @@ describe('interaction diagnostics', () => {
         restoreOwnerId: 'tree',
         restoreTarget: { kind: 'active-cursor', ownerId: 'tree', elementId: 'treeitem-docs' },
       },
+    })
+  })
+
+  it('includes owner diagnostics and matched key rule metadata for handled keys', () => {
+    const registry = createInteractionOwnershipRegistry()
+
+    registry.register({
+      id: 'tree',
+      kind: 'pattern',
+      diagnostics: {
+        label: 'Repository tree',
+        role: 'tree',
+        activeCursor: 'docs',
+        focusStrategy: 'rovingTabIndex',
+        keyRules: [{ id: 'tree.navigate.next', keys: ['ArrowDown'], kind: 'navigation', label: 'Move to next visible node' }],
+      },
+      ownsKey: (input) => input.key === 'ArrowDown',
+    })
+    registry.activate('tree')
+
+    const route = routeInteractionKey(registry, { key: 'ArrowDown', targetKind: 'scroll-container' })
+    const diagnostics = createInteractionDiagnosticsSnapshot(registry, { route })
+
+    expect(diagnostics.activeOwnerDiagnostics).toEqual({
+      label: 'Repository tree',
+      role: 'tree',
+      activeCursor: 'docs',
+      focusStrategy: 'rovingTabIndex',
+      keyRules: [{ id: 'tree.navigate.next', keys: ['ArrowDown'], kind: 'navigation', label: 'Move to next visible node' }],
+    })
+    expect(diagnostics.route?.matchedKeyRule).toEqual({
+      id: 'tree.navigate.next',
+      key: 'ArrowDown',
+      kind: 'navigation',
+      label: 'Move to next visible node',
     })
   })
 

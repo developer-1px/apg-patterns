@@ -10,6 +10,12 @@ describe('interaction key routing', () => {
     registry.register({
       id: 'tree',
       kind: 'pattern',
+      diagnostics: {
+        role: 'tree',
+        activeCursor: 'docs',
+        focusStrategy: 'rovingTabIndex',
+        keyRules: [{ id: 'tree.navigate.next', keys: ['ArrowDown'], kind: 'navigation', label: 'Move to next visible node' }],
+      },
       ownsKey: (input) => input.key === 'ArrowDown',
     })
     registry.activate('tree')
@@ -22,6 +28,12 @@ describe('interaction key routing', () => {
       targetKind: 'scroll-container',
       ownerId: 'tree',
       ownerKind: 'pattern',
+      matchedKeyRule: {
+        id: 'tree.navigate.next',
+        key: 'ArrowDown',
+        kind: 'navigation',
+        label: 'Move to next visible node',
+      },
     })
   })
 
@@ -87,6 +99,9 @@ describe('interaction key routing', () => {
     registry.register({
       id: 'command-palette',
       kind: 'shell',
+      diagnostics: {
+        keyRules: [{ id: 'shell.commandPalette.open', keys: ['k'], metaKey: true, kind: 'shell', label: 'Open command palette' }],
+      },
       ownsKey: (input) => input.metaKey === true && input.key === 'k',
     })
     registry.activate('tree')
@@ -99,6 +114,12 @@ describe('interaction key routing', () => {
       targetKind: 'pattern',
       ownerId: 'command-palette',
       ownerKind: 'shell',
+      matchedKeyRule: {
+        id: 'shell.commandPalette.open',
+        key: 'k',
+        kind: 'shell',
+        label: 'Open command palette',
+      },
     })
 
     expect(routeInteractionKey(registry, { key: 's', metaKey: true, targetKind: 'pattern' })).toEqual({

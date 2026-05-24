@@ -4,6 +4,35 @@ export type InteractionOwnerKind = 'pattern' | 'temporary-control' | 'shell'
 
 export type InteractionRestoreReason = 'release' | 'cancel' | 'remove'
 
+export type InteractionKeyRuleKind = 'navigation' | 'command' | 'restore' | 'shell' | 'custom'
+
+export interface InteractionKeyRule {
+  id: string
+  keys: readonly string[]
+  kind?: InteractionKeyRuleKind
+  label?: string
+  altKey?: boolean
+  ctrlKey?: boolean
+  metaKey?: boolean
+  shiftKey?: boolean
+  targetKinds?: readonly InteractionKeyTargetKind[]
+}
+
+export interface InteractionMatchedKeyRule {
+  id: string
+  key: string
+  kind?: InteractionKeyRuleKind
+  label?: string
+}
+
+export interface InteractionOwnerDiagnostics {
+  label?: string
+  role?: string
+  activeCursor?: string | null
+  focusStrategy?: string
+  keyRules?: readonly InteractionKeyRule[]
+}
+
 export type InteractionRestoreTargetKind =
   | 'invoker'
   | 'previous-owner'
@@ -54,6 +83,7 @@ export type InteractionRestoreTargetResolver = (
 export interface InteractionOwner {
   id: InteractionOwnerId
   kind: InteractionOwnerKind
+  diagnostics?: InteractionOwnerDiagnostics
   ownsKey?: (input: InteractionKeyInput) => boolean
   restoreKeys?: (input: InteractionKeyInput) => boolean
   allowsShellKey?: (input: InteractionKeyInput) => boolean
@@ -188,4 +218,30 @@ export function resolveInteractionRestoreTarget(
     : owner.restoreTarget
   if (!target) return null
   return { ...target, ownerId: target.ownerId ?? owner.id }
+}
+
+export function matchInteractionKeyRule(
+  rules: readonly InteractionKeyRule[] | undefined,
+  input: InteractionKeyInput,
+): InteractionMatchedKeyRule | null {
+  if (!rules) return null
+  const targetKind = input.targetKind ?? 'unknown'
+
+  for (const rule of rules) {
+    if (!rule.keys.includes(input.key)) continue
+    if (rule.altKey !== undefined && rule.altKey !== (input.altKey ?? false)) continue
+    if (rule.ctrlKey !== undefined && rule.ctrlKey !== (input.ctrlKey ?? false)) continue
+    if (rule.metaKey !== undefined && rule.metaKey !== (input.metaKey ?? false)) continue
+    if (rule.shiftKey !== undefined && rule.shiftKey !== (input.shiftKey ?? false)) continue
+    if (rule.targetKinds && !rule.targetKinds.includes(targetKind)) continue
+
+    return {
+      id: rule.id,
+      key: input.key,
+      kind: rule.kind,
+      label: rule.label,
+    }
+  }
+
+  return null
 }

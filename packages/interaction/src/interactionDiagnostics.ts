@@ -1,7 +1,9 @@
 import { classifyInteractionKeyTarget } from './interactionKeyTarget'
 import type {
   InteractionKeyTargetKind,
+  InteractionMatchedKeyRule,
   InteractionOwnerId,
+  InteractionOwnerDiagnostics,
   InteractionOwnerKind,
   InteractionOwnershipRegistry,
   InteractionRestoreTarget,
@@ -31,6 +33,7 @@ export interface InteractionDiagnosticsOptions {
 export interface InteractionDiagnosticsSnapshot {
   activeOwnerId: InteractionOwnerId | null
   activeOwnerKind: InteractionOwnerKind | null
+  activeOwnerDiagnostics?: InteractionOwnerDiagnostics
   ownerIds: readonly InteractionOwnerId[]
   returnOwnerIds: readonly InteractionOwnerId[]
   ownerStack: readonly InteractionOwnerId[]
@@ -42,6 +45,7 @@ export interface InteractionDiagnosticsSnapshot {
     targetKind: InteractionRouteResult['targetKind']
     ownerId?: InteractionOwnerId
     ownerKind?: InteractionOwnerKind
+    matchedKeyRule?: InteractionMatchedKeyRule | null
     candidateOwnerIds: readonly InteractionOwnerId[]
     restoreOwnerId?: InteractionOwnerId | null
     restoreTarget?: InteractionRestoreTarget | null
@@ -70,6 +74,7 @@ export function createInteractionDiagnosticsSnapshot(
   return {
     activeOwnerId: snapshot.activeOwnerId,
     activeOwnerKind: activeOwner?.kind ?? null,
+    activeOwnerDiagnostics: activeOwner?.diagnostics,
     ownerIds: snapshot.ownerIds,
     returnOwnerIds: snapshot.returnOwnerIds,
     ownerStack: [...snapshot.returnOwnerIds, ...(snapshot.activeOwnerId ? [snapshot.activeOwnerId] : [])],
@@ -102,6 +107,7 @@ function describeInteractionRoute(route: InteractionRouteResult): NonNullable<In
     targetKind: route.targetKind,
     ownerId: route.ownerId,
     ownerKind: route.ownerKind,
+    matchedKeyRule: route.matchedKeyRule,
     candidateOwnerIds: route.candidateOwnerIds,
     restoreOwnerId: route.restoreOwnerId,
     restoreTarget: route.restoreTarget,

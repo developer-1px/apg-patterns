@@ -5,9 +5,10 @@ import type {
   InteractionOwnerId,
   InteractionOwnerKind,
   InteractionOwnershipRegistry,
+  InteractionMatchedKeyRule,
   InteractionRestoreTarget,
 } from './interactionOwnership'
-import { resolveInteractionRestoreTarget } from './interactionOwnership'
+import { matchInteractionKeyRule, resolveInteractionRestoreTarget } from './interactionOwnership'
 
 export type InteractionRouteStatus = 'owner' | 'restore' | 'native' | 'ignored'
 
@@ -28,6 +29,7 @@ export interface InteractionRouteResult {
   targetKind: InteractionKeyTargetKind
   ownerId?: InteractionOwnerId
   ownerKind?: InteractionOwnerKind
+  matchedKeyRule?: InteractionMatchedKeyRule | null
   restoreOwnerId?: InteractionOwnerId | null
   restoreTarget?: InteractionRestoreTarget | null
 }
@@ -61,7 +63,7 @@ export function routeInteractionKey(
 
     const shellOwner = findShellOwner(registry, input)
     if (shellOwner) {
-      return ownerRoute('shell-owner-handled', shellOwner, activeOwnerId, [shellOwner.id], targetKind)
+    return ownerRoute('shell-owner-handled', shellOwner, input, activeOwnerId, [shellOwner.id], targetKind)
     }
 
     return {
@@ -102,7 +104,7 @@ export function routeInteractionKey(
   }
 
   if (ownerAcceptsKey(activeOwner, input)) {
-    return ownerRoute('active-owner-handled', activeOwner, activeOwnerId, [activeOwner.id], targetKind)
+    return ownerRoute('active-owner-handled', activeOwner, input, activeOwnerId, [activeOwner.id], targetKind)
   }
 
   if (activeOwner.allowsShellKey?.(input) === true) {
@@ -110,7 +112,7 @@ export function routeInteractionKey(
     const candidateOwnerIds = [activeOwner.id, ...(shellOwner ? [shellOwner.id] : [])]
 
     if (shellOwner) {
-      return ownerRoute('shell-owner-handled', shellOwner, activeOwnerId, candidateOwnerIds, targetKind)
+      return ownerRoute('shell-owner-handled', shellOwner, input, activeOwnerId, candidateOwnerIds, targetKind)
     }
 
     return {
@@ -134,10 +136,12 @@ export function routeInteractionKey(
 function ownerRoute(
   reason: 'active-owner-handled' | 'shell-owner-handled',
   owner: InteractionOwner,
+  input: InteractionKeyInput,
   activeOwnerId: InteractionOwnerId | null,
   candidateOwnerIds: readonly InteractionOwnerId[],
   targetKind: InteractionKeyTargetKind,
 ): InteractionRouteResult {
+  const matchedKeyRule = matchInteractionKeyRule(owner.diagnostics?.keyRules, input)
   return {
     status: 'owner',
     reason,
@@ -146,6 +150,7 @@ function ownerRoute(
     targetKind,
     ownerId: owner.id,
     ownerKind: owner.kind,
+    ...(matchedKeyRule ? { matchedKeyRule } : {}),
   }
 }
 

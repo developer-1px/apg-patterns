@@ -125,4 +125,4 @@ Current signal:
 - Focus guard decisions are reported before mutation: incidental and scroll focus can restore the active pattern owner, native controls are allowed, and declared owner targets can request explicit handoff.
 - React shell hooks live behind the `./react` subpath and cover owner registration, keyboard routing, temporary restore, and focus guard decisions without moving React into the package root.
 - `TreeviewInteractionProviderDemo` applies the React hooks to a real APG treeview shell fixture, proving provider-level routing and focus guard behavior outside hook-only tests.
-- Diagnostics snapshots combine active owner, owner stack, DOM focus, route reason, restore target, and focus guard intervention in one React-free helper.
+- Diagnostics snapshots combine active owner, owner stack, owner diagnostics, DOM focus, route reason, matched key rule, restore target, and focus guard intervention in one React-free helper.
