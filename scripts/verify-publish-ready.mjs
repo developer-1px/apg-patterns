@@ -192,6 +192,8 @@ const requiredPackedPaths = [
   'LICENSE',
   'docs/proposals/2026-05-18-llm-friendly-apg-react-api.md',
   'docs/proposals/2026-05-18-react-facade-zod-blind-loop.md',
+  'docs/proposals/2026-05-24-interaction-ownership-incubation.md',
+  'docs/proposals/2026-05-24-interaction-ownership-technical-research.md',
   'dist/index.js',
   'dist/index.js.map',
   'dist/index.cjs',

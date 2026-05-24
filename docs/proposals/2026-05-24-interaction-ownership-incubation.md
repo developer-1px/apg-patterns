@@ -13,6 +13,22 @@ title: Interaction Ownership Incubation
 
 Interaction ownership can be incubated in this repository while it is discovered through APG demos, but it must stay outside the public `@interactive-os/aria` runtime surface until the boundary is stable.
 
+Research baseline: [Interaction ownership technical research](2026-05-24-interaction-ownership-technical-research.md).
+
+## Package Goal and Significance
+
+Goal: coordinate keyboard and focus ownership in application shells composed from APG patterns, native controls, custom keys, and global keys.
+
+This matters because app shells often combine trees, lists, menus, toolbars, dialogs, forms, scroll containers, and inline editors. In those shells, browser DOM focus alone is not enough to know who should interpret `ArrowDown`, `Escape`, `Enter`, or app-level shortcuts.
+
+The package should make interaction ownership explicit so:
+
+- a tree cursor keeps owning tree navigation even when an incidental scroll container receives focus
+- a listbox, menu, grid, or toolbar can protect its APG keyboard contract from accidental native focus theft
+- an input, editor, popover, or dialog can intentionally take temporary ownership and then restore the previous owner
+- global shortcuts can run only when the active owner allows them
+- focus restoration becomes a declared lifecycle, not a best-effort side effect
+
 ## Identity
 
 The project starts from keyboard behavior, not from visual components. Many keyboard interactions already have shared social expectations: arrow keys move through trees, lists, menus, grids, and controls in recognizable ways.

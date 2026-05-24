@@ -410,5 +410,6 @@ MIT. See [LICENSE](LICENSE).
 ## Design Notes
 
 - [Interaction ownership incubation](docs/proposals/2026-05-24-interaction-ownership-incubation.md)
+- [Interaction ownership technical research](docs/proposals/2026-05-24-interaction-ownership-technical-research.md)
 - [React facade zod blind loop](docs/proposals/2026-05-18-react-facade-zod-blind-loop.md)
 - [LLM-friendly APG React API](docs/proposals/2026-05-18-llm-friendly-apg-react-api.md)
