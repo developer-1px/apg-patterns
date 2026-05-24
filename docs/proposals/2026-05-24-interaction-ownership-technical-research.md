@@ -466,6 +466,8 @@ Current incubation slice:
 - Its tests prove tree keyboard intent survives scroll-container focus, native text input keeps its own keys, `Escape` restores ownership from a temporary input, and only allowed shell shortcuts route globally.
 - `GridInteractionOwnershipDemo` renders the real editable APG grid inside the same ownership model.
 - Its tests prove grid navigation survives scroll-container focus, editor arrow keys stay native, edit-mode `Escape` restores grid ownership and cell focus, and shell shortcuts stay opt-in while editing.
+- `DialogInteractionOwnershipDemo` renders a dialog with a nested APG listbox and search input.
+- Its tests prove dialog chrome can delegate movement to the nested listbox, search input keeps native text navigation, `Escape` restores from search to listbox without closing the dialog, and allowed shell shortcuts remain opt-in.
 
 ## Decision
 
