@@ -60,6 +60,22 @@ Allowed during incubation:
 - Reproduction demos for tree, scrollbar, input, form, dialog, and inline editing ownership conflicts.
 - Discovering metadata that APG patterns may later expose to an app-level interaction layer.
 
+## Adoption Direction
+
+The first customer inside this repository is the APG demo shell. Demo fixtures should prove the contract with concrete APG combinations before the package is treated as public API.
+
+The first product-shell customer is `../hub`. Hub should consume the interaction package as an application shell layer on top of `@interactive-os/aria`, not by moving ownership logic into `@interactive-os/aria` itself.
+
+```txt
+apg-patterns
+└─ A: APG demo shell proves the ownership protocol
+
+../hub
+└─ B: product shell applies the same protocol to real project lists, toolbars, file trees, and native controls
+```
+
+This keeps the feedback loops separate: APG demos explain and stabilize the protocol; Hub tests whether the protocol survives real shell composition.
+
 Not allowed during incubation:
 
 - Public root/core exports for a global manager.
