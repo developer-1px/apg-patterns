@@ -329,6 +329,14 @@ npm run check:apg
 
 `check:independence` verifies that this package keeps its dependency surface separate from legacy APG workspaces.
 
+For the private interaction ownership incubation package:
+
+```bash
+npm run check:interaction
+```
+
+`check:interaction` is intentionally separate from `npm run check` and verifies `packages/interaction` without adding it to the published `@interactive-os/aria` runtime surface.
+
 `check:react-peer` verifies that the optional React peer supports React 18 and React 19 while production source imports stay within the checked React 18/19 API surface.
 
 `check:api` validates that API.md matches the built root, `./core`, and `./react` declaration export surfaces.
@@ -401,5 +409,6 @@ MIT. See [LICENSE](LICENSE).
 
 ## Design Notes
 
+- [Interaction ownership incubation](docs/proposals/2026-05-24-interaction-ownership-incubation.md)
 - [React facade zod blind loop](docs/proposals/2026-05-18-react-facade-zod-blind-loop.md)
 - [LLM-friendly APG React API](docs/proposals/2026-05-18-llm-friendly-apg-react-api.md)

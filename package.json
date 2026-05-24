@@ -97,6 +97,7 @@
     "check:exports": "node scripts/verify-package-exports.mjs",
     "check:external": "node scripts/verify-external-release-state.mjs",
     "check:independence": "node scripts/verify-package-independence.mjs",
+    "check:interaction": "tsc --noEmit -p packages/interaction/tsconfig.json && vitest run --config packages/interaction/vitest.config.ts",
     "check:package": "node scripts/verify-package-side-effects.mjs",
     "check:performance": "npm run build && node scripts/verify-performance-baseline.mjs",
     "check:publish": "node scripts/verify-publish-ready.mjs",

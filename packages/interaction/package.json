@@ -1,0 +1,21 @@
+{
+  "name": "@interactive-os/interaction",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Incubating interaction ownership primitives for Interactive OS keyboard and focus coordination.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "test": "vitest run --config vitest.config.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "peerDependencies": {
+    "@interactive-os/aria": ">=0.1.0"
+  },
+  "peerDependenciesMeta": {
+    "@interactive-os/aria": {
+      "optional": true
+    }
+  }
+}
