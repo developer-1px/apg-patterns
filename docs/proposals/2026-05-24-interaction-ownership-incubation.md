@@ -85,8 +85,14 @@ If a global manager becomes a product, it should live in an app shell or a separ
 packages/interaction/
 ├─ package.json: private @interactive-os/interaction package identity
 ├─ src/
+│  ├─ interactionKeyTarget.ts: DOM key target classification
+│  ├─ interactionKeyTarget.test.ts: native, APG, scroll, and incidental target tests
+│  ├─ interactionKeyboardEvent.ts: explicit KeyboardEvent-to-route adapter
+│  ├─ interactionKeyboardEvent.test.ts: event routing and optional restore release tests
 │  ├─ interactionOwnership.ts: owner registry and protocol primitives
 │  ├─ interactionOwnership.test.ts: focused ownership and restore tests
+│  ├─ interactionRouting.ts: pure owner/native/shell route selection
+│  ├─ interactionRouting.test.ts: key routing priority tests
 │  └─ index.ts: package exports
 ├─ tsconfig.json
 └─ vitest.config.ts

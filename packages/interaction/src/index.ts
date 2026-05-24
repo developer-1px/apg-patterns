@@ -19,3 +19,13 @@ export {
 } from './interactionRouting'
 
 export { classifyInteractionKeyTarget } from './interactionKeyTarget'
+
+export {
+  handleInteractionKeyboardEvent,
+  interactionKeyInputFromKeyboardEvent,
+  routeInteractionKeyboardEvent,
+  type HandleInteractionKeyboardEventOptions,
+  type InteractionKeyboardEventLike,
+  type InteractionKeyboardEventRoute,
+  type InteractionKeyboardRouteCallback,
+} from './interactionKeyboardEvent'

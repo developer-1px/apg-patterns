@@ -414,16 +414,28 @@ No DOM listener yet.
 Add a pure routing function:
 
 ```ts
-routeInteractionKey(input, registrySnapshot): InteractionRouteResult
+routeInteractionKey(registry, input): InteractionRouteResult
 ```
 
 The result should explain whether an owner handled, yielded, restored, or ignored the key.
+
+Current incubation slice:
+
+- `routeInteractionKey` chooses between active owner, restore intent, shell owner, protected native target, and browser fallback.
+- `InteractionRouteResult` reports active owner, candidate owners, target kind, route status, and route reason.
+- It does not install a document listener or mutate focus by default.
 
 ### Phase 3: DOM Focus Guard Adapter
 
 Add an optional DOM adapter that observes focus changes inside declared scopes and can detect when native focus has moved to an incidental target.
 
 This adapter should report intended actions first; direct refocus should be opt-in.
+
+Current incubation slice:
+
+- `classifyInteractionKeyTarget` maps DOM targets to `text-input`, `textarea`, `select`, `contenteditable`, `native-control`, `pattern`, `scroll-container`, `incidental`, or `unknown`.
+- `routeInteractionKeyboardEvent` combines KeyboardEvent modifier state with target classification.
+- `handleInteractionKeyboardEvent` can prevent default for handled owner/restore routes and can explicitly release a temporary owner on restore keys when opted in.
 
 ### Phase 4: React Shell Adapter
 
