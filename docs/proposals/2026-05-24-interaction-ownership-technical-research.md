@@ -460,6 +460,11 @@ Create minimal behavior demos:
 
 Keep demo explanation minimal; use source/state/diagnostics to show the behavior.
 
+Current incubation slice:
+
+- `TreeviewInteractionOwnershipDemo` renders the real APG treeview inside a shell-level interaction owner.
+- Its tests prove tree keyboard intent survives scroll-container focus, native text input keeps its own keys, `Escape` restores ownership from a temporary input, and only allowed shell shortcuts route globally.
+
 ## Decision
 
 The package goal should be stated as:
