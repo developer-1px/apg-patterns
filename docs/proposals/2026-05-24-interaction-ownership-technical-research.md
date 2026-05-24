@@ -464,6 +464,8 @@ Current incubation slice:
 
 - `TreeviewInteractionOwnershipDemo` renders the real APG treeview inside a shell-level interaction owner.
 - Its tests prove tree keyboard intent survives scroll-container focus, native text input keeps its own keys, `Escape` restores ownership from a temporary input, and only allowed shell shortcuts route globally.
+- `GridInteractionOwnershipDemo` renders the real editable APG grid inside the same ownership model.
+- Its tests prove grid navigation survives scroll-container focus, editor arrow keys stay native, edit-mode `Escape` restores grid ownership and cell focus, and shell shortcuts stay opt-in while editing.
 
 ## Decision
 
