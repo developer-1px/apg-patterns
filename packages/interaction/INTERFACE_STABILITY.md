@@ -12,6 +12,8 @@ while the API is hardened against APG demo shell and product shell usage.
 - The package does not import `@interactive-os/aria`.
 - Core decisions are inspectable data before mutation: route results, focus
   guard results, diagnostics snapshots, and restore targets.
+- Serializable owner definitions are the preferred contract. Callback owners
+  remain an adapter surface while the definition-first API hardens.
 - Browser event adapters are optional helpers around the pure routing and focus
   guard functions.
 
@@ -22,6 +24,9 @@ while the API is hardened against APG demo shell and product shell usage.
 - Temporary owners can restore the previous owner through declared restore keys.
 - Native text targets are protected from pattern and shell shortcuts unless the
   shell explicitly opts into a different policy.
+- Zod schemas validate owner definitions, key rules, structured conditions,
+  target policies, focus lifecycle, shell rules, action descriptors, and
+  serializable action params.
 - Focus guard decisions report whether to restore the active owner, activate a
   declared target owner, allow native focus, or do nothing.
 - Diagnostics explain active owner, owner stack, DOM focus, route reason,

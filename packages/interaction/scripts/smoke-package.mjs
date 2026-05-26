@@ -21,6 +21,7 @@ try {
   linkDependency(consumerRoot, 'react')
   linkDependency(consumerRoot, '@types/react')
   linkDependency(consumerRoot, 'csstype')
+  linkDependency(consumerRoot, 'zod')
 
   writeConsumerFiles(consumerRoot)
   execFileSync(process.execPath, ['esm-smoke.mjs'], { cwd: consumerRoot, stdio: 'pipe' })
@@ -98,18 +99,26 @@ function writeConsumerFiles(consumerRoot) {
 
   writeFileSync(join(consumerRoot, 'esm-smoke.mjs'), `
 import {
+  InteractionOwnerDefinitionSchema,
+  compileInteractionOwnerDefinition,
   createInteractionOwnershipRegistry,
   routeInteractionKey,
 } from '@interactive-os/interaction'
 import { InteractionProvider } from '@interactive-os/interaction/react'
 
 const registry = createInteractionOwnershipRegistry()
-registry.register({
+registry.register(compileInteractionOwnerDefinition({
   id: 'tree',
-  kind: 'pattern',
-  ownsKey: (input) => input.key === 'ArrowDown',
-})
+  kind: 'tree',
+  keyRules: [{
+    id: 'tree.down',
+    kind: 'navigation',
+    keys: ['ArrowDown'],
+    action: { type: 'tree.move', params: { direction: 'next' } },
+  }],
+}))
 registry.activate('tree')
+InteractionOwnerDefinitionSchema.parse({ id: 'shell', kind: 'shell' })
 
 const route = routeInteractionKey(registry, {
   key: 'ArrowDown',
@@ -122,18 +131,26 @@ if (typeof InteractionProvider !== 'function') throw new Error('missing React pr
 
   writeFileSync(join(consumerRoot, 'cjs-smoke.cjs'), `
 const {
+  InteractionOwnerDefinitionSchema,
+  compileInteractionOwnerDefinition,
   createInteractionOwnershipRegistry,
   routeInteractionKey,
 } = require('@interactive-os/interaction')
 const { InteractionProvider } = require('@interactive-os/interaction/react')
 
 const registry = createInteractionOwnershipRegistry()
-registry.register({
+registry.register(compileInteractionOwnerDefinition({
   id: 'tree',
-  kind: 'pattern',
-  ownsKey: (input) => input.key === 'ArrowDown',
-})
+  kind: 'tree',
+  keyRules: [{
+    id: 'tree.down',
+    kind: 'navigation',
+    keys: ['ArrowDown'],
+    action: { type: 'tree.move', params: { direction: 'next' } },
+  }],
+}))
 registry.activate('tree')
+InteractionOwnerDefinitionSchema.parse({ id: 'shell', kind: 'shell' })
 
 const route = routeInteractionKey(registry, {
   key: 'ArrowDown',
@@ -146,8 +163,11 @@ if (typeof InteractionProvider !== 'function') throw new Error('missing React pr
 
   writeFileSync(join(consumerRoot, 'types-smoke.ts'), `
 import {
+  InteractionOwnerDefinitionSchema,
+  compileInteractionOwnerDefinition,
   createInteractionOwnershipRegistry,
   routeInteractionKey,
+  type InteractionOwnerDefinition,
   type InteractionOwner,
 } from '@interactive-os/interaction'
 import {
@@ -160,9 +180,20 @@ const owner: InteractionOwner = {
   kind: 'pattern',
   ownsKey: (input) => input.key === 'ArrowDown',
 }
+const definition: InteractionOwnerDefinition = InteractionOwnerDefinitionSchema.parse({
+  id: 'tree-definition',
+  kind: 'tree',
+  keyRules: [{
+    id: 'tree.down',
+    kind: 'navigation',
+    keys: ['ArrowDown'],
+    action: { type: 'tree.move' },
+  }],
+})
 
 const registry = createInteractionOwnershipRegistry()
 registry.register(owner)
+registry.register(compileInteractionOwnerDefinition(definition))
 registry.activate(owner.id)
 const route = routeInteractionKey(registry, { key: 'ArrowDown' })
 

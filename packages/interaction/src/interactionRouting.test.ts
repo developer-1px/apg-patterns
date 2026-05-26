@@ -56,6 +56,28 @@ describe('interaction key routing', () => {
     })
   })
 
+  it('lets an active pattern owner explicitly claim a native text key', () => {
+    const registry = createInteractionOwnershipRegistry()
+
+    registry.register({
+      id: 'tree',
+      kind: 'pattern',
+      ownsKey: (input) => input.key === 'ArrowDown',
+      allowsNativeKey: (input) => input.key === 'ArrowDown',
+    })
+    registry.activate('tree')
+
+    expect(routeInteractionKey(registry, { key: 'ArrowDown', targetKind: 'text-input' })).toEqual({
+      status: 'owner',
+      reason: 'active-owner-handled',
+      activeOwnerId: 'tree',
+      candidateOwnerIds: ['tree'],
+      targetKind: 'text-input',
+      ownerId: 'tree',
+      ownerKind: 'pattern',
+    })
+  })
+
   it('surfaces restore intent for temporary controls without mutating registry state', () => {
     const registry = createInteractionOwnershipRegistry()
 

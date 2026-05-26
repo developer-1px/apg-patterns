@@ -28,26 +28,40 @@ import { createInteractionOwnershipRegistry } from '@interactive-os/interaction'
 import { InteractionProvider } from '@interactive-os/interaction/react'
 ```
 
-- `@interactive-os/interaction`: React-free ownership registry, key routing,
-  focus guard decisions, keyboard event adapter, and diagnostics.
+- `@interactive-os/interaction`: React-free Zod definition schemas, ownership
+  registry, key routing, focus guard decisions, keyboard event adapter, and
+  diagnostics.
 - `@interactive-os/interaction/react`: optional React provider and hooks.
 
-## Core Example
+## Declarative Example
 
 ```ts
 import {
+  compileInteractionOwnerDefinition,
   createInteractionOwnershipRegistry,
   routeInteractionKey,
 } from '@interactive-os/interaction'
 
 const registry = createInteractionOwnershipRegistry()
 
-registry.register({
+registry.register(compileInteractionOwnerDefinition({
   id: 'files.tree',
-  kind: 'pattern',
-  ownsKey: (input) => input.key === 'ArrowDown' || input.key === 'ArrowUp',
-  restoreTarget: { kind: 'active-cursor', label: 'Files' },
-})
+  kind: 'tree',
+  focus: {
+    strategy: 'aria-activedescendant',
+    restore: { kind: 'active-cursor', label: 'Files' },
+  },
+  keyRules: [
+    {
+      id: 'files.next',
+      kind: 'navigation',
+      keys: ['ArrowDown'],
+      targetKinds: ['pattern', 'scroll-container', 'incidental'],
+      action: { type: 'tree.move', params: { direction: 'next' } },
+      preventDefault: true,
+    },
+  ],
+}))
 
 registry.activate('files.tree')
 
@@ -58,6 +72,10 @@ const route = routeInteractionKey(registry, {
 
 route.status
 ```
+
+`InteractionOwnerDefinitionSchema` validates this serializable contract before
+it is adapted to the current owner registry. Runtime effects stay behind action
+descriptors and host adapters.
 
 ## React Example
 

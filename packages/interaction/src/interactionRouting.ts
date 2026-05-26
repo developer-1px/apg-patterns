@@ -52,6 +52,11 @@ export function routeInteractionKey(
 
   if (!activeOwner) {
     if (isNativeTextTarget(targetKind)) {
+      const shellOwner = findShellOwner(registry, input, undefined, { requireNativeAllowance: true })
+      if (shellOwner) {
+        return ownerRoute('shell-owner-handled', shellOwner, input, activeOwnerId, [shellOwner.id], targetKind)
+      }
+
       return {
         status: 'native',
         reason: 'native-target-protected',
@@ -63,7 +68,7 @@ export function routeInteractionKey(
 
     const shellOwner = findShellOwner(registry, input)
     if (shellOwner) {
-    return ownerRoute('shell-owner-handled', shellOwner, input, activeOwnerId, [shellOwner.id], targetKind)
+      return ownerRoute('shell-owner-handled', shellOwner, input, activeOwnerId, [shellOwner.id], targetKind)
     }
 
     return {
@@ -93,7 +98,11 @@ export function routeInteractionKey(
     }
   }
 
-  if (isNativeTextTarget(targetKind) && activeOwner.kind !== 'temporary-control') {
+  if (
+    isNativeTextTarget(targetKind)
+    && activeOwner.kind !== 'temporary-control'
+    && activeOwner.allowsNativeKey?.(input) !== true
+  ) {
     return {
       status: 'native',
       reason: 'native-target-protected',
@@ -166,6 +175,7 @@ function findShellOwner(
   registry: Pick<InteractionOwnershipRegistry, 'getOwner' | 'snapshot'>,
   input: InteractionKeyInput,
   excludedOwnerId?: InteractionOwnerId,
+  options?: { requireNativeAllowance?: boolean },
 ): InteractionOwner | null {
   const ownerIds = [...registry.snapshot().ownerIds].reverse()
 
@@ -173,6 +183,7 @@ function findShellOwner(
     if (ownerId === excludedOwnerId) continue
     const owner = registry.getOwner(ownerId)
     if (!owner || owner.kind !== 'shell') continue
+    if (options?.requireNativeAllowance && owner.allowsNativeKey?.(input) !== true) continue
     if (ownerAcceptsKey(owner, input)) return owner
   }
 

@@ -13,5 +13,5 @@ export default defineConfig({
   outDir: 'dist',
   splitting: true,
   treeshake: true,
-  external: ['react'],
+  external: ['react', 'zod'],
 })

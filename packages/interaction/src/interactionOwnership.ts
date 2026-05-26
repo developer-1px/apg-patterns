@@ -85,6 +85,7 @@ export interface InteractionOwner {
   kind: InteractionOwnerKind
   diagnostics?: InteractionOwnerDiagnostics
   ownsKey?: (input: InteractionKeyInput) => boolean
+  allowsNativeKey?: (input: InteractionKeyInput) => boolean
   restoreKeys?: (input: InteractionKeyInput) => boolean
   allowsShellKey?: (input: InteractionKeyInput) => boolean
   restoreTarget?: InteractionRestoreTarget | InteractionRestoreTargetResolver
