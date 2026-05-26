@@ -31,6 +31,8 @@ while the API is hardened against APG demo shell and product shell usage.
   dispatch effects without reading callback closures.
 - Platform-specific bindings are selected only when route input declares a
   platform; otherwise the base key rule is used.
+- `code`, `preventDefault`, and `stopPropagation` are executable parts of a
+  key rule, not documentation-only fields.
 - Focus guard decisions report whether to restore the active owner, activate a
   declared target owner, allow native focus, or do nothing.
 - Diagnostics explain active owner, owner stack, DOM focus, route reason,

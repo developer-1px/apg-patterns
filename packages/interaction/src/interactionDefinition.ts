@@ -9,15 +9,8 @@ import type {
   InteractionOwner,
   InteractionOwnerKind,
   InteractionRestoreTarget,
+  InteractionSerializableValue,
 } from './interactionOwnership'
-
-export type InteractionSerializableValue =
-  | string
-  | number
-  | boolean
-  | null
-  | readonly InteractionSerializableValue[]
-  | { readonly [key: string]: InteractionSerializableValue }
 
 export const InteractionSerializableValueSchema: z.ZodType<InteractionSerializableValue> = z.lazy(() =>
   z.union([
@@ -134,6 +127,7 @@ export const InteractionActionDescriptorSchema = z.object({
 
 export const InteractionKeyPlatformBindingSchema = z.object({
   keys: z.array(z.string().min(1)).min(1),
+  code: z.array(z.string().min(1)).min(1).optional(),
   modifiers: z.array(InteractionKeyModifierSchema).default([]),
 }).strict()
 
@@ -345,7 +339,9 @@ export function compileInteractionOwnerDefinition(input: unknown): InteractionOw
 }
 
 export function compileInteractionOwnerDefinitions(input: unknown): InteractionOwner[] {
-  return defineInteractionOwners(input).map((definition) => compileInteractionOwnerDefinition(definition))
+  return [...defineInteractionOwners(input)]
+    .sort((first, second) => first.priority - second.priority)
+    .map((definition) => compileInteractionOwnerDefinition(definition))
 }
 
 export function evaluateInteractionCondition(
@@ -377,6 +373,7 @@ function ruleMatchesInput(
 ): boolean {
   const binding = resolveDefinitionKeyBinding(rule, input.platform)
   if (!binding.keys.includes(input.key)) return false
+  if (binding.code && (!input.code || !binding.code.includes(input.code))) return false
   if (rule.targetKinds && !rule.targetKinds.includes(input.targetKind ?? 'unknown')) return false
   if (!definitionBindingModifiersMatch(binding, input)) return false
   if (rule.when && !evaluateCondition(rule.when, { definition, input })) return false
@@ -403,6 +400,7 @@ function resolveDefinitionKeyBinding(
 
   return {
     keys: platformRule?.keys ?? rule.keys,
+    code: platformRule?.code ?? rule.code,
     altKey: modifierRequested(modifiers, 'Alt'),
     ctrlKey: modifierRequested(modifiers, 'Control'),
     metaKey: modifierRequested(modifiers, 'Meta'),
@@ -491,14 +489,17 @@ function toRuntimeKeyRule(rule: InteractionKeyRuleDefinition): InteractionKeyRul
     id: rule.id,
     keys: rule.keys,
     kind: rule.kind as InteractionKeyRuleKind,
-    label: rule.label ?? rule.description,
-    action: rule.action,
     altKey: modifierRequested(modifiers, 'Alt'),
     ctrlKey: modifierRequested(modifiers, 'Control'),
     metaKey: modifierRequested(modifiers, 'Meta'),
     shiftKey: modifierRequested(modifiers, 'Shift'),
-    platform: toRuntimePlatformRules(rule),
-    targetKinds: rule.targetKinds as readonly InteractionKeyTargetKind[] | undefined,
+    ...(rule.code !== undefined ? { code: rule.code } : {}),
+    ...(rule.label !== undefined || rule.description !== undefined ? { label: rule.label ?? rule.description } : {}),
+    action: rule.action,
+    ...(rule.platform !== undefined ? { platform: toRuntimePlatformRules(rule) } : {}),
+    ...(rule.targetKinds !== undefined ? { targetKinds: rule.targetKinds as readonly InteractionKeyTargetKind[] } : {}),
+    ...(rule.preventDefault !== undefined ? { preventDefault: rule.preventDefault } : {}),
+    ...(rule.stopPropagation !== undefined ? { stopPropagation: rule.stopPropagation } : {}),
   }
 }
 
@@ -511,11 +512,14 @@ function toRuntimePlatformRules(rule: InteractionKeyRuleDefinition): Interaction
   }
 }
 
-function toRuntimePlatformRule(
-  rule: { keys: readonly string[]; modifiers: readonly InteractionKeyModifier[] },
-): InteractionKeyPlatformRule {
+function toRuntimePlatformRule(rule: {
+  keys: readonly string[]
+  code?: readonly string[]
+  modifiers: readonly InteractionKeyModifier[]
+}): InteractionKeyPlatformRule {
   return {
     keys: rule.keys,
+    code: rule.code,
     altKey: modifierRequested(rule.modifiers, 'Alt'),
     ctrlKey: modifierRequested(rule.modifiers, 'Control'),
     metaKey: modifierRequested(rule.modifiers, 'Meta'),

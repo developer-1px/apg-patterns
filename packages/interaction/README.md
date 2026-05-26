@@ -211,28 +211,32 @@ const shellOwner = compileInteractionOwnerDefinition({
       id: 'command-palette.open',
       kind: 'shell',
       keys: ['k'],
+      code: ['KeyK'],
       modifiers: ['Control'],
       platform: {
-        mac: { keys: ['k'], modifiers: ['Meta'] },
-        windows: { keys: ['k'], modifiers: ['Control'] },
-        linux: { keys: ['k'], modifiers: ['Control'] },
+        mac: { keys: ['k'], code: ['KeyK'], modifiers: ['Meta'] },
+        windows: { keys: ['k'], code: ['KeyK'], modifiers: ['Control'] },
+        linux: { keys: ['k'], code: ['KeyK'], modifiers: ['Control'] },
       },
       targetKinds: ['pattern', 'incidental'],
       action: { type: 'command-palette.open' },
+      preventDefault: true,
     },
     {
       id: 'app.save',
       kind: 'shell',
       keys: ['s'],
+      code: ['KeyS'],
       modifiers: ['Control'],
       platform: {
-        mac: { keys: ['s'], modifiers: ['Meta'] },
-        windows: { keys: ['s'], modifiers: ['Control'] },
-        linux: { keys: ['s'], modifiers: ['Control'] },
+        mac: { keys: ['s'], code: ['KeyS'], modifiers: ['Meta'] },
+        windows: { keys: ['s'], code: ['KeyS'], modifiers: ['Control'] },
+        linux: { keys: ['s'], code: ['KeyS'], modifiers: ['Control'] },
       },
       targetKinds: ['pattern', 'incidental', 'text-input', 'textarea', 'contenteditable'],
       targetPolicy: { nativeText: 'allow-shell' },
       action: { type: 'app.save' },
+      preventDefault: true,
     },
   ],
 })
@@ -243,10 +247,12 @@ declares `shellRules: { allowGlobal: true }`.
 
 `platform` bindings are selected when route input includes
 `platform: "mac" | "windows" | "linux"`. Without a platform, the base `keys`
-and `modifiers` fields are used.
+and `modifiers` fields are used. `code` is optional and narrows a rule to a
+physical key when route input includes `code`.
 
 When a rule matches, the route exposes `route.matchedKeyRule?.action` so the
-host shell can dispatch the declared effect.
+host shell can dispatch the declared effect. `handleInteractionKeyboardEvent`
+also honors matched `preventDefault` and `stopPropagation` values.
 
 ## Package Boundary
 

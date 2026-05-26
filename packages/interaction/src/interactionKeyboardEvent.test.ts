@@ -160,31 +160,73 @@ describe('interaction keyboard event adapter', () => {
   it('normalizes keyboard modifier state and target kind from an event-like input', () => {
     const button = document.createElement('button')
 
-    expect(interactionKeyInputFromKeyboardEvent(keyboardEvent({ key: 'Enter', shiftKey: true, target: button }))).toEqual({
+    expect(interactionKeyInputFromKeyboardEvent(keyboardEvent({
       key: 'Enter',
+      code: 'Enter',
+      platform: 'mac',
+      shiftKey: true,
+      target: button,
+    }))).toEqual({
+      key: 'Enter',
+      code: 'Enter',
       altKey: false,
       ctrlKey: false,
       metaKey: false,
+      platform: 'mac',
       shiftKey: true,
       targetKind: 'native-control',
     })
+  })
+
+  it('uses declarative preventDefault and stopPropagation policy from the matched key rule', () => {
+    const registry = createInteractionOwnershipRegistry()
+    const preventDefault = vi.fn()
+    const stopPropagation = vi.fn()
+
+    registry.register({
+      id: 'toolbar',
+      kind: 'pattern',
+      diagnostics: {
+        keyRules: [{
+          id: 'toolbar.next',
+          keys: ['ArrowRight'],
+          kind: 'navigation',
+          preventDefault: false,
+          stopPropagation: true,
+        }],
+      },
+      ownsKey: (input) => input.key === 'ArrowRight',
+    })
+    registry.activate('toolbar')
+
+    handleInteractionKeyboardEvent({
+      registry,
+      event: keyboardEvent({ key: 'ArrowRight', preventDefault, stopPropagation }),
+    })
+
+    expect(preventDefault).not.toHaveBeenCalled()
+    expect(stopPropagation).toHaveBeenCalledTimes(1)
   })
 })
 
 function keyboardEvent({
   key,
+  code,
   altKey = false,
   ctrlKey = false,
   metaKey = false,
+  platform,
   shiftKey = false,
   target = null,
   preventDefault = vi.fn(),
   stopPropagation = vi.fn(),
 }: {
   key: string
+  code?: string
   altKey?: boolean
   ctrlKey?: boolean
   metaKey?: boolean
+  platform?: InteractionKeyboardEventLike['platform']
   shiftKey?: boolean
   target?: EventTarget | null
   preventDefault?: () => void
@@ -192,9 +234,11 @@ function keyboardEvent({
 }): InteractionKeyboardEventLike {
   return {
     key,
+    code,
     altKey,
     ctrlKey,
     metaKey,
+    platform,
     shiftKey,
     target,
     preventDefault,

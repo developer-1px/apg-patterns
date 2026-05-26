@@ -4,6 +4,7 @@ import { createInteractionOwnershipRegistry } from './interactionOwnership'
 import {
   InteractionOwnerDefinitionSchema,
   compileInteractionOwnerDefinition,
+  compileInteractionOwnerDefinitions,
   defineInteractionOwner,
   evaluateInteractionCondition,
 } from './interactionDefinition'
@@ -136,6 +137,8 @@ describe('compileInteractionOwnerDefinition', () => {
         key: 'ArrowDown',
         kind: 'navigation',
         action: { type: 'tree.move', params: { direction: 'next' } },
+        preventDefault: true,
+        stopPropagation: true,
       },
     })
 
@@ -236,10 +239,11 @@ describe('compileInteractionOwnerDefinition', () => {
           id: 'shell.palette',
           kind: 'shell',
           keys: ['k'],
+          code: ['KeyK'],
           modifiers: ['Control'],
           platform: {
-            mac: { keys: ['k'], modifiers: ['Meta'] },
-            windows: { keys: ['k'], modifiers: ['Control'] },
+            mac: { keys: ['k'], code: ['KeyK'], modifiers: ['Meta'] },
+            windows: { keys: ['k'], code: ['KeyK'], modifiers: ['Control'] },
           },
           targetKinds: ['pattern'],
           action: { type: 'shell.open-command-palette' },
@@ -251,6 +255,7 @@ describe('compileInteractionOwnerDefinition', () => {
 
     expect(routeInteractionKey(registry, {
       key: 'k',
+      code: 'KeyK',
       metaKey: true,
       platform: 'mac',
       targetKind: 'pattern',
@@ -259,12 +264,14 @@ describe('compileInteractionOwnerDefinition', () => {
       ownerId: 'app-shell',
       matchedKeyRule: {
         id: 'shell.palette',
+        code: 'KeyK',
         action: { type: 'shell.open-command-palette' },
       },
     })
 
     expect(routeInteractionKey(registry, {
       key: 'k',
+      code: 'KeyK',
       ctrlKey: true,
       platform: 'mac',
       targetKind: 'pattern',
@@ -272,6 +279,26 @@ describe('compileInteractionOwnerDefinition', () => {
       status: 'ignored',
       reason: 'no-owner',
     })
+
+    expect(routeInteractionKey(registry, {
+      key: 'k',
+      code: 'KeyJ',
+      metaKey: true,
+      platform: 'mac',
+      targetKind: 'pattern',
+    })).toMatchObject({
+      status: 'ignored',
+      reason: 'no-owner',
+    })
+  })
+
+  it('sorts compiled owner definitions by priority for deterministic registration order', () => {
+    const owners = compileInteractionOwnerDefinitions([
+      { id: 'high-priority-shell', kind: 'shell', priority: 20, keyRules: [] },
+      { id: 'low-priority-shell', kind: 'shell', priority: 0, keyRules: [] },
+    ])
+
+    expect(owners.map((owner) => owner.id)).toEqual(['low-priority-shell', 'high-priority-shell'])
   })
 
   it('compiles temporary owner restore keys and restore targets', () => {
@@ -308,6 +335,10 @@ describe('compileInteractionOwnerDefinition', () => {
       status: 'restore',
       reason: 'temporary-owner-restore-requested',
       ownerId: 'tree-filter',
+      matchedKeyRule: {
+        id: 'filter.escape',
+        action: { type: 'owner.restore' },
+      },
       restoreOwnerId: 'project-tree',
       restoreTarget: {
         kind: 'active-cursor',

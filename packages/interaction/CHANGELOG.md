@@ -10,4 +10,6 @@
   adapters for the current owner registry.
 - Added matched action descriptors and explicit platform-aware key routing
   inputs for declarative key rules.
+- Aligned declarative `code`, `preventDefault`, `stopPropagation`, and
+  owner `priority` fields with runtime behavior and test coverage.
 - Added optional React provider and hooks behind the `./react` subpath.

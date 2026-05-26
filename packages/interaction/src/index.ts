@@ -21,6 +21,7 @@ export {
   type InteractionRestoreTarget,
   type InteractionRestoreTargetKind,
   type InteractionRestoreTargetResolver,
+  type InteractionSerializableValue,
 } from './interactionOwnership'
 
 export {
@@ -62,7 +63,6 @@ export {
   type InteractionOwnerDefinition,
   type InteractionOwnerDefinitionKind,
   type InteractionOwnerScope,
-  type InteractionSerializableValue,
   type InteractionShellRulesDefinition,
   type InteractionTargetPolicy,
 } from './interactionDefinition'

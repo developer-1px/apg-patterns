@@ -8,13 +8,22 @@ export type InteractionRestoreReason = 'release' | 'cancel' | 'remove'
 
 export type InteractionKeyRuleKind = 'navigation' | 'command' | 'restore' | 'shell' | 'custom'
 
+export type InteractionSerializableValue =
+  | string
+  | number
+  | boolean
+  | null
+  | readonly InteractionSerializableValue[]
+  | { readonly [key: string]: InteractionSerializableValue }
+
 export interface InteractionKeyAction {
   type: string
-  params?: unknown
+  params?: InteractionSerializableValue
 }
 
 export interface InteractionKeyPlatformRule {
   keys: readonly string[]
+  code?: readonly string[]
   altKey?: boolean
   ctrlKey?: boolean
   metaKey?: boolean
@@ -24,6 +33,7 @@ export interface InteractionKeyPlatformRule {
 export interface InteractionKeyRule {
   id: string
   keys: readonly string[]
+  code?: readonly string[]
   kind?: InteractionKeyRuleKind
   label?: string
   action?: InteractionKeyAction
@@ -33,14 +43,19 @@ export interface InteractionKeyRule {
   shiftKey?: boolean
   platform?: Partial<Record<InteractionPlatform, InteractionKeyPlatformRule>>
   targetKinds?: readonly InteractionKeyTargetKind[]
+  preventDefault?: boolean
+  stopPropagation?: boolean
 }
 
 export interface InteractionMatchedKeyRule {
   id: string
   key: string
+  code?: string
   kind?: InteractionKeyRuleKind
   label?: string
   action?: InteractionKeyAction
+  preventDefault?: boolean
+  stopPropagation?: boolean
 }
 
 export interface InteractionOwnerDiagnostics {
@@ -81,6 +96,7 @@ export type InteractionKeyTargetKind =
 
 export interface InteractionKeyInput {
   key: string
+  code?: string
   altKey?: boolean
   ctrlKey?: boolean
   metaKey?: boolean
@@ -251,6 +267,7 @@ export function matchInteractionKeyRule(
     const binding = resolveInteractionKeyRuleBinding(rule, input.platform)
 
     if (!binding.keys.includes(input.key)) continue
+    if (binding.code && (!input.code || !binding.code.includes(input.code))) continue
     if (binding.altKey !== undefined && binding.altKey !== (input.altKey ?? false)) continue
     if (binding.ctrlKey !== undefined && binding.ctrlKey !== (input.ctrlKey ?? false)) continue
     if (binding.metaKey !== undefined && binding.metaKey !== (input.metaKey ?? false)) continue
@@ -260,9 +277,12 @@ export function matchInteractionKeyRule(
     return {
       id: rule.id,
       key: input.key,
-      kind: rule.kind,
-      label: rule.label,
-      action: rule.action,
+      ...(input.code !== undefined ? { code: input.code } : {}),
+      ...(rule.kind !== undefined ? { kind: rule.kind } : {}),
+      ...(rule.label !== undefined ? { label: rule.label } : {}),
+      ...(rule.action !== undefined ? { action: rule.action } : {}),
+      ...(rule.preventDefault !== undefined ? { preventDefault: rule.preventDefault } : {}),
+      ...(rule.stopPropagation !== undefined ? { stopPropagation: rule.stopPropagation } : {}),
     }
   }
 
@@ -277,6 +297,7 @@ function resolveInteractionKeyRuleBinding(
 
   return {
     keys: platformRule?.keys ?? rule.keys,
+    code: platformRule?.code ?? rule.code,
     altKey: platformRule?.altKey ?? rule.altKey,
     ctrlKey: platformRule?.ctrlKey ?? rule.ctrlKey,
     metaKey: platformRule?.metaKey ?? rule.metaKey,

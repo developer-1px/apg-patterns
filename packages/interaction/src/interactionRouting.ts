@@ -83,6 +83,7 @@ export function routeInteractionKey(
   if (activeOwner.kind === 'temporary-control' && activeOwner.restoreKeys?.(input) === true) {
     const restoreOwnerId = snapshot.returnOwnerIds[snapshot.returnOwnerIds.length - 1] ?? null
     const restoreOwner = restoreOwnerId ? registry.getOwner(restoreOwnerId) : null
+    const matchedKeyRule = matchInteractionKeyRule(activeOwner.diagnostics?.keyRules, input)
     return {
       status: 'restore',
       reason: 'temporary-owner-restore-requested',
@@ -91,6 +92,7 @@ export function routeInteractionKey(
       targetKind,
       ownerId: activeOwner.id,
       ownerKind: activeOwner.kind,
+      ...(matchedKeyRule ? { matchedKeyRule } : {}),
       restoreOwnerId,
       restoreTarget: restoreOwner
         ? resolveInteractionRestoreTarget(restoreOwner, { reason: 'cancel', fromOwnerId: activeOwner.id })
