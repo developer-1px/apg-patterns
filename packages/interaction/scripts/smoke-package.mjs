@@ -126,6 +126,7 @@ const route = routeInteractionKey(registry, {
 })
 
 if (route.status !== 'owner') throw new Error('expected owner route')
+if (route.matchedKeyRule?.action?.type !== 'tree.move') throw new Error('expected matched action descriptor')
 if (typeof InteractionProvider !== 'function') throw new Error('missing React provider')
 `)
 
@@ -158,6 +159,7 @@ const route = routeInteractionKey(registry, {
 })
 
 if (route.status !== 'owner') throw new Error('expected owner route')
+if (route.matchedKeyRule?.action?.type !== 'tree.move') throw new Error('expected matched action descriptor')
 if (typeof InteractionProvider !== 'function') throw new Error('missing React provider')
 `)
 
@@ -196,8 +198,10 @@ registry.register(owner)
 registry.register(compileInteractionOwnerDefinition(definition))
 registry.activate(owner.id)
 const route = routeInteractionKey(registry, { key: 'ArrowDown' })
+const platformRoute = routeInteractionKey(registry, { key: 'ArrowDown', platform: 'mac' })
 
 route.status satisfies 'owner' | 'restore' | 'native' | 'ignored'
+platformRoute.status satisfies 'owner' | 'restore' | 'native' | 'ignored'
 void InteractionProvider
 void useInteractionOwner
 `)

@@ -8,4 +8,6 @@
 - Added Zod-backed serializable owner definition schemas, structured
   conditions, focus lifecycle descriptors, target policies, and compile
   adapters for the current owner registry.
+- Added matched action descriptors and explicit platform-aware key routing
+  inputs for declarative key rules.
 - Added optional React provider and hooks behind the `./react` subpath.

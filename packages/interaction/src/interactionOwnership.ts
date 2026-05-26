@@ -2,19 +2,36 @@ export type InteractionOwnerId = string
 
 export type InteractionOwnerKind = 'pattern' | 'temporary-control' | 'shell'
 
+export type InteractionPlatform = 'mac' | 'windows' | 'linux'
+
 export type InteractionRestoreReason = 'release' | 'cancel' | 'remove'
 
 export type InteractionKeyRuleKind = 'navigation' | 'command' | 'restore' | 'shell' | 'custom'
+
+export interface InteractionKeyAction {
+  type: string
+  params?: unknown
+}
+
+export interface InteractionKeyPlatformRule {
+  keys: readonly string[]
+  altKey?: boolean
+  ctrlKey?: boolean
+  metaKey?: boolean
+  shiftKey?: boolean
+}
 
 export interface InteractionKeyRule {
   id: string
   keys: readonly string[]
   kind?: InteractionKeyRuleKind
   label?: string
+  action?: InteractionKeyAction
   altKey?: boolean
   ctrlKey?: boolean
   metaKey?: boolean
   shiftKey?: boolean
+  platform?: Partial<Record<InteractionPlatform, InteractionKeyPlatformRule>>
   targetKinds?: readonly InteractionKeyTargetKind[]
 }
 
@@ -23,6 +40,7 @@ export interface InteractionMatchedKeyRule {
   key: string
   kind?: InteractionKeyRuleKind
   label?: string
+  action?: InteractionKeyAction
 }
 
 export interface InteractionOwnerDiagnostics {
@@ -67,6 +85,7 @@ export interface InteractionKeyInput {
   ctrlKey?: boolean
   metaKey?: boolean
   shiftKey?: boolean
+  platform?: InteractionPlatform
   targetKind?: InteractionKeyTargetKind
 }
 
@@ -229,11 +248,13 @@ export function matchInteractionKeyRule(
   const targetKind = input.targetKind ?? 'unknown'
 
   for (const rule of rules) {
-    if (!rule.keys.includes(input.key)) continue
-    if (rule.altKey !== undefined && rule.altKey !== (input.altKey ?? false)) continue
-    if (rule.ctrlKey !== undefined && rule.ctrlKey !== (input.ctrlKey ?? false)) continue
-    if (rule.metaKey !== undefined && rule.metaKey !== (input.metaKey ?? false)) continue
-    if (rule.shiftKey !== undefined && rule.shiftKey !== (input.shiftKey ?? false)) continue
+    const binding = resolveInteractionKeyRuleBinding(rule, input.platform)
+
+    if (!binding.keys.includes(input.key)) continue
+    if (binding.altKey !== undefined && binding.altKey !== (input.altKey ?? false)) continue
+    if (binding.ctrlKey !== undefined && binding.ctrlKey !== (input.ctrlKey ?? false)) continue
+    if (binding.metaKey !== undefined && binding.metaKey !== (input.metaKey ?? false)) continue
+    if (binding.shiftKey !== undefined && binding.shiftKey !== (input.shiftKey ?? false)) continue
     if (rule.targetKinds && !rule.targetKinds.includes(targetKind)) continue
 
     return {
@@ -241,8 +262,24 @@ export function matchInteractionKeyRule(
       key: input.key,
       kind: rule.kind,
       label: rule.label,
+      action: rule.action,
     }
   }
 
   return null
+}
+
+function resolveInteractionKeyRuleBinding(
+  rule: InteractionKeyRule,
+  platform: InteractionPlatform | undefined,
+): InteractionKeyPlatformRule {
+  const platformRule = platform ? rule.platform?.[platform] : undefined
+
+  return {
+    keys: platformRule?.keys ?? rule.keys,
+    altKey: platformRule?.altKey ?? rule.altKey,
+    ctrlKey: platformRule?.ctrlKey ?? rule.ctrlKey,
+    metaKey: platformRule?.metaKey ?? rule.metaKey,
+    shiftKey: platformRule?.shiftKey ?? rule.shiftKey,
+  }
 }

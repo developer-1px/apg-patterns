@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import type {
   InteractionKeyInput,
+  InteractionKeyPlatformRule,
   InteractionKeyRule,
   InteractionKeyRuleKind,
   InteractionKeyTargetKind,
@@ -68,6 +69,8 @@ export const InteractionOwnerRuntimeKindSchema = z.enum(['pattern', 'temporary-c
 export const InteractionKeyRuleKindSchema = z.enum(['navigation', 'command', 'restore', 'shell', 'custom'])
 
 export const InteractionKeyModifierSchema = z.enum(['Alt', 'Control', 'Meta', 'Shift'])
+
+export const InteractionPlatformSchema = z.enum(['mac', 'windows', 'linux'])
 
 export const InteractionOwnerScopeSchema = z.enum(['shell', 'region', 'modal', 'local'])
 
@@ -277,6 +280,7 @@ export const InteractionOwnerDefinitionsSchema = z.array(InteractionOwnerDefinit
 )
 
 export type InteractionKeyModifier = z.infer<typeof InteractionKeyModifierSchema>
+export type InteractionPlatform = z.infer<typeof InteractionPlatformSchema>
 export type InteractionOwnerDefinitionKind = z.infer<typeof InteractionOwnerDefinitionKindSchema>
 export type InteractionOwnerScope = z.infer<typeof InteractionOwnerScopeSchema>
 export type InteractionFocusStrategy = z.infer<typeof InteractionFocusStrategySchema>
@@ -371,22 +375,46 @@ function ruleMatchesInput(
   definition: InteractionOwnerDefinition,
   input: InteractionKeyInput,
 ): boolean {
-  if (!rule.keys.includes(input.key)) return false
+  const binding = resolveDefinitionKeyBinding(rule, input.platform)
+  if (!binding.keys.includes(input.key)) return false
   if (rule.targetKinds && !rule.targetKinds.includes(input.targetKind ?? 'unknown')) return false
-  if (!modifiersMatch(rule.modifiers, input)) return false
+  if (!definitionBindingModifiersMatch(binding, input)) return false
   if (rule.when && !evaluateCondition(rule.when, { definition, input })) return false
   return true
 }
 
-function modifiersMatch(modifiers: readonly InteractionKeyModifier[], input: InteractionKeyInput): boolean {
-  return modifierRequested(modifiers, 'Alt') === (input.altKey ?? false)
-    && modifierRequested(modifiers, 'Control') === (input.ctrlKey ?? false)
-    && modifierRequested(modifiers, 'Meta') === (input.metaKey ?? false)
-    && modifierRequested(modifiers, 'Shift') === (input.shiftKey ?? false)
-}
-
 function modifierRequested(modifiers: readonly InteractionKeyModifier[], modifier: InteractionKeyModifier): boolean {
   return modifiers.includes(modifier)
+}
+
+interface InteractionKeyPlatformBinding extends InteractionKeyPlatformRule {
+  altKey: boolean
+  ctrlKey: boolean
+  metaKey: boolean
+  shiftKey: boolean
+}
+
+function resolveDefinitionKeyBinding(
+  rule: InteractionKeyRuleDefinition,
+  platform: InteractionKeyInput['platform'],
+): InteractionKeyPlatformBinding {
+  const platformRule = platform ? rule.platform?.[platform] : undefined
+  const modifiers = platformRule?.modifiers ?? rule.modifiers
+
+  return {
+    keys: platformRule?.keys ?? rule.keys,
+    altKey: modifierRequested(modifiers, 'Alt'),
+    ctrlKey: modifierRequested(modifiers, 'Control'),
+    metaKey: modifierRequested(modifiers, 'Meta'),
+    shiftKey: modifierRequested(modifiers, 'Shift'),
+  }
+}
+
+function definitionBindingModifiersMatch(binding: InteractionKeyPlatformBinding, input: InteractionKeyInput): boolean {
+  return binding.altKey === (input.altKey ?? false)
+    && binding.ctrlKey === (input.ctrlKey ?? false)
+    && binding.metaKey === (input.metaKey ?? false)
+    && binding.shiftKey === (input.shiftKey ?? false)
 }
 
 function shellRulesAllowKey(definition: InteractionOwnerDefinition, input: InteractionKeyInput): boolean {
@@ -464,11 +492,34 @@ function toRuntimeKeyRule(rule: InteractionKeyRuleDefinition): InteractionKeyRul
     keys: rule.keys,
     kind: rule.kind as InteractionKeyRuleKind,
     label: rule.label ?? rule.description,
+    action: rule.action,
     altKey: modifierRequested(modifiers, 'Alt'),
     ctrlKey: modifierRequested(modifiers, 'Control'),
     metaKey: modifierRequested(modifiers, 'Meta'),
     shiftKey: modifierRequested(modifiers, 'Shift'),
+    platform: toRuntimePlatformRules(rule),
     targetKinds: rule.targetKinds as readonly InteractionKeyTargetKind[] | undefined,
+  }
+}
+
+function toRuntimePlatformRules(rule: InteractionKeyRuleDefinition): InteractionKeyRule['platform'] {
+  if (!rule.platform) return undefined
+  return {
+    ...(rule.platform.mac ? { mac: toRuntimePlatformRule(rule.platform.mac) } : {}),
+    ...(rule.platform.windows ? { windows: toRuntimePlatformRule(rule.platform.windows) } : {}),
+    ...(rule.platform.linux ? { linux: toRuntimePlatformRule(rule.platform.linux) } : {}),
+  }
+}
+
+function toRuntimePlatformRule(
+  rule: { keys: readonly string[]; modifiers: readonly InteractionKeyModifier[] },
+): InteractionKeyPlatformRule {
+  return {
+    keys: rule.keys,
+    altKey: modifierRequested(rule.modifiers, 'Alt'),
+    ctrlKey: modifierRequested(rule.modifiers, 'Control'),
+    metaKey: modifierRequested(rule.modifiers, 'Meta'),
+    shiftKey: modifierRequested(rule.modifiers, 'Shift'),
   }
 }
 

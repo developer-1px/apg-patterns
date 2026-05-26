@@ -34,6 +34,7 @@ InteractionOwnerDefinitionsSchema
 InteractionOwnerDiagnosticsDefinitionSchema
 InteractionOwnerRuntimeKindSchema
 InteractionOwnerScopeSchema
+InteractionPlatformSchema
 InteractionSerializableValueSchema
 InteractionShellRulesDefinitionSchema
 InteractionTargetPolicySchema
@@ -77,7 +78,9 @@ InteractionKeyInput
 InteractionKeyboardEventLike
 InteractionKeyboardEventRoute
 InteractionKeyboardRouteCallback
+InteractionKeyAction
 InteractionKeyModifier
+InteractionKeyPlatformRule
 InteractionKeyRule
 InteractionKeyRuleDefinition
 InteractionKeyRuleKind
@@ -92,6 +95,7 @@ InteractionOwnerKind
 InteractionOwnerScope
 InteractionOwnershipRegistry
 InteractionOwnershipSnapshot
+InteractionPlatform
 InteractionRestoreInput
 InteractionRestoreReason
 InteractionRestoreTarget

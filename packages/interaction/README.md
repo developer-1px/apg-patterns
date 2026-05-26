@@ -77,9 +77,20 @@ route.status
 it is adapted to the current owner registry. Runtime effects stay behind action
 descriptors and host adapters.
 
+Use `defineInteractionOwner` when you only want validation and the typed
+definition back. Use `compileInteractionOwnerDefinition` when you want to
+register it in the current runtime registry.
+
+Definition `kind` values such as `tree`, `grid`, and `toolbar` compile to the
+runtime owner kind `pattern`. Values such as `input`, `form`, `editor`,
+`dialog`, and `popover` compile to `temporary-control`. `shell` compiles to
+`shell`.
+
 ## React Example
 
 ```tsx
+import { useMemo } from 'react'
+import { compileInteractionOwnerDefinition } from '@interactive-os/interaction'
 import {
   InteractionProvider,
   useInteractionKeyboardHandler,
@@ -87,15 +98,27 @@ import {
 } from '@interactive-os/interaction/react'
 
 function FilesTree() {
-  useInteractionOwner(
-    {
+  const owner = useMemo(
+    () => compileInteractionOwnerDefinition({
       id: 'files.tree',
-      kind: 'pattern',
-      ownsKey: (input) => input.key.startsWith('Arrow'),
-      restoreTarget: { kind: 'active-cursor', label: 'Files' },
-    },
-    { active: true },
+      kind: 'tree',
+      focus: {
+        strategy: 'aria-activedescendant',
+        restore: { kind: 'active-cursor', label: 'Files' },
+      },
+      keyRules: [
+        {
+          id: 'files.next',
+          kind: 'navigation',
+          keys: ['ArrowDown'],
+          targetKinds: ['pattern', 'scroll-container', 'incidental'],
+          action: { type: 'tree.move', params: { direction: 'next' } },
+        },
+      ],
+    }),
+    [],
   )
+  useInteractionOwner(owner, { active: true })
 
   const onKeyDown = useInteractionKeyboardHandler()
 
@@ -110,6 +133,120 @@ export function App() {
   )
 }
 ```
+
+## Temporary Control Inside A Pattern
+
+Activating a temporary owner records the previously active owner. A `restore`
+key route points back to that previous owner; the restore target is read from
+the owner being restored.
+
+```ts
+import {
+  compileInteractionOwnerDefinition,
+  createInteractionOwnershipRegistry,
+  handleInteractionKeyboardEvent,
+  type InteractionKeyboardEventLike,
+} from '@interactive-os/interaction'
+
+const registry = createInteractionOwnershipRegistry()
+
+registry.register(compileInteractionOwnerDefinition({
+  id: 'files.tree',
+  kind: 'tree',
+  focus: {
+    strategy: 'aria-activedescendant',
+    restore: { kind: 'active-cursor', label: 'Files' },
+  },
+}))
+
+registry.register(compileInteractionOwnerDefinition({
+  id: 'files.search',
+  kind: 'input',
+  focus: {
+    strategy: 'dom-focus',
+    initial: { kind: 'element', elementId: 'files-search' },
+  },
+  keyRules: [
+    {
+      id: 'files.search.escape',
+      kind: 'restore',
+      keys: ['Escape'],
+      targetKinds: ['text-input'],
+      action: { type: 'search.close' },
+    },
+  ],
+}))
+
+registry.activate('files.tree')
+registry.activate('files.search')
+
+function onSearchKeyDown(event: InteractionKeyboardEventLike) {
+  return handleInteractionKeyboardEvent({
+    registry,
+    event,
+    releaseOnRestore: true,
+    onRestoreKey({ route }) {
+      route.restoreOwnerId // "files.tree"
+      route.restoreTarget // { kind: "active-cursor", ownerId: "files.tree", ... }
+    },
+  })
+}
+```
+
+## App Shell Shortcuts
+
+Native text entry is protected by default. A shell shortcut can run from text
+inputs only when the matching key rule declares
+`targetPolicy.nativeText: "allow-shell"`.
+
+```ts
+import { compileInteractionOwnerDefinition } from '@interactive-os/interaction'
+
+const shellOwner = compileInteractionOwnerDefinition({
+  id: 'app.shell',
+  kind: 'shell',
+  scope: 'shell',
+  keyRules: [
+    {
+      id: 'command-palette.open',
+      kind: 'shell',
+      keys: ['k'],
+      modifiers: ['Control'],
+      platform: {
+        mac: { keys: ['k'], modifiers: ['Meta'] },
+        windows: { keys: ['k'], modifiers: ['Control'] },
+        linux: { keys: ['k'], modifiers: ['Control'] },
+      },
+      targetKinds: ['pattern', 'incidental'],
+      action: { type: 'command-palette.open' },
+    },
+    {
+      id: 'app.save',
+      kind: 'shell',
+      keys: ['s'],
+      modifiers: ['Control'],
+      platform: {
+        mac: { keys: ['s'], modifiers: ['Meta'] },
+        windows: { keys: ['s'], modifiers: ['Control'] },
+        linux: { keys: ['s'], modifiers: ['Control'] },
+      },
+      targetKinds: ['pattern', 'incidental', 'text-input', 'textarea', 'contenteditable'],
+      targetPolicy: { nativeText: 'allow-shell' },
+      action: { type: 'app.save' },
+    },
+  ],
+})
+```
+
+If a pattern owner is active, shell shortcuts run only when that active owner
+declares `shellRules: { allowGlobal: true }`.
+
+`platform` bindings are selected when route input includes
+`platform: "mac" | "windows" | "linux"`. Without a platform, the base `keys`
+and `modifiers` fields are used.
+
+When a rule matches, the route exposes `route.matchedKeyRule?.action` so the
+host shell can dispatch the declared effect.
 
 ## Package Boundary
 

@@ -135,6 +135,7 @@ describe('compileInteractionOwnerDefinition', () => {
         id: 'tree.arrow-down',
         key: 'ArrowDown',
         kind: 'navigation',
+        action: { type: 'tree.move', params: { direction: 'next' } },
       },
     })
 
@@ -221,6 +222,55 @@ describe('compileInteractionOwnerDefinition', () => {
       status: 'owner',
       reason: 'shell-owner-handled',
       ownerId: 'save-command',
+    })
+  })
+
+  it('supports platform-specific bindings when the route input declares a platform', () => {
+    const registry = createInteractionOwnershipRegistry()
+    const shellOwner = compileInteractionOwnerDefinition({
+      id: 'app-shell',
+      kind: 'shell',
+      scope: 'shell',
+      keyRules: [
+        {
+          id: 'shell.palette',
+          kind: 'shell',
+          keys: ['k'],
+          modifiers: ['Control'],
+          platform: {
+            mac: { keys: ['k'], modifiers: ['Meta'] },
+            windows: { keys: ['k'], modifiers: ['Control'] },
+          },
+          targetKinds: ['pattern'],
+          action: { type: 'shell.open-command-palette' },
+        },
+      ],
+    })
+
+    registry.register(shellOwner)
+
+    expect(routeInteractionKey(registry, {
+      key: 'k',
+      metaKey: true,
+      platform: 'mac',
+      targetKind: 'pattern',
+    })).toMatchObject({
+      status: 'owner',
+      ownerId: 'app-shell',
+      matchedKeyRule: {
+        id: 'shell.palette',
+        action: { type: 'shell.open-command-palette' },
+      },
+    })
+
+    expect(routeInteractionKey(registry, {
+      key: 'k',
+      ctrlKey: true,
+      platform: 'mac',
+      targetKind: 'pattern',
+    })).toMatchObject({
+      status: 'ignored',
+      reason: 'no-owner',
     })
   })
 

@@ -27,6 +27,10 @@ while the API is hardened against APG demo shell and product shell usage.
 - Zod schemas validate owner definitions, key rules, structured conditions,
   target policies, focus lifecycle, shell rules, action descriptors, and
   serializable action params.
+- Matched routes expose the matched action descriptor so host shells can
+  dispatch effects without reading callback closures.
+- Platform-specific bindings are selected only when route input declares a
+  platform; otherwise the base key rule is used.
 - Focus guard decisions report whether to restore the active owner, activate a
   declared target owner, allow native focus, or do nothing.
 - Diagnostics explain active owner, owner stack, DOM focus, route reason,
