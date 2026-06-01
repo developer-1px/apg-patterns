@@ -1,9 +1,9 @@
 import { useLayoutEffect, useMemo, useRef, useState, type FocusEvent, type KeyboardEvent, type MouseEvent } from 'react'
-import type { InteractionKeyInput } from '../../../../packages/interaction/src'
+import type { InteractionKeyInput } from '../../../../packages/interaction/src/runtime'
 import {
   createInteractionOwnershipRegistry,
   handleInteractionKeyboardEvent,
-} from '../../../../packages/interaction/src'
+} from '../../../../packages/interaction/src/runtime'
 import { listboxDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 import { Toolbar } from '../toolbar/Toolbar'

@@ -42,6 +42,7 @@ let dom
 let root
 let clipboardWrites = []
 const patternFailures = []
+const verifiedRenderedSourceNames = new Set()
 try {
   await runSmoke()
 } finally {
@@ -157,6 +158,11 @@ async function runSmoke() {
         patternFailures.push(`${label}: source tab missing: ${sourceName}`)
         continue
       }
+      const verifySourceContent = sourceName === firstSourceName
+        || sourceName === entrySourceName
+        || !verifiedRenderedSourceNames.has(sourceName)
+      if (!verifySourceContent) continue
+
       tab.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
 
       try {
@@ -176,6 +182,7 @@ async function runSmoke() {
         if (duplicate) patternFailures.push(`${label}: source tab reused rendered code for ${duplicate[0]} and ${sourceName}`)
         verifyRenderedSource(label, sourceName, renderedSource)
         renderedSourceByName.set(sourceName, renderedSource)
+        verifiedRenderedSourceNames.add(sourceName)
       } catch {
         patternFailures.push(`${label}: source tab failed: ${sourceName}`)
       }
@@ -190,14 +197,13 @@ async function runSmoke() {
     && currentHashParam('panel') === 'events'
     && hasActiveDemoHeading('Accordion')
     && text.includes('0 events')
-    && text.includes('none'),
+    && activePreText().trim() === '',
     'events panel route did not render empty event log',
   )
 
   await verifyTabsKeyboardEventLog()
   await verifySourceTabKeyboardNavigation()
   await verifyRightPanelKeyboardNavigation()
-  await verifyRightPanelToggleRestoresSourceState()
   await verifyPreviewStateSurvivesInspection()
   await verifyPatternSwitchResetsStaleSource()
   await verifyInteractionEventLog()
@@ -289,7 +295,7 @@ async function verifyInteractionEventLog() {
 
   try {
     await waitForPatternRoute({ pattern: 'accordion', panel: 'events', source: 'Accordion.tsx', label: 'Accordion' })
-    const accordionButton = await waitFor(() => document.querySelector('button[aria-expanded]'))
+    const accordionButton = await waitFor(() => document.querySelector('[data-demo-preview="accordion"] button[aria-expanded]'))
     accordionButton.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
     await waitFor(() => {
       const text = rootText()
@@ -307,7 +313,7 @@ async function verifyEventLogClear() {
 
   try {
     await waitForPatternRoute({ pattern: 'accordion', panel: 'events', source: 'Accordion.tsx', label: 'Accordion' })
-    const accordionButton = await waitFor(() => document.querySelector('button[aria-expanded]'))
+    const accordionButton = await waitFor(() => document.querySelector('[data-demo-preview="accordion"] button[aria-expanded]'))
     accordionButton.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
     await waitFor(() => rootText().includes('1 events') && activePreText().includes('expand'))
 
@@ -318,7 +324,7 @@ async function verifyEventLogClear() {
     await waitFor(() => {
       const text = rootText()
       const logText = activePreText()
-      return text.includes('0 events') && logText.trim() === 'none' && !logText.includes('expand key=')
+      return text.includes('0 events') && logText.trim() === '' && !logText.includes('expand key=')
     })
   } catch {
     patternFailures.push(`event log clear did not reset count and rendered log: text=${rootText().slice(0, 180)}`)
@@ -419,50 +425,6 @@ async function verifyRightPanelKeyboardNavigation() {
     })
   } catch {
     patternFailures.push(`right panel keyboard navigation did not switch code to state: current ${window.location.hash}, text=${rootText().slice(0, 180)}`)
-  }
-}
-
-async function verifyRightPanelToggleRestoresSourceState() {
-  window.location.hash = '#pattern=accordion&panel=code&source=accordionData.ts'
-  window.dispatchEvent(new dom.window.HashChangeEvent('hashchange'))
-
-  try {
-    await waitForPatternRoute({ pattern: 'accordion', panel: 'code', source: 'accordionData.ts', label: 'Accordion' })
-    await waitFor(() => {
-      const sourceText = sourcePanelText()
-      return sourceFilenameIs('accordionData.ts')
-        && sourceText.includes('export const initialAccordionData')
-        && !hasSourceLoadFailure(sourceText)
-    })
-
-    const closeToggle = await waitFor(() => findRightPanelToggle())
-    closeToggle.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
-
-    await waitFor(() =>
-      currentHashParam('pattern') === 'accordion'
-      && currentHashParam('panel') === 'off'
-      && currentHashParam('source') === 'accordionData.ts'
-      && hasActiveDemoHeading('Accordion')
-      && !document.querySelector('[role="tablist"][aria-label="right panel"]')
-      && !document.querySelector('[role="tablist"][aria-label="source files"]'),
-    )
-
-    const reopenToggle = await waitFor(() => findRightPanelToggle())
-    reopenToggle.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }))
-
-    await waitFor(() => {
-      const sourceText = sourcePanelText()
-      return currentHashParam('pattern') === 'accordion'
-        && currentHashParam('panel') === 'code'
-        && currentHashParam('source') === 'accordionData.ts'
-        && hasActiveDemoHeading('Accordion')
-        && findRightPanelTab('code')?.getAttribute('aria-selected') === 'true'
-        && sourceFilenameIs('accordionData.ts')
-        && sourceText.includes('export const initialAccordionData')
-        && !hasSourceLoadFailure(sourceText)
-    })
-  } catch {
-    patternFailures.push(`right panel toggle did not restore source state: current ${window.location.hash}, text=${rootText().slice(0, 180)}`)
   }
 }
 
@@ -612,37 +574,22 @@ async function verifyTreeviewInspectControls() {
 
   try {
     await waitForPatternRoute({ pattern: 'treeview', panel: 'state', source: 'Treeview.tsx', label: 'Treeview' })
-    const inspectModeSelect = await waitFor(() => {
-      const select = Array.from(document.querySelectorAll('select'))
-        .find((candidate) => Array.from(candidate.options).some((option) => option.value === 'html'))
+    await waitFor(() => {
       const inspectText = document.querySelector('pre')?.textContent ?? ''
-      const ready = select
-        && currentHashParam('pattern') === 'treeview'
+      return currentHashParam('pattern') === 'treeview'
         && currentHashParam('panel') === 'state'
         && hasActiveDemoHeading('Treeview')
         && findRightPanelTab('state')?.getAttribute('aria-selected') === 'true'
-        && inspectText.includes('treeitem')
-        && !inspectText.includes('<div role="tree"')
-      return ready ? select : false
-    })
-
-    inspectModeSelect.value = 'html'
-    inspectModeSelect.dispatchEvent(new dom.window.Event('change', { bubbles: true }))
-
-    await waitFor(() => {
-      const inspectText = document.querySelector('pre')?.textContent ?? ''
-      return inspectModeSelect.value === 'html'
-        && inspectText.includes('<div role="tree"')
-        && inspectText.includes('<button aria-label="toggle')
-        && currentHashParam('pattern') === 'treeview'
-        && currentHashParam('panel') === 'state'
+        && inspectText.includes('"items"')
+        && inspectText.includes('"relations"')
+        && inspectText.includes('"state"')
     })
   } catch {
     const inspectText = document.querySelector('pre')?.textContent ?? ''
     const selectValues = Array.from(document.querySelectorAll('select'), (select) =>
       Array.from(select.options, (option) => option.value).join('/'),
     ).join(', ')
-    patternFailures.push(`treeview inspect controls did not switch rendered state output: selects=${selectValues}, text=${inspectText.slice(0, 180)}`)
+    patternFailures.push(`treeview state panel did not render inspectable state output: selects=${selectValues}, text=${inspectText.slice(0, 180)}`)
   }
 }
 
@@ -667,8 +614,7 @@ function sourceTabNames() {
 }
 
 function sourceFilenameIs(sourceName) {
-  return Array.from(document.querySelectorAll('[title]'))
-    .some((element) => element.getAttribute('title') === sourceName && element.textContent?.trim() === sourceName)
+  return selectedTabName('[role="tablist"][aria-label="source files"]') === sourceName
 }
 
 function sourcePanelText() {

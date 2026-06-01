@@ -194,6 +194,7 @@ const requiredPackedPaths = [
   'docs/proposals/2026-05-18-react-facade-zod-blind-loop.md',
   'docs/proposals/2026-05-24-interaction-ownership-incubation.md',
   'docs/proposals/2026-05-24-interaction-ownership-technical-research.md',
+  'docs/proposals/2026-05-26-interaction-declarative-interface-references.md',
   'dist/index.js',
   'dist/index.js.map',
   'dist/index.cjs',

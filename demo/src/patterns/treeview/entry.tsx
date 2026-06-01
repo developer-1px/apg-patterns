@@ -2,6 +2,7 @@ import { useReducer } from 'react'
 import type { PatternEvent, PatternOptions } from '../../../../src/react'
 import { resolveTarget } from './treeContract'
 import { Treeview } from './Treeview'
+import { PageInteractionRecoveryDemo } from './PageInteractionRecoveryDemo'
 import { TreeviewInteractionProviderDemo } from './TreeviewInteractionProviderDemo'
 import { treeVariantItems, type TreeVariantKey } from './treeVariants'
 import { defineDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
@@ -24,7 +25,7 @@ const treeviewDemoDefinition = {
   sources: {
     main: 'Treeview.tsx',
     entry: 'treeview/entry.tsx',
-    data: ['treeVariants.ts', 'TreeviewInteractionProviderDemo.tsx'],
+    data: ['treeVariants.ts', 'TreeviewInteractionProviderDemo.tsx', 'PageInteractionRecoveryDemo.tsx'],
     hooks: ['treeview/useTreeviewPattern.ts'],
     definition: 'treeview/definition.ts',
     extra: ['treeContract.ts'],
@@ -140,5 +141,6 @@ function TreeviewDemoPreview({
   options: Parameters<typeof Treeview>[0]['options']
 }) {
   if (variant === 'interactionOwnership') return <TreeviewInteractionProviderDemo />
+  if (variant === 'pageInteractionRecovery') return <PageInteractionRecoveryDemo />
   return <Treeview data={data} onEvent={onEvent} options={options} />
 }

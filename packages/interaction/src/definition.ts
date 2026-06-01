@@ -1,5 +1,3 @@
-export * from './runtime'
-
 export {
   InteractionActionDescriptorSchema,
   InteractionConditionSchema,
@@ -27,4 +25,23 @@ export {
   compileInteractionOwnerDefinitions,
   defineInteractionOwner,
   defineInteractionOwners,
-} from './definition'
+  evaluateInteractionCondition,
+  type InteractionActionDescriptor,
+  type InteractionCondition,
+  type InteractionDefinitionKeyInput,
+  type InteractionFocusContainment,
+  type InteractionFocusDefinition,
+  type InteractionFocusGuardPolicy,
+  type InteractionFocusStrategy,
+  type InteractionFocusTarget,
+  type InteractionKeyModifier,
+  type InteractionKeyPlatformBinding,
+  type InteractionKeyRuleDefinition,
+  type InteractionOwnerDefinition,
+  type InteractionOwnerDefinitionKind,
+  type InteractionOwnerDiagnosticsDefinition,
+  type InteractionOwnerRuntimeKind,
+  type InteractionOwnerScope,
+  type InteractionShellRulesDefinition,
+  type InteractionTargetPolicy,
+} from './interactionDefinition'

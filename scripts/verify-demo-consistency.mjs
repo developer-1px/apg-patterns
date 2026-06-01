@@ -7,6 +7,7 @@ const srcPatternDir = 'src/patterns'
 const failures = []
 
 const demoEntries = readDemoEntries()
+verifyDemoVariantSchemaKeys()
 const srcFolders = readdirSync(srcPatternDir, { withFileTypes: true })
   .filter((entry) => entry.isDirectory() && existsSync(path.join(srcPatternDir, entry.name, 'definition.ts')))
   .map((entry) => entry.name)
@@ -166,4 +167,140 @@ function verifyMainComponentSourceContract(folder, filePath) {
   if (/\bdata\?\s*:/.test(text)) failures.push(`${folder}: main demo component must require data`)
   if (/\bonEvent\?\s*:/.test(text)) failures.push(`${folder}: main demo component must require onEvent`)
   if (/\buseReducer\s*\(/.test(text)) failures.push(`${folder}: main demo component must not own reducer state`)
+}
+
+function verifyDemoVariantSchemaKeys() {
+  for (const filePath of readSourceFiles(demoPatternDir)) {
+    const sourceFile = ts.createSourceFile(filePath, readFileSync(filePath, 'utf8'), ts.ScriptTarget.Latest, true, filePath.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS)
+    const imports = readNamedImports(sourceFile, filePath)
+    const variantKeyArrays = readVariantKeyArrays(sourceFile)
+    const zodEnumArrayNames = readZodEnumArrayNames(sourceFile)
+
+    for (const array of variantKeyArrays) {
+      if (!zodEnumArrayNames.has(array.name)) continue
+      const variantImport = resolveVariantImport(array.name, imports)
+      if (!variantImport) continue
+      const objectKeys = readImportedObjectKeys(variantImport)
+      if (!objectKeys) continue
+      if (array.keys.join('\n') !== objectKeys.join('\n')) {
+        failures.push(`${filePath}: ${array.name} must match ${variantImport.importedName} keys; expected [${objectKeys.join(', ')}], actual [${array.keys.join(', ')}]`)
+      }
+    }
+  }
+}
+
+function readSourceFiles(root) {
+  const files = []
+  for (const dirent of readdirSync(root, { withFileTypes: true })) {
+    const filePath = path.join(root, dirent.name)
+    if (dirent.isDirectory()) files.push(...readSourceFiles(filePath))
+    else if (/\.(?:ts|tsx)$/.test(dirent.name) && !/\.test\.(?:ts|tsx)$/.test(dirent.name)) files.push(filePath)
+  }
+  return files
+}
+
+function readNamedImports(sourceFile, filePath) {
+  const imports = []
+  for (const statement of sourceFile.statements) {
+    if (!ts.isImportDeclaration(statement)) continue
+    if (!ts.isStringLiteralLike(statement.moduleSpecifier)) continue
+    const bindings = statement.importClause?.namedBindings
+    if (!bindings || !ts.isNamedImports(bindings)) continue
+    for (const specifier of bindings.elements) {
+      imports.push({
+        localName: specifier.name.text,
+        importedName: specifier.propertyName?.text ?? specifier.name.text,
+        modulePath: statement.moduleSpecifier.text,
+        importerPath: filePath,
+      })
+    }
+  }
+  return imports
+}
+
+function readVariantKeyArrays(sourceFile) {
+  const arrays = []
+  function visit(node) {
+    if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && /VariantKeys$/i.test(node.name.text)) {
+      const initializer = node.initializer ? unwrapExpression(node.initializer) : null
+      if (initializer && ts.isArrayLiteralExpression(initializer)) {
+        const keys = initializer.elements
+          .map((element) => unwrapExpression(element))
+          .filter((element) => ts.isStringLiteralLike(element))
+          .map((element) => element.text)
+        if (keys.length === initializer.elements.length) arrays.push({ name: node.name.text, keys })
+      }
+    }
+    ts.forEachChild(node, visit)
+  }
+  visit(sourceFile)
+  return arrays
+}
+
+function readZodEnumArrayNames(sourceFile) {
+  const names = new Set()
+  function visit(node) {
+    if (
+      ts.isCallExpression(node)
+      && ts.isPropertyAccessExpression(node.expression)
+      && node.expression.name.text === 'enum'
+      && ts.isIdentifier(node.expression.expression)
+      && node.expression.expression.text === 'z'
+      && node.arguments.length > 0
+      && ts.isIdentifier(node.arguments[0])
+    ) {
+      names.add(node.arguments[0].text)
+    }
+    ts.forEachChild(node, visit)
+  }
+  visit(sourceFile)
+  return names
+}
+
+function resolveVariantImport(arrayName, imports) {
+  const prefix = arrayName.replace(/VariantKeys$/i, '').toLowerCase()
+  const candidates = imports.filter((item) => /Variants$/.test(item.localName))
+  return candidates.find((item) => item.localName.toLowerCase() === `${prefix}variants`) ?? (candidates.length === 1 ? candidates[0] : null)
+}
+
+function readImportedObjectKeys(variantImport) {
+  if (!variantImport.modulePath.startsWith('.')) return null
+  const modulePath = resolveImportPath(variantImport.importerPath, variantImport.modulePath)
+  if (!modulePath) return null
+  const sourceFile = ts.createSourceFile(modulePath, readFileSync(modulePath, 'utf8'), ts.ScriptTarget.Latest, true, modulePath.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS)
+
+  for (const statement of sourceFile.statements) {
+    if (!ts.isVariableStatement(statement)) continue
+    for (const declaration of statement.declarationList.declarations) {
+      if (!ts.isIdentifier(declaration.name) || declaration.name.text !== variantImport.importedName) continue
+      const initializer = declaration.initializer ? unwrapExpression(declaration.initializer) : null
+      if (!initializer || !ts.isObjectLiteralExpression(initializer)) return null
+      return initializer.properties
+        .filter((property) => ts.isPropertyAssignment(property) || ts.isShorthandPropertyAssignment(property))
+        .map((property) => propertyNameText(property.name))
+        .filter(Boolean)
+    }
+  }
+  return null
+}
+
+function resolveImportPath(importerPath, modulePath) {
+  const basePath = path.resolve(path.dirname(importerPath), modulePath)
+  for (const candidate of [`${basePath}.ts`, `${basePath}.tsx`, path.join(basePath, 'index.ts'), path.join(basePath, 'index.tsx')]) {
+    if (existsSync(candidate)) return candidate
+  }
+  return null
+}
+
+function unwrapExpression(node) {
+  let current = node
+  while (
+    ts.isAsExpression(current)
+    || ts.isSatisfiesExpression(current)
+    || ts.isParenthesizedExpression(current)
+    || ts.isTypeAssertionExpression(current)
+  ) {
+    current = current.expression
+  }
+  return current
 }

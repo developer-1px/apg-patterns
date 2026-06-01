@@ -3,6 +3,12 @@
 ## 0.1.0
 
 - Initial publish-ready package surface for APG pattern definitions, runtime helpers, and React adapters.
+- Added the incubating `@interactive-os/interaction` workspace package for keyboard and focus ownership in application shells.
+- Added Zod-free `@interactive-os/interaction/runtime` and Zod-backed `@interactive-os/interaction/definition` subpaths so production runtime code can avoid definition schema cost.
+- Added interaction shortcut APIs for command palettes and app shell shortcuts: `createInteractionRouter`, `shellOwner`, `temporaryControl`, and primary modifier handling.
+- Added interaction typed action helpers, including `createInteractionActions`, so route action params can be narrowed without casts in consumer code.
+- Added interaction DOM adapter safety for Node, SSR, and test environments without global DOM constructors such as `Element`.
+- Added packed consumer smoke coverage that verifies interaction runtime, definition, React subpaths, TypeScript resolution, and runtime schema isolation.
 - Root and `./core` entries are React-free; React hooks and preset components are exposed from `./react`.
 - React is an optional peer for React 18 and React 19 consumers.
 - Published package includes an interface stability guide for permanent package contracts and cleanup decisions.

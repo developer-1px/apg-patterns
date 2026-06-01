@@ -441,6 +441,23 @@ describe('App route state', () => {
     expect(currentHashParam('variant')).toBeNull()
   })
 
+  it('keeps the self-contained page interaction recovery demo alive when its tree is operated', async () => {
+    // Regression: entry.tsx wired PageInteractionRecoveryDemo's onEvent into the
+    // treeview demo-state reducer. Operating its tree dispatched a 'runtime'
+    // activeKey into the unrelated fileDirectoryComputed data, throwing a ZodError
+    // that blanked the whole app. A self-contained interaction demo must not feed
+    // that reducer (the interactionOwnership variant already omits onEvent).
+    replaceHash('#pattern=treeview&panel=code&source=Treeview.tsx&variant=pageInteractionRecovery')
+    render(<App />)
+
+    await waitFor(() => expect(currentHashParam('variant')).toBe('pageInteractionRecovery'))
+    const runtimeItem = screen.getByRole('treeitem', { name: 'Runtime' })
+    fireEvent.click(runtimeItem)
+    fireEvent.keyDown(runtimeItem, { key: 'ArrowDown' })
+
+    expect(screen.getByRole('status', { name: 'Interaction owner' }).textContent).toBe('page-tree')
+  })
+
   it('drives every preview with advertised keyboard and pointer input', async () => {
     const routes = collectPatternRoutes()
 

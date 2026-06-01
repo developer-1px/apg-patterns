@@ -57,4 +57,24 @@ describe('interaction key target classification', () => {
 
     expect(classifyInteractionKeyTarget(target)).toBe('temporary-control')
   })
+
+  it('falls back to unknown when DOM constructors are not installed globally', () => {
+    const elementDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'Element')
+    if (elementDescriptor?.configurable === false) return
+
+    Object.defineProperty(globalThis, 'Element', {
+      configurable: true,
+      value: undefined,
+    })
+
+    try {
+      expect(classifyInteractionKeyTarget({} as EventTarget)).toBe('unknown')
+    } finally {
+      if (elementDescriptor) {
+        Object.defineProperty(globalThis, 'Element', elementDescriptor)
+      } else {
+        Reflect.deleteProperty(globalThis, 'Element')
+      }
+    }
+  })
 })

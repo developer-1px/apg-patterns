@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process'
-import { existsSync, mkdirSync, mkdtempSync, renameSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
@@ -18,6 +18,7 @@ try {
   mkdirSync(packageInstallRoot, { recursive: true })
   execFileSync('tar', ['-xzf', tarballPath, '-C', packageInstallRoot], { cwd: packageRoot })
   renameSync(join(packageInstallRoot, 'package'), packageRootInConsumer)
+  assertRuntimeEntrypointIsSchemaFree(packageRootInConsumer)
   linkDependency(consumerRoot, 'react')
   linkDependency(consumerRoot, '@types/react')
   linkDependency(consumerRoot, 'csstype')
@@ -31,7 +32,7 @@ try {
     stdio: 'pipe',
   })
 
-  console.log('interaction package smoke passed for npm pack contents, ESM, CJS, React subpath, and TypeScript resolution')
+  console.log('interaction package smoke passed for npm pack contents, runtime/definition subpaths, React subpath, TypeScript resolution, and runtime schema isolation')
 } finally {
   rmSync(tempRoot, { recursive: true, force: true })
 }
@@ -59,6 +60,14 @@ function packPackage(destination) {
     'dist/index.cjs',
     'dist/index.d.ts',
     'dist/index.d.cts',
+    'dist/runtime.js',
+    'dist/runtime.cjs',
+    'dist/runtime.d.ts',
+    'dist/runtime.d.cts',
+    'dist/definition.js',
+    'dist/definition.cjs',
+    'dist/definition.d.ts',
+    'dist/definition.d.cts',
     'dist/react.js',
     'dist/react.cjs',
     'dist/react.d.ts',
@@ -83,6 +92,35 @@ function packPackage(destination) {
   return tarballPath
 }
 
+function assertRuntimeEntrypointIsSchemaFree(packageRootInConsumer) {
+  for (const entry of ['dist/runtime.js', 'dist/runtime.cjs']) {
+    const files = collectLocalRuntimeFiles(packageRootInConsumer, entry, new Set())
+    for (const file of files) {
+      const contents = readFileSync(join(packageRootInConsumer, file), 'utf8')
+      if (/from ["']zod["']|require\(["']zod["']\)|InteractionOwnerDefinitionSchema|z\.object/.test(contents)) {
+        throw new Error(`runtime entrypoint includes schema code through ${file}`)
+      }
+    }
+  }
+}
+
+function collectLocalRuntimeFiles(packageRootInConsumer, file, visited) {
+  if (visited.has(file)) return visited
+  visited.add(file)
+
+  const contents = readFileSync(join(packageRootInConsumer, file), 'utf8')
+  const importPattern = /(?:from\s+|import\(|require\()["'](\.\/[^"']+)["']\)?/g
+  for (const match of contents.matchAll(importPattern)) {
+    const importPath = match[1]
+    const nextFile = join(dirname(file), importPath)
+    if (nextFile.startsWith('dist/') && existsSync(join(packageRootInConsumer, nextFile))) {
+      collectLocalRuntimeFiles(packageRootInConsumer, nextFile, visited)
+    }
+  }
+
+  return visited
+}
+
 function linkDependency(consumerRoot, name) {
   const source = dirname(require.resolve(`${name}/package.json`))
   const target = join(consumerRoot, 'node_modules', ...name.split('/'))
@@ -99,11 +137,17 @@ function writeConsumerFiles(consumerRoot) {
 
   writeFileSync(join(consumerRoot, 'esm-smoke.mjs'), `
 import {
-  InteractionOwnerDefinitionSchema,
-  compileInteractionOwnerDefinition,
   createInteractionOwnershipRegistry,
   routeInteractionKey,
 } from '@interactive-os/interaction'
+import {
+  createInteractionRouter,
+  shellOwner,
+} from '@interactive-os/interaction/runtime'
+import {
+  InteractionOwnerDefinitionSchema,
+  compileInteractionOwnerDefinition,
+} from '@interactive-os/interaction/definition'
 import { InteractionProvider } from '@interactive-os/interaction/react'
 
 const registry = createInteractionOwnershipRegistry()
@@ -127,16 +171,32 @@ const route = routeInteractionKey(registry, {
 
 if (route.status !== 'owner') throw new Error('expected owner route')
 if (route.matchedKeyRule?.action?.type !== 'tree.move') throw new Error('expected matched action descriptor')
+
+const router = createInteractionRouter({
+  platform: 'mac',
+  owners: [shellOwner({
+    id: 'shell',
+    keys: [{ key: 'k', code: 'KeyK', mod: 'primary', action: 'palette.open' }],
+  })],
+})
+const shortcutRoute = router.route({ key: 'k', code: 'KeyK', metaKey: true, targetKind: 'pattern' })
+if (shortcutRoute.status !== 'owner') throw new Error('expected runtime shortcut route')
 if (typeof InteractionProvider !== 'function') throw new Error('missing React provider')
 `)
 
   writeFileSync(join(consumerRoot, 'cjs-smoke.cjs'), `
 const {
-  InteractionOwnerDefinitionSchema,
-  compileInteractionOwnerDefinition,
   createInteractionOwnershipRegistry,
   routeInteractionKey,
 } = require('@interactive-os/interaction')
+const {
+  createInteractionRouter,
+  shellOwner,
+} = require('@interactive-os/interaction/runtime')
+const {
+  InteractionOwnerDefinitionSchema,
+  compileInteractionOwnerDefinition,
+} = require('@interactive-os/interaction/definition')
 const { InteractionProvider } = require('@interactive-os/interaction/react')
 
 const registry = createInteractionOwnershipRegistry()
@@ -160,18 +220,38 @@ const route = routeInteractionKey(registry, {
 
 if (route.status !== 'owner') throw new Error('expected owner route')
 if (route.matchedKeyRule?.action?.type !== 'tree.move') throw new Error('expected matched action descriptor')
+
+const router = createInteractionRouter({
+  platform: 'mac',
+  owners: [shellOwner({
+    id: 'shell',
+    keys: [{ key: 'k', code: 'KeyK', mod: 'primary', action: 'palette.open' }],
+  })],
+})
+const shortcutRoute = router.route({ key: 'k', code: 'KeyK', metaKey: true, targetKind: 'pattern' })
+if (shortcutRoute.status !== 'owner') throw new Error('expected runtime shortcut route')
 if (typeof InteractionProvider !== 'function') throw new Error('missing React provider')
 `)
 
   writeFileSync(join(consumerRoot, 'types-smoke.ts'), `
 import {
-  InteractionOwnerDefinitionSchema,
-  compileInteractionOwnerDefinition,
   createInteractionOwnershipRegistry,
   routeInteractionKey,
-  type InteractionOwnerDefinition,
   type InteractionOwner,
 } from '@interactive-os/interaction'
+import {
+  createInteractionActions,
+  createInteractionOwner,
+  createInteractionRouter,
+  getInteractionRouteAction,
+  shellOwner,
+  type InteractionActionDescriptorFor,
+  type InteractionOwnerDefinition,
+} from '@interactive-os/interaction/runtime'
+import {
+  InteractionOwnerDefinitionSchema,
+  compileInteractionOwnerDefinition,
+} from '@interactive-os/interaction/definition'
 import {
   InteractionProvider,
   useInteractionOwner,
@@ -199,9 +279,36 @@ registry.register(compileInteractionOwnerDefinition(definition))
 registry.activate(owner.id)
 const route = routeInteractionKey(registry, { key: 'ArrowDown' })
 const platformRoute = routeInteractionKey(registry, { key: 'ArrowDown', platform: 'mac' })
+const uncheckedOwner = createInteractionOwner({
+  id: 'shell-unchecked',
+  kind: 'shell',
+})
+const router = createInteractionRouter({
+  platform: 'mac',
+  owners: [shellOwner({
+    id: 'shell-shortcut',
+    keys: [{ key: 'k', mod: 'primary', action: 'palette.open' }],
+  })],
+})
+type Actions = {
+  'palette.open': void
+  'palette.move': { delta: number }
+}
+const shortcutRoute = router.route({ key: 'k', metaKey: true, targetKind: 'pattern' })
+const action = getInteractionRouteAction<Actions, 'palette.open'>(shortcutRoute, 'palette.open')
+const actionHelpers = createInteractionActions<Actions>()
+const moveAction = actionHelpers.getRoute({
+  matchedKeyRule: { action: { type: 'palette.move', params: { delta: 1 } } },
+}, 'palette.move')
+const delta: number | undefined = moveAction?.params.delta
+type ActionDescriptor = InteractionActionDescriptorFor<Actions>
 
 route.status satisfies 'owner' | 'restore' | 'native' | 'ignored'
 platformRoute.status satisfies 'owner' | 'restore' | 'native' | 'ignored'
+uncheckedOwner.kind satisfies InteractionOwner['kind']
+action?.type satisfies 'palette.open' | undefined
+delta satisfies number | undefined
+void (null as ActionDescriptor | null)
 void InteractionProvider
 void useInteractionOwner
 `)

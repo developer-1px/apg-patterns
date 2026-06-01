@@ -44,7 +44,8 @@ export async function verifyPatternPanelRoutes({
       && previewSurfaceIsMounted(key)
       && findRightPanelTab('events')?.getAttribute('aria-selected') === 'true'
       && text.includes('events')
-      && logText.trim() === 'none'
+      && text.includes('0 events')
+      && logText.trim() === ''
     )
   },
     `${label}: events panel route did not render`,

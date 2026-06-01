@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState, type KeyboardEvent } from 'react'
-import type { InteractionKeyInput, InteractionOwner } from '../../../../packages/interaction/src'
+import type { InteractionKeyInput, InteractionOwner } from '../../../../packages/interaction/src/runtime'
 import {
   InteractionProvider,
   useInteractionFocusGuardHandler,

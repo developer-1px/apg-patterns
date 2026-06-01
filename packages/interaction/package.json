@@ -42,6 +42,26 @@
         "default": "./dist/index.cjs"
       }
     },
+    "./runtime": {
+      "import": {
+        "types": "./dist/runtime.d.ts",
+        "default": "./dist/runtime.js"
+      },
+      "require": {
+        "types": "./dist/runtime.d.cts",
+        "default": "./dist/runtime.cjs"
+      }
+    },
+    "./definition": {
+      "import": {
+        "types": "./dist/definition.d.ts",
+        "default": "./dist/definition.js"
+      },
+      "require": {
+        "types": "./dist/definition.d.cts",
+        "default": "./dist/definition.cjs"
+      }
+    },
     "./react": {
       "import": {
         "types": "./dist/react.d.ts",

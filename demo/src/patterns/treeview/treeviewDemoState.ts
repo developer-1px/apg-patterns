@@ -3,7 +3,7 @@ import { PatternDataSchema, type PatternEvent } from '../../../../src/react'
 import { reduceData } from './treeContract'
 import { treeVariants, type TreeVariantKey } from './treeVariants'
 
-const treeVariantKeys = ['fileDirectoryComputed', 'fileDirectoryDeclared', 'navigation', 'interactionOwnership'] as const
+const treeVariantKeys = ['fileDirectoryComputed', 'fileDirectoryDeclared', 'navigation', 'interactionOwnership', 'pageInteractionRecovery'] as const
 const focusStrategies = ['rovingTabIndex', 'ariaActiveDescendant'] as const
 const itemClickActions = ['select', 'toggleExpand', 'none'] as const
 const inspectModes = ['aria', 'html'] as const

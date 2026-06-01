@@ -6,14 +6,20 @@ while the API is hardened against APG demo shell and product shell usage.
 ## Permanent Direction
 
 - The root entry stays React-free.
+- `@interactive-os/interaction/runtime` stays React-free and Zod-free.
+- `@interactive-os/interaction/definition` owns Zod schemas, validation, and
+  checked compile.
 - React support stays behind `@interactive-os/interaction/react`.
 - The package coordinates ownership; it does not implement APG pattern
   internals.
 - The package does not import `@interactive-os/aria`.
 - Core decisions are inspectable data before mutation: route results, focus
   guard results, diagnostics snapshots, and restore targets.
-- Serializable owner definitions are the preferred contract. Callback owners
-  remain an adapter surface while the definition-first API hardens.
+- Runtime-first owner shortcuts are the preferred first-use contract.
+  Serializable owner definitions remain the validation, catalog, and generated
+  definition contract.
+- Callback owners remain an adapter surface while the runtime and definition
+  layers harden.
 - Browser event adapters are optional helpers around the pure routing and focus
   guard functions.
 
@@ -30,7 +36,8 @@ while the API is hardened against APG demo shell and product shell usage.
 - Matched routes expose the matched action descriptor so host shells can
   dispatch effects without reading callback closures.
 - Platform-specific bindings are selected only when route input declares a
-  platform; otherwise the base key rule is used.
+  platform; otherwise the base key rule is used. Runtime shortcut `primary`
+  bindings compile to platform-specific Meta/Control rules.
 - `code`, `preventDefault`, and `stopPropagation` are executable parts of a
   key rule, not documentation-only fields.
 - Focus guard decisions report whether to restore the active owner, activate a
@@ -42,8 +49,8 @@ while the API is hardened against APG demo shell and product shell usage.
 
 Before 1.0, changes may still refine names and object shapes. Treat a change as
 breaking when it removes an entrypoint, moves React into the root entry, removes
-CommonJS or ESM output, removes declaration output, or makes the package depend
-on `@interactive-os/aria`.
+CommonJS or ESM output, removes declaration output, adds Zod to the runtime
+subpath, or makes the package depend on `@interactive-os/aria`.
 
 ## Validation Gates
 

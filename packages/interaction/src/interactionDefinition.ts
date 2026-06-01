@@ -1,16 +1,40 @@
 import { z } from 'zod'
 
+import {
+  compileInteractionOwnerUnchecked,
+  compileInteractionOwnersUnchecked,
+} from './interactionDefinitionCompile'
 import type {
-  InteractionKeyInput,
-  InteractionKeyPlatformRule,
-  InteractionKeyRule,
-  InteractionKeyRuleKind,
-  InteractionKeyTargetKind,
+  InteractionCondition,
+  InteractionOwnerDefinition,
+} from './interactionDefinitionTypes'
+import type {
   InteractionOwner,
-  InteractionOwnerKind,
-  InteractionRestoreTarget,
   InteractionSerializableValue,
 } from './interactionOwnership'
+
+export { evaluateInteractionCondition } from './interactionDefinitionCompile'
+
+export type {
+  InteractionActionDescriptor,
+  InteractionCondition,
+  InteractionDefinitionKeyInput,
+  InteractionFocusContainment,
+  InteractionFocusDefinition,
+  InteractionFocusGuardPolicy,
+  InteractionFocusStrategy,
+  InteractionFocusTarget,
+  InteractionKeyModifier,
+  InteractionKeyPlatformBinding,
+  InteractionKeyRuleDefinition,
+  InteractionOwnerDefinition,
+  InteractionOwnerDefinitionKind,
+  InteractionOwnerDiagnosticsDefinition,
+  InteractionOwnerRuntimeKind,
+  InteractionOwnerScope,
+  InteractionShellRulesDefinition,
+  InteractionTargetPolicy,
+} from './interactionDefinitionTypes'
 
 export const InteractionSerializableValueSchema: z.ZodType<InteractionSerializableValue> = z.lazy(() =>
   z.union([
@@ -173,12 +197,6 @@ const InteractionConditionAtomSchema = z.union([
   }
 })
 
-export type InteractionCondition =
-  | z.infer<typeof InteractionConditionAtomSchema>
-  | { readonly type: 'all'; readonly conditions: readonly InteractionCondition[] }
-  | { readonly type: 'any'; readonly conditions: readonly InteractionCondition[] }
-  | { readonly type: 'not'; readonly condition: InteractionCondition }
-
 export const InteractionConditionSchema: z.ZodType<InteractionCondition> = z.lazy(() =>
   z.union([
     InteractionConditionAtomSchema,
@@ -273,28 +291,6 @@ export const InteractionOwnerDefinitionsSchema = z.array(InteractionOwnerDefinit
   },
 )
 
-export type InteractionKeyModifier = z.infer<typeof InteractionKeyModifierSchema>
-export type InteractionPlatform = z.infer<typeof InteractionPlatformSchema>
-export type InteractionOwnerDefinitionKind = z.infer<typeof InteractionOwnerDefinitionKindSchema>
-export type InteractionOwnerScope = z.infer<typeof InteractionOwnerScopeSchema>
-export type InteractionFocusStrategy = z.infer<typeof InteractionFocusStrategySchema>
-export type InteractionFocusContainment = z.infer<typeof InteractionFocusContainmentSchema>
-export type InteractionFocusTarget = z.infer<typeof InteractionFocusTargetSchema>
-export type InteractionTargetPolicy = z.infer<typeof InteractionTargetPolicySchema>
-export type InteractionActionDescriptor = z.infer<typeof InteractionActionDescriptorSchema>
-export type InteractionKeyRuleDefinition = z.infer<typeof InteractionKeyRuleDefinitionSchema>
-export type InteractionShellRulesDefinition = z.infer<typeof InteractionShellRulesDefinitionSchema>
-export type InteractionOwnerDefinition = z.infer<typeof InteractionOwnerDefinitionSchema>
-
-export interface InteractionDefinitionKeyInput extends InteractionKeyInput {
-  context?: Readonly<Record<string, InteractionSerializableValue>>
-}
-
-interface InteractionConditionContext {
-  definition: InteractionOwnerDefinition
-  input: InteractionDefinitionKeyInput
-}
-
 export function defineInteractionOwner(input: unknown): InteractionOwnerDefinition {
   return InteractionOwnerDefinitionSchema.parse(input)
 }
@@ -304,262 +300,9 @@ export function defineInteractionOwners(input: unknown): InteractionOwnerDefinit
 }
 
 export function compileInteractionOwnerDefinition(input: unknown): InteractionOwner {
-  const definition = defineInteractionOwner(input)
-  const keyRules = definition.keyRules.map(toRuntimeKeyRule)
-
-  return {
-    id: definition.id,
-    kind: runtimeKindForDefinition(definition),
-    diagnostics: {
-      label: definition.diagnostics?.label,
-      role: definition.diagnostics?.role,
-      focusStrategy: definition.focus?.strategy,
-      keyRules,
-    },
-    ownsKey(keyInput) {
-      return findMatchingRule(definition, keyInput, (rule) => {
-        if (rule.kind === 'restore') return false
-        if (rule.kind === 'shell') return runtimeKindForDefinition(definition) === 'shell'
-        return true
-      }) !== null
-    },
-    allowsNativeKey(keyInput) {
-      return findMatchingRule(definition, keyInput, (rule) =>
-        rule.kind !== 'restore' && ruleAllowsNativeTarget(rule, keyInput, runtimeKindForDefinition(definition)),
-      ) !== null
-    },
-    restoreKeys(keyInput) {
-      return findMatchingRule(definition, keyInput, (rule) => rule.kind === 'restore') !== null
-    },
-    allowsShellKey(keyInput) {
-      return shellRulesAllowKey(definition, keyInput)
-    },
-    restoreTarget: toRuntimeRestoreTarget(definition),
-  }
+  return compileInteractionOwnerUnchecked(defineInteractionOwner(input))
 }
 
 export function compileInteractionOwnerDefinitions(input: unknown): InteractionOwner[] {
-  return [...defineInteractionOwners(input)]
-    .sort((first, second) => first.priority - second.priority)
-    .map((definition) => compileInteractionOwnerDefinition(definition))
-}
-
-export function evaluateInteractionCondition(
-  condition: InteractionCondition,
-  definition: InteractionOwnerDefinition,
-  input: InteractionDefinitionKeyInput,
-): boolean {
-  return evaluateCondition(condition, { definition, input })
-}
-
-function findMatchingRule(
-  definition: InteractionOwnerDefinition,
-  input: InteractionKeyInput,
-  predicate: (rule: InteractionKeyRuleDefinition) => boolean,
-): InteractionKeyRuleDefinition | null {
-  for (const rule of definition.keyRules) {
-    if (!predicate(rule)) continue
-    if (!ruleMatchesInput(rule, definition, input)) continue
-    return rule
-  }
-
-  return null
-}
-
-function ruleMatchesInput(
-  rule: InteractionKeyRuleDefinition,
-  definition: InteractionOwnerDefinition,
-  input: InteractionKeyInput,
-): boolean {
-  const binding = resolveDefinitionKeyBinding(rule, input.platform)
-  if (!binding.keys.includes(input.key)) return false
-  if (binding.code && (!input.code || !binding.code.includes(input.code))) return false
-  if (rule.targetKinds && !rule.targetKinds.includes(input.targetKind ?? 'unknown')) return false
-  if (!definitionBindingModifiersMatch(binding, input)) return false
-  if (rule.when && !evaluateCondition(rule.when, { definition, input })) return false
-  return true
-}
-
-function modifierRequested(modifiers: readonly InteractionKeyModifier[], modifier: InteractionKeyModifier): boolean {
-  return modifiers.includes(modifier)
-}
-
-interface InteractionKeyPlatformBinding extends InteractionKeyPlatformRule {
-  altKey: boolean
-  ctrlKey: boolean
-  metaKey: boolean
-  shiftKey: boolean
-}
-
-function resolveDefinitionKeyBinding(
-  rule: InteractionKeyRuleDefinition,
-  platform: InteractionKeyInput['platform'],
-): InteractionKeyPlatformBinding {
-  const platformRule = platform ? rule.platform?.[platform] : undefined
-  const modifiers = platformRule?.modifiers ?? rule.modifiers
-
-  return {
-    keys: platformRule?.keys ?? rule.keys,
-    code: platformRule?.code ?? rule.code,
-    altKey: modifierRequested(modifiers, 'Alt'),
-    ctrlKey: modifierRequested(modifiers, 'Control'),
-    metaKey: modifierRequested(modifiers, 'Meta'),
-    shiftKey: modifierRequested(modifiers, 'Shift'),
-  }
-}
-
-function definitionBindingModifiersMatch(binding: InteractionKeyPlatformBinding, input: InteractionKeyInput): boolean {
-  return binding.altKey === (input.altKey ?? false)
-    && binding.ctrlKey === (input.ctrlKey ?? false)
-    && binding.metaKey === (input.metaKey ?? false)
-    && binding.shiftKey === (input.shiftKey ?? false)
-}
-
-function shellRulesAllowKey(definition: InteractionOwnerDefinition, input: InteractionKeyInput): boolean {
-  if (!definition.shellRules?.allowGlobal) return false
-  const blockWhen = definition.shellRules.blockWhen
-  if (!blockWhen) return true
-  return !evaluateCondition(blockWhen, { definition, input })
-}
-
-function ruleAllowsNativeTarget(
-  rule: InteractionKeyRuleDefinition,
-  input: InteractionKeyInput,
-  runtimeKind: InteractionOwnerKind,
-): boolean {
-  const targetKind = input.targetKind ?? 'unknown'
-  if (targetKind === 'text-input' || targetKind === 'textarea' || targetKind === 'select' || targetKind === 'contenteditable') {
-    return runtimeKind === 'shell'
-      ? rule.targetPolicy?.nativeText === 'allow-shell'
-      : rule.targetPolicy?.nativeText === 'allow-owner'
-  }
-  if (targetKind === 'native-control') {
-    return runtimeKind === 'shell'
-      ? rule.targetPolicy?.nativeControl === 'allow-shell'
-      : rule.targetPolicy?.nativeControl === 'allow-owner'
-  }
-  return false
-}
-
-function evaluateCondition(condition: InteractionCondition, context: InteractionConditionContext): boolean {
-  switch (condition.type) {
-    case 'all':
-      return condition.conditions.every((child) => evaluateCondition(child, context))
-    case 'any':
-      return condition.conditions.some((child) => evaluateCondition(child, context))
-    case 'not':
-      return !evaluateCondition(condition.condition, context)
-    case 'target.kind':
-      return matchesOne(context.input.targetKind ?? 'unknown', condition)
-    case 'owner.kind':
-      return matchesOne(context.definition.kind, condition)
-    case 'owner.mode':
-      return context.definition.mode !== undefined && matchesOne(context.definition.mode, condition)
-    case 'key.value':
-      return matchesOne(context.input.key, condition)
-    case 'key.modifier':
-      return modifierIsPressed(condition.includes, context.input)
-    case 'context.value': {
-      const value = context.input.context?.[condition.key]
-      return value !== undefined && matchesOne(value, condition)
-    }
-  }
-}
-
-function matchesOne<T>(
-  value: T,
-  condition: { readonly equals?: T; readonly in?: readonly T[] },
-): boolean {
-  if (condition.equals !== undefined && value === condition.equals) return true
-  if (condition.in?.includes(value)) return true
-  return false
-}
-
-function modifierIsPressed(modifier: InteractionKeyModifier, input: InteractionKeyInput): boolean {
-  if (modifier === 'Alt') return input.altKey ?? false
-  if (modifier === 'Control') return input.ctrlKey ?? false
-  if (modifier === 'Meta') return input.metaKey ?? false
-  return input.shiftKey ?? false
-}
-
-function toRuntimeKeyRule(rule: InteractionKeyRuleDefinition): InteractionKeyRule {
-  const modifiers = rule.modifiers
-
-  return {
-    id: rule.id,
-    keys: rule.keys,
-    kind: rule.kind as InteractionKeyRuleKind,
-    altKey: modifierRequested(modifiers, 'Alt'),
-    ctrlKey: modifierRequested(modifiers, 'Control'),
-    metaKey: modifierRequested(modifiers, 'Meta'),
-    shiftKey: modifierRequested(modifiers, 'Shift'),
-    ...(rule.code !== undefined ? { code: rule.code } : {}),
-    ...(rule.label !== undefined || rule.description !== undefined ? { label: rule.label ?? rule.description } : {}),
-    action: rule.action,
-    ...(rule.platform !== undefined ? { platform: toRuntimePlatformRules(rule) } : {}),
-    ...(rule.targetKinds !== undefined ? { targetKinds: rule.targetKinds as readonly InteractionKeyTargetKind[] } : {}),
-    ...(rule.preventDefault !== undefined ? { preventDefault: rule.preventDefault } : {}),
-    ...(rule.stopPropagation !== undefined ? { stopPropagation: rule.stopPropagation } : {}),
-  }
-}
-
-function toRuntimePlatformRules(rule: InteractionKeyRuleDefinition): InteractionKeyRule['platform'] {
-  if (!rule.platform) return undefined
-  return {
-    ...(rule.platform.mac ? { mac: toRuntimePlatformRule(rule.platform.mac) } : {}),
-    ...(rule.platform.windows ? { windows: toRuntimePlatformRule(rule.platform.windows) } : {}),
-    ...(rule.platform.linux ? { linux: toRuntimePlatformRule(rule.platform.linux) } : {}),
-  }
-}
-
-function toRuntimePlatformRule(rule: {
-  keys: readonly string[]
-  code?: readonly string[]
-  modifiers: readonly InteractionKeyModifier[]
-}): InteractionKeyPlatformRule {
-  return {
-    keys: rule.keys,
-    code: rule.code,
-    altKey: modifierRequested(rule.modifiers, 'Alt'),
-    ctrlKey: modifierRequested(rule.modifiers, 'Control'),
-    metaKey: modifierRequested(rule.modifiers, 'Meta'),
-    shiftKey: modifierRequested(rule.modifiers, 'Shift'),
-  }
-}
-
-function runtimeKindForDefinition(definition: InteractionOwnerDefinition): InteractionOwnerKind {
-  if (definition.runtimeKind) return definition.runtimeKind
-  if (definition.kind === 'shell') return 'shell'
-  if (
-    definition.kind === 'dialog'
-    || definition.kind === 'popover'
-    || definition.kind === 'input'
-    || definition.kind === 'form'
-    || definition.kind === 'editor'
-    || definition.kind === 'native-control'
-    || definition.kind === 'temporary-control'
-  ) {
-    return 'temporary-control'
-  }
-  return 'pattern'
-}
-
-function toRuntimeRestoreTarget(definition: InteractionOwnerDefinition): InteractionRestoreTarget | undefined {
-  const target = definition.focus?.restore
-  if (!target || target.kind === 'none') return undefined
-
-  if (target.kind === 'first' || target.kind === 'selected' || target.kind === 'last-active') {
-    return {
-      kind: 'active-cursor',
-      ownerId: definition.id,
-      label: target.label ?? target.kind,
-    }
-  }
-
-  return {
-    kind: target.kind,
-    ownerId: definition.id,
-    label: target.label,
-    ...('elementId' in target ? { elementId: target.elementId } : {}),
-  }
+  return compileInteractionOwnersUnchecked(defineInteractionOwners(input))
 }

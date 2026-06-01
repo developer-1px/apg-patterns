@@ -3,7 +3,9 @@ import { describe, expect, it, vi } from 'vitest'
 import { createInteractionOwnershipRegistry } from './interactionOwnership'
 import {
   handleInteractionKeyboardEvent,
+  detectInteractionPlatform,
   interactionKeyInputFromKeyboardEvent,
+  resolveInteractionPrimaryModifier,
   routeInteractionKeyboardEvent,
   type InteractionKeyboardEventLike,
 } from './interactionKeyboardEvent'
@@ -175,6 +177,26 @@ describe('interaction keyboard event adapter', () => {
       platform: 'mac',
       shiftKey: true,
       targetKind: 'native-control',
+    })
+  })
+
+  it('can add route platform through adapter options', () => {
+    expect(detectInteractionPlatform({ platform: 'MacIntel' })).toBe('mac')
+    expect(detectInteractionPlatform({ platform: 'Win32' })).toBe('windows')
+    expect(resolveInteractionPrimaryModifier('mac')).toBe('Meta')
+    expect(resolveInteractionPrimaryModifier('windows')).toBe('Control')
+
+    expect(interactionKeyInputFromKeyboardEvent(keyboardEvent({
+      key: 'k',
+      code: 'KeyK',
+      metaKey: true,
+    }), {
+      platform: 'mac',
+    })).toMatchObject({
+      key: 'k',
+      code: 'KeyK',
+      metaKey: true,
+      platform: 'mac',
     })
   })
 

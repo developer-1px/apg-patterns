@@ -271,4 +271,13 @@ describe('APG §Activation', () => {
     expect(screen.getByRole('region', { name: 'Provider tree scroll container' })).toBeTruthy()
     expect(screen.getByRole('textbox', { name: 'Provider tree filter' })).toBeTruthy()
   })
+
+  it('entry runtime exposes the page interaction recovery demo variant', () => {
+    render(<TreeviewEntryDemo />)
+
+    fireEvent.click(screen.getByRole('option', { name: 'Page interaction recovery' }))
+
+    expect(screen.getByRole('region', { name: 'Page scroll recovery target' })).toBeTruthy()
+    expect(screen.getByRole('searchbox', { name: 'Page search' })).toBeTruthy()
+  })
 })

@@ -67,7 +67,7 @@ describe('InteractionOwnerDefinitionSchema', () => {
 
     expect(parsed).toEqual(JSON.parse(JSON.stringify(parsed)))
     expect(parsed.focus?.restore).toEqual({ kind: 'active-cursor', label: 'Tree cursor' })
-    expect(parsed.keyRules[0]?.targetPolicy).toEqual({
+    expect(parsed.keyRules?.[0]?.targetPolicy).toEqual({
       nativeText: 'protect',
       nativeControl: 'protect',
       incidental: 'restore-owner',
@@ -104,7 +104,10 @@ describe('InteractionOwnerDefinitionSchema', () => {
 
   it('evaluates structured conditions without arbitrary predicates', () => {
     const definition = defineInteractionOwner(treeDefinition)
-    const condition = definition.keyRules[0]!.when!
+    const condition = definition.keyRules?.[0]?.when
+
+    expect(condition).toBeDefined()
+    if (!condition) throw new Error('expected parsed condition')
 
     expect(evaluateInteractionCondition(condition, definition, {
       key: 'ArrowDown',
