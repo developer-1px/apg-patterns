@@ -23,7 +23,9 @@ export function commandPaletteTemporaryControl<TActions extends InteractionActio
 export function withCommandPaletteShortcut(owner: InteractionOwner): InteractionOwner {
   return {
     ...owner,
-    allowsShellKey: isCommandPaletteShortcut,
+    allowsShellKey(input) {
+      return owner.allowsShellKey?.(input) === true || isCommandPaletteShortcut(input)
+    },
   }
 }
 
