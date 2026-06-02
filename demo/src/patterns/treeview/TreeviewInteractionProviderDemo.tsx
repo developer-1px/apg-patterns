@@ -66,6 +66,7 @@ function TreeviewInteractionProviderDemoInner() {
   }
 
   const routeKeyboard = useInteractionKeyboardHandler({
+    platform: 'mac',
     releaseOnRestore: true,
     shouldStopPropagation: ({ input, route }) => (
       route.status === 'restore'

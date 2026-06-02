@@ -3,7 +3,6 @@ import type { InteractionFocusGuardAction, InteractionKeyInput, InteractionOwner
 import {
   createInteractionOwnershipRegistry,
   evaluateInteractionFocusTarget,
-  handleInteractionKeyboardEvent,
 } from '../../../../packages/interaction/src/runtime'
 import { gridDefinition, listboxDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
@@ -16,6 +15,7 @@ import { initialToolbarData, reduceToolbarData } from '../toolbar/toolbarData'
 import {
   commandPaletteShellOwner,
   commandPaletteTemporaryControl,
+  handleDemoInteractionKeyboardEvent,
   isCommandPaletteShortcut,
 } from '../shared/interactionDemoOwners'
 import { Treeview } from './Treeview'
@@ -280,7 +280,7 @@ export function PageInteractionRecoveryDemo() {
   }
 
   const handleKeyDownCapture = (event: globalThis.KeyboardEvent) => {
-    const result = handleInteractionKeyboardEvent({
+    const result = handleDemoInteractionKeyboardEvent({
       registry,
       event,
       releaseOnRestore: true,

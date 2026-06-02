@@ -4,13 +4,31 @@ import type {
   InteractionOwner,
   InteractionOwnerId,
   InteractionTemporaryControlOptions,
+  HandleInteractionKeyboardEventOptions,
+  InteractionKeyboardEventRoute,
+  InteractionPlatform,
 } from '../../../../packages/interaction/src/runtime'
-import { shellOwner, temporaryControl } from '../../../../packages/interaction/src/runtime'
+import {
+  detectInteractionPlatform,
+  handleInteractionKeyboardEvent,
+  shellOwner,
+  temporaryControl,
+} from '../../../../packages/interaction/src/runtime'
 
 export function commandPaletteShellOwner(ownerId: InteractionOwnerId): InteractionOwner {
   return shellOwner({
     id: ownerId,
-    keys: [{ key: 'k', mod: 'Meta', action: 'command-palette.open' }],
+    keys: [{ key: 'k', mod: 'primary', action: 'command-palette.open' }],
+  })
+}
+
+export function handleDemoInteractionKeyboardEvent(
+  options: HandleInteractionKeyboardEventOptions,
+): InteractionKeyboardEventRoute {
+  return handleInteractionKeyboardEvent({
+    ...options,
+    platform: options.platform ?? platformFromModifier(options.event),
+    resolvePlatform: options.resolvePlatform ?? detectInteractionPlatform,
   })
 }
 
@@ -30,5 +48,11 @@ export function withCommandPaletteShortcut(owner: InteractionOwner): Interaction
 }
 
 export function isCommandPaletteShortcut(input: InteractionKeyInput): boolean {
-  return input.metaKey === true && input.key.toLowerCase() === 'k'
+  return (input.metaKey === true || input.ctrlKey === true) && input.key.toLowerCase() === 'k'
+}
+
+function platformFromModifier(event: HandleInteractionKeyboardEventOptions['event']): InteractionPlatform | undefined {
+  if (event.metaKey === true) return 'mac'
+  if (event.ctrlKey === true) return 'windows'
+  return undefined
 }

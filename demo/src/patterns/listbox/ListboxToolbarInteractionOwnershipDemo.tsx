@@ -2,13 +2,13 @@ import { useLayoutEffect, useMemo, useRef, useState, type FocusEvent, type Keybo
 import type { InteractionKeyInput } from '../../../../packages/interaction/src/runtime'
 import {
   createInteractionOwnershipRegistry,
-  handleInteractionKeyboardEvent,
 } from '../../../../packages/interaction/src/runtime'
 import { listboxDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 import {
   commandPaletteShellOwner,
   commandPaletteTemporaryControl,
+  handleDemoInteractionKeyboardEvent,
   isCommandPaletteShortcut,
 } from '../shared/interactionDemoOwners'
 import { Toolbar } from '../toolbar/Toolbar'
@@ -103,7 +103,7 @@ export function ListboxToolbarInteractionOwnershipDemo() {
   }
 
   const handleKeyDownCapture = (event: KeyboardEvent<HTMLElement>) => {
-    const result = handleInteractionKeyboardEvent({
+    const result = handleDemoInteractionKeyboardEvent({
       registry,
       event,
       releaseOnRestore: true,

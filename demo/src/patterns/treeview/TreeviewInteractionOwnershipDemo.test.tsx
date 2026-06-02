@@ -54,8 +54,12 @@ describe('treeview interaction ownership demo', () => {
     expect(screen.getByRole('status', { name: 'Command count' }).textContent).toBe('1')
     expect(screen.getByRole('status', { name: 'Interaction route' }).textContent).toBe('shell-owner-handled')
 
+    fireEvent.keyDown(scrollContainer, { key: 'k', ctrlKey: true })
+    expect(screen.getByRole('status', { name: 'Command count' }).textContent).toBe('2')
+    expect(screen.getByRole('status', { name: 'Interaction route' }).textContent).toBe('shell-owner-handled')
+
     fireEvent.keyDown(scrollContainer, { key: 's', metaKey: true })
-    expect(screen.getByRole('status', { name: 'Command count' }).textContent).toBe('1')
+    expect(screen.getByRole('status', { name: 'Command count' }).textContent).toBe('2')
     expect(screen.getByRole('status', { name: 'Interaction route' }).textContent).toBe('browser-fallback')
   })
 })

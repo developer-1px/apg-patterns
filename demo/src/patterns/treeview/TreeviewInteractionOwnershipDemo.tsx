@@ -2,13 +2,13 @@ import { useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from '
 import type { InteractionKeyInput } from '../../../../packages/interaction/src/runtime'
 import {
   createInteractionOwnershipRegistry,
-  handleInteractionKeyboardEvent,
 } from '../../../../packages/interaction/src/runtime'
 import type { PatternData, PatternEvent } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 import {
   commandPaletteShellOwner,
   commandPaletteTemporaryControl,
+  handleDemoInteractionKeyboardEvent,
   isCommandPaletteShortcut,
 } from '../shared/interactionDemoOwners'
 import { Treeview } from './Treeview'
@@ -59,7 +59,7 @@ export function TreeviewInteractionOwnershipDemo() {
   }
 
   const handleShellKeyDown = (event: KeyboardEvent<HTMLElement>) => {
-    const result = handleInteractionKeyboardEvent({
+    const result = handleDemoInteractionKeyboardEvent({
       registry,
       event,
       releaseOnRestore: true,
