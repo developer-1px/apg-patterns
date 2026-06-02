@@ -13,6 +13,11 @@ import { Listbox } from '../listbox/Listbox'
 import { initialListboxData } from '../listbox/listboxData'
 import { Toolbar } from '../toolbar/Toolbar'
 import { initialToolbarData, reduceToolbarData } from '../toolbar/toolbarData'
+import {
+  commandPaletteShellOwner,
+  commandPaletteTemporaryControl,
+  isCommandPaletteShortcut,
+} from '../shared/interactionDemoOwners'
 import { Treeview } from './Treeview'
 import { initialData as initialTreeData, reduceData as reduceTreeData, resolveTarget } from './treeContract'
 
@@ -126,7 +131,7 @@ export function PageInteractionRecoveryDemo() {
       id: treeOwnerId,
       kind: 'pattern',
       ownsKey: (input) => treeKeys.has(input.key),
-      allowsShellKey: isGlobalShortcut,
+      allowsShellKey: isCommandPaletteShortcut,
       restoreTarget: { kind: 'active-cursor', label: 'Tree' },
       restore: () => recoverFocus(treeOwnerId),
     })
@@ -134,7 +139,7 @@ export function PageInteractionRecoveryDemo() {
       id: listboxOwnerId,
       kind: 'pattern',
       ownsKey: (input) => listboxKeys.has(input.key),
-      allowsShellKey: isGlobalShortcut,
+      allowsShellKey: isCommandPaletteShortcut,
       restoreTarget: { kind: 'active-cursor', label: 'Listbox' },
       restore: () => recoverFocus(listboxOwnerId),
     })
@@ -142,7 +147,7 @@ export function PageInteractionRecoveryDemo() {
       id: toolbarOwnerId,
       kind: 'pattern',
       ownsKey: ownsToolbarKey,
-      allowsShellKey: isGlobalShortcut,
+      allowsShellKey: isCommandPaletteShortcut,
       restoreTarget: { kind: 'active-cursor', label: 'Toolbar' },
       restore: () => recoverFocus(toolbarOwnerId),
     })
@@ -150,44 +155,31 @@ export function PageInteractionRecoveryDemo() {
       id: gridOwnerId,
       kind: 'pattern',
       ownsKey: (input) => gridKeys.has(input.key),
-      allowsShellKey: isGlobalShortcut,
+      allowsShellKey: isCommandPaletteShortcut,
       restoreTarget: { kind: 'active-cursor', label: 'Grid cell' },
       restore: () => recoverFocus(gridOwnerId),
     })
-    const unregisterGridEditor = registry.register({
+    const unregisterGridEditor = registry.register(commandPaletteTemporaryControl({
       id: gridEditorOwnerId,
-      kind: 'temporary-control',
-      ownsKey: (input) => input.key === 'Enter' || input.key === 'Escape',
-      restoreKeys: (input) => input.key === 'Enter' || input.key === 'Escape',
-      allowsShellKey: isGlobalShortcut,
-    })
-    const unregisterSearch = registry.register({
+      restore: ['Enter', 'Escape'],
+    }))
+    const unregisterSearch = registry.register(commandPaletteTemporaryControl({
       id: searchOwnerId,
-      kind: 'temporary-control',
-      ownsKey: (input) => input.key === 'Escape',
-      restoreKeys: (input) => input.key === 'Escape',
-      allowsShellKey: isGlobalShortcut,
-    })
+      restore: ['Escape'],
+    }))
     const unregisterDialogListbox = registry.register({
       id: dialogListboxOwnerId,
       kind: 'pattern',
       ownsKey: (input) => dialogListboxKeys.has(input.key),
-      allowsShellKey: isGlobalShortcut,
+      allowsShellKey: isCommandPaletteShortcut,
       restoreTarget: { kind: 'active-cursor', label: 'Dialog listbox' },
       restore: () => recoverFocus(dialogListboxOwnerId),
     })
-    const unregisterDialogSearch = registry.register({
+    const unregisterDialogSearch = registry.register(commandPaletteTemporaryControl({
       id: dialogSearchOwnerId,
-      kind: 'temporary-control',
-      ownsKey: (input) => input.key === 'Escape',
-      restoreKeys: (input) => input.key === 'Escape',
-      allowsShellKey: isGlobalShortcut,
-    })
-    const unregisterShell = registry.register({
-      id: shellOwnerId,
-      kind: 'shell',
-      ownsKey: isGlobalShortcut,
-    })
+      restore: ['Escape'],
+    }))
+    const unregisterShell = registry.register(commandPaletteShellOwner(shellOwnerId))
 
     registry.activate(treeOwnerId)
 
@@ -616,10 +608,6 @@ function isOwnerFocusId(ownerId: unknown): ownerId is OwnerFocusId {
     || ownerId === toolbarOwnerId
     || ownerId === gridOwnerId
     || ownerId === dialogListboxOwnerId
-}
-
-function isGlobalShortcut(input: InteractionKeyInput): boolean {
-  return input.metaKey === true && input.key.toLowerCase() === 'k'
 }
 
 function focusActiveTreeItem(scope: HTMLElement | null): HTMLElement | null {

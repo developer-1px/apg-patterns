@@ -6,6 +6,11 @@ import {
 } from '../../../../packages/interaction/src/runtime'
 import { gridDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
+import {
+  commandPaletteShellOwner,
+  commandPaletteTemporaryControl,
+  isCommandPaletteShortcut,
+} from '../shared/interactionDemoOwners'
 import { Grid } from './Grid'
 import { gridVariants } from './gridData'
 
@@ -40,24 +45,18 @@ export function GridInteractionOwnershipDemo() {
       id: gridOwnerId,
       kind: 'pattern',
       ownsKey: ownsGridKey,
-      allowsShellKey: isCommandShortcut,
+      allowsShellKey: isCommandPaletteShortcut,
       restore: () => {
         setActiveOwnerId(gridOwnerId)
         gridScopeRef.current?.querySelector<HTMLElement>('[role="gridcell"][tabindex="0"], [role="columnheader"][tabindex="0"]')?.focus()
       },
     })
-    const unregisterEditor = registry.register({
+    const unregisterEditor = registry.register(commandPaletteTemporaryControl({
       id: editorOwnerId,
-      kind: 'temporary-control',
-      ownsKey: (input) => input.key === 'Enter' || input.key === 'Escape' || input.key === 'Tab',
-      restoreKeys: (input) => input.key === 'Enter' || input.key === 'Escape',
-      allowsShellKey: isCommandShortcut,
-    })
-    const unregisterShell = registry.register({
-      id: shellOwnerId,
-      kind: 'shell',
-      ownsKey: isCommandShortcut,
-    })
+      restore: ['Enter', 'Escape'],
+      keys: { Tab: 'grid-editor.tab' },
+    }))
+    const unregisterShell = registry.register(commandPaletteShellOwner(shellOwnerId))
 
     registry.activate(gridOwnerId)
 
@@ -145,8 +144,4 @@ function gridKeyEvent(data: PatternData, input: InteractionKeyInput): PatternEve
 
 function ownsGridKey(input: InteractionKeyInput): boolean {
   return gridKeys.has(input.key)
-}
-
-function isCommandShortcut(input: InteractionKeyInput): boolean {
-  return input.metaKey === true && input.key.toLowerCase() === 'k'
 }

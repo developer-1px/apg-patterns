@@ -6,6 +6,11 @@ import {
 } from '../../../../packages/interaction/src/runtime'
 import { listboxDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
+import {
+  commandPaletteShellOwner,
+  commandPaletteTemporaryControl,
+  isCommandPaletteShortcut,
+} from '../shared/interactionDemoOwners'
 import { Listbox } from '../listbox/Listbox'
 import { initialListboxData } from '../listbox/listboxData'
 
@@ -36,24 +41,17 @@ export function DialogInteractionOwnershipDemo() {
       id: listboxOwnerId,
       kind: 'pattern',
       ownsKey: ownsListboxKey,
-      allowsShellKey: isCommandShortcut,
+      allowsShellKey: isCommandPaletteShortcut,
       restore: () => {
         setActiveOwnerId(listboxOwnerId)
         listboxScopeRef.current?.querySelector<HTMLElement>('[role="option"][tabindex="0"]')?.focus()
       },
     })
-    const unregisterSearch = registry.register({
+    const unregisterSearch = registry.register(commandPaletteTemporaryControl({
       id: searchOwnerId,
-      kind: 'temporary-control',
-      ownsKey: (input) => input.key === 'Escape',
-      restoreKeys: (input) => input.key === 'Escape',
-      allowsShellKey: isCommandShortcut,
-    })
-    const unregisterShell = registry.register({
-      id: shellOwnerId,
-      kind: 'shell',
-      ownsKey: isCommandShortcut,
-    })
+      restore: ['Escape'],
+    }))
+    const unregisterShell = registry.register(commandPaletteShellOwner(shellOwnerId))
 
     return () => {
       unregisterShell()
@@ -158,8 +156,4 @@ function listboxKeyEvent(data: PatternData, input: InteractionKeyInput): Pattern
 
 function ownsListboxKey(input: InteractionKeyInput): boolean {
   return listboxKeys.has(input.key)
-}
-
-function isCommandShortcut(input: InteractionKeyInput): boolean {
-  return input.metaKey === true && input.key.toLowerCase() === 'k'
 }

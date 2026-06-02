@@ -6,6 +6,11 @@ import {
 } from '../../../../packages/interaction/src/runtime'
 import { listboxDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
+import {
+  commandPaletteShellOwner,
+  commandPaletteTemporaryControl,
+  isCommandPaletteShortcut,
+} from '../shared/interactionDemoOwners'
 import { Toolbar } from '../toolbar/Toolbar'
 import { initialToolbarData, reduceToolbarData } from '../toolbar/toolbarData'
 import { Listbox } from './Listbox'
@@ -36,7 +41,7 @@ export function ListboxToolbarInteractionOwnershipDemo() {
       id: listboxOwnerId,
       kind: 'pattern',
       ownsKey: ownsListboxKey,
-      allowsShellKey: isCommandShortcut,
+      allowsShellKey: isCommandPaletteShortcut,
       restore: () => {
         setActiveOwnerId(listboxOwnerId)
         focusActiveListboxOption(listboxScopeRef.current)
@@ -46,20 +51,13 @@ export function ListboxToolbarInteractionOwnershipDemo() {
       id: toolbarOwnerId,
       kind: 'pattern',
       ownsKey: ownsToolbarKey,
-      allowsShellKey: isCommandShortcut,
+      allowsShellKey: isCommandPaletteShortcut,
     })
-    const unregisterSearch = registry.register({
+    const unregisterSearch = registry.register(commandPaletteTemporaryControl({
       id: searchOwnerId,
-      kind: 'temporary-control',
-      ownsKey: (input) => input.key === 'Escape',
-      restoreKeys: (input) => input.key === 'Escape',
-      allowsShellKey: isCommandShortcut,
-    })
-    const unregisterShell = registry.register({
-      id: shellOwnerId,
-      kind: 'shell',
-      ownsKey: isCommandShortcut,
-    })
+      restore: ['Escape'],
+    }))
+    const unregisterShell = registry.register(commandPaletteShellOwner(shellOwnerId))
 
     registry.activate(listboxOwnerId)
 
@@ -221,10 +219,6 @@ function isToolbarDelegatedListboxKey(input: InteractionKeyInput): boolean {
 
 function isToolbarCommandKey(input: InteractionKeyInput): boolean {
   return toolbarCommandKeys.has(input.key)
-}
-
-function isCommandShortcut(input: InteractionKeyInput): boolean {
-  return input.metaKey === true && input.key.toLowerCase() === 'k'
 }
 
 function focusActiveListboxOption(scope: HTMLElement | null): void {

@@ -6,6 +6,11 @@ import {
 } from '../../../../packages/interaction/src/runtime'
 import { menuButtonDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
+import {
+  commandPaletteShellOwner,
+  commandPaletteTemporaryControl,
+  isCommandPaletteShortcut,
+} from '../shared/interactionDemoOwners'
 import { Menu } from './Menu'
 import { menuVariants } from './menuData'
 
@@ -38,24 +43,17 @@ export function MenuSearchInteractionOwnershipDemo() {
       id: menuOwnerId,
       kind: 'pattern',
       ownsKey: ownsMenuKey,
-      allowsShellKey: isCommandShortcut,
+      allowsShellKey: isCommandPaletteShortcut,
       restore: () => {
         setActiveOwnerId(menuOwnerId)
         focusActiveMenuTarget(menuScopeRef.current)
       },
     })
-    const unregisterSearch = registry.register({
+    const unregisterSearch = registry.register(commandPaletteTemporaryControl({
       id: searchOwnerId,
-      kind: 'temporary-control',
-      ownsKey: (input) => input.key === 'Escape',
-      restoreKeys: (input) => input.key === 'Escape',
-      allowsShellKey: isCommandShortcut,
-    })
-    const unregisterShell = registry.register({
-      id: shellOwnerId,
-      kind: 'shell',
-      ownsKey: isCommandShortcut,
-    })
+      restore: ['Escape'],
+    }))
+    const unregisterShell = registry.register(commandPaletteShellOwner(shellOwnerId))
 
     registry.activate(menuOwnerId)
 
@@ -193,9 +191,6 @@ function ownsMenuKey(input: InteractionKeyInput): boolean {
   return menuKeys.has(input.key)
 }
 
-function isCommandShortcut(input: InteractionKeyInput): boolean {
-  return input.metaKey === true && input.key.toLowerCase() === 'k'
-}
 
 function focusActiveMenuTarget(scope: HTMLElement | null): void {
   const activeItem = scope?.querySelector<HTMLElement>('[role="menuitem"][tabindex="0"]')

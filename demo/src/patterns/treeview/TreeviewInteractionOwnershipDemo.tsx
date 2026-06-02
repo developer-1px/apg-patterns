@@ -6,6 +6,11 @@ import {
 } from '../../../../packages/interaction/src/runtime'
 import type { PatternData, PatternEvent } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
+import {
+  commandPaletteShellOwner,
+  commandPaletteTemporaryControl,
+  isCommandPaletteShortcut,
+} from '../shared/interactionDemoOwners'
 import { Treeview } from './Treeview'
 import { initialData, reduceData, resolveTarget } from './treeContract'
 
@@ -28,24 +33,17 @@ export function TreeviewInteractionOwnershipDemo() {
       id: treeOwnerId,
       kind: 'pattern',
       ownsKey: ownsTreeKey,
-      allowsShellKey: isCommandShortcut,
+      allowsShellKey: isCommandPaletteShortcut,
       restore: () => {
         setActiveOwnerId(treeOwnerId)
         treeScopeRef.current?.querySelector<HTMLElement>('[role="treeitem"][tabindex="0"]')?.focus()
       },
     })
-    const unregisterInput = registry.register({
+    const unregisterInput = registry.register(commandPaletteTemporaryControl({
       id: inputOwnerId,
-      kind: 'temporary-control',
-      ownsKey: (input) => input.key === 'Escape',
-      restoreKeys: (input) => input.key === 'Escape',
-      allowsShellKey: isCommandShortcut,
-    })
-    const unregisterShell = registry.register({
-      id: shellOwnerId,
-      kind: 'shell',
-      ownsKey: isCommandShortcut,
-    })
+      restore: ['Escape'],
+    }))
+    const unregisterShell = registry.register(commandPaletteShellOwner(shellOwnerId))
 
     registry.activate(treeOwnerId)
 
@@ -143,8 +141,4 @@ function treeDirection(key: string): Extract<PatternEvent, { type: 'navigate' }>
 
 function ownsTreeKey(input: InteractionKeyInput): boolean {
   return treeKeys.has(input.key)
-}
-
-function isCommandShortcut(input: InteractionKeyInput): boolean {
-  return input.metaKey === true && input.key.toLowerCase() === 'k'
 }

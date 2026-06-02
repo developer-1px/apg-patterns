@@ -9,6 +9,11 @@ import {
 } from '../../../../packages/interaction/src/react'
 import type { PatternData, PatternEvent } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
+import {
+  commandPaletteShellOwner,
+  commandPaletteTemporaryControl,
+  isCommandPaletteShortcut,
+} from '../shared/interactionDemoOwners'
 import { Treeview } from './Treeview'
 import { initialData, reduceData, resolveTarget } from './treeContract'
 
@@ -39,25 +44,18 @@ function TreeviewInteractionProviderDemoInner() {
     id: treeOwnerId,
     kind: 'pattern',
     ownsKey: ownsTreeKey,
-    allowsShellKey: isCommandShortcut,
+    allowsShellKey: isCommandPaletteShortcut,
     restoreTarget: { kind: 'active-cursor' },
     restore: () => {
       setActiveOwnerId(treeOwnerId)
       focusActiveTreeItem(treeScopeRef.current)
     },
   }), [])
-  const inputOwner = useMemo<InteractionOwner>(() => ({
+  const inputOwner = useMemo<InteractionOwner>(() => commandPaletteTemporaryControl({
     id: inputOwnerId,
-    kind: 'temporary-control',
-    ownsKey: (input) => input.key === 'Escape',
-    restoreKeys: (input) => input.key === 'Escape',
-    allowsShellKey: isCommandShortcut,
+    restore: ['Escape'],
   }), [])
-  const shellOwner = useMemo<InteractionOwner>(() => ({
-    id: shellOwnerId,
-    kind: 'shell',
-    ownsKey: isCommandShortcut,
-  }), [])
+  const shellOwner = useMemo<InteractionOwner>(() => commandPaletteShellOwner(shellOwnerId), [])
 
   useInteractionOwner(treeOwner, { active: true })
   useInteractionOwner(inputOwner)
@@ -160,10 +158,6 @@ function treeDirection(key: string): Extract<PatternEvent, { type: 'navigate' }>
 
 function ownsTreeKey(input: InteractionKeyInput): boolean {
   return treeKeys.has(input.key)
-}
-
-function isCommandShortcut(input: InteractionKeyInput): boolean {
-  return input.metaKey === true && input.key.toLowerCase() === 'k'
 }
 
 function focusActiveTreeItem(scope: HTMLElement | null): void {
