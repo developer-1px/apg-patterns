@@ -65,6 +65,26 @@ export {
 } from './interactionActions'
 
 export {
+  compileInteractionCommandBindings,
+  compileInteractionCommandDefinitions,
+  defineInteractionCommandDefinitions,
+  formatInteractionCommandBinding,
+  formatInteractionCommandKeyboardShortcut,
+  formatInteractionCommandPointerInput,
+  getInteractionCommandBindingSummary,
+  getInteractionCommandMapping,
+  type InteractionCommandBindingDefinition,
+  type InteractionCommandBindingSummaryInput,
+  type InteractionCommandCompiledBinding,
+  type InteractionCommandDefinition,
+  type InteractionCommandKeyboardShortcutDefinition,
+  type InteractionCommandLabelOptions,
+  type InteractionCommandMapping,
+  type InteractionCommandPointerInputDefinition,
+  type InteractionCommandShortcutModifier,
+} from './interactionCommand'
+
+export {
   createInteractionRouter,
   shellOwner,
   temporaryControl,
