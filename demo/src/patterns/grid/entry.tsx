@@ -1,13 +1,6 @@
-import { gridDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { Grid } from './Grid'
-import { gridVariantItems, gridVariants, type GridVariantKey } from './gridData'
+import { gridVariantItems, gridVariants, reduceGridDemoData, type GridVariantKey } from './gridData'
 import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
-import { reduceSortEvent } from '../../shared/demoPatternTypes'
-
-const reduceGridDemoData = (data: PatternData, event: PatternEvent): PatternData => {
-  if (event.type === 'sort') return reduceSortEvent(data, event)
-  return reducePatternData(gridDefinition, data, event)
-}
 
 const gridDemoDefinition = {
   key: 'grid',

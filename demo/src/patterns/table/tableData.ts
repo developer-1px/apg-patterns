@@ -1,5 +1,5 @@
-import { PatternDataSchema } from '../../../../src/react'
-import { variantItemsFrom } from '../../shared/demoPatternTypes'
+import { PatternDataSchema, reducePatternData, tableDefinition, type PatternData, type PatternEvent } from '../../../../src/react'
+import { reduceSortEvent, variantItemsFrom } from '../../shared/demoPatternTypes'
 
 type TableCellSpec = {
   key: string
@@ -90,3 +90,8 @@ export const tableVariants = {
 export type TableVariantKey = keyof typeof tableVariants
 export const tableVariantItems = variantItemsFrom(tableVariants)
 export const initialTableData = tableVariants.basic.data
+
+export function reduceTableDemoData(data: PatternData, event: PatternEvent): PatternData {
+  if (event.type === 'sort') return reduceSortEvent(data, event)
+  return reducePatternData(tableDefinition, data, event)
+}

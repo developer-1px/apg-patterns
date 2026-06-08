@@ -6,7 +6,6 @@ import { treeVariants, type TreeVariantKey } from './treeVariants'
 const treeVariantKeys = ['fileDirectoryComputed', 'fileDirectoryDeclared', 'navigation', 'interactionOwnership', 'pageInteractionRecovery'] as const
 const focusStrategies = ['rovingTabIndex', 'ariaActiveDescendant'] as const
 const itemClickActions = ['select', 'toggleExpand', 'none'] as const
-const inspectModes = ['aria', 'html'] as const
 
 const TreeviewDemoStateSchema = z.object({
   variant: z.enum(treeVariantKeys),
@@ -14,7 +13,6 @@ const TreeviewDemoStateSchema = z.object({
   followFocus: z.boolean(),
   focusStrategy: z.enum(focusStrategies),
   itemClickAction: z.enum(itemClickActions),
-  inspectMode: z.enum(inspectModes),
 }).strict()
 
 export type TreeviewDemoState = z.infer<typeof TreeviewDemoStateSchema>
@@ -24,7 +22,6 @@ type TreeviewDemoAction =
   | { type: 'setFollowFocus'; value: boolean }
   | { type: 'setFocusStrategy'; value: TreeviewDemoState['focusStrategy'] }
   | { type: 'setItemClickAction'; value: TreeviewDemoState['itemClickAction'] }
-  | { type: 'setInspectMode'; value: TreeviewDemoState['inspectMode'] }
   | { type: 'patternEvent'; event: PatternEvent }
 
 export const initialTreeviewDemoState = TreeviewDemoStateSchema.parse({
@@ -33,7 +30,6 @@ export const initialTreeviewDemoState = TreeviewDemoStateSchema.parse({
   followFocus: false,
   focusStrategy: 'rovingTabIndex',
   itemClickAction: 'select',
-  inspectMode: 'aria',
 })
 
 export const reduceTreeviewDemoState = (state: TreeviewDemoState, action: TreeviewDemoAction): TreeviewDemoState => {
@@ -41,12 +37,7 @@ export const reduceTreeviewDemoState = (state: TreeviewDemoState, action: Treevi
   if (action.type === 'setFollowFocus') return TreeviewDemoStateSchema.parse({ ...state, followFocus: action.value })
   if (action.type === 'setFocusStrategy') return TreeviewDemoStateSchema.parse({ ...state, focusStrategy: action.value })
   if (action.type === 'setItemClickAction') return TreeviewDemoStateSchema.parse({ ...state, itemClickAction: action.value })
-  if (action.type === 'setInspectMode') return TreeviewDemoStateSchema.parse({ ...state, inspectMode: action.value })
   return TreeviewDemoStateSchema.parse({ ...state, data: reduceData(state.data, action.event) })
-}
-
-export function parseInspectMode(value: string): TreeviewDemoState['inspectMode'] {
-  return z.enum(inspectModes).parse(value)
 }
 
 export function parseItemClickAction(value: string): TreeviewDemoState['itemClickAction'] {

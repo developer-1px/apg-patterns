@@ -4,10 +4,16 @@ import {
   createInteractionOwnershipRegistry,
   evaluateInteractionFocusTarget,
 } from '../../../../packages/interaction/src/runtime'
-import { gridDefinition, listboxDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
+import { listboxDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 import { Grid } from '../grid/Grid'
-import { gridVariants } from '../grid/gridData'
+import {
+  gridVariants,
+  isGridDemoEditorStartKey,
+  ownsGridDemoKey,
+  reduceGridDemoData,
+  reduceGridDemoKeyboardInput,
+} from '../grid/gridData'
 import { Listbox } from '../listbox/Listbox'
 import { initialListboxData } from '../listbox/listboxData'
 import { Toolbar } from '../toolbar/Toolbar'
@@ -15,11 +21,16 @@ import { initialToolbarData, reduceToolbarData } from '../toolbar/toolbarData'
 import {
   commandPaletteShellOwner,
   commandPaletteTemporaryControl,
+  getDemoToolbarKeyIntent,
   handleDemoInteractionKeyboardEvent,
   isCommandPaletteShortcut,
+  ownsDemoListboxKey,
+  ownsDemoToolbarKey,
+  reduceDemoListboxKey,
+  reduceDemoToolbarKey,
 } from '../shared/interactionDemoOwners'
 import { Treeview } from './Treeview'
-import { initialData as initialTreeData, reduceData as reduceTreeData, resolveTarget } from './treeContract'
+import { initialData as initialTreeData, reduceTreeEvent, reduceTreeKeyboardInput } from './treeContract'
 
 const treeOwnerId = 'page-tree'
 const listboxOwnerId = 'page-listbox'
@@ -32,24 +43,6 @@ const dialogSearchOwnerId = 'page-dialog-search'
 const shellOwnerId = 'page-shell'
 
 const treeKeys = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End', 'ArrowRight', 'ArrowLeft', 'Enter', ' '])
-const listboxKeys = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', ' '])
-const dialogListboxKeys = new Set([...listboxKeys, 'Escape'])
-const toolbarNavigationKeys = new Set(['ArrowRight', 'ArrowLeft', 'Home', 'End'])
-const toolbarDelegatedListboxKeys = new Set(['ArrowDown', 'ArrowUp'])
-const toolbarCommandKeys = new Set(['Enter', ' '])
-const gridKeys = new Set([
-  'ArrowRight',
-  'ArrowLeft',
-  'ArrowDown',
-  'ArrowUp',
-  'Home',
-  'End',
-  'PageDown',
-  'PageUp',
-  'Enter',
-  'F2',
-  'Escape',
-])
 
 type OwnerFocusId =
   | typeof treeOwnerId
@@ -85,7 +78,6 @@ export function PageInteractionRecoveryDemo() {
   const [focusGuardAction, setFocusGuardAction] = useState<InteractionFocusGuardAction>('none')
   const [focusRecoveryCount, setFocusRecoveryCount] = useState(0)
   const [shellCommandCount, setShellCommandCount] = useState(0)
-  const [customCommandCount, setCustomCommandCount] = useState(0)
 
   const recoverFocus = (ownerId: OwnerFocusId) => {
     lockFocus(ownerId, null)
@@ -138,7 +130,7 @@ export function PageInteractionRecoveryDemo() {
     const unregisterListbox = registry.register({
       id: listboxOwnerId,
       kind: 'pattern',
-      ownsKey: (input) => listboxKeys.has(input.key),
+      ownsKey: ownsDemoListboxKey,
       allowsShellKey: isCommandPaletteShortcut,
       restoreTarget: { kind: 'active-cursor', label: 'Listbox' },
       restore: () => recoverFocus(listboxOwnerId),
@@ -146,7 +138,7 @@ export function PageInteractionRecoveryDemo() {
     const unregisterToolbar = registry.register({
       id: toolbarOwnerId,
       kind: 'pattern',
-      ownsKey: ownsToolbarKey,
+      ownsKey: ownsDemoToolbarKey,
       allowsShellKey: isCommandPaletteShortcut,
       restoreTarget: { kind: 'active-cursor', label: 'Toolbar' },
       restore: () => recoverFocus(toolbarOwnerId),
@@ -154,7 +146,7 @@ export function PageInteractionRecoveryDemo() {
     const unregisterGrid = registry.register({
       id: gridOwnerId,
       kind: 'pattern',
-      ownsKey: (input) => gridKeys.has(input.key),
+      ownsKey: ownsGridDemoKey,
       allowsShellKey: isCommandPaletteShortcut,
       restoreTarget: { kind: 'active-cursor', label: 'Grid cell' },
       restore: () => recoverFocus(gridOwnerId),
@@ -170,7 +162,7 @@ export function PageInteractionRecoveryDemo() {
     const unregisterDialogListbox = registry.register({
       id: dialogListboxOwnerId,
       kind: 'pattern',
-      ownsKey: (input) => dialogListboxKeys.has(input.key),
+      ownsKey: (input) => ownsDemoListboxKey(input) || input.key === 'Escape',
       allowsShellKey: isCommandPaletteShortcut,
       restoreTarget: { kind: 'active-cursor', label: 'Dialog listbox' },
       restore: () => recoverFocus(dialogListboxOwnerId),
@@ -241,7 +233,7 @@ export function PageInteractionRecoveryDemo() {
   }
 
   const handleGridEvent = (event: PatternEvent) => {
-    setGridData((current) => reduceGridEvent(current, event))
+    setGridData((current) => reduceGridDemoData(current, event))
   }
 
   const handleFocusCapture = (event: FocusEvent<HTMLElement>) => {
@@ -286,8 +278,8 @@ export function PageInteractionRecoveryDemo() {
       releaseOnRestore: true,
       shouldStopPropagation: ({ route }) => route.status === 'owner' && route.ownerId !== shellOwnerId,
       onOwnerKey: ({ input, route }) => {
-        if (route.ownerId === treeOwnerId) setTreeData((current) => reduceTreeKey(current, input))
-        else if (route.ownerId === listboxOwnerId) setListboxData((current) => reduceListboxKey(current, input))
+        if (route.ownerId === treeOwnerId) setTreeData((current) => reduceTreeKeyboardInput(current, input))
+        else if (route.ownerId === listboxOwnerId) setListboxData((current) => reduceDemoListboxKey(current, input))
         else if (route.ownerId === toolbarOwnerId) handleToolbarOwnerKey(input)
         else if (route.ownerId === gridOwnerId) handleGridOwnerKey(input)
         else if (route.ownerId === dialogListboxOwnerId) handleDialogListboxOwnerKey(input)
@@ -310,22 +302,20 @@ export function PageInteractionRecoveryDemo() {
   })
 
   const handleToolbarOwnerKey = (input: InteractionKeyInput) => {
-    if (toolbarDelegatedListboxKeys.has(input.key)) {
-      setListboxData((current) => reduceListboxKey(current, input))
+    const toolbarIntent = getDemoToolbarKeyIntent(input)
+    if (toolbarIntent === 'delegate-listbox') {
+      setListboxData((current) => reduceDemoListboxKey(current, input))
       registry.activate(listboxOwnerId)
       recoverFocus(listboxOwnerId)
       return
     }
-    if (toolbarCommandKeys.has(input.key)) {
-      setCustomCommandCount((current) => current + 1)
-      return
-    }
-    if (input.key === 'Escape') {
+    if (toolbarIntent === 'command') return
+    if (toolbarIntent === 'restore-listbox') {
       registry.activate(listboxOwnerId)
       recoverFocus(listboxOwnerId)
       return
     }
-    setToolbarData((current) => reduceToolbarKey(current, input))
+    if (toolbarIntent === 'navigation') setToolbarData((current) => reduceDemoToolbarKey(current, input))
   }
 
   const handleDialogListboxOwnerKey = (input: InteractionKeyInput) => {
@@ -333,17 +323,20 @@ export function PageInteractionRecoveryDemo() {
       closeDialog()
       return
     }
-    setDialogListboxData((current) => reduceListboxKey(current, input))
+    setDialogListboxData((current) => reduceDemoListboxKey(current, input))
   }
 
   const handleGridOwnerKey = (input: InteractionKeyInput) => {
-    if (isGridEditorStartKey(gridData, input)) {
+    if (isGridDemoEditorStartKey(gridData, input)) {
       const activeKey = String(gridData.state?.activeKey ?? '')
       setGridEditorValue(String(gridData.state?.valueByKey?.[activeKey] ?? gridData.items[activeKey]?.label ?? ''))
       setGridEditorOpen(true)
       return
     }
-    setGridData((current) => reduceGridKey(current, input))
+    setGridData((current) => reduceGridDemoKeyboardInput(current, input, {
+      activateColumnheaderAsSort: true,
+      escapeEvent: 'editEnd',
+    }))
   }
 
   const openDialog = () => {
@@ -461,7 +454,6 @@ export function PageInteractionRecoveryDemo() {
         <Status label="Focus recovery count" value={focusRecoveryCount} />
         <Status label="Shell command count" value={shellCommandCount} />
       </div>
-      <output role="status" aria-label="Custom command count" className="sr-only">{customCommandCount}</output>
     </section>
   )
 }
@@ -482,114 +474,6 @@ function Status({ label, value }: { label: string; value: string | number }) {
       <output role="status" aria-label={label} className="truncate text-zinc-800 dark:text-zinc-200">{value}</output>
     </label>
   )
-}
-
-function reduceTreeEvent(data: PatternData, event: PatternEvent): PatternData {
-  if (event.type !== 'navigate') return reduceTreeData(data, event)
-  const target = resolveTarget(event.direction, data)
-  return target ? reduceTreeData(data, { type: 'focus', key: target, meta: event.meta }) : data
-}
-
-function reduceTreeKey(data: PatternData, input: InteractionKeyInput): PatternData {
-  const direction = treeDirection(input.key)
-  if (!direction) return data
-  const target = resolveTarget(direction, data)
-  return target ? reduceTreeData(data, { type: 'focus', key: target, meta: { reason: 'keyboard' } }) : data
-}
-
-function treeDirection(key: string): Extract<PatternEvent, { type: 'navigate' }>['direction'] | null {
-  if (key === 'ArrowDown') return 'next'
-  if (key === 'ArrowUp') return 'previous'
-  if (key === 'Home') return 'first'
-  if (key === 'End') return 'last'
-  if (key === 'ArrowRight') return 'child'
-  if (key === 'ArrowLeft') return 'parent'
-  return null
-}
-
-function reduceListboxKey(data: PatternData, input: InteractionKeyInput): PatternData {
-  const event = listboxKeyEvent(data, input)
-  return event ? reducePatternData(listboxDefinition, data, event) : data
-}
-
-function listboxKeyEvent(data: PatternData, input: InteractionKeyInput): PatternEvent | null {
-  const activeKey = data.state?.activeKey
-  if (input.key === 'ArrowDown') return { type: 'navigate', direction: 'next', meta: { reason: 'keyboard' } }
-  if (input.key === 'ArrowUp') return { type: 'navigate', direction: 'previous', meta: { reason: 'keyboard' } }
-  if (input.key === 'Home') return { type: 'navigate', direction: 'first', meta: { reason: 'keyboard' } }
-  if (input.key === 'End') return { type: 'navigate', direction: 'last', meta: { reason: 'keyboard' } }
-  if ((input.key === 'Enter' || input.key === ' ') && activeKey) {
-    return { type: 'select', keys: [activeKey], anchorKey: activeKey, extentKey: activeKey, meta: { reason: 'keyboard' } }
-  }
-  return null
-}
-
-function reduceToolbarKey(data: PatternData, input: InteractionKeyInput): PatternData {
-  const event = toolbarKeyEvent(input)
-  return event ? reduceToolbarData(data, event) : data
-}
-
-function toolbarKeyEvent(input: InteractionKeyInput): PatternEvent | null {
-  if (input.key === 'ArrowRight') return { type: 'navigate', direction: 'next', meta: { reason: 'keyboard' } }
-  if (input.key === 'ArrowLeft') return { type: 'navigate', direction: 'previous', meta: { reason: 'keyboard' } }
-  if (input.key === 'Home') return { type: 'navigate', direction: 'first', meta: { reason: 'keyboard' } }
-  if (input.key === 'End') return { type: 'navigate', direction: 'last', meta: { reason: 'keyboard' } }
-  return null
-}
-
-function reduceGridEvent(data: PatternData, event: PatternEvent): PatternData {
-  if (event.type === 'sort') {
-    return { ...data, state: { ...data.state, sortByKey: { ...data.state?.sortByKey, [event.key]: event.sort } } }
-  }
-  return reducePatternData(gridDefinition, data, event)
-}
-
-function reduceGridKey(data: PatternData, input: InteractionKeyInput): PatternData {
-  const event = gridKeyEvent(data, input)
-  return event ? reduceGridEvent(data, event) : data
-}
-
-function isGridEditorStartKey(data: PatternData, input: InteractionKeyInput): boolean {
-  const activeKey = data.state?.activeKey
-  return Boolean(
-    activeKey
-    && (input.key === 'Enter' || input.key === 'F2')
-    && (data.state?.editableKeys as readonly string[] | undefined)?.includes(activeKey),
-  )
-}
-
-function gridKeyEvent(data: PatternData, input: InteractionKeyInput): PatternEvent | null {
-  const activeKey = data.state?.activeKey
-  if (!activeKey) return null
-  if (input.key === 'ArrowRight') return { type: 'navigate', direction: 'right', meta: { reason: 'keyboard' } }
-  if (input.key === 'ArrowLeft') return { type: 'navigate', direction: 'left', meta: { reason: 'keyboard' } }
-  if (input.key === 'ArrowDown') return { type: 'navigate', direction: 'down', meta: { reason: 'keyboard' } }
-  if (input.key === 'ArrowUp') return { type: 'navigate', direction: 'up', meta: { reason: 'keyboard' } }
-  if (input.key === 'Home') return { type: 'navigate', direction: input.ctrlKey ? 'gridStart' : 'rowStart', meta: { reason: 'keyboard' } }
-  if (input.key === 'End') return { type: 'navigate', direction: input.ctrlKey ? 'gridEnd' : 'rowEnd', meta: { reason: 'keyboard' } }
-  if (input.key === 'PageDown') return { type: 'navigate', direction: 'pageDown', meta: { reason: 'keyboard' } }
-  if (input.key === 'PageUp') return { type: 'navigate', direction: 'pageUp', meta: { reason: 'keyboard' } }
-  if (input.key === 'Enter' || input.key === 'F2') {
-    if (data.items[activeKey]?.kind === 'columnheader') return { type: 'sort', key: activeKey, sort: nextSort(data.state?.sortByKey?.[activeKey]) }
-    if ((data.state?.editableKeys as readonly string[] | undefined)?.includes(activeKey)) {
-      const value = String(data.state?.valueByKey?.[activeKey] ?? data.items[activeKey]?.label ?? '')
-      return { type: 'editStart', key: activeKey, value, meta: { reason: 'keyboard' } }
-    }
-    return { type: 'activate', key: activeKey, meta: { reason: 'keyboard' } }
-  }
-  if (input.key === 'Escape') return { type: 'editEnd', key: activeKey, meta: { reason: 'keyboard' } }
-  return null
-}
-
-function nextSort(current: unknown): 'ascending' | 'descending' {
-  return current === 'ascending' ? 'descending' : 'ascending'
-}
-
-function ownsToolbarKey(input: InteractionKeyInput): boolean {
-  return toolbarNavigationKeys.has(input.key)
-    || toolbarDelegatedListboxKeys.has(input.key)
-    || toolbarCommandKeys.has(input.key)
-    || input.key === 'Escape'
 }
 
 function temporaryOwnerFromTarget(target: HTMLElement): InteractionOwnerId | null {

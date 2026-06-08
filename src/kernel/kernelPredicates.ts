@@ -47,5 +47,3 @@ definePredicate('isDisabled', (p, ctx) => {
   return ctx.data.state?.disabledKeys?.includes(key) ?? false
 })
 }
-
-registerKernelPredicates()

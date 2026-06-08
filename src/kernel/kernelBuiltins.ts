@@ -18,5 +18,3 @@ export function registerKernelBuiltins() {
   registerKernelPredicates()
   registerKernelNavigationTargets()
 }
-
-registerKernelBuiltins()

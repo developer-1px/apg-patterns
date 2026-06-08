@@ -27,6 +27,7 @@ export const initialData = {
 } satisfies PatternData
 
 type NavigateDirection = Extract<PatternEvent, { type: 'navigate' }>['direction']
+const treeLinearNavigationKeys = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End'])
 
 export function reduceData(data: PatternData, event: PatternEvent): PatternData {
   const reason = 'meta' in event ? event.meta?.reason : undefined
@@ -54,6 +55,21 @@ export function reduceData(data: PatternData, event: PatternEvent): PatternData 
   return data
 }
 
+export function reduceTreeEvent(data: PatternData, event: PatternEvent): PatternData {
+  if (event.type !== 'navigate') return reduceData(data, event)
+  const target = resolveTarget(event.direction, data)
+  return target ? reduceData(data, { type: 'focus', key: target, meta: event.meta }) : data
+}
+
+export function reduceTreeKeyboardInput(data: PatternData, input: { key: string }): PatternData {
+  const direction = treeDirection(input.key)
+  return direction ? reduceTreeEvent(data, { type: 'navigate', direction, meta: { reason: 'keyboard' } }) : data
+}
+
+export function ownsTreeLinearNavigationKey(input: { key: string }): boolean {
+  return treeLinearNavigationKeys.has(input.key)
+}
+
 export function resolveTarget(direction: NavigateDirection, data: PatternData) {
   const visible = getVisible(data)
   const active = data.state?.activeKey
@@ -71,6 +87,16 @@ export function resolveTarget(direction: NavigateDirection, data: PatternData) {
     return visible[0]
   }
   return undefined
+}
+
+function treeDirection(key: string): NavigateDirection | null {
+  if (key === 'ArrowDown') return 'next'
+  if (key === 'ArrowUp') return 'previous'
+  if (key === 'Home') return 'first'
+  if (key === 'End') return 'last'
+  if (key === 'ArrowRight') return 'child'
+  if (key === 'ArrowLeft') return 'parent'
+  return null
 }
 
 function getVisible(data: PatternData) {

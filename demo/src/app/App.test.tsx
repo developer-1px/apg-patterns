@@ -16,7 +16,7 @@ afterEach(() => {
 })
 
 const exhaustivePatternTestTimeout = 90000
-const unusedDemoPattern = () => {
+const throwingDemoPattern = () => {
   throw new Error('useDemoPattern should not be called')
 }
 
@@ -622,7 +622,7 @@ describe('demo pattern registry', () => {
   it('fails fast when a collected pattern module does not export entry', () => {
     expect(() => collectPatternEntries({
       '../patterns/accordion/entry.tsx': {
-        entry: { key: 'accordion', label: 'Accordion', useDemoPattern: unusedDemoPattern },
+        entry: { key: 'accordion', label: 'Accordion', useDemoPattern: throwingDemoPattern },
       },
       '../patterns/missing/entry.tsx': {},
     })).toThrow('[demoPatterns] pattern modules missing exported entry: ../patterns/missing/entry.tsx')
@@ -642,10 +642,10 @@ describe('demo pattern registry', () => {
   it('keeps collected pattern modules sorted by key for stable menus', () => {
     const entries = collectPatternEntries({
       '../patterns/treeview/entry.tsx': {
-        entry: { key: 'treeview', label: 'Treeview', useDemoPattern: unusedDemoPattern },
+        entry: { key: 'treeview', label: 'Treeview', useDemoPattern: throwingDemoPattern },
       },
       '../patterns/accordion/entry.tsx': {
-        entry: { key: 'accordion', label: 'Accordion', useDemoPattern: unusedDemoPattern },
+        entry: { key: 'accordion', label: 'Accordion', useDemoPattern: throwingDemoPattern },
       },
     })
 

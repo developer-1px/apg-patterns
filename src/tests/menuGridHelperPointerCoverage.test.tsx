@@ -1,12 +1,13 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import '../kernel/kernelBuiltins'
 import { resolveAriaSource, type PatternData, type PatternEvent } from '../index'
 import { createGridEditActions, createGridRuntimeEventHandler } from '../patterns/grid/gridRuntimeEvents'
 import { createMenubarItem } from '../patterns/menu/menubarItem'
+import { registerMenuAriaSources } from '../patterns/menu/menuAriaSources'
 import { resolveMenuButtonKey } from '../patterns/menu/menuButtonKeyboard'
-import '../patterns/menu/menuAriaSources'
+
+registerMenuAriaSources()
 
 const menuData = {
   items: {

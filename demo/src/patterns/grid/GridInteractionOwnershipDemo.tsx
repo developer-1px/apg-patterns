@@ -1,9 +1,8 @@
 import { useLayoutEffect, useMemo, useRef, useState, type FocusEvent, type KeyboardEvent } from 'react'
-import type { InteractionKeyInput } from '../../../../packages/interaction/src/runtime'
 import {
   createInteractionOwnershipRegistry,
 } from '../../../../packages/interaction/src/runtime'
-import { gridDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
+import type { PatternData, PatternEvent } from '../../../../src/react'
 import { cx, ds } from '../../shared/designSystem'
 import {
   commandPaletteShellOwner,
@@ -12,25 +11,11 @@ import {
   isCommandPaletteShortcut,
 } from '../shared/interactionDemoOwners'
 import { Grid } from './Grid'
-import { gridVariants } from './gridData'
+import { gridVariants, ownsGridDemoKey, reduceGridDemoData, reduceGridDemoKeyboardInput } from './gridData'
 
 const gridOwnerId = 'grid'
 const editorOwnerId = 'grid-cell-editor'
 const shellOwnerId = 'command-palette'
-
-const gridKeys = new Set([
-  'ArrowRight',
-  'ArrowLeft',
-  'ArrowDown',
-  'ArrowUp',
-  'Home',
-  'End',
-  'PageDown',
-  'PageUp',
-  'Enter',
-  'F2',
-  'Escape',
-])
 
 export function GridInteractionOwnershipDemo() {
   const registry = useMemo(() => createInteractionOwnershipRegistry(), [])
@@ -44,7 +29,7 @@ export function GridInteractionOwnershipDemo() {
     const unregisterGrid = registry.register({
       id: gridOwnerId,
       kind: 'pattern',
-      ownsKey: ownsGridKey,
+      ownsKey: ownsGridDemoKey,
       allowsShellKey: isCommandPaletteShortcut,
       restore: () => {
         setActiveOwnerId(gridOwnerId)
@@ -68,7 +53,7 @@ export function GridInteractionOwnershipDemo() {
   }, [registry])
 
   const handleGridEvent = (event: PatternEvent) => {
-    setData((current) => reducePatternData(gridDefinition, current, event))
+    setData((current) => reduceGridDemoData(current, event))
   }
 
   const handleFocusCapture = (event: FocusEvent<HTMLElement>) => {
@@ -85,7 +70,7 @@ export function GridInteractionOwnershipDemo() {
       releaseOnRestore: true,
       onOwnerKey: ({ input, route }) => {
         if (route.ownerId === gridOwnerId && input.targetKind !== 'pattern') {
-          setData((current) => reduceGridKey(current, input))
+          setData((current) => reduceGridDemoKeyboardInput(current, input))
         }
         if (route.ownerId === shellOwnerId) setCommandCount((current) => current + 1)
       },
@@ -119,29 +104,4 @@ export function GridInteractionOwnershipDemo() {
       </div>
     </section>
   )
-}
-
-function reduceGridKey(data: PatternData, input: InteractionKeyInput): PatternData {
-  const event = gridKeyEvent(data, input)
-  return event ? reducePatternData(gridDefinition, data, event) : data
-}
-
-function gridKeyEvent(data: PatternData, input: InteractionKeyInput): PatternEvent | null {
-  const activeKey = data.state?.activeKey
-  if (!activeKey) return null
-  if (input.key === 'ArrowRight') return { type: 'navigate', direction: 'right', meta: { reason: 'keyboard' } }
-  if (input.key === 'ArrowLeft') return { type: 'navigate', direction: 'left', meta: { reason: 'keyboard' } }
-  if (input.key === 'ArrowDown') return { type: 'navigate', direction: 'down', meta: { reason: 'keyboard' } }
-  if (input.key === 'ArrowUp') return { type: 'navigate', direction: 'up', meta: { reason: 'keyboard' } }
-  if (input.key === 'Home') return { type: 'navigate', direction: input.ctrlKey ? 'gridStart' : 'rowStart', meta: { reason: 'keyboard' } }
-  if (input.key === 'End') return { type: 'navigate', direction: input.ctrlKey ? 'gridEnd' : 'rowEnd', meta: { reason: 'keyboard' } }
-  if (input.key === 'PageDown') return { type: 'navigate', direction: 'pageDown', meta: { reason: 'keyboard' } }
-  if (input.key === 'PageUp') return { type: 'navigate', direction: 'pageUp', meta: { reason: 'keyboard' } }
-  if (input.key === 'Enter' || input.key === 'F2') return { type: 'activate', key: activeKey, meta: { reason: 'keyboard' } }
-  if (input.key === 'Escape') return { type: 'dismiss', key: activeKey, meta: { reason: 'keyboard' } }
-  return null
-}
-
-function ownsGridKey(input: InteractionKeyInput): boolean {
-  return gridKeys.has(input.key)
 }

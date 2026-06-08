@@ -1,10 +1,9 @@
-import { useState } from 'react'
-import { feedDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../../src/react'
+import { feedDefinition, reducePatternData } from '../../../../../src/react'
+import { usePatternDataHost } from '../../../shared/demoHostState'
 import { Feed } from '../Feed'
 import { initialFeedData } from '../feedData'
 
 export function FeedDemo() {
-  const [data, setData] = useState<PatternData>(initialFeedData)
-  const handleEvent = (event: PatternEvent) => setData((current) => reducePatternData(feedDefinition, current, event))
-  return <Feed data={data} onEvent={handleEvent} />
+  const host = usePatternDataHost(initialFeedData, (data, event) => reducePatternData(feedDefinition, data, event))
+  return <Feed data={host.data} onEvent={host.dispatchEvent} />
 }

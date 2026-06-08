@@ -1,10 +1,9 @@
-import { useState } from 'react'
-import { disclosureDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../../src/react'
+import { disclosureDefinition, reducePatternData, type PatternData } from '../../../../../src/react'
+import { usePatternDataHost } from '../../../shared/demoHostState'
 import { Disclosure } from '../Disclosure'
 import { initialImageDisclosureData } from '../disclosureData'
 
 export function DisclosureDemo({ initial = initialImageDisclosureData }: { initial?: PatternData }) {
-  const [data, setData] = useState(initial)
-  const handleEvent = (event: PatternEvent) => setData((current) => reducePatternData(disclosureDefinition, current, event))
-  return <Disclosure data={data} onEvent={handleEvent} />
+  const host = usePatternDataHost(initial, (data, event) => reducePatternData(disclosureDefinition, data, event))
+  return <Disclosure data={host.data} onEvent={host.dispatchEvent} />
 }

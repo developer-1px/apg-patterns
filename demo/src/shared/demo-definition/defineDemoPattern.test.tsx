@@ -24,7 +24,7 @@ const definition = {
   },
 } as const satisfies DemoPatternDefinition
 
-const unusedRuntime = () => {
+const throwingRuntime = () => {
   throw new Error('useRuntime should not be called')
 }
 
@@ -188,7 +188,7 @@ describe('defineDemoPattern', () => {
     expect(() =>
       defineDemoPattern({
         definition: { ...definition, key: 'Bad Key' },
-        useRuntime: unusedRuntime,
+        useRuntime: throwingRuntime,
       }),
     ).toThrow()
   })
@@ -197,7 +197,7 @@ describe('defineDemoPattern', () => {
     expect(() =>
       defineDemoPattern({
         definition: { ...definition, keyboardShortcuts: ['Enter', 'Enter'] },
-        useRuntime: unusedRuntime,
+        useRuntime: throwingRuntime,
       }),
     ).toThrow('[defineDemoPattern] duplicate example keyboardShortcuts: Enter')
   })
@@ -212,7 +212,7 @@ describe('defineDemoPattern', () => {
             data: ['Example.tsx'],
           },
         },
-        useRuntime: unusedRuntime,
+        useRuntime: throwingRuntime,
       }),
     ).toThrow('[defineDemoPattern] duplicate example sources: Example.tsx')
   })
@@ -232,7 +232,7 @@ describe('defineDemoPattern', () => {
             ...sourceOverride,
           },
         },
-        useRuntime: unusedRuntime,
+        useRuntime: throwingRuntime,
       }),
     ).toThrow(`[defineDemoPattern] ${message}`)
   })
@@ -285,7 +285,7 @@ describe('defineDemoPattern', () => {
             ...sourceOverride,
           },
         },
-        useRuntime: unusedRuntime,
+        useRuntime: throwingRuntime,
       }),
     ).toThrow(`[defineDemoPattern] ${message}`)
   })

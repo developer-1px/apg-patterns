@@ -1,11 +1,13 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import '../kernel/kernelBuiltins'
+import { registerKernelBuiltins } from '../kernel/kernelBuiltins'
 import type { PatternData, PatternDefinition, PatternEvent } from '../schema'
 import type { PatternRuntime } from '../kernel/patternRuntime'
 import { handlePatternTrapFocus } from '../adapters/reactPatternTrapFocus'
 import { handleListboxMultiClick } from '../patterns/listbox/handleListboxMultiClick'
+
+registerKernelBuiltins()
 
 const trapData: PatternData = {
   items: {

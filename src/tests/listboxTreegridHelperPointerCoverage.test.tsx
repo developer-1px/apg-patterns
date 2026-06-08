@@ -6,7 +6,9 @@ import { gridRows } from '../patterns/grid/navigation'
 import { handleListboxMultiKeyDown } from '../patterns/listbox/handleListboxMultiKeyDown'
 import { useListboxPattern } from '../patterns/listbox/useListboxPattern'
 import { cellRowKey, visibleCells, visibleRowKeys } from '../patterns/treegrid/geometry'
-import '../patterns/treegrid/predicates'
+import { registerTreegridPredicates } from '../patterns/treegrid/predicates'
+
+registerTreegridPredicates()
 
 const data = {
   items: {

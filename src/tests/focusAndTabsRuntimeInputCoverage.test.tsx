@@ -1,11 +1,13 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import '../kernel/kernelBuiltins'
+import { registerKernelBuiltins } from '../kernel/kernelBuiltins'
 import type { PatternData, PatternEvent } from '../schema'
 import type { PatternRuntime, SlotProps } from '../kernel/patternRuntime'
 import { containsActiveElement, resolveFocusEffectTarget } from '../adapters/reactFocusEffectTarget'
 import { createTabsRuntime } from '../patterns/tabs/runtime'
+
+registerKernelBuiltins()
 
 const tabsData: PatternData = {
   items: {

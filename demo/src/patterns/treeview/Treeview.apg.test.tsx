@@ -8,18 +8,18 @@ import { describe, expect, it } from 'vitest'
 import type { PatternData, PatternEvent } from '../../../../src/react'
 import { Treeview } from './Treeview'
 import { entry } from './entry'
-import { initialData, reduceData, resolveTarget } from './treeContract'
+import { initialData, reduceData, reduceTreeEvent, resolveTarget } from './treeContract'
 import { navigation } from './treeVariantData'
 
 function TreeDemo() {
   const [data, setData] = useState<PatternData>(initialData as PatternData)
-  const handleEvent = (event: PatternEvent) => setData((current) => reduceTreeDemoData(current, event))
+  const handleEvent = (event: PatternEvent) => setData((current) => reduceTreeEvent(current, event))
   return <Treeview data={data} onEvent={handleEvent} />
 }
 
 function NavigationTreeDemo() {
   const [data, setData] = useState<PatternData>(navigation as PatternData)
-  const handleEvent = (event: PatternEvent) => setData((current) => reduceTreeDemoData(current, event))
+  const handleEvent = (event: PatternEvent) => setData((current) => reduceTreeEvent(current, event))
   return <Treeview data={data} onEvent={handleEvent} />
 }
 
@@ -67,12 +67,6 @@ function TreeviewEntryDemo() {
 
 const tree = () => screen.getByRole('tree')
 const treeitem = (name: string) => screen.getByRole('treeitem', { name })
-
-function reduceTreeDemoData(data: PatternData, event: PatternEvent): PatternData {
-  if (event.type !== 'navigate') return reduceData(data, event)
-  const target = resolveTarget(event.direction, data)
-  return target ? reduceData(data, { type: 'focus', key: target, meta: event.meta }) : data
-}
 
 describe('APG §Roles, States, Properties', () => {
   it('container has role="tree"', () => {

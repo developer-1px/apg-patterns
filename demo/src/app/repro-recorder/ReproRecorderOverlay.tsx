@@ -42,7 +42,6 @@ const panelStyle = {
   fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
   fontSize: 11,
   lineHeight: 1.45,
-  boxShadow: '0 16px 48px rgba(24,24,27,0.16)',
 } as const
 
 export function ReproRecorderOverlay() {
@@ -50,7 +49,7 @@ export function ReproRecorderOverlay() {
   const timerRef = useRef<ReturnType<typeof setInterval>>(undefined)
   const startTimeRef = useRef(0)
   const [recording, setRecording] = useState(false)
-  const [summary, setSummary] = useState('REC ready. Cmd/Ctrl+Shift+\\ or Alt+Shift+R')
+  const [summary, setSummary] = useState('')
 
   const copyRecording = useCallback(async (text: string) => {
     if (!navigator.clipboard?.writeText) {
@@ -111,7 +110,7 @@ export function ReproRecorderOverlay() {
       <button type="button" style={recording ? recordingStyle : buttonStyle} onClick={toggle}>
         {recording ? 'STOP REC' : 'REC'}
       </button>
-      <div style={panelStyle}>{summary}</div>
+      {summary ? <div style={panelStyle}>{summary}</div> : null}
     </>
   )
 }

@@ -1,14 +1,6 @@
-import { reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
-import { tableDefinition } from '../../../../src/patterns/table/definition'
 import { Table } from './Table'
-import { initialTableData, tableVariantItems, tableVariants, type TableVariantKey } from './tableData'
+import { initialTableData, reduceTableDemoData, tableVariantItems, tableVariants, type TableVariantKey } from './tableData'
 import { defineVariantDemoPattern, type DemoPatternDefinition } from '../../shared/demo-definition'
-import { reduceSortEvent } from '../../shared/demoPatternTypes'
-
-const reduceTableDemoData = (data: PatternData, event: PatternEvent): PatternData => {
-  if (event.type === 'sort') return reduceSortEvent(data, event)
-  return reducePatternData(tableDefinition, data, event)
-}
 
 const tableDemoDefinition = {
   key: 'table',

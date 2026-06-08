@@ -61,5 +61,3 @@ defineAriaSource('state.rangeValueByKey.max', (ctx) => (ctx.key ? ctx.data.state
 defineAriaSource('state.rangeValueByKey.now', (ctx) => (ctx.key ? ctx.data.state?.rangeValueByKey?.[ctx.key]?.now : undefined))
 defineAriaSource('state.rangeValueByKey.text', (ctx) => (ctx.key ? ctx.data.state?.rangeValueByKey?.[ctx.key]?.text : undefined))
 }
-
-registerKernelAriaSources()

@@ -1,5 +1,4 @@
 import { useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
-import type { InteractionKeyInput } from '../../../../packages/interaction/src/runtime'
 import {
   createInteractionOwnershipRegistry,
 } from '../../../../packages/interaction/src/runtime'
@@ -12,13 +11,11 @@ import {
   isCommandPaletteShortcut,
 } from '../shared/interactionDemoOwners'
 import { Treeview } from './Treeview'
-import { initialData, reduceData, resolveTarget } from './treeContract'
+import { initialData, ownsTreeLinearNavigationKey, reduceTreeEvent, reduceTreeKeyboardInput } from './treeContract'
 
 const treeOwnerId = 'treeview'
 const inputOwnerId = 'tree-filter-input'
 const shellOwnerId = 'command-palette'
-
-const treeKeys = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End'])
 
 export function TreeviewInteractionOwnershipDemo() {
   const registry = useMemo(() => createInteractionOwnershipRegistry(), [])
@@ -32,7 +29,7 @@ export function TreeviewInteractionOwnershipDemo() {
     const unregisterTree = registry.register({
       id: treeOwnerId,
       kind: 'pattern',
-      ownsKey: ownsTreeKey,
+      ownsKey: ownsTreeLinearNavigationKey,
       allowsShellKey: isCommandPaletteShortcut,
       restore: () => {
         setActiveOwnerId(treeOwnerId)
@@ -55,7 +52,7 @@ export function TreeviewInteractionOwnershipDemo() {
   }, [registry])
 
   const handleTreeEvent = (event: PatternEvent) => {
-    setData((current) => reduceTreeDemoData(current, event))
+    setData((current) => reduceTreeEvent(current, event))
   }
 
   const handleShellKeyDown = (event: KeyboardEvent<HTMLElement>) => {
@@ -69,7 +66,7 @@ export function TreeviewInteractionOwnershipDemo() {
       ),
       onOwnerKey: ({ input, route }) => {
         if (route.ownerId === treeOwnerId && input.targetKind !== 'pattern') {
-          setData((current) => reduceTreeKey(current, input))
+          setData((current) => reduceTreeKeyboardInput(current, input))
         }
         if (route.ownerId === shellOwnerId) setCommandCount((current) => current + 1)
       },
@@ -116,29 +113,4 @@ export function TreeviewInteractionOwnershipDemo() {
       </div>
     </section>
   )
-}
-
-function reduceTreeDemoData(data: PatternData, event: PatternEvent): PatternData {
-  if (event.type !== 'navigate') return reduceData(data, event)
-  const target = resolveTarget(event.direction, data)
-  return target ? reduceData(data, { type: 'focus', key: target, meta: event.meta }) : data
-}
-
-function reduceTreeKey(data: PatternData, input: InteractionKeyInput): PatternData {
-  const direction = treeDirection(input.key)
-  if (!direction) return data
-  const target = resolveTarget(direction, data)
-  return target ? reduceData(data, { type: 'focus', key: target, meta: { reason: 'keyboard' } }) : data
-}
-
-function treeDirection(key: string): Extract<PatternEvent, { type: 'navigate' }>['direction'] | null {
-  if (key === 'ArrowDown') return 'next'
-  if (key === 'ArrowUp') return 'previous'
-  if (key === 'Home') return 'first'
-  if (key === 'End') return 'last'
-  return null
-}
-
-function ownsTreeKey(input: InteractionKeyInput): boolean {
-  return treeKeys.has(input.key)
 }

@@ -25,5 +25,3 @@ defineNavigationTarget('linearWrap', (target, ctx) => {
 defineKeyToken('$triggerKey', (_key, _activeKey, ctx) => ctx?.data.relations?.rootKeys?.[0] ?? null)
 defineKeyToken('$initialFocusKey', (_key, _activeKey, ctx) => ctx?.data.refs?.initialFocusKey ?? null)
 }
-
-registerKernelNavigationTargets()

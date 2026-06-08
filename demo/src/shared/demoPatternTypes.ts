@@ -35,15 +35,7 @@ export function reduceSortEvent(data: PatternData, event: Extract<PatternEvent, 
   return { ...data, state: { ...data.state, sortByKey: { ...data.state?.sortByKey, [event.key]: event.sort } } }
 }
 
-const KERNEL_SIDE_EFFECT_SOURCES = [
-  'kernel/kernelAriaSources.ts',
-  'kernel/kernelBuiltins.ts',
-  'kernel/kernelNavigationTargets.ts',
-  'kernel/kernelPredicates.ts',
-  'kernel/kernelStateProjections.ts',
-] as const satisfies readonly SourceName[]
-
-const KERNEL_IMPLEMENTATION_SOURCES = [
+export const KERNEL_SOURCES = [
   'kernel/patternRuntime.ts',
   'kernel/runtimeKeyboard.ts',
   'kernel/runtimePartProps.ts',
@@ -57,11 +49,11 @@ const KERNEL_IMPLEMENTATION_SOURCES = [
   'schema/patternDefinition.ts',
   'schema/patternDefinitionValidation.ts',
   'schema/patternDefinitionVocabulary.ts',
-] as const satisfies readonly SourceName[]
-
-export const KERNEL_SOURCES = [
-  ...KERNEL_IMPLEMENTATION_SOURCES,
-  ...KERNEL_SIDE_EFFECT_SOURCES,
+  'kernel/kernelAriaSources.ts',
+  'kernel/kernelBuiltins.ts',
+  'kernel/kernelNavigationTargets.ts',
+  'kernel/kernelPredicates.ts',
+  'kernel/kernelStateProjections.ts',
 ] as const satisfies readonly SourceName[]
 
 export interface PatternEntry {

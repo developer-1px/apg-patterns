@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import '../kernel/kernelBuiltins'
+import { registerKernelBuiltins } from '../kernel/kernelBuiltins'
 import { defineDomEvent, resolvePartEventBindings, withDefaultReason } from '../kernel/domEventBindings'
 import { useAccordionPattern } from '../patterns/accordion/useAccordionPattern'
 import { useAlertPattern } from '../patterns/alert/useAlertPattern'
@@ -20,6 +20,8 @@ import { useSwitchPattern } from '../patterns/switch/useSwitchPattern'
 import { useTablePattern } from '../patterns/table/useTablePattern'
 import { useToolbarPattern } from '../patterns/toolbar/useToolbarPattern'
 import type { PatternData, PatternEvent } from '../index'
+
+registerKernelBuiltins()
 
 function HookRuntimeHost() {
   const [events, setEvents] = useState<PatternEvent[]>([])

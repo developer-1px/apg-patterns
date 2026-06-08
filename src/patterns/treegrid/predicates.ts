@@ -33,5 +33,3 @@ function activeCellRelation(data: PatternData, activeKey: Key | null | undefined
   if (!activeKey) return null
   return data.relations?.cells?.find((cell) => cell.cellKey === activeKey) ?? null
 }
-
-registerTreegridPredicates()

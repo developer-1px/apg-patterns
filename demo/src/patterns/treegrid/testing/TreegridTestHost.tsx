@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { reducePatternData, type PatternData, type PatternEvent } from '../../../../../src/react'
+import { reducePatternData } from '../../../../../src/react'
 import { treegridDefinition } from '../../../../../src/patterns/treegrid/definition'
+import { usePatternDataHost } from '../../../shared/demoHostState'
 import { Treegrid } from '../Treegrid'
 import { initialTreegridData } from '../treegridData'
 
@@ -9,24 +9,18 @@ if (typeof globalThis.CSS === 'undefined') {
 }
 
 export function TreegridDemo() {
-  const [data, setData] = useState<PatternData>(initialTreegridData)
-  return <Treegrid data={data} onEvent={(event: PatternEvent) => setData((current) => reducePatternData(treegridDefinition, current, event))} />
+  const host = usePatternDataHost(initialTreegridData, (data, event) => reducePatternData(treegridDefinition, data, event))
+  return <Treegrid data={host.data} onEvent={host.dispatchEvent} />
 }
 
 export function RowFocusTreegridDemo({ activeKey = 'src' }: { activeKey?: string }) {
-  const [data, setData] = useState<PatternData>({
+  const host = usePatternDataHost({
     ...initialTreegridData,
     state: {
       ...initialTreegridData.state,
       activeKey,
       selectedKeys: [activeKey],
     },
-  })
-  return (
-    <Treegrid
-      data={data}
-      options={{ focusMode: 'row' }}
-      onEvent={(event: PatternEvent) => setData((current) => reducePatternData(treegridDefinition, current, event))}
-    />
-  )
+  }, (data, event) => reducePatternData(treegridDefinition, data, event))
+  return <Treegrid data={host.data} options={{ focusMode: 'row' }} onEvent={host.dispatchEvent} />
 }

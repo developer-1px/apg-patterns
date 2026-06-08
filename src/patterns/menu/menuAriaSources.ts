@@ -20,5 +20,3 @@ defineAriaSource('menu.expandedIfHasPopup', (ctx) => {
 
 defineAriaSource('items.kind', (ctx) => (ctx.key ? ctx.data.items[ctx.key]?.kind : undefined))
 }
-
-registerMenuAriaSources()

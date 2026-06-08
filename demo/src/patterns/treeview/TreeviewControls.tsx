@@ -1,25 +1,9 @@
 import { ds } from '../../shared/designSystem'
 import {
   parseFocusStrategy,
-  parseInspectMode,
   parseItemClickAction,
   type TreeviewDemoState,
 } from './treeviewDemoState'
-
-export function InspectModeControl({
-  value,
-  onChange,
-}: {
-  value: TreeviewDemoState['inspectMode']
-  onChange: (value: TreeviewDemoState['inspectMode']) => void
-}) {
-  return (
-    <select className={ds.field} value={value} onChange={(event) => onChange(parseInspectMode(event.currentTarget.value))}>
-      <option value="aria">aria</option>
-      <option value="html">html</option>
-    </select>
-  )
-}
 
 export function FollowFocusControl({ value, onChange }: { value: boolean; onChange: (value: boolean) => void }) {
   return (

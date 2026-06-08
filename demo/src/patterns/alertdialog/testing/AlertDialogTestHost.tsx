@@ -1,14 +1,14 @@
-import { useState } from 'react'
-import { reducePatternData, type PatternData, type PatternEvent } from '../../../../../src/react'
+import { reducePatternData, type PatternEvent } from '../../../../../src/react'
 import { alertDialogDefinition } from '../../../../../src/patterns/alertdialog/definition'
+import { usePatternDataHost } from '../../../shared/demoHostState'
 import { AlertDialog } from '../AlertDialog'
 import { initialAlertDialogData } from '../alertdialogData'
 
 export function AlertDialogDemo({ onEvent }: { onEvent?: (event: PatternEvent) => void }) {
-  const [data, setData] = useState<PatternData>(initialAlertDialogData)
+  const host = usePatternDataHost(initialAlertDialogData, (data, event) => reducePatternData(alertDialogDefinition, data, event))
   const handleEvent = (event: PatternEvent) => {
     onEvent?.(event)
-    setData((current) => reducePatternData(alertDialogDefinition, current, event))
+    host.dispatchEvent(event)
   }
-  return <AlertDialog data={data} onEvent={handleEvent} />
+  return <AlertDialog data={host.data} onEvent={handleEvent} />
 }

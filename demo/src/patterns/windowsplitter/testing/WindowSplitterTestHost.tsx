@@ -1,12 +1,8 @@
-import { useState } from 'react'
-import type { PatternEvent } from '../../../../../src/react'
+import { usePatternDataHost } from '../../../shared/demoHostState'
 import { WindowSplitter } from '../WindowSplitter'
 import { initialWindowSplitterData, reduceWindowSplitterData, windowSplitterOptions } from '../windowsplitterData'
 
 export function WindowSplitterDemo() {
-  const [data, setData] = useState(initialWindowSplitterData)
-  const handleEvent = (event: PatternEvent) => {
-    setData((current) => reduceWindowSplitterData(current, event, windowSplitterOptions))
-  }
-  return <WindowSplitter data={data} onEvent={handleEvent} options={windowSplitterOptions} />
+  const host = usePatternDataHost(initialWindowSplitterData, (data, event) => reduceWindowSplitterData(data, event, windowSplitterOptions))
+  return <WindowSplitter data={host.data} onEvent={host.dispatchEvent} options={windowSplitterOptions} />
 }

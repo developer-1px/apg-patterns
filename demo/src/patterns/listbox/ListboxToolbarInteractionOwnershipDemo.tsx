@@ -1,5 +1,4 @@
 import { useLayoutEffect, useMemo, useRef, useState, type FocusEvent, type KeyboardEvent, type MouseEvent } from 'react'
-import type { InteractionKeyInput } from '../../../../packages/interaction/src/runtime'
 import {
   createInteractionOwnershipRegistry,
 } from '../../../../packages/interaction/src/runtime'
@@ -8,8 +7,13 @@ import { cx, ds } from '../../shared/designSystem'
 import {
   commandPaletteShellOwner,
   commandPaletteTemporaryControl,
+  getDemoToolbarKeyIntent,
   handleDemoInteractionKeyboardEvent,
   isCommandPaletteShortcut,
+  ownsDemoListboxKey,
+  ownsDemoToolbarKey,
+  reduceDemoListboxKey,
+  reduceDemoToolbarKey,
 } from '../shared/interactionDemoOwners'
 import { Toolbar } from '../toolbar/Toolbar'
 import { initialToolbarData, reduceToolbarData } from '../toolbar/toolbarData'
@@ -20,11 +24,6 @@ const listboxOwnerId = 'listbox'
 const toolbarOwnerId = 'listbox-toolbar'
 const searchOwnerId = 'listbox-filter-input'
 const shellOwnerId = 'command-palette'
-
-const listboxKeys = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', ' '])
-const toolbarNavigationKeys = new Set(['ArrowRight', 'ArrowLeft', 'Home', 'End'])
-const toolbarDelegatedListboxKeys = new Set(['ArrowDown', 'ArrowUp'])
-const toolbarCommandKeys = new Set(['Enter', ' '])
 
 export function ListboxToolbarInteractionOwnershipDemo() {
   const registry = useMemo(() => createInteractionOwnershipRegistry(), [])
@@ -40,7 +39,7 @@ export function ListboxToolbarInteractionOwnershipDemo() {
     const unregisterListbox = registry.register({
       id: listboxOwnerId,
       kind: 'pattern',
-      ownsKey: ownsListboxKey,
+      ownsKey: ownsDemoListboxKey,
       allowsShellKey: isCommandPaletteShortcut,
       restore: () => {
         setActiveOwnerId(listboxOwnerId)
@@ -50,7 +49,7 @@ export function ListboxToolbarInteractionOwnershipDemo() {
     const unregisterToolbar = registry.register({
       id: toolbarOwnerId,
       kind: 'pattern',
-      ownsKey: ownsToolbarKey,
+      ownsKey: ownsDemoToolbarKey,
       allowsShellKey: isCommandPaletteShortcut,
     })
     const unregisterSearch = registry.register(commandPaletteTemporaryControl({
@@ -113,20 +112,21 @@ export function ListboxToolbarInteractionOwnershipDemo() {
       ),
       onOwnerKey: ({ input, route }) => {
         if (route.ownerId === listboxOwnerId && input.targetKind !== 'pattern') {
-          setListboxData((current) => reduceListboxKey(current, input))
+          setListboxData((current) => reduceDemoListboxKey(current, input))
         }
 
         if (route.ownerId === toolbarOwnerId) {
-          if (input.key === 'Escape') {
+          const toolbarIntent = getDemoToolbarKeyIntent(input)
+          if (toolbarIntent === 'restore-listbox') {
             registry.activate(listboxOwnerId)
             setActiveOwnerId(listboxOwnerId)
             focusActiveListboxOption(listboxScopeRef.current)
-          } else if (isToolbarNavigationKey(input)) {
-            setToolbarData((current) => reduceToolbarKey(current, input))
-          } else if (isToolbarCommandKey(input)) {
+          } else if (toolbarIntent === 'navigation') {
+            setToolbarData((current) => reduceDemoToolbarKey(current, input))
+          } else if (toolbarIntent === 'command') {
             setToolbarCommandCount((current) => current + 1)
-          } else if (isToolbarDelegatedListboxKey(input)) {
-            setListboxData((current) => reduceListboxKey(current, input))
+          } else if (toolbarIntent === 'delegate-listbox') {
+            setListboxData((current) => reduceDemoListboxKey(current, input))
             registry.activate(listboxOwnerId)
             setActiveOwnerId(listboxOwnerId)
           }
@@ -166,59 +166,6 @@ export function ListboxToolbarInteractionOwnershipDemo() {
       </div>
     </section>
   )
-}
-
-function reduceListboxKey(data: PatternData, input: InteractionKeyInput): PatternData {
-  const event = listboxKeyEvent(data, input)
-  return event ? reducePatternData(listboxDefinition, data, event) : data
-}
-
-function listboxKeyEvent(data: PatternData, input: InteractionKeyInput): PatternEvent | null {
-  const activeKey = data.state?.activeKey
-  if (input.key === 'ArrowDown') return { type: 'navigate', direction: 'next', meta: { reason: 'keyboard' } }
-  if (input.key === 'ArrowUp') return { type: 'navigate', direction: 'previous', meta: { reason: 'keyboard' } }
-  if (input.key === 'Home') return { type: 'navigate', direction: 'first', meta: { reason: 'keyboard' } }
-  if (input.key === 'End') return { type: 'navigate', direction: 'last', meta: { reason: 'keyboard' } }
-  if ((input.key === 'Enter' || input.key === ' ') && activeKey) {
-    return { type: 'select', keys: [activeKey], anchorKey: activeKey, extentKey: activeKey, meta: { reason: 'keyboard' } }
-  }
-  return null
-}
-
-function reduceToolbarKey(data: PatternData, input: InteractionKeyInput): PatternData {
-  const event = toolbarKeyEvent(input)
-  return event ? reduceToolbarData(data, event) : data
-}
-
-function toolbarKeyEvent(input: InteractionKeyInput): PatternEvent | null {
-  if (input.key === 'ArrowRight') return { type: 'navigate', direction: 'next', meta: { reason: 'keyboard' } }
-  if (input.key === 'ArrowLeft') return { type: 'navigate', direction: 'previous', meta: { reason: 'keyboard' } }
-  if (input.key === 'Home') return { type: 'navigate', direction: 'first', meta: { reason: 'keyboard' } }
-  if (input.key === 'End') return { type: 'navigate', direction: 'last', meta: { reason: 'keyboard' } }
-  return null
-}
-
-function ownsListboxKey(input: InteractionKeyInput): boolean {
-  return listboxKeys.has(input.key)
-}
-
-function ownsToolbarKey(input: InteractionKeyInput): boolean {
-  return isToolbarNavigationKey(input)
-    || isToolbarDelegatedListboxKey(input)
-    || isToolbarCommandKey(input)
-    || input.key === 'Escape'
-}
-
-function isToolbarNavigationKey(input: InteractionKeyInput): boolean {
-  return toolbarNavigationKeys.has(input.key)
-}
-
-function isToolbarDelegatedListboxKey(input: InteractionKeyInput): boolean {
-  return toolbarDelegatedListboxKeys.has(input.key)
-}
-
-function isToolbarCommandKey(input: InteractionKeyInput): boolean {
-  return toolbarCommandKeys.has(input.key)
 }
 
 function focusActiveListboxOption(scope: HTMLElement | null): void {

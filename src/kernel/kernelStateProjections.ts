@@ -15,5 +15,3 @@ defineStateProjection('state.pressedByKey', (ctx) => (ctx.key ? ctx.data.state?.
 defineStateProjection('state.currentByKey', (ctx) => (ctx.key ? ctx.data.state?.currentByKey?.[ctx.key] : undefined))
 defineStateProjection('state.valueByKey', (ctx) => (ctx.key ? ctx.data.state?.valueByKey?.[ctx.key] : undefined))
 }
-
-registerKernelStateProjections()

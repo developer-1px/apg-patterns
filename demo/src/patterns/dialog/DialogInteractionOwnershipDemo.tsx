@@ -1,5 +1,4 @@
 import { useLayoutEffect, useMemo, useRef, useState, type FocusEvent, type KeyboardEvent } from 'react'
-import type { InteractionKeyInput } from '../../../../packages/interaction/src/runtime'
 import {
   createInteractionOwnershipRegistry,
 } from '../../../../packages/interaction/src/runtime'
@@ -10,6 +9,8 @@ import {
   commandPaletteTemporaryControl,
   handleDemoInteractionKeyboardEvent,
   isCommandPaletteShortcut,
+  ownsDemoListboxKey,
+  reduceDemoListboxKey,
 } from '../shared/interactionDemoOwners'
 import { Listbox } from '../listbox/Listbox'
 import { initialListboxData } from '../listbox/listboxData'
@@ -18,8 +19,6 @@ const dialogOwnerId = 'dialog'
 const listboxOwnerId = 'dialog-listbox'
 const searchOwnerId = 'dialog-search-input'
 const shellOwnerId = 'command-palette'
-
-const listboxKeys = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', ' '])
 
 export function DialogInteractionOwnershipDemo() {
   const registry = useMemo(() => createInteractionOwnershipRegistry(), [])
@@ -40,7 +39,7 @@ export function DialogInteractionOwnershipDemo() {
     const unregisterListbox = registry.register({
       id: listboxOwnerId,
       kind: 'pattern',
-      ownsKey: ownsListboxKey,
+      ownsKey: ownsDemoListboxKey,
       allowsShellKey: isCommandPaletteShortcut,
       restore: () => {
         setActiveOwnerId(listboxOwnerId)
@@ -92,7 +91,7 @@ export function DialogInteractionOwnershipDemo() {
       releaseOnRestore: true,
       onOwnerKey: ({ input, route }) => {
         if (route.ownerId === listboxOwnerId && input.targetKind !== 'pattern') {
-          setListboxData((current) => reduceListboxKey(current, input))
+          setListboxData((current) => reduceDemoListboxKey(current, input))
         }
         if (route.ownerId === shellOwnerId) setCommandCount((current) => current + 1)
       },
@@ -135,25 +134,4 @@ export function DialogInteractionOwnershipDemo() {
       ) : null}
     </section>
   )
-}
-
-function reduceListboxKey(data: PatternData, input: InteractionKeyInput): PatternData {
-  const event = listboxKeyEvent(data, input)
-  return event ? reducePatternData(listboxDefinition, data, event) : data
-}
-
-function listboxKeyEvent(data: PatternData, input: InteractionKeyInput): PatternEvent | null {
-  const activeKey = data.state?.activeKey
-  if (input.key === 'ArrowDown') return { type: 'navigate', direction: 'next', meta: { reason: 'keyboard' } }
-  if (input.key === 'ArrowUp') return { type: 'navigate', direction: 'previous', meta: { reason: 'keyboard' } }
-  if (input.key === 'Home') return { type: 'navigate', direction: 'first', meta: { reason: 'keyboard' } }
-  if (input.key === 'End') return { type: 'navigate', direction: 'last', meta: { reason: 'keyboard' } }
-  if ((input.key === 'Enter' || input.key === ' ') && activeKey) {
-    return { type: 'select', keys: [activeKey], anchorKey: activeKey, extentKey: activeKey, meta: { reason: 'keyboard' } }
-  }
-  return null
-}
-
-function ownsListboxKey(input: InteractionKeyInput): boolean {
-  return listboxKeys.has(input.key)
 }

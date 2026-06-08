@@ -1,5 +1,5 @@
-import { PatternDataSchema } from '../../../../src/react'
-import { variantItemsFrom } from '../../shared/demoPatternTypes'
+import { gridDefinition, PatternDataSchema, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
+import { reduceSortEvent, variantItemsFrom } from '../../shared/demoPatternTypes'
 
 type GridCellSpec = {
   key: string
@@ -10,9 +10,32 @@ type GridCellSpec = {
   editable?: boolean
 }
 
+type GridDemoKeyInput = {
+  key: string
+  ctrlKey?: boolean
+}
+
+type GridDemoKeyboardOptions = {
+  activateColumnheaderAsSort?: boolean
+  escapeEvent?: 'dismiss' | 'editEnd'
+}
+
 const cell = (key: string, label: string, options: Omit<GridCellSpec, 'key' | 'label'> = {}): GridCellSpec => ({ key, label, ...options })
 const header = (key: string, label: string, sort?: GridCellSpec['sort']): GridCellSpec => cell(key, label, { kind: 'columnheader', sort })
 const editCell = (key: string, value: string): GridCellSpec => cell(key, value, { value, editable: true })
+const gridDemoKeys = new Set([
+  'ArrowRight',
+  'ArrowLeft',
+  'ArrowDown',
+  'ArrowUp',
+  'Home',
+  'End',
+  'PageDown',
+  'PageUp',
+  'Enter',
+  'F2',
+  'Escape',
+])
 
 const gridData = (input: {
   label: string
@@ -159,3 +182,67 @@ export const gridVariants = {
 
 export type GridVariantKey = keyof typeof gridVariants
 export const gridVariantItems = variantItemsFrom(gridVariants)
+
+export function ownsGridDemoKey(input: GridDemoKeyInput): boolean {
+  return gridDemoKeys.has(input.key)
+}
+
+export function reduceGridDemoData(data: PatternData, event: PatternEvent): PatternData {
+  if (event.type === 'sort') return reduceSortEvent(data, event)
+  return reducePatternData(gridDefinition, data, event)
+}
+
+export function reduceGridDemoKeyboardInput(
+  data: PatternData,
+  input: GridDemoKeyInput,
+  options: GridDemoKeyboardOptions = {},
+): PatternData {
+  const event = gridDemoKeyboardEvent(data, input, options)
+  return event ? reduceGridDemoData(data, event) : data
+}
+
+export function isGridDemoEditorStartKey(data: PatternData, input: GridDemoKeyInput): boolean {
+  const activeKey = data.state?.activeKey
+  return Boolean(activeKey && isGridDemoEditStartKey(input) && isEditableGridCell(data, activeKey))
+}
+
+function gridDemoKeyboardEvent(
+  data: PatternData,
+  input: GridDemoKeyInput,
+  options: GridDemoKeyboardOptions,
+): PatternEvent | null {
+  const activeKey = data.state?.activeKey
+  if (!activeKey) return null
+  if (input.key === 'ArrowRight') return { type: 'navigate', direction: 'right', meta: { reason: 'keyboard' } }
+  if (input.key === 'ArrowLeft') return { type: 'navigate', direction: 'left', meta: { reason: 'keyboard' } }
+  if (input.key === 'ArrowDown') return { type: 'navigate', direction: 'down', meta: { reason: 'keyboard' } }
+  if (input.key === 'ArrowUp') return { type: 'navigate', direction: 'up', meta: { reason: 'keyboard' } }
+  if (input.key === 'Home') return { type: 'navigate', direction: input.ctrlKey ? 'gridStart' : 'rowStart', meta: { reason: 'keyboard' } }
+  if (input.key === 'End') return { type: 'navigate', direction: input.ctrlKey ? 'gridEnd' : 'rowEnd', meta: { reason: 'keyboard' } }
+  if (input.key === 'PageDown') return { type: 'navigate', direction: 'pageDown', meta: { reason: 'keyboard' } }
+  if (input.key === 'PageUp') return { type: 'navigate', direction: 'pageUp', meta: { reason: 'keyboard' } }
+  if (isGridDemoEditStartKey(input)) {
+    if (options.activateColumnheaderAsSort && data.items[activeKey]?.kind === 'columnheader') {
+      return { type: 'sort', key: activeKey, sort: nextGridDemoSort(data.state?.sortByKey?.[activeKey]) }
+    }
+    return { type: 'activate', key: activeKey, meta: { reason: 'keyboard' } }
+  }
+  if (input.key === 'Escape') {
+    return options.escapeEvent === 'editEnd'
+      ? { type: 'editEnd', key: activeKey, meta: { reason: 'keyboard' } }
+      : { type: 'dismiss', key: activeKey, meta: { reason: 'keyboard' } }
+  }
+  return null
+}
+
+function isGridDemoEditStartKey(input: GridDemoKeyInput): boolean {
+  return input.key === 'Enter' || input.key === 'F2'
+}
+
+function isEditableGridCell(data: PatternData, key: string): boolean {
+  return (data.state?.editableKeys as readonly string[] | undefined)?.includes(key) === true
+}
+
+function nextGridDemoSort(current: unknown): 'ascending' | 'descending' {
+  return current === 'ascending' ? 'descending' : 'ascending'
+}
