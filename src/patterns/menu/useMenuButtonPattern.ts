@@ -9,12 +9,21 @@ import { createMenuButtonMenuProps } from './menuButtonMenuProps'
 import { createMenuButtonTriggerProps } from './menuButtonTriggerProps'
 import { getMenuButtonRuntimeState } from './menuButtonRuntimeState'
 import { usePatternElementId } from '../../adapters/reactDomIds'
+import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
+
+registerKernelBuiltins()
+
+export interface ReactMenuButtonTriggerState {
+  disabled: boolean
+  expanded: boolean
+}
 
 export interface ReactMenuButtonRuntime {
   triggerKey: Key | null
   menuKey: Key | null
   expanded: boolean
   focusStrategy: 'rovingTabIndex' | 'ariaActiveDescendant'
+  triggerState: ReactMenuButtonTriggerState
   triggerProps: ReactPatternProps
   menuProps: ReactPatternProps
   items: readonly ReactMenuButtonItem[]
@@ -55,6 +64,14 @@ export function useMenuButtonPattern(data: PatternData, onEvent: (event: Pattern
     menuKey,
     expanded,
     focusStrategy,
+    get triggerState() {
+      if (!triggerKey) return { disabled: false, expanded: false }
+      const state = runtime.getItemState(triggerKey, 'trigger')
+      return {
+        disabled: Boolean(state.disabled),
+        expanded: Boolean(state.expanded),
+      }
+    },
     get triggerProps() {
       return createMenuButtonTriggerProps({ runtime, data, triggerKey, itemKeys, expanded, onEvent })
     },

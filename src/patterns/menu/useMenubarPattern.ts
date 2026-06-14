@@ -6,6 +6,9 @@ import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseType
 import { menubarDefinition } from './definition'
 import { createMenubarItem, type ReactMenubarItem } from './menubarItem'
 import { usePatternElementId } from '../../adapters/reactDomIds'
+import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
+
+registerKernelBuiltins()
 
 export type { ReactMenubarItem } from './menubarItem'
 

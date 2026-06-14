@@ -1,9 +1,57 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useRef, useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import type { PatternEvent } from '../../../../src/react'
+import { menuButtonDefinition, PatternDataSchema, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
+import { Menu } from './Menu'
 import { MenuDemo } from './testing/MenuTestHost'
 import { useMenubarSubmenuKeyboard } from './useMenubarSubmenuKeyboard'
+
+const disabledTriggerMenuButtonData = PatternDataSchema.parse({
+  items: {
+    trigger: { label: 'Actions' },
+    menu: { label: 'Actions menu' },
+    actAction: { label: 'Action 1' },
+    actAnother: { label: 'Action 2' },
+  },
+  relations: {
+    rootKeys: ['trigger'],
+    controlsByKey: { trigger: ['menu'] },
+    ownerByKey: { menu: 'trigger' },
+    childrenByKey: {
+      trigger: ['menu'],
+      menu: ['actAction', 'actAnother'],
+    },
+  },
+  state: {
+    activeKey: 'actAction',
+    expandedKeys: [],
+    disabledKeys: ['trigger'],
+  },
+})
+
+function MenuButtonDataDemo({ initialData, onEvent }: { initialData: PatternData; onEvent?: (event: PatternEvent) => void }) {
+  const [data, setData] = useState<PatternData>(withMenuButtonDemoState(initialData))
+  return (
+    <Menu
+      data={data}
+      onEvent={(event) => {
+        onEvent?.(event)
+        setData((current) => withMenuButtonDemoState(reducePatternData(menuButtonDefinition, current, event)))
+      }}
+    />
+  )
+}
+
+function withMenuButtonDemoState(data: PatternData): PatternData {
+  return {
+    ...data,
+    state: {
+      ...data.state,
+      apgPattern: 'menu-button',
+      focusStrategy: 'rovingTabIndex',
+    },
+  }
+}
 
 function MenubarSubmenuKeyboardEdges() {
   const menuRef = useRef<HTMLDivElement>(null)
@@ -357,6 +405,36 @@ describe('Menu — actionMenuButton (rovingTabIndex)', () => {
     expect(screen.queryByRole('menu')).toBeNull()
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
     expect(onEvent.mock.calls.some(([e]) => e.type === 'activate')).toBe(true)
+  })
+
+  it('disabled trigger click does not open the menu', () => {
+    const onEvent = vi.fn()
+    render(<MenuButtonDataDemo initialData={disabledTriggerMenuButtonData} onEvent={onEvent} />)
+    const trigger = screen.getByRole('button', { name: /Actions/ })
+
+    expect(trigger.getAttribute('aria-disabled')).toBe('true')
+    fireEvent.click(trigger)
+
+    expect(screen.queryByRole('menu')).toBeNull()
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+    expect(onEvent).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    ['ArrowDown'],
+    ['ArrowUp'],
+    ['Enter'],
+    [' '],
+  ])('disabled trigger %s key does not open the menu', (key) => {
+    const onEvent = vi.fn()
+    render(<MenuButtonDataDemo initialData={disabledTriggerMenuButtonData} onEvent={onEvent} />)
+    const trigger = screen.getByRole('button', { name: /Actions/ })
+
+    fireEvent.keyDown(trigger, { key })
+
+    expect(screen.queryByRole('menu')).toBeNull()
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+    expect(onEvent).not.toHaveBeenCalled()
   })
 })
 

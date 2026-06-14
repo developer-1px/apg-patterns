@@ -338,6 +338,7 @@ ReactListboxRuntime
 ReactMenubarItem
 ReactMenubarRuntime
 ReactMenuButtonRuntime
+ReactMenuButtonTriggerState
 ReactMeterRenderItem
 ReactMeterRuntime
 ReactRadioGroupRuntime

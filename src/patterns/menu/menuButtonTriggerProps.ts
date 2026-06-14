@@ -11,10 +11,15 @@ export function createMenuButtonTriggerProps({
 }: MenuButtonPropsInput & { expanded: boolean }): ReactPatternProps {
   if (!triggerKey) return {}
   const props = reactProps(runtime.getPartProps('trigger', triggerKey))
+  const disabled = isMenuButtonTriggerDisabled(runtime, triggerKey)
   return {
     ...props,
     id: runtime.keyToElementId(triggerKey),
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
+      if (disabled) {
+        props.onKeyDown?.(event)
+        return
+      }
       if (!expanded && (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ')) {
         event.preventDefault()
         onEvent({ type: 'expand', key: triggerKey, expanded: true, meta: { reason: 'open' } })
@@ -30,4 +35,8 @@ export function createMenuButtonTriggerProps({
       props.onKeyDown?.(event)
     },
   }
+}
+
+function isMenuButtonTriggerDisabled(runtime: MenuButtonPropsInput['runtime'], triggerKey: string): boolean {
+  return Boolean(runtime.getItemState?.(triggerKey, 'trigger').disabled)
 }
