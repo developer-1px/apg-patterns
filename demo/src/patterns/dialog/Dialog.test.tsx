@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { DialogDemo } from './testing/DialogTestHost'
+import { initialDialogData } from './dialogData'
 
 describe('Dialog demo (modal)', () => {
   it('opens on trigger click with role=dialog and aria-modal=true', () => {
@@ -32,6 +33,14 @@ describe('Dialog demo (modal)', () => {
 
     const firstInput = document.getElementById('dialog-street') as HTMLInputElement
     expect(document.activeElement).toBe(firstInput)
+  })
+
+  it('prefers refs.initialFocusKey when opened', () => {
+    render(<DialogDemo data={{ ...initialDialogData, refs: { ...initialDialogData.refs, initialFocusKey: 'cancel' } }} />)
+    const trigger = screen.getByRole('button', { name: /add delivery address/i })
+    fireEvent.click(trigger)
+
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Cancel' }))
   })
 
   it('closes on Escape and returns focus to trigger', () => {
