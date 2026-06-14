@@ -18,7 +18,7 @@ const formattingToolbarData = PatternDataSchema.parse({
   },
   state: {
     activeKey: 'bold',
-    selectedKeys: ['alignLeft'],
+    pressedByKey: { alignLeft: true },
   },
   refs: {
     label: 'Text formatting',
@@ -38,7 +38,6 @@ const helpToolbarData = PatternDataSchema.parse({
   },
   state: {
     activeKey: 'contents',
-    selectedKeys: ['contents'],
   },
   refs: {
     label: 'Help',

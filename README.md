@@ -222,6 +222,7 @@ Rules:
 - Generated props do not include `className` or visual `style`.
 - App code may add `className`, `style`, and `data-*` after spreading.
 - App code should not replace `role`, `tabIndex`, `aria-*`, `ref`, or event handlers except through a documented composition helper.
+- Toolbar item props emit `aria-pressed` only for keys present in `state.pressedByKey`; omit that state for command buttons.
 - Treeview `toggleButtonProps` owns expansion only and stops propagation.
 
 ## React Facade Descriptor
