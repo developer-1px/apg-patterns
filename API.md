@@ -340,6 +340,7 @@ ReactMenubarRuntime
 ReactMenuButtonRuntime
 ReactMeterRenderItem
 ReactMeterRuntime
+ReactRadioGroupOptions
 ReactRadioGroupRuntime
 ReactRadioRenderItem
 ReactSliderRenderItem

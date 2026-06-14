@@ -224,6 +224,8 @@ Rules:
 - App code should not replace `role`, `tabIndex`, `aria-*`, `ref`, or event handlers except through a documented composition helper.
 - Treeview `toggleButtonProps` owns expansion only and stops propagation.
 
+Radio groups select on arrow navigation by default. Use `activationMode: 'manual'` for toolbar-contained radio groups where arrows should move focus only and Space should select.
+
 ## React Facade Descriptor
 
 `PatternDefinitionSchema` has an optional `react` section. It describes how to derive React hook output from a serializable definition:
