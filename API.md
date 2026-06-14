@@ -17,6 +17,10 @@ import type { PatternData, PatternEvent } from '@interactive-os/aria'
 
 The export lists include runtime values and TypeScript type-only names. The runtime value sections list names that JavaScript consumers can import at runtime.
 
+## Menubar Submenu Props
+
+`useMenubarPattern` returns `submenuProps(ownerKey)` for open submenu containers. The props include `role="menu"`, `aria-labelledby`, and keyboard handling for ArrowUp/ArrowDown/Home/End, Escape, ArrowLeft, and ArrowRight while reusing existing menubar state events.
+
 ## Root And Core Exports
 
 <!-- apg-api:root-core:start -->

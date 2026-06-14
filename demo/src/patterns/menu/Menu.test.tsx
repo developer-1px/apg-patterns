@@ -1,89 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { useRef, useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import type { PatternEvent } from '../../../../src/react'
 import { MenuDemo } from './testing/MenuTestHost'
-import { useMenubarSubmenuKeyboard } from './useMenubarSubmenuKeyboard'
-
-function MenubarSubmenuKeyboardEdges() {
-  const menuRef = useRef<HTMLDivElement>(null)
-  const cycleRef = useRef<HTMLDivElement>(null)
-  const emptySiblingRef = useRef<HTMLDivElement>(null)
-  const orphanRef = useRef<HTMLDivElement>(null)
-  const [events, setEvents] = useState<string[]>([])
-  const [closed, setClosed] = useState(0)
-  const [activeKey, setActiveKey] = useState<string | null>(null)
-  const [cycleActiveKey, setCycleActiveKey] = useState<string | null>('first')
-  const handler = useMenubarSubmenuKeyboard({
-    data: {
-      items: {
-        solo: { label: 'Solo' },
-        sibling: { label: 'Sibling' },
-        child: { label: 'Child' },
-      },
-      relations: { rootKeys: ['solo', 'sibling'], childrenByKey: { sibling: ['child'] } },
-      state: {},
-    },
-    ownerKey: 'solo',
-    rootKeys: ['solo', 'sibling'],
-    children: [],
-    activeKey,
-    onEvent: (event) => {
-      setEvents((current) => [...current, `${event.type}:${'key' in event ? event.key ?? '' : ''}`])
-      if (event.type === 'focus') setActiveKey(event.key ?? null)
-    },
-    close: () => setClosed((current) => current + 1),
-  })
-  const orphanHandler = useMenubarSubmenuKeyboard({
-    data: { items: { orphan: { label: 'Orphan' } }, relations: { rootKeys: ['orphan'] }, state: {} },
-    ownerKey: 'missing',
-    rootKeys: ['orphan'],
-    children: ['orphan'],
-    activeKey: undefined,
-    onEvent: (event) => setEvents((current) => [...current, `orphan:${event.type}:${'key' in event ? event.key ?? '' : ''}`]),
-    close: () => setClosed((current) => current + 1),
-  })
-  const cycleHandler = useMenubarSubmenuKeyboard({
-    data: { items: { owner: { label: 'Owner' }, first: { label: 'First' }, second: { label: 'Second' } }, relations: { rootKeys: ['owner'], childrenByKey: { owner: ['first', 'second'] } }, state: {} },
-    ownerKey: 'owner',
-    rootKeys: ['owner'],
-    children: ['first', 'second'],
-    activeKey: cycleActiveKey,
-    onEvent: (event) => {
-      setEvents((current) => [...current, `cycle:${event.type}:${'key' in event ? event.key ?? '' : ''}`])
-      if (event.type === 'focus') setCycleActiveKey(event.key ?? null)
-    },
-    close: () => setClosed((current) => current + 1),
-  })
-  const emptySiblingHandler = useMenubarSubmenuKeyboard({
-    data: { items: { owner: { label: 'Owner' } }, relations: { rootKeys: [] }, state: {} },
-    ownerKey: 'owner',
-    rootKeys: [],
-    children: ['owner'],
-    activeKey: 'owner',
-    onEvent: (event) => setEvents((current) => [...current, `empty-sibling:${event.type}:${'key' in event ? event.key ?? '' : ''}`]),
-    close: () => setClosed((current) => current + 1),
-  })
-
-  return (
-    <div>
-      <div ref={menuRef} role="menu" tabIndex={-1} onKeyDown={handler}>Submenu</div>
-      <div ref={cycleRef} role="menu" tabIndex={-1} aria-label="Cycle submenu" onKeyDown={cycleHandler}>Cycle submenu</div>
-      <div ref={emptySiblingRef} role="menu" tabIndex={-1} aria-label="Empty sibling submenu" onKeyDown={emptySiblingHandler}>Empty sibling submenu</div>
-      <div ref={orphanRef} role="menu" tabIndex={-1} aria-label="Orphan submenu" onKeyDown={orphanHandler}>Orphan submenu</div>
-      <button type="button" onClick={() => menuRef.current && fireEvent.keyDown(menuRef.current, { key: 'ArrowDown' })}>Empty next</button>
-      <button type="button" onClick={() => menuRef.current && fireEvent.keyDown(menuRef.current, { key: 'ArrowRight' })}>Open next sibling</button>
-      <button type="button" onClick={() => orphanRef.current && fireEvent.keyDown(orphanRef.current, { key: 'ArrowLeft' })}>Missing sibling</button>
-      <button type="button" onClick={() => cycleRef.current && fireEvent.keyDown(cycleRef.current, { key: 'ArrowDown' })}>Cycle next</button>
-      <button type="button" onClick={() => cycleRef.current && fireEvent.keyDown(cycleRef.current, { key: 'ArrowUp' })}>Cycle previous</button>
-      <button type="button" onClick={() => cycleRef.current && fireEvent.keyDown(cycleRef.current, { key: 'Home' })}>Cycle home</button>
-      <button type="button" onClick={() => cycleRef.current && fireEvent.keyDown(cycleRef.current, { key: 'End' })}>Cycle end</button>
-      <button type="button" onClick={() => emptySiblingRef.current && fireEvent.keyDown(emptySiblingRef.current, { key: 'ArrowRight' })}>Empty sibling</button>
-      <output data-testid="submenu-events">{events.join('|')}</output>
-      <output data-testid="submenu-closed">{String(closed)}</output>
-    </div>
-  )
-}
 
 describe('Menu — editorMenubar', () => {
   it('ArrowRight / ArrowLeft moves active root item', () => {
@@ -210,25 +128,25 @@ describe('Menu — editorMenubar', () => {
     expect(events).toContainEqual({ type: 'expand', key: 'edit', expanded: false })
   })
 
-  it('covers submenu keyboard guard branches through pointer-triggered keys', () => {
-    render(<MenubarSubmenuKeyboardEdges />)
+  it('submenu keyboard skips disabled items and returns focus to the owner', () => {
+    render(<MenuDemo variant="editorMenubar" />)
+    const [file, edit] = screen.getAllByRole('menuitem')
 
-    fireEvent.click(screen.getByRole('button', { name: 'Empty next' }))
-    expect(screen.getByTestId('submenu-events').textContent).toBe('')
+    fireEvent.keyDown(file!, { key: 'ArrowRight' })
+    fireEvent.keyDown(edit!, { key: 'ArrowDown' })
+    const menu = screen.getByRole('menu')
 
-    fireEvent.click(screen.getByRole('button', { name: 'Open next sibling' }))
-    expect(screen.getByTestId('submenu-events').textContent).toBe('focus:sibling|expand:sibling|focus:child')
-    expect(screen.getByTestId('submenu-closed').textContent).toBe('1')
+    fireEvent.keyDown(menu, { key: 'ArrowDown' })
+    expect(screen.getByRole('menuitem', { name: 'Redo' }).getAttribute('tabindex')).toBe('-1')
+    expect(screen.getByRole('menuitem', { name: 'Cut' }).getAttribute('tabindex')).toBe('0')
 
-    fireEvent.click(screen.getByRole('button', { name: 'Missing sibling' }))
-    expect(screen.getByTestId('submenu-closed').textContent).toBe('1')
+    fireEvent.keyDown(menu, { key: 'ArrowUp' })
+    expect(screen.getByRole('menuitem', { name: 'Undo' }).getAttribute('tabindex')).toBe('0')
 
-    fireEvent.click(screen.getByRole('button', { name: 'Cycle next' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Cycle previous' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Cycle home' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Cycle end' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Empty sibling' }))
-    expect(screen.getByTestId('submenu-events').textContent).toContain('cycle:focus:second|cycle:focus:first|cycle:focus:first|cycle:focus:second')
+    fireEvent.keyDown(menu, { key: 'Escape' })
+    expect(screen.queryByRole('menu')).toBeNull()
+    expect(edit!.getAttribute('aria-expanded')).toBe('false')
+    expect(document.activeElement).toBe(edit)
   })
 })
 

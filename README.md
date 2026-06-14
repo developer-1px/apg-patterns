@@ -224,6 +224,15 @@ Rules:
 - App code should not replace `role`, `tabIndex`, `aria-*`, `ref`, or event handlers except through a documented composition helper.
 - Treeview `toggleButtonProps` owns expansion only and stops propagation.
 
+`useMenubarPattern` also returns `submenuProps(ownerKey)` for open submenu containers:
+
+```ts
+const submenuProps = menubar.submenuProps('file')
+const submenuItems = menubar.itemsFor('file')
+```
+
+`submenuProps` provides `role="menu"`, `aria-labelledby`, and submenu keydown behavior. ArrowUp/ArrowDown/Home/End move between enabled submenu items, Escape closes the submenu and restores focus to the owner root item, and ArrowLeft/ArrowRight hand off to sibling root menus.
+
 ## React Facade Descriptor
 
 `PatternDefinitionSchema` has an optional `react` section. It describes how to derive React hook output from a serializable definition:
