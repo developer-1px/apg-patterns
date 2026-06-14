@@ -29,4 +29,21 @@ export const toolbarParts = {
       { event: 'click', when: { kind: 'not', predicate: { kind: 'isDisabled', key: '$key' } }, events: [{ type: 'focus', key: '$key' }, { type: 'select', key: '$key' }] },
     ],
   },
+  control: {
+    role: 'group',
+    focus: {
+      tabIndex: {
+        when: { kind: 'always' },
+        active: 0,
+        inactive: -1,
+      },
+    },
+    state: [
+      { name: 'active', from: 'state.activeKey' },
+      { name: 'disabled', from: 'state.disabledKeys' },
+    ],
+    events: [
+      { event: 'focus', when: { kind: 'not', predicate: { kind: 'isDisabled', key: '$key' } }, events: [{ type: 'focus', key: '$key' }] },
+    ],
+  },
 } as const

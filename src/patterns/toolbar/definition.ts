@@ -18,7 +18,7 @@ export const toolbarDefinition: PatternDefinition = PatternDefinitionSchema.supe
 }).parse({
   apgPattern: 'toolbar',
   rootRole: 'toolbar',
-  containedRoles: ['button'],
+  containedRoles: ['button', 'combobox', 'group', 'menu', 'menubar'],
   focusModel: 'rovingTabIndex',
   effects: [{ kind: 'focus', on: { state: 'activeKey', reasons: ['keyboard'] }, scope: { kind: 'focusWithin' }, target: { kind: 'activeKeyElement' }, preventScroll: true }],
   parts: toolbarParts,

@@ -352,6 +352,7 @@ ReactTableCell
 ReactTableRow
 ReactTableRuntime
 ReactTabsRuntime
+ReactToolbarItemKind
 ReactToolbarRenderItem
 ReactToolbarRuntime
 ReactTooltipRuntime

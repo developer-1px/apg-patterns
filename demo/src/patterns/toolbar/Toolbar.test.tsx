@@ -1,6 +1,34 @@
 import { fireEvent, render, screen } from '@testing-library/react'
+import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
+import { PatternDataSchema, type PatternData } from '../../../../src/react'
+import { Toolbar } from './Toolbar'
+import { reduceToolbarData } from './toolbarData'
 import { ToolbarDemo } from './testing/ToolbarTestHost'
+
+const mixedToolbarData = PatternDataSchema.parse({
+  items: {
+    bold: { label: 'Bold', kind: 'toggleButton' },
+    format: { label: 'Number format', kind: 'select' },
+    fill: { label: 'Fill color', kind: 'colorInput' },
+    more: { label: 'More', kind: 'menuButton' },
+  },
+  relations: {
+    rootKeys: ['bold', 'format', 'fill', 'more'],
+  },
+  state: {
+    activeKey: 'format',
+    selectedKeys: ['bold'],
+  },
+  refs: {
+    label: 'Mixed controls',
+  },
+})
+
+function ToolbarDataDemo({ initialData }: { initialData: PatternData }) {
+  const [data, setData] = useState<PatternData>(initialData)
+  return <Toolbar data={data} onEvent={(event) => setData((current) => reduceToolbarData(current, event))} />
+}
 
 function tabIndexes() {
   return screen.getAllByRole('button').map((el) => el.getAttribute('tabindex'))
@@ -43,5 +71,29 @@ describe('Toolbar demo', () => {
     fireEvent.keyDown(screen.getByRole('toolbar'), { key: 'Home', code: 'Home' })
     expect(activeLabel()).toBe('Bold')
     expect(tabIndexes().filter((t) => t === '0')).toHaveLength(1)
+  })
+
+  it('supports native controls without projecting button role or pressed state', () => {
+    render(<ToolbarDataDemo initialData={mixedToolbarData} />)
+    const toolbar = screen.getByRole('toolbar')
+    const select = screen.getByRole('combobox', { name: 'Number format' })
+    const colorInput = screen.getByLabelText('Fill color')
+    const menuButton = screen.getByRole('button', { name: 'More' })
+
+    expect(select.getAttribute('role')).toBeNull()
+    expect(select.getAttribute('aria-pressed')).toBeNull()
+    expect(select.getAttribute('tabindex')).toBe('0')
+    expect(colorInput.getAttribute('role')).toBeNull()
+    expect(colorInput.getAttribute('aria-pressed')).toBeNull()
+    expect(colorInput.getAttribute('tabindex')).toBe('-1')
+    expect(menuButton.getAttribute('role')).toBeNull()
+    expect(menuButton.getAttribute('aria-pressed')).toBeNull()
+    expect(menuButton.getAttribute('aria-haspopup')).toBe('menu')
+    expect(toolbar.querySelectorAll('[tabindex="0"]')).toHaveLength(1)
+
+    fireEvent.keyDown(toolbar, { key: 'ArrowRight', code: 'ArrowRight' })
+
+    expect(screen.getByLabelText('Fill color').getAttribute('tabindex')).toBe('0')
+    expect(toolbar.querySelectorAll('[tabindex="0"]')).toHaveLength(1)
   })
 })
