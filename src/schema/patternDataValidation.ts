@@ -36,6 +36,8 @@ interface PatternStateRefs {
   setSizeByKey?: Record<string, unknown>
   rowIndexByKey?: Record<string, unknown>
   columnIndexByKey?: Record<string, unknown>
+  rowSpanByKey?: Record<string, unknown>
+  colSpanByKey?: Record<string, unknown>
   sortByKey?: Record<string, unknown>
   valueByKey?: Record<string, unknown>
   rangeValueByKey?: Record<string, unknown>
@@ -141,6 +143,8 @@ function validateStateRefs(
     'setSizeByKey',
     'rowIndexByKey',
     'columnIndexByKey',
+    'rowSpanByKey',
+    'colSpanByKey',
     'sortByKey',
     'valueByKey',
     'rangeValueByKey',

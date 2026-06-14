@@ -33,6 +33,8 @@ export interface PatternState {
   setSizeByKey?: Record<Key, number>
   rowIndexByKey?: Record<Key, number>
   columnIndexByKey?: Record<Key, number>
+  rowSpanByKey?: Record<Key, number>
+  colSpanByKey?: Record<Key, number>
   sortByKey?: Record<Key, 'ascending' | 'descending' | 'other'>
   valueByKey?: Record<Key, ItemValue>
   rangeValueByKey?: Record<Key, RangeValue>
@@ -65,6 +67,8 @@ export const PatternStateSchema: z.ZodType<PatternState> = z
     setSizeByKey: z.record(KeySchema, z.number().int().positive()).optional(),
     rowIndexByKey: z.record(KeySchema, z.number().int().positive()).optional(),
     columnIndexByKey: z.record(KeySchema, z.number().int().positive()).optional(),
+    rowSpanByKey: z.record(KeySchema, z.number().int().positive()).optional(),
+    colSpanByKey: z.record(KeySchema, z.number().int().positive()).optional(),
     sortByKey: z.record(KeySchema, z.enum(['ascending', 'descending', 'other'])).optional(),
     valueByKey: z.record(KeySchema, z.union([z.string(), z.number(), z.boolean(), z.null()])).optional(),
     rangeValueByKey: z.record(KeySchema, z.object({ min: z.number().optional(), max: z.number().optional(), now: z.number(), text: z.string().optional() }).strict()).optional(),
@@ -98,6 +102,8 @@ export const PatternStateSchema: z.ZodType<PatternState> = z
         'setSizeByKey',
         'rowIndexByKey',
         'columnIndexByKey',
+        'rowSpanByKey',
+        'colSpanByKey',
         'sortByKey',
         'valueByKey',
         'rangeValueByKey',
