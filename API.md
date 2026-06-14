@@ -69,6 +69,7 @@ FocusModel
 FocusModelSchema
 FocusProjection
 FocusProjectionSchema
+getTabsDataDiagnostics
 gridDefinition
 IdRefListSchema
 isRegisteredAriaSource
@@ -147,6 +148,8 @@ StateProjectionResolver
 StateProjectionSchema
 switchDefinition
 tableDefinition
+TabsDataDiagnostic
+TabsDataDiagnosticCode
 tabsDefinition
 toolbarDefinition
 tooltipDefinition
@@ -203,6 +206,7 @@ FocusEffectTargetSchema
 FocusEffectTriggerSchema
 FocusModelSchema
 FocusProjectionSchema
+getTabsDataDiagnostics
 gridDefinition
 IdRefListSchema
 isRegisteredAriaSource
