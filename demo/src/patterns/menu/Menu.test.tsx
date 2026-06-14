@@ -1,9 +1,39 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useRef, useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import type { PatternEvent } from '../../../../src/react'
+import { useMenuButtonPattern, type PatternEvent } from '../../../../src/react'
+import { menuVariants } from './menuData'
 import { MenuDemo } from './testing/MenuTestHost'
 import { useMenubarSubmenuKeyboard } from './useMenubarSubmenuKeyboard'
+
+const optionsActiveDescendantMenuData = {
+  ...menuVariants.actionMenuButton.data,
+  state: {
+    ...menuVariants.actionMenuButton.data.state,
+    activeKey: 'actAction',
+    expandedKeys: ['trigger'],
+    lastEventReason: 'open',
+  },
+}
+
+function OptionsActiveDescendantMenuButton() {
+  const menuButton = useMenuButtonPattern(optionsActiveDescendantMenuData, () => undefined, { focusStrategy: 'ariaActiveDescendant' })
+  if (!menuButton.triggerKey || !menuButton.menuKey) return null
+
+  return (
+    <div>
+      <output data-testid="menu-focus-strategy">{menuButton.focusStrategy}</output>
+      <button type="button" {...menuButton.triggerProps}>
+        {optionsActiveDescendantMenuData.items[menuButton.triggerKey]?.label}
+      </button>
+      <ul {...menuButton.menuProps}>
+        {menuButton.items.map((item) => (
+          <li key={item.key} {...item.itemProps}>{item.label}</li>
+        ))}
+      </ul>
+    </div>
+  )
+}
 
 function MenubarSubmenuKeyboardEdges() {
   const menuRef = useRef<HTMLDivElement>(null)
@@ -361,6 +391,20 @@ describe('Menu — actionMenuButton (rovingTabIndex)', () => {
 })
 
 describe('Menu — actionMenuButtonActiveDescendant', () => {
+  it('honors ariaActiveDescendant passed through hook options', () => {
+    render(<OptionsActiveDescendantMenuButton />)
+
+    const menu = screen.getByRole('menu')
+    const items = screen.getAllByRole('menuitem')
+
+    expect(screen.getByTestId('menu-focus-strategy').textContent).toBe('ariaActiveDescendant')
+    expect(menu.getAttribute('tabindex')).toBe('0')
+    expect(menu.getAttribute('aria-activedescendant')).toBe(items[0]!.id)
+    expect(items[0]!.hasAttribute('tabindex')).toBe(false)
+    expect(items[1]!.hasAttribute('tabindex')).toBe(false)
+    expect(document.activeElement).toBe(menu)
+  })
+
   it('open menu sets aria-activedescendant to first item id', () => {
     render(<MenuDemo variant="actionMenuButtonActiveDescendant" />)
     const trigger = screen.getByRole('button', { name: /Actions/ })
