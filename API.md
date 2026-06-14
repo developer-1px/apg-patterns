@@ -17,6 +17,10 @@ import type { PatternData, PatternEvent } from '@interactive-os/aria'
 
 The export lists include runtime values and TypeScript type-only names. The runtime value sections list names that JavaScript consumers can import at runtime.
 
+## Menu Item Roles
+
+Menu item props use `item.kind` to choose `menuitem`, `menuitemcheckbox`, or `menuitemradio`. Items present in `state.checkedByKey` without an explicit kind default to `menuitemcheckbox`; checkable roles receive `aria-checked` from `checkedByKey`.
+
 ## Root And Core Exports
 
 <!-- apg-api:root-core:start -->

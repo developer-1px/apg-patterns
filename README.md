@@ -224,6 +224,8 @@ Rules:
 - App code should not replace `role`, `tabIndex`, `aria-*`, `ref`, or event handlers except through a documented composition helper.
 - Treeview `toggleButtonProps` owns expansion only and stops propagation.
 
+Menu item roles can be specialized through item data. Set `kind: 'menuitemcheckbox'` or `kind: 'menuitemradio'`; items present in `state.checkedByKey` without an explicit kind default to `menuitemcheckbox`. Checkable menu items receive `aria-checked` from `checkedByKey`.
+
 ## React Facade Descriptor
 
 `PatternDefinitionSchema` has an optional `react` section. It describes how to derive React hook output from a serializable definition:
