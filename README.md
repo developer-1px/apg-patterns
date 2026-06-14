@@ -224,6 +224,19 @@ Rules:
 - App code should not replace `role`, `tabIndex`, `aria-*`, `ref`, or event handlers except through a documented composition helper.
 - Treeview `toggleButtonProps` owns expansion only and stops propagation.
 
+WindowSplitter value helpers are available from the root/core/react entrypoints:
+
+```ts
+const nextData = reduceWindowSplitterValue(data, event, {
+  min: 40,
+  max: 400,
+  step: 8,
+  largeStep: 32,
+})
+```
+
+`min` defaults to `0`, `max` to `100`, and `step` to `1`. `largeStep` defaults to one tenth of a finite range, never smaller than `step`; when helper options use `max: Infinity`, the upper clamp is disabled, `largeStep` defaults to `step * 10`, and a `max` value-step leaves the current value unchanged. `collapse` stores the current value in `state.previousValueByKey`, moves to `min`, then restores the previous value on the next collapse.
+
 ## React Facade Descriptor
 
 `PatternDefinitionSchema` has an optional `react` section. It describes how to derive React hook output from a serializable definition:
