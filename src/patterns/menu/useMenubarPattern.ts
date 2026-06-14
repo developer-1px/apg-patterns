@@ -1,11 +1,15 @@
 import { useRef, type KeyboardEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
+import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { menubarDefinition } from './definition'
 import { createMenubarItem, type ReactMenubarItem } from './menubarItem'
+import { getEnabledMenubarKeys } from './menubarNavigation'
 import { usePatternElementId } from '../../adapters/reactDomIds'
+
+registerKernelBuiltins()
 
 export type { ReactMenubarItem } from './menubarItem'
 
@@ -83,8 +87,9 @@ function useMenubarTypeahead(data: PatternData, rootKeys: readonly string[], onE
       state.query = ''
       state.timer = null
     }, 500)
-    const start = data.state?.activeKey ? rootKeys.indexOf(data.state.activeKey) : -1
-    const ordered = [...rootKeys.slice(start + 1), ...rootKeys.slice(0, start + 1)]
+    const enabledRootKeys = getEnabledMenubarKeys(rootKeys, data)
+    const start = data.state?.activeKey ? enabledRootKeys.indexOf(data.state.activeKey) : -1
+    const ordered = [...enabledRootKeys.slice(start + 1), ...enabledRootKeys.slice(0, start + 1)]
     const match = ordered.find((key) => (data.items[key]?.label ?? '').toLowerCase().startsWith(state.query))
     if (match) onEvent({ type: 'focus', key: match, meta: { reason: 'typeahead' } })
   }

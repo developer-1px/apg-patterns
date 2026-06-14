@@ -2,6 +2,7 @@ import type { KeyboardEvent } from 'react'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent } from '../../schema'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { getMenubarChildEntryKey, getMenubarSiblingKey } from './menubarNavigation'
 
 export interface ReactMenubarItem {
   key: Key
@@ -38,7 +39,7 @@ export function createMenubarItem({
         if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
           event.preventDefault()
           event.stopPropagation()
-          const target = siblingKey(rootKeys, key, event.key === 'ArrowRight' ? 'next' : 'previous')
+          const target = getMenubarSiblingKey(rootKeys, key, event.key === 'ArrowRight' ? 'next' : 'previous', data)
           if (target) onEvent({ type: 'focus', key: target, meta: { reason: 'keyboard' } })
           return
         }
@@ -46,18 +47,12 @@ export function createMenubarItem({
           event.preventDefault()
           event.stopPropagation()
           onEvent({ type: 'expand', key, expanded: true })
-          onEvent({ type: 'focus', key: event.key === 'ArrowDown' ? children[0]! : children[children.length - 1]!, meta: { reason: 'keyboard' } })
+          const target = getMenubarChildEntryKey(children, event.key === 'ArrowDown' ? 'first' : 'last', data)
+          if (target) onEvent({ type: 'focus', key: target, meta: { reason: 'keyboard' } })
           return
         }
         itemProps.onKeyDown?.(event)
       },
     },
   }
-}
-
-function siblingKey(keys: readonly string[], key: string, direction: 'next' | 'previous') {
-  if (keys.length === 0) return undefined
-  const index = keys.indexOf(key)
-  if (index === -1) return undefined
-  return keys[(index + (direction === 'next' ? 1 : -1) + keys.length) % keys.length]
 }

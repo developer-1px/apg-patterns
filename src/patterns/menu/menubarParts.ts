@@ -23,8 +23,8 @@ export const menubarParts = {
       { name: 'disabled', from: 'state.disabledKeys' },
     ],
     events: [
-      { event: 'click', events: [{ type: 'focus', key: '$key' }, { type: 'activate', key: '$key' }] },
-      { event: 'focus', events: [{ type: 'focus', key: '$key' }] },
+      { event: 'click', when: { kind: 'not', predicate: { kind: 'isDisabled', key: '$key' } }, events: [{ type: 'focus', key: '$key' }, { type: 'activate', key: '$key' }] },
+      { event: 'focus', when: { kind: 'not', predicate: { kind: 'isDisabled', key: '$key' } }, events: [{ type: 'focus', key: '$key' }] },
     ],
   },
 } as const
