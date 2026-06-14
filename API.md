@@ -17,6 +17,10 @@ import type { PatternData, PatternEvent } from '@interactive-os/aria'
 
 The export lists include runtime values and TypeScript type-only names. The runtime value sections list names that JavaScript consumers can import at runtime.
 
+## Autocomplete Listbox Owner
+
+`@interactive-os/aria/react` exports `useAutocompleteListbox` and `dispatchAutocompleteOwnerKeyDown`. They connect an app-owned input or contenteditable editor to existing listbox option props while keeping DOM focus on the editor. Owner props compose `role="combobox"`, popup ARIA, active descendant state, and ArrowUp/ArrowDown/Enter/Tab/Escape dispatch.
+
 ## Root And Core Exports
 
 <!-- apg-api:root-core:start -->
@@ -277,6 +281,10 @@ Alert
 AlertDialog
 AlertDialogProps
 AlertProps
+AutocompleteListboxActions
+AutocompleteListboxOptions
+AutocompleteListboxState
+AutocompleteOwnerAutocomplete
 Breadcrumb
 BreadcrumbProps
 Button
@@ -291,6 +299,7 @@ Dialog
 DialogProps
 Disclosure
 DisclosureProps
+dispatchAutocompleteOwnerKeyDown
 Feed
 FeedProps
 Grid
@@ -313,6 +322,7 @@ ReactAccordionRenderItem
 ReactAccordionRuntime
 ReactAlertDialogRuntime
 ReactAlertRuntime
+ReactAutocompleteListboxRuntime
 ReactBreadcrumbItem
 ReactBreadcrumbRuntime
 ReactButtonRuntime
@@ -382,6 +392,7 @@ TreeviewProps
 useAccordionPattern
 useAlertDialogPattern
 useAlertPattern
+useAutocompleteListbox
 useBreadcrumbPattern
 useButtonPattern
 useCarouselPattern
@@ -427,6 +438,7 @@ Checkbox
 Combobox
 Dialog
 Disclosure
+dispatchAutocompleteOwnerKeyDown
 Feed
 Grid
 Landmarks
@@ -448,6 +460,7 @@ Treeview
 useAccordionPattern
 useAlertDialogPattern
 useAlertPattern
+useAutocompleteListbox
 useBreadcrumbPattern
 useButtonPattern
 useCarouselPattern
