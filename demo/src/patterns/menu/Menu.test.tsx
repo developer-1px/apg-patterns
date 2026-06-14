@@ -275,6 +275,15 @@ describe('Menu — actionMenuButton (rovingTabIndex)', () => {
     expect(screen.getByRole('menuitem', { name: 'Action 1' }).getAttribute('tabindex')).toBe('0')
   })
 
+  it('omits aria-activedescendant from the menu root', () => {
+    render(<MenuDemo variant="actionMenuButton" />)
+    const trigger = screen.getByRole('button', { name: /Actions/ })
+
+    fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+
+    expect(screen.getByRole('menu').hasAttribute('aria-activedescendant')).toBe(false)
+  })
+
   it('ArrowDown after trigger click moves from first to next item', () => {
     render(<MenuDemo variant="actionMenuButton" />)
     const trigger = screen.getByRole('button', { name: /Actions/ })
