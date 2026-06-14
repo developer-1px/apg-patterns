@@ -27,6 +27,11 @@ export function createMenuButtonTriggerProps({
         if (itemKeys.length > 0) onEvent({ type: 'focus', key: itemKeys[itemKeys.length - 1]!, meta: { reason: 'open' } })
         return
       }
+      if (expanded && event.key === 'Escape') {
+        event.preventDefault()
+        onEvent({ type: 'expand', key: triggerKey, expanded: false })
+        return
+      }
       props.onKeyDown?.(event)
     },
   }
