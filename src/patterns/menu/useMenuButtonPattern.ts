@@ -9,6 +9,9 @@ import { createMenuButtonMenuProps } from './menuButtonMenuProps'
 import { createMenuButtonTriggerProps } from './menuButtonTriggerProps'
 import { getMenuButtonRuntimeState } from './menuButtonRuntimeState'
 import { usePatternElementId } from '../../adapters/reactDomIds'
+import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
+
+registerKernelBuiltins()
 
 export interface ReactMenuButtonRuntime {
   triggerKey: Key | null
@@ -45,7 +48,7 @@ export function useMenuButtonPattern(data: PatternData, onEvent: (event: Pattern
   }
   const activateActiveItem = () => {
     const activeKey = data.state?.activeKey && itemKeys.includes(data.state.activeKey) ? data.state.activeKey : itemKeys[0]
-    if (!activeKey) return
+    if (!activeKey || data.state?.disabledKeys?.includes(activeKey)) return
     onEvent({ type: 'activate', key: activeKey })
     closeAndFocusTrigger()
   }
