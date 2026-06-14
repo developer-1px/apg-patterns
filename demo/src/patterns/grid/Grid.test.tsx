@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest'
 if (typeof globalThis.CSS === 'undefined') {
   ;(globalThis as { CSS?: { escape: (value: string) => string } }).CSS = { escape: (value: string) => value }
 }
-import { gridDefinition, reducePatternData, type PatternData } from '../../../../src/react'
+import { gridDefinition, reducePatternData, useGridPattern, type PatternData } from '../../../../src/react'
 import { Grid } from './Grid'
 import { gridVariants } from './gridData'
 import { GridDemo } from './testing/GridTestHost'
@@ -16,7 +16,33 @@ function GridDataDemo({ initialData }: { initialData: PatternData }) {
   return <Grid data={data} onEvent={(event) => setData((current) => reducePatternData(gridDefinition, current, event))} />
 }
 
+function GridRuntimeStateDemo({ initialData }: { initialData: PatternData }) {
+  const [data, setData] = useState<PatternData>(initialData)
+  const grid = useGridPattern(data, (event) => setData((current) => reducePatternData(gridDefinition, current, event)))
+
+  return (
+    <>
+      <div {...grid.gridProps}>
+        {grid.rows.map((row) => (
+          <div key={row.key} {...row.rowProps}>
+            {row.cells.map((cell) => (
+              <div key={cell.key} {...cell.cellProps}>{cell.value}</div>
+            ))}
+          </div>
+        ))}
+      </div>
+      <output data-testid="grid-runtime-state">
+        {[grid.state.activeKey, grid.state.anchorKey, grid.state.extentKey, grid.state.selectedKeys.join(',')].join('|')}
+      </output>
+    </>
+  )
+}
+
 const cellOf = (key: string) => document.getElementById(`gridcell-${key}`)!
+const selectedKeys = () =>
+  [...document.querySelectorAll('[aria-selected="true"]')]
+    .map((element) => element.id.replace('gridcell-', ''))
+    .filter(Boolean)
 
 describe('Grid demo (layoutLinks)', () => {
   it('advertises rowcount, colcount, and aria-readonly', () => {
@@ -78,6 +104,16 @@ describe('Grid demo (dataTransactions)', () => {
     render(<GridDemo variant="dataTransactions" />)
     expect(cellOf('c22').getAttribute('aria-rowindex')).toBe('3')
     expect(cellOf('c22').getAttribute('aria-colindex')).toBe('2')
+  })
+
+  it('does not opt single-select grids into Shift+Arrow range selection', () => {
+    render(<GridDemo variant="dataTransactions" />)
+    const grid = screen.getByRole('grid')
+
+    fireEvent.keyDown(grid, { key: 'ArrowRight', shiftKey: true })
+
+    expect(cellOf('c12').hasAttribute('data-active')).toBe(true)
+    expect(selectedKeys()).toEqual(['c12'])
   })
 })
 
@@ -184,6 +220,74 @@ describe('Grid demo (dataAdvanced, multi-select)', () => {
 
     fireEvent.click(cellOf('av13'))
     expect(cellOf('av13').getAttribute('aria-selected')).toBe('true')
+  })
+
+  it('extends selection ranges with Shift+Arrow keys', () => {
+    render(<GridDemo variant="dataAdvanced" />)
+    const grid = screen.getByRole('grid')
+
+    fireEvent.keyDown(grid, { key: 'ArrowRight', shiftKey: true })
+    expect(cellOf('av12').hasAttribute('data-active')).toBe(true)
+    expect(selectedKeys()).toEqual(['av11', 'av12'])
+
+    fireEvent.keyDown(grid, { key: 'ArrowDown', shiftKey: true })
+    expect(cellOf('av22').hasAttribute('data-active')).toBe(true)
+    expect(selectedKeys()).toEqual(['av11', 'av12', 'av21', 'av22'])
+    expect(cellOf('av23').getAttribute('aria-selected')).not.toBe('true')
+  })
+
+  it('extends to row boundaries with Shift+Home and Shift+End', () => {
+    render(<GridDemo variant="dataAdvanced" />)
+    const grid = screen.getByRole('grid')
+
+    fireEvent.keyDown(grid, { key: 'End', shiftKey: true })
+    expect(cellOf('av14').hasAttribute('data-active')).toBe(true)
+    expect(selectedKeys()).toEqual(['av11', 'av12', 'av13', 'av14'])
+
+    fireEvent.keyDown(grid, { key: 'Home', shiftKey: true })
+    expect(cellOf('av11').hasAttribute('data-active')).toBe(true)
+    expect(selectedKeys()).toEqual(['av11'])
+  })
+
+  it('selects all cells, the active column, and the active row from keyboard shortcuts', () => {
+    render(<GridDemo variant="dataAdvanced" />)
+    const grid = screen.getByRole('grid')
+
+    fireEvent.keyDown(grid, { key: 'a', ctrlKey: true })
+    expect(selectedKeys()).toEqual([
+      'hQ1',
+      'hQ2',
+      'hQ3',
+      'hQ4',
+      'av11',
+      'av12',
+      'av13',
+      'av14',
+      'av21',
+      'av22',
+      'av23',
+      'av24',
+      'av31',
+      'av32',
+      'av33',
+      'av34',
+    ])
+
+    fireEvent.click(cellOf('av22'))
+    fireEvent.keyDown(grid, { key: ' ', ctrlKey: true })
+    expect(selectedKeys()).toEqual(['hQ2', 'av12', 'av22', 'av32'])
+
+    fireEvent.keyDown(grid, { key: ' ', shiftKey: true })
+    expect(selectedKeys()).toEqual(['av31', 'av32', 'av33', 'av34'])
+  })
+
+  it('exposes active, selected, anchor, and extent keys from useGridPattern state', () => {
+    render(<GridRuntimeStateDemo initialData={gridVariants.dataAdvanced.data} />)
+    const grid = screen.getByRole('grid')
+
+    fireEvent.keyDown(grid, { key: 'ArrowRight', shiftKey: true })
+
+    expect(screen.getByTestId('grid-runtime-state').textContent).toBe('av12|av11|av12|av11,av12')
   })
 })
 
