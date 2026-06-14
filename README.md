@@ -179,6 +179,8 @@ listbox.ids
 
 `renderItems` is the JSX mapping surface where present. App code should spread the named semantic props onto the named element and own all visual styling.
 
+Triggerless popup menus use `useMenuPattern`. Use `relations.rootKeys[0]` as the menu key and `childrenByKey[menuKey]` as items; React options own `open`, `onClose`, `initialActiveKey`, and `restoreFocusTo`.
+
 ```tsx
 const listbox = useListboxPattern(data, onEvent, options)
 
