@@ -69,6 +69,7 @@ FocusModel
 FocusModelSchema
 FocusProjection
 FocusProjectionSchema
+getWindowSplitterDataDiagnostics
 gridDefinition
 IdRefListSchema
 isRegisteredAriaSource
@@ -160,6 +161,8 @@ VisibleOrderKind
 VisibleOrderKindSchema
 VisibleOrderResolver
 VisibleOrderSchema
+WindowSplitterDataDiagnostic
+WindowSplitterDataDiagnosticCode
 windowSplitterDefinition
 ```
 <!-- apg-api:root-core:end -->
@@ -203,6 +206,7 @@ FocusEffectTargetSchema
 FocusEffectTriggerSchema
 FocusModelSchema
 FocusProjectionSchema
+getWindowSplitterDataDiagnostics
 gridDefinition
 IdRefListSchema
 isRegisteredAriaSource

@@ -4,6 +4,7 @@ import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { windowSplitterDefinition } from './definition'
 import { createWindowSplitterSeparatorProps } from './windowSplitterSeparatorProps'
 import { usePatternElementId } from '../../adapters/reactDomIds'
+import { getWindowSplitterDataDiagnostics, type WindowSplitterDataDiagnostic } from './diagnostics'
 
 interface ReactWindowSplitterState {
   value: number
@@ -17,6 +18,7 @@ export interface ReactWindowSplitterRuntime {
   separatorProps: ReactPatternProps
   key: Key | null
   controlledKey: Key | null
+  diagnostics: readonly WindowSplitterDataDiagnostic[]
   state: ReactWindowSplitterState
   actions: {
     focus(): void
@@ -42,6 +44,7 @@ export function useWindowSplitterPattern(data: PatternData, onEvent: (event: Pat
   const key = data.relations?.rootKeys?.[0] ?? null
   const controlledKey = key ? data.relations?.controlsByKey?.[key]?.[0] ?? null : null
   const state = getWindowSplitterState({ data, key, options: runtimeOptions })
+  const diagnostics = getWindowSplitterDataDiagnostics(data)
 
   return {
     rootProps: {},
@@ -50,6 +53,7 @@ export function useWindowSplitterPattern(data: PatternData, onEvent: (event: Pat
     },
     key,
     controlledKey,
+    diagnostics,
     state,
     get actions() {
       return {
