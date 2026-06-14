@@ -179,6 +179,18 @@ listbox.ids
 
 `renderItems` is the JSX mapping surface where present. App code should spread the named semantic props onto the named element and own all visual styling.
 
+For app-state-owned modal flows without a DOM trigger, use `useControlledDialogPattern` or `useControlledAlertDialogPattern`:
+
+```ts
+const dialog = useControlledDialogPattern(data, {
+  open,
+  onOpenChange: setOpen,
+  restoreFocusTo: openerRef,
+})
+```
+
+The controlled hooks use `open` directly, close with `onOpenChange(false)`, emit `dismiss` through `onEvent` when supplied, and restore focus to `restoreFocusTo`.
+
 ```tsx
 const listbox = useListboxPattern(data, onEvent, options)
 

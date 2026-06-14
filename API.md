@@ -17,6 +17,10 @@ import type { PatternData, PatternEvent } from '@interactive-os/aria'
 
 The export lists include runtime values and TypeScript type-only names. The runtime value sections list names that JavaScript consumers can import at runtime.
 
+## Controlled Dialog Hooks
+
+`useControlledDialogPattern` and `useControlledAlertDialogPattern` support app-state-owned dialogs without a rendered trigger item. They take `{ open, onOpenChange, onEvent?, initialFocusKey?, restoreFocusTo? }`, provide dialog props, trap focus while open, close with `onOpenChange(false)`, and emit `dismiss` when `onEvent` is supplied.
+
 ## Root And Core Exports
 
 <!-- apg-api:root-core:start -->
@@ -322,6 +326,11 @@ ReactCheckboxRenderItem
 ReactCheckboxRuntime
 ReactComboboxOption
 ReactComboboxRuntime
+ReactControlledAlertDialogRuntime
+ReactControlledDialogConfig
+ReactControlledDialogOpenChangeMeta
+ReactControlledDialogRuntime
+ReactDialogFocusTarget
 ReactDialogRuntime
 ReactDisclosureItem
 ReactDisclosureRuntime
@@ -387,6 +396,8 @@ useButtonPattern
 useCarouselPattern
 useCheckboxPattern
 useComboboxPattern
+useControlledAlertDialogPattern
+useControlledDialogPattern
 useDialogPattern
 useDisclosurePattern
 useFeedPattern
@@ -453,6 +464,8 @@ useButtonPattern
 useCarouselPattern
 useCheckboxPattern
 useComboboxPattern
+useControlledAlertDialogPattern
+useControlledDialogPattern
 useDialogPattern
 useDisclosurePattern
 useFeedPattern
