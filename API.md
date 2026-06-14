@@ -17,6 +17,10 @@ import type { PatternData, PatternEvent } from '@interactive-os/aria'
 
 The export lists include runtime values and TypeScript type-only names. The runtime value sections list names that JavaScript consumers can import at runtime.
 
+## Command Surface Helpers
+
+`@interactive-os/aria/react` exports `createToolbarPatternData`, `createRadioGroupPatternData`, `createMenuButtonPatternData`, and `usePatternStateReducer`. Pass `{ state, onStateChange }` to `usePatternStateReducer` when the app owns reducer state. Use these helpers for flat command surfaces where an array of keys, labels, disabled state, checked state, and initial selection fully describes the APG data. Build `PatternData` directly when relations, geometry, custom state records, async state, or domain metadata are part of the public contract.
+
 ## Root And Core Exports
 
 <!-- apg-api:root-core:start -->
@@ -287,6 +291,11 @@ Checkbox
 CheckboxProps
 Combobox
 ComboboxProps
+CommandSurfaceDataOptions
+CommandSurfaceItem
+createMenuButtonPatternData
+createRadioGroupPatternData
+createToolbarPatternData
 Dialog
 DialogProps
 Disclosure
@@ -304,9 +313,12 @@ ListboxProps
 Menubar
 MenubarProps
 MenuButton
+MenuButtonCommandSurfaceDataOptions
 MenuButtonProps
 Meter
 MeterProps
+PatternStateReducerOptions
+PatternStateReducerResult
 RadioGroup
 RadioGroupProps
 ReactAccordionRenderItem
@@ -361,6 +373,7 @@ ReactTreegridRuntime
 ReactTreeviewRenderItem
 ReactTreeviewRuntime
 ReactWindowSplitterRuntime
+SelectableCommandSurfaceDataOptions
 Slider
 SliderProps
 Spinbutton
@@ -397,6 +410,7 @@ useListboxPattern
 useMenubarPattern
 useMenuButtonPattern
 useMeterPattern
+usePatternStateReducer
 useRadioGroupPattern
 useSliderPattern
 useSpinbuttonPattern
@@ -425,6 +439,9 @@ Button
 Carousel
 Checkbox
 Combobox
+createMenuButtonPatternData
+createRadioGroupPatternData
+createToolbarPatternData
 Dialog
 Disclosure
 Feed
@@ -463,6 +480,7 @@ useListboxPattern
 useMenubarPattern
 useMenuButtonPattern
 useMeterPattern
+usePatternStateReducer
 useRadioGroupPattern
 useSliderPattern
 useSpinbuttonPattern
