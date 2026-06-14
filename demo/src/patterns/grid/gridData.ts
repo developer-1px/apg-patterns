@@ -4,7 +4,7 @@ import { reduceSortEvent, variantItemsFrom } from '../../shared/demoPatternTypes
 type GridCellSpec = {
   key: string
   label: string
-  kind?: 'columnheader'
+  kind?: 'columnheader' | 'rowheader'
   sort?: 'ascending' | 'descending' | 'other'
   value?: string | number | boolean | null
   editable?: boolean

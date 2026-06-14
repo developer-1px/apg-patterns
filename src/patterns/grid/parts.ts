@@ -42,6 +42,21 @@ export const gridParts = {
       { name: 'disabled', from: 'state.disabledKeys' },
     ],
   },
+  rowheader: {
+    role: 'rowheader',
+    aria: [
+      { attribute: 'aria-rowindex', from: 'state.rowIndexByKey' },
+      { attribute: 'aria-colindex', from: 'state.columnIndexByKey' },
+      { attribute: 'aria-selected', from: 'state.selectedKeys' },
+    ],
+    focus: cellFocus,
+    events: cellEvents,
+    state: [
+      { name: 'active', from: 'state.activeKey' },
+      { name: 'selected', from: 'state.selectedKeys' },
+      { name: 'disabled', from: 'state.disabledKeys' },
+    ],
+  },
   columnheader: {
     role: 'columnheader',
     aria: [
