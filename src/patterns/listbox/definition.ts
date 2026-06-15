@@ -8,7 +8,16 @@ export const listboxDefinition: PatternDefinition = PatternDefinitionSchema.pars
   rootRole: 'listbox',
   containedRoles: ['option'],
   focusModel: 'rovingTabIndex',
-  effects: [{ kind: 'focus', on: { state: 'activeKey', reasons: ['keyboard', 'typeahead'] }, scope: { kind: 'focusWithin' }, target: { kind: 'activeKeyElement' }, preventScroll: true }],
+  effects: [
+    {
+      kind: 'focus',
+      when: { kind: 'optionEquals', option: 'focusStrategy', value: 'rovingTabIndex' },
+      on: { state: 'activeKey', reasons: ['keyboard', 'typeahead'] },
+      scope: { kind: 'focusWithin' },
+      target: { kind: 'activeKeyElement' },
+      preventScroll: true,
+    },
+  ],
   parts: listboxParts,
   navigation: {
     visibleOrder: { kind: 'flat' },
