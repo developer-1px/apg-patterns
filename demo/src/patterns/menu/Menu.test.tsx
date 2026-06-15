@@ -152,6 +152,29 @@ const disabledMenuButtonData = PatternDataSchema.parse({
   },
 })
 
+const disabledTriggerMenuButtonData = PatternDataSchema.parse({
+  items: {
+    trigger: { label: 'Actions' },
+    menu: { label: 'Actions menu' },
+    actAction: { label: 'Action 1' },
+    actAnother: { label: 'Action 2' },
+  },
+  relations: {
+    rootKeys: ['trigger'],
+    controlsByKey: { trigger: ['menu'] },
+    ownerByKey: { menu: 'trigger' },
+    childrenByKey: {
+      trigger: ['menu'],
+      menu: ['actAction', 'actAnother'],
+    },
+  },
+  state: {
+    activeKey: 'actAction',
+    expandedKeys: [],
+    disabledKeys: ['trigger'],
+  },
+})
+
 function MenuButtonDataDemo({ initialData, onEvent }: { initialData: PatternData; onEvent?: (event: PatternEvent) => void }) {
   const [data, setData] = useState<PatternData>(withMenuButtonDemoState(initialData))
   return (
@@ -560,6 +583,19 @@ describe('Menu — actionMenuButton (rovingTabIndex)', () => {
     expect(onEvent.mock.calls.some(([e]) => e.type === 'activate')).toBe(true)
   })
 
+  it('disabled trigger click does not open the menu', () => {
+    const onEvent = vi.fn()
+    render(<MenuButtonDataDemo initialData={disabledTriggerMenuButtonData} onEvent={onEvent} />)
+    const trigger = screen.getByRole('button', { name: /Actions/ })
+
+    expect(trigger.getAttribute('aria-disabled')).toBe('true')
+    fireEvent.click(trigger)
+
+    expect(screen.queryByRole('menu')).toBeNull()
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+    expect(onEvent).not.toHaveBeenCalled()
+  })
+
   it('disabled menuitem click does not activate or close the menu', () => {
     const onEvent = vi.fn()
     render(<MenuButtonDataDemo initialData={disabledMenuButtonData} onEvent={onEvent} />)
@@ -573,6 +609,23 @@ describe('Menu — actionMenuButton (rovingTabIndex)', () => {
     expect(disabledItem.getAttribute('aria-disabled')).toBe('true')
     expect(screen.getByRole('menu')).toBeTruthy()
     expect(trigger.getAttribute('aria-expanded')).toBe('true')
+    expect(onEvent).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    ['ArrowDown'],
+    ['ArrowUp'],
+    ['Enter'],
+    [' '],
+  ])('disabled trigger %s key does not open the menu', (key) => {
+    const onEvent = vi.fn()
+    render(<MenuButtonDataDemo initialData={disabledTriggerMenuButtonData} onEvent={onEvent} />)
+    const trigger = screen.getByRole('button', { name: /Actions/ })
+
+    fireEvent.keyDown(trigger, { key })
+
+    expect(screen.queryByRole('menu')).toBeNull()
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
     expect(onEvent).not.toHaveBeenCalled()
   })
 

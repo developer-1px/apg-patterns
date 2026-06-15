@@ -407,6 +407,7 @@ ReactListboxRuntime
 ReactMenubarItem
 ReactMenubarRuntime
 ReactMenuButtonRuntime
+ReactMenuButtonTriggerState
 ReactMenuItem
 ReactMenuPatternOptions
 ReactMenuRuntime
