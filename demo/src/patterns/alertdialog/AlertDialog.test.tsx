@@ -19,6 +19,8 @@ describe('AlertDialog demo', () => {
     expect(dialog.getAttribute('aria-modal')).toBe('true')
     expect(dialog.getAttribute('aria-labelledby')).toBeTruthy()
     expect(dialog.getAttribute('aria-describedby')).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Discard draft?' }).id).toBe(dialog.getAttribute('aria-labelledby'))
+    expect(screen.getByText('Changes will be lost.').id).toBe(dialog.getAttribute('aria-describedby'))
 
     const confirm = screen.getByRole('button', { name: 'Discard' })
     expect(document.activeElement).toBe(confirm)
