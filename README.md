@@ -226,6 +226,19 @@ Rules:
 
 Grid range selection is opt-in. `useGridPattern(data, onEvent, { selectionMode: 'multiple' })`, or grid data with `state.multiselectable`, enables `Shift+Arrow*`, `Shift+Home`, `Shift+End`, `Control+a`, `Control+Space`, and `Shift+Space`. The hook exposes `state.activeKey`, `state.selectedKeys`, `state.anchorKey`, and `state.extentKey`; grid cells expose `cell.state.selected` and `aria-selected` through `cell.cellProps`.
 
+Command surface helpers are available from the React entrypoint for flat, app-defined command arrays:
+
+```ts
+const toolbarData = createToolbarPatternData([
+  { key: 'find', label: 'Find' },
+  { key: 'replace', label: 'Replace' },
+], { label: 'Search actions' })
+const toolbar = usePatternStateReducer(toolbarDefinition, toolbarData)
+const toolbarProps = { data: toolbar.data, onEvent: toolbar.onEvent }
+```
+
+Pass `{ state, onStateChange }` to `usePatternStateReducer` when the app owns the reducer state. Use `createToolbarPatternData`, `createRadioGroupPatternData`, or `createMenuButtonPatternData` when command keys, labels, disabled state, and initial selection are enough. Build `PatternData` directly when the surface owns nested relations, app-specific state records, composite grid/tree geometry, async loading state, or custom item metadata that should stay explicit.
+
 ## React Facade Descriptor
 
 `PatternDefinitionSchema` has an optional `react` section. It describes how to derive React hook output from a serializable definition:
