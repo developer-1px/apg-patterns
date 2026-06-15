@@ -2,6 +2,7 @@ import type { MouseEvent } from 'react'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent } from '../../schema'
 import { reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
+import { withMenuItemRoleProps } from './menuItemRole'
 
 export interface ReactMenuButtonItem {
   key: Key
@@ -23,7 +24,7 @@ export function createMenuButtonItem({
   onEvent: (event: PatternEvent) => void
   closeAndFocusTrigger(): void
 }): ReactMenuButtonItem {
-  const itemProps = reactProps(runtime.getPartProps('menuitem', key))
+  const itemProps = withMenuItemRoleProps(reactProps(runtime.getPartProps('menuitem', key)), data, key)
   const state = runtime.getItemState(key, 'menuitem')
   return {
     key,

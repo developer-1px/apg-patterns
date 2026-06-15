@@ -1,6 +1,32 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
+import type { PatternData } from '../../../../src/react'
+import { Toolbar } from './Toolbar'
 import { ToolbarDemo } from './testing/ToolbarTestHost'
+import { initialToolbarData } from './toolbarData'
+
+const mixedToolbarData = {
+  items: {
+    undo: { label: 'Undo' },
+    bold: { label: 'Bold' },
+    italic: { label: 'Italic' },
+    delete: { label: 'Delete' },
+  },
+  relations: {
+    rootKeys: ['undo', 'bold', 'italic', 'delete'],
+  },
+  state: {
+    activeKey: 'undo',
+    pressedByKey: { bold: true, italic: false },
+  },
+  refs: {
+    label: 'Mixed actions',
+  },
+} satisfies PatternData
+
+function MixedToolbarDemo() {
+  return <Toolbar data={mixedToolbarData} onEvent={() => undefined} />
+}
 
 function tabIndexes() {
   return screen.getAllByRole('button').map((el) => el.getAttribute('tabindex'))
@@ -43,5 +69,41 @@ describe('Toolbar demo', () => {
     fireEvent.keyDown(screen.getByRole('toolbar'), { key: 'Home', code: 'Home' })
     expect(activeLabel()).toBe('Bold')
     expect(tabIndexes().filter((t) => t === '0')).toHaveLength(1)
+  })
+
+  it('omits aria-pressed for command buttons and keeps explicit toggle state', () => {
+    render(<MixedToolbarDemo />)
+
+    expect(screen.getByRole('button', { name: 'Undo' }).getAttribute('aria-pressed')).toBeNull()
+    expect(screen.getByRole('button', { name: 'Bold' }).getAttribute('aria-pressed')).toBe('true')
+    expect(screen.getByRole('button', { name: 'Italic' }).getAttribute('aria-pressed')).toBe('false')
+    expect(screen.getByRole('button', { name: 'Delete' }).getAttribute('aria-pressed')).toBeNull()
+  })
+
+  it('skips disabled items during arrow navigation', () => {
+    render(<ToolbarDemo data={{ ...initialToolbarData, state: { ...initialToolbarData.state, disabledKeys: ['italic'] } }} />)
+
+    fireEvent.keyDown(screen.getByRole('toolbar'), { key: 'ArrowRight', code: 'ArrowRight' })
+
+    expect(activeLabel()).toBe('Underline')
+    expect(screen.getByRole('button', { name: 'Italic' }).getAttribute('aria-disabled')).toBe('true')
+  })
+
+  it('uses enabled boundary items for Home and End', () => {
+    render(<ToolbarDemo data={{ ...initialToolbarData, state: { ...initialToolbarData.state, activeKey: 'underline', disabledKeys: ['bold', 'alignRight'] } }} />)
+
+    fireEvent.keyDown(screen.getByRole('toolbar'), { key: 'End', code: 'End' })
+    expect(activeLabel()).toBe('Align center')
+
+    fireEvent.keyDown(screen.getByRole('toolbar'), { key: 'Home', code: 'Home' })
+    expect(activeLabel()).toBe('Italic')
+  })
+
+  it('keeps active item when the previous candidate is disabled', () => {
+    render(<ToolbarDemo data={{ ...initialToolbarData, state: { ...initialToolbarData.state, activeKey: 'italic', disabledKeys: ['bold'] } }} />)
+
+    fireEvent.keyDown(screen.getByRole('toolbar'), { key: 'ArrowLeft', code: 'ArrowLeft' })
+
+    expect(activeLabel()).toBe('Italic')
   })
 })

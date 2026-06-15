@@ -1,10 +1,133 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useRef, useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { menuButtonDefinition, PatternDataSchema, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
+import { menuButtonDefinition, PatternDataSchema, reducePatternData, useMenuButtonPattern, useMenuPattern, type PatternData, type PatternEvent } from '../../../../src/react'
 import { Menu } from './Menu'
+import { menuVariants } from './menuData'
 import { MenuDemo } from './testing/MenuTestHost'
 import { useMenubarSubmenuKeyboard } from './useMenubarSubmenuKeyboard'
+
+const optionsActiveDescendantMenuData = {
+  ...menuVariants.actionMenuButton.data,
+  state: {
+    ...menuVariants.actionMenuButton.data.state,
+    activeKey: 'actAction',
+    expandedKeys: ['trigger'],
+    lastEventReason: 'open',
+  },
+}
+
+function OptionsActiveDescendantMenuButton() {
+  const menuButton = useMenuButtonPattern(optionsActiveDescendantMenuData, () => undefined, { focusStrategy: 'ariaActiveDescendant' })
+  if (!menuButton.triggerKey || !menuButton.menuKey) return null
+
+  return (
+    <div>
+      <output data-testid="menu-focus-strategy">{menuButton.focusStrategy}</output>
+      <button type="button" {...menuButton.triggerProps}>
+        {optionsActiveDescendantMenuData.items[menuButton.triggerKey]?.label}
+      </button>
+      <ul {...menuButton.menuProps}>
+        {menuButton.items.map((item) => (
+          <li key={item.key} {...item.itemProps}>{item.label}</li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+const checkedMenuButtonData: PatternData = PatternDataSchema.parse({
+  items: {
+    trigger: { label: 'Format' },
+    menu: { label: 'Format menu' },
+    bold: { label: 'Bold' },
+    showGrid: { label: 'Show grid', kind: 'menuitemcheckbox' },
+    alignLeft: { label: 'Align left', kind: 'menuitemradio' },
+    alignCenter: { label: 'Align center', kind: 'menuitemradio' },
+    plain: { label: 'Plain action' },
+  },
+  relations: {
+    rootKeys: ['trigger'],
+    controlsByKey: { trigger: ['menu'] },
+    ownerByKey: { menu: 'trigger' },
+    childrenByKey: {
+      trigger: ['menu'],
+      menu: ['bold', 'showGrid', 'alignLeft', 'alignCenter', 'plain'],
+    },
+  },
+  state: {
+    activeKey: 'bold',
+    expandedKeys: ['trigger'],
+    checkedByKey: { bold: true, showGrid: false, alignLeft: false, alignCenter: true },
+  },
+})
+
+function CheckedMenuButtonRoles() {
+  const menuButton = useMenuButtonPattern(checkedMenuButtonData, () => undefined)
+  if (!menuButton.expanded) return null
+
+  return (
+    <ul {...menuButton.menuProps}>
+      {menuButton.items.map((item) => (
+        <li key={item.key} {...item.itemProps}>{item.label}</li>
+      ))}
+    </ul>
+  )
+}
+
+const triggerlessContextMenuData: PatternData = PatternDataSchema.parse({
+  items: {
+    contextMenu: { label: 'Cell context menu' },
+    copy: { label: 'Copy' },
+    locked: { label: 'Locked action' },
+    paste: { label: 'Paste' },
+    delete: { label: 'Delete' },
+  },
+  relations: {
+    rootKeys: ['contextMenu'],
+    childrenByKey: {
+      contextMenu: ['copy', 'locked', 'paste', 'delete'],
+    },
+  },
+  state: {
+    disabledKeys: ['locked'],
+  },
+  refs: {
+    label: 'Cell context menu',
+  },
+})
+
+function TriggerlessContextMenu({ events, closeEvents }: { events: PatternEvent[]; closeEvents: PatternEvent[] }) {
+  const restoreRef = useRef<HTMLButtonElement>(null)
+  const [open, setOpen] = useState(true)
+  const [data, setData] = useState<PatternData>(triggerlessContextMenuData)
+  const menu = useMenuPattern(data, (event) => {
+    events.push(event)
+    setData((current) => reducePatternData(menuButtonDefinition, current, event))
+  }, {
+    open,
+    initialActiveKey: 'copy',
+    restoreFocusTo: restoreRef,
+    onClose: (event) => {
+      closeEvents.push(event)
+      setOpen(false)
+    },
+  })
+
+  return (
+    <div>
+      <button ref={restoreRef} type="button">Grid cell</button>
+      <button type="button">Outside</button>
+      {menu.open ? (
+        <ul {...menu.menuProps}>
+          {menu.items.map((item) => (
+            <li key={item.key} {...item.itemProps}>{item.label}</li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
+  )
+}
 
 const disabledMenuButtonData = PatternDataSchema.parse({
   items: {
@@ -258,6 +381,27 @@ describe('Menu — editorMenubar', () => {
     expect(events).toContainEqual({ type: 'expand', key: 'edit', expanded: false })
   })
 
+  it('submenu keyboard skips disabled items and returns focus to the owner', () => {
+    render(<MenuDemo variant="editorMenubar" />)
+    const [file, edit] = screen.getAllByRole('menuitem')
+
+    fireEvent.keyDown(file!, { key: 'ArrowRight' })
+    fireEvent.keyDown(edit!, { key: 'ArrowDown' })
+    const menu = screen.getByRole('menu')
+
+    fireEvent.keyDown(menu, { key: 'ArrowDown' })
+    expect(screen.getByRole('menuitem', { name: 'Redo' }).getAttribute('tabindex')).toBe('-1')
+    expect(screen.getByRole('menuitem', { name: 'Cut' }).getAttribute('tabindex')).toBe('0')
+
+    fireEvent.keyDown(menu, { key: 'ArrowUp' })
+    expect(screen.getByRole('menuitem', { name: 'Undo' }).getAttribute('tabindex')).toBe('0')
+
+    fireEvent.keyDown(menu, { key: 'Escape' })
+    expect(screen.queryByRole('menu')).toBeNull()
+    expect(edit!.getAttribute('aria-expanded')).toBe('false')
+    expect(document.activeElement).toBe(edit)
+  })
+
   it('covers submenu keyboard guard branches through pointer-triggered keys', () => {
     render(<MenubarSubmenuKeyboardEdges />)
 
@@ -321,6 +465,15 @@ describe('Menu — actionMenuButton (rovingTabIndex)', () => {
 
     expect(trigger.getAttribute('aria-expanded')).toBe('true')
     expect(screen.getByRole('menuitem', { name: 'Action 1' }).getAttribute('tabindex')).toBe('0')
+  })
+
+  it('omits aria-activedescendant from the menu root', () => {
+    render(<MenuDemo variant="actionMenuButton" />)
+    const trigger = screen.getByRole('button', { name: /Actions/ })
+
+    fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+
+    expect(screen.getByRole('menu').hasAttribute('aria-activedescendant')).toBe(false)
   })
 
   it('ArrowDown after trigger click moves from first to next item', () => {
@@ -442,9 +595,132 @@ describe('Menu — actionMenuButton (rovingTabIndex)', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('true')
     expect(onEvent).not.toHaveBeenCalled()
   })
+
+  it('returns checkbox and radio menu item roles from item metadata and checked state', () => {
+    render(<CheckedMenuButtonRoles />)
+
+    const bold = screen.getByRole('menuitemcheckbox', { name: 'Bold' })
+    const showGrid = screen.getByRole('menuitemcheckbox', { name: 'Show grid' })
+    const alignCenter = screen.getByRole('menuitemradio', { name: 'Align center' })
+    const plain = screen.getByRole('menuitem', { name: 'Plain action' })
+
+    expect(bold.getAttribute('aria-checked')).toBe('true')
+    expect(showGrid.getAttribute('aria-checked')).toBe('false')
+    expect(alignCenter.getAttribute('aria-checked')).toBe('true')
+    expect(plain.getAttribute('aria-checked')).toBeNull()
+  })
+
+  it('menuitem pointer activation emits one close event', () => {
+    const onEvent = vi.fn()
+    render(<MenuDemo variant="actionMenuButton" onEvent={onEvent} />)
+    const trigger = screen.getByRole('button', { name: /Actions/ })
+
+    fireEvent.keyDown(trigger, { key: 'Enter' })
+    onEvent.mockClear()
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Action 2' }))
+
+    expect(onEvent.mock.calls.map(([event]) => event)).toEqual([
+      { type: 'activate', key: 'actAnother' },
+      { type: 'expand', key: 'trigger', expanded: false },
+    ])
+    expect(onEvent.mock.calls.some(([event]) => event.type === 'dismiss')).toBe(false)
+  })
+
+  it('menuitem keyboard activation matches pointer close sequence', () => {
+    const onEvent = vi.fn()
+    render(<MenuDemo variant="actionMenuButton" onEvent={onEvent} />)
+    const trigger = screen.getByRole('button', { name: /Actions/ })
+
+    fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+    onEvent.mockClear()
+    fireEvent.keyDown(screen.getByRole('menu'), { key: 'Enter' })
+
+    expect(onEvent.mock.calls.map(([event]) => event)).toEqual([
+      { type: 'activate', key: 'actAction' },
+      { type: 'expand', key: 'trigger', expanded: false },
+    ])
+    expect(onEvent.mock.calls.some(([event]) => event.type === 'dismiss')).toBe(false)
+  })
+})
+
+describe('Menu — triggerless context menu', () => {
+  it('renders an open menu without a synthetic trigger relationship', () => {
+    render(<TriggerlessContextMenu events={[]} closeEvents={[]} />)
+
+    const menu = screen.getByRole('menu', { name: 'Cell context menu' })
+    const copy = screen.getByRole('menuitem', { name: 'Copy' })
+
+    expect(menu.getAttribute('aria-controls')).toBeNull()
+    expect(menu.getAttribute('aria-labelledby')).toBeNull()
+    expect(copy.getAttribute('tabindex')).toBe('0')
+    expect(document.activeElement).toBe(copy)
+  })
+
+  it('skips disabled items during keyboard movement', () => {
+    render(<TriggerlessContextMenu events={[]} closeEvents={[]} />)
+
+    fireEvent.keyDown(screen.getByRole('menu'), { key: 'ArrowDown' })
+
+    expect(screen.getByRole('menuitem', { name: 'Locked action' }).getAttribute('tabindex')).toBe('-1')
+    expect(screen.getByRole('menuitem', { name: 'Paste' }).getAttribute('tabindex')).toBe('0')
+  })
+
+  it('activates the active item and closes with focus restored', () => {
+    const events: PatternEvent[] = []
+    const closeEvents: PatternEvent[] = []
+    render(<TriggerlessContextMenu events={events} closeEvents={closeEvents} />)
+
+    fireEvent.keyDown(screen.getByRole('menu'), { key: 'ArrowDown' })
+    fireEvent.keyDown(screen.getByRole('menu'), { key: 'Enter' })
+
+    expect(events.some((event) => event.type === 'activate' && event.key === 'paste')).toBe(true)
+    expect(events.some((event) => event.type === 'dismiss' && event.key === 'contextMenu')).toBe(true)
+    expect(closeEvents).toHaveLength(1)
+    expect(screen.queryByRole('menu')).toBeNull()
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Grid cell' }))
+  })
+
+  it('closes on Escape without activating an item', () => {
+    const events: PatternEvent[] = []
+    const closeEvents: PatternEvent[] = []
+    render(<TriggerlessContextMenu events={events} closeEvents={closeEvents} />)
+
+    fireEvent.keyDown(screen.getByRole('menu'), { key: 'Escape' })
+
+    expect(events.some((event) => event.type === 'activate')).toBe(false)
+    expect(events.some((event) => event.type === 'dismiss' && event.key === 'contextMenu')).toBe(true)
+    expect(closeEvents).toHaveLength(1)
+    expect(screen.queryByRole('menu')).toBeNull()
+  })
+
+  it('closes on outside pointer interaction', () => {
+    const events: PatternEvent[] = []
+    const closeEvents: PatternEvent[] = []
+    render(<TriggerlessContextMenu events={events} closeEvents={closeEvents} />)
+
+    fireEvent.pointerDown(screen.getByRole('button', { name: 'Outside' }))
+
+    expect(events.some((event) => event.type === 'dismiss' && event.key === 'contextMenu')).toBe(true)
+    expect(closeEvents).toHaveLength(1)
+    expect(screen.queryByRole('menu')).toBeNull()
+  })
 })
 
 describe('Menu — actionMenuButtonActiveDescendant', () => {
+  it('honors ariaActiveDescendant passed through hook options', () => {
+    render(<OptionsActiveDescendantMenuButton />)
+
+    const menu = screen.getByRole('menu')
+    const items = screen.getAllByRole('menuitem')
+
+    expect(screen.getByTestId('menu-focus-strategy').textContent).toBe('ariaActiveDescendant')
+    expect(menu.getAttribute('tabindex')).toBe('0')
+    expect(menu.getAttribute('aria-activedescendant')).toBe(items[0]!.id)
+    expect(items[0]!.hasAttribute('tabindex')).toBe(false)
+    expect(items[1]!.hasAttribute('tabindex')).toBe(false)
+    expect(document.activeElement).toBe(menu)
+  })
+
   it('open menu sets aria-activedescendant to first item id', () => {
     render(<MenuDemo variant="actionMenuButtonActiveDescendant" />)
     const trigger = screen.getByRole('button', { name: /Actions/ })
