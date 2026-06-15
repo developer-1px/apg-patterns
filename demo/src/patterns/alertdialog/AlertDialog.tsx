@@ -19,8 +19,8 @@ export function AlertDialog({ data, onEvent }: AlertDialogProps) {
           style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)' }}
         >
           <div {...alertDialog.dialogProps}>
-            <h2 id={alertDialog.ids.forKey('title')}>{alertDialog.labelOf('title')}</h2>
-            <p id={alertDialog.ids.forKey('description')}>{alertDialog.labelOf('description')}</p>
+            <h2 {...alertDialog.titleProps}>{alertDialog.labelOf('title')}</h2>
+            <p {...alertDialog.descriptionProps}>{alertDialog.labelOf('description')}</p>
             <div>
               <button {...alertDialog.confirmProps} type="button">
                 {alertDialog.labelOf('confirm')}

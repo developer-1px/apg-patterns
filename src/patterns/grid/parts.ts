@@ -52,6 +52,7 @@ export const gridParts = {
       { attribute: 'aria-rowspan', from: 'state.rowSpanByKey' },
       { attribute: 'aria-colspan', from: 'state.colSpanByKey' },
       { attribute: 'aria-sort', from: 'state.sortByKey' },
+      { attribute: 'aria-selected', from: 'state.selectedKeys' },
     ],
     focus: cellFocus,
     events: [

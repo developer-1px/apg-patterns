@@ -1,14 +1,14 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
-import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
+import type { Key, PatternData, PatternEvent, PatternItem } from '../../schema'
 import type { ReactRadioRenderItem } from './radioRenderItem'
-import { useRadioGroupPattern } from './useRadioGroupPattern'
+import { useRadioGroupPattern, type ReactRadioGroupOptions } from './useRadioGroupPattern'
 
 type DivProps = ComponentPropsWithoutRef<'div'>
 
 export interface RadioGroupProps<TItem extends PatternItem = PatternItem> {
   data: PatternData<TItem>
   onEvent: (event: PatternEvent) => void
-  options?: PatternOptions
+  options?: ReactRadioGroupOptions
   className?: string
   renderRadio?: (item: ReactRadioRenderItem, dataItem: TItem) => ReactNode
 }
