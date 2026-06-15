@@ -404,7 +404,7 @@ describe('action and prop helper coverage from pointer input', () => {
     expect(screen.getByText('0|focus|activate')).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Run menu trigger props' }))
-    expect(screen.getByText('0|menu-button-trigger|expand:trigger|activate:fallback')).toBeTruthy()
+    expect(screen.getByText('0|menu-button-trigger|expand:trigger|expand:trigger')).toBeTruthy()
 
     const input = screen.getByRole('textbox', { name: 'Edit value' })
     fireEvent.change(input, { target: { value: 'draft' } })

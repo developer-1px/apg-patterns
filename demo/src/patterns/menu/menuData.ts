@@ -1,4 +1,4 @@
-import { PatternDataSchema, type PatternData } from '../../../../src/react'
+import { createMenuButtonPatternData, PatternDataSchema, type PatternData } from '../../../../src/react'
 import { variantItemsFrom } from '../../shared/demoPatternTypes'
 
 export type MenuVariantKey =
@@ -73,47 +73,27 @@ const initialNavMenubarData: PatternData = PatternDataSchema.parse({
   refs: { label: 'Mythical University' },
 })
 
-const initialActionMenuData: PatternData = PatternDataSchema.parse({
-  items: {
-    trigger: { label: 'Actions' },
-    menu: { label: 'Actions menu' },
-    actAction: { label: 'Action 1' },
-    actAnother: { label: 'Action 2' },
-    actSomething: { label: 'Action 3' },
-    actLast: { label: 'Last action' },
-  },
-  relations: {
-    rootKeys: ['trigger'],
-    controlsByKey: { trigger: ['menu'] },
-    ownerByKey: { menu: 'trigger' },
-    childrenByKey: {
-      trigger: ['menu'],
-      menu: ['actAction', 'actAnother', 'actSomething', 'actLast'],
-    },
-  },
-  state: { activeKey: 'actAction', expandedKeys: [] },
-})
+const initialActionMenuData = createMenuButtonPatternData(
+  { key: 'trigger', label: 'Actions' },
+  [
+    { key: 'actAction', label: 'Action 1' },
+    { key: 'actAnother', label: 'Action 2' },
+    { key: 'actSomething', label: 'Action 3' },
+    { key: 'actLast', label: 'Last action' },
+  ],
+  { menuKey: 'menu', menuLabel: 'Actions menu' },
+)
 
-const initialLinkMenuData: PatternData = PatternDataSchema.parse({
-  items: {
-    trigger: { label: 'Links' },
-    menu: { label: 'Links menu' },
-    linkHome: { label: 'Home' },
-    linkAbout: { label: 'About' },
-    linkAdmissions: { label: 'Admissions' },
-    linkAcademics: { label: 'Academics' },
-  },
-  relations: {
-    rootKeys: ['trigger'],
-    controlsByKey: { trigger: ['menu'] },
-    ownerByKey: { menu: 'trigger' },
-    childrenByKey: {
-      trigger: ['menu'],
-      menu: ['linkHome', 'linkAbout', 'linkAdmissions', 'linkAcademics'],
-    },
-  },
-  state: { activeKey: 'linkHome', expandedKeys: [] },
-})
+const initialLinkMenuData = createMenuButtonPatternData(
+  { key: 'trigger', label: 'Links' },
+  [
+    { key: 'linkHome', label: 'Home' },
+    { key: 'linkAbout', label: 'About' },
+    { key: 'linkAdmissions', label: 'Admissions' },
+    { key: 'linkAcademics', label: 'Academics' },
+  ],
+  { menuKey: 'menu', menuLabel: 'Links menu' },
+)
 
 export const menuVariants: Record<MenuVariantKey, { label: string; data: PatternData; apgPattern: 'menubar' | 'menu-button'; focusStrategy: 'rovingTabIndex' | 'ariaActiveDescendant' }> = {
   editorMenubar: { label: 'Menubar (Editor)', data: initialEditorMenubarData, apgPattern: 'menubar', focusStrategy: 'rovingTabIndex' },

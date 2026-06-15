@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { listboxDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
+import { listboxDefinition, reducePatternData, useListboxPattern, type PatternData, type PatternEvent, type PatternOptions } from '../../../../src/react'
 
 // jsdom lacks CSS.escape; Listbox uses it inside a useLayoutEffect.
 if (typeof (globalThis as { CSS?: { escape?: (s: string) => string } }).CSS === 'undefined') {
@@ -79,6 +79,26 @@ function ListboxEntryDemo() {
   )
 }
 
+function NativeButtonOptionListbox({ focusStrategy }: { focusStrategy: PatternOptions['focusStrategy'] }) {
+  const data: PatternData = {
+    items: { alpha: { label: 'Alpha' }, beta: { label: 'Beta' } },
+    relations: { rootKeys: ['alpha', 'beta'] },
+    state: { activeKey: 'alpha', selectedKeys: ['alpha'] },
+    refs: { label: 'Native option listbox' },
+  }
+  const listbox = useListboxPattern(data, () => undefined, { focusStrategy })
+
+  return (
+    <div {...listbox.rootProps}>
+      {listbox.renderItems.map((item) => (
+        <button key={item.key} type="button" {...item.optionProps}>
+          {item.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 describe('Listbox demo — basic', () => {
   it('exposes aria-label on root listbox', () => {
     render(<ListboxDemo />)
@@ -127,6 +147,18 @@ describe('Listbox demo — basic', () => {
     const listbox = screen.getByRole('listbox')
     fireEvent.keyDown(listbox, { key: 'c' })
     expect(activeOption()?.textContent).toBe('Cherry')
+  })
+
+  it('aria-activedescendant options remove native button tab stops', () => {
+    render(<NativeButtonOptionListbox focusStrategy="ariaActiveDescendant" />)
+
+    expect(screen.getAllByRole('option').map((option) => option.tabIndex)).toEqual([-1, -1])
+  })
+
+  it('roving options keep active and inactive tab stops', () => {
+    render(<NativeButtonOptionListbox focusStrategy="rovingTabIndex" />)
+
+    expect(screen.getAllByRole('option').map((option) => option.tabIndex)).toEqual([0, -1])
   })
 })
 

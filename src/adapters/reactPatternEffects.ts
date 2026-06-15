@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef } from 'react'
 import type { Key, PatternData, PatternDefinition } from '../schema'
+import { registerKernelBuiltins } from '../kernel/kernelBuiltins'
 import { createPatternRuntime, type CreatePatternRuntimeInput, type PatternRuntime } from '../kernel/patternRuntime'
 import { runPatternEffects } from './reactEffectRunner'
 import { useRovingFocusEventHandler } from './reactRovingFocus'
@@ -22,6 +23,7 @@ export function usePatternEffects({
 }
 
 export function useReactPatternRuntime(input: CreatePatternRuntimeInput): PatternRuntime {
+  registerKernelBuiltins()
   const keyToElementId = input.keyToElementId ?? ((key: Key) => `${key}`)
   const keyboardFocusKeyRef = useRef<Key | null>(null)
   const onEvent = useRovingFocusEventHandler({
