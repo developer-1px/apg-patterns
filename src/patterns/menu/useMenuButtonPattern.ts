@@ -1,4 +1,5 @@
 import { useLayoutEffect } from 'react'
+import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
 import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
 import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'

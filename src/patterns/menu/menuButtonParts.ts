@@ -30,7 +30,11 @@ export const menuButtonParts = {
     role: 'menu',
     aria: [
       { attribute: 'aria-labelledby', from: 'relations.ownerByKey' },
-      { attribute: 'aria-activedescendant', from: 'state.activeKey.elementId' },
+      {
+        attribute: 'aria-activedescendant',
+        from: 'state.activeKey.elementId',
+        when: { kind: 'optionEquals', option: 'focusStrategy', value: 'ariaActiveDescendant' },
+      },
     ],
   },
   menuitem: {
