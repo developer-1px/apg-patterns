@@ -26,10 +26,13 @@ export * from './patterns/spinbutton/definition'
 export * from './patterns/switch/definition'
 export * from './patterns/table/definition'
 export * from './patterns/tabs/definition'
+export * from './patterns/tabs/diagnostics'
 export * from './patterns/toolbar/definition'
 export * from './patterns/tooltip/definition'
 export * from './patterns/treegrid/definition'
 export * from './patterns/treeview/definition'
 export * from './patterns/windowsplitter/definition'
+export * from './patterns/windowsplitter/diagnostics'
+export * from './patterns/windowsplitter/valueReducer'
 
 registerKernelBuiltins()
