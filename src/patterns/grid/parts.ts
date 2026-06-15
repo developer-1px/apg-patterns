@@ -32,6 +32,8 @@ export const gridParts = {
     aria: [
       { attribute: 'aria-rowindex', from: 'state.rowIndexByKey' },
       { attribute: 'aria-colindex', from: 'state.columnIndexByKey' },
+      { attribute: 'aria-rowspan', from: 'state.rowSpanByKey' },
+      { attribute: 'aria-colspan', from: 'state.colSpanByKey' },
       { attribute: 'aria-selected', from: 'state.selectedKeys' },
     ],
     focus: cellFocus,
@@ -47,7 +49,10 @@ export const gridParts = {
     aria: [
       { attribute: 'aria-rowindex', from: 'state.rowIndexByKey' },
       { attribute: 'aria-colindex', from: 'state.columnIndexByKey' },
+      { attribute: 'aria-rowspan', from: 'state.rowSpanByKey' },
+      { attribute: 'aria-colspan', from: 'state.colSpanByKey' },
       { attribute: 'aria-sort', from: 'state.sortByKey' },
+      { attribute: 'aria-selected', from: 'state.selectedKeys' },
     ],
     focus: cellFocus,
     events: [

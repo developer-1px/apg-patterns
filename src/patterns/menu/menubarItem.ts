@@ -2,6 +2,7 @@ import type { KeyboardEvent } from 'react'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent } from '../../schema'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { withMenuItemRoleProps } from './menuItemRole'
 
 export interface ReactMenubarItem {
   key: Key
@@ -24,7 +25,7 @@ export function createMenubarItem({
   rootKeys: readonly Key[]
   onEvent: (event: PatternEvent) => void
 }): ReactMenubarItem {
-  const itemProps = reactProps(runtime.getPartProps('menuitem', key))
+  const itemProps = withMenuItemRoleProps(reactProps(runtime.getPartProps('menuitem', key)), data, key)
   const children = data.relations?.childrenByKey?.[key] ?? []
   return {
     key,

@@ -12,7 +12,7 @@ const alertDialogDemoDefinition = {
     main: 'AlertDialog.tsx',
     entry: 'alertdialog/entry.tsx',
     data: ['alertdialogData.ts'],
-    hooks: ['alertdialog/useAlertDialogPattern.ts'],
+    hooks: ['alertdialog/useAlertDialogPattern.ts', 'alertdialog/useControlledAlertDialogPattern.ts'],
     definition: 'alertdialog/definition.ts',
   },
   view: {
