@@ -38,7 +38,13 @@ export const dialogDefinition: PatternDefinition = PatternDefinitionSchema.super
     {
       kind: 'focus',
       when: { kind: 'isExpanded', key: '$triggerKey' },
-      target: { kind: 'firstFocusable', root: { kind: 'controlledBy', key: '$triggerKey' } },
+      target: {
+        kind: 'firstAvailable',
+        targets: [
+          { kind: 'key', key: '$initialFocusKey' },
+          { kind: 'firstFocusable', root: { kind: 'controlledBy', key: '$triggerKey' } },
+        ],
+      },
       preventScroll: true,
     },
     {

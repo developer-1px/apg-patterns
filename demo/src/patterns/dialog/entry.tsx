@@ -12,7 +12,7 @@ const dialogDemoDefinition = {
     main: 'Dialog.tsx',
     entry: 'dialog/entry.tsx',
     data: ['dialogData.ts'],
-    hooks: ['dialog/useDialogPattern.ts'],
+    hooks: ['dialog/useControlledDialogPattern.ts', 'dialog/useDialogPattern.ts'],
     definition: 'dialog/definition.ts',
   },
   controls: {

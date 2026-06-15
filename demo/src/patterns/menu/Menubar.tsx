@@ -2,7 +2,6 @@ import { useMenubarPattern, type PatternData, type PatternEvent } from '../../..
 import { cx, ds } from '../../shared/designSystem'
 import { Icon } from '../../shared/Icon'
 import type { MenuProps } from './menuTypes'
-import { useMenubarSubmenuKeyboard } from './useMenubarSubmenuKeyboard'
 
 export function Menubar({ data, onEvent }: MenuProps) {
   const menubar = useMenubarPattern(data, onEvent)
@@ -40,11 +39,10 @@ function Submenu({ data, menubar, ownerKey, rootKeys, onEvent }: { data: Pattern
   const radioGroup = children.filter((key) => (data.items[key] as { kind?: string } | undefined)?.kind === 'menuitemradio')
   const activeKey = children.includes(data.state?.activeKey ?? '') ? data.state?.activeKey : children[0]
   const close = () => onEvent({ type: 'expand', key: ownerKey, expanded: false })
-  const onSubmenuKeyDown = useMenubarSubmenuKeyboard({ data, ownerKey, rootKeys, children, activeKey, onEvent, close })
   const popupLeft = `${rootKeys.indexOf(ownerKey) * 4.25}rem`
   const items = menubar.itemsFor(ownerKey)
   return (
-    <ul role="menu" aria-labelledby={menubar.ids.forKey(ownerKey)} style={{ left: popupLeft }} className="absolute top-10 z-10 grid w-56 gap-0.5 rounded-md border border-zinc-200 bg-white p-1 text-sm outline-none dark:border-white/10 dark:bg-zinc-950" onKeyDown={onSubmenuKeyDown}>
+    <ul {...menubar.submenuProps(ownerKey)} style={{ left: popupLeft }} className="absolute top-10 z-10 grid w-56 gap-0.5 rounded-md border border-zinc-200 bg-white p-1 text-sm outline-none dark:border-white/10 dark:bg-zinc-950">
       {items.map((item) => <SubmenuItem key={item.key} item={item} data={data} active={item.key === activeKey} radioGroup={radioGroup} onEvent={onEvent} onClose={close} />)}
     </ul>
   )

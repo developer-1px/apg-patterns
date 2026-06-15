@@ -10,7 +10,7 @@ const menuDemoDefinition = {
   sources: {
     main: 'Menu.tsx',
     entry: 'menu/entry.tsx',
-    hooks: ['menu/useMenuButtonPattern.ts', 'menu/useMenubarPattern.ts'],
+    hooks: ['menu/useMenuButtonPattern.ts', 'menu/useMenubarPattern.ts', 'menu/useMenuPattern.ts'],
     data: ['menuData.ts'],
     definition: 'menu/definition.ts',
   },
