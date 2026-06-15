@@ -7,6 +7,7 @@ import {
 import { PatternDataSchema, PatternEventSchema, PatternOptionsSchema, type Key, type PatternData, type PatternEvent, type PatternOptions } from '../../schema'
 import { tabsDefinition } from './definition'
 import { createElementId } from '../../kernel/domIds'
+import { getTabsDataDiagnostics, type TabsDataDiagnostic } from './diagnostics'
 
 export interface TabsRuntime {
   definition: typeof tabsDefinition
@@ -15,6 +16,7 @@ export interface TabsRuntime {
   tabs: readonly Key[]
   selectedKey: Key | null
   selectedPanelKey: Key | null
+  diagnostics: readonly TabsDataDiagnostic[]
   getTablistProps(): SlotProps
   getTabProps(key: Key): SlotProps
   getTabPanelProps(key: Key): SlotProps
@@ -56,6 +58,7 @@ export function createTabsRuntime(input: CreateTabsRuntimeInput): TabsRuntime {
     },
     selectedKey,
     selectedPanelKey,
+    diagnostics: getTabsDataDiagnostics(data),
     getTablistProps: () => runtime.getPartProps('tablist'),
     getTabProps: (key) => runtime.getPartProps('tab', key),
     getTabPanelProps: (key) => runtime.getPartProps('tabpanel', key),

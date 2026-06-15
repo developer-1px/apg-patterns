@@ -5,6 +5,9 @@ import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schem
 import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { dialogDefinition } from './definition'
 import { usePatternElementId } from '../../adapters/reactDomIds'
+import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
+
+registerKernelBuiltins()
 
 export interface ReactDialogRuntime {
   open: boolean

@@ -17,6 +17,34 @@ import type { PatternData, PatternEvent } from '@interactive-os/aria'
 
 The export lists include runtime values and TypeScript type-only names. The runtime value sections list names that JavaScript consumers can import at runtime.
 
+## Grid Selection Contract
+
+`gridDefinition` keeps range selection opt-in. Set `selectionMode: 'multiple'` in `PatternOptions`, or `state.multiselectable` in grid data, to enable `Shift+Arrow*`, `Shift+Home`, `Shift+End`, `Control+a`, `Control+Space`, and `Shift+Space`. `useGridPattern` returns `state.selectedKeys`, `state.anchorKey`, and `state.extentKey`, and each `ReactGridCell` exposes `state.selected` plus `aria-selected` in `cellProps`.
+
+## Command Surface Helpers
+
+`@interactive-os/aria/react` exports `createToolbarPatternData`, `createRadioGroupPatternData`, `createMenuButtonPatternData`, and `usePatternStateReducer`. Pass `{ state, onStateChange }` to `usePatternStateReducer` when the app owns reducer state. Use these helpers for flat command surfaces where an array of keys, labels, disabled state, checked state, and initial selection fully describes the APG data. Build `PatternData` directly when relations, geometry, custom state records, async state, or domain metadata are part of the public contract.
+
+## WindowSplitter Value Helpers
+
+`@interactive-os/aria`, `@interactive-os/aria/core`, and `@interactive-os/aria/react` export `reduceWindowSplitterValue`, `resolveWindowSplitterStepValue`, and `resolveWindowSplitterValueRange`. Use these to connect `valueStep` and `collapse` events to app-owned splitter state. `min` defaults to `0`, `max` to `100`, `step` to `1`, and `largeStep` to one tenth of a finite range, never below `step`. Helper options may use `max: Infinity`; that disables the upper clamp, defaults `largeStep` to `step * 10`, and makes `max` value-steps keep the current value.
+
+## Autocomplete Listbox Owner
+
+`@interactive-os/aria/react` exports `useAutocompleteListbox` and `dispatchAutocompleteOwnerKeyDown`. They connect an app-owned input or contenteditable editor to existing listbox option props while keeping DOM focus on the editor. Owner props compose `role="combobox"`, popup ARIA, active descendant state, and ArrowUp/ArrowDown/Enter/Tab/Escape dispatch.
+
+## Menubar Submenu Props
+
+`useMenubarPattern` returns `submenuProps(ownerKey)` for open submenu containers. The props include `role="menu"`, `aria-labelledby`, and keyboard handling for ArrowUp/ArrowDown/Home/End, Escape, ArrowLeft, and ArrowRight while reusing existing menubar state events.
+
+## Controlled Dialog Hooks
+
+`useControlledDialogPattern` and `useControlledAlertDialogPattern` support app-state-owned dialogs without a rendered trigger item. They take `{ open, onOpenChange, onEvent?, initialFocusKey?, restoreFocusTo? }`, provide dialog props, trap focus while open, close with `onOpenChange(false)`, and emit `dismiss` when `onEvent` is supplied.
+
+## Menu Item Roles
+
+Menu item props use `item.kind` to choose `menuitem`, `menuitemcheckbox`, or `menuitemradio`. Items present in `state.checkedByKey` without an explicit kind default to `menuitemcheckbox`; checkable roles receive `aria-checked` from `checkedByKey`.
+
 ## Root And Core Exports
 
 <!-- apg-api:root-core:start -->
@@ -37,6 +65,7 @@ breadcrumbDefinition
 buttonDefinition
 carouselDefinition
 checkboxDefinition
+clampWindowSplitterValue
 comboboxDefinition
 createParentByKey
 createPatternRuntime
@@ -69,6 +98,7 @@ FocusModel
 FocusModelSchema
 FocusProjection
 FocusProjectionSchema
+getTabsDataDiagnostics
 gridDefinition
 IdRefListSchema
 isRegisteredAriaSource
@@ -129,12 +159,15 @@ PredicateResolver
 PredicateSchema
 radioGroupDefinition
 reducePatternData
+reduceWindowSplitterValue
 resolveAriaSource
 resolveEventTemplate
 resolveKeyToken
 resolveNavigationTarget
 resolveStateProjection
 resolveVisibleOrder
+resolveWindowSplitterStepValue
+resolveWindowSplitterValueRange
 sliderDefinition
 SlotProps
 spinbuttonDefinition
@@ -147,6 +180,8 @@ StateProjectionResolver
 StateProjectionSchema
 switchDefinition
 tableDefinition
+TabsDataDiagnostic
+TabsDataDiagnosticCode
 tabsDefinition
 toolbarDefinition
 tooltipDefinition
@@ -161,6 +196,10 @@ VisibleOrderKindSchema
 VisibleOrderResolver
 VisibleOrderSchema
 windowSplitterDefinition
+WindowSplitterValueData
+WindowSplitterValueOptions
+WindowSplitterValueRange
+WindowSplitterValueState
 ```
 <!-- apg-api:root-core:end -->
 
@@ -179,6 +218,7 @@ breadcrumbDefinition
 buttonDefinition
 carouselDefinition
 checkboxDefinition
+clampWindowSplitterValue
 comboboxDefinition
 createParentByKey
 createPatternRuntime
@@ -203,6 +243,7 @@ FocusEffectTargetSchema
 FocusEffectTriggerSchema
 FocusModelSchema
 FocusProjectionSchema
+getTabsDataDiagnostics
 gridDefinition
 IdRefListSchema
 isRegisteredAriaSource
@@ -241,12 +282,15 @@ PatternValueStepDirectionSchema
 PredicateSchema
 radioGroupDefinition
 reducePatternData
+reduceWindowSplitterValue
 resolveAriaSource
 resolveEventTemplate
 resolveKeyToken
 resolveNavigationTarget
 resolveStateProjection
 resolveVisibleOrder
+resolveWindowSplitterStepValue
+resolveWindowSplitterValueRange
 sliderDefinition
 spinbuttonDefinition
 StateActionSchema
@@ -277,6 +321,10 @@ Alert
 AlertDialog
 AlertDialogProps
 AlertProps
+AutocompleteListboxActions
+AutocompleteListboxOptions
+AutocompleteListboxState
+AutocompleteOwnerAutocomplete
 Breadcrumb
 BreadcrumbProps
 Button
@@ -287,10 +335,16 @@ Checkbox
 CheckboxProps
 Combobox
 ComboboxProps
+CommandSurfaceDataOptions
+CommandSurfaceItem
+createMenuButtonPatternData
+createRadioGroupPatternData
+createToolbarPatternData
 Dialog
 DialogProps
 Disclosure
 DisclosureProps
+dispatchAutocompleteOwnerKeyDown
 Feed
 FeedProps
 Grid
@@ -301,18 +355,24 @@ Link
 LinkProps
 Listbox
 ListboxProps
+Menu
 Menubar
 MenubarProps
 MenuButton
+MenuButtonCommandSurfaceDataOptions
 MenuButtonProps
+MenuProps
 Meter
 MeterProps
+PatternStateReducerOptions
+PatternStateReducerResult
 RadioGroup
 RadioGroupProps
 ReactAccordionRenderItem
 ReactAccordionRuntime
 ReactAlertDialogRuntime
 ReactAlertRuntime
+ReactAutocompleteListboxRuntime
 ReactBreadcrumbItem
 ReactBreadcrumbRuntime
 ReactButtonRuntime
@@ -322,6 +382,11 @@ ReactCheckboxRenderItem
 ReactCheckboxRuntime
 ReactComboboxOption
 ReactComboboxRuntime
+ReactControlledAlertDialogRuntime
+ReactControlledDialogConfig
+ReactControlledDialogOpenChangeMeta
+ReactControlledDialogRuntime
+ReactDialogFocusTarget
 ReactDialogRuntime
 ReactDisclosureItem
 ReactDisclosureRuntime
@@ -338,6 +403,9 @@ ReactListboxRuntime
 ReactMenubarItem
 ReactMenubarRuntime
 ReactMenuButtonRuntime
+ReactMenuItem
+ReactMenuPatternOptions
+ReactMenuRuntime
 ReactMeterRenderItem
 ReactMeterRuntime
 ReactRadioGroupOptions
@@ -362,6 +430,7 @@ ReactTreegridRuntime
 ReactTreeviewRenderItem
 ReactTreeviewRuntime
 ReactWindowSplitterRuntime
+SelectableCommandSurfaceDataOptions
 Slider
 SliderProps
 Spinbutton
@@ -383,11 +452,14 @@ TreeviewProps
 useAccordionPattern
 useAlertDialogPattern
 useAlertPattern
+useAutocompleteListbox
 useBreadcrumbPattern
 useButtonPattern
 useCarouselPattern
 useCheckboxPattern
 useComboboxPattern
+useControlledAlertDialogPattern
+useControlledDialogPattern
 useDialogPattern
 useDisclosurePattern
 useFeedPattern
@@ -397,7 +469,9 @@ useLinkPattern
 useListboxPattern
 useMenubarPattern
 useMenuButtonPattern
+useMenuPattern
 useMeterPattern
+usePatternStateReducer
 useRadioGroupPattern
 useSliderPattern
 useSpinbuttonPattern
@@ -426,13 +500,18 @@ Button
 Carousel
 Checkbox
 Combobox
+createMenuButtonPatternData
+createRadioGroupPatternData
+createToolbarPatternData
 Dialog
 Disclosure
+dispatchAutocompleteOwnerKeyDown
 Feed
 Grid
 Landmarks
 Link
 Listbox
+Menu
 Menubar
 MenuButton
 Meter
@@ -449,11 +528,14 @@ Treeview
 useAccordionPattern
 useAlertDialogPattern
 useAlertPattern
+useAutocompleteListbox
 useBreadcrumbPattern
 useButtonPattern
 useCarouselPattern
 useCheckboxPattern
 useComboboxPattern
+useControlledAlertDialogPattern
+useControlledDialogPattern
 useDialogPattern
 useDisclosurePattern
 useFeedPattern
@@ -463,7 +545,9 @@ useLinkPattern
 useListboxPattern
 useMenubarPattern
 useMenuButtonPattern
+useMenuPattern
 useMeterPattern
+usePatternStateReducer
 useRadioGroupPattern
 useSliderPattern
 useSpinbuttonPattern

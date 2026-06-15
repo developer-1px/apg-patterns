@@ -48,6 +48,7 @@ export const gridParts = {
       { attribute: 'aria-rowindex', from: 'state.rowIndexByKey' },
       { attribute: 'aria-colindex', from: 'state.columnIndexByKey' },
       { attribute: 'aria-sort', from: 'state.sortByKey' },
+      { attribute: 'aria-selected', from: 'state.selectedKeys' },
     ],
     focus: cellFocus,
     events: [
