@@ -330,11 +330,13 @@ Link
 LinkProps
 Listbox
 ListboxProps
+Menu
 Menubar
 MenubarProps
 MenuButton
 MenuButtonCommandSurfaceDataOptions
 MenuButtonProps
+MenuProps
 Meter
 MeterProps
 PatternStateReducerOptions
@@ -370,6 +372,9 @@ ReactListboxRuntime
 ReactMenubarItem
 ReactMenubarRuntime
 ReactMenuButtonRuntime
+ReactMenuItem
+ReactMenuPatternOptions
+ReactMenuRuntime
 ReactMeterRenderItem
 ReactMeterRuntime
 ReactRadioGroupRuntime
@@ -429,6 +434,7 @@ useLinkPattern
 useListboxPattern
 useMenubarPattern
 useMenuButtonPattern
+useMenuPattern
 useMeterPattern
 usePatternStateReducer
 useRadioGroupPattern
@@ -469,6 +475,7 @@ Grid
 Landmarks
 Link
 Listbox
+Menu
 Menubar
 MenuButton
 Meter
@@ -499,6 +506,7 @@ useLinkPattern
 useListboxPattern
 useMenubarPattern
 useMenuButtonPattern
+useMenuPattern
 useMeterPattern
 usePatternStateReducer
 useRadioGroupPattern
