@@ -29,6 +29,10 @@ The export lists include runtime values and TypeScript type-only names. The runt
 
 `@interactive-os/aria`, `@interactive-os/aria/core`, and `@interactive-os/aria/react` export `reduceWindowSplitterValue`, `resolveWindowSplitterStepValue`, and `resolveWindowSplitterValueRange`. Use these to connect `valueStep` and `collapse` events to app-owned splitter state. `min` defaults to `0`, `max` to `100`, `step` to `1`, and `largeStep` to one tenth of a finite range, never below `step`. Helper options may use `max: Infinity`; that disables the upper clamp, defaults `largeStep` to `step * 10`, and makes `max` value-steps keep the current value.
 
+## Autocomplete Listbox Owner
+
+`@interactive-os/aria/react` exports `useAutocompleteListbox` and `dispatchAutocompleteOwnerKeyDown`. They connect an app-owned input or contenteditable editor to existing listbox option props while keeping DOM focus on the editor. Owner props compose `role="combobox"`, popup ARIA, active descendant state, and ArrowUp/ArrowDown/Enter/Tab/Escape dispatch.
+
 ## Root And Core Exports
 
 <!-- apg-api:root-core:start -->
@@ -305,6 +309,10 @@ Alert
 AlertDialog
 AlertDialogProps
 AlertProps
+AutocompleteListboxActions
+AutocompleteListboxOptions
+AutocompleteListboxState
+AutocompleteOwnerAutocomplete
 Breadcrumb
 BreadcrumbProps
 Button
@@ -324,6 +332,7 @@ Dialog
 DialogProps
 Disclosure
 DisclosureProps
+dispatchAutocompleteOwnerKeyDown
 Feed
 FeedProps
 Grid
@@ -351,6 +360,7 @@ ReactAccordionRenderItem
 ReactAccordionRuntime
 ReactAlertDialogRuntime
 ReactAlertRuntime
+ReactAutocompleteListboxRuntime
 ReactBreadcrumbItem
 ReactBreadcrumbRuntime
 ReactButtonRuntime
@@ -424,6 +434,7 @@ TreeviewProps
 useAccordionPattern
 useAlertDialogPattern
 useAlertPattern
+useAutocompleteListbox
 useBreadcrumbPattern
 useButtonPattern
 useCarouselPattern
@@ -474,6 +485,7 @@ createRadioGroupPatternData
 createToolbarPatternData
 Dialog
 Disclosure
+dispatchAutocompleteOwnerKeyDown
 Feed
 Grid
 Landmarks
@@ -496,6 +508,7 @@ Treeview
 useAccordionPattern
 useAlertDialogPattern
 useAlertPattern
+useAutocompleteListbox
 useBreadcrumbPattern
 useButtonPattern
 useCarouselPattern

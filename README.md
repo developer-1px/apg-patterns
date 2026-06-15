@@ -254,6 +254,22 @@ const nextData = reduceWindowSplitterValue(data, event, {
 
 `min` defaults to `0`, `max` to `100`, and `step` to `1`. `largeStep` defaults to one tenth of a finite range, never smaller than `step`; when helper options use `max: Infinity`, the upper clamp is disabled, `largeStep` defaults to `step * 10`, and a `max` value-step leaves the current value unchanged. `collapse` stores the current value in `state.previousValueByKey`, moves to `min`, then restores the previous value on the next collapse.
 
+`useAutocompleteListbox` connects an app-owned text editor to APG listbox option semantics without moving DOM focus out of the editor:
+
+```ts
+const autocomplete = useAutocompleteListbox(data, onEvent, {
+  open,
+  ownerKey: 'formula-owner',
+  popupId: 'formula-listbox',
+})
+
+const ownerProps = autocomplete.ownerProps
+const popupProps = autocomplete.popupProps
+const options = autocomplete.renderItems
+```
+
+`ownerProps` includes `role="combobox"`, `aria-expanded`, `aria-controls`, `aria-activedescendant`, `aria-autocomplete`, and the owner keydown dispatcher. ArrowUp/ArrowDown emit open/navigation events, Enter and Tab select the active option and close, and Escape emits dismiss and close. `popupProps` and `renderItems[*].optionProps` come from the existing listbox runtime.
+
 ## React Facade Descriptor
 
 `PatternDefinitionSchema` has an optional `react` section. It describes how to derive React hook output from a serializable definition:

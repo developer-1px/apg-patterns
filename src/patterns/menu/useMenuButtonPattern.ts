@@ -1,7 +1,6 @@
 import { useLayoutEffect } from 'react'
 import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
 import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
-import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
@@ -11,27 +10,6 @@ import { createMenuButtonMenuProps } from './menuButtonMenuProps'
 import { createMenuButtonTriggerProps } from './menuButtonTriggerProps'
 import { getMenuButtonRuntimeState } from './menuButtonRuntimeState'
 import { usePatternElementId } from '../../adapters/reactDomIds'
-import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
-
-registerKernelBuiltins()
-
-registerKernelBuiltins()
-
-registerKernelBuiltins()
-
-registerKernelBuiltins()
-
-registerKernelBuiltins()
-
-registerKernelBuiltins()
-
-registerKernelBuiltins()
-
-registerKernelBuiltins()
-
-registerKernelBuiltins()
-
-registerKernelBuiltins()
 
 registerKernelBuiltins()
 

@@ -1,40 +1,16 @@
 import { useRef, type KeyboardEvent } from 'react'
 import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
-import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { menubarDefinition } from './definition'
 import { createMenubarItem, type ReactMenubarItem } from './menubarItem'
 import { usePatternElementId } from '../../adapters/reactDomIds'
-import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
-
-registerKernelBuiltins()
-
-registerKernelBuiltins()
-
-registerKernelBuiltins()
-
-registerKernelBuiltins()
-
-registerKernelBuiltins()
-
-registerKernelBuiltins()
-
-registerKernelBuiltins()
-
-registerKernelBuiltins()
-
-registerKernelBuiltins()
-
-registerKernelBuiltins()
 
 registerKernelBuiltins()
 
 export type { ReactMenubarItem } from './menubarItem'
-
-registerKernelBuiltins()
 
 export interface ReactMenubarRuntime {
   rootProps: ReactPatternProps
