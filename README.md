@@ -224,6 +224,8 @@ Rules:
 - App code should not replace `role`, `tabIndex`, `aria-*`, `ref`, or event handlers except through a documented composition helper.
 - Treeview `toggleButtonProps` owns expansion only and stops propagation.
 
+Grid range selection is opt-in. `useGridPattern(data, onEvent, { selectionMode: 'multiple' })`, or grid data with `state.multiselectable`, enables `Shift+Arrow*`, `Shift+Home`, `Shift+End`, `Control+a`, `Control+Space`, and `Shift+Space`. The hook exposes `state.activeKey`, `state.selectedKeys`, `state.anchorKey`, and `state.extentKey`; grid cells expose `cell.state.selected` and `aria-selected` through `cell.cellProps`.
+
 ## React Facade Descriptor
 
 `PatternDefinitionSchema` has an optional `react` section. It describes how to derive React hook output from a serializable definition:
