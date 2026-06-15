@@ -17,6 +17,7 @@ const allowedReactImports = new Set([
   'useLayoutEffect',
   'useMemo',
   'useRef',
+  'useState',
 ])
 const failures = []
 

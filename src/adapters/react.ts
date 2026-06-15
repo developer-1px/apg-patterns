@@ -1,4 +1,5 @@
 export * from './reactTypes'
+export * from './reactCommandSurface'
 export * from '../patterns/accordion/Accordion'
 export * from '../patterns/accordion/useAccordionPattern'
 export * from '../patterns/alert/Alert'
