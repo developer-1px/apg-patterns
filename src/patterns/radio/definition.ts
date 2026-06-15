@@ -1,8 +1,10 @@
 import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { radioKeyboard } from './keyboard'
+import { registerRadioNavigation } from './navigation'
 import { radioParts } from './parts'
 import { registerRadioStateSources } from './stateSources'
 
+registerRadioNavigation()
 registerRadioStateSources()
 
 export const radioGroupDefinition: PatternDefinition = PatternDefinitionSchema.parse({
@@ -14,10 +16,10 @@ export const radioGroupDefinition: PatternDefinition = PatternDefinitionSchema.p
   navigation: {
     visibleOrder: { kind: 'flat' },
     targets: {
-      next: { kind: 'linear', action: 'next' },
-      previous: { kind: 'linear', action: 'previous' },
-      first: { kind: 'linear', action: 'first' },
-      last: { kind: 'linear', action: 'last' },
+      next: { kind: 'radioLinear', action: 'next' },
+      previous: { kind: 'radioLinear', action: 'previous' },
+      first: { kind: 'radioLinear', action: 'first' },
+      last: { kind: 'radioLinear', action: 'last' },
     },
   },
   keyboard: radioKeyboard,
