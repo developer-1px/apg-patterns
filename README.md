@@ -291,6 +291,8 @@ const submenuItems = menubar.itemsFor('file')
 
 `submenuProps` provides `role="menu"`, `aria-labelledby`, and submenu keydown behavior. ArrowUp/ArrowDown/Home/End move between enabled submenu items, Escape closes the submenu and restores focus to the owner root item, and ArrowLeft/ArrowRight hand off to sibling root menus.
 
+Menu item roles can be specialized through item data. Set `kind: 'menuitemcheckbox'` or `kind: 'menuitemradio'`; items present in `state.checkedByKey` without an explicit kind default to `menuitemcheckbox`. Checkable menu items receive `aria-checked` from `checkedByKey`.
+
 ## React Facade Descriptor
 
 `PatternDefinitionSchema` has an optional `react` section. It describes how to derive React hook output from a serializable definition:

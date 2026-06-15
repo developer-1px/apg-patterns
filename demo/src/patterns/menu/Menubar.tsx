@@ -40,27 +40,28 @@ function Submenu({ data, menubar, ownerKey, rootKeys, onEvent }: { data: Pattern
   const activeKey = children.includes(data.state?.activeKey ?? '') ? data.state?.activeKey : children[0]
   const close = () => onEvent({ type: 'expand', key: ownerKey, expanded: false })
   const popupLeft = `${rootKeys.indexOf(ownerKey) * 4.25}rem`
+  const items = menubar.itemsFor(ownerKey)
   return (
     <ul {...menubar.submenuProps(ownerKey)} style={{ left: popupLeft }} className="absolute top-10 z-10 grid w-56 gap-0.5 rounded-md border border-zinc-200 bg-white p-1 text-sm outline-none dark:border-white/10 dark:bg-zinc-950">
-      {children.map((key) => <SubmenuItem key={key} ids={menubar.ids} itemKey={key} data={data} active={key === activeKey} radioGroup={radioGroup} onEvent={onEvent} onClose={close} />)}
+      {items.map((item) => <SubmenuItem key={item.key} item={item} data={data} active={item.key === activeKey} radioGroup={radioGroup} onEvent={onEvent} onClose={close} />)}
     </ul>
   )
 }
 
-function SubmenuItem({ itemKey, ids, data, active, radioGroup, onEvent, onClose }: { itemKey: string; ids: ReturnType<typeof useMenubarPattern>['ids']; data: PatternData; active: boolean; radioGroup: readonly string[]; onEvent: (event: PatternEvent) => void; onClose: () => void }) {
-  const item = data.items[itemKey] as { label?: string; kind?: string } | undefined
-  const role = item?.kind === 'menuitemcheckbox' ? 'menuitemcheckbox' : item?.kind === 'menuitemradio' ? 'menuitemradio' : 'menuitem'
+function SubmenuItem({ item, data, active, radioGroup, onEvent, onClose }: { item: ReturnType<typeof useMenubarPattern>['rootItems'][number]; data: PatternData; active: boolean; radioGroup: readonly string[]; onEvent: (event: PatternEvent) => void; onClose: () => void }) {
+  const itemKey = item.key
+  const role = item.itemProps.role
   const checked = data.state?.checkedByKey?.[itemKey]
   const disabled = data.state?.disabledKeys?.includes(itemKey)
   const activate = () => {
     if (disabled) return
-    if (item?.kind === 'menuitemcheckbox') return onEvent({ type: 'check', key: itemKey, checked: !checked })
-    if (item?.kind === 'menuitemradio') return radioGroup.forEach((key) => onEvent({ type: 'check', key, checked: key === itemKey }))
+    if (role === 'menuitemcheckbox') return onEvent({ type: 'check', key: itemKey, checked: !checked })
+    if (role === 'menuitemradio') return radioGroup.forEach((key) => onEvent({ type: 'check', key, checked: key === itemKey }))
     onEvent({ type: 'activate', key: itemKey })
     onClose()
   }
   return (
-    <li id={ids.forKey(itemKey)} role={role} tabIndex={active ? 0 : -1} data-active={active ? '' : undefined} aria-disabled={disabled || undefined} aria-checked={role === 'menuitemcheckbox' || role === 'menuitemradio' ? Boolean(checked) : undefined} onFocus={() => onEvent({ type: 'focus', key: itemKey })} onClick={activate} onKeyDown={(event) => {
+    <li {...item.itemProps} tabIndex={active ? 0 : -1} data-active={active ? '' : undefined} onFocus={() => onEvent({ type: 'focus', key: itemKey })} onClick={activate} onKeyDown={(event) => {
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault()
         activate()
@@ -70,7 +71,7 @@ function SubmenuItem({ itemKey, ids, data, active, radioGroup, onEvent, onClose 
         {role === 'menuitemcheckbox' ? <Icon name={checked ? 'square-check' : 'square'} /> : null}
         {role === 'menuitemradio' ? <Icon name="circle-dot" className={checked ? '' : 'opacity-0'} /> : null}
       </span>
-      {item?.label ?? itemKey}
+      {item.label}
     </li>
   )
 }

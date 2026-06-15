@@ -1,9 +1,48 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useRef, useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { menuButtonDefinition, PatternDataSchema, reducePatternData, useMenuPattern, type PatternData, type PatternEvent } from '../../../../src/react'
+import { menuButtonDefinition, PatternDataSchema, reducePatternData, useMenuButtonPattern, useMenuPattern, type PatternData, type PatternEvent } from '../../../../src/react'
 import { MenuDemo } from './testing/MenuTestHost'
 import { useMenubarSubmenuKeyboard } from './useMenubarSubmenuKeyboard'
+
+const checkedMenuButtonData: PatternData = PatternDataSchema.parse({
+  items: {
+    trigger: { label: 'Format' },
+    menu: { label: 'Format menu' },
+    bold: { label: 'Bold' },
+    showGrid: { label: 'Show grid', kind: 'menuitemcheckbox' },
+    alignLeft: { label: 'Align left', kind: 'menuitemradio' },
+    alignCenter: { label: 'Align center', kind: 'menuitemradio' },
+    plain: { label: 'Plain action' },
+  },
+  relations: {
+    rootKeys: ['trigger'],
+    controlsByKey: { trigger: ['menu'] },
+    ownerByKey: { menu: 'trigger' },
+    childrenByKey: {
+      trigger: ['menu'],
+      menu: ['bold', 'showGrid', 'alignLeft', 'alignCenter', 'plain'],
+    },
+  },
+  state: {
+    activeKey: 'bold',
+    expandedKeys: ['trigger'],
+    checkedByKey: { bold: true, showGrid: false, alignLeft: false, alignCenter: true },
+  },
+})
+
+function CheckedMenuButtonRoles() {
+  const menuButton = useMenuButtonPattern(checkedMenuButtonData, () => undefined)
+  if (!menuButton.expanded) return null
+
+  return (
+    <ul {...menuButton.menuProps}>
+      {menuButton.items.map((item) => (
+        <li key={item.key} {...item.itemProps}>{item.label}</li>
+      ))}
+    </ul>
+  )
+}
 
 const triggerlessContextMenuData: PatternData = PatternDataSchema.parse({
   items: {
@@ -441,6 +480,20 @@ describe('Menu — actionMenuButton (rovingTabIndex)', () => {
     expect(screen.queryByRole('menu')).toBeNull()
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
     expect(onEvent.mock.calls.some(([e]) => e.type === 'activate')).toBe(true)
+  })
+
+  it('returns checkbox and radio menu item roles from item metadata and checked state', () => {
+    render(<CheckedMenuButtonRoles />)
+
+    const bold = screen.getByRole('menuitemcheckbox', { name: 'Bold' })
+    const showGrid = screen.getByRole('menuitemcheckbox', { name: 'Show grid' })
+    const alignCenter = screen.getByRole('menuitemradio', { name: 'Align center' })
+    const plain = screen.getByRole('menuitem', { name: 'Plain action' })
+
+    expect(bold.getAttribute('aria-checked')).toBe('true')
+    expect(showGrid.getAttribute('aria-checked')).toBe('false')
+    expect(alignCenter.getAttribute('aria-checked')).toBe('true')
+    expect(plain.getAttribute('aria-checked')).toBeNull()
   })
 
   it('menuitem pointer activation emits one close event', () => {
