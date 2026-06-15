@@ -44,6 +44,50 @@ const selectedKeys = () =>
     .map((element) => element.id.replace('gridcell-', ''))
     .filter(Boolean)
 
+const rowHeaderGridData = {
+  items: {
+    headerRow: { label: 'Header row' },
+    dataRow: { label: 'Data row' },
+    rowHeaderColumn: { label: 'Row header column' },
+    nameColumn: { label: 'Name column' },
+    corner: { label: '' },
+    hName: { label: 'Name', kind: 'columnheader' },
+    rAda: { label: 'Ada', kind: 'rowheader' },
+    cAda: { label: 'Lovelace' },
+  },
+  relations: {
+    rowKeys: ['headerRow', 'dataRow'],
+    columnKeys: ['rowHeaderColumn', 'nameColumn'],
+    cells: [
+      { rowKey: 'headerRow', columnKey: 'rowHeaderColumn', cellKey: 'corner' },
+      { rowKey: 'headerRow', columnKey: 'nameColumn', cellKey: 'hName' },
+      { rowKey: 'dataRow', columnKey: 'rowHeaderColumn', cellKey: 'rAda' },
+      { rowKey: 'dataRow', columnKey: 'nameColumn', cellKey: 'cAda' },
+    ],
+  },
+  state: {
+    activeKey: 'rAda',
+    selectedKeys: ['rAda'],
+    rowIndexByKey: {
+      headerRow: 1,
+      dataRow: 2,
+      corner: 1,
+      hName: 1,
+      rAda: 2,
+      cAda: 2,
+    },
+    columnIndexByKey: {
+      corner: 1,
+      hName: 2,
+      rAda: 1,
+      cAda: 2,
+    },
+    rowCount: 2,
+    colCount: 2,
+  },
+  refs: { label: 'Row header grid' },
+} satisfies PatternData
+
 describe('Grid demo (layoutLinks)', () => {
   it('advertises rowcount, colcount, and aria-readonly', () => {
     render(<GridDemo variant="layoutLinks" />)
@@ -104,6 +148,23 @@ describe('Grid demo (dataTransactions)', () => {
     render(<GridDemo variant="dataTransactions" />)
     expect(cellOf('c22').getAttribute('aria-rowindex')).toBe('3')
     expect(cellOf('c22').getAttribute('aria-colindex')).toBe('2')
+  })
+
+  it('projects rowheader cells from relations.cells with grid indices and selection state', () => {
+    render(<GridDataDemo initialData={rowHeaderGridData} />)
+    const grid = screen.getByRole('grid')
+    const rowHeader = cellOf('rAda')
+
+    expect(rowHeader.getAttribute('role')).toBe('rowheader')
+    expect(rowHeader.getAttribute('aria-rowindex')).toBe('2')
+    expect(rowHeader.getAttribute('aria-colindex')).toBe('1')
+    expect(rowHeader.getAttribute('aria-selected')).toBe('true')
+    expect(rowHeader.getAttribute('tabindex')).toBe('0')
+
+    fireEvent.keyDown(grid, { key: 'ArrowRight' })
+    expect(cellOf('cAda').hasAttribute('data-active')).toBe(true)
+    expect(cellOf('cAda').getAttribute('role')).toBe('gridcell')
+    expect(cellOf('cAda').getAttribute('aria-colindex')).toBe('2')
   })
 
   it('projects row and column spans for merged cells', () => {
