@@ -6,6 +6,7 @@ import {
   resolveWindowSplitterStepValue,
   resolveWindowSplitterValueRange,
   useWindowSplitterPattern,
+  type PatternData,
   type PatternEvent,
   type WindowSplitterValueData,
   type WindowSplitterValueState,
@@ -13,6 +14,19 @@ import {
 import { createWindowSplitterSeparatorProps } from '../../../../src/patterns/windowsplitter/windowSplitterSeparatorProps'
 import { initialWindowSplitterData, reduceWindowSplitterData, windowSplitterOptions } from './windowsplitterData'
 import { WindowSplitterDemo as Demo } from './testing/WindowSplitterTestHost'
+
+const missingControlsData: PatternData = {
+  items: {
+    splitter: { label: 'Resize panes' },
+  },
+  relations: {
+    rootKeys: ['splitter'],
+  },
+  state: {
+    activeKey: 'splitter',
+    valueByKey: { splitter: 50 },
+  },
+}
 
 function ActionsDemo() {
   const [data, setData] = useState(initialWindowSplitterData)
@@ -27,6 +41,18 @@ function ActionsDemo() {
       <button type="button" onClick={() => splitter.actions.focus()}>Focus separator</button>
       <button type="button" onClick={() => splitter.actions.step('increment')}>Increase separator</button>
       <button type="button" onClick={() => splitter.actions.collapse()}>Collapse separator</button>
+    </div>
+  )
+}
+
+function DiagnosticsDemo() {
+  const splitter = useWindowSplitterPattern(missingControlsData, () => undefined, windowSplitterOptions)
+
+  return (
+    <div>
+      <div {...splitter.separatorProps} />
+      <output data-testid="diagnostic-code">{splitter.diagnostics[0]?.code ?? ''}</output>
+      <output data-testid="controlled-key">{splitter.controlledKey ?? 'none'}</output>
     </div>
   )
 }
@@ -195,6 +221,15 @@ describe('WindowSplitter demo', () => {
     expect(sep.getAttribute('aria-valuenow')).toBe('50')
     expect(sep.getAttribute('aria-orientation')).toBe('horizontal')
     expect(sep.getAttribute('aria-controls')).toBe('windowsplitter-primary')
+  })
+
+  it('reports missing controlled pane relations', () => {
+    render(<DiagnosticsDemo />)
+    const sep = screen.getByRole('separator')
+
+    expect(sep.getAttribute('aria-controls')).toBeNull()
+    expect(screen.getByTestId('controlled-key').textContent).toBe('none')
+    expect(screen.getByTestId('diagnostic-code').textContent).toBe('windowsplitter.separator.missingControls')
   })
 
   it('arrow and page keys change aria-valuenow', () => {

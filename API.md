@@ -99,6 +99,7 @@ FocusModelSchema
 FocusProjection
 FocusProjectionSchema
 getTabsDataDiagnostics
+getWindowSplitterDataDiagnostics
 gridDefinition
 IdRefListSchema
 isRegisteredAriaSource
@@ -195,6 +196,8 @@ VisibleOrderKind
 VisibleOrderKindSchema
 VisibleOrderResolver
 VisibleOrderSchema
+WindowSplitterDataDiagnostic
+WindowSplitterDataDiagnosticCode
 windowSplitterDefinition
 WindowSplitterValueData
 WindowSplitterValueOptions
@@ -244,6 +247,7 @@ FocusEffectTriggerSchema
 FocusModelSchema
 FocusProjectionSchema
 getTabsDataDiagnostics
+getWindowSplitterDataDiagnostics
 gridDefinition
 IdRefListSchema
 isRegisteredAriaSource

@@ -32,6 +32,7 @@ export * from './patterns/tooltip/definition'
 export * from './patterns/treegrid/definition'
 export * from './patterns/treeview/definition'
 export * from './patterns/windowsplitter/definition'
+export * from './patterns/windowsplitter/diagnostics'
 export * from './patterns/windowsplitter/valueReducer'
 
 registerKernelBuiltins()
