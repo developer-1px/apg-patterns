@@ -54,6 +54,14 @@ defineAriaSource('state.posInSetByKey', (ctx) => (ctx.key ? ctx.data.state?.posI
 defineAriaSource('state.setSizeByKey', (ctx) => (ctx.key ? ctx.data.state?.setSizeByKey?.[ctx.key] : undefined))
 defineAriaSource('state.rowIndexByKey', (ctx) => (ctx.key ? ctx.data.state?.rowIndexByKey?.[ctx.key] : undefined))
 defineAriaSource('state.columnIndexByKey', (ctx) => (ctx.key ? ctx.data.state?.columnIndexByKey?.[ctx.key] : undefined))
+defineAriaSource('state.rowSpanByKey', (ctx) => {
+  const span = ctx.key ? ctx.data.state?.rowSpanByKey?.[ctx.key] : undefined
+  return span && span > 1 ? span : undefined
+})
+defineAriaSource('state.colSpanByKey', (ctx) => {
+  const span = ctx.key ? ctx.data.state?.colSpanByKey?.[ctx.key] : undefined
+  return span && span > 1 ? span : undefined
+})
 defineAriaSource('state.sortByKey', (ctx) => (ctx.key ? ctx.data.state?.sortByKey?.[ctx.key] : undefined))
 defineAriaSource('state.valueByKey', (ctx) => (ctx.key ? ctx.data.state?.valueByKey?.[ctx.key] : undefined))
 defineAriaSource('state.rangeValueByKey.min', (ctx) => (ctx.key ? ctx.data.state?.rangeValueByKey?.[ctx.key]?.min : undefined))

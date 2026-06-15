@@ -24,6 +24,10 @@ function ValidationHost() {
               columnKeys: ['missing-column'],
               cells: [{ rowKey: 'missing-cell-row', columnKey: 'missing-cell-column', cellKey: 'missing-cell' }],
             },
+            state: {
+              rowSpanByKey: { 'missing-rowspan': 2 },
+              colSpanByKey: { 'missing-colspan': 2 },
+            },
             refs: {
               domainIdByKey: { 'missing-domain': 'domain' },
               pointerByKey: { 'missing-pointer': 'pointer' },
@@ -53,6 +57,8 @@ describe('pattern data validation from pointer input', () => {
     expect(screen.getByText(/relations\.rowKeys\.0/)).toBeTruthy()
     expect(screen.getByText(/relations\.columnKeys\.0/)).toBeTruthy()
     expect(screen.getByText(/relations\.cells\.0\.cellKey/)).toBeTruthy()
+    expect(screen.getByText(/state\.rowSpanByKey\.missing-rowspan/)).toBeTruthy()
+    expect(screen.getByText(/state\.colSpanByKey\.missing-colspan/)).toBeTruthy()
     expect(screen.getByText(/refs\.domainIdByKey\.missing-domain/)).toBeTruthy()
     expect(screen.getByText(/refs\.pointerByKey\.missing-pointer/)).toBeTruthy()
   })

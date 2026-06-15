@@ -1,14 +1,20 @@
 import type { PatternData } from '../../schema'
 
 export function resolveMenuButtonKey(key: string, keys: readonly string[], activeKey: string | null | undefined, data: PatternData) {
-  if (keys.length === 0) return undefined
-  const index = activeKey ? keys.indexOf(activeKey) : -1
-  if (key === 'ArrowDown') return keys[(index + 1 + keys.length) % keys.length]
-  if (key === 'ArrowUp') return keys[(index - 1 + keys.length) % keys.length]
-  if (key === 'Home') return keys[0]
-  if (key === 'End') return keys[keys.length - 1]
-  if (key.length === 1 && /\S/.test(key)) return resolveMenuButtonTypeaheadKey(key, keys, index, data)
+  const availableKeys = getAvailableMenuButtonKeys(keys, data)
+  if (availableKeys.length === 0) return undefined
+  const index = activeKey ? availableKeys.indexOf(activeKey) : -1
+  if (key === 'ArrowDown') return availableKeys[(index + 1 + availableKeys.length) % availableKeys.length]
+  if (key === 'ArrowUp') return availableKeys[(index - 1 + availableKeys.length) % availableKeys.length]
+  if (key === 'Home') return availableKeys[0]
+  if (key === 'End') return availableKeys[availableKeys.length - 1]
+  if (key.length === 1 && /\S/.test(key)) return resolveMenuButtonTypeaheadKey(key, availableKeys, index, data)
   return undefined
+}
+
+function getAvailableMenuButtonKeys(keys: readonly string[], data: PatternData): readonly string[] {
+  const disabledKeys = new Set(data.state?.disabledKeys ?? [])
+  return keys.filter((key) => !disabledKeys.has(key))
 }
 
 function resolveMenuButtonTypeaheadKey(key: string, keys: readonly string[], activeIndex: number, data: PatternData) {

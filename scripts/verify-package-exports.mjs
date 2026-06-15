@@ -85,6 +85,7 @@ const reactAdapterExports = [
   'useButtonPattern',
   'useCarouselPattern',
   'useCheckboxPattern',
+  'useAutocompleteListbox',
   'useComboboxPattern',
   'useDialogPattern',
   'useDisclosurePattern',

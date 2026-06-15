@@ -33,7 +33,7 @@ export function GridInteractionOwnershipDemo() {
       allowsShellKey: isCommandPaletteShortcut,
       restore: () => {
         setActiveOwnerId(gridOwnerId)
-        gridScopeRef.current?.querySelector<HTMLElement>('[role="gridcell"][tabindex="0"], [role="columnheader"][tabindex="0"]')?.focus()
+        gridScopeRef.current?.querySelector<HTMLElement>('[role="gridcell"][tabindex="0"], [role="columnheader"][tabindex="0"], [role="rowheader"][tabindex="0"]')?.focus()
       },
     })
     const unregisterEditor = registry.register(commandPaletteTemporaryControl({

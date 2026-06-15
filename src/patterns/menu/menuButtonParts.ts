@@ -6,22 +6,24 @@ export const menuButtonParts = {
       { attribute: 'aria-expanded', from: 'state.expandedKeys' },
       { attribute: 'aria-controls', from: 'relations.controlsByKey' },
       { attribute: 'aria-label', from: 'items.label' },
+      { attribute: 'aria-disabled', from: 'state.disabledKeys' },
     ],
     focus: {
       tabIndex: { when: { kind: 'always' }, value: 0 },
     },
     state: [
       { name: 'expanded', from: 'state.expandedKeys' },
+      { name: 'disabled', from: 'state.disabledKeys' },
     ],
     events: [
       {
         event: 'click',
-        when: { kind: 'isExpanded', key: '$key' },
+        when: { kind: 'all', predicates: [{ kind: 'isExpanded', key: '$key' }, { kind: 'not', predicate: { kind: 'isDisabled', key: '$key' } }] },
         events: [{ type: 'expand', key: '$key', expanded: false }],
       },
       {
         event: 'click',
-        when: { kind: 'not', predicate: { kind: 'isExpanded', key: '$key' } },
+        when: { kind: 'all', predicates: [{ kind: 'not', predicate: { kind: 'isExpanded', key: '$key' } }, { kind: 'not', predicate: { kind: 'isDisabled', key: '$key' } }] },
         events: [{ type: 'expand', key: '$key', expanded: true }],
       },
     ],
@@ -30,7 +32,11 @@ export const menuButtonParts = {
     role: 'menu',
     aria: [
       { attribute: 'aria-labelledby', from: 'relations.ownerByKey' },
-      { attribute: 'aria-activedescendant', from: 'state.activeKey.elementId' },
+      {
+        attribute: 'aria-activedescendant',
+        from: 'state.activeKey.elementId',
+        when: { kind: 'optionEquals', option: 'focusStrategy', value: 'ariaActiveDescendant' },
+      },
     ],
   },
   menuitem: {
@@ -52,7 +58,7 @@ export const menuButtonParts = {
     ],
     events: [
       { event: 'focus', when: { kind: 'not', predicate: { kind: 'isDisabled', key: '$key' } }, events: [{ type: 'focus', key: '$key' }] },
-      { event: 'click', when: { kind: 'not', predicate: { kind: 'isDisabled', key: '$key' } }, events: [{ type: 'activate', key: '$key' }, { type: 'dismiss' }] },
+      { event: 'click', when: { kind: 'not', predicate: { kind: 'isDisabled', key: '$key' } }, events: [{ type: 'activate', key: '$key' }] },
     ],
   },
 } as const

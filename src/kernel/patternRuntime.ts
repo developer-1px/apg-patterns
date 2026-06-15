@@ -10,6 +10,7 @@ import { resolveRuntimePartProps } from './runtimePartProps'
 import { resolveRuntimeKeyboardBinding, type RuntimeKeyboardBindingResult } from './runtimeKeyboard'
 import { createElementId } from './domIds'
 import { withDefaultReason } from './domEventBindings'
+import { registerKernelBuiltins } from './kernelBuiltins'
 export { defineDomEvent } from './domEventBindings'
 
 export type SlotProps = Record<string, unknown>
@@ -41,6 +42,8 @@ export interface CreatePatternRuntimeInput {
 }
 
 export function createPatternRuntime<TData extends PatternData = PatternData>(input: Omit<CreatePatternRuntimeInput, 'data'> & { data: TData }): PatternRuntime<TData> {
+  registerKernelBuiltins()
+
   // Fail fast at the runtime boundary so schema violations are localized.
   const definition = PatternDefinitionSchema.parse(input.definition)
   const data = PatternDataSchema.parse(input.data) as TData

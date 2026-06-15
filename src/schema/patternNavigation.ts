@@ -8,7 +8,7 @@ export type VisibleOrderKind = z.infer<typeof VisibleOrderKindSchema>
 
 export const NavigationTargetKindSchema = z.enum([
   'linear', 'linearWrap', 'firstChild', 'gridCell', 'gridPage', 'optionLinear',
-  'parentKey', 'radioLinear', 'tabsLinear', 'treegridCell', 'treegridPage', 'treegridParentRowFirstCell',
+  'parentKey', 'radioLinear', 'tabsLinear', 'toolbarLinear', 'treegridCell', 'treegridPage', 'treegridParentRowFirstCell',
   'treegridRow', 'treegridRowPage',
 ])
 export type NavigationTargetKind = z.infer<typeof NavigationTargetKindSchema>
@@ -34,6 +34,7 @@ type NavigationTarget =
   | { kind: 'parentKey'; key: KeyToken }
   | { kind: 'radioLinear'; action: LinearAction }
   | { kind: 'tabsLinear'; action: LinearAction }
+  | { kind: 'toolbarLinear'; action: LinearAction }
   | { kind: 'treegridCell'; action: GridAction }
   | { kind: 'treegridPage'; direction: TreegridPageDirection }
   | { kind: 'treegridParentRowFirstCell' }
@@ -63,6 +64,7 @@ export const NavigationTargetSchema: z.ZodType<NavigationTarget> = z.discriminat
   z.object({ kind: z.literal('parentKey'), key: KeyTokenSchema }).strict(),
   z.object({ kind: z.literal('radioLinear'), action: LinearActionSchema }).strict(),
   z.object({ kind: z.literal('tabsLinear'), action: LinearActionSchema }).strict(),
+  z.object({ kind: z.literal('toolbarLinear'), action: LinearActionSchema }).strict(),
   z.object({ kind: z.literal('treegridCell'), action: GridActionSchema }).strict(),
   z.object({ kind: z.literal('treegridPage'), direction: TreegridPageDirectionSchema }).strict(),
   z.object({ kind: z.literal('treegridParentRowFirstCell') }).strict(),

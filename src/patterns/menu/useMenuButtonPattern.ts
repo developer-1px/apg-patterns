@@ -1,6 +1,6 @@
 import { useLayoutEffect } from 'react'
-import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
 import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
+import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
@@ -13,11 +13,17 @@ import { usePatternElementId } from '../../adapters/reactDomIds'
 
 registerKernelBuiltins()
 
+export interface ReactMenuButtonTriggerState {
+  disabled: boolean
+  expanded: boolean
+}
+
 export interface ReactMenuButtonRuntime {
   triggerKey: Key | null
   menuKey: Key | null
   expanded: boolean
   focusStrategy: 'rovingTabIndex' | 'ariaActiveDescendant'
+  triggerState: ReactMenuButtonTriggerState
   triggerProps: ReactPatternProps
   menuProps: ReactPatternProps
   items: readonly ReactMenuButtonItem[]
@@ -47,8 +53,8 @@ export function useMenuButtonPattern(data: PatternData, onEvent: (event: Pattern
     document.getElementById(runtime.keyToElementId(triggerKey))?.focus({ preventScroll: true })
   }
   const activateActiveItem = () => {
-    const activeKey = data.state?.activeKey && itemKeys.includes(data.state.activeKey) ? data.state.activeKey : itemKeys[0]
-    if (!activeKey) return
+    const activeKey = data.state?.activeKey
+    if (!activeKey || !itemKeys.includes(activeKey) || data.state?.disabledKeys?.includes(activeKey)) return
     onEvent({ type: 'activate', key: activeKey })
     closeAndFocusTrigger()
   }
@@ -58,6 +64,14 @@ export function useMenuButtonPattern(data: PatternData, onEvent: (event: Pattern
     menuKey,
     expanded,
     focusStrategy,
+    get triggerState() {
+      if (!triggerKey) return { disabled: false, expanded: false }
+      const state = runtime.getItemState(triggerKey, 'trigger')
+      return {
+        disabled: Boolean(state.disabled),
+        expanded: Boolean(state.expanded),
+      }
+    },
     get triggerProps() {
       return createMenuButtonTriggerProps({ runtime, data, triggerKey, itemKeys, expanded, onEvent })
     },
