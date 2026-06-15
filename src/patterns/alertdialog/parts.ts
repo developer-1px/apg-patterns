@@ -22,6 +22,8 @@ export const alertDialogParts = {
       { attribute: 'aria-describedby', from: 'relations.controlsByKey' },
     ],
   },
+  title: { role: 'heading' },
+  description: { role: 'paragraph' },
   confirm: {
     role: 'button',
     events: [

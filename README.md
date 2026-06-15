@@ -179,6 +179,8 @@ listbox.ids
 
 `renderItems` is the JSX mapping surface where present. App code should spread the named semantic props onto the named element and own all visual styling.
 
+Triggerless popup menus use `useMenuPattern`. Use `relations.rootKeys[0]` as the menu key and `childrenByKey[menuKey]` as items; React options own `open`, `onClose`, `initialActiveKey`, and `restoreFocusTo`.
+
 ```tsx
 const listbox = useListboxPattern(data, onEvent, options)
 
@@ -223,6 +225,34 @@ Rules:
 - App code may add `className`, `style`, and `data-*` after spreading.
 - App code should not replace `role`, `tabIndex`, `aria-*`, `ref`, or event handlers except through a documented composition helper.
 - Treeview `toggleButtonProps` owns expansion only and stops propagation.
+
+Grid range selection is opt-in. `useGridPattern(data, onEvent, { selectionMode: 'multiple' })`, or grid data with `state.multiselectable`, enables `Shift+Arrow*`, `Shift+Home`, `Shift+End`, `Control+a`, `Control+Space`, and `Shift+Space`. The hook exposes `state.activeKey`, `state.selectedKeys`, `state.anchorKey`, and `state.extentKey`; grid cells expose `cell.state.selected` and `aria-selected` through `cell.cellProps`.
+
+Command surface helpers are available from the React entrypoint for flat, app-defined command arrays:
+
+```ts
+const toolbarData = createToolbarPatternData([
+  { key: 'find', label: 'Find' },
+  { key: 'replace', label: 'Replace' },
+], { label: 'Search actions' })
+const toolbar = usePatternStateReducer(toolbarDefinition, toolbarData)
+const toolbarProps = { data: toolbar.data, onEvent: toolbar.onEvent }
+```
+
+Pass `{ state, onStateChange }` to `usePatternStateReducer` when the app owns the reducer state. Use `createToolbarPatternData`, `createRadioGroupPatternData`, or `createMenuButtonPatternData` when command keys, labels, disabled state, and initial selection are enough. Build `PatternData` directly when the surface owns nested relations, app-specific state records, composite grid/tree geometry, async loading state, or custom item metadata that should stay explicit.
+
+WindowSplitter value helpers are available from the root/core/react entrypoints:
+
+```ts
+const nextData = reduceWindowSplitterValue(data, event, {
+  min: 40,
+  max: 400,
+  step: 8,
+  largeStep: 32,
+})
+```
+
+`min` defaults to `0`, `max` to `100`, and `step` to `1`. `largeStep` defaults to one tenth of a finite range, never smaller than `step`; when helper options use `max: Infinity`, the upper clamp is disabled, `largeStep` defaults to `step * 10`, and a `max` value-step leaves the current value unchanged. `collapse` stores the current value in `state.previousValueByKey`, moves to `min`, then restores the previous value on the next collapse.
 
 `useAutocompleteListbox` connects an app-owned text editor to APG listbox option semantics without moving DOM focus out of the editor:
 

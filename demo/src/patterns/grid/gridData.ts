@@ -5,6 +5,7 @@ type GridCellSpec = {
   key: string
   label: string
   kind?: 'columnheader'
+  sortable?: boolean
   sort?: 'ascending' | 'descending' | 'other'
   value?: string | number | boolean | null
   editable?: boolean
@@ -22,6 +23,7 @@ type GridDemoKeyboardOptions = {
 
 const cell = (key: string, label: string, options: Omit<GridCellSpec, 'key' | 'label'> = {}): GridCellSpec => ({ key, label, ...options })
 const header = (key: string, label: string, sort?: GridCellSpec['sort']): GridCellSpec => cell(key, label, { kind: 'columnheader', sort })
+const sortableHeader = (key: string, label: string, sort?: GridCellSpec['sort']): GridCellSpec => cell(key, label, { kind: 'columnheader', sortable: true, sort })
 const editCell = (key: string, value: string): GridCellSpec => cell(key, value, { value, editable: true })
 const gridDemoKeys = new Set([
   'ArrowRight',
@@ -62,7 +64,7 @@ const gridData = (input: {
         if (spec.sort) sortByKey[spec.key] = spec.sort
         if (spec.value !== undefined) valueByKey[spec.key] = spec.value
         if (spec.editable) editableKeys.push(spec.key)
-        return [spec.key, { label: spec.label, kind: spec.kind }]
+        return [spec.key, { label: spec.label, kind: spec.kind, ...(spec.sortable ? { sortable: true } : {}) }]
       }),
     ),
   ])
@@ -143,7 +145,7 @@ export const gridVariants = {
       activeKey: 'hName',
       readonly: true,
       rows: [
-        [header('hName', 'Name', 'ascending'), header('hDistance', 'Distance'), header('hType', 'Type')],
+        [sortableHeader('hName', 'Name', 'ascending'), sortableHeader('hDistance', 'Distance'), sortableHeader('hType', 'Type')],
         [cell('mercury', 'Mercury'), cell('mercuryDistance', '57.9'), cell('mercuryType', 'Terrestrial')],
         [cell('venus', 'Venus'), cell('venusDistance', '108.2'), cell('venusType', 'Terrestrial')],
         [cell('earth', 'Earth'), cell('earthDistance', '149.6'), cell('earthType', 'Terrestrial')],

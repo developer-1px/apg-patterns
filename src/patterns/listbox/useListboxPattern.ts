@@ -55,7 +55,7 @@ export function useListboxPattern(data: PatternData, onEvent: (event: PatternEve
 }
 
 function createListboxRenderItem(runtime: PatternRuntime, key: Key): ReactListboxRenderItem {
-  const optionProps = reactProps(runtime.getPartProps('option', key))
+  const optionProps = withListboxOptionFocusOwnership(runtime, reactProps(runtime.getPartProps('option', key)))
   return {
     kind: 'option',
     key,
@@ -63,6 +63,14 @@ function createListboxRenderItem(runtime: PatternRuntime, key: Key): ReactListbo
     textValue: getTextValue(runtime.data, key),
     state: getItemState(runtime, key, 'option'),
     optionProps: withListboxOptionClick(runtime, key, optionProps),
+  }
+}
+
+function withListboxOptionFocusOwnership(runtime: PatternRuntime, props: ReactPatternProps): ReactPatternProps {
+  if (runtime.options.focusStrategy !== 'ariaActiveDescendant') return props
+  return {
+    ...props,
+    tabIndex: -1,
   }
 }
 
