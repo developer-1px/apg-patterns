@@ -5,7 +5,7 @@ import { useReactPatternRuntime } from '../../adapters/reactPatternEffects'
 import { toolbarDefinition } from './definition'
 import { createToolbarRenderItem, type ReactToolbarRenderItem } from './toolbarRenderItem'
 import { usePatternElementId } from '../../adapters/reactDomIds'
-export type { ReactToolbarRenderItem } from './toolbarRenderItem'
+export type { ReactToolbarItemKind, ReactToolbarRenderItem } from './toolbarRenderItem'
 
 export interface ReactToolbarRuntime {
   rootProps: ReactPatternProps

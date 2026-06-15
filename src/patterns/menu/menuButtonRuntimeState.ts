@@ -10,8 +10,8 @@ interface MenuButtonRuntimeState {
 }
 
 export function getMenuButtonRuntimeState(data: PatternData, options?: PatternOptions): MenuButtonRuntimeState {
-  const focusStrategy = data.state?.focusStrategy === 'ariaActiveDescendant' ? 'ariaActiveDescendant' : 'rovingTabIndex'
-  const runtimeOptions = { focusStrategy, ...(options ?? {}) } satisfies PatternOptions
+  const focusStrategy = options?.focusStrategy ?? (data.state?.focusStrategy === 'ariaActiveDescendant' ? 'ariaActiveDescendant' : 'rovingTabIndex')
+  const runtimeOptions = { ...(options ?? {}), focusStrategy } satisfies PatternOptions
   const triggerKey = data.relations?.rootKeys?.[0] ?? null
   const menuKey = triggerKey ? data.relations?.controlsByKey?.[triggerKey]?.[0] ?? null : null
   const expanded = triggerKey ? data.state?.expandedKeys?.includes(triggerKey) ?? false : false

@@ -26,7 +26,7 @@ export function useSourceTabs<T extends string>({ label, tabs, value, onChange }
       if (event.type === 'select') selectTab(event.keys[0], keyToTab, onChange)
       if (event.type === 'navigate') onChange(resolveNavigatedTab(tabs, value, event))
     },
-    { orientation: 'horizontal', activationMode: 'automatic' },
+    { orientation: 'horizontal', activationMode: 'automatic', elementIdPrefix: 'tab-' },
   )
 
   return {

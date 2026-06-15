@@ -7,7 +7,7 @@ export interface ReactGridCell {
   key: Key
   label: string
   value: string
-  kind: 'columnheader' | 'gridcell'
+  kind: 'columnheader' | 'gridcell' | 'rowheader'
   state: ReactRenderItemState
   editable: boolean
   editing: boolean
@@ -29,7 +29,7 @@ export function createGridCell(input: {
   cancelEdit(): void
   onEvent(event: PatternEvent): void
 }): ReactGridCell {
-  const part = input.data.items[input.key]?.kind === 'columnheader' ? 'columnheader' : 'gridcell'
+  const part = getGridCellPart(input.data.items[input.key]?.kind)
   const state = input.runtime.getItemState(input.key, part)
   const value = input.valueByKey[input.key] !== undefined ? String(input.valueByKey[input.key]) : input.data.items[input.key]?.label ?? ''
   return {
@@ -54,4 +54,8 @@ export function createGridCell(input: {
       onEvent: input.onEvent,
     }),
   }
+}
+
+function getGridCellPart(kind: unknown): ReactGridCell['kind'] {
+  return kind === 'columnheader' || kind === 'rowheader' ? kind : 'gridcell'
 }

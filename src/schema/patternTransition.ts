@@ -7,7 +7,8 @@ export const StateFieldSchema = z.enum([
   'activeKey', 'anchorKey', 'extentKey', 'selectedKeys', 'expandedKeys', 'disabledKeys',
   'checkedByKey', 'pressedByKey', 'currentByKey', 'invalidByKey', 'requiredKeys',
   'busyKeys', 'modalKeys', 'levelByKey', 'posInSetByKey', 'setSizeByKey',
-  'rowIndexByKey', 'columnIndexByKey', 'sortByKey', 'valueByKey', 'rangeValueByKey',
+  'rowIndexByKey', 'columnIndexByKey', 'rowSpanByKey', 'colSpanByKey',
+  'sortByKey', 'valueByKey', 'rangeValueByKey',
   'typeaheadTextByKey', 'rowCount', 'colCount',
   'editingKey', 'editDraftByKey',
 ])

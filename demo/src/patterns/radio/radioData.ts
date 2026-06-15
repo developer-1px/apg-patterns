@@ -51,9 +51,5 @@ export const radioVariantItems = variantItemsFrom(radioVariants)
 export const initialRadioData = radioVariants.rovingTabindex.data
 
 export function reduceRadioData(data: PatternData, event: PatternEvent): PatternData {
-  const next = reducePatternData(radioGroupDefinition, data, event)
-  if (event.type === 'navigate' && next.state?.activeKey) {
-    return reducePatternData(radioGroupDefinition, next, { type: 'select', keys: [next.state.activeKey], anchorKey: next.state.activeKey, extentKey: next.state.activeKey })
-  }
-  return next
+  return reducePatternData(radioGroupDefinition, data, event)
 }
