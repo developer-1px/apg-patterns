@@ -293,6 +293,8 @@ const submenuItems = menubar.itemsFor('file')
 
 Menu item roles can be specialized through item data. Set `kind: 'menuitemcheckbox'` or `kind: 'menuitemradio'`; items present in `state.checkedByKey` without an explicit kind default to `menuitemcheckbox`. Checkable menu items receive `aria-checked` from `checkedByKey`.
 
+Radio groups select on arrow navigation by default. Use `activationMode: 'manual'` for toolbar-contained radio groups where arrows should move focus only and Space should select.
+
 ## React Facade Descriptor
 
 `PatternDefinitionSchema` has an optional `react` section. It describes how to derive React hook output from a serializable definition:

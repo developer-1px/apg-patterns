@@ -408,6 +408,7 @@ ReactMenuPatternOptions
 ReactMenuRuntime
 ReactMeterRenderItem
 ReactMeterRuntime
+ReactRadioGroupOptions
 ReactRadioGroupRuntime
 ReactRadioRenderItem
 ReactSliderRenderItem
