@@ -11,6 +11,9 @@ import { createMenuButtonMenuProps } from './menuButtonMenuProps'
 import { createMenuButtonTriggerProps } from './menuButtonTriggerProps'
 import { getMenuButtonRuntimeState } from './menuButtonRuntimeState'
 import { usePatternElementId } from '../../adapters/reactDomIds'
+import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
+
+registerKernelBuiltins()
 
 registerKernelBuiltins()
 
