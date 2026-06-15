@@ -14,6 +14,8 @@ export interface ReactAlertDialogRuntime {
   triggerProps: ReactPatternProps
   overlayProps: ReactPatternProps
   dialogProps: ReactPatternProps
+  titleProps: ReactPatternProps
+  descriptionProps: ReactPatternProps
   confirmProps: ReactPatternProps
   cancelProps: ReactPatternProps
   labelOf(key: Key): string
@@ -38,6 +40,12 @@ export function useAlertDialogPattern(data: PatternData, onEvent: (event: Patter
     overlayProps: alertDialogOverlayProps,
     get dialogProps() {
       return createAlertDialogDialogProps({ runtime, data, onEvent, keyToElementId })
+    },
+    get titleProps() {
+      return reactProps(runtime.getPartProps('title', 'title'))
+    },
+    get descriptionProps() {
+      return reactProps(runtime.getPartProps('description', 'description'))
     },
     get confirmProps() {
       return createAlertDialogActionProps({ runtime, part: 'confirm', onEvent })

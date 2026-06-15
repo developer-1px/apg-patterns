@@ -3,6 +3,7 @@ import { useRef, useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import { useControlledDialogPattern, type PatternData, type PatternEvent } from '../../../../src/react'
 import { DialogDemo } from './testing/DialogTestHost'
+import { initialDialogData } from './dialogData'
 
 const triggerlessDialogData: PatternData = {
   items: {
@@ -86,6 +87,14 @@ describe('Dialog demo (modal)', () => {
 
     const firstInput = document.getElementById('dialog-street') as HTMLInputElement
     expect(document.activeElement).toBe(firstInput)
+  })
+
+  it('prefers refs.initialFocusKey when opened', () => {
+    render(<DialogDemo data={{ ...initialDialogData, refs: { ...initialDialogData.refs, initialFocusKey: 'cancel' } }} />)
+    const trigger = screen.getByRole('button', { name: /add delivery address/i })
+    fireEvent.click(trigger)
+
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Cancel' }))
   })
 
   it('closes on Escape and returns focus to trigger', () => {

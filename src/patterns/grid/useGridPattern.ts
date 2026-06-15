@@ -18,6 +18,9 @@ export interface ReactGridRuntime {
   state: {
     editingKey: Key | null
     activeKey: Key | null
+    selectedKeys: readonly Key[]
+    anchorKey: Key | null
+    extentKey: Key | null
   }
   actions: {
     commitEdit(): void
@@ -56,6 +59,9 @@ export function useGridPattern(data: GridData, onEvent: (event: PatternEvent) =>
     state: {
       editingKey,
       activeKey: data.state?.activeKey ?? null,
+      selectedKeys: data.state?.selectedKeys ?? [],
+      anchorKey: data.state?.anchorKey ?? null,
+      extentKey: data.state?.extentKey ?? null,
     },
     actions: { commitEdit, cancelEdit },
     get ids() {

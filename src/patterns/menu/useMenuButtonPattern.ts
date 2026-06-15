@@ -1,4 +1,5 @@
 import { useLayoutEffect } from 'react'
+import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
 import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
@@ -9,6 +10,8 @@ import { createMenuButtonMenuProps } from './menuButtonMenuProps'
 import { createMenuButtonTriggerProps } from './menuButtonTriggerProps'
 import { getMenuButtonRuntimeState } from './menuButtonRuntimeState'
 import { usePatternElementId } from '../../adapters/reactDomIds'
+
+registerKernelBuiltins()
 
 export interface ReactMenuButtonRuntime {
   triggerKey: Key | null
@@ -44,8 +47,8 @@ export function useMenuButtonPattern(data: PatternData, onEvent: (event: Pattern
     document.getElementById(runtime.keyToElementId(triggerKey))?.focus({ preventScroll: true })
   }
   const activateActiveItem = () => {
-    const activeKey = data.state?.activeKey && itemKeys.includes(data.state.activeKey) ? data.state.activeKey : itemKeys[0]
-    if (!activeKey) return
+    const activeKey = data.state?.activeKey
+    if (!activeKey || !itemKeys.includes(activeKey) || data.state?.disabledKeys?.includes(activeKey)) return
     onEvent({ type: 'activate', key: activeKey })
     closeAndFocusTrigger()
   }
