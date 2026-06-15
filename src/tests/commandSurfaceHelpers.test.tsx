@@ -141,11 +141,12 @@ describe('command surface helpers', () => {
     render(<SearchActionsToolbarDogfood />)
 
     expect(screen.getByRole('toolbar', { name: 'Search actions' })).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Find' }).getAttribute('aria-pressed')).toBe('true')
+    expect(screen.getByRole('button', { name: 'Find' }).getAttribute('aria-pressed')).toBeNull()
+    expect(screen.getByTestId('toolbar-selected').textContent).toBe('find')
 
     fireEvent.click(screen.getByRole('button', { name: 'Replace' }))
 
-    expect(screen.getByRole('button', { name: 'Replace' }).getAttribute('aria-pressed')).toBe('true')
+    expect(screen.getByRole('button', { name: 'Replace' }).getAttribute('aria-pressed')).toBeNull()
     expect(screen.getByTestId('toolbar-selected').textContent).toBe('replace')
   })
 
@@ -191,7 +192,7 @@ describe('command surface helpers', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Italic' }))
 
-    expect(screen.getByRole('button', { name: 'Italic' }).getAttribute('aria-pressed')).toBe('true')
+    expect(screen.getByRole('button', { name: 'Italic' }).getAttribute('aria-pressed')).toBeNull()
     expect(screen.getByTestId('controlled-selected').textContent).toBe('italic')
   })
 
