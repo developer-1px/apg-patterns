@@ -25,6 +25,10 @@ The export lists include runtime values and TypeScript type-only names. The runt
 
 `@interactive-os/aria/react` exports `createToolbarPatternData`, `createRadioGroupPatternData`, `createMenuButtonPatternData`, and `usePatternStateReducer`. Pass `{ state, onStateChange }` to `usePatternStateReducer` when the app owns reducer state. Use these helpers for flat command surfaces where an array of keys, labels, disabled state, checked state, and initial selection fully describes the APG data. Build `PatternData` directly when relations, geometry, custom state records, async state, or domain metadata are part of the public contract.
 
+## WindowSplitter Value Helpers
+
+`@interactive-os/aria`, `@interactive-os/aria/core`, and `@interactive-os/aria/react` export `reduceWindowSplitterValue`, `resolveWindowSplitterStepValue`, and `resolveWindowSplitterValueRange`. Use these to connect `valueStep` and `collapse` events to app-owned splitter state. `min` defaults to `0`, `max` to `100`, `step` to `1`, and `largeStep` to one tenth of a finite range, never below `step`. Helper options may use `max: Infinity`; that disables the upper clamp, defaults `largeStep` to `step * 10`, and makes `max` value-steps keep the current value.
+
 ## Root And Core Exports
 
 <!-- apg-api:root-core:start -->
@@ -45,6 +49,7 @@ breadcrumbDefinition
 buttonDefinition
 carouselDefinition
 checkboxDefinition
+clampWindowSplitterValue
 comboboxDefinition
 createParentByKey
 createPatternRuntime
@@ -137,12 +142,15 @@ PredicateResolver
 PredicateSchema
 radioGroupDefinition
 reducePatternData
+reduceWindowSplitterValue
 resolveAriaSource
 resolveEventTemplate
 resolveKeyToken
 resolveNavigationTarget
 resolveStateProjection
 resolveVisibleOrder
+resolveWindowSplitterStepValue
+resolveWindowSplitterValueRange
 sliderDefinition
 SlotProps
 spinbuttonDefinition
@@ -169,6 +177,10 @@ VisibleOrderKindSchema
 VisibleOrderResolver
 VisibleOrderSchema
 windowSplitterDefinition
+WindowSplitterValueData
+WindowSplitterValueOptions
+WindowSplitterValueRange
+WindowSplitterValueState
 ```
 <!-- apg-api:root-core:end -->
 
@@ -187,6 +199,7 @@ breadcrumbDefinition
 buttonDefinition
 carouselDefinition
 checkboxDefinition
+clampWindowSplitterValue
 comboboxDefinition
 createParentByKey
 createPatternRuntime
@@ -249,12 +262,15 @@ PatternValueStepDirectionSchema
 PredicateSchema
 radioGroupDefinition
 reducePatternData
+reduceWindowSplitterValue
 resolveAriaSource
 resolveEventTemplate
 resolveKeyToken
 resolveNavigationTarget
 resolveStateProjection
 resolveVisibleOrder
+resolveWindowSplitterStepValue
+resolveWindowSplitterValueRange
 sliderDefinition
 spinbuttonDefinition
 StateActionSchema
