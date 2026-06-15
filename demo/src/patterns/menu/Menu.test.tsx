@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { useRef, useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { menuButtonDefinition, PatternDataSchema, reducePatternData, useMenuButtonPattern, useMenuPattern, type PatternData, type PatternEvent } from '../../../../src/react'
+import { Menu } from './Menu'
 import { menuVariants } from './menuData'
 import { MenuDemo } from './testing/MenuTestHost'
 import { useMenubarSubmenuKeyboard } from './useMenubarSubmenuKeyboard'
@@ -126,6 +127,53 @@ function TriggerlessContextMenu({ events, closeEvents }: { events: PatternEvent[
       ) : null}
     </div>
   )
+}
+
+const disabledMenuButtonData = PatternDataSchema.parse({
+  items: {
+    trigger: { label: 'Actions' },
+    menu: { label: 'Actions menu' },
+    disabledAction: { label: 'Disabled action' },
+    enabledAction: { label: 'Enabled action' },
+  },
+  relations: {
+    rootKeys: ['trigger'],
+    controlsByKey: { trigger: ['menu'] },
+    ownerByKey: { menu: 'trigger' },
+    childrenByKey: {
+      trigger: ['menu'],
+      menu: ['disabledAction', 'enabledAction'],
+    },
+  },
+  state: {
+    activeKey: 'disabledAction',
+    expandedKeys: [],
+    disabledKeys: ['disabledAction'],
+  },
+})
+
+function MenuButtonDataDemo({ initialData, onEvent }: { initialData: PatternData; onEvent?: (event: PatternEvent) => void }) {
+  const [data, setData] = useState<PatternData>(withMenuButtonDemoState(initialData))
+  return (
+    <Menu
+      data={data}
+      onEvent={(event) => {
+        onEvent?.(event)
+        setData((current) => withMenuButtonDemoState(reducePatternData(menuButtonDefinition, current, event)))
+      }}
+    />
+  )
+}
+
+function withMenuButtonDemoState(data: PatternData): PatternData {
+  return {
+    ...data,
+    state: {
+      ...data.state,
+      apgPattern: 'menu-button',
+      focusStrategy: 'rovingTabIndex',
+    },
+  }
 }
 
 function MenubarSubmenuKeyboardEdges() {
@@ -510,6 +558,42 @@ describe('Menu — actionMenuButton (rovingTabIndex)', () => {
     expect(screen.queryByRole('menu')).toBeNull()
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
     expect(onEvent.mock.calls.some(([e]) => e.type === 'activate')).toBe(true)
+  })
+
+  it('disabled menuitem click does not activate or close the menu', () => {
+    const onEvent = vi.fn()
+    render(<MenuButtonDataDemo initialData={disabledMenuButtonData} onEvent={onEvent} />)
+    const trigger = screen.getByRole('button', { name: /Actions/ })
+
+    fireEvent.click(trigger)
+    onEvent.mockClear()
+    const disabledItem = screen.getByRole('menuitem', { name: 'Disabled action' })
+    fireEvent.click(disabledItem)
+
+    expect(disabledItem.getAttribute('aria-disabled')).toBe('true')
+    expect(screen.getByRole('menu')).toBeTruthy()
+    expect(trigger.getAttribute('aria-expanded')).toBe('true')
+    expect(onEvent).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    ['Enter', 'Enter'],
+    ['Space', ' '],
+  ])('disabled active menuitem %s does not activate or close the menu', (_label, key) => {
+    const onEvent = vi.fn()
+    render(<MenuButtonDataDemo initialData={disabledMenuButtonData} onEvent={onEvent} />)
+    const trigger = screen.getByRole('button', { name: /Actions/ })
+
+    fireEvent.keyDown(trigger, { key: 'Enter' })
+    const menu = screen.getByRole('menu')
+    expect(screen.getByRole('menuitem', { name: 'Disabled action' }).getAttribute('tabindex')).toBe('0')
+
+    onEvent.mockClear()
+    fireEvent.keyDown(menu, { key })
+
+    expect(screen.getByRole('menu')).toBeTruthy()
+    expect(trigger.getAttribute('aria-expanded')).toBe('true')
+    expect(onEvent).not.toHaveBeenCalled()
   })
 
   it('returns checkbox and radio menu item roles from item metadata and checked state', () => {

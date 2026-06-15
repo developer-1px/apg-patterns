@@ -38,6 +38,11 @@ export function createMenuButtonItem({
       id: runtime.keyToElementId(key),
       onFocus: () => onEvent({ type: 'focus', key }),
       onClick: (event: MouseEvent<HTMLElement>) => {
+        if (state.disabled) {
+          event.preventDefault()
+          event.stopPropagation()
+          return
+        }
         itemProps.onClick?.(event)
         closeAndFocusTrigger()
       },
