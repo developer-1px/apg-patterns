@@ -5,10 +5,14 @@ import { PredicateSchema, type Predicate } from './patternPredicate'
 
 type KeyToken = string
 
-export type ElementTarget =
+type DirectElementTarget =
   | { kind: 'key'; key: KeyToken }
   | { kind: 'controlledBy'; key: KeyToken }
   | { kind: 'firstFocusable'; root: { kind: 'controlledBy'; key: KeyToken } }
+
+export type ElementTarget =
+  | DirectElementTarget
+  | { kind: 'firstAvailable'; targets: readonly DirectElementTarget[] }
 
 interface FocusEffectTrigger {
   state: 'activeKey'
@@ -30,10 +34,19 @@ export type EffectDefinition =
   | { kind: 'restoreFocus'; when: Predicate; target: ElementTarget; preventScroll?: boolean }
   | { kind: 'trapFocus'; when: Predicate; root: ElementTarget }
 
+const KeyElementTargetSchema = z.object({ kind: z.literal('key'), key: KeyTokenSchema }).strict()
+const ControlledByElementTargetSchema = z.object({ kind: z.literal('controlledBy'), key: KeyTokenSchema }).strict()
+const FirstFocusableElementTargetSchema = z.object({ kind: z.literal('firstFocusable'), root: z.object({ kind: z.literal('controlledBy'), key: KeyTokenSchema }).strict() }).strict()
+
+const DirectElementTargetUnionSchema = z.discriminatedUnion('kind', [
+  KeyElementTargetSchema,
+  ControlledByElementTargetSchema,
+  FirstFocusableElementTargetSchema,
+])
+
 const ElementTargetUnionSchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('key'), key: KeyTokenSchema }).strict(),
-  z.object({ kind: z.literal('controlledBy'), key: KeyTokenSchema }).strict(),
-  z.object({ kind: z.literal('firstFocusable'), root: z.object({ kind: z.literal('controlledBy'), key: KeyTokenSchema }).strict() }).strict(),
+  ...DirectElementTargetUnionSchema.options,
+  z.object({ kind: z.literal('firstAvailable'), targets: z.array(DirectElementTargetUnionSchema).min(1).readonly() }).strict(),
 ])
 
 export const ElementTargetSchema: z.ZodType<ElementTarget> = ElementTargetUnionSchema

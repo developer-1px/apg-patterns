@@ -30,7 +30,11 @@ export const menuButtonParts = {
     role: 'menu',
     aria: [
       { attribute: 'aria-labelledby', from: 'relations.ownerByKey' },
-      { attribute: 'aria-activedescendant', from: 'state.activeKey.elementId' },
+      {
+        attribute: 'aria-activedescendant',
+        from: 'state.activeKey.elementId',
+        when: { kind: 'optionEquals', option: 'focusStrategy', value: 'ariaActiveDescendant' },
+      },
     ],
   },
   menuitem: {
@@ -52,7 +56,7 @@ export const menuButtonParts = {
     ],
     events: [
       { event: 'focus', when: { kind: 'not', predicate: { kind: 'isDisabled', key: '$key' } }, events: [{ type: 'focus', key: '$key' }] },
-      { event: 'click', when: { kind: 'not', predicate: { kind: 'isDisabled', key: '$key' } }, events: [{ type: 'activate', key: '$key' }, { type: 'dismiss' }] },
+      { event: 'click', when: { kind: 'not', predicate: { kind: 'isDisabled', key: '$key' } }, events: [{ type: 'activate', key: '$key' }] },
     ],
   },
 } as const

@@ -54,7 +54,7 @@ export function moveApgLinear<T>(
   if (action === 'last') return lastAvailable(items, options)
 
   const index = items.indexOf(current)
-  if (index < 0) return null
+  if (index < 0) return action === 'next' ? firstAvailable(items, options) : lastAvailable(items, options)
 
   const delta = action === 'next' ? 1 : -1
   const maxSteps = options.wrap ? items.length - 1 : items.length

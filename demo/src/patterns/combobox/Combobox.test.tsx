@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { comboboxDefinition, reducePatternData, type PatternData, type PatternEvent } from '../../../../src/react'
+import { comboboxDefinition, listboxDefinition, reducePatternData, useAutocompleteListbox, type PatternData, type PatternEvent } from '../../../../src/react'
 import { Combobox } from './Combobox'
 import { buildComboboxData, FRUITS, reduceComboboxData } from './comboboxData'
 import { ComboboxDemo } from './testing/ComboboxTestHost'
@@ -37,6 +37,166 @@ function ComboboxReducerEdgesDemo() {
     </div>
   )
 }
+
+const AUTOCOMPLETE_OWNER_KEY = 'formula-owner'
+const FORMULA_ITEMS = [
+  { key: 'sum', label: 'SUM' },
+  { key: 'average', label: 'AVERAGE' },
+  { key: 'count', label: 'COUNT' },
+] as const
+
+function buildFormulaAutocompleteData(
+  query = '=',
+  state: PatternData['state'] = { activeKey: null, expandedKeys: [], selectedKeys: [] },
+): PatternData {
+  const needle = query.replace(/^=/, '').trim().toLowerCase()
+  const visibleItems = FORMULA_ITEMS.filter((item) => !needle || item.label.toLowerCase().startsWith(needle))
+
+  return {
+    items: {
+      [AUTOCOMPLETE_OWNER_KEY]: { label: 'Formula' },
+      ...Object.fromEntries(visibleItems.map((item) => [item.key, { label: item.label }])),
+    },
+    relations: { rootKeys: visibleItems.map((item) => item.key) },
+    refs: { label: 'Formula suggestions' },
+    state,
+  }
+}
+
+function formulaLabel(key: string | null | undefined): string {
+  return FORMULA_ITEMS.find((item) => item.key === key)?.label ?? ''
+}
+
+function FormulaInputAutocompleteDemo() {
+  const [query, setQuery] = useState('=')
+  const [data, setData] = useState<PatternData>(() => buildFormulaAutocompleteData())
+  const [committed, setCommitted] = useState('')
+  const open = Boolean(data.state?.expandedKeys?.includes(AUTOCOMPLETE_OWNER_KEY))
+  const autocomplete = useAutocompleteListbox<HTMLInputElement>(
+    data,
+    (event) => {
+      if (event.type === 'select') setCommitted(formulaLabel(event.keys[0]))
+      setData((current) => reducePatternData(listboxDefinition, current, event))
+    },
+    {
+      elementIdPrefix: 'formula-option-',
+      label: 'Formula',
+      open,
+      ownerKey: AUTOCOMPLETE_OWNER_KEY,
+      popupId: 'formula-listbox',
+    },
+  )
+
+  return (
+    <div>
+      <input
+        {...autocomplete.ownerProps}
+        value={query}
+        onChange={(event) => {
+          const nextQuery = event.currentTarget.value
+          setQuery(nextQuery)
+          setData(buildFormulaAutocompleteData(nextQuery, {
+            activeKey: null,
+            expandedKeys: [AUTOCOMPLETE_OWNER_KEY],
+            selectedKeys: [],
+          }))
+        }}
+      />
+      {open ? (
+        <ul {...autocomplete.popupProps}>
+          {autocomplete.renderItems.map((item) => (
+            <li key={item.key} {...item.optionProps}>{item.label}</li>
+          ))}
+        </ul>
+      ) : null}
+      <output data-testid="formula-committed">{committed}</output>
+    </div>
+  )
+}
+
+function ContenteditableAutocompleteDemo() {
+  const [data, setData] = useState<PatternData>(() => buildFormulaAutocompleteData('=s'))
+  const [dismissed, setDismissed] = useState('false')
+  const open = Boolean(data.state?.expandedKeys?.includes(AUTOCOMPLETE_OWNER_KEY))
+  const autocomplete = useAutocompleteListbox<HTMLDivElement>(
+    data,
+    (event) => {
+      if (event.type === 'dismiss') setDismissed('true')
+      setData((current) => reducePatternData(listboxDefinition, current, event))
+    },
+    {
+      elementIdPrefix: 'cell-option-',
+      label: 'Cell formula',
+      open,
+      ownerKey: AUTOCOMPLETE_OWNER_KEY,
+      popupId: 'cell-listbox',
+    },
+  )
+
+  return (
+    <div>
+      <div
+        {...autocomplete.ownerProps}
+        contentEditable
+        data-testid="cell-editor"
+        suppressContentEditableWarning
+        tabIndex={0}
+      >
+        =s
+      </div>
+      {open ? (
+        <div {...autocomplete.popupProps}>
+          {autocomplete.renderItems.map((item) => (
+            <div key={item.key} {...item.optionProps}>{item.label}</div>
+          ))}
+        </div>
+      ) : null}
+      <output data-testid="cell-dismissed">{dismissed}</output>
+    </div>
+  )
+}
+
+describe('Autocomplete listbox owner adapter', () => {
+  it('keeps input focus while active descendant tracks popup options', () => {
+    render(<FormulaInputAutocompleteDemo />)
+    const input = screen.getByRole('combobox', { name: 'Formula' }) as HTMLInputElement
+    input.focus()
+
+    fireEvent.keyDown(input, { key: 'ArrowDown', code: 'ArrowDown' })
+    expect(document.activeElement).toBe(input)
+    expect(input.getAttribute('aria-expanded')).toBe('true')
+    expect(input.getAttribute('aria-controls')).toBe('formula-listbox')
+
+    const options = screen.getAllByRole('option')
+    expect(input.getAttribute('aria-activedescendant')).toBe(options[0].getAttribute('id'))
+    expect(screen.getByRole('listbox').getAttribute('aria-activedescendant')).toBeNull()
+
+    fireEvent.keyDown(input, { key: 'ArrowDown', code: 'ArrowDown' })
+    expect(input.getAttribute('aria-activedescendant')).toBe(options[1].getAttribute('id'))
+    expect(fireEvent.keyDown(input, { key: 'Tab', code: 'Tab' })).toBe(true)
+    expect(screen.getByTestId('formula-committed').textContent).toBe('AVERAGE')
+    expect(input.getAttribute('aria-expanded')).toBe('false')
+  })
+
+  it('keeps contenteditable focus and maps Escape to dismiss and close', () => {
+    render(<ContenteditableAutocompleteDemo />)
+    const editor = screen.getByTestId('cell-editor')
+    editor.focus()
+
+    fireEvent.keyDown(editor, { key: 'ArrowDown', code: 'ArrowDown' })
+    const option = screen.getByRole('option', { name: 'SUM' })
+    expect(document.activeElement).toBe(editor)
+    expect(editor.getAttribute('role')).toBe('combobox')
+    expect(editor.getAttribute('aria-controls')).toBe('cell-listbox')
+    expect(editor.getAttribute('aria-activedescendant')).toBe(option.getAttribute('id'))
+
+    fireEvent.keyDown(editor, { key: 'Escape', code: 'Escape' })
+    expect(document.activeElement).toBe(editor)
+    expect(editor.getAttribute('aria-expanded')).toBe('false')
+    expect(screen.queryByRole('option')).toBeNull()
+    expect(screen.getByTestId('cell-dismissed').textContent).toBe('true')
+  })
+})
 
 describe('Combobox demo — selectOnly', () => {
   it('ArrowDown opens popup and activates first option', () => {
