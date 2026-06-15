@@ -421,6 +421,38 @@ describe('Menu — actionMenuButton (rovingTabIndex)', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
     expect(onEvent.mock.calls.some(([e]) => e.type === 'activate')).toBe(true)
   })
+
+  it('menuitem pointer activation emits one close event', () => {
+    const onEvent = vi.fn()
+    render(<MenuDemo variant="actionMenuButton" onEvent={onEvent} />)
+    const trigger = screen.getByRole('button', { name: /Actions/ })
+
+    fireEvent.keyDown(trigger, { key: 'Enter' })
+    onEvent.mockClear()
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Action 2' }))
+
+    expect(onEvent.mock.calls.map(([event]) => event)).toEqual([
+      { type: 'activate', key: 'actAnother' },
+      { type: 'expand', key: 'trigger', expanded: false },
+    ])
+    expect(onEvent.mock.calls.some(([event]) => event.type === 'dismiss')).toBe(false)
+  })
+
+  it('menuitem keyboard activation matches pointer close sequence', () => {
+    const onEvent = vi.fn()
+    render(<MenuDemo variant="actionMenuButton" onEvent={onEvent} />)
+    const trigger = screen.getByRole('button', { name: /Actions/ })
+
+    fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+    onEvent.mockClear()
+    fireEvent.keyDown(screen.getByRole('menu'), { key: 'Enter' })
+
+    expect(onEvent.mock.calls.map(([event]) => event)).toEqual([
+      { type: 'activate', key: 'actAction' },
+      { type: 'expand', key: 'trigger', expanded: false },
+    ])
+    expect(onEvent.mock.calls.some(([event]) => event.type === 'dismiss')).toBe(false)
+  })
 })
 
 describe('Menu — triggerless context menu', () => {

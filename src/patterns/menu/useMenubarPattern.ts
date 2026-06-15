@@ -14,6 +14,8 @@ registerKernelBuiltins()
 
 registerKernelBuiltins()
 
+registerKernelBuiltins()
+
 export type { ReactMenubarItem } from './menubarItem'
 
 registerKernelBuiltins()
