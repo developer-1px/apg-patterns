@@ -106,6 +106,27 @@ describe('Grid demo (dataTransactions)', () => {
     expect(cellOf('c22').getAttribute('aria-colindex')).toBe('2')
   })
 
+  it('projects row and column spans for merged cells', () => {
+    render(
+      <GridDataDemo
+        initialData={{
+          ...gridVariants.dataTransactions.data,
+          state: {
+            ...gridVariants.dataTransactions.data.state,
+            rowSpanByKey: { c11: 2, hDate: 1 },
+            colSpanByKey: { c11: 3, hDate: 2, c12: 1 },
+          },
+        }}
+      />,
+    )
+
+    expect(cellOf('c11').getAttribute('aria-rowspan')).toBe('2')
+    expect(cellOf('c11').getAttribute('aria-colspan')).toBe('3')
+    expect(cellOf('hDate').getAttribute('aria-colspan')).toBe('2')
+    expect(cellOf('hDate').hasAttribute('aria-rowspan')).toBe(false)
+    expect(cellOf('c12').hasAttribute('aria-colspan')).toBe(false)
+  })
+
   it('does not opt single-select grids into Shift+Arrow range selection', () => {
     render(<GridDemo variant="dataTransactions" />)
     const grid = screen.getByRole('grid')
