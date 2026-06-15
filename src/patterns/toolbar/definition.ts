@@ -1,5 +1,6 @@
 import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { toolbarKeyboard } from './keyboard'
+import { registerToolbarNavigation } from './navigation'
 import { toolbarParts } from './parts'
 
 // APG Toolbar pattern
@@ -10,6 +11,8 @@ import { toolbarParts } from './parts'
 // toolbar (roving tabindex). Arrow keys move focus among siblings; Home/End
 // jump to first/last. Horizontal orientation uses ArrowLeft/Right; vertical
 // uses ArrowUp/Down.
+registerToolbarNavigation()
+
 export const toolbarDefinition: PatternDefinition = PatternDefinitionSchema.superRefine((value, ctx) => {
   if (value.apgPattern !== 'toolbar') ctx.addIssue({ code: 'custom', path: ['apgPattern'], message: 'expected "toolbar"' })
   if (value.rootRole !== 'toolbar') ctx.addIssue({ code: 'custom', path: ['rootRole'], message: 'expected "toolbar"' })
@@ -25,10 +28,10 @@ export const toolbarDefinition: PatternDefinition = PatternDefinitionSchema.supe
   navigation: {
     visibleOrder: { kind: 'flat' },
     targets: {
-      next: { kind: 'linear', action: 'next' },
-      previous: { kind: 'linear', action: 'previous' },
-      first: { kind: 'linear', action: 'first' },
-      last: { kind: 'linear', action: 'last' },
+      next: { kind: 'toolbarLinear', action: 'next' },
+      previous: { kind: 'toolbarLinear', action: 'previous' },
+      first: { kind: 'toolbarLinear', action: 'first' },
+      last: { kind: 'toolbarLinear', action: 'last' },
     },
   },
   keyboard: toolbarKeyboard,
