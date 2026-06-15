@@ -27,6 +27,8 @@ registerKernelBuiltins()
 
 registerKernelBuiltins()
 
+registerKernelBuiltins()
+
 export interface ReactMenuButtonRuntime {
   triggerKey: Key | null
   menuKey: Key | null

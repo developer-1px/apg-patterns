@@ -14,6 +14,7 @@ const allowedReactImports = new Set([
   'PointerEvent',
   'ReactNode',
   'createElement',
+  'useId',
   'useLayoutEffect',
   'useMemo',
   'useRef',
