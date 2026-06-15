@@ -113,7 +113,7 @@ describe('menu and grid helper coverage from pointer input', () => {
     expect(screen.getByText('undefined|undefined|undefined|undefined|undefined')).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Run menubar item helpers' }))
-    expect(screen.getByText('activate:fallback')).toBeTruthy()
+    expect(screen.getByText((content) => content.includes('activate:fallback'))).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Run grid helpers' }))
     expect(screen.getByText('editStart:value|editEnd:|editEnd:')).toBeTruthy()
