@@ -2,7 +2,6 @@ import { useMenubarPattern, type PatternData, type PatternEvent } from '../../..
 import { cx, ds } from '../../shared/designSystem'
 import { Icon } from '../../shared/Icon'
 import type { MenuProps } from './menuTypes'
-import { useMenubarSubmenuKeyboard } from './useMenubarSubmenuKeyboard'
 
 export function Menubar({ data, onEvent }: MenuProps) {
   const menubar = useMenubarPattern(data, onEvent)
@@ -16,7 +15,7 @@ export function Menubar({ data, onEvent }: MenuProps) {
         ))}
       </div>
       {menubar.expandedRootKeys.map((rootKey) => (
-        <Submenu key={rootKey} data={data} ids={menubar.ids} ownerKey={rootKey} rootKeys={rootKeys} onEvent={onEvent} />
+        <Submenu key={rootKey} data={data} menubar={menubar} ownerKey={rootKey} rootKeys={rootKeys} onEvent={onEvent} />
       ))}
     </div>
   )
@@ -35,16 +34,15 @@ function RootMenuItem({ item }: { item: ReturnType<typeof useMenubarPattern>['ro
   )
 }
 
-function Submenu({ data, ids, ownerKey, rootKeys, onEvent }: { data: PatternData; ids: ReturnType<typeof useMenubarPattern>['ids']; ownerKey: string; rootKeys: readonly string[]; onEvent: (event: PatternEvent) => void }) {
+function Submenu({ data, menubar, ownerKey, rootKeys, onEvent }: { data: PatternData; menubar: ReturnType<typeof useMenubarPattern>; ownerKey: string; rootKeys: readonly string[]; onEvent: (event: PatternEvent) => void }) {
   const children = data.relations?.childrenByKey?.[ownerKey] ?? []
   const radioGroup = children.filter((key) => (data.items[key] as { kind?: string } | undefined)?.kind === 'menuitemradio')
   const activeKey = children.includes(data.state?.activeKey ?? '') ? data.state?.activeKey : children[0]
   const close = () => onEvent({ type: 'expand', key: ownerKey, expanded: false })
-  const onSubmenuKeyDown = useMenubarSubmenuKeyboard({ data, ownerKey, rootKeys, children, activeKey, onEvent, close })
   const popupLeft = `${rootKeys.indexOf(ownerKey) * 4.25}rem`
   return (
-    <ul role="menu" aria-labelledby={ids.forKey(ownerKey)} style={{ left: popupLeft }} className="absolute top-10 z-10 grid w-56 gap-0.5 rounded-md border border-zinc-200 bg-white p-1 text-sm outline-none dark:border-white/10 dark:bg-zinc-950" onKeyDown={onSubmenuKeyDown}>
-      {children.map((key) => <SubmenuItem key={key} ids={ids} itemKey={key} data={data} active={key === activeKey} radioGroup={radioGroup} onEvent={onEvent} onClose={close} />)}
+    <ul {...menubar.submenuProps(ownerKey)} style={{ left: popupLeft }} className="absolute top-10 z-10 grid w-56 gap-0.5 rounded-md border border-zinc-200 bg-white p-1 text-sm outline-none dark:border-white/10 dark:bg-zinc-950">
+      {children.map((key) => <SubmenuItem key={key} ids={menubar.ids} itemKey={key} data={data} active={key === activeKey} radioGroup={radioGroup} onEvent={onEvent} onClose={close} />)}
     </ul>
   )
 }

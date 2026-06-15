@@ -270,6 +270,15 @@ const options = autocomplete.renderItems
 
 `ownerProps` includes `role="combobox"`, `aria-expanded`, `aria-controls`, `aria-activedescendant`, `aria-autocomplete`, and the owner keydown dispatcher. ArrowUp/ArrowDown emit open/navigation events, Enter and Tab select the active option and close, and Escape emits dismiss and close. `popupProps` and `renderItems[*].optionProps` come from the existing listbox runtime.
 
+`useMenubarPattern` also returns `submenuProps(ownerKey)` for open submenu containers:
+
+```ts
+const submenuProps = menubar.submenuProps('file')
+const submenuItems = menubar.itemsFor('file')
+```
+
+`submenuProps` provides `role="menu"`, `aria-labelledby`, and submenu keydown behavior. ArrowUp/ArrowDown/Home/End move between enabled submenu items, Escape closes the submenu and restores focus to the owner root item, and ArrowLeft/ArrowRight hand off to sibling root menus.
+
 ## React Facade Descriptor
 
 `PatternDefinitionSchema` has an optional `react` section. It describes how to derive React hook output from a serializable definition:

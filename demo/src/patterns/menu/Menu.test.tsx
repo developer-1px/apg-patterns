@@ -264,6 +264,27 @@ describe('Menu — editorMenubar', () => {
     expect(events).toContainEqual({ type: 'expand', key: 'edit', expanded: false })
   })
 
+  it('submenu keyboard skips disabled items and returns focus to the owner', () => {
+    render(<MenuDemo variant="editorMenubar" />)
+    const [file, edit] = screen.getAllByRole('menuitem')
+
+    fireEvent.keyDown(file!, { key: 'ArrowRight' })
+    fireEvent.keyDown(edit!, { key: 'ArrowDown' })
+    const menu = screen.getByRole('menu')
+
+    fireEvent.keyDown(menu, { key: 'ArrowDown' })
+    expect(screen.getByRole('menuitem', { name: 'Redo' }).getAttribute('tabindex')).toBe('-1')
+    expect(screen.getByRole('menuitem', { name: 'Cut' }).getAttribute('tabindex')).toBe('0')
+
+    fireEvent.keyDown(menu, { key: 'ArrowUp' })
+    expect(screen.getByRole('menuitem', { name: 'Undo' }).getAttribute('tabindex')).toBe('0')
+
+    fireEvent.keyDown(menu, { key: 'Escape' })
+    expect(screen.queryByRole('menu')).toBeNull()
+    expect(edit!.getAttribute('aria-expanded')).toBe('false')
+    expect(document.activeElement).toBe(edit)
+  })
+
   it('covers submenu keyboard guard branches through pointer-triggered keys', () => {
     render(<MenubarSubmenuKeyboardEdges />)
 
