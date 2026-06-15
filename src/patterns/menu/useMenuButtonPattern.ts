@@ -29,6 +29,8 @@ registerKernelBuiltins()
 
 registerKernelBuiltins()
 
+registerKernelBuiltins()
+
 export interface ReactMenuButtonRuntime {
   triggerKey: Key | null
   menuKey: Key | null
@@ -63,8 +65,8 @@ export function useMenuButtonPattern(data: PatternData, onEvent: (event: Pattern
     document.getElementById(runtime.keyToElementId(triggerKey))?.focus({ preventScroll: true })
   }
   const activateActiveItem = () => {
-    const activeKey = data.state?.activeKey && itemKeys.includes(data.state.activeKey) ? data.state.activeKey : itemKeys[0]
-    if (!activeKey) return
+    const activeKey = data.state?.activeKey
+    if (!activeKey || !itemKeys.includes(activeKey) || data.state?.disabledKeys?.includes(activeKey)) return
     onEvent({ type: 'activate', key: activeKey })
     closeAndFocusTrigger()
   }
