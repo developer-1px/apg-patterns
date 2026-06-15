@@ -9,7 +9,7 @@ export const toolbarParts = {
   item: {
     role: 'button',
     aria: [
-      { attribute: 'aria-pressed', from: 'state.selectedKeys' },
+      { attribute: 'aria-pressed', from: 'state.pressedByKey' },
       { attribute: 'aria-disabled', from: 'state.disabledKeys' },
     ],
     focus: {
@@ -21,7 +21,7 @@ export const toolbarParts = {
     },
     state: [
       { name: 'active', from: 'state.activeKey' },
-      { name: 'pressed', from: 'state.selectedKeys' },
+      { name: 'pressed', from: 'state.pressedByKey' },
       { name: 'disabled', from: 'state.disabledKeys' },
     ],
     events: [

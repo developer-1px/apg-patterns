@@ -5,8 +5,32 @@ import { PatternDataSchema, type PatternData } from '../../../../src/react'
 import { Toolbar } from './Toolbar'
 import { reduceToolbarData } from './toolbarData'
 import { ToolbarDemo } from './testing/ToolbarTestHost'
+import { initialToolbarData } from './toolbarData'
 
-const mixedToolbarData = PatternDataSchema.parse({
+const commandToolbarData = {
+  items: {
+    undo: { label: 'Undo' },
+    bold: { label: 'Bold' },
+    italic: { label: 'Italic' },
+    delete: { label: 'Delete' },
+  },
+  relations: {
+    rootKeys: ['undo', 'bold', 'italic', 'delete'],
+  },
+  state: {
+    activeKey: 'undo',
+    pressedByKey: { bold: true, italic: false },
+  },
+  refs: {
+    label: 'Mixed actions',
+  },
+} satisfies PatternData
+
+function MixedToolbarDemo() {
+  return <Toolbar data={commandToolbarData} onEvent={() => undefined} />
+}
+
+const mixedControlToolbarData = PatternDataSchema.parse({
   items: {
     bold: { label: 'Bold', kind: 'toggleButton' },
     format: { label: 'Number format', kind: 'select' },
@@ -74,7 +98,7 @@ describe('Toolbar demo', () => {
   })
 
   it('supports native controls without projecting button role or pressed state', () => {
-    render(<ToolbarDataDemo initialData={mixedToolbarData} />)
+    render(<ToolbarDataDemo initialData={mixedControlToolbarData} />)
     const toolbar = screen.getByRole('toolbar')
     const select = screen.getByRole('combobox', { name: 'Number format' })
     const colorInput = screen.getByLabelText('Fill color')
@@ -95,5 +119,41 @@ describe('Toolbar demo', () => {
 
     expect(screen.getByLabelText('Fill color').getAttribute('tabindex')).toBe('0')
     expect(toolbar.querySelectorAll('[tabindex="0"]')).toHaveLength(1)
+  })
+
+  it('omits aria-pressed for command buttons and keeps explicit toggle state', () => {
+    render(<MixedToolbarDemo />)
+
+    expect(screen.getByRole('button', { name: 'Undo' }).getAttribute('aria-pressed')).toBeNull()
+    expect(screen.getByRole('button', { name: 'Bold' }).getAttribute('aria-pressed')).toBe('true')
+    expect(screen.getByRole('button', { name: 'Italic' }).getAttribute('aria-pressed')).toBe('false')
+    expect(screen.getByRole('button', { name: 'Delete' }).getAttribute('aria-pressed')).toBeNull()
+  })
+
+  it('skips disabled items during arrow navigation', () => {
+    render(<ToolbarDemo data={{ ...initialToolbarData, state: { ...initialToolbarData.state, disabledKeys: ['italic'] } }} />)
+
+    fireEvent.keyDown(screen.getByRole('toolbar'), { key: 'ArrowRight', code: 'ArrowRight' })
+
+    expect(activeLabel()).toBe('Underline')
+    expect(screen.getByRole('button', { name: 'Italic' }).getAttribute('aria-disabled')).toBe('true')
+  })
+
+  it('uses enabled boundary items for Home and End', () => {
+    render(<ToolbarDemo data={{ ...initialToolbarData, state: { ...initialToolbarData.state, activeKey: 'underline', disabledKeys: ['bold', 'alignRight'] } }} />)
+
+    fireEvent.keyDown(screen.getByRole('toolbar'), { key: 'End', code: 'End' })
+    expect(activeLabel()).toBe('Align center')
+
+    fireEvent.keyDown(screen.getByRole('toolbar'), { key: 'Home', code: 'Home' })
+    expect(activeLabel()).toBe('Italic')
+  })
+
+  it('keeps active item when the previous candidate is disabled', () => {
+    render(<ToolbarDemo data={{ ...initialToolbarData, state: { ...initialToolbarData.state, activeKey: 'italic', disabledKeys: ['bold'] } }} />)
+
+    fireEvent.keyDown(screen.getByRole('toolbar'), { key: 'ArrowLeft', code: 'ArrowLeft' })
+
+    expect(activeLabel()).toBe('Italic')
   })
 })

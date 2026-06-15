@@ -11,6 +11,13 @@ export const FOCUSABLE_SELECTOR = [
 ].join(',')
 
 export function resolveElementTarget(target: ElementTarget, data: PatternData, keyToElementId: (key: Key) => string): HTMLElement | null {
+  if (target.kind === 'firstAvailable') {
+    for (const candidate of target.targets) {
+      const element = resolveOptionalElementTarget(candidate, data, keyToElementId)
+      if (element) return element
+    }
+    return null
+  }
   if (target.kind === 'firstFocusable') {
     return resolveElementTarget(target.root, data, keyToElementId)?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR) ?? null
   }
@@ -18,7 +25,20 @@ export function resolveElementTarget(target: ElementTarget, data: PatternData, k
   return key ? document.getElementById(keyToElementId(key)) : null
 }
 
-function resolveElementTargetKey(target: Exclude<ElementTarget, { kind: 'firstFocusable' }>, data: PatternData): Key | null {
+function resolveOptionalElementTarget(target: Exclude<ElementTarget, { kind: 'firstAvailable' }>, data: PatternData, keyToElementId: (key: Key) => string): HTMLElement | null {
+  try {
+    return resolveElementTarget(target, data, keyToElementId)
+  } catch (error) {
+    if (isUnresolvedKeyTokenError(error)) return null
+    throw error
+  }
+}
+
+function isUnresolvedKeyTokenError(error: unknown): boolean {
+  return error instanceof Error && error.message.startsWith('Cannot resolve key token:')
+}
+
+function resolveElementTargetKey(target: Extract<ElementTarget, { kind: 'key' }> | Extract<ElementTarget, { kind: 'controlledBy' }>, data: PatternData): Key | null {
   const activeKey = data.state?.activeKey ?? null
   if (target.kind === 'key') return resolveKeyToken(target.key, undefined, activeKey, { data, activeKey })
   const ownerKey = resolveKeyToken(target.key, undefined, activeKey, { data, activeKey })
