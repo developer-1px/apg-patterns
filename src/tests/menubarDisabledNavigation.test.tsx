@@ -1,11 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { reducePatternData, type PatternData, type PatternEvent } from '../index'
-import { registerKernelBuiltins } from '../kernel/kernelBuiltins'
 import { menubarDefinition } from '../patterns/menu/menubarDefinition'
 import { useMenubarPattern } from '../patterns/menu/useMenubarPattern'
-
-registerKernelBuiltins()
 
 const rootKeys = ['file', 'edit', 'view'] as const
 const fileChildren = ['new', 'open', 'close'] as const

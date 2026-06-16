@@ -1,10 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { registerKernelBuiltins } from '../kernel/kernelBuiltins'
 import type { PatternData } from '../schema'
 import { getTabsDataDiagnostics } from '../patterns/tabs/diagnostics'
 import { createTabsRuntime } from '../patterns/tabs/runtime'
-
-registerKernelBuiltins()
 
 const completeTabsData: PatternData = {
   items: {

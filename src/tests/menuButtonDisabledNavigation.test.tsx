@@ -1,11 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import type { PatternData, PatternEvent } from '../index'
-import { registerKernelBuiltins } from '../kernel/kernelBuiltins'
 import { resolveMenuButtonKey } from '../patterns/menu/menuButtonKeyboard'
 import { useMenuButtonPattern } from '../patterns/menu/useMenuButtonPattern'
-
-registerKernelBuiltins()
 
 const itemKeys = ['a', 'b', 'c'] as const
 const menuData = {

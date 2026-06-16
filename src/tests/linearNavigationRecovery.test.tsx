@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { moveApgLinear } from '../internal/collectionNavigation'
 import { reducePatternData, type PatternData, type PatternDefinition } from '../index'
-import { registerKernelBuiltins } from '../kernel/kernelBuiltins'
 
 const definition = {
   apgPattern: 'linear-recovery',
@@ -35,8 +34,6 @@ const data = {
 
 describe('linear navigation recovery', () => {
   it('recovers from an active key outside visible order', () => {
-    registerKernelBuiltins()
-
     expect(reducePatternData(definition, data, { type: 'navigate', direction: 'next' }).state?.activeKey).toBe('open')
     expect(reducePatternData(definition, data, { type: 'navigate', direction: 'previous' }).state?.activeKey).toBe('closed')
     expect(reducePatternData(definition, data, { type: 'navigate', direction: 'first' }).state?.activeKey).toBe('open')

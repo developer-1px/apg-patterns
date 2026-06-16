@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { reducePatternData, type PatternData, type PatternEvent } from '../index'
-import { registerKernelBuiltins } from '../kernel/kernelBuiltins'
 import { radioGroupDefinition } from '../patterns/radio/definition'
-
-registerKernelBuiltins()
 
 const baseData = {
   items: {
