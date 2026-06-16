@@ -1,5 +1,5 @@
 import { createParentByKey, resolveVisibleOrder } from '../../kernel/patternKernel'
-import type { Key, PatternData } from '../../schema'
+import type { Key } from '../../schema'
 import type { ReactPatternProps, ReactRenderItemState } from '../../adapters/reactBaseTypes'
 import type { ReactTreeviewRenderItem } from './reactTypes'
 import type { TreeviewRuntime } from './runtime'
@@ -11,7 +11,15 @@ export function createTreeviewRenderItems(
   getIndicatorProps: (key: Key) => ReactPatternProps,
 ): readonly ReactTreeviewRenderItem[] {
   const parentByKey = createParentByKey(runtime.data)
-  const indexInParentByKey = createIndexInParentByKey(runtime.data)
+  const indexInParentByKey = new Map<Key, number>()
+  for (const [index, key] of (runtime.data.relations?.rootKeys ?? []).entries()) {
+    indexInParentByKey.set(key, index + 1)
+  }
+  for (const children of Object.values(runtime.data.relations?.childrenByKey ?? {})) {
+    for (const [index, key] of children.entries()) {
+      indexInParentByKey.set(key, index + 1)
+    }
+  }
   const visibleKeys = resolveVisibleOrder(runtime.definition.navigation.visibleOrder, runtime.data)
   return visibleKeys.map((key) => {
     const hasChildren = (runtime.data.relations?.childrenByKey?.[key]?.length ?? 0) > 0
@@ -57,17 +65,4 @@ function getTreeItemRenderState(runtime: TreeviewRuntime, key: Key, branch: bool
     expanded: Boolean(state.expanded),
     toggleDisabled: Boolean(state.disabled),
   }
-}
-
-function createIndexInParentByKey(data: PatternData): ReadonlyMap<Key, number> {
-  const indexInParentByKey = new Map<Key, number>()
-  for (const [index, key] of (data.relations?.rootKeys ?? []).entries()) {
-    indexInParentByKey.set(key, index + 1)
-  }
-  for (const children of Object.values(data.relations?.childrenByKey ?? {})) {
-    for (const [index, key] of children.entries()) {
-      indexInParentByKey.set(key, index + 1)
-    }
-  }
-  return indexInParentByKey
 }
