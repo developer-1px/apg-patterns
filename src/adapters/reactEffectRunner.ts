@@ -1,7 +1,8 @@
 import type { EffectDefinition, Key, PatternData, PatternDefinition } from '../schema'
 import { createParentByKey, evaluatePredicate } from '../kernel/patternKernel'
 import { resolveElementTarget } from './reactElementTargets'
-import { containsActiveElement, resolveFocusEffectTarget } from './reactFocusEffectTarget'
+
+type FocusEffectTarget = Extract<EffectDefinition, { kind: 'focus' }>['target']
 
 export function runPatternEffects({
   definition,
@@ -56,4 +57,20 @@ function shouldRunEffect({
     return effect.scope?.kind !== 'focusWithin' || reason === 'keyboard' || reason === 'typeahead' || containsActiveElement(effect.target, data, keyToElementId, definition.rootRole)
   }
   return previousMatches !== undefined && previousMatches !== matches
+}
+
+function resolveFocusEffectTarget(target: FocusEffectTarget, data: PatternData, keyToElementId: (key: Key) => string): HTMLElement | null {
+  const activeKey = data.state?.activeKey
+  if (target.kind === 'activeKeyElement') return activeKey ? document.getElementById(keyToElementId(activeKey)) : null
+  return resolveElementTarget(target, data, keyToElementId)
+}
+
+function containsActiveElement(target: FocusEffectTarget, data: PatternData, keyToElementId: (key: Key) => string, rootRole: string): boolean {
+  const targetElement = resolveFocusEffectTarget(target, data, keyToElementId)
+  if (!targetElement) return false
+  let root: HTMLElement | null = targetElement
+  while (root && root.getAttribute('role') !== rootRole) {
+    root = root.parentElement
+  }
+  return Boolean(root && document.activeElement && root.contains(document.activeElement))
 }

@@ -1,9 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import type { PatternData, PatternEvent } from '../schema'
+import type { PatternData, PatternDefinition, PatternEvent } from '../schema'
 import type { PatternRuntime, SlotProps } from '../kernel/patternRuntime'
-import { containsActiveElement, resolveFocusEffectTarget } from '../adapters/reactFocusEffectTarget'
+import { runPatternEffects } from '../adapters/reactEffectRunner'
 import { createTabsRuntime } from '../patterns/tabs/runtime'
 
 const tabsData: PatternData = {
@@ -23,8 +23,6 @@ function FocusAndTabsRuntimeHost() {
   const [events, setEvents] = useState<PatternEvent[]>([])
 
   const keyToElementId = (key: string) => `focus-${key}`
-  const activeTarget = { kind: 'activeKeyElement' } as const
-  const panelTarget = { kind: 'controlledBy', key: '$activeKey' } as const
 
   const customRuntime: PatternRuntime = {
     definition: createTabsRuntime({ data: tabsData, onEvent: () => undefined }).definition,
@@ -45,14 +43,16 @@ function FocusAndTabsRuntimeHost() {
     const data: PatternData = {
       items: { one: { label: 'One' }, panelOne: { label: 'Panel one' } },
       relations: { rootKeys: ['one'], controlsByKey: { one: ['panelOne'] } },
-      state: { activeKey: 'one' },
+      state: { activeKey: 'one', lastEventReason: 'pointer' },
       refs: { label: 'Focus target' },
     }
     document.getElementById('focus-panelOne')?.focus()
-    const active = resolveFocusEffectTarget(activeTarget, data, keyToElementId)?.id ?? 'none'
-    const within = containsActiveElement(panelTarget, data, keyToElementId, 'tablist')
-    const empty = containsActiveElement(activeTarget, { ...data, state: { activeKey: null } }, keyToElementId, 'tablist')
-    setFocusResult(`${active}:${within}:${empty}`)
+    runPatternEffects({ definition: focusDefinition, data, keyToElementId, previousMatches: [] })
+    const focused = (document.activeElement as HTMLElement | null)?.id ?? 'none'
+    document.getElementById('focus-panelOne')?.focus()
+    runPatternEffects({ definition: focusDefinition, data: { ...data, state: { activeKey: null, lastEventReason: 'pointer' } }, keyToElementId, previousMatches: [] })
+    const empty = (document.activeElement as HTMLElement | null)?.id ?? 'none'
+    setFocusResult(`${focused}:${empty}`)
   }
 
   const evaluateTabs = () => {
@@ -89,6 +89,25 @@ function FocusAndTabsRuntimeHost() {
   )
 }
 
+const focusDefinition = {
+  apgPattern: 'focus-target',
+  rootRole: 'tablist',
+  containedRoles: ['tab'],
+  focusModel: 'rovingTabIndex',
+  parts: {},
+  navigation: { visibleOrder: { kind: 'flat' }, targets: {} },
+  keyboard: [],
+  effects: [
+    {
+      kind: 'focus',
+      when: { kind: 'always' },
+      on: { state: 'activeKey', reasons: ['pointer'] },
+      scope: { kind: 'focusWithin' },
+      target: { kind: 'activeKeyElement' },
+    },
+  ],
+} satisfies PatternDefinition
+
 describe('focus targets and tabs runtime from input controls', () => {
   it('covers focus containment and tabs runtime fallback branches from pointer input', () => {
     render(<FocusAndTabsRuntimeHost />)
@@ -96,7 +115,7 @@ describe('focus targets and tabs runtime from input controls', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Evaluate focus target' }))
     fireEvent.click(screen.getByRole('button', { name: 'Evaluate tabs runtime' }))
 
-    expect(screen.getByTestId('focus-result').textContent).toBe('focus-one:true:false')
+    expect(screen.getByTestId('focus-result').textContent).toBe('focus-one:focus-panelOne')
     expect(screen.getByTestId('runtime-result').textContent).toBe('one:panelOne:runtime-tab-one:none:none:custom')
     expect(screen.getByTestId('runtime-events').textContent).toBe('focus')
   })
