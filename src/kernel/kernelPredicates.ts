@@ -29,7 +29,7 @@ definePredicate('isPopupOpen', (_p, ctx) => {
 })
 definePredicate('optionEquals', (p, ctx) => {
   if (p.kind !== 'optionEquals') return false
-  return (ctx.options as Record<string, unknown> | undefined)?.[p.option] === p.value
+  return ctx.options?.[p.option] === p.value
 })
 definePredicate('hasChildren', (p, ctx) => {
   if (p.kind !== 'hasChildren') return false
