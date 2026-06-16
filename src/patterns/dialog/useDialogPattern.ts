@@ -1,6 +1,7 @@
 import type { KeyboardEvent } from 'react'
 import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
-import { handlePatternTrapFocus, usePatternEffects } from '../../adapters/reactPatternEffects'
+import { usePatternEffects } from '../../adapters/reactPatternEffects'
+import { handlePatternTrapFocus } from '../../adapters/reactPatternTrapFocus'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { createReactKeyboardHandler, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { dialogDefinition } from './definition'

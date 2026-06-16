@@ -3,7 +3,6 @@ import type { Key, PatternData, PatternDefinition, PatternEvent, PatternOptions 
 import { createPatternRuntime, type CreatePatternRuntimeInput, type PatternRuntime } from '../kernel/patternRuntime'
 import { reducePatternData } from '../kernel/patternReducer'
 import { runPatternEffects } from './reactEffectRunner'
-export { handlePatternTrapFocus } from './reactPatternTrapFocus'
 
 export function usePatternEffects({
   definition,
