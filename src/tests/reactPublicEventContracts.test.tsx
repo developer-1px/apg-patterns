@@ -34,7 +34,7 @@ import {
   type PatternEvent,
 } from '../react'
 
-type PatternEventPayload = PatternEvent extends infer T ? T extends PatternEvent ? Omit<T, 'meta'> : never : never
+type PatternEventPayload<T extends PatternEvent = PatternEvent> = T extends PatternEvent ? Omit<T, 'meta'> : never
 
 describe('React public event contracts', () => {
   it('keeps treeview keyboard and indicator events on the public hook surface', () => {
@@ -747,11 +747,11 @@ function RemainingFlowContractHost({ onEvent }: { onEvent: (event: PatternEvent)
   )
 }
 
-function eventPayload(event: PatternEvent | undefined): Omit<PatternEvent, 'meta'> | undefined {
+function eventPayload(event: PatternEvent | undefined): PatternEventPayload | undefined {
   if (!event) return undefined
   const payload = { ...event }
   delete (payload as { meta?: unknown }).meta
-  return payload as Omit<PatternEvent, 'meta'>
+  return payload as PatternEventPayload
 }
 
 function eventReason(event: PatternEvent | undefined): string | undefined {
