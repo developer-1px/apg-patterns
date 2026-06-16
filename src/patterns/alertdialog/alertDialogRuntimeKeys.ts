@@ -1,12 +1,7 @@
-import type { Key, PatternData } from '../../schema'
+import type { PatternData } from '../../schema'
 import { getDialogRuntimeKeys } from '../dialog/dialogRuntimeKeys'
 
-interface AlertDialogRuntimeKeys extends ReturnType<typeof getDialogRuntimeKeys> {
-  confirmKey: Key | null
-  cancelKey: Key | null
-}
-
-export function getAlertDialogRuntimeKeys(data: PatternData): AlertDialogRuntimeKeys {
+export function getAlertDialogRuntimeKeys(data: PatternData) {
   return {
     ...getDialogRuntimeKeys(data),
     confirmKey: data.items.confirm ? 'confirm' : null,

@@ -1,13 +1,6 @@
 import type { Key, PatternData } from '../../schema'
 
-interface DialogRuntimeKeys {
-  triggerKey: Key | null
-  dialogKey: Key | null
-  titleKey: Key | null
-  descriptionKey: Key | null
-}
-
-export function getDialogRuntimeKeys(data: PatternData): DialogRuntimeKeys {
+export function getDialogRuntimeKeys(data: PatternData) {
   const triggerKey = data.relations?.rootKeys?.[0] ?? (data.items.trigger ? 'trigger' : null)
   const relationDialogKey = firstExistingRelationOwnerKey(data) ?? firstExistingRelationControllerKey(data)
   const dialogKey = triggerKey ? data.relations?.controlsByKey?.[triggerKey]?.[0] ?? (data.items.dialog ? 'dialog' : null) ?? relationDialogKey : data.items.dialog ? 'dialog' : relationDialogKey
