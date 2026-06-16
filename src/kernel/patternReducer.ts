@@ -15,16 +15,7 @@ export function reducePatternData(definition: PatternDefinition, data: PatternDa
   }
 
   if (event.type === 'select') {
-    return withLastEventReason({
-      ...data,
-      state: {
-        ...data.state,
-        activeKey: event.extentKey ?? event.anchorKey ?? event.keys[0] ?? data.state?.activeKey,
-        selectedKeys: [...event.keys],
-        anchorKey: event.anchorKey,
-        extentKey: event.extentKey,
-      },
-    }, event)
+    return withLastEventReason(withSelection(data, event.keys, event.anchorKey, event.extentKey), event)
   }
 
   if (event.type === 'selectAll') {
@@ -148,7 +139,7 @@ function withActiveKey(data: PatternData, activeKey: Key): PatternData {
   return { ...data, state: { ...data.state, activeKey } }
 }
 
-function withSelection(data: PatternData, keys: readonly Key[], anchorKey: Key | null, extentKey: Key | null): PatternData {
+function withSelection(data: PatternData, keys: readonly Key[], anchorKey: Key | null | undefined, extentKey: Key | null | undefined): PatternData {
   return {
     ...data,
     state: {
