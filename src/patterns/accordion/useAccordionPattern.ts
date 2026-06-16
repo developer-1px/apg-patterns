@@ -1,5 +1,5 @@
 import { accordionDefinition } from './definition'
-import { createPatternRuntime } from '../../kernel/patternRuntime'
+import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
 import { reactProps } from '../../adapters/reactBaseTypes'
@@ -48,7 +48,7 @@ export function useAccordionPattern(data: PatternData, onEvent: (event: PatternE
   }
 }
 
-function createAccordionRenderItem(runtime: ReturnType<typeof createPatternRuntime>, key: Key): ReactAccordionRenderItem {
+function createAccordionRenderItem(runtime: PatternRuntime, key: Key): ReactAccordionRenderItem {
   const panelKey = runtime.data.relations?.controlsByKey?.[key]?.[0] ?? null
   const state = runtime.getItemState(key, 'header')
   return {

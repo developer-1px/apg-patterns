@@ -1,5 +1,5 @@
 import type { KeyboardEvent } from 'react'
-import { createPatternRuntime } from '../../kernel/patternRuntime'
+import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
 import { handlePatternTrapFocus, usePatternEffects } from '../../adapters/reactPatternEffects'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
@@ -71,7 +71,7 @@ function createDialogProps({
   keyToElementId,
   dialogKey,
 }: {
-  runtime: ReturnType<typeof createPatternRuntime>
+  runtime: PatternRuntime
   data: PatternData
   keyToElementId: (key: Key) => string
   dialogKey: Key

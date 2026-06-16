@@ -1,4 +1,4 @@
-import { createPatternRuntime } from '../../kernel/patternRuntime'
+import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key } from '../../schema'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 
@@ -16,7 +16,7 @@ export interface ReactTableRow {
   cells: readonly ReactTableCell[]
 }
 
-export function createTableRows(runtime: ReturnType<typeof createPatternRuntime>): readonly ReactTableRow[] {
+export function createTableRows(runtime: PatternRuntime): readonly ReactTableRow[] {
   const rowKeys = runtime.data.relations?.rowKeys ?? []
   const cellKeysByRow = createCellKeysByRow(runtime.data.relations?.cells ?? [])
   return rowKeys.map((rowKey) => {
@@ -39,7 +39,7 @@ function createCellKeysByRow(cells: readonly { rowKey: Key; cellKey: Key }[]): R
   return cellKeysByRow
 }
 
-function createTableCell(runtime: ReturnType<typeof createPatternRuntime>, cellKey: Key): ReactTableCell {
+function createTableCell(runtime: PatternRuntime, cellKey: Key): ReactTableCell {
   const kind = runtime.data.items[cellKey]?.kind ?? 'cell'
   const part = kind === 'columnheader' ? 'columnheader' : kind === 'rowheader' ? 'rowheader' : 'cell'
   return {

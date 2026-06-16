@@ -1,4 +1,4 @@
-import { createPatternRuntime } from '../../kernel/patternRuntime'
+import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData } from '../../schema'
 import { reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
 import { visibleCells, visibleRowKeys } from './geometry'
@@ -23,7 +23,7 @@ export function createTreegridRows({
   runtime,
   data,
 }: {
-  runtime: ReturnType<typeof createPatternRuntime>
+  runtime: PatternRuntime
   data: PatternData
 }): readonly ReactTreegridRow[] {
   const rowKeys = visibleRowKeys(data)
@@ -36,7 +36,7 @@ export function createTreegridRows({
 }
 
 function createTreegridCell(
-  runtime: ReturnType<typeof createPatternRuntime>,
+  runtime: PatternRuntime,
   data: PatternData,
   rowKey: Key,
   cellKey: Key,

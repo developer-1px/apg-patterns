@@ -2,7 +2,7 @@ import type { KeyboardEvent, MouseEvent } from 'react'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
-import { createPatternRuntime } from '../../kernel/patternRuntime'
+import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { dialogDefinition } from './definition'
 import {
@@ -95,7 +95,7 @@ function createControlledDialogOverlayProps({
   runtime,
   close,
 }: {
-  runtime: ReturnType<typeof createPatternRuntime>
+  runtime: PatternRuntime
   close(reason: 'pointer'): void
 }): ReactPatternProps {
   const props = reactProps(runtime.getPartProps('overlay'))
@@ -114,7 +114,7 @@ function createControlledDialogProps({
   dialogKey,
   close,
 }: {
-  runtime: ReturnType<typeof createPatternRuntime>
+  runtime: PatternRuntime
   open: boolean
   keyToElementId(key: Key): string
   dialogKey: Key
@@ -140,7 +140,7 @@ function createControlledDialogActionProps({
   onEvent,
   close,
 }: {
-  runtime: ReturnType<typeof createPatternRuntime>
+  runtime: PatternRuntime
   part: 'cancel' | 'submit'
   action: 'dismiss' | 'activate'
   onEvent?: (event: PatternEvent) => void

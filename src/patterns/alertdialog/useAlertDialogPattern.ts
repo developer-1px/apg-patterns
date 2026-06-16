@@ -1,5 +1,5 @@
 import type { KeyboardEvent, MouseEvent } from 'react'
-import { createPatternRuntime } from '../../kernel/patternRuntime'
+import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
 import { withDefaultReason } from '../../kernel/domEventBindings'
 import { handlePatternTrapFocus, usePatternEffects } from '../../adapters/reactPatternEffects'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
@@ -78,7 +78,7 @@ function createAlertDialogDialogProps({
   keyToElementId,
   dialogKey,
 }: {
-  runtime: ReturnType<typeof createPatternRuntime>
+  runtime: PatternRuntime
   data: PatternData
   onEvent: (event: PatternEvent) => void
   keyToElementId: (key: Key) => string
@@ -101,7 +101,7 @@ function createAlertDialogActionProps({
   key,
   onEvent,
 }: {
-  runtime: ReturnType<typeof createPatternRuntime>
+  runtime: PatternRuntime
   part: 'confirm' | 'cancel'
   key: Key
   onEvent: (event: PatternEvent) => void
