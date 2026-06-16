@@ -1,6 +1,8 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import assert from 'node:assert/strict'
 import { fileURLToPath } from 'node:url'
+import { createElement } from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import ts from 'typescript'
 
 const repoRoot = new URL('../', import.meta.url)
@@ -8,6 +10,7 @@ const apiReferencePath = new URL('API.md', repoRoot)
 const interfaceStabilityPath = new URL('INTERFACE_STABILITY.md', repoRoot)
 const publicContractFixturePath = new URL('scripts/fixtures/public-api-contract.json', repoRoot)
 const publicPatternFixturePath = new URL('scripts/fixtures/public-pattern-contracts.json', repoRoot)
+const publicReactPatternFixturePath = new URL('scripts/fixtures/public-react-pattern-contracts.json', repoRoot)
 const shouldWrite = process.argv.includes('--write')
 const failures = []
 const forbiddenPublicExports = new Map([
@@ -301,8 +304,9 @@ const coreExports = declarationExports('dist/core.d.ts')
 const reactExports = declarationExports('dist/react.d.ts')
 const rootRuntimeExports = await runtimeExports('dist/index.js')
 const coreRuntimeExports = await runtimeExports('dist/core.js')
-const reactRuntimeExports = await runtimeExports('dist/react.js')
 const coreRuntimeModule = await import(new URL('dist/core.js', repoRoot))
+const reactRuntimeModule = await import(new URL('dist/react.js', repoRoot))
+const reactRuntimeExports = Object.keys(reactRuntimeModule).sort((left, right) => left.localeCompare(right))
 
 expectExactExportSet(rootExports, coreExports, 'root exports', './core exports')
 expectExactExportSet(rootRuntimeExports, coreRuntimeExports, 'root runtime exports', './core runtime exports')
@@ -322,6 +326,7 @@ const reactSurfaceManifest = publicSurfaceManifest(reactOnlyExports, classifyRea
 assertInterfaceStabilityDocumentsBucketPolicies(rootSurfaceBuckets, reactSurfaceBuckets)
 assertPublicContractFixture(coreRuntimeModule)
 assertPublicPatternFixtures(coreRuntimeModule)
+assertPublicReactPatternFixtures(coreRuntimeModule, reactRuntimeModule)
 const nextApiReference = shouldWrite
   ? replaceExportBlock(
     replaceExportBlock(
@@ -367,7 +372,7 @@ if (failures.length > 0) {
   process.exit(1)
 }
 
-console.log(`${wroteApiReference ? 'Updated API reference and verified' : 'API reference covers'} ${coreExports.length} root/core exports, ${rootRuntimeExports.length} root/core runtime values, ${reactOnlyExports.length} React-only exports, and ${reactOnlyRuntimeExports.length} React-only runtime values. Surface buckets: root/core ${formatBuckets(rootSurfaceBuckets)}; react-only ${formatBuckets(reactSurfaceBuckets)}. Public contract fixtures verified.`)
+console.log(`${wroteApiReference ? 'Updated API reference and verified' : 'API reference covers'} ${coreExports.length} root/core exports, ${rootRuntimeExports.length} root/core runtime values, ${reactOnlyExports.length} React-only exports, and ${reactOnlyRuntimeExports.length} React-only runtime values. Surface buckets: root/core ${formatBuckets(rootSurfaceBuckets)}; react-only ${formatBuckets(reactSurfaceBuckets)}. Core and React public contract fixtures verified.`)
 
 function declarationExports(packagePath) {
   const filePath = fileURLToPath(new URL(packagePath, repoRoot))
@@ -608,6 +613,78 @@ function assertPublicPatternFixtures(coreRuntime) {
   assertListboxPatternContract(coreRuntime, fixture.listbox)
   assertMenuButtonPatternContract(coreRuntime, fixture.menuButton)
   assertTreegridPatternContract(coreRuntime, fixture.treegrid)
+}
+
+function assertPublicReactPatternFixtures(coreRuntime, reactRuntime) {
+  if (!existsSync(publicReactPatternFixturePath)) {
+    failures.push('scripts/fixtures/public-react-pattern-contracts.json is required')
+    return
+  }
+
+  const fixture = JSON.parse(readFileSync(publicReactPatternFixturePath, 'utf8'))
+  expectEqual('public React pattern fixture schemaVersion', fixture.schemaVersion, 1)
+
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'treeview', fixture.treeview, [
+    '<div role="tree" aria-label="Documentation tree" aria-multiselectable="true">',
+    'role="treeitem" id="treeitem-docs"',
+    'aria-selected="true"',
+    'aria-expanded="true"',
+    'tabindex="0"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'tabs', fixture.tabs, [
+    'role="tablist" aria-label="Documentation tabs" aria-orientation="vertical"',
+    'role="tab" id="tab-tab-overview" aria-selected="true" aria-controls="tab-panel-overview" tabindex="0"',
+    'role="tabpanel" id="tab-panel-overview" aria-labelledby="tab-tab-overview" tabindex="0"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'combobox', fixture.combobox, [
+    'role="combobox"',
+    'aria-expanded="false"',
+    'aria-haspopup="listbox"',
+    'aria-autocomplete="list"',
+    'aria-activedescendant="combobox-option-combobox"',
+    'aria-controls="combobox-popup"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'dialog', fixture.dialog, [
+    'role="button" id="dialog-trigger" aria-haspopup="dialog" aria-expanded="true" aria-controls="dialog-modal"',
+    'role="dialog" id="dialog-modal" aria-modal="true" aria-labelledby="dialog-title" aria-describedby="dialog-description"',
+    'role="button" id="dialog-cancel"',
+    'role="button" id="dialog-submit"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'listbox', fixture.listbox, [
+    'role="listbox" aria-label="Number list" aria-multiselectable="true" aria-orientation="vertical" aria-activedescendant="option-one"',
+    'role="option" id="option-one" aria-selected="true" aria-posinset="1" aria-setsize="3"',
+    'role="option" id="option-three" aria-selected="false" aria-disabled="true" aria-posinset="3" aria-setsize="3"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'menuButton', fixture.menuButton, [
+    'role="button" id="mb-trigger" aria-haspopup="menu" aria-expanded="true" aria-controls="mb-menu" aria-label="Actions" tabindex="0"',
+    'role="menu" id="mb-menu" aria-labelledby="mb-trigger"',
+    'role="menuitem" id="mb-copy" tabindex="0"',
+    'role="menuitem" id="mb-paste" aria-disabled="true" tabindex="-1"',
+  ])
+}
+
+function assertReactPatternMarkupContract(coreRuntime, reactRuntime, label, fixture, expectedMarkupParts) {
+  const Component = reactRuntime[fixture?.component]
+  if (typeof Component !== 'function') {
+    failures.push(`public React ${label} fixture component is not exported: ${fixture?.component}`)
+    return
+  }
+
+  const data = parsePatternDataFixture(coreRuntime, `React ${label}`, fixture)
+  const options = parsePatternOptionsFixture(coreRuntime, `React ${label}`, fixture)
+  if (!data || !options) return
+
+  const markup = renderToStaticMarkup(createElement(Component, {
+    data,
+    options,
+    onEvent: () => undefined,
+  }))
+
+  for (const expected of expectedMarkupParts) {
+    if (!markup.includes(expected)) {
+      failures.push(`public React ${label} markup must include ${expected}; got ${markup}`)
+    }
+  }
 }
 
 function assertTreeviewPatternContract(coreRuntime, fixture) {

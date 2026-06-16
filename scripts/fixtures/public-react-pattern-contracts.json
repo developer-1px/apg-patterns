@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 1,
+  "treeview": {
+    "component": "Treeview",
+    "options": {
+      "selectionMode": "multiple"
+    },
+    "data": {
+      "items": {
+        "docs": { "label": "Docs" },
+        "overview": { "label": "Overview" },
+        "api": { "label": "API" }
+      },
+      "relations": {
+        "rootKeys": ["docs"],
+        "childrenByKey": { "docs": ["overview", "api"] }
+      },
+      "state": {
+        "activeKey": "docs",
+        "selectedKeys": ["overview"],
+        "expandedKeys": ["docs"],
+        "levelByKey": { "docs": 1, "overview": 2, "api": 2 },
+        "posInSetByKey": { "docs": 1, "overview": 1, "api": 2 },
+        "setSizeByKey": { "docs": 1, "overview": 2, "api": 2 }
+      },
+      "refs": { "label": "Documentation tree" }
+    }
+  },
+  "tabs": {
+    "component": "Tabs",
+    "options": {
+      "orientation": "vertical",
+      "activationMode": "automatic"
+    },
+    "data": {
+      "items": {
+        "tab-overview": { "label": "Overview" },
+        "tab-api": { "label": "API" },
+        "panel-overview": { "label": "Overview panel" },
+        "panel-api": { "label": "API panel" }
+      },
+      "relations": {
+        "rootKeys": ["tab-overview", "tab-api"],
+        "controlsByKey": {
+          "tab-overview": ["panel-overview"],
+          "tab-api": ["panel-api"]
+        },
+        "ownerByKey": {
+          "panel-overview": "tab-overview",
+          "panel-api": "tab-api"
+        }
+      },
+      "state": {
+        "activeKey": "tab-overview",
+        "selectedKeys": ["tab-overview"]
+      },
+      "refs": { "label": "Documentation tabs" }
+    }
+  },
+  "combobox": {
+    "component": "Combobox",
+    "options": {
+      "haspopup": "listbox",
+      "autocomplete": "list"
+    },
+    "data": {
+      "items": {
+        "combobox": { "label": "Search" },
+        "alpha": { "label": "Alpha" },
+        "beta": { "label": "Beta" }
+      },
+      "state": {
+        "activeKey": "combobox",
+        "expandedKeys": [],
+        "selectedKeys": []
+      },
+      "refs": { "label": "Search options" }
+    }
+  },
+  "dialog": {
+    "component": "Dialog",
+    "data": {
+      "items": {
+        "trigger": { "label": "Open dialog", "kind": "dialog" },
+        "modal": { "label": "Settings dialog" },
+        "title": { "label": "Settings" },
+        "description": { "label": "Configure settings" },
+        "cancel": { "label": "Cancel" },
+        "submit": { "label": "Save" }
+      },
+      "relations": {
+        "rootKeys": ["trigger"],
+        "controlsByKey": {
+          "trigger": ["modal"],
+          "modal": ["description"]
+        },
+        "ownerByKey": { "modal": "title" }
+      },
+      "state": {
+        "activeKey": "trigger",
+        "expandedKeys": ["trigger"]
+      },
+      "refs": { "initialFocusKey": "cancel" }
+    }
+  },
+  "listbox": {
+    "component": "Listbox",
+    "options": {
+      "focusStrategy": "ariaActiveDescendant",
+      "selectionMode": "multiple",
+      "orientation": "vertical"
+    },
+    "data": {
+      "items": {
+        "one": { "label": "One" },
+        "two": { "label": "Two" },
+        "three": { "label": "Three" }
+      },
+      "relations": {
+        "rootKeys": ["one", "two", "three"]
+      },
+      "state": {
+        "activeKey": "one",
+        "selectedKeys": ["one"],
+        "disabledKeys": ["three"],
+        "posInSetByKey": { "one": 1, "two": 2, "three": 3 },
+        "setSizeByKey": { "one": 3, "two": 3, "three": 3 }
+      },
+      "refs": { "label": "Number list" }
+    }
+  },
+  "menuButton": {
+    "component": "MenuButton",
+    "options": {
+      "focusStrategy": "rovingTabIndex"
+    },
+    "data": {
+      "items": {
+        "trigger": { "label": "Actions" },
+        "menu": { "label": "Actions menu" },
+        "copy": { "label": "Copy" },
+        "paste": { "label": "Paste" },
+        "delete": { "label": "Delete" }
+      },
+      "relations": {
+        "rootKeys": ["trigger"],
+        "childrenByKey": {
+          "trigger": ["menu"],
+          "menu": ["copy", "paste", "delete"]
+        },
+        "controlsByKey": { "trigger": ["menu"] },
+        "ownerByKey": { "menu": "trigger" }
+      },
+      "state": {
+        "activeKey": "copy",
+        "expandedKeys": ["trigger"],
+        "disabledKeys": ["paste"]
+      }
+    }
+  }
+}

@@ -29,25 +29,26 @@ export function useDialogPattern(data: PatternData, onEvent: (event: PatternEven
   const runtimeOptions = options ?? {}
   const keyToElementId = usePatternElementId(runtimeOptions, 'dialog-')
   const runtime = createPatternRuntime({ definition: dialogDefinition, data, options: runtimeOptions, onEvent, keyToElementId })
+  const keys = getDialogRuntimeKeys(data)
 
   usePatternEffects({ definition: dialogDefinition, data: runtime.data, keyToElementId })
 
   return {
-    open: data.state?.expandedKeys?.includes('trigger') ?? false,
+    open: keys.triggerKey ? data.state?.expandedKeys?.includes(keys.triggerKey) ?? false : false,
     get triggerProps() {
-      return reactProps(runtime.getPartProps('trigger', 'trigger'))
+      return keys.triggerKey ? reactProps(runtime.getPartProps('trigger', keys.triggerKey)) : {}
     },
     get overlayProps() {
       return reactProps(runtime.getPartProps('overlay'))
     },
     get dialogProps() {
-      return createDialogProps({ runtime, data, keyToElementId })
+      return keys.dialogKey ? createDialogProps({ runtime, data, keyToElementId, dialogKey: keys.dialogKey }) : {}
     },
     get titleProps() {
-      return reactProps(runtime.getPartProps('title', 'title'))
+      return keys.titleKey ? reactProps(runtime.getPartProps('title', keys.titleKey)) : {}
     },
     get descriptionProps() {
-      return reactProps(runtime.getPartProps('description', 'description'))
+      return keys.descriptionKey ? reactProps(runtime.getPartProps('description', keys.descriptionKey)) : {}
     },
     get cancelProps() {
       return reactProps(runtime.getPartProps('cancel', 'cancel'))
@@ -63,18 +64,34 @@ export function useDialogPattern(data: PatternData, onEvent: (event: PatternEven
   }
 }
 
+function getDialogRuntimeKeys(data: PatternData): {
+  triggerKey: Key | null
+  dialogKey: Key | null
+  titleKey: Key | null
+  descriptionKey: Key | null
+} {
+  const triggerKey = data.relations?.rootKeys?.[0] ?? (data.items.trigger ? 'trigger' : null)
+  const dialogKey = triggerKey ? data.relations?.controlsByKey?.[triggerKey]?.[0] ?? (data.items.dialog ? 'dialog' : null) : data.items.dialog ? 'dialog' : null
+  const titleKey = dialogKey ? data.relations?.ownerByKey?.[dialogKey] ?? (data.items.title ? 'title' : null) : data.items.title ? 'title' : null
+  const descriptionKey = dialogKey ? data.relations?.controlsByKey?.[dialogKey]?.[0] ?? (data.items.description ? 'description' : null) : data.items.description ? 'description' : null
+
+  return { triggerKey, dialogKey, titleKey, descriptionKey }
+}
+
 function createDialogProps({
   runtime,
   data,
   keyToElementId,
+  dialogKey,
 }: {
   runtime: ReturnType<typeof createPatternRuntime>
   data: PatternData
   keyToElementId: (key: Key) => string
+  dialogKey: Key
 }): ReactPatternProps {
   const rootKeyDown = runtime.getRootKeyboardHandler()
   return reactProps({
-    ...runtime.getPartProps('dialog', 'dialog'),
+    ...runtime.getPartProps('dialog', dialogKey),
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
       rootKeyDown(reactKeyInput(event))
       handlePatternTrapFocus({ event, definition: dialogDefinition, data, keyToElementId })

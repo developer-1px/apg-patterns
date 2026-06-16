@@ -214,6 +214,19 @@ definitions through the same built core entrypoint:
 Add a pattern to this fixture when its APG keyboard/focus behavior becomes part
 of the package identity rather than just demo coverage.
 
+`scripts/fixtures/public-react-pattern-contracts.json` anchors selected React
+preset components through the built `@interactive-os/aria/react` entrypoint and
+server-rendered markup:
+
+- `Treeview`, `Tabs`, `Combobox`, `Dialog`, `Listbox`, and `MenuButton` must
+  preserve representative role, id, ARIA relationship, selected/disabled, and
+  tab stop attributes at the published React component boundary.
+- The React fixture intentionally checks semantic markup fragments rather than
+  whole HTML snapshots, so layout wrappers and rendering composition can evolve
+  without weakening the public accessibility contract.
+- Relationship-keyed dialog data, including a non-literal dialog item key, must
+  render through the React preset. Literal demo keys are not the public API.
+
 ## Not A Stability Contract
 
 These details may change without being treated as package identity:
