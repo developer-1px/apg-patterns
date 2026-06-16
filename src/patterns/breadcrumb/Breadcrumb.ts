@@ -1,7 +1,6 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
-import type { ReactBreadcrumbItem } from './breadcrumbItem'
-import { useBreadcrumbPattern } from './useBreadcrumbPattern'
+import { useBreadcrumbPattern, type ReactBreadcrumbItem } from './useBreadcrumbPattern'
 
 type BreadcrumbDataItem = PatternItem & {
   href?: unknown

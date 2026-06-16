@@ -1,7 +1,6 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
-import type { ReactDisclosureItem } from './disclosureItem'
-import { useDisclosurePattern } from './useDisclosurePattern'
+import { useDisclosurePattern, type ReactDisclosureItem } from './useDisclosurePattern'
 
 type DisclosureDataItem = PatternItem & {
   content?: string

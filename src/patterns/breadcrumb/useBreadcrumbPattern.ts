@@ -1,7 +1,8 @@
-import { createPatternRuntime } from '../../kernel/patternRuntime'
+import type { MouseEvent } from 'react'
+import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
+import { withDefaultReason } from '../../kernel/domEventBindings'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
-import { createBreadcrumbItems, type ReactBreadcrumbItem } from './breadcrumbItem'
 import { breadcrumbDefinition } from './definition'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 
@@ -9,7 +10,14 @@ interface BreadcrumbItem extends PatternItem {
   href?: unknown
 }
 
-export type { ReactBreadcrumbItem } from './breadcrumbItem'
+type BreadcrumbData = PatternData<BreadcrumbItem>
+
+export interface ReactBreadcrumbItem {
+  key: Key
+  label: string
+  current: string | boolean | null
+  crumbProps: ReactPatternProps
+}
 
 export interface ReactBreadcrumbRuntime {
   rootProps: ReactPatternProps
@@ -50,4 +58,33 @@ export function useBreadcrumbPattern(data: PatternData<BreadcrumbItem>, onEvent:
     },
     keyToElementId: runtime.keyToElementId,
   }
+}
+
+function createBreadcrumbItems({
+  runtime,
+  data,
+  onEvent,
+}: {
+  runtime: PatternRuntime<BreadcrumbData>
+  data: BreadcrumbData
+  onEvent: (event: PatternEvent) => void
+}): readonly ReactBreadcrumbItem[] {
+  return (data.relations?.rootKeys ?? []).map((key) => {
+    const props = reactProps(runtime.getPartProps('crumb', key))
+    const current = data.state?.currentByKey?.[key] ?? null
+    return {
+      key,
+      label: data.items[key]?.label ?? key,
+      current,
+      crumbProps: reactProps({
+        ...props,
+        href: String(data.items[key]?.href ?? '#'),
+        'aria-current': current || undefined,
+        onClick: (event: MouseEvent<HTMLElement>) => {
+          event.preventDefault()
+          onEvent(withDefaultReason({ type: 'activate', key }, 'pointer'))
+        },
+      }),
+    }
+  })
 }

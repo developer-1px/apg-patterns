@@ -1,10 +1,17 @@
-import { createPatternRuntime } from '../../kernel/patternRuntime'
+import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { createReactKeyboardHandler, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { disclosureDefinition } from './definition'
-import { createDisclosureItems, createDisclosureTriggerProps, type ReactDisclosureItem } from './disclosureItem'
 import { usePatternElementId } from '../../adapters/reactDomIds'
-export type { ReactDisclosureItem } from './disclosureItem'
+
+export interface ReactDisclosureItem {
+  key: Key
+  label: string
+  panelKey: Key | null
+  expanded: boolean
+  triggerProps: ReactPatternProps
+  panelProps: ReactPatternProps | null
+}
 
 export interface ReactDisclosureRuntime {
   triggerKey: Key | null
@@ -54,5 +61,35 @@ export function useDisclosurePattern(data: PatternData, onEvent: (event: Pattern
       return { forKey: runtime.keyToElementId }
     },
     keyToElementId: runtime.keyToElementId,
+  }
+}
+
+function createDisclosureItems({
+  runtime,
+  data,
+  expandedKeys,
+}: {
+  runtime: PatternRuntime
+  data: PatternData
+  expandedKeys: readonly Key[]
+}): readonly ReactDisclosureItem[] {
+  return (data.relations?.rootKeys ?? []).map((key) => {
+    const panelKey = data.relations?.controlsByKey?.[key]?.[0] ?? null
+    return {
+      key,
+      label: data.items[key]?.label ?? key,
+      panelKey,
+      expanded: expandedKeys.includes(key),
+      triggerProps: createDisclosureTriggerProps(runtime, key),
+      panelProps: panelKey ? reactProps(runtime.getItemProps('panel', panelKey)) : null,
+    }
+  })
+}
+
+function createDisclosureTriggerProps(runtime: PatternRuntime, key: Key): ReactPatternProps {
+  const { onKeyDown: _onKeyDown, ...props } = reactProps(runtime.getItemProps('trigger', key))
+  return {
+    ...props,
+    onKeyDown: createReactKeyboardHandler(runtime.getRootKeyboardHandler()),
   }
 }
