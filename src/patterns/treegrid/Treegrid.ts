@@ -1,7 +1,6 @@
 import { createElement, type ComponentPropsWithoutRef, type CSSProperties, type ReactNode } from 'react'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
-import type { ReactTreegridCell } from './treegridRow'
-import { useTreegridPattern } from './useTreegridPattern'
+import { useTreegridPattern, type ReactTreegridCell } from './useTreegridPattern'
 
 type DivProps = ComponentPropsWithoutRef<'div'>
 
