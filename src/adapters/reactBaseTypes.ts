@@ -1,5 +1,8 @@
 import type { HTMLAttributes, KeyboardEvent } from 'react'
 import type { KeyInput } from '../internal/keyboard'
+import { withDefaultReason } from '../kernel/domEventBindings'
+import type { PatternRuntime } from '../kernel/patternRuntime'
+import type { Key } from '../schema'
 
 export type ReactPatternProps = HTMLAttributes<HTMLElement>
 
@@ -22,6 +25,14 @@ export function reactKeyInput(event: KeyboardEvent<HTMLElement>): KeyInput & { p
     timeStamp: event.timeStamp,
     preventDefault: () => event.preventDefault(),
   }
+}
+
+export function dispatchReactKeyboardBinding(runtime: PatternRuntime, key: Key, event: KeyboardEvent<HTMLElement>) {
+  const result = runtime.resolveKeyboardBinding(reactKeyInput(event), key)
+  if (!result) return false
+  if (result.preventDefault) event.preventDefault()
+  for (const next of result.events) runtime.emit(withDefaultReason(next, 'keyboard'))
+  return true
 }
 
 export interface ReactRenderItemState {
