@@ -40,13 +40,9 @@ export function Accordion<TItem extends AccordionDataItem = AccordionDataItem>({
           createElement('button', { key: `${item.key}-button`, ...item.headerProps } as ButtonProps, renderHeader?.(item, data.items[item.key]) ?? item.label),
         ]),
         item.state.expanded && item.panelProps
-          ? createElement('div', { key: `${item.key}-panel`, ...item.panelProps } as DivProps, renderPanel?.(item, panelItem) ?? renderDefaultPanel(panelItem))
+          ? createElement('div', { key: `${item.key}-panel`, ...item.panelProps } as DivProps, renderPanel?.(item, panelItem) ?? panelItem?.content ?? panelItem?.label ?? null)
           : null,
       ])
     }),
   )
-}
-
-function renderDefaultPanel<TItem extends AccordionDataItem>(item: TItem | undefined) {
-  return item?.content ?? item?.label ?? null
 }
