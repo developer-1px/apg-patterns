@@ -1,4 +1,6 @@
 import { createApgTypeaheadBuffer, type ApgTypeaheadBuffer, type KeyInput } from '../../internal/keyboard'
+import { findApgTypeaheadMatch } from '../../internal/collectionNavigation'
+import { getPatternItemTextValue } from '../../internal/patternItemText'
 import {
   PatternDataSchema,
   PatternEventSchema,
@@ -10,7 +12,7 @@ import {
 } from '../../schema'
 import { treeviewDefinition } from './definition'
 import { createPatternRuntime, type PatternRuntime, type SlotProps } from '../../kernel/patternRuntime'
-import { resolveTreeviewVisibleKeys, resolveTypeaheadTarget } from './typeahead'
+import { resolveVisibleOrder } from '../../kernel/patternKernel'
 import { createElementId } from '../../kernel/domIds'
 import { withNonEnumerableMeta } from '../../kernel/domEventBindings'
 
@@ -131,6 +133,23 @@ function toTreeviewRenderState(state: Record<string, unknown>): TreeviewRenderSt
   out.expanded = Boolean(state.expanded)
   if (state.checked !== undefined) out.checked = state.checked as boolean | 'mixed'
   return out
+}
+
+function resolveTreeviewVisibleKeys(data: PatternData): readonly Key[] {
+  return resolveVisibleOrder(treeviewDefinition.navigation.visibleOrder, data)
+}
+
+function resolveTypeaheadTarget(query: string | null, data: PatternData, options: PatternOptions): Key | null {
+  if (options.typeaheadEnabled === false) return null
+  if (!query) return null
+
+  return findApgTypeaheadMatch(
+    resolveTreeviewVisibleKeys(data).map((key) => ({
+      item: key,
+      label: getPatternItemTextValue(data, key),
+    })),
+    query,
+  )
 }
 
 function createTreeProps({
