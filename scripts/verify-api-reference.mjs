@@ -114,6 +114,153 @@ const forbiddenPublicExports = new Map([
   ['windowsplitterDefinition', 'use windowSplitterDefinition'],
 ])
 
+const rootCoreContractTypes = new Set([
+  'AriaAttribute',
+  'AriaProjection',
+  'AriaRole',
+  'AriaSourcePath',
+  'CreatePatternRuntimeInput',
+  'DomEventName',
+  'EffectDefinition',
+  'ElementTarget',
+  'EventTemplate',
+  'EventValueSource',
+  'FocusModel',
+  'FocusProjection',
+  'Key',
+  'KeyboardBinding',
+  'KeyInput',
+  'ModifierKeyName',
+  'NavigationTargetContext',
+  'NavigationTargetKind',
+  'PartEventBinding',
+  'PatternData',
+  'PatternDefinition',
+  'PatternDirection',
+  'PatternEvent',
+  'PatternEventReason',
+  'PatternEventType',
+  'PatternItem',
+  'PatternOptions',
+  'PatternRuntime',
+  'PatternRuntimeContext',
+  'PatternState',
+  'PatternValueStepDirection',
+  'Predicate',
+  'SlotProps',
+  'StateAction',
+  'StateField',
+  'StateProjection',
+  'Transition',
+  'TransitionValue',
+  'TabsDataDiagnostic',
+  'TabsDataDiagnosticCode',
+  'VisibleOrderKind',
+  'WindowSplitterDataDiagnostic',
+  'WindowSplitterDataDiagnosticCode',
+  'WindowSplitterValueData',
+  'WindowSplitterValueOptions',
+  'WindowSplitterValueRange',
+  'WindowSplitterValueState',
+])
+
+const rootCoreRuntimeBoundaryExports = new Set([
+  'clampWindowSplitterValue',
+  'createParentByKey',
+  'createPatternRuntime',
+  'evaluatePredicate',
+  'getTabsDataDiagnostics',
+  'getWindowSplitterDataDiagnostics',
+  'reducePatternData',
+  'reduceWindowSplitterValue',
+  'resolveAriaSource',
+  'resolveEventTemplate',
+  'resolveKeyToken',
+  'resolveNavigationTarget',
+  'resolveStateProjection',
+  'resolveVisibleOrder',
+  'resolveWindowSplitterStepValue',
+  'resolveWindowSplitterValueRange',
+])
+
+const rootCoreExtensionExports = new Set([
+  'defineAriaSource',
+  'defineDomEvent',
+  'defineKeyToken',
+  'defineNavigationTarget',
+  'definePredicate',
+  'defineStateProjection',
+  'defineVisibleOrder',
+  'isRegisteredAriaSource',
+  'isRegisteredNavigationTarget',
+  'isRegisteredPredicate',
+  'isRegisteredStateProjection',
+  'isRegisteredVisibleOrder',
+])
+
+const reactComponentExports = new Set([
+  'Accordion',
+  'Alert',
+  'AlertDialog',
+  'Breadcrumb',
+  'Button',
+  'Carousel',
+  'Checkbox',
+  'Combobox',
+  'Dialog',
+  'Disclosure',
+  'Feed',
+  'Grid',
+  'Landmarks',
+  'Link',
+  'Listbox',
+  'Menu',
+  'Menubar',
+  'MenuButton',
+  'Meter',
+  'RadioGroup',
+  'Slider',
+  'Spinbutton',
+  'Switch',
+  'Table',
+  'Tabs',
+  'Toolbar',
+  'Tooltip',
+  'Treegrid',
+  'Treeview',
+  'WindowSplitter',
+])
+
+const reactDataHelperExports = new Set([
+  'CommandSurfaceDataOptions',
+  'CommandSurfaceItem',
+  'createMenuButtonPatternData',
+  'createRadioGroupPatternData',
+  'createToolbarPatternData',
+  'MenuButtonCommandSurfaceDataOptions',
+  'ReactMenuButtonTriggerState',
+  'ReactToolbarItemKind',
+  'SelectableCommandSurfaceDataOptions',
+])
+
+const reactOwnerAdapterExports = new Set([
+  'AutocompleteListboxActions',
+  'AutocompleteListboxOptions',
+  'AutocompleteListboxState',
+  'AutocompleteOwnerAutocomplete',
+  'dispatchAutocompleteOwnerKeyDown',
+  'useAutocompleteListbox',
+])
+
+const reactStateHelperExports = new Set([
+  'PatternStateReducerOptions',
+  'PatternStateReducerResult',
+  'ReactControlledDialogConfig',
+  'ReactControlledDialogOpenChangeMeta',
+  'ReactDialogFocusTarget',
+  'usePatternStateReducer',
+])
+
 if (!existsSync(apiReferencePath)) {
   throw new Error('API.md is required')
 }
@@ -137,6 +284,8 @@ assertNoForbiddenPublicExports('./react runtime exports', reactRuntimeExports)
 
 const reactOnlyExports = reactExports.filter((name) => !coreExports.includes(name))
 const reactOnlyRuntimeExports = reactRuntimeExports.filter((name) => !coreRuntimeExports.includes(name))
+const rootSurfaceBuckets = assertClassifiedPublicExports('root/core declaration exports', coreExports, classifyRootCoreExport)
+const reactSurfaceBuckets = assertClassifiedPublicExports('./react-only declaration exports', reactOnlyExports, classifyReactOnlyExport)
 const nextApiReference = shouldWrite
   ? replaceExportBlock(
     replaceExportBlock(
@@ -172,7 +321,7 @@ if (failures.length > 0) {
   process.exit(1)
 }
 
-console.log(`${wroteApiReference ? 'Updated API reference and verified' : 'API reference covers'} ${coreExports.length} root/core exports, ${rootRuntimeExports.length} root/core runtime values, ${reactOnlyExports.length} React-only exports, and ${reactOnlyRuntimeExports.length} React-only runtime values.`)
+console.log(`${wroteApiReference ? 'Updated API reference and verified' : 'API reference covers'} ${coreExports.length} root/core exports, ${rootRuntimeExports.length} root/core runtime values, ${reactOnlyExports.length} React-only exports, and ${reactOnlyRuntimeExports.length} React-only runtime values. Surface buckets: root/core ${formatBuckets(rootSurfaceBuckets)}; react-only ${formatBuckets(reactSurfaceBuckets)}.`)
 
 function declarationExports(packagePath) {
   const filePath = fileURLToPath(new URL(packagePath, repoRoot))
@@ -231,6 +380,55 @@ function assertNoForbiddenPublicExports(label, exports) {
     const reason = forbiddenPublicExports.get(name)
     if (reason) failures.push(`${label} must not expose ${name}: ${reason}`)
   }
+}
+
+function assertClassifiedPublicExports(label, exports, classify) {
+  const buckets = new Map()
+  const unclassified = []
+
+  for (const name of exports) {
+    const bucket = classify(name)
+    if (!bucket) {
+      unclassified.push(name)
+      continue
+    }
+    buckets.set(bucket, (buckets.get(bucket) ?? 0) + 1)
+  }
+
+  if (unclassified.length > 0) {
+    failures.push(`${label} contains unclassified public exports: ${unclassified.join(', ')}`)
+  }
+
+  return buckets
+}
+
+function classifyRootCoreExport(name) {
+  if (/^[a-z][A-Za-z0-9]*Definition$/.test(name)) return 'apg-pattern-definition'
+  if (name.endsWith('Schema')) return 'schema-validator'
+  if (name.endsWith('Resolver')) return 'extension-resolver-type'
+  if (rootCoreContractTypes.has(name)) return 'core-contract-type'
+  if (rootCoreRuntimeBoundaryExports.has(name)) return 'runtime-boundary'
+  if (rootCoreExtensionExports.has(name)) return 'extension-vocabulary'
+  return null
+}
+
+function classifyReactOnlyExport(name) {
+  if (reactComponentExports.has(name)) return 'react-preset-component'
+  if (reactComponentExports.has(name.replace(/Props$/, ''))) return 'react-preset-props'
+  if (reactDataHelperExports.has(name)) return 'react-data-helper'
+  if (reactOwnerAdapterExports.has(name)) return 'react-owner-adapter'
+  if (reactStateHelperExports.has(name)) return 'react-state-helper'
+  if (/^use[A-Z][A-Za-z0-9]*Pattern$/.test(name)) return 'react-pattern-hook'
+  if (/^React[A-Z][A-Za-z0-9]*(Runtime|Options)$/.test(name)) return 'react-runtime-type'
+  if (/^React[A-Z][A-Za-z0-9]*(RenderItem|Item|Slide|Article|Cell|Row|Option)$/.test(name)) return 'react-render-surface-type'
+  return null
+}
+
+function formatBuckets(buckets) {
+  return [...buckets.entries()]
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([name, count]) => `${name}:${count}`)
+    .join(', ')
 }
 
 function assertExportBlock(name, exports) {

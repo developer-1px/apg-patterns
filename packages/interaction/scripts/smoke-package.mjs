@@ -32,7 +32,7 @@ try {
     stdio: 'pipe',
   })
 
-  console.log('interaction package smoke passed for npm pack contents, runtime/definition subpaths, React subpath, TypeScript resolution, and runtime schema isolation')
+  console.log('interaction package smoke passed for npm pack contents, runtime/definition/APG/React subpaths, TypeScript resolution, and schema isolation')
 } finally {
   rmSync(tempRoot, { recursive: true, force: true })
 }
@@ -60,6 +60,10 @@ function packPackage(destination) {
     'dist/index.cjs',
     'dist/index.d.ts',
     'dist/index.d.cts',
+    'dist/apg.js',
+    'dist/apg.cjs',
+    'dist/apg.d.ts',
+    'dist/apg.d.cts',
     'dist/runtime.js',
     'dist/runtime.cjs',
     'dist/runtime.d.ts',
@@ -93,7 +97,7 @@ function packPackage(destination) {
 }
 
 function assertRuntimeEntrypointIsSchemaFree(packageRootInConsumer) {
-  for (const entry of ['dist/runtime.js', 'dist/runtime.cjs']) {
+  for (const entry of ['dist/runtime.js', 'dist/runtime.cjs', 'dist/apg.js', 'dist/apg.cjs']) {
     const files = collectLocalRuntimeFiles(packageRootInConsumer, entry, new Set())
     for (const file of files) {
       const contents = readFileSync(join(packageRootInConsumer, file), 'utf8')
@@ -140,6 +144,7 @@ import {
   createInteractionOwnershipRegistry,
   routeInteractionKey,
 } from '@interactive-os/interaction'
+import { createApgInteractionOwner } from '@interactive-os/interaction/apg'
 import {
   createInteractionRouter,
   shellOwner,
@@ -181,6 +186,20 @@ const router = createInteractionRouter({
 })
 const shortcutRoute = router.route({ key: 'k', code: 'KeyK', metaKey: true, targetKind: 'pattern' })
 if (shortcutRoute.status !== 'owner') throw new Error('expected runtime shortcut route')
+
+const apgOwner = createApgInteractionOwner({
+  id: 'tree-bridge',
+  definition: {
+    apgPattern: 'treeview',
+    rootRole: 'tree',
+    focusModel: 'ariaActiveDescendant',
+    keyboard: [{ shortcut: 'ArrowDown', cases: [{ events: [{ type: 'navigate' }] }] }],
+  },
+})
+const bridgeRouter = createInteractionRouter({ owners: [apgOwner], activeOwnerId: apgOwner.id })
+if (bridgeRouter.route({ key: 'ArrowDown', targetKind: 'scroll-container' }).status !== 'owner') {
+  throw new Error('expected APG bridge owner route')
+}
 if (typeof InteractionProvider !== 'function') throw new Error('missing React provider')
 `)
 
@@ -189,6 +208,7 @@ const {
   createInteractionOwnershipRegistry,
   routeInteractionKey,
 } = require('@interactive-os/interaction')
+const { createApgInteractionOwner } = require('@interactive-os/interaction/apg')
 const {
   createInteractionRouter,
   shellOwner,
@@ -230,6 +250,20 @@ const router = createInteractionRouter({
 })
 const shortcutRoute = router.route({ key: 'k', code: 'KeyK', metaKey: true, targetKind: 'pattern' })
 if (shortcutRoute.status !== 'owner') throw new Error('expected runtime shortcut route')
+
+const apgOwner = createApgInteractionOwner({
+  id: 'tree-bridge',
+  definition: {
+    apgPattern: 'treeview',
+    rootRole: 'tree',
+    focusModel: 'ariaActiveDescendant',
+    keyboard: [{ shortcut: 'ArrowDown', cases: [{ events: [{ type: 'navigate' }] }] }],
+  },
+})
+const bridgeRouter = createInteractionRouter({ owners: [apgOwner], activeOwnerId: apgOwner.id })
+if (bridgeRouter.route({ key: 'ArrowDown', targetKind: 'scroll-container' }).status !== 'owner') {
+  throw new Error('expected APG bridge owner route')
+}
 if (typeof InteractionProvider !== 'function') throw new Error('missing React provider')
 `)
 
@@ -239,6 +273,7 @@ import {
   routeInteractionKey,
   type InteractionOwner,
 } from '@interactive-os/interaction'
+import { createApgInteractionOwner } from '@interactive-os/interaction/apg'
 import {
   createInteractionActions,
   createInteractionOwner,
@@ -290,6 +325,15 @@ const router = createInteractionRouter({
     keys: [{ key: 'k', mod: 'primary', action: 'palette.open' }],
   })],
 })
+const apgOwner = createApgInteractionOwner({
+  id: 'tree-bridge',
+  definition: {
+    apgPattern: 'treeview',
+    rootRole: 'tree',
+    focusModel: 'ariaActiveDescendant',
+    keyboard: [{ shortcut: 'ArrowDown', cases: [{ events: [{ type: 'navigate' }] }] }],
+  },
+})
 type Actions = {
   'palette.open': void
   'palette.move': { delta: number }
@@ -306,6 +350,7 @@ type ActionDescriptor = InteractionActionDescriptorFor<Actions>
 route.status satisfies 'owner' | 'restore' | 'native' | 'ignored'
 platformRoute.status satisfies 'owner' | 'restore' | 'native' | 'ignored'
 uncheckedOwner.kind satisfies InteractionOwner['kind']
+apgOwner.kind satisfies InteractionOwner['kind']
 action?.type satisfies 'palette.open' | undefined
 delta satisfies number | undefined
 void (null as ActionDescriptor | null)

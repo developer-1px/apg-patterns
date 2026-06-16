@@ -1,8 +1,10 @@
 import type { Key, PatternData, PatternDefinition, PatternEvent } from '../schema'
 import { createParentByKey, resolveNavigationTarget, resolveVisibleOrder } from './patternKernel'
+import { registerKernelBuiltins } from './kernelBuiltins'
 import { reduceDeclarativeTransitions } from './patternTransitions'
 
 export function reducePatternData(definition: PatternDefinition, data: PatternData, event: PatternEvent): PatternData {
+  registerKernelBuiltins()
   const declarative = reduceDeclarativeTransitions(definition, data, event)
   if (declarative) return withLastEventReason(declarative, event)
 

@@ -62,6 +62,16 @@
         "default": "./dist/definition.cjs"
       }
     },
+    "./apg": {
+      "import": {
+        "types": "./dist/apg.d.ts",
+        "default": "./dist/apg.js"
+      },
+      "require": {
+        "types": "./dist/apg.d.cts",
+        "default": "./dist/apg.cjs"
+      }
+    },
     "./react": {
       "import": {
         "types": "./dist/react.d.ts",
@@ -84,7 +94,8 @@
   ],
   "scripts": {
     "build": "tsup --config tsup.config.ts",
-    "check": "npm run typecheck && npm test && npm run build && npm run smoke:package",
+    "check": "npm run typecheck && npm test && npm run build && npm run check:api && npm run smoke:package",
+    "check:api": "node scripts/verify-api-reference.mjs",
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run check",
     "smoke:package": "node scripts/smoke-package.mjs",

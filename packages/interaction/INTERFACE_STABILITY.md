@@ -9,6 +9,8 @@ while the API is hardened against APG demo shell and product shell usage.
 - `@interactive-os/interaction/runtime` stays React-free and Zod-free.
 - `@interactive-os/interaction/definition` owns Zod schemas, validation, and
   checked compile.
+- `@interactive-os/interaction/apg` owns APG structural adapters. It stays
+  outside the core runtime entrypoint and must remain React-free and Zod-free.
 - React support stays behind `@interactive-os/interaction/react`.
 - The package coordinates ownership; it does not implement APG pattern
   internals.
@@ -18,10 +20,22 @@ while the API is hardened against APG demo shell and product shell usage.
 - Runtime-first owner shortcuts are the preferred first-use contract.
   Serializable owner definitions remain the validation, catalog, and generated
   definition contract.
+- APG bridge helpers may accept APG-shaped structural contracts, but they stay
+  in the interaction package and must not import `@interactive-os/aria`.
 - Callback owners remain an adapter surface while the runtime and definition
   layers harden.
 - Browser event adapters are optional helpers around the pure routing and focus
   guard functions.
+
+## Public Surface Table
+
+| Surface | Tier | Good | Still weak |
+| --- | --- | --- | --- |
+| `@interactive-os/interaction/runtime` | Permanent core | React-free, Zod-free, decision-oriented owner/route/focus APIs | Callback owner shortcuts are convenient but less serializable than owner definitions |
+| `@interactive-os/interaction/definition` | Permanent validation/catalog | Serializable definitions, strict schemas, checked compile, schema boundary is explicit | Broad `kind` vocabulary still needs long-term naming pressure from real APG/product shells |
+| `@interactive-os/interaction/apg` | Standard adapter | APG-shaped keyboard/focus contracts map to interaction owners without depending on `@interactive-os/aria` | Adapter shape is newer than the core runtime; keep it off the root/runtime aggregate while it hardens |
+| `@interactive-os/interaction/react` | Framework adapter | React stays optional and out of the root/runtime entries | Hook ergonomics depend on more product-shell usage before calling it permanent |
+| `@interactive-os/interaction` | Compatibility aggregate | React-free migration path for existing imports | Bundle-sensitive and 30-year API docs should prefer explicit subpaths |
 
 ## Stable Concepts
 
@@ -35,6 +49,8 @@ while the API is hardened against APG demo shell and product shell usage.
   serializable action params.
 - Matched routes expose the matched action descriptor so host shells can
   dispatch effects without reading callback closures.
+- APG bridge owners route pattern keyboard ownership only; APG runtimes remain
+  responsible for local pattern state transitions and semantic props.
 - Platform-specific bindings are selected only when route input declares a
   platform; otherwise the base key rule is used. Runtime shortcut `primary`
   bindings compile to platform-specific Meta/Control rules.

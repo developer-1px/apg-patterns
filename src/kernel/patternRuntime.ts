@@ -43,7 +43,6 @@ export interface CreatePatternRuntimeInput {
 
 export function createPatternRuntime<TData extends PatternData = PatternData>(input: Omit<CreatePatternRuntimeInput, 'data'> & { data: TData }): PatternRuntime<TData> {
   registerKernelBuiltins()
-
   // Fail fast at the runtime boundary so schema violations are localized.
   const definition = PatternDefinitionSchema.parse(input.definition)
   const data = PatternDataSchema.parse(input.data) as TData

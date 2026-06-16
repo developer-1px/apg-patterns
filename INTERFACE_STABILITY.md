@@ -86,6 +86,42 @@ identity from implementation shape.
 - The package has no install lifecycle scripts.
 - Public release uses npm provenance and the configured public registry.
 
+## Public Surface Taxonomy
+
+Every public export must fit one of these buckets. `npm run check:api` enforces
+this taxonomy so accidental exports fail before release.
+
+### Root And Core
+
+- `apg-pattern-definition`: pattern definition constants such as
+  `treeviewDefinition` and `tabsDefinition`.
+- `core-contract-type`: stable data, event, definition, runtime, option, and
+  vocabulary types such as `PatternData`, `PatternEvent`,
+  `PatternDefinition`, and `PatternRuntime`.
+- `schema-validator`: Zod schemas that validate the serializable contract.
+- `runtime-boundary`: runtime functions that callers use to create, reduce, or
+  inspect APG pattern behavior, such as `createPatternRuntime` and
+  `reducePatternData`.
+- `extension-vocabulary`: explicit extension registration and discovery
+  helpers, such as `defineNavigationTarget` and `isRegisteredPredicate`.
+- `extension-resolver-type`: resolver callback types used by the extension
+  vocabulary.
+
+### React
+
+- `react-pattern-hook`: `useXPattern(data, onEvent, options?)` hooks.
+- `react-preset-component`: descriptor-backed preset components.
+- `react-preset-props`: preset component prop types.
+- `react-data-helper`: app-owned `PatternData` helper factories and related
+  command-surface option/item types.
+- `react-owner-adapter`: focus-retaining owner/composite adapters such as
+  autocomplete listbox ownership helpers.
+- `react-state-helper`: controlled state, reducer, and open-change bridge
+  helpers that keep app state outside the package runtime.
+- `react-runtime-type`: hook return/runtime types.
+- `react-render-surface-type`: render item, row, cell, option, and related
+  JSX mapping surface types.
+
 ## Not A Stability Contract
 
 These details may change without being treated as package identity:

@@ -2,6 +2,7 @@ import { defineConfig } from 'tsup'
 
 export default defineConfig({
   entry: {
+    apg: 'src/apg.ts',
     index: 'src/index.ts',
     runtime: 'src/runtime.ts',
     definition: 'src/definition.ts',

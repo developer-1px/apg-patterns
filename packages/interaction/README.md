@@ -26,6 +26,7 @@ npm install @interactive-os/interaction react
 ```ts
 import { createInteractionRouter, temporaryControl } from '@interactive-os/interaction/runtime'
 import { compileInteractionOwnerDefinition } from '@interactive-os/interaction/definition'
+import { createApgInteractionOwner } from '@interactive-os/interaction/apg'
 import { InteractionProvider } from '@interactive-os/interaction/react'
 ```
 
@@ -35,6 +36,9 @@ import { InteractionProvider } from '@interactive-os/interaction/react'
 - `@interactive-os/interaction/definition`: Zod schemas, validation helpers,
   and checked compile for JSON, catalogs, docs, LLM-authored definitions, and
   tests.
+- `@interactive-os/interaction/apg`: APG structural adapter for turning APG
+  keyboard contracts into interaction owners without importing
+  `@interactive-os/aria`.
 - `@interactive-os/interaction`: compatibility aggregate. Prefer the subpaths
   for bundle-sensitive code. Root and definition imports load Zod-backed schema
   code; production runtime code should import the runtime subpath.
@@ -170,6 +174,46 @@ Definition `kind` values such as `tree`, `grid`, and `toolbar` compile to the
 runtime owner kind `pattern`. Values such as `input`, `form`, `editor`,
 `dialog`, and `popover` compile to `temporary-control`. `shell` compiles to
 `shell`.
+
+## APG Pattern Bridge
+
+Use `createApgInteractionOwner` when an APG pattern runtime already owns its
+local keyboard behavior and the shell only needs ownership routing. The helper
+accepts an APG-shaped structural contract, so the interaction package does not
+import `@interactive-os/aria`.
+
+```ts
+import {
+  createApgInteractionOwner,
+} from '@interactive-os/interaction/apg'
+import {
+  createInteractionRouter,
+} from '@interactive-os/interaction/runtime'
+
+const treeOwner = createApgInteractionOwner({
+  id: 'files.tree',
+  label: 'Files',
+  definition: {
+    apgPattern: 'treeview',
+    rootRole: 'tree',
+    focusModel: 'ariaActiveDescendant',
+    keyboard: [
+      { shortcut: 'ArrowDown', cases: [{ events: [{ type: 'navigate' }] }] },
+      { shortcut: 'ArrowUp', cases: [{ events: [{ type: 'navigate' }] }] },
+    ],
+  },
+})
+
+const router = createInteractionRouter({
+  owners: [treeOwner],
+  activeOwnerId: treeOwner.id,
+})
+
+router.route({ key: 'ArrowDown', targetKind: 'scroll-container' }).status
+```
+
+The generated owner claims APG pattern keys from pattern, scroll-container, and
+incidental targets, but native text entry remains protected by default.
 
 ## React Example
 

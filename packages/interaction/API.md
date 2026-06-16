@@ -22,6 +22,7 @@ import {
   temporaryControl,
 } from '@interactive-os/interaction/runtime'
 import { compileInteractionOwnerDefinition } from '@interactive-os/interaction/definition'
+import { createApgInteractionOwner } from '@interactive-os/interaction/apg'
 import { InteractionProvider } from '@interactive-os/interaction/react'
 ```
 
@@ -30,6 +31,8 @@ import { InteractionProvider } from '@interactive-os/interaction/react'
   focus guard, event adapter, and diagnostics.
 - `@interactive-os/interaction/definition`: Zod schemas, validation helpers,
   and checked compile for serializable definitions.
+- `@interactive-os/interaction/apg`: React-free and Zod-free APG structural
+  adapter for turning APG pattern keyboard contracts into interaction owners.
 - `@interactive-os/interaction`: compatibility aggregate. It remains
   React-free, but bundle-sensitive consumers should import from the runtime or
   definition subpath directly. Root and definition imports load Zod-backed
@@ -427,7 +430,59 @@ summary, and focus guard summary.
 
 Diagnostics are read-only. They are safe to log, snapshot, or show in demos.
 
-### 9. Use React Adapters
+### 9. Bridge APG Pattern Contracts
+
+Use `defineApgInteractionOwner` or `createApgInteractionOwner` when an APG
+pattern runtime already owns local keyboard behavior and the shell only needs
+ownership routing.
+
+The bridge accepts an APG-shaped structural contract. It does not import
+`@interactive-os/aria`, so dependency direction stays one-way: shells and
+interaction code can consume APG contracts, but `@interactive-os/aria` does not
+depend on `@interactive-os/interaction`.
+
+```ts
+import {
+  createApgInteractionOwner,
+} from '@interactive-os/interaction/apg'
+import {
+  createInteractionRouter,
+} from '@interactive-os/interaction/runtime'
+
+const treeOwner = createApgInteractionOwner({
+  id: 'files.tree',
+  label: 'Files',
+  definition: {
+    apgPattern: 'treeview',
+    rootRole: 'tree',
+    focusModel: 'ariaActiveDescendant',
+    keyboard: [
+      { shortcut: 'ArrowDown', cases: [{ events: [{ type: 'navigate' }] }] },
+      { shortcut: 'ArrowUp', cases: [{ events: [{ type: 'navigate' }] }] },
+    ],
+  },
+})
+
+const router = createInteractionRouter({
+  owners: [treeOwner],
+  activeOwnerId: treeOwner.id,
+})
+```
+
+Bridge contract:
+
+- APG `focusModel: "rovingTabIndex"` maps to interaction
+  `focus.strategy: "roving-tabindex"`.
+- APG `focusModel: "ariaActiveDescendant"` maps to interaction
+  `focus.strategy: "aria-activedescendant"`.
+- APG keyboard bindings become routeable interaction key rules.
+- Pattern keys are claimable from `pattern`, `scroll-container`, and
+  `incidental` targets by default.
+- Native text entry remains protected by default.
+- The generated route action defaults to `<apgPattern>.keyboard` with
+  `apgPattern`, `rootRole`, and `shortcut` metadata.
+
+### 10. Use React Adapters
 
 The React subpath is optional.
 
@@ -470,6 +525,7 @@ The package owns decisions, not app effects.
   `targetPolicy` or shortcut `allowNativeText`.
 - Do not treat DOM focus as the only ownership signal in composite shells.
 - Do not route keys from React hooks before registering the intended owner.
+- Do not put APG structural adapters in the core runtime entrypoint.
 - Do not import React from the root entrypoint.
 - Do not make `@interactive-os/interaction` a dependency of
   `@interactive-os/aria`.
@@ -478,6 +534,9 @@ The package owns decisions, not app effects.
 
 ```txt
 classifyInteractionKeyTarget
+compileInteractionCommandBindings
+compileInteractionCommandDefinitions
+defineInteractionCommandDefinitions
 compileInteractionOwnerUnchecked
 compileInteractionOwnersUnchecked
 createInteractionActions
@@ -490,6 +549,11 @@ describeInteractionDomFocus
 evaluateInteractionCondition
 evaluateInteractionFocusGuard
 evaluateInteractionFocusTarget
+formatInteractionCommandBinding
+formatInteractionCommandKeyboardShortcut
+formatInteractionCommandPointerInput
+getInteractionCommandBindingSummary
+getInteractionCommandMapping
 getInteractionAction
 getInteractionRouteAction
 handleInteractionKeyboardEvent
@@ -514,13 +578,24 @@ InteractionActionHelpers
 InteractionActionMap
 InteractionActionOf
 InteractionActionRouteLike
+InteractionCommandBindingDefinition
+InteractionCommandBindingSummaryInput
+InteractionCommandCompiledBinding
+InteractionCommandDefinition
+InteractionCommandKeyboardShortcutDefinition
+InteractionCommandLabelOptions
+InteractionCommandMapping
+InteractionCommandPointerInputDefinition
+InteractionCommandShortcutModifier
 InteractionCondition
 InteractionDefinitionKeyInput
 InteractionDiagnosticsOptions
 InteractionDiagnosticsSnapshot
 InteractionDomFocusSnapshot
 InteractionFocusContainment
+InteractionFocusDefinition
 InteractionFocusGuardAction
+InteractionFocusGuardPolicy
 InteractionFocusGuardInput
 InteractionFocusGuardReason
 InteractionFocusGuardResult
@@ -573,6 +648,24 @@ InteractionShortcutModifier
 InteractionShortcutOwnerOptions
 InteractionTargetPolicy
 InteractionTemporaryControlOptions
+```
+
+## APG Bridge Exports
+
+```txt
+createApgInteractionOwner
+defineApgInteractionOwner
+```
+
+## APG Bridge Type Exports
+
+```txt
+ApgInteractionEventTemplate
+ApgInteractionFocusModel
+ApgInteractionKeyboardBinding
+ApgInteractionKeyboardCase
+ApgInteractionOwnerOptions
+ApgInteractionPatternDefinition
 ```
 
 ## Definition Exports
