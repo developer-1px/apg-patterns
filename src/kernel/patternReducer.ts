@@ -8,7 +8,7 @@ export function reducePatternData(definition: PatternDefinition, data: PatternDa
   const declarative = reduceDeclarativeTransitions(definition, data, event)
   if (declarative) return withLastEventReason(declarative, event)
 
-  if (event.type === 'focus') return withLastEventReason(reduceFocusEvent(data, event), event)
+  if (event.type === 'focus') return withLastEventReason(withActiveKey(data, event.key), event)
 
   if (event.type === 'navigate') {
     return withLastEventReason(reduceNavigateEvent(definition, data, event), event)
@@ -52,15 +52,15 @@ export function reducePatternData(definition: PatternDefinition, data: PatternDa
   }
 
   if (event.type === 'check') {
-    return withLastEventReason(reduceCheckEvent(data, event), event)
+    return withLastEventReason({ ...data, state: { ...data.state, checkedByKey: { ...data.state?.checkedByKey, [event.key]: event.checked } } }, event)
   }
 
   if (event.type === 'press') {
-    return withLastEventReason(reducePressEvent(data, event), event)
+    return withLastEventReason({ ...data, state: { ...data.state, pressedByKey: { ...data.state?.pressedByKey, [event.key]: event.pressed ?? true } } }, event)
   }
 
   if (event.type === 'value') {
-    return withLastEventReason(reduceValueEvent(data, event), event)
+    return withLastEventReason({ ...data, state: { ...data.state, valueByKey: { ...data.state?.valueByKey, [event.key]: event.value } } }, event)
   }
 
   // 'activate'/'typeahead'/'dismiss'/'extension' are outbound-only signals.
@@ -70,10 +70,6 @@ export function reducePatternData(definition: PatternDefinition, data: PatternDa
 function withLastEventReason(data: PatternData, event: PatternEvent): PatternData {
   if (!event.meta?.reason) return data
   return { ...data, state: { ...data.state, lastEventReason: event.meta.reason } }
-}
-
-function reduceFocusEvent(data: PatternData, event: Extract<PatternEvent, { type: 'focus' }>): PatternData {
-  return withActiveKey(data, event.key)
 }
 
 function reduceNavigateEvent(definition: PatternDefinition, data: PatternData, event: Extract<PatternEvent, { type: 'navigate' }>): PatternData {
@@ -146,18 +142,6 @@ function reduceExpandActiveRowEvent(data: PatternData, event: Extract<PatternEve
   if (event.expanded) expanded.add(rowKey)
   else expanded.delete(rowKey)
   return { ...data, state: { ...data.state, expandedKeys: [...expanded] } }
-}
-
-function reduceCheckEvent(data: PatternData, event: Extract<PatternEvent, { type: 'check' }>): PatternData {
-  return { ...data, state: { ...data.state, checkedByKey: { ...data.state?.checkedByKey, [event.key]: event.checked } } }
-}
-
-function reducePressEvent(data: PatternData, event: Extract<PatternEvent, { type: 'press' }>): PatternData {
-  return { ...data, state: { ...data.state, pressedByKey: { ...data.state?.pressedByKey, [event.key]: event.pressed ?? true } } }
-}
-
-function reduceValueEvent(data: PatternData, event: Extract<PatternEvent, { type: 'value' }>): PatternData {
-  return { ...data, state: { ...data.state, valueByKey: { ...data.state?.valueByKey, [event.key]: event.value } } }
 }
 
 function withActiveKey(data: PatternData, activeKey: Key): PatternData {

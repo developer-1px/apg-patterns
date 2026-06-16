@@ -40,7 +40,7 @@ export function resolvePartEventBindings(
   }
   const out: SlotProps = {}
   for (const [eventName, eventBindings] of byEvent) {
-    const descriptor = getDomEventDescriptor(eventName)
+    const descriptor = domEventRegistry.get(eventName)
     if (!descriptor) throw new Error(`[apg-pattern] unknown domEvent token: "${eventName}" — register via defineDomEvent()`)
     out[descriptor.handlerProp] = () => {
       for (const binding of eventBindings) {
@@ -63,16 +63,8 @@ function isNoopDomEvent(event: PatternEvent, ctx: PatternRuntimeContext): boolea
   return false
 }
 
-function getDomEventDescriptor(eventName: string): DomEventDescriptor | undefined {
-  return domEventRegistry.get(eventName)
-}
-
 export function withDefaultReason(event: PatternEvent, reason: PatternEventReason): PatternEvent {
   if (event.meta?.reason) return event
-  return withEventReason(event, reason)
-}
-
-function withEventReason(event: PatternEvent, reason: PatternEventReason): PatternEvent {
   const next = { ...event } as PatternEvent
   Object.defineProperty(next, 'meta', {
     value: { ...event.meta, reason },
