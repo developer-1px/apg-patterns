@@ -1,7 +1,6 @@
-import type { KeyboardEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
-import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { createReactKeyboardHandler, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { linkDefinition } from './definition'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 
@@ -43,11 +42,10 @@ export function useLinkPattern(data: PatternData<LinkItem>, onEvent: (event: Pat
   return {
     get linkProps() {
       if (!key) return {}
-      const rootKeyboard = runtime.getRootKeyboardHandler()
       const { onKeyDown: _onKeyDown, ...props } = reactProps(runtime.getPartProps('link', key))
       return {
         ...props,
-        onKeyDown: (event: KeyboardEvent<HTMLElement>) => rootKeyboard(reactKeyInput(event)),
+        onKeyDown: createReactKeyboardHandler(runtime.getRootKeyboardHandler()),
       }
     },
     key,

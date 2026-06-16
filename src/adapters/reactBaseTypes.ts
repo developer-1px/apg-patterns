@@ -5,12 +5,13 @@ import type { PatternRuntime } from '../kernel/patternRuntime'
 import type { Key } from '../schema'
 
 export type ReactPatternProps = HTMLAttributes<HTMLElement>
+type ReactKeyboardHandler = (event: KeyInput & { preventDefault?: () => void }) => void
 
 export function reactProps<TProps extends ReactPatternProps = ReactPatternProps>(props: Record<string, unknown>): TProps {
   return props as TProps
 }
 
-export function reactKeyInput(event: KeyboardEvent<HTMLElement>): KeyInput & { preventDefault: () => void } {
+function reactKeyInput(event: KeyboardEvent<HTMLElement>): KeyInput & { preventDefault: () => void } {
   return {
     key: event.key,
     code: event.code,
@@ -25,6 +26,10 @@ export function reactKeyInput(event: KeyboardEvent<HTMLElement>): KeyInput & { p
     timeStamp: event.timeStamp,
     preventDefault: () => event.preventDefault(),
   }
+}
+
+export function createReactKeyboardHandler(handler: ReactKeyboardHandler) {
+  return (event: KeyboardEvent<HTMLElement>) => handler(reactKeyInput(event))
 }
 
 export function dispatchReactKeyboardBinding(runtime: PatternRuntime, key: Key, event: KeyboardEvent<HTMLElement>) {

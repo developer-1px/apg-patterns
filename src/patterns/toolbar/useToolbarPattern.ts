@@ -1,6 +1,5 @@
-import type { KeyboardEvent } from 'react'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { createReactKeyboardHandler, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { useReactPatternRuntime } from '../../adapters/reactPatternEffects'
 import { toolbarDefinition } from './definition'
 import { createToolbarRenderItem, type ReactToolbarRenderItem } from './toolbarRenderItem'
@@ -39,10 +38,10 @@ export function useToolbarPattern(data: PatternData, onEvent: (event: PatternEve
   return {
     get rootProps() {
       const rootProps = reactProps(runtime.getPartProps('toolbar'))
-      const onKeyDown = runtime.getRootKeyboardHandler()
+      const onKeyDown = createReactKeyboardHandler(runtime.getRootKeyboardHandler())
       return {
         ...rootProps,
-        onKeyDown: (event: KeyboardEvent<HTMLElement>) => onKeyDown(reactKeyInput(event)),
+        onKeyDown,
       }
     },
     get renderItems() {

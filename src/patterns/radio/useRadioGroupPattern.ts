@@ -1,6 +1,6 @@
 import type { KeyboardEvent } from 'react'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { createReactKeyboardHandler, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { useReactPatternRuntime } from '../../adapters/reactPatternEffects'
 import { radioGroupDefinition } from './definition'
 import { createRadioRenderItem, type ReactRadioRenderItem } from './radioRenderItem'
@@ -44,12 +44,12 @@ export function useRadioGroupPattern(data: PatternData, onEvent: (event: Pattern
   return {
     get rootProps() {
       const rootProps = reactProps(runtime.getPartProps('radiogroup'))
-      const onKeyDown = runtime.getRootKeyboardHandler()
+      const onKeyDown = createReactKeyboardHandler(runtime.getRootKeyboardHandler())
       return {
         ...rootProps,
         onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
           const nextKey = activationMode === 'automatic' ? resolveRadioNavigationKey(event.key, runtime.visibleKeys, runtime.data.state?.activeKey) : null
-          onKeyDown(reactKeyInput(event))
+          onKeyDown(event)
           if (nextKey) {
             runtime.emit({ type: 'select', keys: [nextKey], anchorKey: nextKey, extentKey: nextKey, meta: { reason: 'keyboard' } })
           }

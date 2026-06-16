@@ -1,5 +1,5 @@
 import type { KeyboardEvent } from 'react'
-import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { createReactKeyboardHandler, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import type { Key, PatternEventReason } from '../../schema'
 import { resolveMenuButtonKey } from './menuButtonKeyboard'
 import type { MenuButtonPropsInput } from './menuButtonPropsInput'
@@ -22,7 +22,7 @@ export function createMenuButtonMenuProps({
 }): ReactPatternProps {
   if (!menuKey || !triggerKey) return {}
   const props = reactProps(runtime.getPartProps('menu', menuKey))
-  const rootKeyDown = runtime.getRootKeyboardHandler()
+  const rootKeyDown = createReactKeyboardHandler(runtime.getRootKeyboardHandler())
   return {
     ...props,
     tabIndex: focusStrategy === 'ariaActiveDescendant' ? 0 : -1,
@@ -47,7 +47,7 @@ export function createMenuButtonMenuProps({
         onEvent({ type: 'focus', key: nextKey, meta: { reason: 'keyboard' } })
         return
       }
-      rootKeyDown(reactKeyInput(event))
+      rootKeyDown(event)
     },
   }
 }

@@ -2,7 +2,7 @@ import type { KeyboardEvent } from 'react'
 import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
 import { handlePatternTrapFocus, usePatternEffects } from '../../adapters/reactPatternEffects'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { createReactKeyboardHandler, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { dialogDefinition } from './definition'
 import { getDialogRuntimeKeys } from './dialogRuntimeKeys'
 import { usePatternElementId } from '../../adapters/reactDomIds'
@@ -73,11 +73,11 @@ function createDialogProps({
   keyToElementId: (key: Key) => string
   dialogKey: Key
 }): ReactPatternProps {
-  const rootKeyDown = runtime.getRootKeyboardHandler()
+  const rootKeyDown = createReactKeyboardHandler(runtime.getRootKeyboardHandler())
   return reactProps({
     ...runtime.getPartProps('dialog', dialogKey),
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
-      rootKeyDown(reactKeyInput(event))
+      rootKeyDown(event)
       handlePatternTrapFocus({ event, definition: dialogDefinition, data, keyToElementId })
     },
     tabIndex: -1,

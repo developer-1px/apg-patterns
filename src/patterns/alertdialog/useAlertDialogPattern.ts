@@ -3,7 +3,7 @@ import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternR
 import { withDefaultReason } from '../../kernel/domEventBindings'
 import { handlePatternTrapFocus, usePatternEffects } from '../../adapters/reactPatternEffects'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { createReactKeyboardHandler, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { alertDialogDefinition } from './definition'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 import { getAlertDialogRuntimeKeys } from './alertDialogRuntimeKeys'
@@ -81,12 +81,12 @@ function createAlertDialogDialogProps({
   keyToElementId: (key: Key) => string
   dialogKey: Key
 }): ReactPatternProps {
-  const rootKeyDown = runtime.getRootKeyboardHandler()
+  const rootKeyDown = createReactKeyboardHandler(runtime.getRootKeyboardHandler())
   return reactProps({
     ...runtime.getPartProps('dialog', dialogKey),
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
       if (event.key === 'Escape') onEvent(withDefaultReason({ type: 'activate', key: 'cancel' }, 'keyboard'))
-      rootKeyDown(reactKeyInput(event))
+      rootKeyDown(event)
       handlePatternTrapFocus({ event, definition: alertDialogDefinition, data, keyToElementId })
     },
   })
