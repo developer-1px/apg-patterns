@@ -1,16 +1,27 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import {
+  useAccordionPattern,
+  useButtonPattern,
+  useCheckboxPattern,
   useComboboxPattern,
   useDialogPattern,
+  useDisclosurePattern,
   useGridPattern,
+  useLinkPattern,
   useListboxPattern,
   useMenuPattern,
   useMenuButtonPattern,
   useMenubarPattern,
+  useRadioGroupPattern,
+  useSliderPattern,
+  useSpinbuttonPattern,
+  useSwitchPattern,
   useTabsPattern,
+  useToolbarPattern,
   useTreegridPattern,
   useTreeviewPattern,
+  useWindowSplitterPattern,
   type PatternData,
   type PatternEvent,
 } from '../react'
@@ -201,6 +212,85 @@ describe('React public event contracts', () => {
     ])
     expect(pointerEvents.map(eventReason)).toEqual(['pointer'])
   })
+
+  it('keeps simple control keyboard and pointer events on the public hook surface', () => {
+    const events: PatternEvent[] = []
+    render(<SimpleControlsContractHost onEvent={(event) => events.push(event)} />)
+
+    fireEvent.keyDown(screen.getByRole('button', { name: 'Submit' }), { key: 'Enter' })
+    fireEvent.keyDown(screen.getByRole('checkbox', { name: 'Agree' }), { key: ' ' })
+    fireEvent.keyDown(screen.getByRole('switch', { name: 'Power' }), { key: ' ' })
+    fireEvent.click(screen.getByRole('link', { name: 'Docs' }))
+
+    expect(events.map(eventPayload)).toEqual([
+      { type: 'press', key: 'submit', pressed: true },
+      { type: 'activate', key: 'submit' },
+      { type: 'check', key: 'agree', checked: true },
+      { type: 'check', key: 'power', checked: true },
+      { type: 'activate', key: 'docs' },
+    ])
+    expect(events.map(eventReason)).toEqual(['keyboard', 'keyboard', 'keyboard', 'keyboard', 'pointer'])
+  })
+
+  it('keeps accordion and disclosure expand events on the public hook surface', () => {
+    const events: PatternEvent[] = []
+    render(<ExpansionControlsContractHost onEvent={(event) => events.push(event)} />)
+
+    fireEvent.keyDown(screen.getByRole('group', { name: 'Sections' }), { key: 'Enter' })
+    fireEvent.click(screen.getByRole('button', { name: 'Details' }))
+
+    expect(events.map(eventPayload)).toEqual([
+      { type: 'expand', key: 'section', expanded: true },
+      { type: 'expand', key: 'details', expanded: true },
+    ])
+    expect(events.map(eventReason)).toEqual(['keyboard', 'pointer'])
+  })
+
+  it('keeps radio group and toolbar navigation events on the public hook surface', () => {
+    const events: PatternEvent[] = []
+    render(<CompositeControlsContractHost onEvent={(event) => events.push(event)} />)
+
+    fireEvent.keyDown(screen.getByRole('radiogroup', { name: 'Density' }), { key: 'ArrowRight' })
+    fireEvent.keyDown(screen.getByRole('toolbar', { name: 'Formatting' }), { key: 'ArrowRight' })
+
+    expect(events.map(eventPayload)).toEqual([
+      { type: 'navigate', direction: 'next' },
+      { type: 'select', keys: ['comfortable'], anchorKey: 'comfortable', extentKey: 'comfortable' },
+      { type: 'navigate', direction: 'next' },
+    ])
+    expect(events.map(eventReason)).toEqual(['keyboard', 'keyboard', 'keyboard'])
+  })
+
+  it('keeps range widget value events on the public hook surface', () => {
+    const events: PatternEvent[] = []
+    render(<RangeControlsContractHost onEvent={(event) => events.push(event)} />)
+
+    fireEvent.keyDown(screen.getByRole('slider', { name: 'Volume' }), { key: 'ArrowRight' })
+    fireEvent.keyDown(screen.getByRole('spinbutton', { name: 'Quantity' }), { key: 'PageUp' })
+    fireEvent.click(screen.getByRole('button', { name: 'Increment Quantity' }))
+    fireEvent.keyDown(screen.getByRole('separator', { name: 'Resize panel' }), { key: 'Enter' })
+
+    expect(events.map(eventPayload)).toEqual([
+      { type: 'focus', key: 'volume' },
+      { type: 'valueStep', key: 'volume', direction: 'increment' },
+      { type: 'focus', key: 'quantity' },
+      { type: 'valueStep', key: 'quantity', direction: 'incrementLarge' },
+      { type: 'focus', key: 'quantity' },
+      { type: 'valueStep', key: 'quantity', direction: 'increment' },
+      { type: 'focus', key: 'splitter' },
+      { type: 'collapse', key: 'splitter' },
+    ])
+    expect(events.map(eventReason)).toEqual([
+      'keyboard',
+      'keyboard',
+      'keyboard',
+      'keyboard',
+      'pointer',
+      'pointer',
+      'keyboard',
+      'keyboard',
+    ])
+  })
 })
 
 function TreeviewContractHost({ onEvent }: { onEvent: (event: PatternEvent) => void }) {
@@ -342,6 +432,77 @@ function MenuContractHost({ onEvent }: { onEvent: (event: PatternEvent) => void 
   return (
     <div {...menu.menuProps}>
       {menu.items.map((item) => <div key={item.key} {...item.itemProps}>{item.label}</div>)}
+    </div>
+  )
+}
+
+function SimpleControlsContractHost({ onEvent }: { onEvent: (event: PatternEvent) => void }) {
+  const button = useButtonPattern(buttonData, onEvent)
+  const checkbox = useCheckboxPattern(checkboxData, onEvent)
+  const switchRuntime = useSwitchPattern(switchData, onEvent)
+  const link = useLinkPattern(linkData, onEvent)
+
+  return (
+    <div>
+      <button type="button" {...button.rootProps}>{button.label}</button>
+      {checkbox.renderItems.map((item) => <div key={item.key} {...item.checkboxProps}>{item.label}</div>)}
+      {switchRuntime.renderItems.map((item) => <div key={item.key} {...item.switchProps}>{item.label}</div>)}
+      <a href={link.href} {...link.linkProps}>{link.label}</a>
+    </div>
+  )
+}
+
+function ExpansionControlsContractHost({ onEvent }: { onEvent: (event: PatternEvent) => void }) {
+  const accordion = useAccordionPattern(accordionData, onEvent)
+  const disclosure = useDisclosurePattern(disclosureData, onEvent)
+
+  return (
+    <div>
+      <div {...accordion.rootProps}>
+        {accordion.renderItems.map((item) => (
+          <div key={item.key}>
+            <button type="button" {...item.headerProps}>{item.label}</button>
+            {item.panelProps ? <div {...item.panelProps}>Panel</div> : null}
+          </div>
+        ))}
+      </div>
+      <button type="button" {...disclosure.triggerProps}>{disclosureData.items.details?.label}</button>
+      <div {...disclosure.panelProps}>Details panel</div>
+    </div>
+  )
+}
+
+function CompositeControlsContractHost({ onEvent }: { onEvent: (event: PatternEvent) => void }) {
+  const radio = useRadioGroupPattern(radioData, onEvent)
+  const toolbar = useToolbarPattern(toolbarData, onEvent)
+
+  return (
+    <div>
+      <div {...radio.rootProps}>
+        {radio.renderItems.map((item) => <div key={item.key} {...item.radioProps}>{item.label}</div>)}
+      </div>
+      <div {...toolbar.rootProps}>
+        {toolbar.renderItems.map((item) => <button key={item.key} type="button" {...item.itemProps}>{item.label}</button>)}
+      </div>
+    </div>
+  )
+}
+
+function RangeControlsContractHost({ onEvent }: { onEvent: (event: PatternEvent) => void }) {
+  const slider = useSliderPattern(sliderData, onEvent)
+  const spinbutton = useSpinbuttonPattern(spinbuttonData, onEvent)
+  const splitter = useWindowSplitterPattern(windowSplitterData, onEvent, { min: 0, max: 100 })
+
+  return (
+    <div>
+      {slider.renderItems.map((item) => <div key={item.key} {...item.sliderProps}>{item.label}</div>)}
+      {spinbutton.renderItems.map((item) => (
+        <div key={item.key}>
+          <div {...item.spinbuttonProps}>{item.label}</div>
+          <button type="button" {...item.incrementButtonProps}>+</button>
+        </div>
+      ))}
+      <div {...splitter.separatorProps}>Resize panel</div>
     </div>
   )
 }
@@ -657,4 +818,159 @@ const menuData = {
     activeKey: 'copy',
   },
   refs: { label: 'Actions' },
+} satisfies PatternData
+
+const buttonData = {
+  items: {
+    submit: { label: 'Submit' },
+  },
+  relations: {
+    rootKeys: ['submit'],
+  },
+  state: {
+    activeKey: 'submit',
+    pressedByKey: { submit: false },
+  },
+} satisfies PatternData
+
+const checkboxData = {
+  items: {
+    agree: { label: 'Agree' },
+  },
+  relations: {
+    rootKeys: ['agree'],
+  },
+  state: {
+    activeKey: 'agree',
+    checkedByKey: { agree: false },
+  },
+} satisfies PatternData
+
+const switchData = {
+  items: {
+    power: { label: 'Power' },
+  },
+  relations: {
+    rootKeys: ['power'],
+  },
+  state: {
+    activeKey: 'power',
+    checkedByKey: { power: false },
+  },
+} satisfies PatternData
+
+const linkData = {
+  items: {
+    docs: { label: 'Docs', href: '#docs' },
+  },
+  relations: {
+    rootKeys: ['docs'],
+  },
+  state: {
+    activeKey: 'docs',
+  },
+} satisfies PatternData
+
+const accordionData = {
+  items: {
+    section: { label: 'Section' },
+    sectionPanel: { label: 'Section panel' },
+  },
+  relations: {
+    rootKeys: ['section'],
+    controlsByKey: { section: ['sectionPanel'] },
+    ownerByKey: { sectionPanel: 'section' },
+  },
+  state: {
+    activeKey: 'section',
+    expandedKeys: [],
+  },
+  refs: { label: 'Sections' },
+} satisfies PatternData
+
+const disclosureData = {
+  items: {
+    details: { label: 'Details' },
+    detailsPanel: { label: 'Details panel' },
+  },
+  relations: {
+    rootKeys: ['details'],
+    controlsByKey: { details: ['detailsPanel'] },
+    ownerByKey: { detailsPanel: 'details' },
+  },
+  state: {
+    activeKey: 'details',
+    expandedKeys: [],
+  },
+} satisfies PatternData
+
+const radioData = {
+  items: {
+    compact: { label: 'Compact' },
+    comfortable: { label: 'Comfortable' },
+  },
+  relations: {
+    rootKeys: ['compact', 'comfortable'],
+  },
+  state: {
+    activeKey: 'compact',
+    selectedKeys: ['compact'],
+  },
+  refs: { label: 'Density' },
+} satisfies PatternData
+
+const toolbarData = {
+  items: {
+    bold: { label: 'Bold', kind: 'toggleButton' },
+    italic: { label: 'Italic', kind: 'toggleButton' },
+  },
+  relations: {
+    rootKeys: ['bold', 'italic'],
+  },
+  state: {
+    activeKey: 'bold',
+    pressedByKey: { bold: true, italic: false },
+  },
+  refs: { label: 'Formatting' },
+} satisfies PatternData
+
+const sliderData = {
+  items: {
+    volume: { label: 'Volume', valuemin: 0, valuemax: 10 },
+  },
+  relations: {
+    rootKeys: ['volume'],
+  },
+  state: {
+    activeKey: 'volume',
+    valueByKey: { volume: 4 },
+  },
+} satisfies PatternData
+
+const spinbuttonData = {
+  items: {
+    quantity: { label: 'Quantity', valuemin: 0, valuemax: 20 },
+  },
+  relations: {
+    rootKeys: ['quantity'],
+  },
+  state: {
+    activeKey: 'quantity',
+    valueByKey: { quantity: 2 },
+  },
+} satisfies PatternData
+
+const windowSplitterData = {
+  items: {
+    splitter: { label: 'Resize panel' },
+    panel: { label: 'Resizable panel' },
+  },
+  relations: {
+    rootKeys: ['splitter'],
+    controlsByKey: { splitter: ['panel'] },
+  },
+  state: {
+    activeKey: 'splitter',
+    valueByKey: { splitter: 60 },
+  },
 } satisfies PatternData

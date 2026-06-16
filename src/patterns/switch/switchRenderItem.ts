@@ -2,6 +2,7 @@ import type { KeyboardEvent } from 'react'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key } from '../../schema'
 import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { withDefaultReason } from '../../kernel/domEventBindings'
 
 export interface ReactSwitchRenderItem {
   key: Key
@@ -27,7 +28,7 @@ export function createSwitchRenderItem(runtime: PatternRuntime, key: Key): React
       ...props,
       tabIndex: 0,
       onKeyDown: (event) => handleSwitchKeyDown(runtime, key, event),
-      onFocus: () => runtime.emit({ type: 'focus', key }),
+      onFocus: () => runtime.emit(withDefaultReason({ type: 'focus', key }, 'focus')),
     },
   }
 }
@@ -36,5 +37,5 @@ function handleSwitchKeyDown(runtime: PatternRuntime, key: Key, event: KeyboardE
   const result = runtime.resolveKeyboardBinding(reactKeyInput(event), key)
   if (!result) return
   if (result.preventDefault) event.preventDefault()
-  for (const next of result.events) runtime.emit(next)
+  for (const next of result.events) runtime.emit(withDefaultReason(next, 'keyboard'))
 }

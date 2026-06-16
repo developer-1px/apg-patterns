@@ -2,6 +2,7 @@ import type { KeyboardEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key } from '../../schema'
 import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { withDefaultReason } from '../../kernel/domEventBindings'
 
 export function createButtonRootProps(runtime: ReturnType<typeof createPatternRuntime>, key: Key | null): ReactPatternProps {
   if (!key) return {}
@@ -10,7 +11,7 @@ export function createButtonRootProps(runtime: ReturnType<typeof createPatternRu
     ...props,
     type: 'button',
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => handleButtonKeyDown(runtime, key, event),
-    onFocus: () => runtime.emit({ type: 'focus', key }),
+    onFocus: () => runtime.emit(withDefaultReason({ type: 'focus', key }, 'focus')),
   })
 }
 
@@ -18,5 +19,5 @@ function handleButtonKeyDown(runtime: ReturnType<typeof createPatternRuntime>, k
   const result = runtime.resolveKeyboardBinding(reactKeyInput(event), key)
   if (!result) return
   if (result.preventDefault) event.preventDefault()
-  for (const next of result.events) runtime.emit(next)
+  for (const next of result.events) runtime.emit(withDefaultReason(next, 'keyboard'))
 }

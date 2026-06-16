@@ -2,6 +2,7 @@ import type { KeyboardEvent, PointerEvent } from 'react'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternItem } from '../../schema'
 import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { withDefaultReason } from '../../kernel/domEventBindings'
 import { valueFromSliderPointer } from './sliderPointerValue'
 
 type SliderPatternData = PatternData<PatternItem & {
@@ -44,16 +45,16 @@ export function createSliderRenderItem(runtime: PatternRuntime<SliderPatternData
     sliderProps: {
       ...props,
       onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
-        runtime.emit({ type: 'focus', key })
+        runtime.emit(withDefaultReason({ type: 'focus', key }, 'keyboard'))
         const result = runtime.resolveKeyboardBinding(reactKeyInput(event), key)
         if (!result) return
         if (result.preventDefault) event.preventDefault()
-        for (const next of result.events) runtime.emit(next)
+        for (const next of result.events) runtime.emit(withDefaultReason(next, 'keyboard'))
       },
-      onFocus: () => runtime.emit({ type: 'focus', key }),
+      onFocus: () => runtime.emit(withDefaultReason({ type: 'focus', key }, 'focus')),
     },
     updateFromPointer: (event: PointerEvent<HTMLElement>) => {
-      runtime.emit({ type: 'value', key, value: valueFromSliderPointer({ event, min, max, orientation, step }) })
+      runtime.emit(withDefaultReason({ type: 'value', key, value: valueFromSliderPointer({ event, min, max, orientation, step }) }, 'pointer'))
     },
   }
 }

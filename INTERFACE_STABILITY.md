@@ -233,12 +233,19 @@ contracts through the public `../react` facade:
 - `useTreeviewPattern`, `useTabsPattern`, `useComboboxPattern`,
   `useDialogPattern`, `useListboxPattern`, `useMenuButtonPattern`,
   `useGridPattern`, `useTreegridPattern`, `useMenubarPattern`, and
-  `useMenuPattern` must preserve representative keyboard, focus, pointer,
-  open, close, select, activate, navigation, sort, edit, and dismiss event
-  payloads.
+  `useMenuPattern`, `useButtonPattern`, `useCheckboxPattern`,
+  `useSwitchPattern`, `useLinkPattern`, `useAccordionPattern`,
+  `useDisclosurePattern`, `useRadioGroupPattern`, `useToolbarPattern`,
+  `useSliderPattern`, `useSpinbuttonPattern`, and `useWindowSplitterPattern`
+  must preserve representative keyboard, focus, pointer, open, close, select,
+  activate, navigation, sort, edit, dismiss, check, press, expand, value-step,
+  and collapse event payloads.
 - Event payloads and `meta.reason` are checked separately so enumerable versus
   non-enumerable metadata remains an implementation detail, while the public
   event meaning stays fixed.
+- React handlers that translate DOM keyboard, focus, or pointer interactions
+  into public events must attach the matching advisory `meta.reason` when the
+  event does not already carry one.
 
 ## Not A Stability Contract
 
