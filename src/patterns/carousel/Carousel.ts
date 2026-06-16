@@ -10,14 +10,10 @@ type CarouselDataItem = PatternItem & {
   imageAlt?: unknown
 }
 
-type CarouselDataState = PatternState & {
-  showDots?: boolean
-}
-
 type DivProps = ComponentPropsWithoutRef<'div'>
 
 export interface CarouselProps<TItem extends CarouselDataItem = CarouselDataItem> {
-  data: PatternData<TItem, CarouselDataState>
+  data: PatternData<TItem, PatternState & { showDots?: boolean }>
   onEvent: (event: PatternEvent) => void
   options?: PatternOptions
   className?: string
