@@ -197,6 +197,19 @@ definitions through the same built core entrypoint:
   reduction, and edit transition reduction.
 - `menubarDefinition`: disabled-item navigation skipping, submenu owner ARIA,
   child menu navigation, expansion reduction, and active item click semantics.
+- `tabsDefinition`: vertical keyboard navigation, close keyboard emission,
+  tab/panel ARIA links, selection reduction, and automatic activation emission.
+- `comboboxDefinition`: popup state ARIA, option ordering, open/select/close
+  keyboard events, reducer behavior, and input event emission.
+- `dialogDefinition`: trigger/dialog ARIA links, Escape close semantics,
+  expansion reduction, and overlay close emission.
+- `listboxDefinition`: active descendant root props, option selected/disabled
+  ARIA, keyboard navigation, reduction, and follow-focus emission.
+- `menuButtonDefinition`: trigger/menu/menuitem ARIA links, disabled item props,
+  activate+dismiss keyboard emission, trigger close, and item activation.
+- `treegridDefinition`: treegrid visible cell order, row/cell ARIA, collapse
+  keyboard emission, navigation reduction, active-row collapse reduction, and
+  row selection reduction.
 
 Add a pattern to this fixture when its APG keyboard/focus behavior becomes part
 of the package identity rather than just demo coverage.

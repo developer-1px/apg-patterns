@@ -89,5 +89,195 @@
       },
       "refs": { "label": "Application menu" }
     }
+  },
+  "tabs": {
+    "options": {
+      "orientation": "vertical",
+      "activationMode": "automatic",
+      "closeable": true
+    },
+    "data": {
+      "items": {
+        "tab-overview": { "label": "Overview" },
+        "tab-api": { "label": "API" },
+        "panel-overview": { "label": "Overview panel" },
+        "panel-api": { "label": "API panel" }
+      },
+      "relations": {
+        "rootKeys": ["tab-overview", "tab-api"],
+        "controlsByKey": {
+          "tab-overview": ["panel-overview"],
+          "tab-api": ["panel-api"]
+        },
+        "ownerByKey": {
+          "panel-overview": "tab-overview",
+          "panel-api": "tab-api"
+        }
+      },
+      "state": {
+        "activeKey": "tab-overview",
+        "selectedKeys": ["tab-overview"]
+      },
+      "refs": { "label": "Documentation tabs" }
+    }
+  },
+  "combobox": {
+    "options": {
+      "haspopup": "listbox",
+      "autocomplete": "list"
+    },
+    "data": {
+      "items": {
+        "combobox": { "label": "Search" },
+        "alpha": { "label": "Alpha" },
+        "beta": { "label": "Beta" }
+      },
+      "state": {
+        "activeKey": "combobox",
+        "expandedKeys": [],
+        "selectedKeys": []
+      },
+      "refs": { "label": "Search options" }
+    }
+  },
+  "dialog": {
+    "data": {
+      "items": {
+        "trigger": { "label": "Open dialog", "kind": "dialog" },
+        "modal": { "label": "Settings dialog" },
+        "title": { "label": "Settings" },
+        "description": { "label": "Configure settings" },
+        "cancel": { "label": "Cancel" },
+        "submit": { "label": "Save" }
+      },
+      "relations": {
+        "rootKeys": ["trigger"],
+        "controlsByKey": {
+          "trigger": ["modal"],
+          "modal": ["description"]
+        },
+        "ownerByKey": { "modal": "title" }
+      },
+      "state": {
+        "activeKey": "trigger",
+        "expandedKeys": ["trigger"]
+      },
+      "refs": { "initialFocusKey": "cancel" }
+    }
+  },
+  "listbox": {
+    "options": {
+      "focusStrategy": "ariaActiveDescendant",
+      "selectionMode": "multiple",
+      "orientation": "vertical",
+      "followFocus": true
+    },
+    "data": {
+      "items": {
+        "one": { "label": "One" },
+        "two": { "label": "Two" },
+        "three": { "label": "Three" }
+      },
+      "relations": {
+        "rootKeys": ["one", "two", "three"]
+      },
+      "state": {
+        "activeKey": "one",
+        "selectedKeys": ["one"],
+        "disabledKeys": ["three"],
+        "posInSetByKey": { "one": 1, "two": 2, "three": 3 },
+        "setSizeByKey": { "one": 3, "two": 3, "three": 3 }
+      },
+      "refs": { "label": "Number list" }
+    }
+  },
+  "menuButton": {
+    "options": {
+      "focusStrategy": "rovingTabIndex"
+    },
+    "data": {
+      "items": {
+        "trigger": { "label": "Actions" },
+        "menu": { "label": "Actions menu" },
+        "copy": { "label": "Copy" },
+        "paste": { "label": "Paste" },
+        "delete": { "label": "Delete" }
+      },
+      "relations": {
+        "rootKeys": ["copy", "paste", "delete"],
+        "childrenByKey": { "trigger": ["copy", "paste", "delete"] },
+        "controlsByKey": { "trigger": ["menu"] },
+        "ownerByKey": { "menu": "trigger" }
+      },
+      "state": {
+        "activeKey": "copy",
+        "expandedKeys": ["trigger"],
+        "disabledKeys": ["paste"]
+      }
+    }
+  },
+  "treegrid": {
+    "options": {
+      "focusStrategy": "rovingTabIndex",
+      "selectionMode": "multiple"
+    },
+    "data": {
+      "items": {
+        "parent": { "label": "Parent" },
+        "child": { "label": "Child" },
+        "sibling": { "label": "Sibling" },
+        "name": { "label": "Name" },
+        "status": { "label": "Status" },
+        "parent-name": { "label": "Parent name" },
+        "parent-status": { "label": "Ready" },
+        "child-name": { "label": "Child name" },
+        "child-status": { "label": "Queued" },
+        "sibling-name": { "label": "Sibling name" },
+        "sibling-status": { "label": "Done" }
+      },
+      "relations": {
+        "rootKeys": ["parent", "sibling"],
+        "childrenByKey": { "parent": ["child"] },
+        "rowKeys": ["parent", "child", "sibling"],
+        "columnKeys": ["name", "status"],
+        "cells": [
+          { "rowKey": "parent", "columnKey": "name", "cellKey": "parent-name" },
+          { "rowKey": "parent", "columnKey": "status", "cellKey": "parent-status" },
+          { "rowKey": "child", "columnKey": "name", "cellKey": "child-name" },
+          { "rowKey": "child", "columnKey": "status", "cellKey": "child-status" },
+          { "rowKey": "sibling", "columnKey": "name", "cellKey": "sibling-name" },
+          { "rowKey": "sibling", "columnKey": "status", "cellKey": "sibling-status" }
+        ]
+      },
+      "state": {
+        "activeKey": "parent-name",
+        "anchorKey": "parent-name",
+        "selectedKeys": ["parent-name"],
+        "expandedKeys": ["parent"],
+        "rowIndexByKey": {
+          "parent": 1,
+          "child": 2,
+          "sibling": 3,
+          "parent-name": 1,
+          "parent-status": 1,
+          "child-name": 2,
+          "child-status": 2,
+          "sibling-name": 3,
+          "sibling-status": 3
+        },
+        "columnIndexByKey": {
+          "parent-name": 1,
+          "parent-status": 2,
+          "child-name": 1,
+          "child-status": 2,
+          "sibling-name": 1,
+          "sibling-status": 2
+        },
+        "levelByKey": { "parent": 1, "child": 2, "sibling": 1 },
+        "rowCount": 3,
+        "colCount": 2
+      },
+      "refs": { "label": "Resource treegrid" }
+    }
   }
 }

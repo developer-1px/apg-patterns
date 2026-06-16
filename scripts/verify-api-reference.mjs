@@ -602,6 +602,12 @@ function assertPublicPatternFixtures(coreRuntime) {
   assertTreeviewPatternContract(coreRuntime, fixture.treeview)
   assertGridPatternContract(coreRuntime, fixture.grid)
   assertMenubarPatternContract(coreRuntime, fixture.menubar)
+  assertTabsPatternContract(coreRuntime, fixture.tabs)
+  assertComboboxPatternContract(coreRuntime, fixture.combobox)
+  assertDialogPatternContract(coreRuntime, fixture.dialog)
+  assertListboxPatternContract(coreRuntime, fixture.listbox)
+  assertMenuButtonPatternContract(coreRuntime, fixture.menuButton)
+  assertTreegridPatternContract(coreRuntime, fixture.treegrid)
 }
 
 function assertTreeviewPatternContract(coreRuntime, fixture) {
@@ -764,6 +770,315 @@ function assertMenubarPatternContract(coreRuntime, fixture) {
   runtime.getItemProps('menuitem', 'file').onClick()
   expectDeepEqual('menubar active click emits activate only', emitted.map(enumerableEvent), [{ type: 'activate', key: 'file' }])
   expectDeepEqual('menubar active click reason', emitted.map((event) => event.meta?.reason), ['pointer'])
+}
+
+function assertTabsPatternContract(coreRuntime, fixture) {
+  const definition = parsePatternDefinitionExport(coreRuntime, 'tabs', 'tabsDefinition')
+  const data = parsePatternDataFixture(coreRuntime, 'tabs', fixture)
+  const options = parsePatternOptionsFixture(coreRuntime, 'tabs', fixture)
+  if (!definition || !data || !options) return
+
+  const emitted = []
+  const runtime = coreRuntime.createPatternRuntime({
+    definition,
+    data,
+    options,
+    keyToElementId: (key) => `tabs-${key}`,
+    onEvent: (event) => emitted.push(event),
+  })
+
+  expectDeepEqual('tabs visible order', runtime.visibleKeys, ['tab-overview', 'tab-api'])
+  expectDeepEqual('tabs root props', pick(runtime.getRootProps(), ['role', 'aria-label', 'aria-orientation']), {
+    role: 'tablist',
+    'aria-label': 'Documentation tabs',
+    'aria-orientation': 'vertical',
+  })
+  expectDeepEqual('tabs active tab props', pick(runtime.getItemProps('tab', 'tab-overview'), ['role', 'id', 'aria-selected', 'aria-controls', 'tabIndex']), {
+    role: 'tab',
+    id: 'tabs-tab-overview',
+    'aria-selected': true,
+    'aria-controls': 'tabs-panel-overview',
+    tabIndex: 0,
+  })
+  expectDeepEqual('tabs panel props', pick(runtime.getItemProps('tabpanel', 'panel-api'), ['role', 'id', 'aria-labelledby', 'tabIndex']), {
+    role: 'tabpanel',
+    id: 'tabs-panel-api',
+    'aria-labelledby': 'tabs-tab-api',
+    tabIndex: 0,
+  })
+  expectDeepEqual('tabs vertical ArrowDown binding', runtime.resolveKeyboardBinding(keyInput('ArrowDown'), 'tab-overview'), {
+    preventDefault: true,
+    events: [{ type: 'navigate', direction: 'next' }],
+  })
+  expectDeepEqual('tabs Delete binding', runtime.resolveKeyboardBinding(keyInput('Delete'), 'tab-overview'), {
+    preventDefault: true,
+    events: [{ type: 'close', key: 'tab-overview' }],
+  })
+  expectEqual('tabs next navigation reducer', coreRuntime.reducePatternData(definition, data, { type: 'navigate', direction: 'next' }).state?.activeKey, 'tab-api')
+  expectDeepEqual('tabs select reducer', pick(coreRuntime.reducePatternData(definition, data, { type: 'select', keys: ['tab-api'], anchorKey: 'tab-api', extentKey: 'tab-api' }).state, ['activeKey', 'selectedKeys']), {
+    activeKey: 'tab-api',
+    selectedKeys: ['tab-api'],
+  })
+  runtime.getItemProps('tab', 'tab-api').onFocus()
+  expectDeepEqual('tabs automatic focus emits focus and select', emitted.map(enumerableEvent), [
+    { type: 'focus', key: 'tab-api' },
+    { type: 'select', keys: ['tab-api'], anchorKey: 'tab-api', extentKey: 'tab-api' },
+  ])
+  expectDeepEqual('tabs automatic focus reasons', emitted.map((event) => event.meta?.reason), ['focus', 'focus'])
+}
+
+function assertComboboxPatternContract(coreRuntime, fixture) {
+  const definition = parsePatternDefinitionExport(coreRuntime, 'combobox', 'comboboxDefinition')
+  const data = parsePatternDataFixture(coreRuntime, 'combobox', fixture)
+  const options = parsePatternOptionsFixture(coreRuntime, 'combobox', fixture)
+  if (!definition || !data || !options) return
+
+  const emitted = []
+  const runtime = coreRuntime.createPatternRuntime({
+    definition,
+    data,
+    options,
+    keyToElementId: (key) => `combo-${key}`,
+    onEvent: (event) => emitted.push(event),
+  })
+
+  expectDeepEqual('combobox visible order', runtime.visibleKeys, ['alpha', 'beta'])
+  expectDeepEqual('combobox root props', pick(runtime.getRootProps(), ['role', 'aria-expanded', 'aria-haspopup', 'aria-autocomplete', 'aria-activedescendant', 'aria-label']), {
+    role: 'combobox',
+    'aria-expanded': false,
+    'aria-haspopup': 'listbox',
+    'aria-autocomplete': 'list',
+    'aria-activedescendant': 'combo-combobox',
+    'aria-label': 'Search options',
+  })
+  expectDeepEqual('combobox option props', pick(runtime.getItemProps('option', 'alpha'), ['role', 'id', 'aria-selected']), {
+    role: 'option',
+    id: 'combo-alpha',
+    'aria-selected': false,
+  })
+  expectDeepEqual('combobox ArrowDown opens popup', runtime.resolveKeyboardBinding(keyInput('ArrowDown'), 'combobox'), {
+    preventDefault: true,
+    events: [
+      { type: 'expand', key: 'combobox', expanded: true },
+      { type: 'navigate', direction: 'first' },
+    ],
+  })
+  expectDeepEqual('combobox Enter selects and closes when open', coreRuntime.createPatternRuntime({
+    definition,
+    data: { ...data, state: { ...data.state, activeKey: 'alpha', expandedKeys: ['combobox'] } },
+    options,
+    keyToElementId: (key) => `combo-${key}`,
+    onEvent: () => {},
+  }).resolveKeyboardBinding(keyInput('Enter'), 'alpha'), {
+    preventDefault: true,
+    events: [
+      { type: 'select', keys: ['alpha'], anchorKey: 'alpha', extentKey: 'alpha' },
+      { type: 'expand', key: 'combobox', expanded: false },
+    ],
+  })
+  expectDeepEqual('combobox open reducer', coreRuntime.reducePatternData(definition, data, { type: 'expand', key: 'combobox', expanded: true }).state?.expandedKeys, ['combobox'])
+  expectEqual('combobox first option reducer', coreRuntime.reducePatternData(definition, data, { type: 'navigate', direction: 'first' }).state?.activeKey, 'alpha')
+
+  runtime.getRootProps().onInput()
+  expectDeepEqual('combobox input emits inputValue', enumerableEvent(emitted.at(-1)), { type: 'inputValue', key: 'combobox', value: '' })
+  expectEqual('combobox input reason', emitted.at(-1)?.meta?.reason, 'keyboard')
+}
+
+function assertDialogPatternContract(coreRuntime, fixture) {
+  const definition = parsePatternDefinitionExport(coreRuntime, 'dialog', 'dialogDefinition')
+  const data = parsePatternDataFixture(coreRuntime, 'dialog', fixture)
+  const options = parsePatternOptionsFixture(coreRuntime, 'dialog', fixture)
+  if (!definition || !data || !options) return
+
+  const emitted = []
+  const runtime = coreRuntime.createPatternRuntime({
+    definition,
+    data,
+    options,
+    keyToElementId: (key) => `dialog-${key}`,
+    onEvent: (event) => emitted.push(event),
+  })
+
+  expectDeepEqual('dialog root props', pick(runtime.getRootProps(), ['role', 'aria-modal']), {
+    role: 'dialog',
+    'aria-modal': true,
+  })
+  expectDeepEqual('dialog trigger props', pick(runtime.getItemProps('trigger', 'trigger'), ['role', 'id', 'aria-haspopup', 'aria-expanded', 'aria-controls']), {
+    role: 'button',
+    id: 'dialog-trigger',
+    'aria-haspopup': 'dialog',
+    'aria-expanded': true,
+    'aria-controls': 'dialog-modal',
+  })
+  expectDeepEqual('dialog keyed dialog props', pick(runtime.getItemProps('dialog', 'modal'), ['role', 'id', 'aria-modal', 'aria-labelledby', 'aria-describedby']), {
+    role: 'dialog',
+    id: 'dialog-modal',
+    'aria-modal': true,
+    'aria-labelledby': 'dialog-title',
+    'aria-describedby': 'dialog-description',
+  })
+  expectDeepEqual('dialog Escape closes trigger', runtime.resolveKeyboardBinding(keyInput('Escape'), 'trigger'), {
+    preventDefault: true,
+    events: [{ type: 'expand', key: 'trigger', expanded: false }],
+  })
+  expectDeepEqual('dialog close reducer', pick(coreRuntime.reducePatternData(definition, data, { type: 'expand', key: 'trigger', expanded: false }).state, ['activeKey', 'expandedKeys']), {
+    activeKey: 'trigger',
+    expandedKeys: [],
+  })
+  runtime.getItemProps('overlay', 'modal').onMouseDown()
+  expectDeepEqual('dialog overlay emits close', enumerableEvent(emitted.at(-1)), { type: 'expand', key: 'trigger', expanded: false })
+  expectEqual('dialog overlay close reason', emitted.at(-1)?.meta?.reason, 'pointer')
+}
+
+function assertListboxPatternContract(coreRuntime, fixture) {
+  const definition = parsePatternDefinitionExport(coreRuntime, 'listbox', 'listboxDefinition')
+  const data = parsePatternDataFixture(coreRuntime, 'listbox', fixture)
+  const options = parsePatternOptionsFixture(coreRuntime, 'listbox', fixture)
+  if (!definition || !data || !options) return
+
+  const emitted = []
+  const runtime = coreRuntime.createPatternRuntime({
+    definition,
+    data,
+    options,
+    keyToElementId: (key) => `list-${key}`,
+    onEvent: (event) => emitted.push(event),
+  })
+
+  expectDeepEqual('listbox visible order', runtime.visibleKeys, ['one', 'two', 'three'])
+  expectDeepEqual('listbox root props', pick(runtime.getRootProps(), ['role', 'aria-label', 'aria-multiselectable', 'aria-orientation', 'aria-activedescendant']), {
+    role: 'listbox',
+    'aria-label': 'Number list',
+    'aria-multiselectable': true,
+    'aria-orientation': 'vertical',
+    'aria-activedescendant': 'list-one',
+  })
+  expectDeepEqual('listbox selected option props', pick(runtime.getItemProps('option', 'one'), ['role', 'id', 'aria-selected', 'aria-posinset', 'aria-setsize']), {
+    role: 'option',
+    id: 'list-one',
+    'aria-selected': true,
+    'aria-posinset': 1,
+    'aria-setsize': 3,
+  })
+  expectDeepEqual('listbox disabled option props', pick(runtime.getItemProps('option', 'three'), ['role', 'id', 'aria-selected', 'aria-disabled', 'aria-posinset', 'aria-setsize']), {
+    role: 'option',
+    id: 'list-three',
+    'aria-selected': false,
+    'aria-disabled': true,
+    'aria-posinset': 3,
+    'aria-setsize': 3,
+  })
+  expectDeepEqual('listbox ArrowDown binding', runtime.resolveKeyboardBinding(keyInput('ArrowDown'), 'one'), {
+    preventDefault: true,
+    events: [{ type: 'navigate', direction: 'next' }],
+  })
+  expectEqual('listbox next navigation reducer', coreRuntime.reducePatternData(definition, data, { type: 'navigate', direction: 'next' }).state?.activeKey, 'two')
+  runtime.getItemProps('option', 'two').onFocus()
+  expectDeepEqual('listbox followFocus emits focus and select', emitted.map(enumerableEvent), [
+    { type: 'focus', key: 'two' },
+    { type: 'select', keys: ['two'], anchorKey: 'two', extentKey: 'two' },
+  ])
+  expectDeepEqual('listbox followFocus reasons', emitted.map((event) => event.meta?.reason), ['focus', 'focus'])
+}
+
+function assertMenuButtonPatternContract(coreRuntime, fixture) {
+  const definition = parsePatternDefinitionExport(coreRuntime, 'menuButton', 'menuButtonDefinition')
+  const data = parsePatternDataFixture(coreRuntime, 'menuButton', fixture)
+  const options = parsePatternOptionsFixture(coreRuntime, 'menuButton', fixture)
+  if (!definition || !data || !options) return
+
+  const emitted = []
+  const runtime = coreRuntime.createPatternRuntime({
+    definition,
+    data,
+    options,
+    keyToElementId: (key) => `mb-${key}`,
+    onEvent: (event) => emitted.push(event),
+  })
+
+  expectDeepEqual('menuButton visible order', runtime.visibleKeys, ['copy', 'paste', 'delete'])
+  expectDeepEqual('menuButton trigger props', pick(runtime.getItemProps('trigger', 'trigger'), ['role', 'id', 'aria-haspopup', 'aria-expanded', 'aria-controls', 'aria-label', 'tabIndex']), {
+    role: 'button',
+    id: 'mb-trigger',
+    'aria-haspopup': 'menu',
+    'aria-expanded': true,
+    'aria-controls': 'mb-menu',
+    'aria-label': 'Actions',
+    tabIndex: 0,
+  })
+  expectDeepEqual('menuButton menu props', pick(runtime.getItemProps('menu', 'menu'), ['role', 'id', 'aria-labelledby']), {
+    role: 'menu',
+    id: 'mb-menu',
+    'aria-labelledby': 'mb-trigger',
+  })
+  expectDeepEqual('menuButton disabled item props', pick(runtime.getItemProps('menuitem', 'paste'), ['role', 'id', 'aria-disabled', 'tabIndex']), {
+    role: 'menuitem',
+    id: 'mb-paste',
+    'aria-disabled': true,
+    tabIndex: -1,
+  })
+  expectDeepEqual('menuButton Enter activates and dismisses', runtime.resolveKeyboardBinding(keyInput('Enter'), 'copy'), {
+    preventDefault: true,
+    events: [
+      { type: 'activate', key: 'copy' },
+      { type: 'dismiss' },
+    ],
+  })
+  runtime.getItemProps('trigger', 'trigger').onClick()
+  expectDeepEqual('menuButton trigger click closes when expanded', enumerableEvent(emitted.at(-1)), { type: 'expand', key: 'trigger', expanded: false })
+  expectEqual('menuButton trigger click reason', emitted.at(-1)?.meta?.reason, 'pointer')
+  runtime.getItemProps('menuitem', 'copy').onClick()
+  expectDeepEqual('menuButton item click activates', enumerableEvent(emitted.at(-1)), { type: 'activate', key: 'copy' })
+}
+
+function assertTreegridPatternContract(coreRuntime, fixture) {
+  const definition = parsePatternDefinitionExport(coreRuntime, 'treegrid', 'treegridDefinition')
+  const data = parsePatternDataFixture(coreRuntime, 'treegrid', fixture)
+  const options = parsePatternOptionsFixture(coreRuntime, 'treegrid', fixture)
+  if (!definition || !data || !options) return
+
+  const runtime = coreRuntime.createPatternRuntime({
+    definition,
+    data,
+    options,
+    keyToElementId: (key) => `tg-${key}`,
+    onEvent: () => {},
+  })
+
+  expectDeepEqual('treegrid visible order', runtime.visibleKeys, ['parent-name', 'parent-status', 'child-name', 'child-status', 'sibling-name', 'sibling-status'])
+  expectDeepEqual('treegrid root props', pick(runtime.getRootProps(), ['role', 'aria-label', 'aria-rowcount', 'aria-colcount', 'aria-multiselectable']), {
+    role: 'treegrid',
+    'aria-label': 'Resource treegrid',
+    'aria-rowcount': 3,
+    'aria-colcount': 2,
+    'aria-multiselectable': true,
+  })
+  expectDeepEqual('treegrid parent row props', pick(runtime.getItemProps('row', 'parent'), ['role', 'id', 'aria-rowindex', 'aria-level', 'aria-expanded']), {
+    role: 'row',
+    id: 'tg-parent',
+    'aria-rowindex': 1,
+    'aria-level': 1,
+    'aria-expanded': true,
+  })
+  expectDeepEqual('treegrid active cell props', pick(runtime.getItemProps('gridcell', 'parent-name'), ['role', 'id', 'aria-rowindex', 'aria-colindex', 'aria-selected', 'tabIndex']), {
+    role: 'gridcell',
+    id: 'tg-parent-name',
+    'aria-rowindex': 1,
+    'aria-colindex': 1,
+    'aria-selected': true,
+    tabIndex: 0,
+  })
+  expectDeepEqual('treegrid ArrowLeft collapses parent row from first cell', runtime.resolveKeyboardBinding(keyInput('ArrowLeft'), 'parent-name'), {
+    preventDefault: true,
+    events: [{ type: 'expandActiveRow', expanded: false }],
+  })
+  expectEqual('treegrid right navigation reducer', coreRuntime.reducePatternData(definition, data, { type: 'navigate', direction: 'right' }).state?.activeKey, 'parent-status')
+  expectDeepEqual('treegrid collapse active row reducer', coreRuntime.reducePatternData(definition, data, { type: 'expandActiveRow', expanded: false }).state?.expandedKeys, [])
+  expectDeepEqual('treegrid row selection reducer', pick(coreRuntime.reducePatternData(definition, data, { type: 'selectRow' }).state, ['selectedKeys', 'anchorKey', 'extentKey']), {
+    selectedKeys: ['parent-name', 'parent-status'],
+    anchorKey: 'parent-name',
+    extentKey: 'parent-status',
+  })
 }
 
 function parsePatternDefinitionExport(coreRuntime, label, exportName) {
