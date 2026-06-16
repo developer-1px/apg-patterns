@@ -11,7 +11,6 @@ import {
   type WindowSplitterValueData,
   type WindowSplitterValueState,
 } from '../../../../src/react'
-import { createWindowSplitterSeparatorProps } from '../../../../src/patterns/windowsplitter/windowSplitterSeparatorProps'
 import { initialWindowSplitterData, reduceWindowSplitterData, windowSplitterOptions } from './windowsplitterData'
 import { WindowSplitterDemo as Demo } from './testing/WindowSplitterTestHost'
 
@@ -126,28 +125,16 @@ function WindowSplitterReducerEdgesDemo() {
 function SeparatorPropsEdgesDemo() {
   const [events, setEvents] = useState<string[]>([])
   const [focused, setFocused] = useState(false)
-  const runtime = {
-    getPartProps: () => ({ role: 'separator', id: 'edge-separator', onKeyDown: () => undefined }),
-    emit: (event: PatternEvent) => setEvents((current) => [...current, `${event.type}:${'key' in event ? event.key ?? '' : ''}`]),
-    resolveKeyboardBinding: (input: { key: string }) =>
-      input.key === 'ArrowRight'
-        ? { preventDefault: false, events: [{ type: 'valueStep', key: 'splitter', direction: 'increment' }] }
-        : null,
-  }
-  const emptyProps = createWindowSplitterSeparatorProps({
-    runtime: runtime as never,
-    key: null,
-    min: 0,
-    max: 100,
-    options: { orientation: 'diagonal' as never },
-  })
-  const props = createWindowSplitterSeparatorProps({
-    runtime: runtime as never,
-    key: 'splitter',
-    min: 0,
-    max: 100,
-    options: { orientation: 'vertical' },
-  })
+  const empty = useWindowSplitterPattern(
+    { items: {}, relations: { rootKeys: [] }, state: {} },
+    () => undefined,
+  )
+  const splitter = useWindowSplitterPattern(
+    initialWindowSplitterData,
+    (event) => setEvents((current) => [...current, `${event.type}:${'key' in event ? event.key ?? '' : ''}`]),
+    { ...windowSplitterOptions, orientation: 'vertical' },
+  )
+  const props = splitter.separatorProps
 
   return (
     <div>
@@ -161,7 +148,7 @@ function SeparatorPropsEdgesDemo() {
       <button type="button" onClick={() => fireEvent.keyDown(screen.getByRole('separator'), { key: 'A', code: 'KeyA' })}>No binding</button>
       <button type="button" onClick={() => fireEvent.keyDown(screen.getByRole('separator'), { key: 'ArrowRight', code: 'ArrowRight' })}>Emit binding</button>
       <button type="button" onClick={() => fireEvent.focus(screen.getByRole('separator'))}>Focus props</button>
-      <output data-testid="empty-props">{String(Object.keys(emptyProps).length)}</output>
+      <output data-testid="empty-props">{String(Object.keys(empty.separatorProps).length)}</output>
       <output data-testid="separator-orientation">{String(props['aria-orientation'] ?? '')}</output>
       <output data-testid="separator-events">{events.join('|')}</output>
       <output data-testid="separator-focused">{String(focused)}</output>

@@ -1,8 +1,9 @@
+import type { KeyboardEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions, PatternValueStepDirection } from '../../schema'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { dispatchReactKeyboardBinding, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { withDefaultReason } from '../../kernel/domEventBindings'
 import { windowSplitterDefinition } from './definition'
-import { createWindowSplitterSeparatorProps } from './windowSplitterSeparatorProps'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 import { getWindowSplitterDataDiagnostics, type WindowSplitterDataDiagnostic } from './diagnostics'
 
@@ -52,7 +53,19 @@ export function useWindowSplitterPattern(data: PatternData, onEvent: (event: Pat
   return {
     rootProps: {},
     get separatorProps() {
-      return createWindowSplitterSeparatorProps({ runtime, key, min: state.min, max: state.max, options: runtimeOptions })
+      if (!key) return {}
+      const { onKeyDown: _onKeyDown, ...props } = reactProps(runtime.getPartProps('separator', key))
+      return {
+        ...props,
+        'aria-valuemin': state.min,
+        'aria-valuemax': state.max,
+        'aria-orientation': runtimeOptions.orientation === 'horizontal' || runtimeOptions.orientation === 'vertical' ? runtimeOptions.orientation : undefined,
+        onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
+          runtime.emit(withDefaultReason({ type: 'focus', key }, 'keyboard'))
+          dispatchReactKeyboardBinding(runtime, key, event)
+        },
+        onFocus: () => runtime.emit(withDefaultReason({ type: 'focus', key }, 'focus')),
+      }
     },
     key,
     controlledKey,
