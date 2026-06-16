@@ -1,7 +1,8 @@
+import type { KeyboardEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
-import { createButtonRootProps } from './buttonRootProps'
+import { dispatchReactKeyboardBinding, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { withDefaultReason } from '../../kernel/domEventBindings'
 import { buttonDefinition } from './definition'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 
@@ -38,7 +39,14 @@ export function useButtonPattern(data: PatternData, onEvent: (event: PatternEven
 
   return {
     get rootProps() {
-      return createButtonRootProps(runtime, key)
+      if (!key) return {}
+      const { role: _role, onKeyDown: _onKeyDown, ...props } = reactProps<ReactPatternProps & { role?: string }>(runtime.getPartProps('button', key))
+      return reactProps({
+        ...props,
+        type: 'button',
+        onKeyDown: (event: KeyboardEvent<HTMLElement>) => dispatchReactKeyboardBinding(runtime, key, event),
+        onFocus: () => runtime.emit(withDefaultReason({ type: 'focus', key }, 'focus')),
+      })
     },
     key,
     label: key ? data.items[key]?.label ?? '' : '',

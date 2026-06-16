@@ -255,18 +255,21 @@ describe('React public event contracts', () => {
     const events: PatternEvent[] = []
     render(<SimpleControlsContractHost onEvent={(event) => events.push(event)} />)
 
-    fireEvent.keyDown(screen.getByRole('button', { name: 'Submit' }), { key: 'Enter' })
+    const button = screen.getByRole('button', { name: 'Submit' })
+    fireEvent.focus(button)
+    fireEvent.keyDown(button, { key: 'Enter' })
     fireEvent.keyDown(screen.getByRole('checkbox', { name: 'Agree' }), { key: ' ' })
     fireEvent.keyDown(screen.getByRole('switch', { name: 'Power' }), { key: ' ' })
     fireEvent.click(screen.getByRole('link', { name: 'Docs' }))
 
     expectEventTrace(events, [
+      { type: 'focus', key: 'submit' },
       { type: 'press', key: 'submit', pressed: true },
       { type: 'activate', key: 'submit' },
       { type: 'check', key: 'agree', checked: true },
       { type: 'check', key: 'power', checked: true },
       { type: 'activate', key: 'docs' },
-    ], ['keyboard', 'keyboard', 'keyboard', 'keyboard', 'pointer'])
+    ], ['focus', 'keyboard', 'keyboard', 'keyboard', 'keyboard', 'pointer'])
   })
 
   it('keeps breadcrumb pointer activation on the public hook surface', () => {

@@ -5,7 +5,6 @@ import { registerKernelBuiltins } from '../kernel/kernelBuiltins'
 import { defineDomEvent, resolvePartEventBindings, withDefaultReason } from '../kernel/domEventBindings'
 import { useAccordionPattern } from '../patterns/accordion/useAccordionPattern'
 import { useAlertPattern } from '../patterns/alert/useAlertPattern'
-import { createButtonRootProps } from '../patterns/button/buttonRootProps'
 import { useButtonPattern } from '../patterns/button/useButtonPattern'
 import { useCheckboxPattern } from '../patterns/checkbox/useCheckboxPattern'
 import { Grid } from '../patterns/grid/Grid'
@@ -250,40 +249,6 @@ function HelperHost() {
 
   return (
     <div>
-      <button
-        type="button"
-        onClick={() => {
-          const events: PatternEvent[] = []
-          const runtime = {
-            getPartProps: () => ({ role: 'button', id: 'runtime-button' }),
-            emit: (event: PatternEvent) => events.push(event),
-            resolveKeyboardBinding: (input: { key: string }) =>
-              input.key === 'Enter'
-                ? { preventDefault: false, events: [{ type: 'activate', key: 'button' }] }
-                : null,
-          }
-          const empty = createButtonRootProps(runtime as never, null)
-          const props = createButtonRootProps(runtime as never, 'button')
-          fireEvent.focus(screen.getByTestId('button-props-target'))
-          props.onFocus?.({} as never)
-          const eventBase = {
-            altKey: false,
-            ctrlKey: false,
-            metaKey: false,
-            shiftKey: false,
-            repeat: false,
-            location: 0,
-            nativeEvent: { isComposing: false },
-            preventDefault: () => undefined,
-          }
-          props.onKeyDown?.({ ...eventBase, key: 'Escape', code: 'Escape' } as never)
-          props.onKeyDown?.({ ...eventBase, key: 'Enter', code: 'Enter' } as never)
-          setResult(`${Object.keys(empty).length}|${events.map((event) => event.type).join('|')}`)
-        }}
-      >
-        Run button props
-      </button>
-      <button data-testid="button-props-target" type="button">Button props target</button>
       <Grid
         data={{
           items: { cell: { label: 'Edit value' }, row: { label: 'Row' }, column: { label: 'Column' } },
@@ -409,9 +374,6 @@ function HelperHost() {
 describe('action and prop helper coverage from pointer input', () => {
   it('covers action, prop, and dom binding helpers through input events', () => {
     render(<HelperHost />)
-
-    fireEvent.click(screen.getByRole('button', { name: 'Run button props' }))
-    expect(screen.getByText('0|focus|activate')).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Run menu trigger props' }))
     expect(screen.getByText('0|menu-button-trigger|expand:trigger|expand:trigger')).toBeTruthy()
