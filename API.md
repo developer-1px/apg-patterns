@@ -47,168 +47,168 @@ Menu item props use `item.kind` to choose `menuitem`, `menuitemcheckbox`, or `me
 
 ## Public Surface Manifest
 
-Each line maps `export | bucket`. `npm run check:api` verifies these blocks
-against the built declaration files and the taxonomy in
+Each line maps `export | bucket | tier`. `npm run check:api` verifies these
+blocks against the built declaration files, bucket policy, and taxonomy in
 `INTERFACE_STABILITY.md`.
 
 ### Root And Core Public Surface
 
 <!-- apg-api:root-core-surface:start -->
 ```txt
-accordionDefinition | apg-pattern-definition
-alertDefinition | apg-pattern-definition
-alertDialogDefinition | apg-pattern-definition
-AriaAttribute | core-contract-type
-AriaAttributeSchema | schema-validator
-AriaProjection | core-contract-type
-AriaProjectionSchema | schema-validator
-AriaRole | core-contract-type
-AriaRoleSchema | schema-validator
-AriaSourcePath | core-contract-type
-AriaSourcePathSchema | schema-validator
-AriaSourceResolver | extension-resolver-type
-breadcrumbDefinition | apg-pattern-definition
-buttonDefinition | apg-pattern-definition
-carouselDefinition | apg-pattern-definition
-checkboxDefinition | apg-pattern-definition
-clampWindowSplitterValue | runtime-boundary
-comboboxDefinition | apg-pattern-definition
-createParentByKey | runtime-boundary
-createPatternRuntime | runtime-boundary
-CreatePatternRuntimeInput | core-contract-type
-defineAriaSource | extension-vocabulary
-defineDomEvent | extension-vocabulary
-defineKeyToken | extension-vocabulary
-defineNavigationTarget | extension-vocabulary
-definePredicate | extension-vocabulary
-defineStateProjection | extension-vocabulary
-defineVisibleOrder | extension-vocabulary
-dialogDefinition | apg-pattern-definition
-disclosureDefinition | apg-pattern-definition
-DomEventName | core-contract-type
-DomEventNameSchema | schema-validator
-EffectDefinition | core-contract-type
-EffectSchema | schema-validator
-ElementTarget | core-contract-type
-ElementTargetSchema | schema-validator
-evaluatePredicate | runtime-boundary
-EventTemplate | core-contract-type
-EventTemplateSchema | schema-validator
-EventValueSource | core-contract-type
-EventValueSourceSchema | schema-validator
-feedDefinition | apg-pattern-definition
-FocusEffectScopeSchema | schema-validator
-FocusEffectTargetSchema | schema-validator
-FocusEffectTriggerSchema | schema-validator
-FocusModel | core-contract-type
-FocusModelSchema | schema-validator
-FocusProjection | core-contract-type
-FocusProjectionSchema | schema-validator
-getTabsDataDiagnostics | runtime-boundary
-getWindowSplitterDataDiagnostics | runtime-boundary
-gridDefinition | apg-pattern-definition
-IdRefListSchema | schema-validator
-isRegisteredAriaSource | extension-vocabulary
-isRegisteredNavigationTarget | extension-vocabulary
-isRegisteredPredicate | extension-vocabulary
-isRegisteredStateProjection | extension-vocabulary
-isRegisteredVisibleOrder | extension-vocabulary
-Key | core-contract-type
-KeyboardBinding | core-contract-type
-KeyboardBindingSchema | schema-validator
-KeyboardCaseSchema | schema-validator
-KeyInput | core-contract-type
-KeySchema | schema-validator
-KeyTokenSchema | schema-validator
-landmarksDefinition | apg-pattern-definition
-linkDefinition | apg-pattern-definition
-listboxDefinition | apg-pattern-definition
-menubarDefinition | apg-pattern-definition
-menuButtonDefinition | apg-pattern-definition
-meterDefinition | apg-pattern-definition
-ModifierKeyName | core-contract-type
-NavigationSchema | schema-validator
-NavigationTargetContext | core-contract-type
-NavigationTargetKind | core-contract-type
-NavigationTargetKindSchema | schema-validator
-NavigationTargetResolver | extension-resolver-type
-NavigationTargetSchema | schema-validator
-PartEventBinding | core-contract-type
-PartEventBindingSchema | schema-validator
-PartSchema | schema-validator
-PatternData | core-contract-type
-PatternDataSchema | schema-validator
-PatternDefinition | core-contract-type
-PatternDefinitionSchema | schema-validator
-PatternDirection | core-contract-type
-PatternDirectionSchema | schema-validator
-PatternEvent | core-contract-type
-PatternEventMetaSchema | schema-validator
-PatternEventReason | core-contract-type
-PatternEventReasonSchema | schema-validator
-PatternEventSchema | schema-validator
-PatternEventType | core-contract-type
-PatternEventTypeSchema | schema-validator
-PatternItem | core-contract-type
-PatternItemSchema | schema-validator
-PatternOptions | core-contract-type
-PatternOptionsSchema | schema-validator
-PatternRefsSchema | schema-validator
-PatternRelationsSchema | schema-validator
-PatternRuntime | core-contract-type
-PatternRuntimeContext | core-contract-type
-PatternState | core-contract-type
-PatternStateSchema | schema-validator
-PatternValueStepDirection | core-contract-type
-PatternValueStepDirectionSchema | schema-validator
-Predicate | core-contract-type
-PredicateResolver | extension-resolver-type
-PredicateSchema | schema-validator
-radioGroupDefinition | apg-pattern-definition
-reducePatternData | runtime-boundary
-reduceWindowSplitterValue | runtime-boundary
-resolveAriaSource | runtime-boundary
-resolveEventTemplate | runtime-boundary
-resolveKeyToken | runtime-boundary
-resolveNavigationTarget | runtime-boundary
-resolveStateProjection | runtime-boundary
-resolveVisibleOrder | runtime-boundary
-resolveWindowSplitterStepValue | runtime-boundary
-resolveWindowSplitterValueRange | runtime-boundary
-sliderDefinition | apg-pattern-definition
-SlotProps | core-contract-type
-spinbuttonDefinition | apg-pattern-definition
-StateAction | core-contract-type
-StateActionSchema | schema-validator
-StateField | core-contract-type
-StateFieldSchema | schema-validator
-StateProjection | core-contract-type
-StateProjectionResolver | extension-resolver-type
-StateProjectionSchema | schema-validator
-switchDefinition | apg-pattern-definition
-tableDefinition | apg-pattern-definition
-TabsDataDiagnostic | core-contract-type
-TabsDataDiagnosticCode | core-contract-type
-tabsDefinition | apg-pattern-definition
-toolbarDefinition | apg-pattern-definition
-tooltipDefinition | apg-pattern-definition
-Transition | core-contract-type
-TransitionSchema | schema-validator
-TransitionValue | core-contract-type
-TransitionValueSchema | schema-validator
-treegridDefinition | apg-pattern-definition
-treeviewDefinition | apg-pattern-definition
-VisibleOrderKind | core-contract-type
-VisibleOrderKindSchema | schema-validator
-VisibleOrderResolver | extension-resolver-type
-VisibleOrderSchema | schema-validator
-WindowSplitterDataDiagnostic | core-contract-type
-WindowSplitterDataDiagnosticCode | core-contract-type
-windowSplitterDefinition | apg-pattern-definition
-WindowSplitterValueData | core-contract-type
-WindowSplitterValueOptions | core-contract-type
-WindowSplitterValueRange | core-contract-type
-WindowSplitterValueState | core-contract-type
+accordionDefinition | apg-pattern-definition | permanent-catalog
+alertDefinition | apg-pattern-definition | permanent-catalog
+alertDialogDefinition | apg-pattern-definition | permanent-catalog
+AriaAttribute | core-contract-type | permanent-core
+AriaAttributeSchema | schema-validator | permanent-validation
+AriaProjection | core-contract-type | permanent-core
+AriaProjectionSchema | schema-validator | permanent-validation
+AriaRole | core-contract-type | permanent-core
+AriaRoleSchema | schema-validator | permanent-validation
+AriaSourcePath | core-contract-type | permanent-core
+AriaSourcePathSchema | schema-validator | permanent-validation
+AriaSourceResolver | extension-resolver-type | stable-extension
+breadcrumbDefinition | apg-pattern-definition | permanent-catalog
+buttonDefinition | apg-pattern-definition | permanent-catalog
+carouselDefinition | apg-pattern-definition | permanent-catalog
+checkboxDefinition | apg-pattern-definition | permanent-catalog
+clampWindowSplitterValue | core-data-helper | narrow-core-helper
+comboboxDefinition | apg-pattern-definition | permanent-catalog
+createParentByKey | core-data-helper | narrow-core-helper
+createPatternRuntime | runtime-boundary | permanent-runtime
+CreatePatternRuntimeInput | core-contract-type | permanent-core
+defineAriaSource | extension-vocabulary | stable-extension
+defineDomEvent | extension-vocabulary | stable-extension
+defineKeyToken | extension-vocabulary | stable-extension
+defineNavigationTarget | extension-vocabulary | stable-extension
+definePredicate | extension-vocabulary | stable-extension
+defineStateProjection | extension-vocabulary | stable-extension
+defineVisibleOrder | extension-vocabulary | stable-extension
+dialogDefinition | apg-pattern-definition | permanent-catalog
+disclosureDefinition | apg-pattern-definition | permanent-catalog
+DomEventName | core-contract-type | permanent-core
+DomEventNameSchema | schema-validator | permanent-validation
+EffectDefinition | core-contract-type | permanent-core
+EffectSchema | schema-validator | permanent-validation
+ElementTarget | core-contract-type | permanent-core
+ElementTargetSchema | schema-validator | permanent-validation
+evaluatePredicate | runtime-resolver | stable-extension
+EventTemplate | core-contract-type | permanent-core
+EventTemplateSchema | schema-validator | permanent-validation
+EventValueSource | core-contract-type | permanent-core
+EventValueSourceSchema | schema-validator | permanent-validation
+feedDefinition | apg-pattern-definition | permanent-catalog
+FocusEffectScopeSchema | schema-validator | permanent-validation
+FocusEffectTargetSchema | schema-validator | permanent-validation
+FocusEffectTriggerSchema | schema-validator | permanent-validation
+FocusModel | core-contract-type | permanent-core
+FocusModelSchema | schema-validator | permanent-validation
+FocusProjection | core-contract-type | permanent-core
+FocusProjectionSchema | schema-validator | permanent-validation
+getTabsDataDiagnostics | core-data-helper | narrow-core-helper
+getWindowSplitterDataDiagnostics | core-data-helper | narrow-core-helper
+gridDefinition | apg-pattern-definition | permanent-catalog
+IdRefListSchema | schema-validator | permanent-validation
+isRegisteredAriaSource | extension-vocabulary | stable-extension
+isRegisteredNavigationTarget | extension-vocabulary | stable-extension
+isRegisteredPredicate | extension-vocabulary | stable-extension
+isRegisteredStateProjection | extension-vocabulary | stable-extension
+isRegisteredVisibleOrder | extension-vocabulary | stable-extension
+Key | core-contract-type | permanent-core
+KeyboardBinding | core-contract-type | permanent-core
+KeyboardBindingSchema | schema-validator | permanent-validation
+KeyboardCaseSchema | schema-validator | permanent-validation
+KeyInput | core-contract-type | permanent-core
+KeySchema | schema-validator | permanent-validation
+KeyTokenSchema | schema-validator | permanent-validation
+landmarksDefinition | apg-pattern-definition | permanent-catalog
+linkDefinition | apg-pattern-definition | permanent-catalog
+listboxDefinition | apg-pattern-definition | permanent-catalog
+menubarDefinition | apg-pattern-definition | permanent-catalog
+menuButtonDefinition | apg-pattern-definition | permanent-catalog
+meterDefinition | apg-pattern-definition | permanent-catalog
+ModifierKeyName | core-contract-type | permanent-core
+NavigationSchema | schema-validator | permanent-validation
+NavigationTargetContext | core-contract-type | permanent-core
+NavigationTargetKind | core-contract-type | permanent-core
+NavigationTargetKindSchema | schema-validator | permanent-validation
+NavigationTargetResolver | extension-resolver-type | stable-extension
+NavigationTargetSchema | schema-validator | permanent-validation
+PartEventBinding | core-contract-type | permanent-core
+PartEventBindingSchema | schema-validator | permanent-validation
+PartSchema | schema-validator | permanent-validation
+PatternData | core-contract-type | permanent-core
+PatternDataSchema | schema-validator | permanent-validation
+PatternDefinition | core-contract-type | permanent-core
+PatternDefinitionSchema | schema-validator | permanent-validation
+PatternDirection | core-contract-type | permanent-core
+PatternDirectionSchema | schema-validator | permanent-validation
+PatternEvent | core-contract-type | permanent-core
+PatternEventMetaSchema | schema-validator | permanent-validation
+PatternEventReason | core-contract-type | permanent-core
+PatternEventReasonSchema | schema-validator | permanent-validation
+PatternEventSchema | schema-validator | permanent-validation
+PatternEventType | core-contract-type | permanent-core
+PatternEventTypeSchema | schema-validator | permanent-validation
+PatternItem | core-contract-type | permanent-core
+PatternItemSchema | schema-validator | permanent-validation
+PatternOptions | core-contract-type | permanent-core
+PatternOptionsSchema | schema-validator | permanent-validation
+PatternRefsSchema | schema-validator | permanent-validation
+PatternRelationsSchema | schema-validator | permanent-validation
+PatternRuntime | core-contract-type | permanent-core
+PatternRuntimeContext | core-contract-type | permanent-core
+PatternState | core-contract-type | permanent-core
+PatternStateSchema | schema-validator | permanent-validation
+PatternValueStepDirection | core-contract-type | permanent-core
+PatternValueStepDirectionSchema | schema-validator | permanent-validation
+Predicate | core-contract-type | permanent-core
+PredicateResolver | extension-resolver-type | stable-extension
+PredicateSchema | schema-validator | permanent-validation
+radioGroupDefinition | apg-pattern-definition | permanent-catalog
+reducePatternData | runtime-boundary | permanent-runtime
+reduceWindowSplitterValue | core-data-helper | narrow-core-helper
+resolveAriaSource | runtime-resolver | stable-extension
+resolveEventTemplate | runtime-resolver | stable-extension
+resolveKeyToken | runtime-resolver | stable-extension
+resolveNavigationTarget | runtime-resolver | stable-extension
+resolveStateProjection | runtime-resolver | stable-extension
+resolveVisibleOrder | runtime-resolver | stable-extension
+resolveWindowSplitterStepValue | core-data-helper | narrow-core-helper
+resolveWindowSplitterValueRange | core-data-helper | narrow-core-helper
+sliderDefinition | apg-pattern-definition | permanent-catalog
+SlotProps | core-contract-type | permanent-core
+spinbuttonDefinition | apg-pattern-definition | permanent-catalog
+StateAction | core-contract-type | permanent-core
+StateActionSchema | schema-validator | permanent-validation
+StateField | core-contract-type | permanent-core
+StateFieldSchema | schema-validator | permanent-validation
+StateProjection | core-contract-type | permanent-core
+StateProjectionResolver | extension-resolver-type | stable-extension
+StateProjectionSchema | schema-validator | permanent-validation
+switchDefinition | apg-pattern-definition | permanent-catalog
+tableDefinition | apg-pattern-definition | permanent-catalog
+TabsDataDiagnostic | core-contract-type | permanent-core
+TabsDataDiagnosticCode | core-contract-type | permanent-core
+tabsDefinition | apg-pattern-definition | permanent-catalog
+toolbarDefinition | apg-pattern-definition | permanent-catalog
+tooltipDefinition | apg-pattern-definition | permanent-catalog
+Transition | core-contract-type | permanent-core
+TransitionSchema | schema-validator | permanent-validation
+TransitionValue | core-contract-type | permanent-core
+TransitionValueSchema | schema-validator | permanent-validation
+treegridDefinition | apg-pattern-definition | permanent-catalog
+treeviewDefinition | apg-pattern-definition | permanent-catalog
+VisibleOrderKind | core-contract-type | permanent-core
+VisibleOrderKindSchema | schema-validator | permanent-validation
+VisibleOrderResolver | extension-resolver-type | stable-extension
+VisibleOrderSchema | schema-validator | permanent-validation
+WindowSplitterDataDiagnostic | core-contract-type | permanent-core
+WindowSplitterDataDiagnosticCode | core-contract-type | permanent-core
+windowSplitterDefinition | apg-pattern-definition | permanent-catalog
+WindowSplitterValueData | core-contract-type | permanent-core
+WindowSplitterValueOptions | core-contract-type | permanent-core
+WindowSplitterValueRange | core-contract-type | permanent-core
+WindowSplitterValueState | core-contract-type | permanent-core
 ```
 <!-- apg-api:root-core-surface:end -->
 
@@ -216,178 +216,178 @@ WindowSplitterValueState | core-contract-type
 
 <!-- apg-api:react-only-surface:start -->
 ```txt
-Accordion | react-preset-component
-AccordionProps | react-preset-props
-Alert | react-preset-component
-AlertDialog | react-preset-component
-AlertDialogProps | react-preset-props
-AlertProps | react-preset-props
-AutocompleteListboxActions | react-owner-adapter
-AutocompleteListboxOptions | react-owner-adapter
-AutocompleteListboxState | react-owner-adapter
-AutocompleteOwnerAutocomplete | react-owner-adapter
-Breadcrumb | react-preset-component
-BreadcrumbProps | react-preset-props
-Button | react-preset-component
-ButtonProps | react-preset-props
-Carousel | react-preset-component
-CarouselProps | react-preset-props
-Checkbox | react-preset-component
-CheckboxProps | react-preset-props
-Combobox | react-preset-component
-ComboboxProps | react-preset-props
-CommandSurfaceDataOptions | react-data-helper
-CommandSurfaceItem | react-data-helper
-createMenuButtonPatternData | react-data-helper
-createRadioGroupPatternData | react-data-helper
-createToolbarPatternData | react-data-helper
-Dialog | react-preset-component
-DialogProps | react-preset-props
-Disclosure | react-preset-component
-DisclosureProps | react-preset-props
-dispatchAutocompleteOwnerKeyDown | react-owner-adapter
-Feed | react-preset-component
-FeedProps | react-preset-props
-Grid | react-preset-component
-GridProps | react-preset-props
-Landmarks | react-preset-component
-LandmarksProps | react-preset-props
-Link | react-preset-component
-LinkProps | react-preset-props
-Listbox | react-preset-component
-ListboxProps | react-preset-props
-Menu | react-preset-component
-Menubar | react-preset-component
-MenubarProps | react-preset-props
-MenuButton | react-preset-component
-MenuButtonCommandSurfaceDataOptions | react-data-helper
-MenuButtonProps | react-preset-props
-MenuProps | react-preset-props
-Meter | react-preset-component
-MeterProps | react-preset-props
-PatternStateReducerOptions | react-state-helper
-PatternStateReducerResult | react-state-helper
-RadioGroup | react-preset-component
-RadioGroupProps | react-preset-props
-ReactAccordionRenderItem | react-render-surface-type
-ReactAccordionRuntime | react-runtime-type
-ReactAlertDialogRuntime | react-runtime-type
-ReactAlertRuntime | react-runtime-type
-ReactAutocompleteListboxRuntime | react-runtime-type
-ReactBreadcrumbItem | react-render-surface-type
-ReactBreadcrumbRuntime | react-runtime-type
-ReactButtonRuntime | react-runtime-type
-ReactCarouselRuntime | react-runtime-type
-ReactCarouselSlide | react-render-surface-type
-ReactCheckboxRenderItem | react-render-surface-type
-ReactCheckboxRuntime | react-runtime-type
-ReactComboboxOption | react-render-surface-type
-ReactComboboxRuntime | react-runtime-type
-ReactControlledAlertDialogRuntime | react-runtime-type
-ReactControlledDialogConfig | react-state-helper
-ReactControlledDialogOpenChangeMeta | react-state-helper
-ReactControlledDialogRuntime | react-runtime-type
-ReactDialogFocusTarget | react-state-helper
-ReactDialogRuntime | react-runtime-type
-ReactDisclosureItem | react-render-surface-type
-ReactDisclosureRuntime | react-runtime-type
-ReactFeedArticle | react-render-surface-type
-ReactFeedRuntime | react-runtime-type
-ReactGridCell | react-render-surface-type
-ReactGridRow | react-render-surface-type
-ReactGridRuntime | react-runtime-type
-ReactLandmarkItem | react-render-surface-type
-ReactLandmarksRuntime | react-runtime-type
-ReactLinkRuntime | react-runtime-type
-ReactListboxRenderItem | react-render-surface-type
-ReactListboxRuntime | react-runtime-type
-ReactMenubarItem | react-render-surface-type
-ReactMenubarRuntime | react-runtime-type
-ReactMenuButtonRuntime | react-runtime-type
-ReactMenuButtonTriggerState | react-data-helper
-ReactMenuItem | react-render-surface-type
-ReactMenuPatternOptions | react-runtime-type
-ReactMenuRuntime | react-runtime-type
-ReactMeterRenderItem | react-render-surface-type
-ReactMeterRuntime | react-runtime-type
-ReactRadioGroupOptions | react-runtime-type
-ReactRadioGroupRuntime | react-runtime-type
-ReactRadioRenderItem | react-render-surface-type
-ReactSliderRenderItem | react-render-surface-type
-ReactSliderRuntime | react-runtime-type
-ReactSpinbuttonRenderItem | react-render-surface-type
-ReactSpinbuttonRuntime | react-runtime-type
-ReactSwitchRenderItem | react-render-surface-type
-ReactSwitchRuntime | react-runtime-type
-ReactTableCell | react-render-surface-type
-ReactTableRow | react-render-surface-type
-ReactTableRuntime | react-runtime-type
-ReactTabsRuntime | react-runtime-type
-ReactToolbarItemKind | react-data-helper
-ReactToolbarRenderItem | react-render-surface-type
-ReactToolbarRuntime | react-runtime-type
-ReactTooltipRuntime | react-runtime-type
-ReactTreegridCell | react-render-surface-type
-ReactTreegridRow | react-render-surface-type
-ReactTreegridRuntime | react-runtime-type
-ReactTreeviewRenderItem | react-render-surface-type
-ReactTreeviewRuntime | react-runtime-type
-ReactWindowSplitterRuntime | react-runtime-type
-SelectableCommandSurfaceDataOptions | react-data-helper
-Slider | react-preset-component
-SliderProps | react-preset-props
-Spinbutton | react-preset-component
-SpinbuttonProps | react-preset-props
-Switch | react-preset-component
-SwitchProps | react-preset-props
-Table | react-preset-component
-TableProps | react-preset-props
-Tabs | react-preset-component
-TabsProps | react-preset-props
-Toolbar | react-preset-component
-ToolbarProps | react-preset-props
-Tooltip | react-preset-component
-TooltipProps | react-preset-props
-Treegrid | react-preset-component
-TreegridProps | react-preset-props
-Treeview | react-preset-component
-TreeviewProps | react-preset-props
-useAccordionPattern | react-pattern-hook
-useAlertDialogPattern | react-pattern-hook
-useAlertPattern | react-pattern-hook
-useAutocompleteListbox | react-owner-adapter
-useBreadcrumbPattern | react-pattern-hook
-useButtonPattern | react-pattern-hook
-useCarouselPattern | react-pattern-hook
-useCheckboxPattern | react-pattern-hook
-useComboboxPattern | react-pattern-hook
-useControlledAlertDialogPattern | react-pattern-hook
-useControlledDialogPattern | react-pattern-hook
-useDialogPattern | react-pattern-hook
-useDisclosurePattern | react-pattern-hook
-useFeedPattern | react-pattern-hook
-useGridPattern | react-pattern-hook
-useLandmarksPattern | react-pattern-hook
-useLinkPattern | react-pattern-hook
-useListboxPattern | react-pattern-hook
-useMenubarPattern | react-pattern-hook
-useMenuButtonPattern | react-pattern-hook
-useMenuPattern | react-pattern-hook
-useMeterPattern | react-pattern-hook
-usePatternStateReducer | react-state-helper
-useRadioGroupPattern | react-pattern-hook
-useSliderPattern | react-pattern-hook
-useSpinbuttonPattern | react-pattern-hook
-useSwitchPattern | react-pattern-hook
-useTablePattern | react-pattern-hook
-useTabsPattern | react-pattern-hook
-useToolbarPattern | react-pattern-hook
-useTooltipPattern | react-pattern-hook
-useTreegridPattern | react-pattern-hook
-useTreeviewPattern | react-pattern-hook
-useWindowSplitterPattern | react-pattern-hook
-WindowSplitter | react-preset-component
-WindowSplitterProps | react-preset-props
+Accordion | react-preset-component | framework-adapter
+AccordionProps | react-preset-props | framework-adapter
+Alert | react-preset-component | framework-adapter
+AlertDialog | react-preset-component | framework-adapter
+AlertDialogProps | react-preset-props | framework-adapter
+AlertProps | react-preset-props | framework-adapter
+AutocompleteListboxActions | react-owner-adapter | narrow-react-adapter
+AutocompleteListboxOptions | react-owner-adapter | narrow-react-adapter
+AutocompleteListboxState | react-owner-adapter | narrow-react-adapter
+AutocompleteOwnerAutocomplete | react-owner-adapter | narrow-react-adapter
+Breadcrumb | react-preset-component | framework-adapter
+BreadcrumbProps | react-preset-props | framework-adapter
+Button | react-preset-component | framework-adapter
+ButtonProps | react-preset-props | framework-adapter
+Carousel | react-preset-component | framework-adapter
+CarouselProps | react-preset-props | framework-adapter
+Checkbox | react-preset-component | framework-adapter
+CheckboxProps | react-preset-props | framework-adapter
+Combobox | react-preset-component | framework-adapter
+ComboboxProps | react-preset-props | framework-adapter
+CommandSurfaceDataOptions | react-data-helper | narrow-react-helper
+CommandSurfaceItem | react-data-helper | narrow-react-helper
+createMenuButtonPatternData | react-data-helper | narrow-react-helper
+createRadioGroupPatternData | react-data-helper | narrow-react-helper
+createToolbarPatternData | react-data-helper | narrow-react-helper
+Dialog | react-preset-component | framework-adapter
+DialogProps | react-preset-props | framework-adapter
+Disclosure | react-preset-component | framework-adapter
+DisclosureProps | react-preset-props | framework-adapter
+dispatchAutocompleteOwnerKeyDown | react-owner-adapter | narrow-react-adapter
+Feed | react-preset-component | framework-adapter
+FeedProps | react-preset-props | framework-adapter
+Grid | react-preset-component | framework-adapter
+GridProps | react-preset-props | framework-adapter
+Landmarks | react-preset-component | framework-adapter
+LandmarksProps | react-preset-props | framework-adapter
+Link | react-preset-component | framework-adapter
+LinkProps | react-preset-props | framework-adapter
+Listbox | react-preset-component | framework-adapter
+ListboxProps | react-preset-props | framework-adapter
+Menu | react-preset-component | framework-adapter
+Menubar | react-preset-component | framework-adapter
+MenubarProps | react-preset-props | framework-adapter
+MenuButton | react-preset-component | framework-adapter
+MenuButtonCommandSurfaceDataOptions | react-data-helper | narrow-react-helper
+MenuButtonProps | react-preset-props | framework-adapter
+MenuProps | react-preset-props | framework-adapter
+Meter | react-preset-component | framework-adapter
+MeterProps | react-preset-props | framework-adapter
+PatternStateReducerOptions | react-state-helper | narrow-react-helper
+PatternStateReducerResult | react-state-helper | narrow-react-helper
+RadioGroup | react-preset-component | framework-adapter
+RadioGroupProps | react-preset-props | framework-adapter
+ReactAccordionRenderItem | react-render-surface-type | framework-adapter
+ReactAccordionRuntime | react-runtime-type | framework-adapter
+ReactAlertDialogRuntime | react-runtime-type | framework-adapter
+ReactAlertRuntime | react-runtime-type | framework-adapter
+ReactAutocompleteListboxRuntime | react-runtime-type | framework-adapter
+ReactBreadcrumbItem | react-render-surface-type | framework-adapter
+ReactBreadcrumbRuntime | react-runtime-type | framework-adapter
+ReactButtonRuntime | react-runtime-type | framework-adapter
+ReactCarouselRuntime | react-runtime-type | framework-adapter
+ReactCarouselSlide | react-render-surface-type | framework-adapter
+ReactCheckboxRenderItem | react-render-surface-type | framework-adapter
+ReactCheckboxRuntime | react-runtime-type | framework-adapter
+ReactComboboxOption | react-render-surface-type | framework-adapter
+ReactComboboxRuntime | react-runtime-type | framework-adapter
+ReactControlledAlertDialogRuntime | react-runtime-type | framework-adapter
+ReactControlledDialogConfig | react-state-helper | narrow-react-helper
+ReactControlledDialogOpenChangeMeta | react-state-helper | narrow-react-helper
+ReactControlledDialogRuntime | react-runtime-type | framework-adapter
+ReactDialogFocusTarget | react-state-helper | narrow-react-helper
+ReactDialogRuntime | react-runtime-type | framework-adapter
+ReactDisclosureItem | react-render-surface-type | framework-adapter
+ReactDisclosureRuntime | react-runtime-type | framework-adapter
+ReactFeedArticle | react-render-surface-type | framework-adapter
+ReactFeedRuntime | react-runtime-type | framework-adapter
+ReactGridCell | react-render-surface-type | framework-adapter
+ReactGridRow | react-render-surface-type | framework-adapter
+ReactGridRuntime | react-runtime-type | framework-adapter
+ReactLandmarkItem | react-render-surface-type | framework-adapter
+ReactLandmarksRuntime | react-runtime-type | framework-adapter
+ReactLinkRuntime | react-runtime-type | framework-adapter
+ReactListboxRenderItem | react-render-surface-type | framework-adapter
+ReactListboxRuntime | react-runtime-type | framework-adapter
+ReactMenubarItem | react-render-surface-type | framework-adapter
+ReactMenubarRuntime | react-runtime-type | framework-adapter
+ReactMenuButtonRuntime | react-runtime-type | framework-adapter
+ReactMenuButtonTriggerState | react-data-helper | narrow-react-helper
+ReactMenuItem | react-render-surface-type | framework-adapter
+ReactMenuPatternOptions | react-runtime-type | framework-adapter
+ReactMenuRuntime | react-runtime-type | framework-adapter
+ReactMeterRenderItem | react-render-surface-type | framework-adapter
+ReactMeterRuntime | react-runtime-type | framework-adapter
+ReactRadioGroupOptions | react-runtime-type | framework-adapter
+ReactRadioGroupRuntime | react-runtime-type | framework-adapter
+ReactRadioRenderItem | react-render-surface-type | framework-adapter
+ReactSliderRenderItem | react-render-surface-type | framework-adapter
+ReactSliderRuntime | react-runtime-type | framework-adapter
+ReactSpinbuttonRenderItem | react-render-surface-type | framework-adapter
+ReactSpinbuttonRuntime | react-runtime-type | framework-adapter
+ReactSwitchRenderItem | react-render-surface-type | framework-adapter
+ReactSwitchRuntime | react-runtime-type | framework-adapter
+ReactTableCell | react-render-surface-type | framework-adapter
+ReactTableRow | react-render-surface-type | framework-adapter
+ReactTableRuntime | react-runtime-type | framework-adapter
+ReactTabsRuntime | react-runtime-type | framework-adapter
+ReactToolbarItemKind | react-data-helper | narrow-react-helper
+ReactToolbarRenderItem | react-render-surface-type | framework-adapter
+ReactToolbarRuntime | react-runtime-type | framework-adapter
+ReactTooltipRuntime | react-runtime-type | framework-adapter
+ReactTreegridCell | react-render-surface-type | framework-adapter
+ReactTreegridRow | react-render-surface-type | framework-adapter
+ReactTreegridRuntime | react-runtime-type | framework-adapter
+ReactTreeviewRenderItem | react-render-surface-type | framework-adapter
+ReactTreeviewRuntime | react-runtime-type | framework-adapter
+ReactWindowSplitterRuntime | react-runtime-type | framework-adapter
+SelectableCommandSurfaceDataOptions | react-data-helper | narrow-react-helper
+Slider | react-preset-component | framework-adapter
+SliderProps | react-preset-props | framework-adapter
+Spinbutton | react-preset-component | framework-adapter
+SpinbuttonProps | react-preset-props | framework-adapter
+Switch | react-preset-component | framework-adapter
+SwitchProps | react-preset-props | framework-adapter
+Table | react-preset-component | framework-adapter
+TableProps | react-preset-props | framework-adapter
+Tabs | react-preset-component | framework-adapter
+TabsProps | react-preset-props | framework-adapter
+Toolbar | react-preset-component | framework-adapter
+ToolbarProps | react-preset-props | framework-adapter
+Tooltip | react-preset-component | framework-adapter
+TooltipProps | react-preset-props | framework-adapter
+Treegrid | react-preset-component | framework-adapter
+TreegridProps | react-preset-props | framework-adapter
+Treeview | react-preset-component | framework-adapter
+TreeviewProps | react-preset-props | framework-adapter
+useAccordionPattern | react-pattern-hook | framework-adapter
+useAlertDialogPattern | react-pattern-hook | framework-adapter
+useAlertPattern | react-pattern-hook | framework-adapter
+useAutocompleteListbox | react-owner-adapter | narrow-react-adapter
+useBreadcrumbPattern | react-pattern-hook | framework-adapter
+useButtonPattern | react-pattern-hook | framework-adapter
+useCarouselPattern | react-pattern-hook | framework-adapter
+useCheckboxPattern | react-pattern-hook | framework-adapter
+useComboboxPattern | react-pattern-hook | framework-adapter
+useControlledAlertDialogPattern | react-pattern-hook | framework-adapter
+useControlledDialogPattern | react-pattern-hook | framework-adapter
+useDialogPattern | react-pattern-hook | framework-adapter
+useDisclosurePattern | react-pattern-hook | framework-adapter
+useFeedPattern | react-pattern-hook | framework-adapter
+useGridPattern | react-pattern-hook | framework-adapter
+useLandmarksPattern | react-pattern-hook | framework-adapter
+useLinkPattern | react-pattern-hook | framework-adapter
+useListboxPattern | react-pattern-hook | framework-adapter
+useMenubarPattern | react-pattern-hook | framework-adapter
+useMenuButtonPattern | react-pattern-hook | framework-adapter
+useMenuPattern | react-pattern-hook | framework-adapter
+useMeterPattern | react-pattern-hook | framework-adapter
+usePatternStateReducer | react-state-helper | narrow-react-helper
+useRadioGroupPattern | react-pattern-hook | framework-adapter
+useSliderPattern | react-pattern-hook | framework-adapter
+useSpinbuttonPattern | react-pattern-hook | framework-adapter
+useSwitchPattern | react-pattern-hook | framework-adapter
+useTablePattern | react-pattern-hook | framework-adapter
+useTabsPattern | react-pattern-hook | framework-adapter
+useToolbarPattern | react-pattern-hook | framework-adapter
+useTooltipPattern | react-pattern-hook | framework-adapter
+useTreegridPattern | react-pattern-hook | framework-adapter
+useTreeviewPattern | react-pattern-hook | framework-adapter
+useWindowSplitterPattern | react-pattern-hook | framework-adapter
+WindowSplitter | react-preset-component | framework-adapter
+WindowSplitterProps | react-preset-props | framework-adapter
 ```
 <!-- apg-api:react-only-surface:end -->
 

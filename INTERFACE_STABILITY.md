@@ -99,9 +99,13 @@ this taxonomy so accidental exports fail before release.
   vocabulary types such as `PatternData`, `PatternEvent`,
   `PatternDefinition`, and `PatternRuntime`.
 - `schema-validator`: Zod schemas that validate the serializable contract.
-- `runtime-boundary`: runtime functions that callers use to create, reduce, or
-  inspect APG pattern behavior, such as `createPatternRuntime` and
+- `runtime-boundary`: runtime functions that callers use to create or reduce
+  APG pattern behavior, such as `createPatternRuntime` and
   `reducePatternData`.
+- `runtime-resolver`: runtime functions that resolve registered extension
+  vocabulary into concrete behavior.
+- `core-data-helper`: narrow data reducers, diagnostics, and structural helpers
+  that encode reusable APG behavior without owning app state.
 - `extension-vocabulary`: explicit extension registration and discovery
   helpers, such as `defineNavigationTarget` and `isRegisteredPredicate`.
 - `extension-resolver-type`: resolver callback types used by the extension
@@ -121,6 +125,31 @@ this taxonomy so accidental exports fail before release.
 - `react-runtime-type`: hook return/runtime types.
 - `react-render-surface-type`: render item, row, cell, option, and related
   JSX mapping surface types.
+
+## Public Surface Bucket Policy
+
+This table is machine-enforced by `npm run check:api`. A bucket may only appear
+in the listed public manifest section, and every manifest row carries the same
+tier label.
+
+| Bucket | Entrypoint | Tier |
+| --- | --- | --- |
+| `apg-pattern-definition` | root/core | permanent-catalog |
+| `core-contract-type` | root/core | permanent-core |
+| `schema-validator` | root/core | permanent-validation |
+| `runtime-boundary` | root/core | permanent-runtime |
+| `runtime-resolver` | root/core | stable-extension |
+| `core-data-helper` | root/core | narrow-core-helper |
+| `extension-vocabulary` | root/core | stable-extension |
+| `extension-resolver-type` | root/core | stable-extension |
+| `react-pattern-hook` | react-only | framework-adapter |
+| `react-preset-component` | react-only | framework-adapter |
+| `react-preset-props` | react-only | framework-adapter |
+| `react-data-helper` | react-only | narrow-react-helper |
+| `react-owner-adapter` | react-only | narrow-react-adapter |
+| `react-state-helper` | react-only | narrow-react-helper |
+| `react-runtime-type` | react-only | framework-adapter |
+| `react-render-surface-type` | react-only | framework-adapter |
 
 ## Public Surface Readiness
 

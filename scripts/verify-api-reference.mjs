@@ -115,6 +115,25 @@ const forbiddenPublicExports = new Map([
   ['windowsplitterDefinition', 'use windowSplitterDefinition'],
 ])
 
+const surfaceBucketPolicies = new Map([
+  ['apg-pattern-definition', { entrypoint: 'root/core', tier: 'permanent-catalog' }],
+  ['core-contract-type', { entrypoint: 'root/core', tier: 'permanent-core' }],
+  ['schema-validator', { entrypoint: 'root/core', tier: 'permanent-validation' }],
+  ['runtime-boundary', { entrypoint: 'root/core', tier: 'permanent-runtime' }],
+  ['runtime-resolver', { entrypoint: 'root/core', tier: 'stable-extension' }],
+  ['core-data-helper', { entrypoint: 'root/core', tier: 'narrow-core-helper' }],
+  ['extension-vocabulary', { entrypoint: 'root/core', tier: 'stable-extension' }],
+  ['extension-resolver-type', { entrypoint: 'root/core', tier: 'stable-extension' }],
+  ['react-pattern-hook', { entrypoint: 'react-only', tier: 'framework-adapter' }],
+  ['react-preset-component', { entrypoint: 'react-only', tier: 'framework-adapter' }],
+  ['react-preset-props', { entrypoint: 'react-only', tier: 'framework-adapter' }],
+  ['react-data-helper', { entrypoint: 'react-only', tier: 'narrow-react-helper' }],
+  ['react-owner-adapter', { entrypoint: 'react-only', tier: 'narrow-react-adapter' }],
+  ['react-state-helper', { entrypoint: 'react-only', tier: 'narrow-react-helper' }],
+  ['react-runtime-type', { entrypoint: 'react-only', tier: 'framework-adapter' }],
+  ['react-render-surface-type', { entrypoint: 'react-only', tier: 'framework-adapter' }],
+])
+
 const rootCoreContractTypes = new Set([
   'AriaAttribute',
   'AriaProjection',
@@ -166,20 +185,26 @@ const rootCoreContractTypes = new Set([
 ])
 
 const rootCoreRuntimeBoundaryExports = new Set([
-  'clampWindowSplitterValue',
-  'createParentByKey',
   'createPatternRuntime',
-  'evaluatePredicate',
-  'getTabsDataDiagnostics',
-  'getWindowSplitterDataDiagnostics',
   'reducePatternData',
-  'reduceWindowSplitterValue',
+])
+
+const rootCoreRuntimeResolverExports = new Set([
+  'evaluatePredicate',
   'resolveAriaSource',
   'resolveEventTemplate',
   'resolveKeyToken',
   'resolveNavigationTarget',
   'resolveStateProjection',
   'resolveVisibleOrder',
+])
+
+const rootCoreDataHelperExports = new Set([
+  'clampWindowSplitterValue',
+  'createParentByKey',
+  'getTabsDataDiagnostics',
+  'getWindowSplitterDataDiagnostics',
+  'reduceWindowSplitterValue',
   'resolveWindowSplitterStepValue',
   'resolveWindowSplitterValueRange',
 ])
@@ -286,11 +311,11 @@ assertNoForbiddenPublicExports('./react runtime exports', reactRuntimeExports)
 
 const reactOnlyExports = reactExports.filter((name) => !coreExports.includes(name))
 const reactOnlyRuntimeExports = reactRuntimeExports.filter((name) => !coreRuntimeExports.includes(name))
-const rootSurfaceBuckets = assertClassifiedPublicExports('root/core declaration exports', coreExports, classifyRootCoreExport)
-const reactSurfaceBuckets = assertClassifiedPublicExports('./react-only declaration exports', reactOnlyExports, classifyReactOnlyExport)
+const rootSurfaceBuckets = assertClassifiedPublicExports('root/core declaration exports', coreExports, classifyRootCoreExport, 'root/core')
+const reactSurfaceBuckets = assertClassifiedPublicExports('./react-only declaration exports', reactOnlyExports, classifyReactOnlyExport, 'react-only')
 const rootSurfaceManifest = publicSurfaceManifest(coreExports, classifyRootCoreExport)
 const reactSurfaceManifest = publicSurfaceManifest(reactOnlyExports, classifyReactOnlyExport)
-assertInterfaceStabilityDocumentsBuckets(rootSurfaceBuckets, reactSurfaceBuckets)
+assertInterfaceStabilityDocumentsBucketPolicies(rootSurfaceBuckets, reactSurfaceBuckets)
 const nextApiReference = shouldWrite
   ? replaceExportBlock(
     replaceExportBlock(
@@ -397,27 +422,43 @@ function assertNoForbiddenPublicExports(label, exports) {
   }
 }
 
-function assertInterfaceStabilityDocumentsBuckets(...bucketMaps) {
-  const documentedBuckets = new Set(
-    Array.from(interfaceStability.matchAll(/`([a-z][a-z-]+)`: /g), ([, bucket]) => bucket),
-  )
-  const missingBuckets = [...new Set(bucketMaps.flatMap((buckets) => [...buckets.keys()]))]
-    .filter((bucket) => !documentedBuckets.has(bucket))
+function assertInterfaceStabilityDocumentsBucketPolicies(...bucketMaps) {
+  const usedBuckets = new Set(bucketMaps.flatMap((buckets) => [...buckets.keys()]))
+  const missingPolicies = [...usedBuckets]
+    .filter((bucket) => !surfaceBucketPolicies.has(bucket))
     .sort((left, right) => left.localeCompare(right))
 
-  if (missingBuckets.length > 0) {
-    failures.push(`INTERFACE_STABILITY.md does not document public surface buckets: ${missingBuckets.join(', ')}`)
+  if (missingPolicies.length > 0) {
+    failures.push(`public surface buckets are missing policy metadata: ${missingPolicies.join(', ')}`)
+  }
+
+  for (const [bucket, policy] of surfaceBucketPolicies) {
+    const row = `| \`${bucket}\` | ${policy.entrypoint} | ${policy.tier} |`
+    if (!interfaceStability.includes(row)) {
+      failures.push(`INTERFACE_STABILITY.md must document bucket policy row: ${row}`)
+    }
   }
 }
 
-function assertClassifiedPublicExports(label, exports, classify) {
+function assertClassifiedPublicExports(label, exports, classify, entrypoint) {
   const buckets = new Map()
   const unclassified = []
+  const invalidEntrypoints = []
+  const missingPolicies = []
 
   for (const name of exports) {
     const bucket = classify(name)
     if (!bucket) {
       unclassified.push(name)
+      continue
+    }
+    const policy = surfaceBucketPolicies.get(bucket)
+    if (!policy) {
+      missingPolicies.push(`${name} -> ${bucket}`)
+      continue
+    }
+    if (policy.entrypoint !== entrypoint) {
+      invalidEntrypoints.push(`${name} -> ${bucket} (${policy.entrypoint})`)
       continue
     }
     buckets.set(bucket, (buckets.get(bucket) ?? 0) + 1)
@@ -426,12 +467,22 @@ function assertClassifiedPublicExports(label, exports, classify) {
   if (unclassified.length > 0) {
     failures.push(`${label} contains unclassified public exports: ${unclassified.join(', ')}`)
   }
+  if (missingPolicies.length > 0) {
+    failures.push(`${label} contains public exports with unknown bucket policies: ${missingPolicies.join(', ')}`)
+  }
+  if (invalidEntrypoints.length > 0) {
+    failures.push(`${label} contains public exports in buckets not allowed for ${entrypoint}: ${invalidEntrypoints.join(', ')}`)
+  }
 
   return buckets
 }
 
 function publicSurfaceManifest(exports, classify) {
-  return exports.map((name) => `${name} | ${classify(name) ?? 'unclassified'}`)
+  return exports.map((name) => {
+    const bucket = classify(name) ?? 'unclassified'
+    const tier = surfaceBucketPolicies.get(bucket)?.tier ?? 'unclassified'
+    return `${name} | ${bucket} | ${tier}`
+  })
 }
 
 function classifyRootCoreExport(name) {
@@ -440,6 +491,8 @@ function classifyRootCoreExport(name) {
   if (name.endsWith('Resolver')) return 'extension-resolver-type'
   if (rootCoreContractTypes.has(name)) return 'core-contract-type'
   if (rootCoreRuntimeBoundaryExports.has(name)) return 'runtime-boundary'
+  if (rootCoreRuntimeResolverExports.has(name)) return 'runtime-resolver'
+  if (rootCoreDataHelperExports.has(name)) return 'core-data-helper'
   if (rootCoreExtensionExports.has(name)) return 'extension-vocabulary'
   return null
 }
