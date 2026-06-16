@@ -227,6 +227,17 @@ server-rendered markup:
 - Relationship-keyed dialog data, including a non-literal dialog item key, must
   render through the React preset. Literal demo keys are not the public API.
 
+`src/tests/reactPublicEventContracts.test.tsx` anchors selected React hook event
+contracts through the public `../react` facade:
+
+- `useTreeviewPattern`, `useTabsPattern`, `useComboboxPattern`,
+  `useDialogPattern`, `useListboxPattern`, and `useMenuButtonPattern` must
+  preserve representative keyboard, focus, pointer, open, close, select,
+  activate, and navigation event payloads.
+- Event payloads and `meta.reason` are checked separately so enumerable versus
+  non-enumerable metadata remains an implementation detail, while the public
+  event meaning stays fixed.
+
 ## Not A Stability Contract
 
 These details may change without being treated as package identity:
