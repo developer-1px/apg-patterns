@@ -14,7 +14,6 @@ import { createMenuButtonTriggerProps } from '../patterns/menu/menuButtonTrigger
 import { getMenuButtonRuntimeState } from '../patterns/menu/menuButtonRuntimeState'
 import { useRadioGroupPattern } from '../patterns/radio/useRadioGroupPattern'
 import { getSliderRuntimeState, isMultiThumbSlider } from '../patterns/slider/sliderRuntimeState'
-import { getSpinbuttonRuntimeState } from '../patterns/spinbutton/spinbuttonRuntimeState'
 import { useSpinbuttonPattern } from '../patterns/spinbutton/useSpinbuttonPattern'
 import { useSwitchPattern } from '../patterns/switch/useSwitchPattern'
 import { useTablePattern } from '../patterns/table/useTablePattern'
@@ -368,14 +367,11 @@ function HelperHost() {
             },
           }
           const sliderState = getSliderRuntimeState(sliderRuntime as never)
-          const spinState = getSpinbuttonRuntimeState({ items: {}, relations: {}, state: {} })
           setResult([
             sliderState.activeKey ?? 'null',
             Object.keys(sliderState.valueByKey).length,
             isMultiThumbSlider(sliderRuntime as never),
             getSliderRuntimeState({ ...sliderRuntime, visibleKeys: ['min'], data: { ...sliderRuntime.data, state: { activeKey: 'min', valueByKey: { min: 4 } } } } as never).activeKey,
-            spinState.activeKey ?? 'null',
-            Object.keys(spinState.valueByKey).length,
           ].map(String).join('|'))
         }}
       >
@@ -432,7 +428,7 @@ describe('action and prop helper coverage from pointer input', () => {
     expect(screen.getByText('null|null|false|0')).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Read runtime state helpers' }))
-    expect(screen.getByText('null|0|true|min|null|0')).toBeTruthy()
+    expect(screen.getByText('null|0|true|min')).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Resolve dom bindings' }))
     expect(screen.getByText(/\[apg-pattern\] unk/)).toBeTruthy()

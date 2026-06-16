@@ -2,11 +2,15 @@ import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternEvent, PatternOptions, PatternValueStepDirection } from '../../schema'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { createSpinbuttonRenderItem, type ReactSpinbuttonRenderItem, type SpinbuttonData } from './spinbuttonRenderItem'
-import { getSpinbuttonRuntimeState, type SpinbuttonRuntimeState } from './spinbuttonRuntimeState'
 import { spinbuttonDefinition } from './definition'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 
 export type { ReactSpinbuttonRenderItem } from './spinbuttonRenderItem'
+
+interface SpinbuttonRuntimeState {
+  activeKey: Key | null
+  valueByKey: Readonly<Record<Key, string | number | boolean | null>>
+}
 
 export interface ReactSpinbuttonRuntime {
   rootProps: ReactPatternProps
@@ -39,7 +43,10 @@ export function useSpinbuttonPattern(data: SpinbuttonData, onEvent: (event: Patt
       return runtime.visibleKeys.map((key) => createSpinbuttonRenderItem(runtime, key))
     },
     get state() {
-      return getSpinbuttonRuntimeState(runtime.data)
+      return {
+        activeKey: runtime.data.state?.activeKey ?? null,
+        valueByKey: runtime.data.state?.valueByKey ?? {},
+      }
     },
     get actions() {
       return {
