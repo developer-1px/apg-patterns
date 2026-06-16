@@ -8,7 +8,7 @@ import { useAlertPattern } from '../patterns/alert/useAlertPattern'
 import { createButtonRootProps } from '../patterns/button/buttonRootProps'
 import { useButtonPattern } from '../patterns/button/useButtonPattern'
 import { useCheckboxPattern } from '../patterns/checkbox/useCheckboxPattern'
-import { createGridEditInputProps } from '../patterns/grid/gridEditInputProps'
+import { Grid } from '../patterns/grid/Grid'
 import { useLinkPattern } from '../patterns/link/useLinkPattern'
 import { createMenuButtonTriggerProps } from '../patterns/menu/menuButtonTriggerProps'
 import { getMenuButtonRuntimeState } from '../patterns/menu/menuButtonRuntimeState'
@@ -247,6 +247,7 @@ function HookRuntimeHost() {
 function HelperHost() {
   const [result, setResult] = useState('')
   const [draft, setDraft] = useState('')
+  const [editResult, setEditResult] = useState('')
 
   return (
     <div>
@@ -284,18 +285,31 @@ function HelperHost() {
         Run button props
       </button>
       <button data-testid="button-props-target" type="button">Button props target</button>
-      <input
-        aria-label="Edit value"
-        {...createGridEditInputProps({
-          key: 'cell',
-          editDraftByKey: { cell: draft },
-          commitEdit: () => setResult('commit'),
-          cancelEdit: () => setResult('cancel'),
-          onEvent: (event) => {
-            if (event.type === 'editDraft') setDraft(String(event.value))
+      <Grid
+        data={{
+          items: { cell: { label: 'Edit value' }, row: { label: 'Row' }, column: { label: 'Column' } },
+          relations: {
+            rootKeys: ['cell'],
+            rowKeys: ['row'],
+            columnKeys: ['column'],
+            cells: [{ rowKey: 'row', columnKey: 'column', cellKey: 'cell' }],
           },
-        })}
+          state: {
+            activeKey: 'cell',
+            editableKeys: ['cell'],
+            editingKey: 'cell',
+            editDraftByKey: { cell: draft },
+          },
+          refs: { label: 'Editable grid' },
+        }}
+        onEvent={(event) => {
+          if (event.type === 'editDraft') setDraft(String(event.value))
+          if (event.type === 'value' || event.type === 'editEnd') {
+            setEditResult((current) => current ? `${current}|${event.type}` : event.type)
+          }
+        }}
       />
+      <output data-testid="grid-edit-result">{editResult}</output>
       <button
         type="button"
         onClick={() => {
@@ -406,12 +420,12 @@ describe('action and prop helper coverage from pointer input', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Run menu trigger props' }))
     expect(screen.getByText('0|menu-button-trigger|expand:trigger|expand:trigger')).toBeTruthy()
 
-    const input = screen.getByRole('textbox', { name: 'Edit value' })
+    const input = screen.getByRole('textbox')
     fireEvent.change(input, { target: { value: 'draft' } })
     fireEvent.keyDown(input, { key: 'Tab', code: 'Tab' })
-    expect(screen.getByText('commit')).toBeTruthy()
+    expect(screen.getByTestId('grid-edit-result').textContent).toBe('value|editEnd')
     fireEvent.keyDown(input, { key: 'Escape', code: 'Escape' })
-    expect(screen.getByText('cancel')).toBeTruthy()
+    expect(screen.getByTestId('grid-edit-result').textContent).toBe('value|editEnd|editEnd')
     fireEvent.keyDown(input, { key: 'A', code: 'KeyA' })
 
     fireEvent.click(screen.getByRole('button', { name: 'Read empty menu state' }))
