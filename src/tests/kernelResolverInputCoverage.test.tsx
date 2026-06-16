@@ -26,7 +26,6 @@ import {
 		} from '../index'
 import { predicateRegistry } from '../kernel/kernelRegistries'
 import { treegridDefinition } from '../patterns/treegrid/definition'
-import { createTreeviewRenderItems } from '../patterns/treeview/createTreeviewRenderItems'
 import { treeviewDefinition } from '../patterns/treeview/definition'
 
 const treegridData = {
@@ -401,52 +400,6 @@ function KernelResolverHost() {
       <button
         type="button"
         onClick={() => {
-          const runtime = {
-            data: {
-              items: {
-                branch: {},
-                leaf: {},
-                ghost: {},
-              },
-              relations: {
-                rootKeys: ['branch', 'ghost'],
-                childrenByKey: { branch: ['leaf'] },
-              },
-              state: {
-                expandedKeys: ['branch'],
-                typeaheadTextByKey: { branch: 'Branch typeahead' },
-              },
-            },
-            definition: treeviewDefinition,
-            items: [
-              { key: 'branch', state: { active: true, selected: true, disabled: true, expanded: true } },
-              { key: 'leaf', state: { active: false, selected: false, disabled: false, expanded: false } },
-            ],
-          }
-          const items = createTreeviewRenderItems(
-            runtime as never,
-            (key) => ({ id: `item-${key}` }),
-            (key) => ({ id: `toggle-${key}` }),
-          )
-          setResult(items.map((item) => [
-            item.kind,
-            item.key,
-            item.label,
-            item.textValue,
-            item.level,
-            item.parentKey ?? 'null',
-            item.indexInParent,
-            item.state.active,
-            item.state.selected,
-            item.state.disabled,
-          ].join(':')).join('|'))
-        }}
-      >
-        Create treeview render fallback items
-      </button>
-      <button
-        type="button"
-        onClick={() => {
           const emptyData: PatternData = { ...selectionData, relations: { rootKeys: ['ghost'], cells: [] } }
           const noActiveData: PatternData = { ...selectionData, state: { activeKey: null, selectedKeys: [] } }
           const missingActiveData: PatternData = { ...selectionData, state: { activeKey: 'ghost', selectedKeys: [] } }
@@ -707,9 +660,6 @@ describe('kernel resolver coverage from pointer input', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Resolve treegrid row edges' }))
     expect(screen.getByText('parent|child|parent|child|parent|null|null|parent|null|null|parent|null|null|null|null|null')).toBeTruthy()
-
-    fireEvent.click(screen.getByRole('button', { name: 'Create treeview render fallback items' }))
-    expect(screen.getByText('branch:branch:branch:Branch typeahead:1:null:1:true:true:true|leaf:leaf:leaf:leaf:1:branch:1:false:false:false|leaf:ghost:ghost:ghost:1:null:2:false:false:false')).toBeTruthy()
 
 	    fireEvent.click(screen.getByRole('button', { name: 'Reduce selection edges' }))
 	    expect(screen.getByText('a1||||ghost|a1,a2|a1,b1|a1,a2|a1|a1|a1,a2,b1')).toBeTruthy()

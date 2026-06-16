@@ -51,9 +51,7 @@ export function createTreeviewRenderItems(
 function getTreeItemRenderState(runtime: TreeviewRuntime, key: Key, branch: false): ReactRenderItemState
 function getTreeItemRenderState(runtime: TreeviewRuntime, key: Key, branch: true): ReactRenderItemState & { expanded: boolean; toggleDisabled: boolean }
 function getTreeItemRenderState(runtime: TreeviewRuntime, key: Key, branch: boolean): ReactRenderItemState | (ReactRenderItemState & { expanded: boolean; toggleDisabled: boolean }) {
-  const state = typeof runtime.getTreeItemState === 'function'
-    ? runtime.getTreeItemState(key)
-    : runtime.items.find((item) => item.key === key)?.state ?? { active: false, selected: false, disabled: false, expanded: false }
+  const state = runtime.getTreeItemState(key)
   const base = {
     active: Boolean(state.active),
     selected: Boolean(state.selected),
