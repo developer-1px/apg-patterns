@@ -26,14 +26,9 @@ export function Grid<TItem extends PatternItem = PatternItem>({ data, onEvent, o
         'div',
         { key: row.key, ...row.rowProps } as DivProps & { key: Key },
         row.cells.map((cell) =>
-          createElement('div', { key: cell.key, ...cell.cellProps } as DivProps & { key: Key }, renderCell?.(cell, data.items[cell.key]) ?? renderGridCell(cell)),
+          createElement('div', { key: cell.key, ...cell.cellProps } as DivProps & { key: Key }, renderCell?.(cell, data.items[cell.key]) ?? (cell.editing ? createElement('input', cell.editInputProps as InputProps) : cell.value)),
         ),
       ),
     ),
   )
-}
-
-function renderGridCell(cell: ReactGridCell) {
-  if (cell.editing) return createElement('input', cell.editInputProps as InputProps)
-  return cell.value
 }
