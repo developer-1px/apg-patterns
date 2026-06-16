@@ -22,13 +22,14 @@ export function createGridRuntimeEventHandler({
   return (event) => {
     if (event.type === 'activate') {
       const key = event.key
-      if (data.items[key]?.kind === 'columnheader' && isSortableColumnHeader(data, sortByKey, key)) {
+      const item = data.items[key]
+      if (item?.kind === 'columnheader' && (item.sortable === true || Object.prototype.hasOwnProperty.call(sortByKey, key))) {
         const current = sortByKey[key]
         onEvent(withDefaultReason({ type: 'sort', key, sort: current === 'ascending' ? 'descending' : 'ascending' }, event.meta?.reason ?? 'external'))
         return
       }
       if (editableKeys.includes(key)) {
-        onEvent(withDefaultReason({ type: 'editStart', key, value: String(valueByKey[key] ?? data.items[key]?.label ?? '') }, event.meta?.reason ?? 'external'))
+        onEvent(withDefaultReason({ type: 'editStart', key, value: String(valueByKey[key] ?? item?.label ?? '') }, event.meta?.reason ?? 'external'))
         return
       }
     }
@@ -38,10 +39,6 @@ export function createGridRuntimeEventHandler({
     }
     onEvent(event)
   }
-}
-
-function isSortableColumnHeader(data: PatternData, sortByKey: Readonly<Record<Key, GridSort>>, key: Key): boolean {
-  return data.items[key]?.sortable === true || Object.prototype.hasOwnProperty.call(sortByKey, key)
 }
 
 export function createGridEditActions({
