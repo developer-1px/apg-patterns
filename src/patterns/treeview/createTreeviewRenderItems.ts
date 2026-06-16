@@ -3,6 +3,7 @@ import type { Key, PatternData } from '../../schema'
 import type { ReactPatternProps, ReactRenderItemState } from '../../adapters/reactBaseTypes'
 import type { ReactTreeviewRenderItem } from './reactTypes'
 import type { TreeviewRuntime } from './runtime'
+import { getPatternItemLabel, getPatternItemTextValue } from '../../internal/patternItemText'
 
 export function createTreeviewRenderItems(
   runtime: TreeviewRuntime,
@@ -16,8 +17,8 @@ export function createTreeviewRenderItems(
     const hasChildren = (runtime.data.relations?.childrenByKey?.[key]?.length ?? 0) > 0
     const base = {
       key,
-      label: getLabel(runtime.data, key),
-      textValue: getTextValue(runtime.data, key),
+      label: getPatternItemLabel(runtime.data, key),
+      textValue: getPatternItemTextValue(runtime.data, key),
       level: runtime.data.state?.levelByKey?.[key] ?? 1,
       parentKey: parentByKey.get(key) ?? null,
       indexInParent: indexInParentByKey.get(key) ?? 1,
@@ -37,14 +38,6 @@ export function createTreeviewRenderItems(
       toggleButtonProps: getIndicatorProps(key),
     }
   })
-}
-
-function getLabel(data: PatternData, key: Key): string {
-  return data.items[key]?.label ?? key
-}
-
-function getTextValue(data: PatternData, key: Key): string {
-  return data.state?.typeaheadTextByKey?.[key] ?? data.items[key]?.textValue ?? data.items[key]?.label ?? key
 }
 
 function getTreeItemRenderState(runtime: TreeviewRuntime, key: Key, branch: false): ReactRenderItemState

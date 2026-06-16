@@ -1,4 +1,5 @@
 import { findApgTypeaheadMatch } from '../../internal/collectionNavigation'
+import { getPatternItemTextValue } from '../../internal/patternItemText'
 import type { Key, PatternData, PatternOptions } from '../../schema'
 import { treeviewDefinition } from './definition'
 import { resolveVisibleOrder } from '../../kernel/patternKernel'
@@ -14,7 +15,7 @@ export function resolveTypeaheadTarget(query: string | null, data: PatternData, 
   return findApgTypeaheadMatch(
     resolveTreeviewVisibleKeys(data).map((key) => ({
       item: key,
-      label: data.state?.typeaheadTextByKey?.[key] ?? data.items[key]?.textValue ?? data.items[key]?.label ?? key,
+      label: getPatternItemTextValue(data, key),
     })),
     query,
   )

@@ -11,6 +11,7 @@ import type { ReactListboxRenderItem, ReactListboxRuntime } from '../../adapters
 import { handleListboxMultiClick } from './handleListboxMultiClick'
 import { handleListboxMultiKeyDown } from './handleListboxMultiKeyDown'
 import { usePatternElementId } from '../../adapters/reactDomIds'
+import { getPatternItemLabel, getPatternItemTextValue } from '../../internal/patternItemText'
 
 export function useListboxPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactListboxRuntime {
   const typeaheadBufferRef = useRef(createApgTypeaheadBuffer())
@@ -57,8 +58,8 @@ function createListboxRenderItem(runtime: PatternRuntime, key: Key): ReactListbo
   return {
     kind: 'option',
     key,
-    label: getLabel(runtime.data, key),
-    textValue: getTextValue(runtime.data, key),
+    label: getPatternItemLabel(runtime.data, key),
+    textValue: getPatternItemTextValue(runtime.data, key),
     state: getItemState(runtime, key, 'option'),
     optionProps: withListboxOptionClick(runtime, key, optionProps),
   }
@@ -81,10 +82,6 @@ function withListboxOptionClick(runtime: PatternRuntime, key: Key, props: ReactP
       onClick?.(event)
     },
   }
-}
-
-function getLabel(data: PatternData, key: Key): string {
-  return data.items[key]?.label ?? key
 }
 
 function getItemState(runtime: PatternRuntime, key: Key, part: string): ReactRenderItemState {
@@ -120,12 +117,8 @@ function resolveListboxTypeaheadTarget(query: string | null, runtime: PatternRun
   return findApgTypeaheadMatch(
     runtime.visibleKeys.map((key) => ({
       item: key,
-      label: getTextValue(runtime.data, key),
+      label: getPatternItemTextValue(runtime.data, key),
     })),
     query,
   )
-}
-
-function getTextValue(data: PatternData, key: Key): string {
-  return data.state?.typeaheadTextByKey?.[key] ?? data.items[key]?.textValue ?? data.items[key]?.label ?? key
 }

@@ -5,6 +5,7 @@ import { usePatternEffects } from '../../adapters/reactPatternEffects'
 import { reactProps } from '../../adapters/reactBaseTypes'
 import type { ReactAccordionRenderItem, ReactAccordionRuntime } from '../../adapters/reactTypes'
 import { usePatternElementId } from '../../adapters/reactDomIds'
+import { getPatternItemLabel, getPatternItemTextValue } from '../../internal/patternItemText'
 
 export function useAccordionPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactAccordionRuntime {
   const mergedOptions: PatternOptions = { ...options }
@@ -54,8 +55,8 @@ function createAccordionRenderItem(runtime: PatternRuntime, key: Key): ReactAcco
   return {
     kind: 'section',
     key,
-    label: getLabel(runtime.data, key),
-    textValue: getTextValue(runtime.data, key),
+    label: getPatternItemLabel(runtime.data, key),
+    textValue: getPatternItemTextValue(runtime.data, key),
     panelKey,
     state: {
       active: Boolean(state.active),
@@ -68,12 +69,4 @@ function createAccordionRenderItem(runtime: PatternRuntime, key: Key): ReactAcco
     }),
     panelProps: panelKey ? reactProps(runtime.getItemProps('panel', panelKey)) : null,
   }
-}
-
-function getLabel(data: PatternData, key: Key): string {
-  return data.items[key]?.label ?? key
-}
-
-function getTextValue(data: PatternData, key: Key): string {
-  return data.state?.typeaheadTextByKey?.[key] ?? data.items[key]?.textValue ?? data.items[key]?.label ?? key
 }
