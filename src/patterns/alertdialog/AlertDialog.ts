@@ -8,7 +8,6 @@ type AlertDialogDataItem = PatternItem & {
 }
 
 type DivProps = ComponentPropsWithoutRef<'div'>
-type ButtonProps = ComponentPropsWithoutRef<'button'>
 
 export interface AlertDialogProps<TItem extends AlertDialogDataItem = AlertDialogDataItem> {
   data: PatternData<TItem>
@@ -39,7 +38,7 @@ export function AlertDialog<TItem extends AlertDialogDataItem = AlertDialogDataI
   return createElement('div', { className } as DivProps, [
     createElement(
       'button',
-      { key: 'trigger', ...alertDialog.triggerProps } as ButtonProps,
+      { key: 'trigger', ...alertDialog.triggerProps } as ComponentPropsWithoutRef<'button'>,
       keys.triggerKey ? data.items[keys.triggerKey]?.label ?? alertDialog.labelOf(keys.triggerKey) : data.items.trigger?.label ?? alertDialog.labelOf('trigger'),
     ),
     alertDialog.open
@@ -51,8 +50,8 @@ export function AlertDialog<TItem extends AlertDialogDataItem = AlertDialogDataI
               { key: 'description', ...alertDialog.descriptionProps } as ComponentPropsWithoutRef<'p'>,
               renderDescription?.(descriptionItem) ?? descriptionItem?.content ?? descriptionItem?.label,
             ),
-            createElement('button', { key: 'confirm', ...alertDialog.confirmProps } as ButtonProps, renderConfirm?.(data.items.confirm) ?? data.items.confirm?.label ?? 'Confirm'),
-            createElement('button', { key: 'cancel', ...alertDialog.cancelProps } as ButtonProps, renderCancel?.(data.items.cancel) ?? data.items.cancel?.label ?? 'Cancel'),
+            createElement('button', { key: 'confirm', ...alertDialog.confirmProps } as ComponentPropsWithoutRef<'button'>, renderConfirm?.(data.items.confirm) ?? data.items.confirm?.label ?? 'Confirm'),
+            createElement('button', { key: 'cancel', ...alertDialog.cancelProps } as ComponentPropsWithoutRef<'button'>, renderCancel?.(data.items.cancel) ?? data.items.cancel?.label ?? 'Cancel'),
           ]),
         ])
       : null,

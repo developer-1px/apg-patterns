@@ -7,7 +7,6 @@ type DialogDataItem = PatternItem & {
 }
 
 type DivProps = ComponentPropsWithoutRef<'div'>
-type ButtonProps = ComponentPropsWithoutRef<'button'>
 
 export interface DialogProps<TItem extends DialogDataItem = DialogDataItem> {
   data: PatternData<TItem>
@@ -37,7 +36,7 @@ export function Dialog<TItem extends DialogDataItem = DialogDataItem>({
   const descriptionItem = data.items.description
 
   return createElement('div', { className } as DivProps, [
-    createElement('button', { key: 'trigger', ...dialog.triggerProps } as ButtonProps, data.items.trigger?.label ?? dialog.labelOf('trigger')),
+    createElement('button', { key: 'trigger', ...dialog.triggerProps } as ComponentPropsWithoutRef<'button'>, data.items.trigger?.label ?? dialog.labelOf('trigger')),
     dialog.open
       ? createElement('div', { key: 'overlay', ...dialog.overlayProps } as DivProps, [
           createElement('div', { key: 'dialog', ...dialog.dialogProps } as DivProps, [
@@ -48,8 +47,8 @@ export function Dialog<TItem extends DialogDataItem = DialogDataItem>({
               renderDescription?.(descriptionItem) ?? descriptionItem?.content ?? descriptionItem?.label,
             ),
             renderBody ? createElement('div', { key: 'body' } as DivProps, renderBody()) : null,
-            createElement('button', { key: 'cancel', ...dialog.cancelProps } as ButtonProps, renderCancel?.(data.items.cancel) ?? data.items.cancel?.label ?? 'Cancel'),
-            createElement('button', { key: 'submit', ...dialog.submitProps } as ButtonProps, renderSubmit?.(data.items.submit) ?? data.items.submit?.label ?? 'Submit'),
+            createElement('button', { key: 'cancel', ...dialog.cancelProps } as ComponentPropsWithoutRef<'button'>, renderCancel?.(data.items.cancel) ?? data.items.cancel?.label ?? 'Cancel'),
+            createElement('button', { key: 'submit', ...dialog.submitProps } as ComponentPropsWithoutRef<'button'>, renderSubmit?.(data.items.submit) ?? data.items.submit?.label ?? 'Submit'),
           ]),
         ])
       : null,
