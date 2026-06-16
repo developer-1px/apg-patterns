@@ -36,7 +36,7 @@ function applyStateAction(data: PatternData, event: PatternEvent, action: StateA
   if (action.kind === 'setRecordValue') {
     const key = resolveTransitionValue(action.key, event, data)
     if (!isKey(key)) return data
-    const record = isRecord(current) ? current : {}
+    const record = typeof current === 'object' && current !== null && !Array.isArray(current) ? current : {}
     return { ...data, state: { ...state, [action.field]: { ...record, [key]: resolveTransitionValue(action.value, event, data) } } }
   }
 
@@ -74,8 +74,4 @@ export function resolveTransitionValue(value: TransitionValue, event: PatternEve
 
 function isKey(value: unknown): value is Key {
   return typeof value === 'string' && value.length > 0
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
