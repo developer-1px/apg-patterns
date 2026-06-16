@@ -43,7 +43,10 @@ export function useWindowSplitterPattern(data: PatternData, onEvent: (event: Pat
   })
   const key = data.relations?.rootKeys?.[0] ?? null
   const controlledKey = key ? data.relations?.controlsByKey?.[key]?.[0] ?? null : null
-  const state = getWindowSplitterState({ data, key, options: runtimeOptions })
+  const min = Number(runtimeOptions.min ?? 0)
+  const max = Number(runtimeOptions.max ?? 100)
+  const value = key ? Number(data.state?.valueByKey?.[key] ?? min) : min
+  const state: ReactWindowSplitterState = { value, min, max, position: max === min ? 0 : ((value - min) / (max - min)) * 100 }
   const diagnostics = getWindowSplitterDataDiagnostics(data)
 
   return {
@@ -73,12 +76,4 @@ export function useWindowSplitterPattern(data: PatternData, onEvent: (event: Pat
     },
     keyToElementId: runtime.keyToElementId,
   }
-}
-
-function getWindowSplitterState({ data, key, options }: { data: PatternData; key: Key | null; options: PatternOptions }): ReactWindowSplitterState {
-  const min = Number(options.min ?? 0)
-  const max = Number(options.max ?? 100)
-  const value = key ? Number(data.state?.valueByKey?.[key] ?? min) : min
-  const position = max === min ? 0 : ((value - min) / (max - min)) * 100
-  return { value, min, max, position }
 }
