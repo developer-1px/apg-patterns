@@ -75,7 +75,7 @@ export function createToolbarPatternData(
       .map((item) => item.key)
   const disabledKeys = commandDisabledKeys(items, options.disabledKeys)
 
-  return parsePatternData({
+  return PatternDataSchema.parse({
     items: commandItemsRecord(items),
     relations: { rootKeys },
     state: {
@@ -100,7 +100,7 @@ export function createRadioGroupPatternData(
     fallbackActiveKey(rootKeys, disabledKeys, options.activeKey)
   const activeKey = options.activeKey ?? selectedKey
 
-  return parsePatternData({
+  return PatternDataSchema.parse({
     items: commandItemsRecord(items),
     relations: { rootKeys },
     state: {
@@ -125,7 +125,7 @@ export function createMenuButtonPatternData(
   const disabledKeys = commandDisabledKeys(menuItems, options.disabledKeys)
   const checkedByKey = commandCheckedByKey(menuItems, options.checkedByKey)
 
-  return parsePatternData({
+  return PatternDataSchema.parse({
     items: {
       [trigger.key]: commandItemRecordValue(trigger),
       [menuKey]: { label: options.menuLabel ?? `${trigger.label} menu` },
@@ -247,10 +247,10 @@ function commandDisabledKeys(
   items: readonly CommandSurfaceItem[],
   disabledKeys: readonly Key[] = [],
 ): readonly Key[] {
-  return uniqueKeys([
+  return [...new Set([
     ...disabledKeys,
     ...items.filter((item) => item.disabled === true).map((item) => item.key),
-  ])
+  ])]
 }
 
 function commandCheckedByKey(
@@ -290,10 +290,6 @@ function withPatternState<TData extends PatternData>(
   } as TData
 }
 
-function parsePatternData(data: PatternData): PatternData {
-  return PatternDataSchema.parse(data)
-}
-
 function isPatternStateReducerOptions(
   options: PatternState | PatternStateReducerOptions,
 ): options is PatternStateReducerOptions {
@@ -309,10 +305,6 @@ function resolveStateAction(
   return typeof nextState === 'function'
     ? nextState(currentState)
     : nextState
-}
-
-function uniqueKeys(keys: readonly Key[]): readonly Key[] {
-  return [...new Set(keys)]
 }
 
 function assertUniqueKeys(keys: readonly Key[]): void {
