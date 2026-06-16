@@ -123,7 +123,7 @@ function createTreeProps({
       const typeaheadTarget = resolveTypeaheadTarget(typeaheadQuery, data, options)
       if (typeaheadTarget) {
         event.preventDefault?.()
-        emit({ type: 'focus', key: typeaheadTarget as Key, meta: { reason: 'typeahead' } })
+        emit({ type: 'focus', key: typeaheadTarget, meta: { reason: 'typeahead' } })
         return
       }
       runtime.getRootKeyboardHandler()(event)
