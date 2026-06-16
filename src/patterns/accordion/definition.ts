@@ -1,7 +1,6 @@
 import { PatternDefinitionSchema, type PatternDefinition } from '../../schema'
 import { accordionKeyboard } from './keyboard'
 import { accordionParts } from './parts'
-import { accordionReact } from './react'
 
 export const accordionDefinition: PatternDefinition = PatternDefinitionSchema.superRefine((value, ctx) => {
   if (value.apgPattern !== 'accordion') ctx.addIssue({ code: 'custom', path: ['apgPattern'], message: 'expected "accordion"' })
@@ -26,5 +25,31 @@ export const accordionDefinition: PatternDefinition = PatternDefinitionSchema.su
     },
   },
   keyboard: accordionKeyboard,
-  react: accordionReact,
+  react: {
+    hook: 'useAccordionPattern',
+    root: { prop: 'rootProps', part: 'accordion', element: 'div' },
+    renderItems: {
+      name: 'renderItems',
+      source: { kind: 'visibleOrder' },
+      order: 'flat',
+      variants: [
+        {
+          kind: 'section',
+          when: { kind: 'always' },
+          fields: {
+            key: { kind: 'key' },
+            kind: { kind: 'literal', value: 'section' },
+            label: { kind: 'itemField', field: 'label', fallback: 'key' },
+            textValue: { kind: 'textValue', fallback: 'label' },
+            panelKey: { kind: 'firstControlledKey', fallback: null },
+            state: { kind: 'partState', part: 'header' },
+          },
+          props: {
+            headerProps: { part: 'header', element: 'button', owner: 'item', defaults: { type: 'button' } },
+            panelProps: { part: 'panel', element: 'div', owner: 'panel' },
+          },
+        },
+      ],
+    },
+  },
 })
