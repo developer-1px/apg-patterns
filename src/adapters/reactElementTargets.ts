@@ -35,7 +35,13 @@ export function resolveElementTarget(target: ElementTarget, data: PatternData, k
   if (target.kind === 'firstFocusable') {
     return resolveElementTarget(target.root, data, keyToElementId)?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR) ?? null
   }
-  const key = resolveElementTargetKey(target, data)
+  const activeKey = data.state?.activeKey ?? null
+  if (target.kind === 'key') {
+    const key = resolveKeyToken(target.key, undefined, activeKey, { data, activeKey })
+    return document.getElementById(keyToElementId(key))
+  }
+  const ownerKey = resolveKeyToken(target.key, undefined, activeKey, { data, activeKey })
+  const key = data.relations?.controlsByKey?.[ownerKey]?.[0] ?? null
   return key ? document.getElementById(keyToElementId(key)) : null
 }
 
@@ -46,11 +52,4 @@ function resolveOptionalElementTarget(target: Exclude<ElementTarget, { kind: 'fi
     if (error instanceof Error && error.message.startsWith('Cannot resolve key token:')) return null
     throw error
   }
-}
-
-function resolveElementTargetKey(target: Extract<ElementTarget, { kind: 'key' }> | Extract<ElementTarget, { kind: 'controlledBy' }>, data: PatternData): Key | null {
-  const activeKey = data.state?.activeKey ?? null
-  if (target.kind === 'key') return resolveKeyToken(target.key, undefined, activeKey, { data, activeKey })
-  const ownerKey = resolveKeyToken(target.key, undefined, activeKey, { data, activeKey })
-  return data.relations?.controlsByKey?.[ownerKey]?.[0] ?? null
 }
