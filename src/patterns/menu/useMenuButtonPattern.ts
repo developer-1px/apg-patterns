@@ -92,16 +92,11 @@ export function useMenuButtonPattern(data: PatternData, onEvent: (event: Pattern
             props.onKeyDown?.(event)
             return
           }
-          if (!expanded && (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ')) {
+          if (!expanded && (event.key === 'ArrowDown' || event.key === 'ArrowUp' || event.key === 'Enter' || event.key === ' ')) {
             event.preventDefault()
             onEvent({ type: 'expand', key: triggerKey, expanded: true, meta: { reason: 'open' } })
-            if (itemKeys[0]) onEvent({ type: 'focus', key: itemKeys[0], meta: { reason: 'open' } })
-            return
-          }
-          if (!expanded && event.key === 'ArrowUp') {
-            event.preventDefault()
-            onEvent({ type: 'expand', key: triggerKey, expanded: true, meta: { reason: 'open' } })
-            if (itemKeys.length > 0) onEvent({ type: 'focus', key: itemKeys[itemKeys.length - 1]!, meta: { reason: 'open' } })
+            const targetKey = event.key === 'ArrowUp' ? itemKeys[itemKeys.length - 1] : itemKeys[0]
+            if (targetKey) onEvent({ type: 'focus', key: targetKey, meta: { reason: 'open' } })
             return
           }
           if (expanded && event.key === 'Escape') {
