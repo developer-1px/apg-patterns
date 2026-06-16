@@ -5,13 +5,13 @@ import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import {
-  dialogKey,
   emitControlledDialogClose,
   handleControlledDialogKeyDown,
   useControlledDialogFocus,
   type ReactControlledDialogConfig,
 } from '../dialog/controlledDialog'
 import { alertDialogDefinition } from './definition'
+import { getAlertDialogRuntimeKeys } from './alertDialogRuntimeKeys'
 
 registerKernelBuiltins()
 
@@ -47,14 +47,17 @@ export function useControlledAlertDialogPattern(
     onEvent: config.onEvent ?? (() => undefined),
     keyToElementId,
   })
+  const keys = getAlertDialogRuntimeKeys(data)
+  const dialogKey = keys.dialogKey ?? 'dialog'
   const close = (reason: 'keyboard' | 'pointer' | 'external' = 'external') => {
-    emitControlledDialogClose({ config, reason })
+    emitControlledDialogClose({ config, reason, key: dialogKey })
   }
 
   useControlledDialogFocus({
     open: config.open,
     data,
     keyToElementId,
+    dialogKey,
     initialFocusKey: config.initialFocusKey,
     restoreFocusTo: config.restoreFocusTo,
   })
@@ -63,19 +66,19 @@ export function useControlledAlertDialogPattern(
     open: config.open,
     overlayProps: controlledAlertDialogOverlayProps,
     get dialogProps() {
-      return createControlledAlertDialogProps({ runtime, open: config.open, keyToElementId, onEvent: config.onEvent, close })
+      return createControlledAlertDialogProps({ runtime, open: config.open, keyToElementId, dialogKey, onEvent: config.onEvent, close })
     },
     get titleProps() {
-      return reactProps({ id: keyToElementId('title') })
+      return keys.titleKey ? reactProps(runtime.getPartProps('title', keys.titleKey)) : {}
     },
     get descriptionProps() {
-      return reactProps({ id: keyToElementId('description') })
+      return keys.descriptionKey ? reactProps(runtime.getPartProps('description', keys.descriptionKey)) : {}
     },
     get confirmProps() {
-      return createControlledAlertDialogActionProps({ runtime, part: 'confirm', onEvent: config.onEvent, close })
+      return keys.confirmKey ? createControlledAlertDialogActionProps({ runtime, part: 'confirm', key: keys.confirmKey, onEvent: config.onEvent, close }) : {}
     },
     get cancelProps() {
-      return createControlledAlertDialogActionProps({ runtime, part: 'cancel', onEvent: config.onEvent, close })
+      return keys.cancelKey ? createControlledAlertDialogActionProps({ runtime, part: 'cancel', key: keys.cancelKey, onEvent: config.onEvent, close }) : {}
     },
     close,
     labelOf: (key) => data.items[key]?.label ?? key,
@@ -97,21 +100,24 @@ function createControlledAlertDialogProps({
   runtime,
   open,
   keyToElementId,
+  dialogKey,
   onEvent,
   close,
 }: {
   runtime: ReturnType<typeof createPatternRuntime>
   open: boolean
   keyToElementId(key: Key): string
+  dialogKey: Key
   onEvent?: (event: PatternEvent) => void
   close(reason: 'keyboard'): void
 }): ReactPatternProps {
   return reactProps({
-    ...runtime.getPartProps('dialog', dialogKey()),
+    ...runtime.getPartProps('dialog', dialogKey),
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => handleControlledDialogKeyDown({
       event,
       open,
       keyToElementId,
+      dialogKey,
       onClose: (reason) => {
         onEvent?.({ type: 'activate', key: 'cancel', meta: { reason } })
         close(reason)
@@ -124,19 +130,21 @@ function createControlledAlertDialogProps({
 function createControlledAlertDialogActionProps({
   runtime,
   part,
+  key,
   onEvent,
   close,
 }: {
   runtime: ReturnType<typeof createPatternRuntime>
   part: 'confirm' | 'cancel'
+  key: Key
   onEvent?: (event: PatternEvent) => void
   close(reason: 'pointer'): void
 }): ReactPatternProps {
-  const props = reactProps(runtime.getPartProps(part, part))
+  const props = reactProps(runtime.getPartProps(part, key))
   return {
     ...props,
     onClick: () => {
-      onEvent?.({ type: 'activate', key: part, meta: { reason: 'pointer' } })
+      onEvent?.({ type: 'activate', key, meta: { reason: 'pointer' } })
       close('pointer')
     },
   }

@@ -1,6 +1,7 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { withDefaultReason } from '../../kernel/domEventBindings'
 import { tableDefinition } from './definition'
 import { createTableRows, type ReactTableRow } from './tableRow'
 import { usePatternElementId } from '../../adapters/reactDomIds'
@@ -28,7 +29,7 @@ export function useTablePattern(data: PatternData, onEvent: (event: PatternEvent
     onEvent: (event) => {
       if (event.type === 'activate' && data.items[event.key]?.kind === 'columnheader') {
         const current = sortByKey[event.key]
-        onEvent({ type: 'sort', key: event.key, sort: current === 'ascending' ? 'descending' : 'ascending' })
+        onEvent(withDefaultReason({ type: 'sort', key: event.key, sort: current === 'ascending' ? 'descending' : 'ascending' }, event.meta?.reason ?? 'external'))
         return
       }
       onEvent(event)

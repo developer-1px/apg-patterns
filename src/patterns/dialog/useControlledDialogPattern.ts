@@ -6,12 +6,12 @@ import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { dialogDefinition } from './definition'
 import {
-  dialogKey,
   emitControlledDialogClose,
   handleControlledDialogKeyDown,
   useControlledDialogFocus,
   type ReactControlledDialogConfig,
 } from './controlledDialog'
+import { getDialogRuntimeKeys } from './dialogRuntimeKeys'
 
 registerKernelBuiltins()
 
@@ -47,14 +47,17 @@ export function useControlledDialogPattern(
     onEvent: config.onEvent ?? (() => undefined),
     keyToElementId,
   })
+  const keys = getDialogRuntimeKeys(data)
+  const dialogKey = keys.dialogKey ?? 'dialog'
   const close = (reason: 'keyboard' | 'pointer' | 'external' = 'external') => {
-    emitControlledDialogClose({ config, reason })
+    emitControlledDialogClose({ config, reason, key: dialogKey })
   }
 
   useControlledDialogFocus({
     open: config.open,
     data,
     keyToElementId,
+    dialogKey,
     initialFocusKey: config.initialFocusKey,
     restoreFocusTo: config.restoreFocusTo,
   })
@@ -65,13 +68,13 @@ export function useControlledDialogPattern(
       return createControlledDialogOverlayProps({ runtime, close })
     },
     get dialogProps() {
-      return createControlledDialogProps({ runtime, open: config.open, keyToElementId, close })
+      return createControlledDialogProps({ runtime, open: config.open, keyToElementId, dialogKey, close })
     },
     get titleProps() {
-      return reactProps(runtime.getPartProps('title', 'title'))
+      return keys.titleKey ? reactProps(runtime.getPartProps('title', keys.titleKey)) : {}
     },
     get descriptionProps() {
-      return reactProps(runtime.getPartProps('description', 'description'))
+      return keys.descriptionKey ? reactProps(runtime.getPartProps('description', keys.descriptionKey)) : {}
     },
     get cancelProps() {
       return createControlledDialogActionProps({ runtime, part: 'cancel', action: 'dismiss', close })
@@ -108,19 +111,22 @@ function createControlledDialogProps({
   runtime,
   open,
   keyToElementId,
+  dialogKey,
   close,
 }: {
   runtime: ReturnType<typeof createPatternRuntime>
   open: boolean
   keyToElementId(key: Key): string
+  dialogKey: Key
   close(reason: 'keyboard'): void
 }): ReactPatternProps {
   return reactProps({
-    ...runtime.getPartProps('dialog', dialogKey()),
+    ...runtime.getPartProps('dialog', dialogKey),
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => handleControlledDialogKeyDown({
       event,
       open,
       keyToElementId,
+      dialogKey,
       onClose: close,
     }),
     tabIndex: -1,

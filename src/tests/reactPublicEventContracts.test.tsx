@@ -3,10 +3,14 @@ import { describe, expect, it } from 'vitest'
 import {
   useAccordionPattern,
   useButtonPattern,
+  useCarouselPattern,
   useCheckboxPattern,
   useComboboxPattern,
+  useControlledAlertDialogPattern,
+  useControlledDialogPattern,
   useDialogPattern,
   useDisclosurePattern,
+  useFeedPattern,
   useGridPattern,
   useLinkPattern,
   useListboxPattern,
@@ -18,7 +22,9 @@ import {
   useSpinbuttonPattern,
   useSwitchPattern,
   useTabsPattern,
+  useTablePattern,
   useToolbarPattern,
+  useTooltipPattern,
   useTreegridPattern,
   useTreeviewPattern,
   useWindowSplitterPattern,
@@ -291,6 +297,88 @@ describe('React public event contracts', () => {
       'keyboard',
     ])
   })
+
+  it('keeps controlled dialog close metadata on the public hook surface', () => {
+    const keyboardEvents: PatternEvent[] = []
+    const keyboardChanges: OpenChangeRecord[] = []
+    const { unmount } = render(<ControlledDialogContractHost onEvent={(event) => keyboardEvents.push(event)} onOpenChange={(change) => keyboardChanges.push(change)} />)
+
+    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' })
+
+    expect(keyboardEvents.map(eventPayload)).toEqual([
+      { type: 'dismiss', key: 'settingsDialog' },
+    ])
+    expect(keyboardEvents.map(eventReason)).toEqual(['keyboard'])
+    expect(keyboardChanges).toEqual([{ open: false, reason: 'keyboard', key: 'settingsDialog' }])
+
+    unmount()
+
+    const pointerEvents: PatternEvent[] = []
+    const pointerChanges: OpenChangeRecord[] = []
+    render(<ControlledDialogContractHost onEvent={(event) => pointerEvents.push(event)} onOpenChange={(change) => pointerChanges.push(change)} />)
+
+    fireEvent.mouseDown(screen.getByTestId('controlled-dialog-overlay'))
+
+    expect(pointerEvents.map(eventPayload)).toEqual([
+      { type: 'dismiss', key: 'settingsDialog' },
+    ])
+    expect(pointerEvents.map(eventReason)).toEqual(['pointer'])
+    expect(pointerChanges).toEqual([{ open: false, reason: 'pointer', key: 'settingsDialog' }])
+  })
+
+  it('keeps controlled alert dialog activation and close metadata on the public hook surface', () => {
+    const keyboardEvents: PatternEvent[] = []
+    const keyboardChanges: OpenChangeRecord[] = []
+    const { unmount } = render(<ControlledAlertDialogContractHost onEvent={(event) => keyboardEvents.push(event)} onOpenChange={(change) => keyboardChanges.push(change)} />)
+
+    fireEvent.keyDown(screen.getByRole('alertdialog'), { key: 'Escape' })
+
+    expect(keyboardEvents.map(eventPayload)).toEqual([
+      { type: 'activate', key: 'cancel' },
+      { type: 'dismiss', key: 'warningDialog' },
+    ])
+    expect(keyboardEvents.map(eventReason)).toEqual(['keyboard', 'keyboard'])
+    expect(keyboardChanges).toEqual([{ open: false, reason: 'keyboard', key: 'warningDialog' }])
+
+    unmount()
+
+    const pointerEvents: PatternEvent[] = []
+    const pointerChanges: OpenChangeRecord[] = []
+    render(<ControlledAlertDialogContractHost onEvent={(event) => pointerEvents.push(event)} onOpenChange={(change) => pointerChanges.push(change)} />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Delete' }))
+
+    expect(pointerEvents.map(eventPayload)).toEqual([
+      { type: 'activate', key: 'confirm' },
+      { type: 'dismiss', key: 'warningDialog' },
+    ])
+    expect(pointerEvents.map(eventReason)).toEqual(['pointer', 'pointer'])
+    expect(pointerChanges).toEqual([{ open: false, reason: 'pointer', key: 'warningDialog' }])
+  })
+
+  it('keeps table sort, carousel picker, feed, and tooltip events on the public hook surface', () => {
+    const events: PatternEvent[] = []
+    render(<RemainingFlowContractHost onEvent={(event) => events.push(event)} />)
+
+    fireEvent.click(screen.getByRole('columnheader', { name: 'Name' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Previous' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Slide 2' }))
+    fireEvent.keyDown(screen.getByRole('feed'), { key: 'PageDown' })
+    fireEvent.focus(screen.getAllByRole('article')[1]!)
+    fireEvent.focus(screen.getByRole('button', { name: 'Help' }))
+    fireEvent.keyDown(screen.getByRole('button', { name: 'Help' }), { key: 'Escape' })
+
+    expect(events.map(eventPayload)).toEqual([
+      { type: 'sort', key: 'name', sort: 'descending' },
+      { type: 'navigate', direction: 'previous' },
+      { type: 'select', keys: ['slide2'], anchorKey: 'slide2', extentKey: 'slide2' },
+      { type: 'navigate', direction: 'next' },
+      { type: 'focus', key: 'second' },
+      { type: 'expand', key: 'help', expanded: true },
+      { type: 'expand', key: 'help', expanded: false },
+    ])
+    expect(events.map(eventReason)).toEqual(['pointer', 'pointer', 'pointer', 'keyboard', 'focus', 'focus', 'keyboard'])
+  })
 })
 
 function TreeviewContractHost({ onEvent }: { onEvent: (event: PatternEvent) => void }) {
@@ -503,6 +591,90 @@ function RangeControlsContractHost({ onEvent }: { onEvent: (event: PatternEvent)
         </div>
       ))}
       <div {...splitter.separatorProps}>Resize panel</div>
+    </div>
+  )
+}
+
+interface OpenChangeRecord {
+  open: boolean
+  reason: string | undefined
+  key: string | undefined
+}
+
+function ControlledDialogContractHost({
+  onEvent,
+  onOpenChange,
+}: {
+  onEvent: (event: PatternEvent) => void
+  onOpenChange: (change: OpenChangeRecord) => void
+}) {
+  const dialog = useControlledDialogPattern(controlledDialogData, {
+    open: true,
+    onEvent,
+    onOpenChange: (open, meta) => onOpenChange({ open, reason: meta.reason, key: meta.key }),
+  })
+
+  return (
+    <div data-testid="controlled-dialog-overlay" {...dialog.overlayProps}>
+      <div {...dialog.dialogProps}>
+        <h2 {...dialog.titleProps}>{controlledDialogData.items.settingsTitle?.label}</h2>
+        <p {...dialog.descriptionProps}>{controlledDialogData.items.settingsDescription?.label}</p>
+        <button type="button" {...dialog.cancelProps}>{controlledDialogData.items.cancel?.label}</button>
+        <button type="button" {...dialog.submitProps}>{controlledDialogData.items.submit?.label}</button>
+      </div>
+    </div>
+  )
+}
+
+function ControlledAlertDialogContractHost({
+  onEvent,
+  onOpenChange,
+}: {
+  onEvent: (event: PatternEvent) => void
+  onOpenChange: (change: OpenChangeRecord) => void
+}) {
+  const alertDialog = useControlledAlertDialogPattern(controlledAlertDialogData, {
+    open: true,
+    onEvent,
+    onOpenChange: (open, meta) => onOpenChange({ open, reason: meta.reason, key: meta.key }),
+  })
+
+  return (
+    <div data-testid="controlled-alertdialog-overlay" {...alertDialog.overlayProps}>
+      <div {...alertDialog.dialogProps}>
+        <h2 {...alertDialog.titleProps}>{controlledAlertDialogData.items.alertTitle?.label}</h2>
+        <p {...alertDialog.descriptionProps}>{controlledAlertDialogData.items.alertDescription?.label}</p>
+        <button type="button" {...alertDialog.confirmProps}>{controlledAlertDialogData.items.confirm?.label}</button>
+        <button type="button" {...alertDialog.cancelProps}>{controlledAlertDialogData.items.cancel?.label}</button>
+      </div>
+    </div>
+  )
+}
+
+function RemainingFlowContractHost({ onEvent }: { onEvent: (event: PatternEvent) => void }) {
+  const table = useTablePattern(tableData, onEvent)
+  const carousel = useCarouselPattern(carouselData, onEvent)
+  const feed = useFeedPattern(feedData, onEvent)
+  const tooltip = useTooltipPattern(tooltipData, onEvent)
+
+  return (
+    <div>
+      <div {...table.tableProps}>
+        {table.rows.map((row) => (
+          <div key={row.key} {...row.rowProps}>
+            {row.cells.map((cell) => <div key={cell.key} {...cell.cellProps}>{cell.label}</div>)}
+          </div>
+        ))}
+      </div>
+      <div {...carousel.rootProps}>
+        <button type="button" {...carousel.prevProps}>{carouselData.items.prev?.label}</button>
+        <button type="button" {...carousel.nextProps}>{carouselData.items.next?.label}</button>
+        {carousel.slides.map((slide) => <button key={slide.key} type="button" {...slide.pickerProps}>{carouselData.items[slide.key]?.label}</button>)}
+      </div>
+      <div {...feed.feedProps}>
+        {feed.articles.map((article) => <article key={article.key} {...article.articleProps}>{article.label}</article>)}
+      </div>
+      <button type="button" {...tooltip.triggerProps}>{tooltip.triggerLabel}</button>
     </div>
   )
 }
@@ -972,5 +1144,116 @@ const windowSplitterData = {
   state: {
     activeKey: 'splitter',
     valueByKey: { splitter: 60 },
+  },
+} satisfies PatternData
+
+const controlledDialogData = {
+  items: {
+    settingsDialog: { label: 'Controlled settings' },
+    settingsTitle: { label: 'Settings' },
+    settingsDescription: { label: 'Configure settings' },
+    cancel: { label: 'Cancel' },
+    submit: { label: 'Save' },
+  },
+  relations: {
+    controlsByKey: {
+      settingsDialog: ['settingsDescription'],
+    },
+    ownerByKey: { settingsDialog: 'settingsTitle' },
+  },
+  refs: { initialFocusKey: 'cancel' },
+} satisfies PatternData
+
+const controlledAlertDialogData = {
+  items: {
+    trigger: { label: 'Delete item', kind: 'dialog' },
+    warningDialog: { label: 'Delete warning' },
+    alertTitle: { label: 'Delete item?' },
+    alertDescription: { label: 'This cannot be undone.' },
+    confirm: { label: 'Delete' },
+    cancel: { label: 'Cancel' },
+  },
+  relations: {
+    rootKeys: ['trigger'],
+    controlsByKey: {
+      trigger: ['warningDialog'],
+      warningDialog: ['alertDescription'],
+    },
+    ownerByKey: { warningDialog: 'alertTitle' },
+  },
+  refs: { initialFocusKey: 'cancel' },
+} satisfies PatternData
+
+const tableData = {
+  items: {
+    row: { label: 'Row' },
+    name: { label: 'Name', kind: 'columnheader' },
+    value: { label: 'Value', kind: 'cell' },
+  },
+  relations: {
+    rowKeys: ['row'],
+    columnKeys: ['name', 'value'],
+    cells: [
+      { rowKey: 'row', columnKey: 'name', cellKey: 'name' },
+      { rowKey: 'row', columnKey: 'value', cellKey: 'value' },
+    ],
+  },
+  state: {
+    sortByKey: { name: 'ascending' },
+    rowIndexByKey: { row: 1, name: 1, value: 1 },
+    columnIndexByKey: { name: 1, value: 2 },
+    rowCount: 1,
+    colCount: 2,
+  },
+  refs: { label: 'Metrics' },
+} satisfies PatternData
+
+const carouselData: PatternData = {
+  items: {
+    prev: { label: 'Previous' },
+    next: { label: 'Next' },
+    slide1: { label: 'Slide 1', title: 'First slide' },
+    slide2: { label: 'Slide 2', title: 'Second slide' },
+  },
+  relations: {
+    rootKeys: ['slide1', 'slide2'],
+  },
+  state: {
+    activeKey: 'slide1',
+    selectedKeys: ['slide1'],
+    showDots: true,
+  },
+  refs: { label: 'Featured' },
+} satisfies PatternData
+
+const feedData = {
+  items: {
+    first: { label: 'First article' },
+    second: { label: 'Second article' },
+  },
+  relations: {
+    rootKeys: ['first', 'second'],
+  },
+  state: {
+    activeKey: 'first',
+    posInSetByKey: { first: 1, second: 2 },
+    setSizeByKey: { first: 2, second: 2 },
+  },
+  refs: { label: 'Updates' },
+} satisfies PatternData
+
+const tooltipData = {
+  items: {
+    help: { label: 'Help' },
+    tip: { label: 'Helpful tip' },
+  },
+  relations: {
+    rootKeys: ['help'],
+    controlsByKey: { help: ['tip'] },
+    ownerByKey: { tip: 'help' },
+  },
+  state: {
+    activeKey: 'help',
+    expandedKeys: [],
   },
 } satisfies PatternData

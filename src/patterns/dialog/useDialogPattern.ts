@@ -4,6 +4,7 @@ import { handlePatternTrapFocus, usePatternEffects } from '../../adapters/reactP
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { dialogDefinition } from './definition'
+import { getDialogRuntimeKeys } from './dialogRuntimeKeys'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
 
@@ -62,20 +63,6 @@ export function useDialogPattern(data: PatternData, onEvent: (event: PatternEven
     },
     keyToElementId,
   }
-}
-
-function getDialogRuntimeKeys(data: PatternData): {
-  triggerKey: Key | null
-  dialogKey: Key | null
-  titleKey: Key | null
-  descriptionKey: Key | null
-} {
-  const triggerKey = data.relations?.rootKeys?.[0] ?? (data.items.trigger ? 'trigger' : null)
-  const dialogKey = triggerKey ? data.relations?.controlsByKey?.[triggerKey]?.[0] ?? (data.items.dialog ? 'dialog' : null) : data.items.dialog ? 'dialog' : null
-  const titleKey = dialogKey ? data.relations?.ownerByKey?.[dialogKey] ?? (data.items.title ? 'title' : null) : data.items.title ? 'title' : null
-  const descriptionKey = dialogKey ? data.relations?.controlsByKey?.[dialogKey]?.[0] ?? (data.items.description ? 'description' : null) : data.items.description ? 'description' : null
-
-  return { triggerKey, dialogKey, titleKey, descriptionKey }
 }
 
 function createDialogProps({

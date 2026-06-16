@@ -229,8 +229,8 @@ server-rendered markup:
   whole HTML snapshots, so layout wrappers and rendering composition can evolve
   without weakening the public accessibility contract.
 - Relationship-keyed dialog data, including a non-literal dialog item key, must
-  render through the React `Dialog` and `AlertDialog` presets. Literal demo keys
-  are not the public API.
+  render through the React `Dialog` and `AlertDialog` presets and controlled
+  hooks. Literal demo keys are not the public API.
 
 `src/tests/reactPublicEventContracts.test.tsx` anchors selected React hook event
 contracts through the public `../react` facade:
@@ -241,10 +241,12 @@ contracts through the public `../react` facade:
   `useMenuPattern`, `useButtonPattern`, `useCheckboxPattern`,
   `useSwitchPattern`, `useLinkPattern`, `useAccordionPattern`,
   `useDisclosurePattern`, `useRadioGroupPattern`, `useToolbarPattern`,
-  `useSliderPattern`, `useSpinbuttonPattern`, and `useWindowSplitterPattern`
-  must preserve representative keyboard, focus, pointer, open, close, select,
-  activate, navigation, sort, edit, dismiss, check, press, expand, value-step,
-  and collapse event payloads.
+  `useSliderPattern`, `useSpinbuttonPattern`, `useWindowSplitterPattern`,
+  `useControlledDialogPattern`, `useControlledAlertDialogPattern`,
+  `useTablePattern`, `useCarouselPattern`, `useFeedPattern`, and
+  `useTooltipPattern` must preserve representative keyboard, focus, pointer,
+  open, close, select, activate, navigation, sort, edit, dismiss, check, press,
+  expand, value-step, collapse, and controlled open-change payloads.
 - Event payloads and `meta.reason` are checked separately so enumerable versus
   non-enumerable metadata remains an implementation detail, while the public
   event meaning stays fixed.

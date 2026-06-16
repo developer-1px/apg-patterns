@@ -25,12 +25,14 @@ export function useControlledDialogFocus({
   open,
   data,
   keyToElementId,
+  dialogKey,
   initialFocusKey,
   restoreFocusTo,
 }: {
   open: boolean
   data: PatternData
   keyToElementId(key: Key): string
+  dialogKey?: Key | null
   initialFocusKey?: Key
   restoreFocusTo?: ReactDialogFocusTarget
 }) {
@@ -41,20 +43,22 @@ export function useControlledDialogFocus({
     const closed = !open && wasOpen.current
     wasOpen.current = open
 
-    if (opened) focusInitialDialogTarget({ data, keyToElementId, initialFocusKey })
+    if (opened) focusInitialDialogTarget({ data, keyToElementId, dialogKey, initialFocusKey })
     if (closed) resolveDialogFocusTarget(restoreFocusTo)?.focus({ preventScroll: true })
-  }, [data, initialFocusKey, keyToElementId, open, restoreFocusTo])
+  }, [data, dialogKey, initialFocusKey, keyToElementId, open, restoreFocusTo])
 }
 
 export function handleControlledDialogKeyDown({
   event,
   open,
   keyToElementId,
+  dialogKey,
   onClose,
 }: {
   event: KeyboardEvent<HTMLElement>
   open: boolean
   keyToElementId(key: Key): string
+  dialogKey?: Key | null
   onClose(reason: 'keyboard'): void
 }) {
   if (event.key === 'Escape') {
@@ -64,39 +68,47 @@ export function handleControlledDialogKeyDown({
     return
   }
 
-  if (open && event.key === 'Tab') trapDialogFocus(event, keyToElementId(dialogKey()))
+  if (open && event.key === 'Tab') trapDialogFocus(event, keyToElementId(dialogKey ?? fallbackDialogKey()))
 }
 
 export function emitControlledDialogClose({
   config,
   reason,
+  key,
 }: {
   config: ReactControlledDialogConfig
   reason: PatternEventReason
+  key?: Key | null
 }) {
-  const key = dialogKey()
-  config.onEvent?.({ type: 'dismiss', key, meta: { reason } })
-  config.onOpenChange(false, { reason, key })
+  const dialogKey = key ?? fallbackDialogKey()
+  config.onEvent?.({ type: 'dismiss', key: dialogKey, meta: { reason } })
+  config.onOpenChange(false, { reason, key: dialogKey })
 }
 
 export function dialogKey(): Key {
-  return 'dialog'
+  return fallbackDialogKey()
 }
 
 function focusInitialDialogTarget({
   data,
   keyToElementId,
+  dialogKey,
   initialFocusKey,
 }: {
   data: PatternData
   keyToElementId(key: Key): string
+  dialogKey?: Key | null
   initialFocusKey?: Key
 }) {
-  const root = document.getElementById(keyToElementId(dialogKey()))
+  const root = document.getElementById(keyToElementId(dialogKey ?? fallbackDialogKey()))
   const targetKey = initialFocusKey ?? data.refs?.initialFocusKey
   const target = targetKey ? document.getElementById(keyToElementId(targetKey)) : root?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR)
   const focusTarget = target ?? root
   focusTarget?.focus({ preventScroll: true })
+}
+
+function fallbackDialogKey(): Key {
+  return 'dialog'
 }
 
 function trapDialogFocus(event: KeyboardEvent<HTMLElement>, dialogElementId: string) {
