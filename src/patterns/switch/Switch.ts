@@ -1,7 +1,6 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
-import type { ReactSwitchRenderItem } from './switchRenderItem'
-import { useSwitchPattern } from './useSwitchPattern'
+import { useSwitchPattern, type ReactSwitchRenderItem } from './useSwitchPattern'
 
 type DivProps = ComponentPropsWithoutRef<'div'>
 

@@ -1,7 +1,6 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
-import type { ReactCheckboxRenderItem } from './checkboxRenderItem'
-import { useCheckboxPattern } from './useCheckboxPattern'
+import { useCheckboxPattern, type ReactCheckboxRenderItem } from './useCheckboxPattern'
 
 type DivProps = ComponentPropsWithoutRef<'div'>
 

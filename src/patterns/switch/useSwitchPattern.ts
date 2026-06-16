@@ -1,10 +1,20 @@
-import { createPatternRuntime } from '../../kernel/patternRuntime'
+import type { KeyboardEvent } from 'react'
+import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { dispatchReactKeyboardBinding, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { withDefaultReason } from '../../kernel/domEventBindings'
 import { switchDefinition } from './definition'
-import { createSwitchRenderItem, type ReactSwitchRenderItem } from './switchRenderItem'
 import { usePatternElementId } from '../../adapters/reactDomIds'
-export type { ReactSwitchRenderItem } from './switchRenderItem'
+
+export interface ReactSwitchRenderItem {
+  key: Key
+  label: string
+  state: {
+    checked: boolean
+    disabled: boolean
+  }
+  switchProps: ReactPatternProps
+}
 
 export interface ReactSwitchRuntime {
   rootProps: ReactPatternProps
@@ -56,5 +66,24 @@ export function useSwitchPattern(data: PatternData, onEvent: (event: PatternEven
       return { forKey: runtime.keyToElementId }
     },
     keyToElementId: runtime.keyToElementId,
+  }
+}
+
+function createSwitchRenderItem(runtime: PatternRuntime, key: Key): ReactSwitchRenderItem {
+  const { onKeyDown: _onKeyDown, ...props } = reactProps(runtime.getPartProps('switch', key))
+  const state = runtime.getItemState(key, 'switch')
+  return {
+    key,
+    label: runtime.data.items[key]?.label ?? key,
+    state: {
+      checked: state.checked === true,
+      disabled: Boolean(state.disabled),
+    },
+    switchProps: {
+      ...props,
+      tabIndex: 0,
+      onKeyDown: (event: KeyboardEvent<HTMLElement>) => dispatchReactKeyboardBinding(runtime, key, event),
+      onFocus: () => runtime.emit(withDefaultReason({ type: 'focus', key }, 'focus')),
+    },
   }
 }

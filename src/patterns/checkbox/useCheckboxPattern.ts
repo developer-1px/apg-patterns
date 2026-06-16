@@ -1,10 +1,20 @@
-import { createPatternRuntime } from '../../kernel/patternRuntime'
+import type { KeyboardEvent } from 'react'
+import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
-import { createCheckboxRenderItem, type ReactCheckboxRenderItem } from './checkboxRenderItem'
+import { dispatchReactKeyboardBinding, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { withDefaultReason } from '../../kernel/domEventBindings'
 import { checkboxDefinition } from './definition'
 import { usePatternElementId } from '../../adapters/reactDomIds'
-export type { ReactCheckboxRenderItem } from './checkboxRenderItem'
+
+export interface ReactCheckboxRenderItem {
+  key: Key
+  label: string
+  state: {
+    checked: boolean | 'mixed'
+    disabled: boolean
+  }
+  checkboxProps: ReactPatternProps
+}
 
 export interface ReactCheckboxRuntime {
   rootProps: ReactPatternProps
@@ -56,5 +66,24 @@ export function useCheckboxPattern(data: PatternData, onEvent: (event: PatternEv
       return { forKey: runtime.keyToElementId }
     },
     keyToElementId: runtime.keyToElementId,
+  }
+}
+
+function createCheckboxRenderItem(runtime: PatternRuntime, key: Key): ReactCheckboxRenderItem {
+  const { onKeyDown: _onKeyDown, ...props } = reactProps(runtime.getPartProps('checkbox', key))
+  const state = runtime.getItemState(key, 'checkbox')
+  return {
+    key,
+    label: runtime.data.items[key]?.label ?? key,
+    state: {
+      checked: state.checked === 'mixed' ? 'mixed' : Boolean(state.checked),
+      disabled: Boolean(state.disabled),
+    },
+    checkboxProps: {
+      ...props,
+      tabIndex: 0,
+      onKeyDown: (event: KeyboardEvent<HTMLElement>) => dispatchReactKeyboardBinding(runtime, key, event),
+      onFocus: () => runtime.emit(withDefaultReason({ type: 'focus', key }, 'focus')),
+    },
   }
 }
