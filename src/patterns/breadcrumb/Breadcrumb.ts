@@ -7,10 +7,8 @@ type BreadcrumbDataItem = PatternItem & {
   href?: unknown
 }
 
-type BreadcrumbData<TItem extends BreadcrumbDataItem> = PatternData<TItem>
-
 export interface BreadcrumbProps<TItem extends BreadcrumbDataItem = BreadcrumbDataItem> {
-  data: BreadcrumbData<TItem>
+  data: PatternData<TItem>
   onEvent?: (event: PatternEvent) => void
   options?: PatternOptions
   className?: string
