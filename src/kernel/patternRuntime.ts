@@ -83,7 +83,14 @@ export function createPatternRuntime<TData extends PatternData = PatternData>(in
   }
 
   const getItemState = (key: Key, partName: string): Record<string, unknown> => {
-    return resolveRuntimeItemState({ definition, partName, key, context })
+    const part = definition.parts[partName]
+    if (!part) return {}
+    const ctx = context(key)
+    const out: Record<string, unknown> = {}
+    for (const projection of part.state ?? []) {
+      out[projection.name] = resolveStateProjection(projection.from, ctx)
+    }
+    return out
   }
 
   const rootPartName = Object.keys(definition.parts).find((name) => definition.parts[name]?.role === definition.rootRole)
@@ -94,25 +101,4 @@ export function createPatternRuntime<TData extends PatternData = PatternData>(in
   const getItemProps = (partName: string, key: Key): SlotProps => getPartProps(partName, key)
 
   return { definition, data, options, visibleKeys, getRootProps, getItemProps, getPartProps, getRootKeyboardHandler, resolveKeyboardBinding, getItemState, keyToElementId, emit }
-}
-
-function resolveRuntimeItemState({
-  definition,
-  partName,
-  key,
-  context,
-}: {
-  definition: PatternDefinition
-  partName: string
-  key: Key
-  context(key?: Key): PatternRuntimeContext
-}): Record<string, unknown> {
-  const part = definition.parts[partName]
-  if (!part) return {}
-  const ctx = context(key)
-  const out: Record<string, unknown> = {}
-  for (const projection of part.state ?? []) {
-    out[projection.name] = resolveStateProjection(projection.from, ctx)
-  }
-  return out
 }
