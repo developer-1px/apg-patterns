@@ -8,7 +8,6 @@ type TreeDataItem = PatternItem & {
 }
 
 type DivProps = ComponentPropsWithoutRef<'div'>
-type SpanProps = ComponentPropsWithoutRef<'span'>
 
 export interface TreeviewProps<TItem extends TreeDataItem = TreeDataItem> {
   data: PatternData<TItem>
@@ -67,9 +66,9 @@ function renderTreeItem<TItem extends TreeDataItem>({
   }
 
   const icon = renderIcon?.(item, dataItem)
-  if (icon !== undefined && icon !== null) children.push(createElement('span', { key: `${item.key}-icon`, 'aria-hidden': true } as SpanProps, icon))
+  if (icon !== undefined && icon !== null) children.push(createElement('span', { key: `${item.key}-icon`, 'aria-hidden': true } as ComponentPropsWithoutRef<'span'>, icon))
 
-  children.push(createElement('span', { key: `${item.key}-label` } as SpanProps, renderLabel?.(item, dataItem) ?? (dataItem.href ? createElement('a', { href: dataItem.href } as ComponentPropsWithoutRef<'a'>, item.label) : item.label)))
+  children.push(createElement('span', { key: `${item.key}-label` } as ComponentPropsWithoutRef<'span'>, renderLabel?.(item, dataItem) ?? (dataItem.href ? createElement('a', { href: dataItem.href } as ComponentPropsWithoutRef<'a'>, item.label) : item.label)))
 
   const style: CSSProperties | undefined = item.level > 1 ? { paddingInlineStart: `${(item.level - 1) * indent}px` } : undefined
   return createElement('div', { key: item.key, ...item.treeitemProps, style } as DivProps & { key: Key }, children)
