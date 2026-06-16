@@ -1,5 +1,8 @@
 const activeItemEnabled = { kind: 'not', predicate: { kind: 'isDisabled', key: '$activeKey' } } as const
 const activeItemWithChildren = { kind: 'all', predicates: [{ kind: 'hasChildren', key: '$activeKey' }, activeItemEnabled] } as const
+const activateActiveItemCases = [
+  { case: 'when', when: activeItemEnabled, events: [{ type: 'activate', key: '$activeKey' }] },
+] as const
 
 export const menubarKeyboard = [
   { shortcut: 'ArrowRight', preventDefault: true, cases: [{ case: 'always', events: [{ type: 'navigate', direction: 'next' }] }] },
@@ -20,11 +23,7 @@ export const menubarKeyboard = [
       },
     ],
   },
-  { shortcut: 'Enter', preventDefault: true, cases: activeItemCases([{ type: 'activate', key: '$activeKey' }]) },
-  { shortcut: 'Space', preventDefault: true, cases: activeItemCases([{ type: 'activate', key: '$activeKey' }]) },
+  { shortcut: 'Enter', preventDefault: true, cases: activateActiveItemCases },
+  { shortcut: 'Space', preventDefault: true, cases: activateActiveItemCases },
   { shortcut: 'Escape', preventDefault: true, cases: [{ case: 'always', events: [{ type: 'dismiss', key: '$activeKey' }] }] },
 ] as const
-
-function activeItemCases(events: readonly unknown[]) {
-  return [{ case: 'when', when: activeItemEnabled, events }]
-}
