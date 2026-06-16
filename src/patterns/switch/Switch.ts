@@ -1,8 +1,7 @@
-import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
-import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
+import type { ReactNode } from 'react'
+import { renderItemCollection } from '../../adapters/reactPresetElements'
+import type { PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import { useSwitchPattern, type ReactSwitchRenderItem } from './useSwitchPattern'
-
-type DivProps = ComponentPropsWithoutRef<'div'>
 
 export interface SwitchProps<TItem extends PatternItem = PatternItem> {
   data: PatternData<TItem>
@@ -15,11 +14,9 @@ export interface SwitchProps<TItem extends PatternItem = PatternItem> {
 export function Switch<TItem extends PatternItem = PatternItem>({ data, onEvent, options, className, renderSwitch }: SwitchProps<TItem>) {
   const switchRuntime = useSwitchPattern(data, onEvent, options)
 
-  return createElement(
-    'div',
-    { ...switchRuntime.rootProps, className } as DivProps,
-    switchRuntime.renderItems.map((item) =>
-      createElement('div', { key: item.key, ...item.switchProps } as DivProps & { key: Key }, renderSwitch?.(item, data.items[item.key]) ?? item.label),
-    ),
-  )
+  return renderItemCollection({
+    rootProps: switchRuntime.rootProps, className, items: switchRuntime.renderItems, dataItems: data.items,
+    getItemProps: (item) => item.switchProps,
+    children: (item, dataItem) => renderSwitch?.(item, dataItem) ?? item.label,
+  })
 }

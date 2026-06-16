@@ -1,8 +1,7 @@
-import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
-import type { Key, PatternData, PatternEvent, PatternItem } from '../../schema'
+import type { ReactNode } from 'react'
+import { renderItemCollection } from '../../adapters/reactPresetElements'
+import type { PatternData, PatternEvent, PatternItem } from '../../schema'
 import { useRadioGroupPattern, type ReactRadioGroupOptions, type ReactRadioRenderItem } from './useRadioGroupPattern'
-
-type DivProps = ComponentPropsWithoutRef<'div'>
 
 export interface RadioGroupProps<TItem extends PatternItem = PatternItem> {
   data: PatternData<TItem>
@@ -15,11 +14,9 @@ export interface RadioGroupProps<TItem extends PatternItem = PatternItem> {
 export function RadioGroup<TItem extends PatternItem = PatternItem>({ data, onEvent, options, className, renderRadio }: RadioGroupProps<TItem>) {
   const radioGroup = useRadioGroupPattern(data, onEvent, options)
 
-  return createElement(
-    'div',
-    { ...radioGroup.rootProps, className } as DivProps,
-    radioGroup.renderItems.map((item) =>
-      createElement('div', { key: item.key, ...item.radioProps } as DivProps & { key: Key }, renderRadio?.(item, data.items[item.key]) ?? item.label),
-    ),
-  )
+  return renderItemCollection({
+    rootProps: radioGroup.rootProps, className, items: radioGroup.renderItems, dataItems: data.items,
+    getItemProps: (item) => item.radioProps,
+    children: (item, dataItem) => renderRadio?.(item, dataItem) ?? item.label,
+  })
 }

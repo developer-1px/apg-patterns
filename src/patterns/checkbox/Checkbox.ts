@@ -1,8 +1,7 @@
-import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
-import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
+import type { ReactNode } from 'react'
+import { renderItemCollection } from '../../adapters/reactPresetElements'
+import type { PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import { useCheckboxPattern, type ReactCheckboxRenderItem } from './useCheckboxPattern'
-
-type DivProps = ComponentPropsWithoutRef<'div'>
 
 export interface CheckboxProps<TItem extends PatternItem = PatternItem> {
   data: PatternData<TItem>
@@ -15,11 +14,9 @@ export interface CheckboxProps<TItem extends PatternItem = PatternItem> {
 export function Checkbox<TItem extends PatternItem = PatternItem>({ data, onEvent, options, className, renderCheckbox }: CheckboxProps<TItem>) {
   const checkbox = useCheckboxPattern(data, onEvent, options)
 
-  return createElement(
-    'div',
-    { ...checkbox.rootProps, className } as DivProps,
-    checkbox.renderItems.map((item) =>
-      createElement('div', { key: item.key, ...item.checkboxProps } as DivProps & { key: Key }, renderCheckbox?.(item, data.items[item.key]) ?? item.label),
-    ),
-  )
+  return renderItemCollection({
+    rootProps: checkbox.rootProps, className, items: checkbox.renderItems, dataItems: data.items,
+    getItemProps: (item) => item.checkboxProps,
+    children: (item, dataItem) => renderCheckbox?.(item, dataItem) ?? item.label,
+  })
 }

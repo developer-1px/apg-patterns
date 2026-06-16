@@ -1,8 +1,7 @@
-import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
-import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
+import type { ReactNode } from 'react'
+import { renderItemCollection } from '../../adapters/reactPresetElements'
+import type { PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import { useMeterPattern, type ReactMeterRenderItem } from './useMeterPattern'
-
-type DivProps = ComponentPropsWithoutRef<'div'>
 
 export interface MeterProps<TItem extends PatternItem = PatternItem> {
   data: PatternData<TItem>
@@ -15,11 +14,9 @@ export interface MeterProps<TItem extends PatternItem = PatternItem> {
 export function Meter<TItem extends PatternItem = PatternItem>({ data, onEvent = () => undefined, options, className, renderMeter }: MeterProps<TItem>) {
   const meter = useMeterPattern(data, onEvent, options)
 
-  return createElement(
-    'div',
-    { ...meter.rootProps, className } as DivProps,
-    meter.renderItems.map((item) =>
-      createElement('div', { key: item.key, ...item.meterProps } as DivProps & { key: Key }, renderMeter?.(item, data.items[item.key]) ?? `${item.label} ${Math.round(item.percent)}%`),
-    ),
-  )
+  return renderItemCollection({
+    rootProps: meter.rootProps, className, items: meter.renderItems, dataItems: data.items,
+    getItemProps: (item) => item.meterProps,
+    children: (item, dataItem) => renderMeter?.(item, dataItem) ?? `${item.label} ${Math.round(item.percent)}%`,
+  })
 }

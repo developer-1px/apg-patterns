@@ -1,5 +1,6 @@
-import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
-import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
+import type { ReactNode } from 'react'
+import { renderItemCollection } from '../../adapters/reactPresetElements'
+import type { PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import { useToolbarPattern, type ReactToolbarRenderItem } from './useToolbarPattern'
 
 export interface ToolbarProps<TItem extends PatternItem = PatternItem> {
@@ -13,11 +14,10 @@ export interface ToolbarProps<TItem extends PatternItem = PatternItem> {
 export function Toolbar<TItem extends PatternItem = PatternItem>({ data, onEvent, options, className, renderItem }: ToolbarProps<TItem>) {
   const toolbar = useToolbarPattern(data, onEvent, options)
 
-  return createElement(
-    'div',
-    { ...toolbar.rootProps, className } as ComponentPropsWithoutRef<'div'>,
-    toolbar.renderItems.map((item) =>
-      createElement('button', { key: item.key, type: 'button', ...item.itemProps } as ComponentPropsWithoutRef<'button'> & { key: Key }, renderItem?.(item, data.items[item.key]) ?? item.label),
-    ),
-  )
+  return renderItemCollection({
+    rootProps: toolbar.rootProps, className, items: toolbar.renderItems, dataItems: data.items,
+    itemElement: 'button',
+    getItemProps: (item) => ({ type: 'button', ...item.itemProps }),
+    children: (item, dataItem) => renderItem?.(item, dataItem) ?? item.label,
+  })
 }

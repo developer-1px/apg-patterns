@@ -1,8 +1,7 @@
-import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
-import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
+import type { ReactNode } from 'react'
+import { renderItemCollection } from '../../adapters/reactPresetElements'
+import type { PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import { useListboxPattern, type ReactListboxRenderItem } from './useListboxPattern'
-
-type DivProps = ComponentPropsWithoutRef<'div'>
 
 export interface ListboxProps<TItem extends PatternItem = PatternItem> {
   data: PatternData<TItem>
@@ -15,15 +14,9 @@ export interface ListboxProps<TItem extends PatternItem = PatternItem> {
 export function Listbox<TItem extends PatternItem = PatternItem>({ data, onEvent, options, className, renderOption }: ListboxProps<TItem>) {
   const listbox = useListboxPattern(data, onEvent, options)
 
-  return createElement(
-    'div',
-    { ...listbox.rootProps, className } as DivProps,
-    listbox.renderItems.map((item) =>
-      createElement(
-        'div',
-        { key: item.key, ...item.optionProps } as DivProps & { key: Key },
-        renderOption?.(item, data.items[item.key]) ?? item.label,
-      ),
-    ),
-  )
+  return renderItemCollection({
+    rootProps: listbox.rootProps, className, items: listbox.renderItems, dataItems: data.items,
+    getItemProps: (item) => item.optionProps,
+    children: (item, dataItem) => renderOption?.(item, dataItem) ?? item.label,
+  })
 }

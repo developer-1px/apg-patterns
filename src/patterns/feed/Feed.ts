@@ -1,5 +1,6 @@
-import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
-import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
+import type { ReactNode } from 'react'
+import { renderItemCollection } from '../../adapters/reactPresetElements'
+import type { PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import { useFeedPattern, type ReactFeedArticle } from './useFeedPattern'
 
 type FeedDataItem = PatternItem & {
@@ -17,15 +18,10 @@ export interface FeedProps<TItem extends FeedDataItem = FeedDataItem> {
 export function Feed<TItem extends FeedDataItem = FeedDataItem>({ data, onEvent, options, className, renderArticle }: FeedProps<TItem>) {
   const feed = useFeedPattern(data, onEvent, options)
 
-  return createElement(
-    'div',
-    { ...feed.feedProps, className } as ComponentPropsWithoutRef<'div'>,
-    feed.articles.map((article) =>
-      createElement(
-        'article',
-        { key: article.key, ...article.articleProps } as ComponentPropsWithoutRef<'article'> & { key: Key },
-        renderArticle?.(article, data.items[article.key]) ?? data.items[article.key]?.content ?? article.label,
-      ),
-    ),
-  )
+  return renderItemCollection({
+    rootProps: feed.feedProps, className, items: feed.articles, dataItems: data.items,
+    itemElement: 'article',
+    getItemProps: (article) => article.articleProps,
+    children: (article, dataItem) => renderArticle?.(article, dataItem) ?? dataItem.content ?? article.label,
+  })
 }

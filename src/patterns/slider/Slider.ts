@@ -1,5 +1,6 @@
-import { createElement, type ComponentPropsWithoutRef, type PointerEvent, type ReactNode } from 'react'
-import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
+import type { PointerEvent, ReactNode } from 'react'
+import { renderItemCollection } from '../../adapters/reactPresetElements'
+import type { PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import { useSliderPattern, type ReactSliderRenderItem } from './useSliderPattern'
 
 type SliderDataItem = PatternItem & {
@@ -7,8 +8,6 @@ type SliderDataItem = PatternItem & {
   valuemax?: number
   valuetext?: string
 }
-
-type DivProps = ComponentPropsWithoutRef<'div'>
 
 export interface SliderProps<TItem extends SliderDataItem = SliderDataItem> {
   data: PatternData<TItem>
@@ -21,19 +20,12 @@ export interface SliderProps<TItem extends SliderDataItem = SliderDataItem> {
 export function Slider<TItem extends SliderDataItem = SliderDataItem>({ data, onEvent, options, className, renderSlider }: SliderProps<TItem>) {
   const slider = useSliderPattern(data, onEvent, options)
 
-  return createElement(
-    'div',
-    { ...slider.rootProps, className } as DivProps,
-    slider.renderItems.map((item) =>
-      createElement(
-        'div',
-        {
-          key: item.key,
-          ...item.sliderProps,
-          onPointerDown: (event: PointerEvent<HTMLElement>) => item.updateFromPointer(event),
-        } as DivProps & { key: Key },
-        renderSlider?.(item, data.items[item.key]) ?? `${item.label} ${item.value}`,
-      ),
-    ),
-  )
+  return renderItemCollection({
+    rootProps: slider.rootProps, className, items: slider.renderItems, dataItems: data.items,
+    getItemProps: (item) => ({
+      ...item.sliderProps,
+      onPointerDown: (event: PointerEvent<HTMLElement>) => item.updateFromPointer(event),
+    }),
+    children: (item, dataItem) => renderSlider?.(item, dataItem) ?? `${item.label} ${item.value}`,
+  })
 }

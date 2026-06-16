@@ -1,8 +1,7 @@
-import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
-import type { Key, PatternData, PatternEvent, PatternItem } from '../../schema'
+import type { ReactNode } from 'react'
+import { renderItemCollection } from '../../adapters/reactPresetElements'
+import type { PatternData, PatternEvent, PatternItem } from '../../schema'
 import { useMenuPattern, type ReactMenuItem, type ReactMenuPatternOptions } from './useMenuPattern'
-
-type DivProps = ComponentPropsWithoutRef<'div'>
 
 export interface MenuProps<TItem extends PatternItem = PatternItem> {
   data: PatternData<TItem>
@@ -16,11 +15,9 @@ export function Menu<TItem extends PatternItem = PatternItem>({ data, onEvent, o
   const menu = useMenuPattern(data, onEvent, options)
   if (!menu.open || !menu.menuKey) return null
 
-  return createElement(
-    'div',
-    { ...menu.menuProps, className } as DivProps,
-    menu.items.map((item) =>
-      createElement('div', { key: item.key, ...item.itemProps } as DivProps & { key: Key }, renderItem?.(item, data.items[item.key]) ?? item.label),
-    ),
-  )
+  return renderItemCollection({
+    rootProps: menu.menuProps, className, items: menu.items, dataItems: data.items,
+    getItemProps: (item) => item.itemProps,
+    children: (item, dataItem) => renderItem?.(item, dataItem) ?? item.label,
+  })
 }
