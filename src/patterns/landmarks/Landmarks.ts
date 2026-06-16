@@ -39,20 +39,11 @@ export function Landmarks<TItem extends LandmarkDataItem = LandmarkDataItem>({
   return createElement(
     'div',
     { ...landmarks.rootProps, className } as ComponentPropsWithoutRef<'div'>,
-    landmarks.items.map((item) => renderLandmarkElement({ item, dataItem: data.items[item.key], renderLandmark })),
+    landmarks.items.map((item) => {
+      const dataItem = data.items[item.key]
+      const content = renderLandmark?.(item, dataItem) ?? dataItem.content ?? item.label
+      const tag = landmarkTags[item.kind] ?? 'div'
+      return createElement(tag, { key: item.key, ...item.landmarkProps } as ComponentPropsWithoutRef<LandmarkTag> & { key: Key }, content)
+    }),
   )
-}
-
-function renderLandmarkElement<TItem extends LandmarkDataItem>({
-  item,
-  dataItem,
-  renderLandmark,
-}: {
-  item: ReactLandmarkItem
-  dataItem: TItem
-  renderLandmark?: (item: ReactLandmarkItem, dataItem: TItem) => ReactNode
-}) {
-  const content = renderLandmark?.(item, dataItem) ?? dataItem.content ?? item.label
-  const tag = landmarkTags[item.kind] ?? 'div'
-  return createElement(tag, { key: item.key, ...item.landmarkProps } as ComponentPropsWithoutRef<LandmarkTag> & { key: Key }, content)
 }
