@@ -1,5 +1,5 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
-import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
+import type { PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import type { ReactLandmarkItem } from './useLandmarksPattern'
 import { useLandmarksPattern } from './useLandmarksPattern'
 
@@ -43,7 +43,7 @@ export function Landmarks<TItem extends LandmarkDataItem = LandmarkDataItem>({
       const dataItem = data.items[item.key]
       const content = renderLandmark?.(item, dataItem) ?? dataItem.content ?? item.label
       const tag = landmarkTags[item.kind] ?? 'div'
-      return createElement(tag, { key: item.key, ...item.landmarkProps } as ComponentPropsWithoutRef<LandmarkTag> & { key: Key }, content)
+      return createElement(tag, { key: item.key, ...item.landmarkProps }, content)
     }),
   )
 }

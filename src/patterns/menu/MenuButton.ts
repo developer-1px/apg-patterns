@@ -1,4 +1,4 @@
-import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
+import { createElement, type ReactNode } from 'react'
 import { renderItemCollection } from '../../adapters/reactPresetElements'
 import type { PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import { useMenuButtonPattern, type ReactMenuButtonRuntime } from './useMenuButtonPattern'
@@ -20,7 +20,7 @@ export function MenuButton<TItem extends PatternItem = PatternItem>({ data, onEv
   return createElement(
     'div',
     { className },
-    createElement('button', menu.triggerProps as ComponentPropsWithoutRef<'button'>, renderTrigger?.() ?? (menu.triggerKey ? data.items[menu.triggerKey]?.label : undefined)),
+    createElement('button', menu.triggerProps, renderTrigger?.() ?? (menu.triggerKey ? data.items[menu.triggerKey]?.label : undefined)),
     menu.expanded
       ? renderItemCollection({
           rootProps: menu.menuProps, items: menu.items, dataItems: data.items,

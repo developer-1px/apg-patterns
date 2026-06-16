@@ -1,4 +1,4 @@
-import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
+import { createElement, type ReactNode } from 'react'
 import { renderItemCollection } from '../../adapters/reactPresetElements'
 import type { Key, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import { useComboboxPattern, type ComboboxData, type ReactComboboxOption } from './useComboboxPattern'
@@ -17,7 +17,7 @@ export function Combobox<TItem extends PatternItem = PatternItem>({ data, onEven
   return createElement(
     'div',
     { className },
-    createElement('input', { ...combobox.inputProps, ref: combobox.setInputRef } as ComponentPropsWithoutRef<'input'>),
+    createElement('input', { ...combobox.inputProps, ref: combobox.setInputRef }),
     combobox.open
       ? renderItemCollection({
           rootProps: combobox.listboxProps, items: combobox.options, dataItems: data.items,

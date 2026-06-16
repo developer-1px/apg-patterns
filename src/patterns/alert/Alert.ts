@@ -29,15 +29,14 @@ export function Alert<TItem extends AlertDataItem = AlertDataItem>({
   if (!alert.key || !alert.state.visible) return null
 
   const item = data.items[alert.key]
-  const children: ReactNode[] = [
-    createElement('span', { key: `${alert.key}-message` }, renderMessage?.(alert.message, item) ?? alert.message),
-  ]
+  const dismissButton = dismissible && data.items.dismiss
+    ? createElement('button', alert.dismissProps, renderDismiss?.() ?? data.items.dismiss.label ?? 'Dismiss')
+    : null
 
-  if (dismissible && data.items.dismiss) {
-    children.push(
-      createElement('button', { key: `${alert.key}-dismiss`, ...alert.dismissProps } as ComponentPropsWithoutRef<'button'>, renderDismiss?.() ?? data.items.dismiss.label ?? 'Dismiss'),
-    )
-  }
-
-  return createElement('div', { ...alert.rootProps, className } as ComponentPropsWithoutRef<'div'>, children)
+  return createElement(
+    'div',
+    { ...alert.rootProps, className } as ComponentPropsWithoutRef<'div'>,
+    createElement('span', null, renderMessage?.(alert.message, item) ?? alert.message),
+    dismissButton,
+  )
 }

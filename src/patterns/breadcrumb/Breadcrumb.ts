@@ -1,5 +1,5 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
-import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
+import type { PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import { useBreadcrumbPattern, type ReactBreadcrumbItem } from './useBreadcrumbPattern'
 
 type BreadcrumbDataItem = PatternItem & {
@@ -28,10 +28,12 @@ export function Breadcrumb<TItem extends BreadcrumbDataItem = BreadcrumbDataItem
     { ...breadcrumb.rootProps, className } as ComponentPropsWithoutRef<'nav'>,
     createElement(
       'ol',
-      breadcrumb.listProps as ComponentPropsWithoutRef<'ol'>,
+      breadcrumb.listProps,
       breadcrumb.items.map((item) =>
-        createElement('li', { key: item.key } as ComponentPropsWithoutRef<'li'> & { key: Key },
-          createElement('a', item.crumbProps as ComponentPropsWithoutRef<'a'>, renderCrumb?.(item, data.items[item.key]) ?? item.label),
+        createElement(
+          'li',
+          { key: item.key },
+          createElement('a', item.crumbProps, renderCrumb?.(item, data.items[item.key]) ?? item.label),
         ),
       ),
     ),
