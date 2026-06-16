@@ -1,7 +1,6 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
 import type { Key, PatternData, PatternEvent, PatternItem } from '../../schema'
-import type { ReactRadioRenderItem } from './radioRenderItem'
-import { useRadioGroupPattern, type ReactRadioGroupOptions } from './useRadioGroupPattern'
+import { useRadioGroupPattern, type ReactRadioGroupOptions, type ReactRadioRenderItem } from './useRadioGroupPattern'
 
 type DivProps = ComponentPropsWithoutRef<'div'>
 

@@ -1,7 +1,6 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
-import type { ReactMeterRenderItem } from './meterRenderItem'
-import { useMeterPattern } from './useMeterPattern'
+import { useMeterPattern, type ReactMeterRenderItem } from './useMeterPattern'
 
 type DivProps = ComponentPropsWithoutRef<'div'>
 

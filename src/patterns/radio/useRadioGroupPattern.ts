@@ -1,11 +1,17 @@
 import type { KeyboardEvent } from 'react'
+import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import { createReactKeyboardHandler, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { createReactKeyboardHandler, reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
 import { useReactPatternRuntime } from '../../adapters/reactPatternEffects'
 import { radioGroupDefinition } from './definition'
-import { createRadioRenderItem, type ReactRadioRenderItem } from './radioRenderItem'
 import { usePatternElementId } from '../../adapters/reactDomIds'
-export type { ReactRadioRenderItem } from './radioRenderItem'
+
+export interface ReactRadioRenderItem {
+  key: Key
+  label: string
+  state: ReactRenderItemState & { checked: boolean }
+  radioProps: ReactPatternProps
+}
 
 export interface ReactRadioGroupOptions extends PatternOptions {
   activationMode?: 'automatic' | 'manual'
@@ -90,4 +96,19 @@ function resolveRadioNavigationKey(key: string, keys: readonly Key[], activeKey:
   if (key === 'ArrowRight' || key === 'ArrowDown') return keys[index + 1] ?? null
   if (key === 'ArrowLeft' || key === 'ArrowUp') return keys[index - 1] ?? null
   return null
+}
+
+function createRadioRenderItem(runtime: PatternRuntime, key: Key): ReactRadioRenderItem {
+  const state = runtime.getItemState(key, 'radio')
+  return {
+    key,
+    label: runtime.data.items[key]?.label ?? key,
+    state: {
+      active: Boolean(state.active),
+      selected: Boolean(state.checked),
+      checked: Boolean(state.checked),
+      disabled: Boolean(state.disabled),
+    },
+    radioProps: reactProps(runtime.getPartProps('radio', key)),
+  }
 }
