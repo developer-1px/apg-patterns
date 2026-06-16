@@ -1,0 +1,187 @@
+{
+  "schemaVersion": 1,
+  "definition": {
+    "apgPattern": "contract-listbox",
+    "rootRole": "listbox",
+    "containedRoles": ["option"],
+    "focusModel": "rovingTabIndex",
+    "parts": {
+      "root": {
+        "role": "listbox",
+        "aria": [
+          { "attribute": "aria-label", "from": "refs.label" },
+          { "attribute": "aria-activedescendant", "from": "state.activeKey.elementId" },
+          { "attribute": "aria-multiselectable", "from": "options.selectionMode.multiple" }
+        ]
+      },
+      "option": {
+        "role": "option",
+        "aria": [
+          { "attribute": "aria-selected", "from": "state.selectedKeys" },
+          { "attribute": "aria-disabled", "from": "state.disabledKeys" }
+        ],
+        "focus": {
+          "tabIndex": {
+            "when": { "kind": "always" },
+            "active": 0,
+            "inactive": -1
+          }
+        },
+        "state": [
+          { "name": "active", "from": "state.activeKey" },
+          { "name": "selected", "from": "state.selectedKeys" },
+          { "name": "disabled", "from": "state.disabledKeys" }
+        ],
+        "events": [
+          {
+            "event": "click",
+            "events": [{ "type": "select", "key": "$key" }]
+          }
+        ]
+      }
+    },
+    "navigation": {
+      "visibleOrder": { "kind": "flat" },
+      "targets": {
+        "next": { "kind": "linear", "action": "next" },
+        "previous": { "kind": "linear", "action": "previous" },
+        "first": { "kind": "linear", "action": "first" },
+        "last": { "kind": "linear", "action": "last" }
+      }
+    },
+    "keyboard": [
+      {
+        "shortcut": "ArrowDown",
+        "preventDefault": true,
+        "cases": [
+          { "case": "always", "events": [{ "type": "navigate", "direction": "next" }] }
+        ]
+      },
+      {
+        "shortcut": "Home",
+        "preventDefault": true,
+        "cases": [
+          { "case": "always", "events": [{ "type": "navigate", "direction": "first" }] }
+        ]
+      },
+      {
+        "shortcut": "Enter",
+        "preventDefault": true,
+        "cases": [
+          { "case": "always", "events": [{ "type": "select", "key": "$activeKey" }] }
+        ]
+      }
+    ],
+    "transitions": [
+      {
+        "on": "activate",
+        "actions": [
+          { "kind": "set", "field": "activeKey", "value": { "from": "$event.key" } }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "items": {
+      "alpha": {
+        "label": "Alpha",
+        "textValue": "alpha",
+        "itemValue": { "id": "alpha", "flags": ["stable", true] },
+        "kind": "option",
+        "domain": { "rank": 1 }
+      },
+      "beta": {
+        "label": "Beta",
+        "labelledBy": ["beta-label"],
+        "textValue": "beta",
+        "itemValue": 2,
+        "kind": "option"
+      },
+      "gamma": {
+        "label": "Gamma",
+        "textValue": "gamma",
+        "kind": "option"
+      },
+      "row-1": { "label": "Row 1" },
+      "col-label": { "label": "Column label" },
+      "cell-alpha": { "label": "Cell alpha" }
+    },
+    "relations": {
+      "rootKeys": ["alpha", "beta", "gamma"],
+      "childrenByKey": { "alpha": ["beta"] },
+      "ownerByKey": { "beta": "alpha" },
+      "controlsByKey": { "alpha": ["gamma"] },
+      "rowKeys": ["row-1"],
+      "columnKeys": ["col-label"],
+      "cells": [
+        { "rowKey": "row-1", "columnKey": "col-label", "cellKey": "cell-alpha" }
+      ]
+    },
+    "state": {
+      "activeKey": "alpha",
+      "anchorKey": "alpha",
+      "extentKey": "alpha",
+      "selectedKeys": ["alpha"],
+      "expandedKeys": ["alpha"],
+      "disabledKeys": ["gamma"],
+      "checkedByKey": { "beta": "mixed" },
+      "pressedByKey": { "alpha": true },
+      "currentByKey": { "alpha": "page" },
+      "invalidByKey": { "gamma": "spelling" },
+      "requiredKeys": ["beta"],
+      "busyKeys": ["gamma"],
+      "modalKeys": ["alpha"],
+      "levelByKey": { "alpha": 1, "beta": 2 },
+      "posInSetByKey": { "alpha": 1, "beta": 2, "gamma": 3 },
+      "setSizeByKey": { "alpha": 3, "beta": 3, "gamma": 3 },
+      "rowIndexByKey": { "cell-alpha": 1 },
+      "columnIndexByKey": { "cell-alpha": 1 },
+      "rowSpanByKey": { "cell-alpha": 1 },
+      "colSpanByKey": { "cell-alpha": 1 },
+      "sortByKey": { "col-label": "ascending" },
+      "valueByKey": { "alpha": "A" },
+      "rangeValueByKey": { "alpha": { "min": 0, "max": 10, "now": 4, "text": "4 of 10" } },
+      "typeaheadTextByKey": { "alpha": "alpha" },
+      "rowCount": 1,
+      "colCount": 1,
+      "editingKey": "beta",
+      "editDraftByKey": { "beta": "draft" },
+      "customState": { "source": "fixture", "stable": true }
+    },
+    "refs": {
+      "label": "Contract listbox",
+      "labelledBy": ["contract-title"],
+      "initialFocusKey": "beta",
+      "domainIdByKey": { "alpha": "domain-alpha" },
+      "pointerByKey": { "beta": "pointer-beta" }
+    }
+  },
+  "events": [
+    { "type": "focus", "key": "beta", "meta": { "reason": "keyboard" } },
+    { "type": "navigate", "direction": "next" },
+    { "type": "select", "keys": ["beta", "gamma"], "anchorKey": "beta", "extentKey": "gamma" },
+    { "type": "selectAll" },
+    { "type": "selectColumn" },
+    { "type": "selectRow" },
+    { "type": "extendSelection", "direction": "right" },
+    { "type": "expand", "key": "beta", "expanded": true },
+    { "type": "expandActiveRow", "expanded": false },
+    { "type": "activate", "key": "beta" },
+    { "type": "check", "key": "beta", "checked": true },
+    { "type": "press", "key": "gamma" },
+    { "type": "value", "key": "beta", "value": 42 },
+    { "type": "valueStep", "key": "alpha", "direction": "incrementLarge" },
+    { "type": "collapse", "key": "alpha" },
+    { "type": "close", "key": "alpha" },
+    { "type": "inputValue", "key": "alpha", "value": "alp", "inline": true },
+    { "type": "commitValue", "key": "alpha", "value": "alpha" },
+    { "type": "typeahead", "query": "ga" },
+    { "type": "dismiss", "key": "alpha" },
+    { "type": "sort", "key": "col-label", "sort": "descending" },
+    { "type": "editStart", "key": "beta", "value": "draft" },
+    { "type": "editDraft", "key": "beta", "value": "next draft" },
+    { "type": "editEnd", "key": "beta" },
+    { "type": "reorder", "key": "alpha", "keys": ["gamma", "alpha", "beta"] },
+    { "type": "remove", "key": "gamma", "keys": ["gamma"], "activeKey": "beta", "selectedKeys": ["beta"] }
+  ]
+}

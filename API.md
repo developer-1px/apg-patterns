@@ -49,7 +49,11 @@ Menu item props use `item.kind` to choose `menuitem`, `menuitemcheckbox`, or `me
 
 Each line maps `export | bucket | tier`. `npm run check:api` verifies these
 blocks against the built declaration files, bucket policy, and taxonomy in
-`INTERFACE_STABILITY.md`.
+`INTERFACE_STABILITY.md`. The same gate also verifies
+`scripts/fixtures/public-api-contract.json` against the built core entrypoint
+so the permanent `PatternDefinition`, `PatternData`, `PatternEvent`,
+`createPatternRuntime`, and `reducePatternData` contracts keep their baseline
+schema and runtime semantics.
 
 ### Root And Core Public Surface
 

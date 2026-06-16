@@ -1,10 +1,12 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import assert from 'node:assert/strict'
 import { fileURLToPath } from 'node:url'
 import ts from 'typescript'
 
 const repoRoot = new URL('../', import.meta.url)
 const apiReferencePath = new URL('API.md', repoRoot)
 const interfaceStabilityPath = new URL('INTERFACE_STABILITY.md', repoRoot)
+const publicContractFixturePath = new URL('scripts/fixtures/public-api-contract.json', repoRoot)
 const shouldWrite = process.argv.includes('--write')
 const failures = []
 const forbiddenPublicExports = new Map([
@@ -299,6 +301,7 @@ const reactExports = declarationExports('dist/react.d.ts')
 const rootRuntimeExports = await runtimeExports('dist/index.js')
 const coreRuntimeExports = await runtimeExports('dist/core.js')
 const reactRuntimeExports = await runtimeExports('dist/react.js')
+const coreRuntimeModule = await import(new URL('dist/core.js', repoRoot))
 
 expectExactExportSet(rootExports, coreExports, 'root exports', './core exports')
 expectExactExportSet(rootRuntimeExports, coreRuntimeExports, 'root runtime exports', './core runtime exports')
@@ -316,6 +319,7 @@ const reactSurfaceBuckets = assertClassifiedPublicExports('./react-only declarat
 const rootSurfaceManifest = publicSurfaceManifest(coreExports, classifyRootCoreExport)
 const reactSurfaceManifest = publicSurfaceManifest(reactOnlyExports, classifyReactOnlyExport)
 assertInterfaceStabilityDocumentsBucketPolicies(rootSurfaceBuckets, reactSurfaceBuckets)
+assertPublicContractFixture(coreRuntimeModule)
 const nextApiReference = shouldWrite
   ? replaceExportBlock(
     replaceExportBlock(
@@ -361,7 +365,7 @@ if (failures.length > 0) {
   process.exit(1)
 }
 
-console.log(`${wroteApiReference ? 'Updated API reference and verified' : 'API reference covers'} ${coreExports.length} root/core exports, ${rootRuntimeExports.length} root/core runtime values, ${reactOnlyExports.length} React-only exports, and ${reactOnlyRuntimeExports.length} React-only runtime values. Surface buckets: root/core ${formatBuckets(rootSurfaceBuckets)}; react-only ${formatBuckets(reactSurfaceBuckets)}.`)
+console.log(`${wroteApiReference ? 'Updated API reference and verified' : 'API reference covers'} ${coreExports.length} root/core exports, ${rootRuntimeExports.length} root/core runtime values, ${reactOnlyExports.length} React-only exports, and ${reactOnlyRuntimeExports.length} React-only runtime values. Surface buckets: root/core ${formatBuckets(rootSurfaceBuckets)}; react-only ${formatBuckets(reactSurfaceBuckets)}. Public contract fixture verified.`)
 
 function declarationExports(packagePath) {
   const filePath = fileURLToPath(new URL(packagePath, repoRoot))
@@ -438,6 +442,190 @@ function assertInterfaceStabilityDocumentsBucketPolicies(...bucketMaps) {
       failures.push(`INTERFACE_STABILITY.md must document bucket policy row: ${row}`)
     }
   }
+}
+
+function assertPublicContractFixture(coreRuntime) {
+  if (!existsSync(publicContractFixturePath)) {
+    failures.push('scripts/fixtures/public-api-contract.json is required')
+    return
+  }
+
+  const fixture = JSON.parse(readFileSync(publicContractFixturePath, 'utf8'))
+  expectEqual('public contract fixture schemaVersion', fixture.schemaVersion, 1)
+
+  const definitionResult = coreRuntime.PatternDefinitionSchema.safeParse(fixture.definition)
+  const dataResult = coreRuntime.PatternDataSchema.safeParse(fixture.data)
+  if (!definitionResult.success) failures.push(`public contract PatternDefinition fixture failed schema parse: ${formatSchemaIssues(definitionResult.error)}`)
+  if (!dataResult.success) failures.push(`public contract PatternData fixture failed schema parse: ${formatSchemaIssues(dataResult.error)}`)
+  if (!definitionResult.success || !dataResult.success) return
+
+  const definition = definitionResult.data
+  const data = dataResult.data
+  const parsedEvents = []
+  for (const [index, event] of fixture.events.entries()) {
+    const eventResult = coreRuntime.PatternEventSchema.safeParse(event)
+    if (!eventResult.success) {
+      failures.push(`public contract PatternEvent fixture ${index} failed schema parse: ${formatSchemaIssues(eventResult.error)}`)
+      continue
+    }
+    parsedEvents.push(eventResult.data)
+  }
+  expectEqual('public contract event fixture count', parsedEvents.length, 26)
+
+  const emitted = []
+  const runtime = coreRuntime.createPatternRuntime({
+    definition,
+    data,
+    options: { selectionMode: 'multiple' },
+    keyToElementId: (key) => `fixture-${key}`,
+    onEvent: (event) => emitted.push(event),
+  })
+
+  expectDeepEqual('public contract visible order', runtime.visibleKeys, ['alpha', 'beta', 'gamma'])
+  expectDeepEqual('public contract root props', pick(runtime.getRootProps(), ['role', 'aria-label', 'aria-activedescendant', 'aria-multiselectable']), {
+    role: 'listbox',
+    'aria-label': 'Contract listbox',
+    'aria-activedescendant': 'fixture-alpha',
+    'aria-multiselectable': true,
+  })
+  expectEqual('public contract root exposes keyboard handler', typeof runtime.getRootProps().onKeyDown, 'function')
+
+  const alphaProps = runtime.getItemProps('option', 'alpha')
+  const gammaProps = runtime.getItemProps('option', 'gamma')
+  expectDeepEqual('public contract active option props', pick(alphaProps, ['role', 'id', 'aria-selected', 'tabIndex']), {
+    role: 'option',
+    id: 'fixture-alpha',
+    'aria-selected': true,
+    tabIndex: 0,
+  })
+  expectEqual('public contract active option omits disabled ARIA', Object.hasOwn(alphaProps, 'aria-disabled'), false)
+  expectDeepEqual('public contract disabled option props', pick(gammaProps, ['role', 'id', 'aria-selected', 'aria-disabled', 'tabIndex']), {
+    role: 'option',
+    id: 'fixture-gamma',
+    'aria-selected': false,
+    'aria-disabled': true,
+    tabIndex: -1,
+  })
+  expectDeepEqual('public contract active item state', runtime.getItemState('alpha', 'option'), {
+    active: true,
+    selected: true,
+    disabled: false,
+  })
+  expectDeepEqual('public contract disabled item state', runtime.getItemState('gamma', 'option'), {
+    active: false,
+    selected: false,
+    disabled: true,
+  })
+
+  const keyboardResult = runtime.resolveKeyboardBinding(keyInput('ArrowDown'), 'alpha')
+  expectDeepEqual('public contract keyboard binding result', keyboardResult, {
+    preventDefault: true,
+    events: [{ type: 'navigate', direction: 'next' }],
+  })
+
+  let prevented = false
+  runtime.getRootKeyboardHandler()({ ...keyInput('ArrowDown'), preventDefault: () => { prevented = true } })
+  expectEqual('public contract root keyboard prevents default', prevented, true)
+  expectDeepEqual('public contract root keyboard emits event', enumerableEvent(emitted.at(-1)), { type: 'navigate', direction: 'next' })
+  expectEqual('public contract root keyboard emits keyboard reason', emitted.at(-1)?.meta?.reason, 'keyboard')
+
+  runtime.getItemProps('option', 'beta').onClick()
+  expectDeepEqual('public contract pointer select event', enumerableEvent(emitted.at(-1)), {
+    type: 'select',
+    keys: ['beta'],
+    anchorKey: 'beta',
+    extentKey: 'beta',
+  })
+  expectEqual('public contract pointer select reason', emitted.at(-1)?.meta?.reason, 'pointer')
+
+  expectEqual('public contract navigate reducer activeKey', coreRuntime.reducePatternData(definition, data, { type: 'navigate', direction: 'next' }).state?.activeKey, 'beta')
+  expectEqual('public contract transition reducer activeKey', coreRuntime.reducePatternData(definition, data, { type: 'activate', key: 'beta' }).state?.activeKey, 'beta')
+  expectDeepEqual('public contract select reducer state', pick(coreRuntime.reducePatternData(definition, data, {
+    type: 'select',
+    keys: ['beta', 'gamma'],
+    anchorKey: 'beta',
+    extentKey: 'gamma',
+  }).state, ['activeKey', 'selectedKeys', 'anchorKey', 'extentKey']), {
+    activeKey: 'gamma',
+    selectedKeys: ['beta', 'gamma'],
+    anchorKey: 'beta',
+    extentKey: 'gamma',
+  })
+  expectDeepEqual('public contract expand reducer keys', coreRuntime.reducePatternData(definition, data, { type: 'expand', key: 'beta', expanded: true }).state?.expandedKeys, ['alpha', 'beta'])
+  expectEqual('public contract check reducer value', coreRuntime.reducePatternData(definition, data, { type: 'check', key: 'beta', checked: true }).state?.checkedByKey?.beta, true)
+  expectEqual('public contract press reducer default value', coreRuntime.reducePatternData(definition, data, { type: 'press', key: 'gamma' }).state?.pressedByKey?.gamma, true)
+  expectEqual('public contract value reducer value', coreRuntime.reducePatternData(definition, data, { type: 'value', key: 'beta', value: 42 }).state?.valueByKey?.beta, 42)
+  expectDeepEqual('public contract focus reducer reason', pick(coreRuntime.reducePatternData(definition, data, {
+    type: 'focus',
+    key: 'beta',
+    meta: { reason: 'focus' },
+  }).state, ['activeKey', 'lastEventReason']), { activeKey: 'beta', lastEventReason: 'focus' })
+  expectEqual('public contract reducer does not mutate input activeKey', data.state?.activeKey, 'alpha')
+
+  expectSchemaFailure(
+    'public contract rejects unknown top-level PatternData fields',
+    coreRuntime.PatternDataSchema.safeParse({ ...fixture.data, unexpected: true }),
+  )
+  expectSchemaFailure(
+    'public contract rejects non-JSON item extension values',
+    coreRuntime.PatternDataSchema.safeParse({
+      ...fixture.data,
+      items: {
+        ...fixture.data.items,
+        alpha: { ...fixture.data.items.alpha, nonJson: Number.POSITIVE_INFINITY },
+      },
+    }),
+  )
+  expectSchemaFailure(
+    'public contract rejects unknown relation keys',
+    coreRuntime.PatternDataSchema.safeParse({
+      ...fixture.data,
+      relations: { ...fixture.data.relations, rootKeys: ['missing'] },
+    }),
+  )
+  expectSchemaFailure(
+    'public contract rejects unknown event fields',
+    coreRuntime.PatternEventSchema.safeParse({ type: 'focus', key: 'alpha', extra: true }),
+  )
+}
+
+function keyInput(key) {
+  return { key, ctrlKey: false, shiftKey: false, altKey: false, metaKey: false }
+}
+
+function enumerableEvent(event) {
+  return event ? { ...event } : event
+}
+
+function pick(value, keys) {
+  const source = value ?? {}
+  return Object.fromEntries(keys.filter((key) => Object.hasOwn(source, key)).map((key) => [key, source[key]]))
+}
+
+function expectSchemaFailure(label, result) {
+  if (result.success) failures.push(`${label}: expected schema failure`)
+}
+
+function expectEqual(label, actual, expected) {
+  try {
+    assert.equal(actual, expected)
+  } catch (error) {
+    failures.push(`${label}: ${error.message}`)
+  }
+}
+
+function expectDeepEqual(label, actual, expected) {
+  try {
+    assert.deepEqual(actual, expected)
+  } catch (error) {
+    failures.push(`${label}: ${error.message}`)
+  }
+}
+
+function formatSchemaIssues(error) {
+  return error.issues
+    .map((issue) => `${issue.path.join('.') || '<root>'}: ${issue.message}`)
+    .join('; ')
 }
 
 function assertClassifiedPublicExports(label, exports, classify, entrypoint) {

@@ -167,6 +167,25 @@ surface from useful but narrower helper surfaces.
 | React data/state/owner helpers | Narrow adapter/helper | Command surface factories, controlled dialog hooks, and autocomplete listbox ownership bridge common app-owned workflows | These helpers should stay narrower than `PatternData`; avoid turning them into a second domain model |
 | Root entry `@interactive-os/aria` | Compatibility aggregate | It mirrors `@interactive-os/aria/core` and remains React-free | New non-React code should prefer `@interactive-os/aria/core` so import intent stays explicit |
 
+## Semantic Contract Fixtures
+
+`scripts/fixtures/public-api-contract.json` is a durable public API fixture.
+`npm run check:api` loads it through the built `@interactive-os/aria/core`
+entrypoint and verifies these long-lived contracts:
+
+- `PatternDefinitionSchema`, `PatternDataSchema`, and `PatternEventSchema`
+  accept the canonical serializable descriptor, data, and event shapes.
+- `createPatternRuntime` preserves visible order, semantic root/item props,
+  item state projection, keyboard event emission, and pointer event emission.
+- `reducePatternData` preserves the core data-in/events-out state transition
+  meanings for focus, navigation, selection, expansion, check, press, value,
+  and declarative transition events.
+- Invalid top-level data fields, non-JSON extension values, unknown relation
+  keys, and unknown event fields remain rejected.
+
+The fixture is not exhaustive APG behavior coverage. It is the minimum semantic
+compatibility anchor for the permanent core contract.
+
 ## Not A Stability Contract
 
 These details may change without being treated as package identity:
@@ -229,7 +248,8 @@ and controls that do not improve APG behavior inspection.
 Run the smallest gate that covers the change, then widen when the change touches
 published behavior or package metadata.
 
-- `npm run check:api` verifies `API.md` against declaration exports.
+- `npm run check:api` verifies `API.md` against declaration exports and the
+  public semantic contract fixture.
 - `npm run check:exports` verifies public entrypoint resolution.
 - `npm run check:react-peer` verifies the optional React peer boundary.
 - `npm run check:publish` verifies package metadata and packed contents.
