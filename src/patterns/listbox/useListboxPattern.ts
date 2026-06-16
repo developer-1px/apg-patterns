@@ -92,7 +92,15 @@ function createListboxRootProps(runtime: PatternRuntime, typeahead: ApgTypeahead
     onKeyDown: (event) => {
       if (handleListboxMultiKeyDown(runtime, event)) return
       const query = typeahead.feed(event as Parameters<typeof typeahead.feed>[0])
-      const match = resolveListboxTypeaheadTarget(query, runtime)
+      const match = query && runtime.options.typeaheadEnabled !== false
+        ? findApgTypeaheadMatch(
+            runtime.visibleKeys.map((key) => ({
+              item: key,
+              label: getPatternItemTextValue(runtime.data, key),
+            })),
+            query,
+          )
+        : null
       if (match) {
         event.preventDefault()
         runtime.emit({ type: 'focus', key: match, meta: { reason: 'typeahead' } })
@@ -101,15 +109,4 @@ function createListboxRootProps(runtime: PatternRuntime, typeahead: ApgTypeahead
       baseKeyDown?.(event)
     },
   }
-}
-
-function resolveListboxTypeaheadTarget(query: string | null, runtime: PatternRuntime): Key | null {
-  if (!query || runtime.options.typeaheadEnabled === false) return null
-  return findApgTypeaheadMatch(
-    runtime.visibleKeys.map((key) => ({
-      item: key,
-      label: getPatternItemTextValue(runtime.data, key),
-    })),
-    query,
-  )
 }
