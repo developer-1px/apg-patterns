@@ -98,16 +98,13 @@ export function createRadioGroupPatternData(
     options.selectedKeys?.[0] ??
     items.find((item) => item.selected === true || item.checked === true)?.key ??
     fallbackActiveKey(rootKeys, disabledKeys, options.activeKey)
+  const activeKey = options.activeKey ?? selectedKey
 
   return parsePatternData({
     items: commandItemsRecord(items),
     relations: { rootKeys },
     state: {
-      activeKey: fallbackActiveKey(
-        rootKeys,
-        disabledKeys,
-        options.activeKey ?? selectedKey,
-      ),
+      activeKey,
       selectedKeys: selectedKey ? [selectedKey] : [],
       ...(disabledKeys.length > 0 ? { disabledKeys } : {}),
       ...options.state,
