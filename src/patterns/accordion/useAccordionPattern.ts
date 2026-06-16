@@ -2,10 +2,44 @@ import { accordionDefinition } from './definition'
 import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
-import { reactProps } from '../../adapters/reactBaseTypes'
-import type { ReactAccordionRenderItem, ReactAccordionRuntime } from '../../adapters/reactTypes'
+import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 import { getPatternItemLabel, getPatternItemTextValue } from '../../internal/patternItemText'
+
+export interface ReactAccordionRenderItem {
+  kind: 'section'
+  key: Key
+  label: string
+  textValue: string
+  panelKey: Key | null
+  state: {
+    active: boolean
+    expanded: boolean
+    disabled: boolean
+  }
+  headerProps: ReactPatternProps
+  panelProps: ReactPatternProps | null
+}
+
+export interface ReactAccordionRuntime {
+  rootProps: ReactPatternProps
+  renderItems: readonly ReactAccordionRenderItem[]
+  state: {
+    activeKey: Key | null
+    expandedKeys: readonly Key[]
+    disabledKeys: readonly Key[]
+  }
+  actions: {
+    focus(key: Key): void
+    toggle(key: Key): void
+    expand(key: Key): void
+    collapse(key: Key): void
+  }
+  ids: {
+    forKey(key: Key): string
+  }
+  keyToElementId(key: Key): string
+}
 
 export function useAccordionPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactAccordionRuntime {
   const mergedOptions: PatternOptions = { ...options }

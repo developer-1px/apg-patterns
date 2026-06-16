@@ -1,7 +1,6 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
-import type { ReactAccordionRenderItem } from './reactTypes'
-import { useAccordionPattern } from './useAccordionPattern'
+import { useAccordionPattern, type ReactAccordionRenderItem } from './useAccordionPattern'
 
 type AccordionDataItem = PatternItem & {
   content?: string
