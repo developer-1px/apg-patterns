@@ -1,8 +1,8 @@
 import type { SlotProps } from '../../kernel/patternRuntime'
 import type { ReactPatternProps, ReactRenderItemState } from '../../adapters/reactBaseTypes'
 import type { Key } from '../../schema'
-import type { TreeviewRuntime } from './runtime'
-import { createParentByKey, resolveVisibleOrder } from '../../kernel/patternKernel'
+import type { TreeviewRenderState, TreeviewRuntime } from './runtime'
+import { createParentByKey } from '../../kernel/patternKernel'
 import { getPatternItemLabel, getPatternItemTextValue } from '../../internal/patternItemText'
 
 export type ReactTreeviewRenderItem =
@@ -84,7 +84,7 @@ export function adaptTreeviewRuntime(runtime: TreeviewRuntime): ReactTreeviewRun
       return getTreeProps()
     },
     get renderItems() {
-      return createTreeviewRenderItems(runtime, getTreeItemProps, getIndicatorProps)
+      return createTreeviewRenderItems(runtime)
     },
     get state() {
       return {
@@ -128,11 +128,7 @@ function adaptTreeviewIndicatorProps(props: SlotProps): ReactPatternProps {
   } as ReactPatternProps
 }
 
-function createTreeviewRenderItems(
-  runtime: TreeviewRuntime,
-  getTreeItemProps: (key: Key) => ReactPatternProps,
-  getIndicatorProps: (key: Key) => ReactPatternProps,
-): readonly ReactTreeviewRenderItem[] {
+function createTreeviewRenderItems(runtime: TreeviewRuntime): readonly ReactTreeviewRenderItem[] {
   const parentByKey = createParentByKey(runtime.data)
   const indexInParentByKey = new Map<Key, number>()
   for (const [index, key] of (runtime.data.relations?.rootKeys ?? []).entries()) {
@@ -143,8 +139,8 @@ function createTreeviewRenderItems(
       indexInParentByKey.set(key, index + 1)
     }
   }
-  const visibleKeys = resolveVisibleOrder(runtime.definition.navigation.visibleOrder, runtime.data)
-  return visibleKeys.map((key) => {
+  return runtime.items.map((item) => {
+    const key = item.key
     const hasChildren = (runtime.data.relations?.childrenByKey?.[key]?.length ?? 0) > 0
     const base = {
       key,
@@ -153,37 +149,36 @@ function createTreeviewRenderItems(
       level: runtime.data.state?.levelByKey?.[key] ?? 1,
       parentKey: parentByKey.get(key) ?? null,
       indexInParent: indexInParentByKey.get(key) ?? 1,
-      treeitemProps: getTreeItemProps(key),
+      treeitemProps: adaptTreeviewProps(item.slotProps.treeitem),
     }
     if (!hasChildren) {
       return {
         kind: 'leaf',
         ...base,
-        state: getTreeItemRenderState(runtime, key, false),
+        state: getTreeItemRenderState(item.state, false),
       }
     }
     return {
       kind: 'branch',
       ...base,
-      state: getTreeItemRenderState(runtime, key, true),
-      toggleButtonProps: getIndicatorProps(key),
+      state: getTreeItemRenderState(item.state, true),
+      toggleButtonProps: adaptTreeviewIndicatorProps(item.slotProps.indicator ?? {}),
     }
   })
 }
 
-function getTreeItemRenderState(runtime: TreeviewRuntime, key: Key, branch: false): ReactRenderItemState
-function getTreeItemRenderState(runtime: TreeviewRuntime, key: Key, branch: true): ReactRenderItemState & { expanded: boolean; toggleDisabled: boolean }
-function getTreeItemRenderState(runtime: TreeviewRuntime, key: Key, branch: boolean): ReactRenderItemState | (ReactRenderItemState & { expanded: boolean; toggleDisabled: boolean }) {
-  const state = runtime.getTreeItemState(key)
+function getTreeItemRenderState(state: TreeviewRenderState, branch: false): ReactRenderItemState
+function getTreeItemRenderState(state: TreeviewRenderState, branch: true): ReactRenderItemState & { expanded: boolean; toggleDisabled: boolean }
+function getTreeItemRenderState(state: TreeviewRenderState, branch: boolean): ReactRenderItemState | (ReactRenderItemState & { expanded: boolean; toggleDisabled: boolean }) {
   const base = {
-    active: Boolean(state.active),
-    selected: Boolean(state.selected),
-    disabled: Boolean(state.disabled),
+    active: state.active,
+    selected: state.selected,
+    disabled: state.disabled,
   }
   if (!branch) return base
   return {
     ...base,
-    expanded: Boolean(state.expanded),
-    toggleDisabled: Boolean(state.disabled),
+    expanded: state.expanded,
+    toggleDisabled: state.disabled,
   }
 }
