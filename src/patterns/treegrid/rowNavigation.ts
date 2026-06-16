@@ -4,9 +4,8 @@ import { cellRowKey, visibleRowKeys } from './geometry'
 
 const PAGE_STEP = 10
 
-const activeRowKey = (ctx: { activeKey: Key | null; data: PatternData }): Key | null => {
+const activeRowKey = (ctx: { activeKey: Key | null; data: PatternData }, rows: readonly Key[]): Key | null => {
   if (!ctx.activeKey) return null
-  const rows = visibleRowKeys(ctx.data)
   if (rows.includes(ctx.activeKey)) return ctx.activeKey
   return cellRowKey(ctx.data, ctx.activeKey)
 }
@@ -23,7 +22,7 @@ defineNavigationTarget('treegridRow', (target, ctx) => {
   if (rows.length === 0) return null
   if (action === 'gridStart') return rows[0] ?? null
   if (action === 'gridEnd') return rows[rows.length - 1] ?? null
-  const current = activeRowKey(ctx)
+  const current = activeRowKey(ctx, rows)
   if (!current) return rows[0] ?? null
   const idx = rows.indexOf(current)
   if (idx === -1) return null
@@ -36,7 +35,7 @@ defineNavigationTarget('treegridRowPage', (target, ctx) => {
   const direction = target.direction ?? 'down'
   const rows = visibleRowKeys(ctx.data)
   if (rows.length === 0) return null
-  const current = activeRowKey(ctx)
+  const current = activeRowKey(ctx, rows)
   if (!current) return rows[0] ?? null
   const idx = rows.indexOf(current)
   if (idx === -1) return null
