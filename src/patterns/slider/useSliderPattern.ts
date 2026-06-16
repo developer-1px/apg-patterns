@@ -1,12 +1,17 @@
 import type { KeyboardEvent, PointerEvent } from 'react'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
-import { PatternDataSchema, PatternOptionsSchema, type Key, type PatternEvent, type PatternOptions } from '../../schema'
+import { PatternDataSchema, PatternOptionsSchema, type Key, type PatternData, type PatternEvent, type PatternItem, type PatternOptions } from '../../schema'
 import { dispatchReactKeyboardBinding, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { withDefaultReason } from '../../kernel/domEventBindings'
 import { sliderDefinition } from './definition'
-import { getSliderRuntimeState, isMultiThumbSlider, type SliderPatternData } from './sliderRuntimeState'
 import { usePatternElementId } from '../../adapters/reactDomIds'
+
+type SliderPatternData = PatternData<PatternItem & {
+  valuemin?: number
+  valuemax?: number
+  valuetext?: string
+}>
 
 export interface ReactSliderRenderItem {
   key: Key
@@ -98,6 +103,20 @@ function createSliderRenderItem(runtime: PatternRuntime<SliderPatternData>, key:
       runtime.emit(withDefaultReason({ type: 'value', key, value: valueFromSliderPointer({ event, min, max, orientation, step }) }, 'pointer'))
     },
   }
+}
+
+function getSliderRuntimeState(runtime: PatternRuntime<SliderPatternData>): ReactSliderRuntime['state'] {
+  return {
+    activeKey: runtime.data.state?.activeKey ?? null,
+    valueByKey: runtime.data.state?.valueByKey ?? {},
+  }
+}
+
+function isMultiThumbSlider(runtime: PatternRuntime<SliderPatternData>): boolean {
+  return runtime.visibleKeys.length >= 2 && runtime.visibleKeys.every((key) => {
+    const item = runtime.data.items[key]
+    return typeof item?.valuemin === 'number' || typeof item?.valuemax === 'number'
+  })
 }
 
 function valueFromSliderPointer({

@@ -11,7 +11,7 @@ import { Grid } from '../patterns/grid/Grid'
 import { useLinkPattern } from '../patterns/link/useLinkPattern'
 import { useMenuButtonPattern } from '../patterns/menu/useMenuButtonPattern'
 import { useRadioGroupPattern } from '../patterns/radio/useRadioGroupPattern'
-import { getSliderRuntimeState, isMultiThumbSlider } from '../patterns/slider/sliderRuntimeState'
+import { useSliderPattern } from '../patterns/slider/useSliderPattern'
 import { useSpinbuttonPattern } from '../patterns/spinbutton/useSpinbuttonPattern'
 import { useSwitchPattern } from '../patterns/switch/useSwitchPattern'
 import { useTablePattern } from '../patterns/table/useTablePattern'
@@ -279,6 +279,27 @@ function HelperHost() {
     (event) => menuTriggerEvents.current.push(event),
     { elementIdPrefix: 'menu-button-' },
   )
+  const multiSlider = useSliderPattern(
+    {
+      items: {
+        min: { label: 'Minimum', valuemax: 50 },
+        max: { label: 'Maximum', valuemin: 50 },
+      },
+      relations: { rootKeys: ['min', 'max'] },
+      state: {},
+    },
+    () => undefined,
+    { elementIdPrefix: 'edge-slider-' },
+  )
+  const singleSlider = useSliderPattern(
+    {
+      items: { min: { label: 'Minimum', valuemax: 50 } },
+      relations: { rootKeys: ['min'] },
+      state: { activeKey: 'min', valueByKey: { min: 4 } },
+    },
+    () => undefined,
+    { elementIdPrefix: 'edge-single-slider-' },
+  )
 
   return (
     <div>
@@ -334,23 +355,11 @@ function HelperHost() {
       <button
         type="button"
         onClick={() => {
-          const sliderRuntime = {
-            visibleKeys: ['min', 'max'],
-            data: {
-              items: {
-                min: { valuemax: 50 },
-                max: { valuemin: 50 },
-              },
-              relations: { rootKeys: ['min', 'max'] },
-              state: {},
-            },
-          }
-          const sliderState = getSliderRuntimeState(sliderRuntime as never)
           setResult([
-            sliderState.activeKey ?? 'null',
-            Object.keys(sliderState.valueByKey).length,
-            isMultiThumbSlider(sliderRuntime as never),
-            getSliderRuntimeState({ ...sliderRuntime, visibleKeys: ['min'], data: { ...sliderRuntime.data, state: { activeKey: 'min', valueByKey: { min: 4 } } } } as never).activeKey,
+            multiSlider.state.activeKey ?? 'null',
+            Object.keys(multiSlider.state.valueByKey).length,
+            multiSlider.isMultiThumb,
+            singleSlider.state.activeKey,
           ].map(String).join('|'))
         }}
       >
