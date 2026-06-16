@@ -4,6 +4,7 @@ import { reactProps, type ReactPatternProps, type ReactRenderItemState } from '.
 import { withDefaultReason } from '../../kernel/domEventBindings'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
 import { usePatternElementId } from '../../adapters/reactDomIds'
+import { resolveReactFocusTarget } from '../../adapters/reactElementTargets'
 import type { Key, PatternData, PatternEvent, PatternEventReason, PatternOptions } from '../../schema'
 import { menuButtonDefinition } from './definition'
 import { resolveMenuButtonKey } from './menuButtonKeyboard'
@@ -77,7 +78,7 @@ export function useMenuPattern(data: PatternData, onEvent: (event: PatternEvent)
     if (closeOptions?.emitDismiss !== false) onEvent(dismissEvent)
     onClose?.(dismissEvent)
     if (closeOptions?.restoreFocus === false) return
-    resolveRestoreFocusTarget(restoreFocusTo)?.focus({ preventScroll: true })
+    resolveReactFocusTarget(restoreFocusTo)?.focus({ preventScroll: true })
   }
 
   usePatternEffects({ definition: menuButtonDefinition, data: runtime.data, keyToElementId: runtime.keyToElementId })
@@ -211,13 +212,6 @@ function createMenuRuntimeData(data: PatternData, open: boolean, enabledItemKeys
 function activeEnabledKey(data: PatternData, enabledItemKeys: readonly Key[]): Key | null {
   const activeKey = data.state?.activeKey
   return activeKey && enabledItemKeys.includes(activeKey) ? activeKey : null
-}
-
-function resolveRestoreFocusTarget(target: RestoreFocusTarget | undefined): HTMLElement | null {
-  if (!target) return null
-  if (typeof target === 'function') return target()
-  if (typeof target === 'object' && 'current' in target) return target.current
-  return target
 }
 
 function menuLabelProps(data: PatternData, props: ReactPatternProps): ReactPatternProps {

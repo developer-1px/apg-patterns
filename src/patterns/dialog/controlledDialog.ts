@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, type KeyboardEvent } from 'react'
-import { FOCUSABLE_SELECTOR } from '../../adapters/reactElementTargets'
+import { FOCUSABLE_SELECTOR, resolveReactFocusTarget } from '../../adapters/reactElementTargets'
 import type { Key, PatternData, PatternEvent, PatternEventReason } from '../../schema'
 
 export type ReactDialogFocusTarget =
@@ -44,7 +44,7 @@ export function useControlledDialogFocus({
     wasOpen.current = open
 
     if (opened) focusInitialDialogTarget({ data, keyToElementId, dialogKey, initialFocusKey })
-    if (closed) resolveDialogFocusTarget(restoreFocusTo)?.focus({ preventScroll: true })
+    if (closed) resolveReactFocusTarget(restoreFocusTo)?.focus({ preventScroll: true })
   }, [data, dialogKey, initialFocusKey, keyToElementId, open, restoreFocusTo])
 }
 
@@ -119,11 +119,4 @@ function trapDialogFocus(event: KeyboardEvent<HTMLElement>, dialogElementId: str
     event.preventDefault()
     first.focus()
   }
-}
-
-function resolveDialogFocusTarget(target: ReactDialogFocusTarget | undefined): HTMLElement | null {
-  if (!target) return null
-  if (typeof target === 'function') return target()
-  if ('current' in target) return target.current
-  return target
 }
