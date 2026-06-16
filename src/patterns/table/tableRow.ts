@@ -18,7 +18,12 @@ export interface ReactTableRow {
 
 export function createTableRows(runtime: PatternRuntime): readonly ReactTableRow[] {
   const rowKeys = runtime.data.relations?.rowKeys ?? []
-  const cellKeysByRow = createCellKeysByRow(runtime.data.relations?.cells ?? [])
+  const cellKeysByRow = new Map<Key, Key[]>()
+  for (const cell of runtime.data.relations?.cells ?? []) {
+    const cellKeys = cellKeysByRow.get(cell.rowKey)
+    if (cellKeys) cellKeys.push(cell.cellKey)
+    else cellKeysByRow.set(cell.rowKey, [cell.cellKey])
+  }
   return rowKeys.map((rowKey) => {
     const cellKeys = cellKeysByRow.get(rowKey) ?? []
     return {
@@ -27,16 +32,6 @@ export function createTableRows(runtime: PatternRuntime): readonly ReactTableRow
       cells: cellKeys.map((cellKey) => createTableCell(runtime, cellKey)),
     }
   })
-}
-
-function createCellKeysByRow(cells: readonly { rowKey: Key; cellKey: Key }[]): ReadonlyMap<Key, readonly Key[]> {
-  const cellKeysByRow = new Map<Key, Key[]>()
-  for (const cell of cells) {
-    const cellKeys = cellKeysByRow.get(cell.rowKey)
-    if (cellKeys) cellKeys.push(cell.cellKey)
-    else cellKeysByRow.set(cell.rowKey, [cell.cellKey])
-  }
-  return cellKeysByRow
 }
 
 function createTableCell(runtime: PatternRuntime, cellKey: Key): ReactTableCell {
