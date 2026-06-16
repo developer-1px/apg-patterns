@@ -6,9 +6,6 @@ import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapter
 import { dialogDefinition } from './definition'
 import { getDialogRuntimeKeys } from './dialogRuntimeKeys'
 import { usePatternElementId } from '../../adapters/reactDomIds'
-import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
-
-registerKernelBuiltins()
 
 export interface ReactDialogRuntime {
   open: boolean

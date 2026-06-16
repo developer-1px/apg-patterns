@@ -1,7 +1,6 @@
 import type { KeyboardEvent, MouseEvent } from 'react'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { usePatternElementId } from '../../adapters/reactDomIds'
-import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
 import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { dialogDefinition } from './definition'
@@ -12,8 +11,6 @@ import {
   type ReactControlledDialogConfig,
 } from './controlledDialog'
 import { getDialogRuntimeKeys } from './dialogRuntimeKeys'
-
-registerKernelBuiltins()
 
 export type { ReactControlledDialogConfig, ReactControlledDialogOpenChangeMeta, ReactDialogFocusTarget } from './controlledDialog'
 

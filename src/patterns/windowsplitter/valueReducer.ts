@@ -7,9 +7,6 @@ import type {
   PatternState,
   PatternValueStepDirection,
 } from '../../schema'
-import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
-
-registerKernelBuiltins()
 
 export interface WindowSplitterValueOptions {
   readonly defaultValue?: number

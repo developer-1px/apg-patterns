@@ -6,10 +6,7 @@ import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schem
 import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { alertDialogDefinition } from './definition'
 import { usePatternElementId } from '../../adapters/reactDomIds'
-import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
 import { getAlertDialogRuntimeKeys } from './alertDialogRuntimeKeys'
-
-registerKernelBuiltins()
 
 export interface ReactAlertDialogRuntime {
   open: boolean

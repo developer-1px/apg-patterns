@@ -1,6 +1,5 @@
 import { useLayoutEffect, useMemo, useRef, type KeyboardEvent, type MouseEvent } from 'react'
 import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
-import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
 import { reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
 import { withDefaultReason } from '../../kernel/domEventBindings'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
@@ -8,8 +7,6 @@ import { usePatternElementId } from '../../adapters/reactDomIds'
 import type { Key, PatternData, PatternEvent, PatternEventReason, PatternOptions } from '../../schema'
 import { menuButtonDefinition } from './definition'
 import { resolveMenuButtonKey } from './menuButtonKeyboard'
-
-registerKernelBuiltins()
 
 type MenuDismissEvent = Extract<PatternEvent, { type: 'dismiss' }>
 type RestoreFocusTarget = HTMLElement | null | { current: HTMLElement | null } | (() => HTMLElement | null)

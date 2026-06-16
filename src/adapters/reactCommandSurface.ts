@@ -2,7 +2,6 @@ import {
   useMemo,
   useState,
 } from 'react'
-import { registerKernelBuiltins } from '../kernel/kernelBuiltins'
 import { reducePatternData } from '../kernel/patternReducer'
 import type {
   Key,
@@ -13,8 +12,6 @@ import type {
   PatternState,
 } from '../schema'
 import { PatternDataSchema } from '../schema'
-
-registerKernelBuiltins()
 
 type ToggleState = boolean | 'mixed'
 type PatternStateAction = PatternState | ((state: PatternState) => PatternState)

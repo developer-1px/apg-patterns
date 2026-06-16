@@ -1,5 +1,4 @@
 import { useLayoutEffect } from 'react'
-import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
 import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
 import { withDefaultReason } from '../../kernel/domEventBindings'
 import type { Key, PatternData, PatternEvent, PatternEventReason, PatternOptions } from '../../schema'
@@ -11,8 +10,6 @@ import { createMenuButtonMenuProps } from './menuButtonMenuProps'
 import { createMenuButtonTriggerProps } from './menuButtonTriggerProps'
 import { getMenuButtonRuntimeState } from './menuButtonRuntimeState'
 import { usePatternElementId } from '../../adapters/reactDomIds'
-
-registerKernelBuiltins()
 
 export interface ReactMenuButtonTriggerState {
   disabled: boolean

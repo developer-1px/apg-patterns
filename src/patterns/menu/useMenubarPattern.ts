@@ -1,5 +1,4 @@
 import { useRef, type KeyboardEvent } from 'react'
-import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
 import { createPatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
@@ -8,8 +7,6 @@ import { menubarDefinition } from './definition'
 import { createMenubarItem, type ReactMenubarItem } from './menubarItem'
 import { getEnabledMenubarKeys } from './menubarNavigation'
 import { usePatternElementId } from '../../adapters/reactDomIds'
-
-registerKernelBuiltins()
 
 export type { ReactMenubarItem } from './menubarItem'
 

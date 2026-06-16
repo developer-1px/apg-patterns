@@ -1,14 +1,11 @@
 import type { KeyboardEvent } from 'react'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
 import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { useReactPatternRuntime } from '../../adapters/reactPatternEffects'
 import { radioGroupDefinition } from './definition'
 import { createRadioRenderItem, type ReactRadioRenderItem } from './radioRenderItem'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 export type { ReactRadioRenderItem } from './radioRenderItem'
-
-registerKernelBuiltins()
 
 export interface ReactRadioGroupOptions extends PatternOptions {
   activationMode?: 'automatic' | 'manual'

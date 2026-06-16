@@ -11,9 +11,6 @@ import type { ReactListboxRenderItem, ReactListboxRuntime } from '../../adapters
 import { handleListboxMultiClick } from './handleListboxMultiClick'
 import { handleListboxMultiKeyDown } from './handleListboxMultiKeyDown'
 import { usePatternElementId } from '../../adapters/reactDomIds'
-import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
-
-registerKernelBuiltins()
 
 export function useListboxPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactListboxRuntime {
   const typeaheadBufferRef = useRef(createApgTypeaheadBuffer())
