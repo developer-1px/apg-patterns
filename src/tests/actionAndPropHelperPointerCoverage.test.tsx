@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import { registerKernelBuiltins } from '../kernel/kernelBuiltins'
 import { defineDomEvent, resolvePartEventBindings, withDefaultReason } from '../kernel/domEventBindings'
@@ -9,7 +9,6 @@ import { useButtonPattern } from '../patterns/button/useButtonPattern'
 import { useCheckboxPattern } from '../patterns/checkbox/useCheckboxPattern'
 import { Grid } from '../patterns/grid/Grid'
 import { useLinkPattern } from '../patterns/link/useLinkPattern'
-import { createMenuButtonTriggerProps } from '../patterns/menu/menuButtonTriggerProps'
 import { useMenuButtonPattern } from '../patterns/menu/useMenuButtonPattern'
 import { useRadioGroupPattern } from '../patterns/radio/useRadioGroupPattern'
 import { getSliderRuntimeState, isMultiThumbSlider } from '../patterns/slider/sliderRuntimeState'
@@ -256,6 +255,30 @@ function HelperHost() {
   const [result, setResult] = useState('')
   const [draft, setDraft] = useState('')
   const [editResult, setEditResult] = useState('')
+  const menuTriggerEvents = useRef<PatternEvent[]>([])
+  const emptyMenuButton = useMenuButtonPattern(
+    { items: {}, relations: { rootKeys: [] }, state: {} },
+    (event) => menuTriggerEvents.current.push(event),
+    { elementIdPrefix: 'menu-button-' },
+  )
+  const closedMenuButton = useMenuButtonPattern(
+    {
+      items: { trigger: { label: 'Trigger' }, menu: { label: 'Menu' } },
+      relations: { rootKeys: ['trigger'], controlsByKey: { trigger: ['menu'] }, childrenByKey: { menu: [] } },
+      state: { expandedKeys: [] },
+    },
+    (event) => menuTriggerEvents.current.push(event),
+    { elementIdPrefix: 'menu-button-' },
+  )
+  const openMenuButton = useMenuButtonPattern(
+    {
+      items: { trigger: { label: 'Trigger' }, menu: { label: 'Menu' }, first: { label: 'First' } },
+      relations: { rootKeys: ['trigger'], controlsByKey: { trigger: ['menu'] }, childrenByKey: { menu: ['first'] } },
+      state: { activeKey: 'first', expandedKeys: ['trigger'] },
+    },
+    (event) => menuTriggerEvents.current.push(event),
+    { elementIdPrefix: 'menu-button-' },
+  )
 
   return (
     <div>
@@ -287,15 +310,10 @@ function HelperHost() {
       <button
         type="button"
         onClick={() => {
-          const events: PatternEvent[] = []
-          const runtime = {
-            getPartProps: () => ({ role: 'button', onKeyDown: () => events.push({ type: 'activate', key: 'fallback' }) }),
-            keyToElementId: (key: string) => `menu-button-${key}`,
-          }
-          const data: PatternData = { items: {}, relations: {}, state: {} }
-          const empty = createMenuButtonTriggerProps({ runtime: runtime as never, data, triggerKey: null, itemKeys: [], expanded: false, onEvent: (event) => events.push(event) })
-          const closed = createMenuButtonTriggerProps({ runtime: runtime as never, data, triggerKey: 'trigger', itemKeys: [], expanded: false, onEvent: (event) => events.push(event) })
-          const open = createMenuButtonTriggerProps({ runtime: runtime as never, data, triggerKey: 'trigger', itemKeys: ['first'], expanded: true, onEvent: (event) => events.push(event) })
+          menuTriggerEvents.current = []
+          const empty = emptyMenuButton.triggerProps
+          const closed = closedMenuButton.triggerProps
+          const open = openMenuButton.triggerProps
           const eventBase = {
             altKey: false,
             ctrlKey: false,
@@ -308,7 +326,7 @@ function HelperHost() {
           }
           closed.onKeyDown?.({ ...eventBase, key: 'ArrowUp', code: 'ArrowUp' } as never)
           open.onKeyDown?.({ ...eventBase, key: 'Escape', code: 'Escape' } as never)
-          setResult(`${Object.keys(empty).length}|${closed.id}|${events.map((event) => `${event.type}:${'key' in event ? event.key ?? '' : ''}`).join('|')}`)
+          setResult(`${Object.keys(empty).length}|${closed.id}|${menuTriggerEvents.current.map((event) => `${event.type}:${'key' in event ? event.key ?? '' : ''}`).join('|')}`)
         }}
       >
         Run menu trigger props

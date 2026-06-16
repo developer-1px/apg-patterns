@@ -1,13 +1,12 @@
-import { useLayoutEffect } from 'react'
+import { useLayoutEffect, type KeyboardEvent } from 'react'
 import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
 import { withDefaultReason } from '../../kernel/domEventBindings'
 import type { Key, PatternData, PatternEvent, PatternEventReason, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
-import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { createReactKeyboardHandler, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { menuButtonDefinition } from './definition'
 import { createMenuButtonItem, type ReactMenuButtonItem } from './menuButtonItem'
-import { createMenuButtonMenuProps } from './menuButtonMenuProps'
-import { createMenuButtonTriggerProps } from './menuButtonTriggerProps'
+import { resolveMenuButtonKey } from './menuButtonKeyboard'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 
 export interface ReactMenuButtonTriggerState {
@@ -75,10 +74,69 @@ export function useMenuButtonPattern(data: PatternData, onEvent: (event: Pattern
       }
     },
     get triggerProps() {
-      return createMenuButtonTriggerProps({ runtime, data, triggerKey, itemKeys, expanded, onEvent })
+      if (!triggerKey) return {}
+      const props = reactProps(runtime.getPartProps('trigger', triggerKey))
+      const disabled = Boolean(runtime.getItemState(triggerKey, 'trigger').disabled)
+      return {
+        ...props,
+        id: runtime.keyToElementId(triggerKey),
+        onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
+          if (disabled) {
+            props.onKeyDown?.(event)
+            return
+          }
+          if (!expanded && (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ')) {
+            event.preventDefault()
+            onEvent({ type: 'expand', key: triggerKey, expanded: true, meta: { reason: 'open' } })
+            if (itemKeys[0]) onEvent({ type: 'focus', key: itemKeys[0], meta: { reason: 'open' } })
+            return
+          }
+          if (!expanded && event.key === 'ArrowUp') {
+            event.preventDefault()
+            onEvent({ type: 'expand', key: triggerKey, expanded: true, meta: { reason: 'open' } })
+            if (itemKeys.length > 0) onEvent({ type: 'focus', key: itemKeys[itemKeys.length - 1]!, meta: { reason: 'open' } })
+            return
+          }
+          if (expanded && event.key === 'Escape') {
+            event.preventDefault()
+            onEvent(withDefaultReason({ type: 'expand', key: triggerKey, expanded: false }, 'keyboard'))
+            return
+          }
+          props.onKeyDown?.(event)
+        },
+      }
     },
     get menuProps() {
-      return createMenuButtonMenuProps({ runtime, data, triggerKey, menuKey, itemKeys, focusStrategy, onEvent, closeAndFocusTrigger, activateActiveItem })
+      if (!menuKey || !triggerKey) return {}
+      const props = reactProps(runtime.getPartProps('menu', menuKey))
+      const rootKeyDown = createReactKeyboardHandler(runtime.getRootKeyboardHandler())
+      return {
+        ...props,
+        tabIndex: focusStrategy === 'ariaActiveDescendant' ? 0 : -1,
+        onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
+          if (event.key === 'Escape') {
+            event.preventDefault()
+            closeAndFocusTrigger('keyboard')
+            return
+          }
+          if (event.key === 'Tab') {
+            onEvent({ type: 'expand', key: triggerKey, expanded: false, meta: { reason: 'keyboard' } })
+            return
+          }
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault()
+            activateActiveItem('keyboard')
+            return
+          }
+          const nextKey = resolveMenuButtonKey(event.key, itemKeys, data.state?.activeKey, data)
+          if (nextKey) {
+            event.preventDefault()
+            onEvent({ type: 'focus', key: nextKey, meta: { reason: 'keyboard' } })
+            return
+          }
+          rootKeyDown(event)
+        },
+      }
     },
     get items() {
       return itemKeys.map((key) => createMenuButtonItem({ runtime, data, key, onEvent, closeAndFocusTrigger }))
