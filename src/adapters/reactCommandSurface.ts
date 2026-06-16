@@ -123,7 +123,14 @@ export function createMenuButtonPatternData(
 
   const itemKeys = menuItems.map((item) => item.key)
   const disabledKeys = commandDisabledKeys(menuItems, options.disabledKeys)
-  const checkedByKey = commandCheckedByKey(menuItems, options.checkedByKey)
+  const checkedByKey = {
+    ...options.checkedByKey,
+    ...Object.fromEntries(
+      menuItems
+        .filter((item) => item.checked !== undefined)
+        .map((item) => [item.key, item.checked as ToggleState]),
+    ),
+  }
 
   return PatternDataSchema.parse({
     items: {
@@ -251,20 +258,6 @@ function commandDisabledKeys(
     ...disabledKeys,
     ...items.filter((item) => item.disabled === true).map((item) => item.key),
   ])]
-}
-
-function commandCheckedByKey(
-  items: readonly CommandSurfaceItem[],
-  checkedByKey: Record<Key, ToggleState> = {},
-): Record<Key, ToggleState> {
-  return {
-    ...checkedByKey,
-    ...Object.fromEntries(
-      items
-        .filter((item) => item.checked !== undefined)
-        .map((item) => [item.key, item.checked as ToggleState]),
-    ),
-  }
 }
 
 function fallbackActiveKey(
