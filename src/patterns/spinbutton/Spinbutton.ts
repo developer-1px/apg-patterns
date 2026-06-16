@@ -1,4 +1,4 @@
-import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
+import { createElement, type ReactNode } from 'react'
 import type { Key, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import { useSpinbuttonPattern, type ReactSpinbuttonRenderItem, type SpinbuttonData } from './useSpinbuttonPattern'
 
@@ -6,8 +6,6 @@ type SpinbuttonDataItem = PatternItem & {
   valuemin?: number
   valuemax?: number
 }
-
-type DivProps = ComponentPropsWithoutRef<'div'>
 
 export interface SpinbuttonProps<TItem extends SpinbuttonDataItem = SpinbuttonDataItem> {
   data: SpinbuttonData & { items: Record<Key, TItem> }
@@ -22,13 +20,13 @@ export function Spinbutton<TItem extends SpinbuttonDataItem = SpinbuttonDataItem
 
   return createElement(
     'div',
-    { ...spinbutton.rootProps, className } as DivProps,
+    { ...spinbutton.rootProps, className },
     spinbutton.renderItems.map((item) =>
-      createElement('div', { key: item.key } as DivProps & { key: Key }, [
-        createElement('button', { key: `${item.key}-decrement`, ...item.decrementButtonProps } as ComponentPropsWithoutRef<'button'>, '-'),
-        createElement('div', { key: `${item.key}-spinbutton`, ...item.spinbuttonProps } as DivProps, renderSpinbutton?.(item, data.items[item.key]) ?? `${item.label} ${item.value}`),
-        createElement('button', { key: `${item.key}-increment`, ...item.incrementButtonProps } as ComponentPropsWithoutRef<'button'>, '+'),
-      ]),
+      createElement('div', { key: item.key },
+        createElement('button', item.decrementButtonProps, '-'),
+        createElement('div', item.spinbuttonProps, renderSpinbutton?.(item, data.items[item.key]) ?? `${item.label} ${item.value}`),
+        createElement('button', item.incrementButtonProps, '+'),
+      ),
     ),
   )
 }

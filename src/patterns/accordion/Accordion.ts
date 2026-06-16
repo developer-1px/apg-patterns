@@ -1,12 +1,10 @@
-import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
-import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
+import { createElement, type ReactNode } from 'react'
+import type { PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import { useAccordionPattern, type ReactAccordionRenderItem } from './useAccordionPattern'
 
 type AccordionDataItem = PatternItem & {
   content?: string
 }
-
-type DivProps = ComponentPropsWithoutRef<'div'>
 
 export interface AccordionProps<TItem extends AccordionDataItem = AccordionDataItem> {
   data: PatternData<TItem>
@@ -29,17 +27,17 @@ export function Accordion<TItem extends AccordionDataItem = AccordionDataItem>({
 
   return createElement(
     'div',
-    { ...accordion.rootProps, className } as DivProps,
+    { ...accordion.rootProps, className },
     accordion.renderItems.map((item) => {
       const panelItem = item.panelKey ? data.items[item.panelKey] : undefined
-      return createElement('div', { key: item.key } as DivProps & { key: Key }, [
-        createElement('h3', { key: `${item.key}-heading` } as ComponentPropsWithoutRef<'h3'>, [
-          createElement('button', { key: `${item.key}-button`, ...item.headerProps } as ComponentPropsWithoutRef<'button'>, renderHeader?.(item, data.items[item.key]) ?? item.label),
-        ]),
+      return createElement('div', { key: item.key },
+        createElement('h3', null,
+          createElement('button', item.headerProps, renderHeader?.(item, data.items[item.key]) ?? item.label),
+        ),
         item.state.expanded && item.panelProps
-          ? createElement('div', { key: `${item.key}-panel`, ...item.panelProps } as DivProps, renderPanel?.(item, panelItem) ?? panelItem?.content ?? panelItem?.label ?? null)
+          ? createElement('div', item.panelProps, renderPanel?.(item, panelItem) ?? panelItem?.content ?? panelItem?.label ?? null)
           : null,
-      ])
+      )
     }),
   )
 }
