@@ -158,13 +158,9 @@ function normalizeMatchKey(key: string): string {
 }
 
 function resolveMod(): 'Meta' | 'Control' {
-  return isAppleOS() ? 'Meta' : 'Control'
-}
-
-function isAppleOS(): boolean {
-  if (typeof navigator === 'undefined') return false
+  if (typeof navigator === 'undefined') return 'Control'
   const platform = (navigator as Navigator & { userAgentData?: { platform?: string } }).userAgentData?.platform
     ?? navigator.platform
     ?? ''
-  return /Mac|iPhone|iPad|iPod/i.test(platform)
+  return /Mac|iPhone|iPad|iPod/i.test(platform) ? 'Meta' : 'Control'
 }
