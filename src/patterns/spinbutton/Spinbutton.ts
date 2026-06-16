@@ -1,7 +1,6 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
 import type { Key, PatternEvent, PatternItem, PatternOptions } from '../../schema'
-import type { ReactSpinbuttonRenderItem, SpinbuttonData } from './spinbuttonRenderItem'
-import { useSpinbuttonPattern } from './useSpinbuttonPattern'
+import { useSpinbuttonPattern, type ReactSpinbuttonRenderItem, type SpinbuttonData } from './useSpinbuttonPattern'
 
 type SpinbuttonDataItem = PatternItem & {
   valuemin?: number
