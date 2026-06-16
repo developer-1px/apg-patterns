@@ -4,8 +4,6 @@ import { resolveElementTarget } from './reactElementTargets'
 import { containsActiveElement, resolveFocusEffectTarget } from './reactFocusEffectTarget'
 
 type EffectDefinition = NonNullable<PatternDefinition['effects']>[number]
-type FocusEffect = Extract<EffectDefinition, { kind: 'focus' }>
-type RestoreFocusEffect = Extract<EffectDefinition, { kind: 'restoreFocus' }>
 
 export function runPatternEffects({
   definition,
@@ -25,20 +23,16 @@ export function runPatternEffects({
     const matches = evaluatePredicate(effect.when ?? { kind: 'always' }, ctx)
     nextMatches[index] = matches
     if (!shouldRunEffect({ effect, matches, previousMatches: previousMatches[index], data, definition, keyToElementId })) continue
-    if (effect.kind === 'focus') runFocusEffect(effect, data, keyToElementId)
-    if (effect.kind === 'restoreFocus') runRestoreFocusEffect(effect, data, keyToElementId)
+    if (effect.kind === 'focus') {
+      const target = resolveFocusEffectTarget(effect.target, data, keyToElementId)
+      target?.focus({ preventScroll: effect.preventScroll ?? Boolean(effect.on) })
+    }
+    if (effect.kind === 'restoreFocus') {
+      const target = resolveElementTarget(effect.target, data, keyToElementId)
+      target?.focus({ preventScroll: effect.preventScroll })
+    }
   }
   return nextMatches
-}
-
-function runFocusEffect(effect: FocusEffect, data: PatternData, keyToElementId: (key: Key) => string) {
-  const target = resolveFocusEffectTarget(effect.target, data, keyToElementId)
-  target?.focus({ preventScroll: effect.preventScroll ?? Boolean(effect.on) })
-}
-
-function runRestoreFocusEffect(effect: RestoreFocusEffect, data: PatternData, keyToElementId: (key: Key) => string) {
-  const target = resolveElementTarget(effect.target, data, keyToElementId)
-  target?.focus({ preventScroll: effect.preventScroll })
 }
 
 function shouldRunEffect({
