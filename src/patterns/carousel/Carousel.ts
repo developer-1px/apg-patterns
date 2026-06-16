@@ -1,7 +1,6 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions, PatternState } from '../../schema'
-import type { ReactCarouselSlide } from './carouselSlide'
-import { useCarouselPattern } from './useCarouselPattern'
+import { useCarouselPattern, type ReactCarouselSlide } from './useCarouselPattern'
 
 type CarouselDataItem = PatternItem & {
   title?: unknown

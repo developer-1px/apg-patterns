@@ -1,7 +1,6 @@
-import { createPatternRuntime } from '../../kernel/patternRuntime'
+import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions, PatternState } from '../../schema'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
-import { createCarouselSlides, type ReactCarouselSlide } from './carouselSlide'
 import { carouselDefinition } from './definition'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 
@@ -16,7 +15,19 @@ interface CarouselState extends PatternState {
   showDots?: boolean
 }
 
-export type { ReactCarouselSlide } from './carouselSlide'
+type CarouselData = PatternData<CarouselItem, CarouselState>
+
+export interface ReactCarouselSlide {
+  key: Key
+  title: string
+  caption: string
+  imageUrl: string | null
+  imageAlt: string
+  active: boolean
+  index: number
+  slideProps: ReactPatternProps
+  pickerProps: ReactPatternProps
+}
 
 export interface ReactCarouselRuntime {
   rootProps: ReactPatternProps
@@ -69,4 +80,31 @@ export function useCarouselPattern(data: PatternData<CarouselItem, CarouselState
     },
     keyToElementId: runtime.keyToElementId,
   }
+}
+
+function createCarouselSlides({
+  runtime,
+  data,
+  slideKeys,
+  activeKey,
+}: {
+  runtime: PatternRuntime<CarouselData>
+  data: CarouselData
+  slideKeys: readonly Key[]
+  activeKey: Key | null
+}): readonly ReactCarouselSlide[] {
+  return slideKeys.map((key, index) => {
+    const item = data.items[key]
+    return {
+      key,
+      title: String(item?.title ?? data.items[key]?.label ?? key),
+      caption: String(item?.caption ?? ''),
+      imageUrl: typeof item?.imageUrl === 'string' ? item.imageUrl : null,
+      imageAlt: String(item?.imageAlt ?? item?.caption ?? item?.title ?? data.items[key]?.label ?? key),
+      active: key === activeKey,
+      index,
+      slideProps: reactProps(runtime.getPartProps('slide', key)),
+      pickerProps: reactProps(runtime.getPartProps('picker', key)),
+    }
+  })
 }

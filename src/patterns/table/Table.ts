@@ -1,7 +1,6 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
-import type { ReactTableCell } from './tableRow'
-import { useTablePattern } from './useTablePattern'
+import { useTablePattern, type ReactTableCell } from './useTablePattern'
 
 type DivProps = ComponentPropsWithoutRef<'div'>
 
