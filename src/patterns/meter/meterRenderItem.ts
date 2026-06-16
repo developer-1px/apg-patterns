@@ -17,9 +17,9 @@ export interface ReactMeterRenderItem {
 export function createMeterRenderItem(runtime: PatternRuntime, key: Key): ReactMeterRenderItem {
   const item = runtime.data.items[key]
   const value = Number(runtime.data.state?.valueByKey?.[key] ?? 0)
-  const itemRange = item as { valuemin?: number; valuemax?: number; valuetext?: string } | undefined
-  const min = Number(itemRange?.valuemin ?? runtime.options.min ?? 0)
-  const max = Number(itemRange?.valuemax ?? runtime.options.max ?? 100)
+  const min = Number(item?.valuemin ?? runtime.options.min ?? 0)
+  const max = Number(item?.valuemax ?? runtime.options.max ?? 100)
+  const valueText = typeof item?.valuetext === 'string' ? item.valuetext : undefined
   const ratio = max === min ? 0 : Math.min(1, Math.max(0, (value - min) / (max - min)))
   return {
     key,
@@ -29,7 +29,7 @@ export function createMeterRenderItem(runtime: PatternRuntime, key: Key): ReactM
     max,
     ratio,
     percent: ratio * 100,
-    valueText: itemRange?.valuetext,
+    valueText,
     meterProps: reactProps({
       ...runtime.getPartProps('meter', key),
       'aria-valuemin': min,
