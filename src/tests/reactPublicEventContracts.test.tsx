@@ -34,6 +34,8 @@ import {
   type PatternEvent,
 } from '../react'
 
+type PatternEventPayload = PatternEvent extends infer T ? T extends PatternEvent ? Omit<T, 'meta'> : never : never
+
 describe('React public event contracts', () => {
   it('keeps treeview keyboard and indicator events on the public hook surface', () => {
     const events: PatternEvent[] = []
@@ -42,10 +44,10 @@ describe('React public event contracts', () => {
     fireEvent.keyDown(screen.getByRole('tree'), { key: 'ArrowDown' })
     fireEvent.click(screen.getByRole('button', { name: 'toggle docs' }))
 
-    expect(eventPayload(events[0])).toEqual({ type: 'navigate', direction: 'next' })
-    expect(eventReason(events[0])).toBe('keyboard')
-    expect(eventPayload(events[1])).toEqual({ type: 'expand', key: 'docs', expanded: false })
-    expect(eventReason(events[1])).toBe('pointer')
+    expectEventTrace(events, [
+      { type: 'navigate', direction: 'next' },
+      { type: 'expand', key: 'docs', expanded: false },
+    ], ['keyboard', 'pointer'])
   })
 
   it('keeps tabs keyboard and automatic focus events on the public hook surface', () => {
@@ -55,13 +57,11 @@ describe('React public event contracts', () => {
     fireEvent.keyDown(screen.getByRole('tablist'), { key: 'ArrowDown' })
     fireEvent.focus(screen.getByRole('tab', { name: 'API' }))
 
-    expect(eventPayload(events[0])).toEqual({ type: 'navigate', direction: 'next' })
-    expect(eventReason(events[0])).toBe('keyboard')
-    expect(events.slice(1).map(eventPayload)).toEqual([
+    expectEventTrace([events[0]], [{ type: 'navigate', direction: 'next' }], ['keyboard'])
+    expectEventTrace(events.slice(1), [
       { type: 'focus', key: 'tab-api' },
       { type: 'select', keys: ['tab-api'], anchorKey: 'tab-api', extentKey: 'tab-api' },
-    ])
-    expect(events.slice(1).map(eventReason)).toEqual(['focus', 'focus'])
+    ], ['focus', 'focus'])
   })
 
   it('keeps combobox input and open keyboard events on the public hook surface', () => {
@@ -71,13 +71,11 @@ describe('React public event contracts', () => {
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'alp' } })
     fireEvent.keyDown(screen.getByRole('combobox'), { key: 'ArrowDown' })
 
-    expect(eventPayload(events[0])).toEqual({ type: 'inputValue', key: 'combobox', value: 'alp', inline: false })
-    expect(eventReason(events[0])).toBe('keyboard')
-    expect(events.slice(1).map(eventPayload)).toEqual([
+    expectEventTrace([events[0]], [{ type: 'inputValue', key: 'combobox', value: 'alp', inline: false }], ['keyboard'])
+    expectEventTrace(events.slice(1), [
       { type: 'expand', key: 'combobox', expanded: true },
       { type: 'navigate', direction: 'first' },
-    ])
-    expect(events.slice(1).map(eventReason)).toEqual(['keyboard', 'keyboard'])
+    ], ['keyboard', 'keyboard'])
 
     unmount()
 
@@ -86,12 +84,11 @@ describe('React public event contracts', () => {
 
     fireEvent.mouseDown(screen.getByRole('option', { name: 'Alpha' }))
 
-    expect(pointerEvents.map(eventPayload)).toEqual([
+    expectEventTrace(pointerEvents, [
       { type: 'select', keys: ['alpha'], anchorKey: 'alpha', extentKey: 'alpha' },
       { type: 'expand', key: 'combobox', expanded: false },
       { type: 'commitValue', key: 'alpha', value: 'Alpha' },
-    ])
-    expect(pointerEvents.map(eventReason)).toEqual(['pointer', 'pointer', 'pointer'])
+    ], ['pointer', 'pointer', 'pointer'])
   })
 
   it('keeps dialog Escape and overlay close events on the public hook surface', () => {
@@ -101,10 +98,10 @@ describe('React public event contracts', () => {
     fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' })
     fireEvent.mouseDown(screen.getByTestId('dialog-overlay'))
 
-    expect(eventPayload(events[0])).toEqual({ type: 'expand', key: 'trigger', expanded: false })
-    expect(eventReason(events[0])).toBe('keyboard')
-    expect(eventPayload(events[1])).toEqual({ type: 'expand', key: 'trigger', expanded: false })
-    expect(eventReason(events[1])).toBe('pointer')
+    expectEventTrace(events, [
+      { type: 'expand', key: 'trigger', expanded: false },
+      { type: 'expand', key: 'trigger', expanded: false },
+    ], ['keyboard', 'pointer'])
   })
 
   it('keeps alert dialog activation and close events on the public hook surface', () => {
@@ -113,11 +110,10 @@ describe('React public event contracts', () => {
 
     fireEvent.keyDown(screen.getByRole('alertdialog'), { key: 'Escape' })
 
-    expect(keyboardEvents.map(eventPayload)).toEqual([
+    expectEventTrace(keyboardEvents, [
       { type: 'activate', key: 'cancel' },
       { type: 'expand', key: 'trigger', expanded: false },
-    ])
-    expect(keyboardEvents.map(eventReason)).toEqual(['keyboard', 'keyboard'])
+    ], ['keyboard', 'keyboard'])
 
     unmount()
 
@@ -126,11 +122,10 @@ describe('React public event contracts', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Delete' }))
 
-    expect(pointerEvents.map(eventPayload)).toEqual([
+    expectEventTrace(pointerEvents, [
       { type: 'activate', key: 'confirm' },
       { type: 'expand', key: 'trigger', expanded: false },
-    ])
-    expect(pointerEvents.map(eventReason)).toEqual(['pointer', 'pointer'])
+    ], ['pointer', 'pointer'])
   })
 
   it('keeps listbox keyboard navigation and multi-select pointer events on the public hook surface', () => {
@@ -140,10 +135,10 @@ describe('React public event contracts', () => {
     fireEvent.keyDown(screen.getByRole('listbox'), { key: 'ArrowDown' })
     fireEvent.click(screen.getByRole('option', { name: 'Two' }))
 
-    expect(eventPayload(events[0])).toEqual({ type: 'navigate', direction: 'next' })
-    expect(eventReason(events[0])).toBe('keyboard')
-    expect(eventPayload(events[1])).toEqual({ type: 'select', keys: ['two'], anchorKey: 'two', extentKey: 'two' })
-    expect(eventReason(events[1])).toBe('pointer')
+    expectEventTrace(events, [
+      { type: 'navigate', direction: 'next' },
+      { type: 'select', keys: ['two'], anchorKey: 'two', extentKey: 'two' },
+    ], ['keyboard', 'pointer'])
   })
 
   it('keeps menu button open and activation events on the public hook surface', () => {
@@ -152,22 +147,20 @@ describe('React public event contracts', () => {
 
     fireEvent.keyDown(screen.getByRole('button', { name: 'Actions' }), { key: 'ArrowDown' })
 
-    expect(openingEvents.map(eventPayload)).toEqual([
+    expectEventTrace(openingEvents, [
       { type: 'expand', key: 'trigger', expanded: true },
       { type: 'focus', key: 'copy' },
-    ])
-    expect(openingEvents.map(eventReason)).toEqual(['open', 'open'])
+    ], ['open', 'open'])
 
     const activationEvents: PatternEvent[] = []
     render(<MenuButtonContractHost data={menuButtonOpenData} onEvent={(event) => activationEvents.push(event)} />)
 
     fireEvent.keyDown(screen.getByRole('menu'), { key: 'Enter' })
 
-    expect(activationEvents.map(eventPayload)).toEqual([
+    expectEventTrace(activationEvents, [
       { type: 'activate', key: 'copy' },
       { type: 'expand', key: 'trigger', expanded: false },
-    ])
-    expect(activationEvents.map(eventReason)).toEqual(['keyboard', 'keyboard'])
+    ], ['keyboard', 'keyboard'])
   })
 
   it('keeps grid navigation, sorting, and edit events on the public hook surface', () => {
@@ -178,12 +171,11 @@ describe('React public event contracts', () => {
     fireEvent.keyDown(screen.getByRole('grid'), { key: ' ', ctrlKey: true })
     fireEvent.keyDown(screen.getByRole('grid'), { key: 'Enter' })
 
-    expect(navigationEvents.map(eventPayload)).toEqual([
+    expectEventTrace(navigationEvents, [
       { type: 'navigate', direction: 'right' },
       { type: 'selectColumn' },
       { type: 'sort', key: 'name', sort: 'descending' },
-    ])
-    expect(navigationEvents.map(eventReason)).toEqual(['keyboard', 'keyboard', 'keyboard'])
+    ], ['keyboard', 'keyboard', 'keyboard'])
 
     unmount()
 
@@ -192,10 +184,9 @@ describe('React public event contracts', () => {
 
     fireEvent.keyDown(screen.getByRole('grid'), { key: 'Enter' })
 
-    expect(editEvents.map(eventPayload)).toEqual([
+    expectEventTrace(editEvents, [
       { type: 'editStart', key: 'alpha-value', value: 'Draft' },
-    ])
-    expect(editEvents.map(eventReason)).toEqual(['keyboard'])
+    ], ['keyboard'])
   })
 
   it('keeps treegrid collapse and row selection events on the public hook surface', () => {
@@ -205,11 +196,10 @@ describe('React public event contracts', () => {
     fireEvent.keyDown(screen.getByRole('treegrid'), { key: 'ArrowLeft' })
     fireEvent.keyDown(screen.getByRole('treegrid'), { key: ' ', shiftKey: true })
 
-    expect(events.map(eventPayload)).toEqual([
+    expectEventTrace(events, [
       { type: 'expandActiveRow', expanded: false },
       { type: 'selectRow' },
-    ])
-    expect(events.map(eventReason)).toEqual(['keyboard', 'keyboard'])
+    ], ['keyboard', 'keyboard'])
   })
 
   it('keeps menubar root and submenu keyboard events on the public hook surface', () => {
@@ -219,23 +209,21 @@ describe('React public event contracts', () => {
     fireEvent.keyDown(screen.getByRole('menubar'), { key: 'ArrowRight' })
     fireEvent.keyDown(screen.getByRole('menuitem', { name: 'File' }), { key: 'ArrowDown' })
 
-    expect(rootEvents.map(eventPayload)).toEqual([
+    expectEventTrace(rootEvents, [
       { type: 'navigate', direction: 'next' },
       { type: 'expand', key: 'file', expanded: true },
       { type: 'focus', key: 'new' },
-    ])
-    expect(rootEvents.map(eventReason)).toEqual(['keyboard', 'keyboard', 'keyboard'])
+    ], ['keyboard', 'keyboard', 'keyboard'])
 
     const submenuEvents: PatternEvent[] = []
     render(<MenubarContractHost data={menubarOpenData} onEvent={(event) => submenuEvents.push(event)} />)
 
     fireEvent.keyDown(screen.getByRole('menu'), { key: 'Escape' })
 
-    expect(submenuEvents.map(eventPayload)).toEqual([
+    expectEventTrace(submenuEvents, [
       { type: 'expand', key: 'file', expanded: false },
       { type: 'focus', key: 'file' },
-    ])
-    expect(submenuEvents.map(eventReason)).toEqual(['keyboard', 'focus'])
+    ], ['keyboard', 'focus'])
   })
 
   it('keeps standalone menu keyboard activation and dismiss events on the public hook surface', () => {
@@ -245,11 +233,10 @@ describe('React public event contracts', () => {
 
     fireEvent.keyDown(screen.getByRole('menu'), { key: 'Enter' })
 
-    expect(keyboardEvents.map(eventPayload)).toEqual([
+    expectEventTrace(keyboardEvents, [
       { type: 'activate', key: 'copy' },
       { type: 'dismiss', key: 'menu' },
-    ])
-    expect(keyboardEvents.map(eventReason)).toEqual(['keyboard', 'keyboard'])
+    ], ['keyboard', 'keyboard'])
 
     unmount()
 
@@ -259,10 +246,9 @@ describe('React public event contracts', () => {
 
     fireEvent.click(screen.getByRole('menuitem', { name: 'Delete' }))
 
-    expect(pointerEvents.map(eventPayload)).toEqual([
+    expectEventTrace(pointerEvents, [
       { type: 'activate', key: 'delete' },
-    ])
-    expect(pointerEvents.map(eventReason)).toEqual(['pointer'])
+    ], ['pointer'])
   })
 
   it('keeps simple control keyboard and pointer events on the public hook surface', () => {
@@ -274,14 +260,13 @@ describe('React public event contracts', () => {
     fireEvent.keyDown(screen.getByRole('switch', { name: 'Power' }), { key: ' ' })
     fireEvent.click(screen.getByRole('link', { name: 'Docs' }))
 
-    expect(events.map(eventPayload)).toEqual([
+    expectEventTrace(events, [
       { type: 'press', key: 'submit', pressed: true },
       { type: 'activate', key: 'submit' },
       { type: 'check', key: 'agree', checked: true },
       { type: 'check', key: 'power', checked: true },
       { type: 'activate', key: 'docs' },
-    ])
-    expect(events.map(eventReason)).toEqual(['keyboard', 'keyboard', 'keyboard', 'keyboard', 'pointer'])
+    ], ['keyboard', 'keyboard', 'keyboard', 'keyboard', 'pointer'])
   })
 
   it('keeps breadcrumb pointer activation on the public hook surface', () => {
@@ -290,10 +275,9 @@ describe('React public event contracts', () => {
 
     fireEvent.click(screen.getByRole('link', { name: 'API' }))
 
-    expect(events.map(eventPayload)).toEqual([
+    expectEventTrace(events, [
       { type: 'activate', key: 'api' },
-    ])
-    expect(events.map(eventReason)).toEqual(['pointer'])
+    ], ['pointer'])
   })
 
   it('keeps accordion and disclosure expand events on the public hook surface', () => {
@@ -303,11 +287,10 @@ describe('React public event contracts', () => {
     fireEvent.keyDown(screen.getByRole('group', { name: 'Sections' }), { key: 'Enter' })
     fireEvent.click(screen.getByRole('button', { name: 'Details' }))
 
-    expect(events.map(eventPayload)).toEqual([
+    expectEventTrace(events, [
       { type: 'expand', key: 'section', expanded: true },
       { type: 'expand', key: 'details', expanded: true },
-    ])
-    expect(events.map(eventReason)).toEqual(['keyboard', 'pointer'])
+    ], ['keyboard', 'pointer'])
   })
 
   it('keeps radio group and toolbar navigation events on the public hook surface', () => {
@@ -317,12 +300,11 @@ describe('React public event contracts', () => {
     fireEvent.keyDown(screen.getByRole('radiogroup', { name: 'Density' }), { key: 'ArrowRight' })
     fireEvent.keyDown(screen.getByRole('toolbar', { name: 'Formatting' }), { key: 'ArrowRight' })
 
-    expect(events.map(eventPayload)).toEqual([
+    expectEventTrace(events, [
       { type: 'navigate', direction: 'next' },
       { type: 'select', keys: ['comfortable'], anchorKey: 'comfortable', extentKey: 'comfortable' },
       { type: 'navigate', direction: 'next' },
-    ])
-    expect(events.map(eventReason)).toEqual(['keyboard', 'keyboard', 'keyboard'])
+    ], ['keyboard', 'keyboard', 'keyboard'])
   })
 
   it('keeps range widget value events on the public hook surface', () => {
@@ -334,7 +316,7 @@ describe('React public event contracts', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Increment Quantity' }))
     fireEvent.keyDown(screen.getByRole('separator', { name: 'Resize panel' }), { key: 'Enter' })
 
-    expect(events.map(eventPayload)).toEqual([
+    expectEventTrace(events, [
       { type: 'focus', key: 'volume' },
       { type: 'valueStep', key: 'volume', direction: 'increment' },
       { type: 'focus', key: 'quantity' },
@@ -343,8 +325,7 @@ describe('React public event contracts', () => {
       { type: 'valueStep', key: 'quantity', direction: 'increment' },
       { type: 'focus', key: 'splitter' },
       { type: 'collapse', key: 'splitter' },
-    ])
-    expect(events.map(eventReason)).toEqual([
+    ], [
       'keyboard',
       'keyboard',
       'keyboard',
@@ -363,10 +344,9 @@ describe('React public event contracts', () => {
 
     fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' })
 
-    expect(keyboardEvents.map(eventPayload)).toEqual([
+    expectEventTrace(keyboardEvents, [
       { type: 'dismiss', key: 'settingsDialog' },
-    ])
-    expect(keyboardEvents.map(eventReason)).toEqual(['keyboard'])
+    ], ['keyboard'])
     expect(keyboardChanges).toEqual([{ open: false, reason: 'keyboard', key: 'settingsDialog' }])
 
     unmount()
@@ -377,10 +357,9 @@ describe('React public event contracts', () => {
 
     fireEvent.mouseDown(screen.getByTestId('controlled-dialog-overlay'))
 
-    expect(pointerEvents.map(eventPayload)).toEqual([
+    expectEventTrace(pointerEvents, [
       { type: 'dismiss', key: 'settingsDialog' },
-    ])
-    expect(pointerEvents.map(eventReason)).toEqual(['pointer'])
+    ], ['pointer'])
     expect(pointerChanges).toEqual([{ open: false, reason: 'pointer', key: 'settingsDialog' }])
   })
 
@@ -391,11 +370,10 @@ describe('React public event contracts', () => {
 
     fireEvent.keyDown(screen.getByRole('alertdialog'), { key: 'Escape' })
 
-    expect(keyboardEvents.map(eventPayload)).toEqual([
+    expectEventTrace(keyboardEvents, [
       { type: 'activate', key: 'cancel' },
       { type: 'dismiss', key: 'warningDialog' },
-    ])
-    expect(keyboardEvents.map(eventReason)).toEqual(['keyboard', 'keyboard'])
+    ], ['keyboard', 'keyboard'])
     expect(keyboardChanges).toEqual([{ open: false, reason: 'keyboard', key: 'warningDialog' }])
 
     unmount()
@@ -406,11 +384,10 @@ describe('React public event contracts', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Delete' }))
 
-    expect(pointerEvents.map(eventPayload)).toEqual([
+    expectEventTrace(pointerEvents, [
       { type: 'activate', key: 'confirm' },
       { type: 'dismiss', key: 'warningDialog' },
-    ])
-    expect(pointerEvents.map(eventReason)).toEqual(['pointer', 'pointer'])
+    ], ['pointer', 'pointer'])
     expect(pointerChanges).toEqual([{ open: false, reason: 'pointer', key: 'warningDialog' }])
   })
 
@@ -426,7 +403,7 @@ describe('React public event contracts', () => {
     fireEvent.focus(screen.getByRole('button', { name: 'Help' }))
     fireEvent.keyDown(screen.getByRole('button', { name: 'Help' }), { key: 'Escape' })
 
-    expect(events.map(eventPayload)).toEqual([
+    expectEventTrace(events, [
       { type: 'sort', key: 'name', sort: 'descending' },
       { type: 'navigate', direction: 'previous' },
       { type: 'select', keys: ['slide2'], anchorKey: 'slide2', extentKey: 'slide2' },
@@ -434,8 +411,7 @@ describe('React public event contracts', () => {
       { type: 'focus', key: 'second' },
       { type: 'expand', key: 'help', expanded: true },
       { type: 'expand', key: 'help', expanded: false },
-    ])
-    expect(events.map(eventReason)).toEqual(['pointer', 'pointer', 'pointer', 'keyboard', 'focus', 'focus', 'keyboard'])
+    ], ['pointer', 'pointer', 'pointer', 'keyboard', 'focus', 'focus', 'keyboard'])
   })
 })
 
@@ -780,6 +756,15 @@ function eventPayload(event: PatternEvent | undefined): Omit<PatternEvent, 'meta
 
 function eventReason(event: PatternEvent | undefined): string | undefined {
   return event?.meta?.reason
+}
+
+function expectEventTrace(
+  events: readonly (PatternEvent | undefined)[],
+  payloads: readonly (PatternEventPayload | undefined)[],
+  reasons: readonly (string | undefined)[],
+) {
+  expect(events.map(eventPayload)).toEqual(payloads)
+  expect(events.map(eventReason)).toEqual(reasons)
 }
 
 const treeviewData = {

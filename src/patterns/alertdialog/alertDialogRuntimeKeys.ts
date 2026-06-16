@@ -1,6 +1,6 @@
 import type { Key, PatternData } from '../../schema'
 
-export interface AlertDialogRuntimeKeys {
+interface AlertDialogRuntimeKeys {
   triggerKey: Key | null
   dialogKey: Key | null
   titleKey: Key | null
