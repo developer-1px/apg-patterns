@@ -84,7 +84,10 @@ export function reduceWindowSplitterValue<TData extends WindowSplitterValueData>
 
   const range = resolveWindowSplitterValueRange(options)
   const key = event.key
-  const current = currentWindowSplitterValue(data, key, range)
+  const current = clampWindowSplitterValue(
+    numberOption(data.state?.valueByKey?.[key], range.min),
+    range,
+  )
   const previousValueByKey = numericRecord(data.state?.previousValueByKey)
 
   if (event.type === 'collapse') {
@@ -133,17 +136,6 @@ function windowSplitterStepDelta(
   if (direction === 'incrementLarge') return range.largeStep
   if (direction === 'decrementLarge') return -range.largeStep
   return 0
-}
-
-function currentWindowSplitterValue(
-  data: WindowSplitterValueData,
-  key: Key,
-  range: WindowSplitterValueRange,
-): number {
-  return clampWindowSplitterValue(
-    numberOption(data.state?.valueByKey?.[key], range.min),
-    range,
-  )
 }
 
 function fallbackWindowSplitterRestoreValue(
