@@ -166,7 +166,7 @@ function createAutocompleteOwnerProps<TElement extends HTMLElement>({
     'aria-expanded': open,
     'aria-haspopup': 'listbox' as const,
     'aria-label': label,
-    'aria-labelledby': idRefs(labelledBy),
+    'aria-labelledby': typeof labelledBy === 'string' ? labelledBy : labelledBy?.join(' '),
     onKeyDown,
   })
 }
@@ -220,10 +220,6 @@ function useAutocompletePopupId(options: AutocompleteListboxOptions): string {
 
 function keyboardEvent(event: PatternEvent): PatternEvent {
   return { ...event, meta: { ...event.meta, reason: 'keyboard' } }
-}
-
-function idRefs(value: string | readonly string[] | undefined): string | undefined {
-  return typeof value === 'string' ? value : value?.join(' ')
 }
 
 function compactProps<TProps extends Record<string, unknown>>(props: TProps): TProps {
