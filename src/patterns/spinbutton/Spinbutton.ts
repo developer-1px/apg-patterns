@@ -9,7 +9,6 @@ type SpinbuttonDataItem = PatternItem & {
 }
 
 type DivProps = ComponentPropsWithoutRef<'div'>
-type ButtonProps = ComponentPropsWithoutRef<'button'>
 
 export interface SpinbuttonProps<TItem extends SpinbuttonDataItem = SpinbuttonDataItem> {
   data: SpinbuttonData & { items: Record<Key, TItem> }
@@ -27,9 +26,9 @@ export function Spinbutton<TItem extends SpinbuttonDataItem = SpinbuttonDataItem
     { ...spinbutton.rootProps, className } as DivProps,
     spinbutton.renderItems.map((item) =>
       createElement('div', { key: item.key } as DivProps & { key: Key }, [
-        createElement('button', { key: `${item.key}-decrement`, ...item.decrementButtonProps } as ButtonProps, '-'),
+        createElement('button', { key: `${item.key}-decrement`, ...item.decrementButtonProps } as ComponentPropsWithoutRef<'button'>, '-'),
         createElement('div', { key: `${item.key}-spinbutton`, ...item.spinbuttonProps } as DivProps, renderSpinbutton?.(item, data.items[item.key]) ?? `${item.label} ${item.value}`),
-        createElement('button', { key: `${item.key}-increment`, ...item.incrementButtonProps } as ButtonProps, '+'),
+        createElement('button', { key: `${item.key}-increment`, ...item.incrementButtonProps } as ComponentPropsWithoutRef<'button'>, '+'),
       ]),
     ),
   )
