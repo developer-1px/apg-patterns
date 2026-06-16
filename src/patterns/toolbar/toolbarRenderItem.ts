@@ -14,7 +14,7 @@ export interface ReactToolbarRenderItem {
 
 export function createToolbarRenderItem(runtime: PatternRuntime, key: Key): ReactToolbarRenderItem {
   const kind = getToolbarItemKind(runtime.data.items[key]?.kind)
-  const part = isToolbarButtonKind(kind) ? 'item' : 'control'
+  const part = kind === 'button' || kind === 'toggleButton' ? 'item' : 'control'
   const state = runtime.getItemState(key, part)
   return {
     key,
@@ -36,10 +36,6 @@ function getToolbarItemKind(kind: unknown): ReactToolbarItemKind {
   return kind === 'toggleButton' || kind === 'select' || kind === 'colorInput' || kind === 'menuButton' || kind === 'custom'
     ? kind
     : 'button'
-}
-
-function isToolbarButtonKind(kind: ReactToolbarItemKind): boolean {
-  return kind === 'button' || kind === 'toggleButton'
 }
 
 function createToolbarControlProps(runtime: PatternRuntime, key: Key): ReactPatternProps {
