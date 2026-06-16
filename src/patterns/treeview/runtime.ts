@@ -9,7 +9,6 @@ import {
   type PatternOptions,
 } from '../../schema'
 import { treeviewDefinition } from './definition'
-import { treeviewDefaultOptions } from './defaultOptions'
 import { createPatternRuntime, type PatternRuntime, type SlotProps } from '../../kernel/patternRuntime'
 import { createTreeviewRenderItems, type TreeviewRenderItem } from './renderItem'
 import { toTreeviewRenderState, type TreeviewRenderState } from './renderState'
@@ -40,6 +39,16 @@ interface CreateTreeviewRuntimeInput {
   typeaheadBuffer?: ApgTypeaheadBuffer
   keyToElementId?: (key: Key) => string
 }
+
+const treeviewDefaultOptions = {
+  selectionMode: 'single',
+  focusStrategy: 'rovingTabIndex',
+  followFocus: false,
+  itemClickAction: 'select',
+  indicatorClickAction: 'toggleExpand',
+  typeaheadEnabled: true,
+  elementIdPrefix: 'treeitem-',
+} satisfies PatternOptions
 
 export function createTreeviewRuntime(input: CreateTreeviewRuntimeInput): TreeviewRuntime {
   const data = PatternDataSchema.parse(input.data)
