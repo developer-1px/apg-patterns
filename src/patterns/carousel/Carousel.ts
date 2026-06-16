@@ -32,7 +32,14 @@ export function Carousel<TItem extends CarouselDataItem = CarouselDataItem>({ da
   return createElement('div', { ...carousel.rootProps, className } as DivProps, [
     createElement('button', { key: 'prev', ...carousel.prevProps } as ButtonProps, data.items.prev?.label ?? 'Previous'),
     createElement('button', { key: 'next', ...carousel.nextProps } as ButtonProps, data.items.next?.label ?? 'Next'),
-    ...carousel.slides.map((slide) => renderCarouselSlide({ slide, dataItem: data.items[slide.key], renderSlide })),
+    ...carousel.slides.map((slide) => {
+      const dataItem = data.items[slide.key]
+      return createElement('div', { key: slide.key, ...slide.slideProps } as DivProps & { key: Key }, renderSlide?.(slide, dataItem) ?? [
+        slide.imageUrl ? createElement('img', { key: 'image', src: slide.imageUrl, alt: slide.imageAlt } as ImgProps) : null,
+        createElement('strong', { key: 'title' }, slide.title),
+        slide.caption ? createElement('span', { key: 'caption' }, slide.caption) : null,
+      ])
+    }),
     carousel.showDots
       ? createElement(
           'div',
@@ -42,21 +49,5 @@ export function Carousel<TItem extends CarouselDataItem = CarouselDataItem>({ da
           ),
         )
       : null,
-  ])
-}
-
-function renderCarouselSlide<TItem extends CarouselDataItem>({
-  slide,
-  dataItem,
-  renderSlide,
-}: {
-  slide: ReactCarouselSlide
-  dataItem: TItem
-  renderSlide?: (slide: ReactCarouselSlide, dataItem: TItem) => ReactNode
-}) {
-  return createElement('div', { key: slide.key, ...slide.slideProps } as DivProps & { key: Key }, renderSlide?.(slide, dataItem) ?? [
-    slide.imageUrl ? createElement('img', { key: 'image', src: slide.imageUrl, alt: slide.imageAlt } as ImgProps) : null,
-    createElement('strong', { key: 'title' }, slide.title),
-    slide.caption ? createElement('span', { key: 'caption' }, slide.caption) : null,
   ])
 }
