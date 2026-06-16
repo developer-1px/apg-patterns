@@ -29,7 +29,8 @@ export function createGridCell(input: {
   cancelEdit(): void
   onEvent(event: PatternEvent): void
 }): ReactGridCell {
-  const part = getGridCellPart(input.data.items[input.key]?.kind)
+  const kind = input.data.items[input.key]?.kind
+  const part: ReactGridCell['kind'] = kind === 'columnheader' || kind === 'rowheader' ? kind : 'gridcell'
   const state = input.runtime.getItemState(input.key, part)
   const value = input.valueByKey[input.key] !== undefined ? String(input.valueByKey[input.key]) : input.data.items[input.key]?.label ?? ''
   return {
@@ -54,8 +55,4 @@ export function createGridCell(input: {
       onEvent: input.onEvent,
     }),
   }
-}
-
-function getGridCellPart(kind: unknown): ReactGridCell['kind'] {
-  return kind === 'columnheader' || kind === 'rowheader' ? kind : 'gridcell'
 }
