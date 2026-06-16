@@ -29,19 +29,17 @@ export function createTableRows(runtime: PatternRuntime): readonly ReactTableRow
     return {
       key: rowKey,
       rowProps: reactProps(runtime.getPartProps('row', rowKey)),
-      cells: cellKeys.map((cellKey) => createTableCell(runtime, cellKey)),
+      cells: cellKeys.map((cellKey) => {
+        const kind = runtime.data.items[cellKey]?.kind ?? 'cell'
+        const part = kind === 'columnheader' ? 'columnheader' : kind === 'rowheader' ? 'rowheader' : 'cell'
+        return {
+          key: cellKey,
+          label: runtime.data.items[cellKey]?.label ?? cellKey,
+          kind: part,
+          tag: part === 'columnheader' || part === 'rowheader' ? 'th' : 'td',
+          cellProps: reactProps(runtime.getPartProps(part, cellKey)),
+        }
+      }),
     }
   })
-}
-
-function createTableCell(runtime: PatternRuntime, cellKey: Key): ReactTableCell {
-  const kind = runtime.data.items[cellKey]?.kind ?? 'cell'
-  const part = kind === 'columnheader' ? 'columnheader' : kind === 'rowheader' ? 'rowheader' : 'cell'
-  return {
-    key: cellKey,
-    label: runtime.data.items[cellKey]?.label ?? cellKey,
-    kind: part,
-    tag: part === 'columnheader' || part === 'rowheader' ? 'th' : 'td',
-    cellProps: reactProps(runtime.getPartProps(part, cellKey)),
-  }
 }
