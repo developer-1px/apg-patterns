@@ -108,18 +108,12 @@ export function dispatchAutocompleteOwnerKeyDown<TElement extends HTMLElement>(
 
   const ownerKey = input.ownerKey ?? 'autocomplete'
   const activeKey = input.activeKey ?? null
+  const navigationDirection = getAutocompleteNavigationDirection(event.key, input.open)
 
-  if (event.key === 'ArrowDown') {
+  if (navigationDirection) {
     event.preventDefault()
     if (!input.open) input.onEvent(keyboardEvent({ type: 'expand', key: ownerKey, expanded: true }))
-    input.onEvent(keyboardEvent({ type: 'navigate', direction: input.open ? 'next' : 'first' }))
-    return true
-  }
-
-  if (event.key === 'ArrowUp') {
-    event.preventDefault()
-    if (!input.open) input.onEvent(keyboardEvent({ type: 'expand', key: ownerKey, expanded: true }))
-    input.onEvent(keyboardEvent({ type: 'navigate', direction: input.open ? 'previous' : 'last' }))
+    input.onEvent(keyboardEvent({ type: 'navigate', direction: navigationDirection }))
     return true
   }
 
@@ -144,6 +138,12 @@ export function dispatchAutocompleteOwnerKeyDown<TElement extends HTMLElement>(
   }
 
   return false
+}
+
+function getAutocompleteNavigationDirection(key: string, open: boolean) {
+  if (key === 'ArrowDown') return open ? 'next' : 'first'
+  if (key === 'ArrowUp') return open ? 'previous' : 'last'
+  return null
 }
 
 function createAutocompleteOwnerProps<TElement extends HTMLElement>({
