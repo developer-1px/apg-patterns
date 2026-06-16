@@ -3,7 +3,6 @@ import type { Key, PatternData } from '../../schema'
 import { cellRowKey, visibleRowKeys } from './geometry'
 
 const PAGE_STEP = 10
-type TreegridRowAction = 'up' | 'down' | 'gridStart' | 'gridEnd'
 
 const activeRowKey = (ctx: { activeKey: Key | null; data: PatternData }): Key | null => {
   if (!ctx.activeKey) return null
@@ -19,7 +18,7 @@ export function registerTreegridRowNavigation() {
   treegridRowNavigationRegistered = true
 
 defineNavigationTarget('treegridRow', (target, ctx) => {
-  const action = target.action as TreegridRowAction
+  const action = target.action
   const rows = visibleRowKeys(ctx.data)
   if (rows.length === 0) return null
   if (action === 'gridStart') return rows[0] ?? null
