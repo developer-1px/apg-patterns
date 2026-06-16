@@ -2,8 +2,6 @@ import { useLayoutEffect, useRef, type KeyboardEvent } from 'react'
 import { FOCUSABLE_SELECTOR } from '../../adapters/reactElementTargets'
 import type { Key, PatternData, PatternEvent, PatternEventReason } from '../../schema'
 
-const fallbackDialogKey: Key = 'dialog'
-
 export type ReactDialogFocusTarget =
   | HTMLElement
   | null
@@ -34,7 +32,7 @@ export function useControlledDialogFocus({
   open: boolean
   data: PatternData
   keyToElementId(key: Key): string
-  dialogKey?: Key | null
+  dialogKey: Key
   initialFocusKey?: Key
   restoreFocusTo?: ReactDialogFocusTarget
 }) {
@@ -60,7 +58,7 @@ export function handleControlledDialogKeyDown({
   event: KeyboardEvent<HTMLElement>
   open: boolean
   keyToElementId(key: Key): string
-  dialogKey?: Key | null
+  dialogKey: Key
   onClose(reason: 'keyboard'): void
 }) {
   if (event.key === 'Escape') {
@@ -70,7 +68,7 @@ export function handleControlledDialogKeyDown({
     return
   }
 
-  if (open && event.key === 'Tab') trapDialogFocus(event, keyToElementId(dialogKey ?? fallbackDialogKey))
+  if (open && event.key === 'Tab') trapDialogFocus(event, keyToElementId(dialogKey))
 }
 
 export function emitControlledDialogClose({
@@ -80,11 +78,10 @@ export function emitControlledDialogClose({
 }: {
   config: ReactControlledDialogConfig
   reason: PatternEventReason
-  key?: Key | null
+  key: Key
 }) {
-  const dialogKey = key ?? fallbackDialogKey
-  config.onEvent?.({ type: 'dismiss', key: dialogKey, meta: { reason } })
-  config.onOpenChange(false, { reason, key: dialogKey })
+  config.onEvent?.({ type: 'dismiss', key, meta: { reason } })
+  config.onOpenChange(false, { reason, key })
 }
 
 function focusInitialDialogTarget({
@@ -95,10 +92,10 @@ function focusInitialDialogTarget({
 }: {
   data: PatternData
   keyToElementId(key: Key): string
-  dialogKey?: Key | null
+  dialogKey: Key
   initialFocusKey?: Key
 }) {
-  const root = document.getElementById(keyToElementId(dialogKey ?? fallbackDialogKey))
+  const root = document.getElementById(keyToElementId(dialogKey))
   const targetKey = initialFocusKey ?? data.refs?.initialFocusKey
   const target = targetKey ? document.getElementById(keyToElementId(targetKey)) : root?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR)
   const focusTarget = target ?? root
