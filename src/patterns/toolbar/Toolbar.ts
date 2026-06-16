@@ -1,7 +1,6 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
-import type { ReactToolbarRenderItem } from './toolbarRenderItem'
-import { useToolbarPattern } from './useToolbarPattern'
+import { useToolbarPattern, type ReactToolbarRenderItem } from './useToolbarPattern'
 
 export interface ToolbarProps<TItem extends PatternItem = PatternItem> {
   data: PatternData<TItem>

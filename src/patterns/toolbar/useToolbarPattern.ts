@@ -1,10 +1,19 @@
+import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
-import { createReactKeyboardHandler, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { createReactKeyboardHandler, reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
 import { useReactPatternRuntime } from '../../adapters/reactPatternEffects'
 import { toolbarDefinition } from './definition'
-import { createToolbarRenderItem, type ReactToolbarRenderItem } from './toolbarRenderItem'
 import { usePatternElementId } from '../../adapters/reactDomIds'
-export type { ReactToolbarItemKind, ReactToolbarRenderItem } from './toolbarRenderItem'
+
+export type ReactToolbarItemKind = 'button' | 'toggleButton' | 'select' | 'colorInput' | 'menuButton' | 'custom'
+
+export interface ReactToolbarRenderItem {
+  key: Key
+  label: string
+  kind: ReactToolbarItemKind
+  state: ReactRenderItemState & { pressed: boolean }
+  itemProps: ReactPatternProps
+}
 
 export interface ReactToolbarRuntime {
   rootProps: ReactPatternProps
@@ -64,5 +73,28 @@ export function useToolbarPattern(data: PatternData, onEvent: (event: PatternEve
       return { forKey: runtime.keyToElementId }
     },
     keyToElementId: runtime.keyToElementId,
+  }
+}
+
+function createToolbarRenderItem(runtime: PatternRuntime, key: Key): ReactToolbarRenderItem {
+  const rawKind = runtime.data.items[key]?.kind
+  const kind: ReactToolbarItemKind = rawKind === 'toggleButton' || rawKind === 'select' || rawKind === 'colorInput' || rawKind === 'menuButton' || rawKind === 'custom'
+    ? rawKind
+    : 'button'
+  const part = kind === 'button' || kind === 'toggleButton' ? 'item' : 'control'
+  const state = runtime.getItemState(key, part)
+  const itemProps = reactProps(runtime.getPartProps(part, key))
+  const { role: _role, ...controlProps } = itemProps
+  return {
+    key,
+    label: runtime.data.items[key]?.label ?? key,
+    kind,
+    state: {
+      active: Boolean(state.active),
+      selected: Boolean(state.pressed),
+      pressed: Boolean(state.pressed),
+      disabled: Boolean(state.disabled),
+    },
+    itemProps: part === 'control' ? controlProps : itemProps,
   }
 }
