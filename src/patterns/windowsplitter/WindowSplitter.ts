@@ -1,12 +1,10 @@
-import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
+import { createElement, type ReactNode } from 'react'
 import type { PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import { useWindowSplitterPattern } from './useWindowSplitterPattern'
 
 type WindowSplitterDataItem = PatternItem & {
   content?: string
 }
-
-type DivProps = ComponentPropsWithoutRef<'div'>
 
 export interface WindowSplitterProps<TItem extends WindowSplitterDataItem = WindowSplitterDataItem> {
   data: PatternData<TItem>
@@ -26,14 +24,14 @@ export function WindowSplitter<TItem extends WindowSplitterDataItem = WindowSpli
   const splitter = useWindowSplitterPattern(data, onEvent, options)
   const controlledItem = splitter.controlledKey ? data.items[splitter.controlledKey] : undefined
 
-  return createElement('div', { ...splitter.rootProps, className } as DivProps, [
+  return createElement('div', { ...splitter.rootProps, className },
     splitter.controlledKey
       ? createElement(
           'div',
-          { key: 'controlled', id: splitter.ids.forKey(splitter.controlledKey) } as DivProps,
+          { id: splitter.ids.forKey(splitter.controlledKey) },
           renderControlledPane?.(controlledItem) ?? controlledItem?.content ?? controlledItem?.label,
         )
       : null,
-    createElement('div', { key: 'separator', ...splitter.separatorProps } as DivProps, data.items[splitter.key ?? '']?.label ?? ''),
-  ])
+    createElement('div', splitter.separatorProps, data.items[splitter.key ?? '']?.label ?? ''),
+  )
 }
