@@ -1,15 +1,21 @@
-import { createPatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternEvent, PatternOptions } from '../../schema'
+import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
+import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { gridDefinition } from './definition'
-import { getGridRuntimeState, type GridData } from './gridRuntimeState'
+import { getGridRuntimeState, type GridData, type GridSort, type GridValue } from './gridRuntimeState'
 import { createGridEditActions, createGridRuntimeEventHandler } from './gridRuntimeEvents'
-import { createGridRows, type ReactGridRow } from './gridRow'
+import { createGridCell, type ReactGridCell } from './gridCell'
+import { gridRows } from './navigation'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 
 export type { ReactGridCell } from './gridCell'
-export type { ReactGridRow } from './gridRow'
+
+export interface ReactGridRow {
+  key: Key
+  rowProps: ReactPatternProps
+  cells: readonly ReactGridCell[]
+}
 
 export interface ReactGridRuntime {
   gridProps: ReactPatternProps
@@ -69,4 +75,49 @@ export function useGridPattern(data: GridData, onEvent: (event: PatternEvent) =>
     },
     keyToElementId: runtime.keyToElementId,
   }
+}
+
+function createGridRows({
+  runtime,
+  data,
+  editableKeys,
+  editingKey,
+  editDraftByKey,
+  valueByKey,
+  sortByKey,
+  commitEdit,
+  cancelEdit,
+  onEvent,
+}: {
+  runtime: PatternRuntime
+  data: PatternData
+  editableKeys: readonly string[]
+  editingKey: string | null
+  editDraftByKey: Record<string, GridValue>
+  valueByKey: Readonly<Record<Key, GridValue>>
+  sortByKey: Readonly<Record<Key, GridSort>>
+  commitEdit(): void
+  cancelEdit(): void
+  onEvent(event: PatternEvent): void
+}): readonly ReactGridRow[] {
+  return gridRows(data).map((cellKeys, rowIndex) => {
+    const rowKey = data.relations?.rowKeys?.[rowIndex] ?? `row-${rowIndex}`
+    return {
+      key: rowKey,
+      rowProps: reactProps(runtime.getPartProps('row', rowKey)),
+      cells: cellKeys.map((cellKey) => createGridCell({
+        runtime,
+        data,
+        key: cellKey,
+        editableKeys,
+        editingKey,
+        editDraftByKey,
+        valueByKey,
+        sortByKey,
+        commitEdit,
+        cancelEdit,
+        onEvent,
+      })),
+    }
+  })
 }
