@@ -122,6 +122,22 @@ this taxonomy so accidental exports fail before release.
 - `react-render-surface-type`: render item, row, cell, option, and related
   JSX mapping surface types.
 
+## Public Surface Readiness
+
+This table is the public API design filter. It separates the constitutional
+surface from useful but narrower helper surfaces.
+
+| Surface | Tier | Good | Still Weak |
+| --- | --- | --- | --- |
+| `PatternData`, `PatternEvent`, `PatternDefinition`, `createPatternRuntime`, `reducePatternData` | Permanent core | App-owned state, serializable definitions, and data-in/events-out runtime keep the package independent of app effects | Any change to field meaning has broad blast radius and must be treated as major-version territory |
+| Pattern definitions and schemas | Permanent catalog/validation | APG pattern names, roles, keyboard descriptors, and Zod validation are explicit and serializable | Every new schema export increases the named public surface; prefer generic schemas over pattern-specific schema names |
+| Extension vocabulary and resolver types | Stable extension point | Unknown tokens fail loudly, and custom vocabularies are registered through explicit functions | Extension registries are global process state, so new extension categories need a strong reason |
+| Pattern-specific core helpers and diagnostics | Narrow stable helper | Window splitter value reducers and tabs/window splitter diagnostics keep app-owned state outside the runtime | This bucket can sprawl; add helpers only when they encode APG semantics that otherwise repeat across apps |
+| `@interactive-os/aria/react` hooks and runtimes | Framework adapter | Hooks preserve the `useXPattern(data, onEvent, options?)` shape and return named semantic props | Hook return shapes are more likely to grow than core data contracts |
+| React preset components and props | Framework adapter | Presets provide behavior-complete APG DOM for straightforward cases | Presets are convenience surfaces, not the source of truth for app-specific DOM ownership |
+| React data/state/owner helpers | Narrow adapter/helper | Command surface factories, controlled dialog hooks, and autocomplete listbox ownership bridge common app-owned workflows | These helpers should stay narrower than `PatternData`; avoid turning them into a second domain model |
+| Root entry `@interactive-os/aria` | Compatibility aggregate | It mirrors `@interactive-os/aria/core` and remains React-free | New non-React code should prefer `@interactive-os/aria/core` so import intent stays explicit |
+
 ## Not A Stability Contract
 
 These details may change without being treated as package identity:

@@ -4,6 +4,7 @@ import ts from 'typescript'
 
 const repoRoot = new URL('../', import.meta.url)
 const apiReferencePath = new URL('API.md', repoRoot)
+const interfaceStabilityPath = new URL('INTERFACE_STABILITY.md', repoRoot)
 const shouldWrite = process.argv.includes('--write')
 const failures = []
 const forbiddenPublicExports = new Map([
@@ -266,6 +267,7 @@ if (!existsSync(apiReferencePath)) {
 }
 
 let apiReference = readFileSync(apiReferencePath, 'utf8')
+const interfaceStability = readFileSync(interfaceStabilityPath, 'utf8')
 const rootExports = declarationExports('dist/index.d.ts')
 const coreExports = declarationExports('dist/core.d.ts')
 const reactExports = declarationExports('dist/react.d.ts')
@@ -286,6 +288,7 @@ const reactOnlyExports = reactExports.filter((name) => !coreExports.includes(nam
 const reactOnlyRuntimeExports = reactRuntimeExports.filter((name) => !coreRuntimeExports.includes(name))
 const rootSurfaceBuckets = assertClassifiedPublicExports('root/core declaration exports', coreExports, classifyRootCoreExport)
 const reactSurfaceBuckets = assertClassifiedPublicExports('./react-only declaration exports', reactOnlyExports, classifyReactOnlyExport)
+assertInterfaceStabilityDocumentsBuckets(rootSurfaceBuckets, reactSurfaceBuckets)
 const nextApiReference = shouldWrite
   ? replaceExportBlock(
     replaceExportBlock(
@@ -379,6 +382,19 @@ function assertNoForbiddenPublicExports(label, exports) {
   for (const name of exports) {
     const reason = forbiddenPublicExports.get(name)
     if (reason) failures.push(`${label} must not expose ${name}: ${reason}`)
+  }
+}
+
+function assertInterfaceStabilityDocumentsBuckets(...bucketMaps) {
+  const documentedBuckets = new Set(
+    Array.from(interfaceStability.matchAll(/`([a-z][a-z-]+)`: /g), ([, bucket]) => bucket),
+  )
+  const missingBuckets = [...new Set(bucketMaps.flatMap((buckets) => [...buckets.keys()]))]
+    .filter((bucket) => !documentedBuckets.has(bucket))
+    .sort((left, right) => left.localeCompare(right))
+
+  if (missingBuckets.length > 0) {
+    failures.push(`INTERFACE_STABILITY.md does not document public surface buckets: ${missingBuckets.join(', ')}`)
   }
 }
 
