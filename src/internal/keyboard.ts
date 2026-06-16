@@ -72,7 +72,7 @@ export function createApgTypeaheadBuffer(options: ApgTypeaheadOptions = {}): Apg
   }
 
   function feed(e: KeyInput): string | null {
-    if (!isPrintable(e)) return null
+    if (e.ctrlKey || e.metaKey || e.altKey || e.isComposing || e.key.length !== 1) return null
     const now = e.timeStamp || Date.now()
     if (now - lastTime > timeoutMs) query = ''
     query += e.key
@@ -135,12 +135,6 @@ function getModifierState(input: KeyInput, key: ModifierKeyName): boolean {
   if (typeof input.getModifierState === 'function') return input.getModifierState(key)
   if (input.modifierState) return input.modifierState[key] ?? false
   return false
-}
-
-function isPrintable(e: KeyInput): boolean {
-  if (e.ctrlKey || e.metaKey || e.altKey) return false
-  if (e.isComposing) return false
-  return e.key.length === 1
 }
 
 function normalizeParsedKey(raw: string): string {
