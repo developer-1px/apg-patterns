@@ -8,7 +8,6 @@ import { menuButtonDefinition } from './definition'
 import { createMenuButtonItem, type ReactMenuButtonItem } from './menuButtonItem'
 import { createMenuButtonMenuProps } from './menuButtonMenuProps'
 import { createMenuButtonTriggerProps } from './menuButtonTriggerProps'
-import { getMenuButtonRuntimeState } from './menuButtonRuntimeState'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 
 export interface ReactMenuButtonTriggerState {
@@ -32,7 +31,12 @@ export interface ReactMenuButtonRuntime {
 }
 
 export function useMenuButtonPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactMenuButtonRuntime {
-  const { focusStrategy, runtimeOptions, triggerKey, menuKey, expanded, itemKeys } = getMenuButtonRuntimeState(data, options)
+  const focusStrategy = options?.focusStrategy ?? (data.state?.focusStrategy === 'ariaActiveDescendant' ? 'ariaActiveDescendant' : 'rovingTabIndex')
+  const runtimeOptions = { ...(options ?? {}), focusStrategy } satisfies PatternOptions
+  const triggerKey = data.relations?.rootKeys?.[0] ?? null
+  const menuKey = triggerKey ? data.relations?.controlsByKey?.[triggerKey]?.[0] ?? null : null
+  const expanded = triggerKey ? data.state?.expandedKeys?.includes(triggerKey) ?? false : false
+  const itemKeys = menuKey ? data.relations?.childrenByKey?.[menuKey] ?? [] : []
   const keyToElementId = usePatternElementId(runtimeOptions, 'mb-')
   const runtime = createPatternRuntime({
     definition: menuButtonDefinition,

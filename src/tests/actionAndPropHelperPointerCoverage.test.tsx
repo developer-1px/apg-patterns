@@ -10,7 +10,7 @@ import { useCheckboxPattern } from '../patterns/checkbox/useCheckboxPattern'
 import { Grid } from '../patterns/grid/Grid'
 import { useLinkPattern } from '../patterns/link/useLinkPattern'
 import { createMenuButtonTriggerProps } from '../patterns/menu/menuButtonTriggerProps'
-import { getMenuButtonRuntimeState } from '../patterns/menu/menuButtonRuntimeState'
+import { useMenuButtonPattern } from '../patterns/menu/useMenuButtonPattern'
 import { useRadioGroupPattern } from '../patterns/radio/useRadioGroupPattern'
 import { getSliderRuntimeState, isMultiThumbSlider } from '../patterns/slider/sliderRuntimeState'
 import { useSpinbuttonPattern } from '../patterns/spinbutton/useSpinbuttonPattern'
@@ -137,6 +137,11 @@ function HookRuntimeHost() {
     relations: { rootKeys: [] },
     state: {},
   })
+  const emptyMenuButton = useMenuButtonPattern({
+    items: {},
+    relations: { rootKeys: [] },
+    state: {},
+  }, (event) => setEvents((current) => [...current, event]))
 
   return (
     <div>
@@ -235,6 +240,11 @@ function HookRuntimeHost() {
           emptyLink.label,
           emptyLink.href,
           emptyLink.variant,
+          emptyMenuButton.triggerKey ?? 'null',
+          emptyMenuButton.menuKey ?? 'null',
+          String(emptyMenuButton.expanded),
+          emptyMenuButton.focusStrategy,
+          emptyMenuButton.items.length,
           events.map((event) => `${event.type}:${'key' in event ? event.key ?? '' : ''}`).join('|'),
         ].join('|')}
       </output>
@@ -306,20 +316,6 @@ function HelperHost() {
       <button
         type="button"
         onClick={() => {
-          const empty = getMenuButtonRuntimeState({ items: {}, relations: {}, state: {} })
-          setResult([
-            empty.triggerKey ?? 'null',
-            empty.menuKey ?? 'null',
-            String(empty.expanded),
-            empty.itemKeys.length,
-          ].join('|'))
-        }}
-      >
-        Read empty menu state
-      </button>
-      <button
-        type="button"
-        onClick={() => {
           const sliderRuntime = {
             visibleKeys: ['min', 'max'],
             data: {
@@ -386,9 +382,6 @@ describe('action and prop helper coverage from pointer input', () => {
     expect(screen.getByTestId('grid-edit-result').textContent).toBe('value|editEnd|editEnd')
     fireEvent.keyDown(input, { key: 'A', code: 'KeyA' })
 
-    fireEvent.click(screen.getByRole('button', { name: 'Read empty menu state' }))
-    expect(screen.getByText('null|null|false|0')).toBeTruthy()
-
     fireEvent.click(screen.getByRole('button', { name: 'Read runtime state helpers' }))
     expect(screen.getByText('null|0|true|min')).toBeTruthy()
 
@@ -403,6 +396,7 @@ describe('action and prop helper coverage from pointer input', () => {
     expect(hookOutput).toContain('none|1|agree|mixed|edge-check-agree|none|1|power|false|edge-switch-power')
     expect(hookOutput).toContain('table|row|0|1|edge-table-header|group|1|section|edge-accordion-section')
     expect(hookOutput).toContain('link|docs|Docs|#docs|quiet|true|edge-link-docs|fallback|#|anchor|null||#|anchor')
+    expect(hookOutput).toContain('null|null|false|rovingTabIndex|0')
     expect(hookOutput).toContain('focus:two|select:|focus:spin|focus:spin|valueStep:spin|focus:agree|check:agree|focus:agree|check:agree|focus:power|check:power|focus:power|check:power')
   })
 })
