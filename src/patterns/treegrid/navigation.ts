@@ -23,7 +23,7 @@ defineNavigationTarget('treegridCell', (target, ctx) => {
 const PAGE_STEP = 10
 
 defineNavigationTarget('treegridPage', (target, ctx) => {
-  const direction = (target as { direction?: 'up' | 'down' }).direction ?? 'down'
+  const direction = target.direction ?? 'down'
   const rows = visibleCells(ctx.data)
   if (!ctx.activeKey) return null
   let rowIndex = -1

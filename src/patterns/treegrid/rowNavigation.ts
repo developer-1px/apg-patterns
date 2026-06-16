@@ -33,7 +33,7 @@ defineNavigationTarget('treegridRow', (target, ctx) => {
 })
 
 defineNavigationTarget('treegridRowPage', (target, ctx) => {
-  const direction = (target as { direction?: 'up' | 'down' }).direction ?? 'down'
+  const direction = target.direction ?? 'down'
   const rows = visibleRowKeys(ctx.data)
   if (rows.length === 0) return null
   const current = activeRowKey(ctx)

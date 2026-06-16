@@ -16,7 +16,7 @@ defineNavigationTarget('linear', (target, ctx) => {
 defineNavigationTarget('linearWrap', (target, ctx) => {
   if (ctx.visibleKeys.length === 0) return null
   const index = ctx.visibleKeys.indexOf(ctx.activeKey)
-  const action = target.action as 'next' | 'previous'
+  const action = target.action
   if (action === 'next') return ctx.visibleKeys[(index + 1 + ctx.visibleKeys.length) % ctx.visibleKeys.length] ?? null
   if (action === 'previous') return ctx.visibleKeys[(index - 1 + ctx.visibleKeys.length) % ctx.visibleKeys.length] ?? null
   return null
