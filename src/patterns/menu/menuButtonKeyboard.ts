@@ -1,7 +1,8 @@
 import type { PatternData } from '../../schema'
 
 export function resolveMenuButtonKey(key: string, keys: readonly string[], activeKey: string | null | undefined, data: PatternData) {
-  const availableKeys = getAvailableMenuButtonKeys(keys, data)
+  const disabledKeys = new Set(data.state?.disabledKeys ?? [])
+  const availableKeys = keys.filter((key) => !disabledKeys.has(key))
   if (availableKeys.length === 0) return undefined
   const index = activeKey ? availableKeys.indexOf(activeKey) : -1
   if (key === 'ArrowDown') return availableKeys[(index + 1 + availableKeys.length) % availableKeys.length]
@@ -10,11 +11,6 @@ export function resolveMenuButtonKey(key: string, keys: readonly string[], activ
   if (key === 'End') return availableKeys[availableKeys.length - 1]
   if (key.length === 1 && /\S/.test(key)) return resolveMenuButtonTypeaheadKey(key, availableKeys, index, data)
   return undefined
-}
-
-function getAvailableMenuButtonKeys(keys: readonly string[], data: PatternData): readonly string[] {
-  const disabledKeys = new Set(data.state?.disabledKeys ?? [])
-  return keys.filter((key) => !disabledKeys.has(key))
 }
 
 function resolveMenuButtonTypeaheadKey(key: string, keys: readonly string[], activeIndex: number, data: PatternData) {
