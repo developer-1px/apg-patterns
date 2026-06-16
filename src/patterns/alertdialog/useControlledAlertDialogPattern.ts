@@ -12,8 +12,6 @@ import {
 import { alertDialogDefinition } from './definition'
 import { getAlertDialogRuntimeKeys } from './alertDialogRuntimeKeys'
 
-export type { ReactControlledDialogConfig, ReactControlledDialogOpenChangeMeta, ReactDialogFocusTarget } from '../dialog/controlledDialog'
-
 export interface ReactControlledAlertDialogRuntime {
   open: boolean
   overlayProps: ReactPatternProps
