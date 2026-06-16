@@ -1,11 +1,3 @@
-const radioFocus = {
-  tabIndex: {
-    when: { kind: 'optionEquals', option: 'focusStrategy', value: 'rovingTabIndex' },
-    active: 0,
-    inactive: -1,
-  },
-} as const
-
 export const radioParts = {
   radiogroup: {
     role: 'radiogroup',
@@ -17,7 +9,13 @@ export const radioParts = {
       { attribute: 'aria-checked', from: 'state.selectedKeys.radioChecked' },
       { attribute: 'aria-disabled', from: 'state.disabledKeys' },
     ],
-    focus: radioFocus,
+    focus: {
+      tabIndex: {
+        when: { kind: 'optionEquals', option: 'focusStrategy', value: 'rovingTabIndex' },
+        active: 0,
+        inactive: -1,
+      },
+    },
     state: [
       { name: 'active', from: 'state.activeKey' },
       { name: 'checked', from: 'state.selectedKeys.radioChecked' },
