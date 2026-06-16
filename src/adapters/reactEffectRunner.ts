@@ -1,9 +1,7 @@
-import type { Key, PatternData, PatternDefinition } from '../schema'
+import type { EffectDefinition, Key, PatternData, PatternDefinition } from '../schema'
 import { createParentByKey, evaluatePredicate } from '../kernel/patternKernel'
 import { resolveElementTarget } from './reactElementTargets'
 import { containsActiveElement, resolveFocusEffectTarget } from './reactFocusEffectTarget'
-
-type EffectDefinition = NonNullable<PatternDefinition['effects']>[number]
 
 export function runPatternEffects({
   definition,
