@@ -10,10 +10,13 @@ import {
 } from '../../schema'
 import { treeviewDefinition } from './definition'
 import { createPatternRuntime, type PatternRuntime, type SlotProps } from '../../kernel/patternRuntime'
-import { toTreeviewRenderState, type TreeviewRenderState } from './renderState'
 import { resolveTreeviewVisibleKeys, resolveTypeaheadTarget } from './typeahead'
 import { createElementId } from '../../kernel/domIds'
 import { withNonEnumerableMeta } from '../../kernel/domEventBindings'
+
+export type TreeviewRenderState = Record<'active' | 'selected' | 'disabled' | 'expanded', boolean> & {
+  checked?: boolean | 'mixed'
+}
 
 export interface TreeviewRenderItem {
   key: Key
@@ -118,6 +121,16 @@ function createTreeviewRenderItems(
     state: resolveState(key),
     slotProps: { treeitem: getTreeItemProps(key), indicator: getIndicatorProps(key) },
   }))
+}
+
+function toTreeviewRenderState(state: Record<string, unknown>): TreeviewRenderState {
+  const out: TreeviewRenderState = { active: false, selected: false, disabled: false, expanded: false }
+  out.active = Boolean(state.active)
+  out.selected = Boolean(state.selected)
+  out.disabled = Boolean(state.disabled)
+  out.expanded = Boolean(state.expanded)
+  if (state.checked !== undefined) out.checked = state.checked as boolean | 'mixed'
+  return out
 }
 
 function createTreeProps({
