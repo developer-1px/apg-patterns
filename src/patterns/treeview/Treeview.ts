@@ -71,13 +71,8 @@ function renderTreeItem<TItem extends TreeDataItem>({
   const icon = renderIcon?.(item, dataItem)
   if (icon !== undefined && icon !== null) children.push(createElement('span', { key: `${item.key}-icon`, 'aria-hidden': true } as SpanProps, icon))
 
-  children.push(createElement('span', { key: `${item.key}-label` } as SpanProps, renderLabel?.(item, dataItem) ?? renderDefaultLabel(item, dataItem)))
+  children.push(createElement('span', { key: `${item.key}-label` } as SpanProps, renderLabel?.(item, dataItem) ?? (dataItem.href ? createElement('a', { href: dataItem.href } as AnchorProps, item.label) : item.label)))
 
   const style: CSSProperties | undefined = item.level > 1 ? { paddingInlineStart: `${(item.level - 1) * indent}px` } : undefined
   return createElement('div', { key: item.key, ...item.treeitemProps, style } as DivProps & { key: Key }, children)
-}
-
-function renderDefaultLabel<TItem extends TreeDataItem>(item: ReactTreeviewRenderItem, dataItem: TItem) {
-  if (dataItem.href) return createElement('a', { href: dataItem.href } as AnchorProps, item.label)
-  return item.label
 }
