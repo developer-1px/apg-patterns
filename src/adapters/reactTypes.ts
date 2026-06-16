@@ -1,3 +1,3 @@
 export type { ReactAccordionRenderItem, ReactAccordionRuntime } from '../patterns/accordion/useAccordionPattern'
-export * from '../patterns/listbox/reactTypes'
+export type { ReactListboxRenderItem, ReactListboxRuntime } from '../patterns/listbox/useListboxPattern'
 export * from '../patterns/treeview/reactTypes'

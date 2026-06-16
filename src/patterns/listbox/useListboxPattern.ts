@@ -7,9 +7,35 @@ import { listboxDefinition } from './definition'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { useReactPatternRuntime } from '../../adapters/reactPatternEffects'
 import { reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
-import type { ReactListboxRenderItem, ReactListboxRuntime } from '../../adapters/reactTypes'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 import { getPatternItemLabel, getPatternItemTextValue } from '../../internal/patternItemText'
+
+export interface ReactListboxRenderItem {
+  kind: 'option'
+  key: Key
+  label: string
+  textValue: string
+  state: ReactRenderItemState
+  optionProps: ReactPatternProps
+}
+
+export interface ReactListboxRuntime {
+  rootProps: ReactPatternProps
+  renderItems: readonly ReactListboxRenderItem[]
+  state: {
+    activeKey: Key | null
+    selectedKeys: readonly Key[]
+    disabledKeys: readonly Key[]
+  }
+  actions: {
+    focus(key: Key): void
+    select(key: Key): void
+  }
+  ids: {
+    forKey(key: Key): string
+  }
+  keyToElementId(key: Key): string
+}
 
 export function useListboxPattern(data: PatternData, onEvent: (event: PatternEvent) => void, options?: PatternOptions): ReactListboxRuntime {
   const typeaheadBufferRef = useRef(createApgTypeaheadBuffer())

@@ -1,7 +1,6 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
-import type { ReactListboxRenderItem } from './reactTypes'
-import { useListboxPattern } from './useListboxPattern'
+import { useListboxPattern, type ReactListboxRenderItem } from './useListboxPattern'
 
 type DivProps = ComponentPropsWithoutRef<'div'>
 

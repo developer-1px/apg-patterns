@@ -1,9 +1,8 @@
 import { type HTMLAttributes, type KeyboardEvent, useMemo } from 'react'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
-import type { ReactListboxRenderItem } from '../../adapters/reactTypes'
 import { createElementId, createElementIdPrefix } from '../../kernel/domIds'
-import { useListboxPattern } from '../listbox/useListboxPattern'
+import { useListboxPattern, type ReactListboxRenderItem } from '../listbox/useListboxPattern'
 
 export type AutocompleteOwnerAutocomplete = 'none' | 'list' | 'inline' | 'both'
 
