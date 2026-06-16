@@ -54,32 +54,23 @@ export function useListboxPattern(data: PatternData, onEvent: (event: PatternEve
 }
 
 function createListboxRenderItem(runtime: PatternRuntime, key: Key): ReactListboxRenderItem {
-  const optionProps = withListboxOptionFocusOwnership(runtime, reactProps(runtime.getPartProps('option', key)))
+  const baseOptionProps = reactProps(runtime.getPartProps('option', key))
+  const optionProps = runtime.options.focusStrategy === 'ariaActiveDescendant'
+    ? { ...baseOptionProps, tabIndex: -1 }
+    : baseOptionProps
+  const onClick = optionProps.onClick
   return {
     kind: 'option',
     key,
     label: getPatternItemLabel(runtime.data, key),
     textValue: getPatternItemTextValue(runtime.data, key),
     state: getItemState(runtime, key, 'option'),
-    optionProps: withListboxOptionClick(runtime, key, optionProps),
-  }
-}
-
-function withListboxOptionFocusOwnership(runtime: PatternRuntime, props: ReactPatternProps): ReactPatternProps {
-  if (runtime.options.focusStrategy !== 'ariaActiveDescendant') return props
-  return {
-    ...props,
-    tabIndex: -1,
-  }
-}
-
-function withListboxOptionClick(runtime: PatternRuntime, key: Key, props: ReactPatternProps): ReactPatternProps {
-  const onClick = props.onClick
-  return {
-    ...props,
-    onClick: (event) => {
-      if (handleListboxMultiClick(runtime, key, event)) return
-      onClick?.(event)
+    optionProps: {
+      ...optionProps,
+      onClick: (event) => {
+        if (handleListboxMultiClick(runtime, key, event)) return
+        onClick?.(event)
+      },
     },
   }
 }
