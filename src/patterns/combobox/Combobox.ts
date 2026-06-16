@@ -1,7 +1,6 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
 import type { Key, PatternEvent, PatternItem, PatternOptions } from '../../schema'
-import type { ComboboxData } from './comboboxRuntimeState'
-import { useComboboxPattern, type ReactComboboxOption } from './useComboboxPattern'
+import { useComboboxPattern, type ComboboxData, type ReactComboboxOption } from './useComboboxPattern'
 
 type DivProps = ComponentPropsWithoutRef<'div'>
 

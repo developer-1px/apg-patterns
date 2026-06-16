@@ -1,25 +1,28 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { getComboboxRuntimeState } from '../patterns/combobox/comboboxRuntimeState'
+import { useComboboxPattern } from '../patterns/combobox/useComboboxPattern'
 
 function RuntimeStateHost() {
   const [result, setResult] = useState('')
+  const combobox = useComboboxPattern(
+    {
+      items: { combobox: { label: 'Choose' }, selected: {} },
+      relations: {},
+      state: { selectedKeys: ['selected'] },
+    },
+    () => undefined,
+  )
 
   return (
     <div>
       <button
         type="button"
         onClick={() => {
-          const combobox = getComboboxRuntimeState({
-            items: { combobox: { label: 'Choose' }, selected: {} },
-            relations: {},
-            state: { selectedKeys: ['selected'] },
-          })
           setResult([
             combobox.listboxId,
-            combobox.displayValue,
-            combobox.label,
+            combobox.inputProps.value,
+            combobox.inputProps.placeholder,
           ].join('|'))
         }}
       >
@@ -35,6 +38,6 @@ describe('runtime state coverage from pointer input', () => {
     render(<RuntimeStateHost />)
 
     fireEvent.click(screen.getByRole('button', { name: 'Read empty runtime state' }))
-    expect(screen.getByText('combobox-popup||Choose')).toBeTruthy()
+    expect(screen.getByText('combobox-popup||Search choose')).toBeTruthy()
   })
 })
