@@ -15,7 +15,6 @@ type CarouselDataState = PatternState & {
 }
 
 type DivProps = ComponentPropsWithoutRef<'div'>
-type ButtonProps = ComponentPropsWithoutRef<'button'>
 
 export interface CarouselProps<TItem extends CarouselDataItem = CarouselDataItem> {
   data: PatternData<TItem, CarouselDataState>
@@ -29,8 +28,8 @@ export function Carousel<TItem extends CarouselDataItem = CarouselDataItem>({ da
   const carousel = useCarouselPattern(data, onEvent, options)
 
   return createElement('div', { ...carousel.rootProps, className } as DivProps, [
-    createElement('button', { key: 'prev', ...carousel.prevProps } as ButtonProps, data.items.prev?.label ?? 'Previous'),
-    createElement('button', { key: 'next', ...carousel.nextProps } as ButtonProps, data.items.next?.label ?? 'Next'),
+    createElement('button', { key: 'prev', ...carousel.prevProps } as ComponentPropsWithoutRef<'button'>, data.items.prev?.label ?? 'Previous'),
+    createElement('button', { key: 'next', ...carousel.nextProps } as ComponentPropsWithoutRef<'button'>, data.items.next?.label ?? 'Next'),
     ...carousel.slides.map((slide) => {
       const dataItem = data.items[slide.key]
       return createElement('div', { key: slide.key, ...slide.slideProps } as DivProps & { key: Key }, renderSlide?.(slide, dataItem) ?? [
@@ -44,7 +43,7 @@ export function Carousel<TItem extends CarouselDataItem = CarouselDataItem>({ da
           'div',
           { key: 'pickers' } as DivProps,
           carousel.slides.map((slide) =>
-            createElement('button', { key: slide.key, ...slide.pickerProps } as ButtonProps & { key: Key }, data.items[slide.key]?.label ?? slide.title),
+            createElement('button', { key: slide.key, ...slide.pickerProps } as ComponentPropsWithoutRef<'button'> & { key: Key }, data.items[slide.key]?.label ?? slide.title),
           ),
         )
       : null,
