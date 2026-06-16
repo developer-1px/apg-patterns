@@ -7,7 +7,7 @@ import {
   type PatternRuntimeContext,
 } from './patternKernel'
 import { resolveRuntimePartProps } from './runtimePartProps'
-import { resolveRuntimeKeyboardBinding, type RuntimeKeyboardBindingResult } from './runtimeKeyboard'
+import { resolveRuntimeKeyboardBinding } from './runtimeKeyboard'
 import { createElementId } from './domIds'
 import { withDefaultReason } from './domEventBindings'
 import { registerKernelBuiltins } from './kernelBuiltins'
@@ -67,7 +67,16 @@ export function createPatternRuntime<TData extends PatternData = PatternData>(in
 
   const resolveKeyboardBinding = (input: KeyInput, activeKey: Key) => resolveRuntimeKeyboardBinding({ definition, data, options, parentByKey, input, activeKey })
 
-  const getRootKeyboardHandler = () => createRootKeyboardHandler({ data, visibleKeys, emit, resolveKeyboardBinding })
+  const getRootKeyboardHandler = () => (event: KeyInput & { preventDefault?: () => void }) => {
+    const active = data.state?.activeKey ?? visibleKeys[0]
+    if (!active) return
+
+    const result = resolveKeyboardBinding(event, active)
+    if (!result) return
+
+    if (result.preventDefault) event.preventDefault?.()
+    for (const next of result.events) emit(withDefaultReason(next, 'keyboard'))
+  }
 
   const getPartProps = (partName: string, key?: Key): SlotProps => {
     return resolveRuntimePartProps({ definition, data, partName, key, keyToElementId, context, emit, getRootKeyboardHandler })
@@ -85,29 +94,6 @@ export function createPatternRuntime<TData extends PatternData = PatternData>(in
   const getItemProps = (partName: string, key: Key): SlotProps => getPartProps(partName, key)
 
   return { definition, data, options, visibleKeys, getRootProps, getItemProps, getPartProps, getRootKeyboardHandler, resolveKeyboardBinding, getItemState, keyToElementId, emit }
-}
-
-function createRootKeyboardHandler({
-  data,
-  visibleKeys,
-  emit,
-  resolveKeyboardBinding,
-}: {
-  data: PatternData
-  visibleKeys: readonly Key[]
-  emit: (event: PatternEvent) => void
-  resolveKeyboardBinding: (input: KeyInput, activeKey: Key) => RuntimeKeyboardBindingResult | null
-}) {
-  return (event: KeyInput & { preventDefault?: () => void }) => {
-    const active = data.state?.activeKey ?? visibleKeys[0]
-    if (!active) return
-
-    const result = resolveKeyboardBinding(event, active)
-    if (!result) return
-
-    if (result.preventDefault) event.preventDefault?.()
-    for (const next of result.events) emit(withDefaultReason(next, 'keyboard'))
-  }
 }
 
 function resolveRuntimeItemState({
