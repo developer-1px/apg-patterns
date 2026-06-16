@@ -186,6 +186,21 @@ entrypoint and verifies these long-lived contracts:
 The fixture is not exhaustive APG behavior coverage. It is the minimum semantic
 compatibility anchor for the permanent core contract.
 
+`scripts/fixtures/public-pattern-contracts.json` anchors selected high-risk APG
+definitions through the same built core entrypoint:
+
+- `treeviewDefinition`: visible depth-first order, roving treeitem props,
+  expand/collapse keyboard semantics, child navigation, and pointer focus/select
+  emission.
+- `gridDefinition`: row/column visible order, grid and cell ARIA projections,
+  multiple-selection keyboard semantics, navigation reduction, selection range
+  reduction, and edit transition reduction.
+- `menubarDefinition`: disabled-item navigation skipping, submenu owner ARIA,
+  child menu navigation, expansion reduction, and active item click semantics.
+
+Add a pattern to this fixture when its APG keyboard/focus behavior becomes part
+of the package identity rather than just demo coverage.
+
 ## Not A Stability Contract
 
 These details may change without being treated as package identity:

@@ -7,6 +7,7 @@ const repoRoot = new URL('../', import.meta.url)
 const apiReferencePath = new URL('API.md', repoRoot)
 const interfaceStabilityPath = new URL('INTERFACE_STABILITY.md', repoRoot)
 const publicContractFixturePath = new URL('scripts/fixtures/public-api-contract.json', repoRoot)
+const publicPatternFixturePath = new URL('scripts/fixtures/public-pattern-contracts.json', repoRoot)
 const shouldWrite = process.argv.includes('--write')
 const failures = []
 const forbiddenPublicExports = new Map([
@@ -320,6 +321,7 @@ const rootSurfaceManifest = publicSurfaceManifest(coreExports, classifyRootCoreE
 const reactSurfaceManifest = publicSurfaceManifest(reactOnlyExports, classifyReactOnlyExport)
 assertInterfaceStabilityDocumentsBucketPolicies(rootSurfaceBuckets, reactSurfaceBuckets)
 assertPublicContractFixture(coreRuntimeModule)
+assertPublicPatternFixtures(coreRuntimeModule)
 const nextApiReference = shouldWrite
   ? replaceExportBlock(
     replaceExportBlock(
@@ -365,7 +367,7 @@ if (failures.length > 0) {
   process.exit(1)
 }
 
-console.log(`${wroteApiReference ? 'Updated API reference and verified' : 'API reference covers'} ${coreExports.length} root/core exports, ${rootRuntimeExports.length} root/core runtime values, ${reactOnlyExports.length} React-only exports, and ${reactOnlyRuntimeExports.length} React-only runtime values. Surface buckets: root/core ${formatBuckets(rootSurfaceBuckets)}; react-only ${formatBuckets(reactSurfaceBuckets)}. Public contract fixture verified.`)
+console.log(`${wroteApiReference ? 'Updated API reference and verified' : 'API reference covers'} ${coreExports.length} root/core exports, ${rootRuntimeExports.length} root/core runtime values, ${reactOnlyExports.length} React-only exports, and ${reactOnlyRuntimeExports.length} React-only runtime values. Surface buckets: root/core ${formatBuckets(rootSurfaceBuckets)}; react-only ${formatBuckets(reactSurfaceBuckets)}. Public contract fixtures verified.`)
 
 function declarationExports(packagePath) {
   const filePath = fileURLToPath(new URL(packagePath, repoRoot))
@@ -589,8 +591,215 @@ function assertPublicContractFixture(coreRuntime) {
   )
 }
 
-function keyInput(key) {
-  return { key, ctrlKey: false, shiftKey: false, altKey: false, metaKey: false }
+function assertPublicPatternFixtures(coreRuntime) {
+  if (!existsSync(publicPatternFixturePath)) {
+    failures.push('scripts/fixtures/public-pattern-contracts.json is required')
+    return
+  }
+
+  const fixture = JSON.parse(readFileSync(publicPatternFixturePath, 'utf8'))
+  expectEqual('public pattern fixture schemaVersion', fixture.schemaVersion, 1)
+  assertTreeviewPatternContract(coreRuntime, fixture.treeview)
+  assertGridPatternContract(coreRuntime, fixture.grid)
+  assertMenubarPatternContract(coreRuntime, fixture.menubar)
+}
+
+function assertTreeviewPatternContract(coreRuntime, fixture) {
+  const definition = parsePatternDefinitionExport(coreRuntime, 'treeview', 'treeviewDefinition')
+  const data = parsePatternDataFixture(coreRuntime, 'treeview', fixture)
+  const options = parsePatternOptionsFixture(coreRuntime, 'treeview', fixture)
+  if (!definition || !data || !options) return
+
+  const emitted = []
+  const runtime = coreRuntime.createPatternRuntime({
+    definition,
+    data,
+    options,
+    keyToElementId: (key) => `tree-${key}`,
+    onEvent: (event) => emitted.push(event),
+  })
+
+  expectDeepEqual('treeview visible order', runtime.visibleKeys, ['docs', 'overview', 'api', 'settings'])
+  expectDeepEqual('treeview root props', pick(runtime.getRootProps(), ['role', 'aria-label', 'aria-multiselectable']), {
+    role: 'tree',
+    'aria-label': 'Documentation tree',
+    'aria-multiselectable': true,
+  })
+  expectDeepEqual('treeview expanded active item props', pick(runtime.getItemProps('treeitem', 'docs'), ['role', 'id', 'aria-label', 'aria-selected', 'aria-expanded', 'aria-level', 'aria-posinset', 'aria-setsize', 'tabIndex']), {
+    role: 'treeitem',
+    id: 'tree-docs',
+    'aria-label': 'Docs',
+    'aria-selected': false,
+    'aria-expanded': true,
+    'aria-level': 1,
+    'aria-posinset': 1,
+    'aria-setsize': 2,
+    tabIndex: 0,
+  })
+  expectDeepEqual('treeview selected child state', pick(runtime.getItemState('overview', 'treeitem'), ['active', 'selected', 'disabled', 'expanded']), {
+    active: false,
+    selected: true,
+    disabled: false,
+    expanded: false,
+  })
+  expectDeepEqual('treeview ArrowRight on expanded parent', runtime.resolveKeyboardBinding(keyInput('ArrowRight'), 'docs'), {
+    preventDefault: true,
+    events: [{ type: 'navigate', direction: 'child' }],
+  })
+  expectDeepEqual('treeview ArrowLeft on expanded parent', runtime.resolveKeyboardBinding(keyInput('ArrowLeft'), 'docs'), {
+    preventDefault: true,
+    events: [{ type: 'expand', key: 'docs', expanded: false }],
+  })
+  expectEqual('treeview child navigation reducer', coreRuntime.reducePatternData(definition, data, { type: 'navigate', direction: 'child' }).state?.activeKey, 'overview')
+  expectDeepEqual('treeview collapse reducer', coreRuntime.reducePatternData(definition, data, { type: 'expand', key: 'docs', expanded: false }).state?.expandedKeys, [])
+
+  runtime.getItemProps('treeitem', 'api').onClick()
+  expectDeepEqual('treeview click emits focus and select', emitted.map(enumerableEvent), [
+    { type: 'focus', key: 'api' },
+    { type: 'select', keys: ['api'], anchorKey: 'api', extentKey: 'api' },
+  ])
+  expectDeepEqual('treeview click event reasons', emitted.map((event) => event.meta?.reason), ['pointer', 'pointer'])
+}
+
+function assertGridPatternContract(coreRuntime, fixture) {
+  const definition = parsePatternDefinitionExport(coreRuntime, 'grid', 'gridDefinition')
+  const data = parsePatternDataFixture(coreRuntime, 'grid', fixture)
+  const options = parsePatternOptionsFixture(coreRuntime, 'grid', fixture)
+  if (!definition || !data || !options) return
+
+  const runtime = coreRuntime.createPatternRuntime({
+    definition,
+    data,
+    options,
+    keyToElementId: (key) => `grid-${key}`,
+    onEvent: () => {},
+  })
+
+  expectDeepEqual('grid visible order', runtime.visibleKeys, ['r1-name', 'r1-status', 'r2-name', 'r2-status'])
+  expectDeepEqual('grid root props', pick(runtime.getRootProps(), ['role', 'aria-label', 'aria-rowcount', 'aria-colcount', 'aria-multiselectable']), {
+    role: 'grid',
+    'aria-label': 'Status grid',
+    'aria-rowcount': 2,
+    'aria-colcount': 2,
+    'aria-multiselectable': true,
+  })
+  expectDeepEqual('grid active cell props', pick(runtime.getItemProps('gridcell', 'r1-name'), ['role', 'id', 'aria-rowindex', 'aria-colindex', 'aria-selected', 'tabIndex']), {
+    role: 'gridcell',
+    id: 'grid-r1-name',
+    'aria-rowindex': 1,
+    'aria-colindex': 1,
+    'aria-selected': true,
+    tabIndex: 0,
+  })
+  expectDeepEqual('grid inactive cell props', pick(runtime.getItemProps('gridcell', 'r2-status'), ['role', 'id', 'aria-rowindex', 'aria-colindex', 'aria-selected', 'tabIndex']), {
+    role: 'gridcell',
+    id: 'grid-r2-status',
+    'aria-rowindex': 2,
+    'aria-colindex': 2,
+    'aria-selected': false,
+    tabIndex: -1,
+  })
+  expectDeepEqual('grid Shift+ArrowRight binding', runtime.resolveKeyboardBinding(keyInput('ArrowRight', { shiftKey: true }), 'r1-name'), {
+    preventDefault: true,
+    events: [{ type: 'extendSelection', direction: 'right' }],
+  })
+  expectEqual('grid right navigation reducer', coreRuntime.reducePatternData(definition, data, { type: 'navigate', direction: 'right' }).state?.activeKey, 'r1-status')
+  expectDeepEqual('grid extend selection reducer', pick(coreRuntime.reducePatternData(definition, data, { type: 'extendSelection', direction: 'right' }).state, ['activeKey', 'selectedKeys', 'anchorKey', 'extentKey']), {
+    activeKey: 'r1-status',
+    selectedKeys: ['r1-name', 'r1-status'],
+    anchorKey: 'r1-name',
+    extentKey: 'r1-status',
+  })
+  expectDeepEqual('grid editStart transition reducer', pick(coreRuntime.reducePatternData(definition, data, { type: 'editStart', key: 'r1-name', value: 'draft' }).state, ['editingKey', 'editDraftByKey']), {
+    editingKey: 'r1-name',
+    editDraftByKey: { 'r1-name': 'draft' },
+  })
+}
+
+function assertMenubarPatternContract(coreRuntime, fixture) {
+  const definition = parsePatternDefinitionExport(coreRuntime, 'menubar', 'menubarDefinition')
+  const data = parsePatternDataFixture(coreRuntime, 'menubar', fixture)
+  const options = parsePatternOptionsFixture(coreRuntime, 'menubar', fixture)
+  if (!definition || !data || !options) return
+
+  const emitted = []
+  const runtime = coreRuntime.createPatternRuntime({
+    definition,
+    data,
+    options,
+    keyToElementId: (key) => `menu-${key}`,
+    onEvent: (event) => emitted.push(event),
+  })
+
+  expectDeepEqual('menubar visible order', runtime.visibleKeys, ['file', 'edit', 'view'])
+  expectDeepEqual('menubar root props', pick(runtime.getRootProps(), ['role', 'aria-label', 'aria-orientation']), {
+    role: 'menubar',
+    'aria-label': 'Application menu',
+    'aria-orientation': 'horizontal',
+  })
+  expectDeepEqual('menubar submenu owner props', pick(runtime.getItemProps('menuitem', 'file'), ['role', 'id', 'aria-haspopup', 'aria-expanded', 'tabIndex']), {
+    role: 'menuitem',
+    id: 'menu-file',
+    'aria-haspopup': 'menu',
+    'aria-expanded': false,
+    tabIndex: 0,
+  })
+  expectDeepEqual('menubar disabled item props', pick(runtime.getItemProps('menuitem', 'edit'), ['role', 'id', 'aria-disabled', 'tabIndex']), {
+    role: 'menuitem',
+    id: 'menu-edit',
+    'aria-disabled': true,
+    tabIndex: -1,
+  })
+  expectDeepEqual('menubar ArrowDown opens child menu', runtime.resolveKeyboardBinding(keyInput('ArrowDown'), 'file'), {
+    preventDefault: true,
+    events: [
+      { type: 'expand', key: 'file', expanded: true },
+      { type: 'navigate', direction: 'down' },
+    ],
+  })
+  expectEqual('menubar next navigation skips disabled item', coreRuntime.reducePatternData(definition, data, { type: 'navigate', direction: 'next' }).state?.activeKey, 'view')
+  expectEqual('menubar child navigation reducer', coreRuntime.reducePatternData(definition, data, { type: 'navigate', direction: 'down' }).state?.activeKey, 'new')
+  expectDeepEqual('menubar expand reducer', coreRuntime.reducePatternData(definition, data, { type: 'expand', key: 'file', expanded: true }).state?.expandedKeys, ['file'])
+
+  runtime.getItemProps('menuitem', 'file').onClick()
+  expectDeepEqual('menubar active click emits activate only', emitted.map(enumerableEvent), [{ type: 'activate', key: 'file' }])
+  expectDeepEqual('menubar active click reason', emitted.map((event) => event.meta?.reason), ['pointer'])
+}
+
+function parsePatternDefinitionExport(coreRuntime, label, exportName) {
+  const definition = coreRuntime[exportName]
+  if (!definition) {
+    failures.push(`${label} public pattern contract missing ${exportName}`)
+    return null
+  }
+  const result = coreRuntime.PatternDefinitionSchema.safeParse(definition)
+  if (!result.success) {
+    failures.push(`${label} public definition failed schema parse: ${formatSchemaIssues(result.error)}`)
+    return null
+  }
+  return result.data
+}
+
+function parsePatternDataFixture(coreRuntime, label, fixture) {
+  const result = coreRuntime.PatternDataSchema.safeParse(fixture?.data)
+  if (!result.success) {
+    failures.push(`${label} public pattern data failed schema parse: ${formatSchemaIssues(result.error)}`)
+    return null
+  }
+  return result.data
+}
+
+function parsePatternOptionsFixture(coreRuntime, label, fixture) {
+  const result = coreRuntime.PatternOptionsSchema.safeParse(fixture?.options ?? {})
+  if (!result.success) {
+    failures.push(`${label} public pattern options failed schema parse: ${formatSchemaIssues(result.error)}`)
+    return null
+  }
+  return result.data
+}
+
+function keyInput(key, modifiers = {}) {
+  return { key, ctrlKey: false, shiftKey: false, altKey: false, metaKey: false, ...modifiers }
 }
 
 function enumerableEvent(event) {

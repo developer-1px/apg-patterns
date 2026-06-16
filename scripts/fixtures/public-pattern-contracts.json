@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "treeview": {
+    "options": {
+      "focusStrategy": "rovingTabIndex",
+      "selectionMode": "multiple",
+      "itemClickAction": "select"
+    },
+    "data": {
+      "items": {
+        "docs": { "label": "Docs" },
+        "overview": { "label": "Overview" },
+        "api": { "label": "API" },
+        "settings": { "label": "Settings" }
+      },
+      "relations": {
+        "rootKeys": ["docs", "settings"],
+        "childrenByKey": { "docs": ["overview", "api"] }
+      },
+      "state": {
+        "activeKey": "docs",
+        "selectedKeys": ["overview"],
+        "expandedKeys": ["docs"],
+        "levelByKey": { "docs": 1, "overview": 2, "api": 2, "settings": 1 },
+        "posInSetByKey": { "docs": 1, "overview": 1, "api": 2, "settings": 2 },
+        "setSizeByKey": { "docs": 2, "overview": 2, "api": 2, "settings": 2 }
+      },
+      "refs": { "label": "Documentation tree" }
+    }
+  },
+  "grid": {
+    "options": {
+      "focusStrategy": "rovingTabIndex",
+      "selectionMode": "multiple"
+    },
+    "data": {
+      "items": {
+        "row-1": { "label": "Row 1" },
+        "row-2": { "label": "Row 2" },
+        "name": { "label": "Name" },
+        "status": { "label": "Status" },
+        "r1-name": { "label": "Alpha" },
+        "r1-status": { "label": "Ready" },
+        "r2-name": { "label": "Beta" },
+        "r2-status": { "label": "Blocked" }
+      },
+      "relations": {
+        "rowKeys": ["row-1", "row-2"],
+        "columnKeys": ["name", "status"],
+        "cells": [
+          { "rowKey": "row-1", "columnKey": "name", "cellKey": "r1-name" },
+          { "rowKey": "row-1", "columnKey": "status", "cellKey": "r1-status" },
+          { "rowKey": "row-2", "columnKey": "name", "cellKey": "r2-name" },
+          { "rowKey": "row-2", "columnKey": "status", "cellKey": "r2-status" }
+        ]
+      },
+      "state": {
+        "activeKey": "r1-name",
+        "anchorKey": "r1-name",
+        "selectedKeys": ["r1-name"],
+        "rowIndexByKey": { "r1-name": 1, "r1-status": 1, "r2-name": 2, "r2-status": 2 },
+        "columnIndexByKey": { "r1-name": 1, "r1-status": 2, "r2-name": 1, "r2-status": 2 },
+        "rowCount": 2,
+        "colCount": 2
+      },
+      "refs": { "label": "Status grid" }
+    }
+  },
+  "menubar": {
+    "options": {
+      "orientation": "horizontal"
+    },
+    "data": {
+      "items": {
+        "file": { "label": "File" },
+        "new": { "label": "New" },
+        "open": { "label": "Open" },
+        "edit": { "label": "Edit" },
+        "view": { "label": "View" }
+      },
+      "relations": {
+        "rootKeys": ["file", "edit", "view"],
+        "childrenByKey": { "file": ["new", "open"] }
+      },
+      "state": {
+        "activeKey": "file",
+        "disabledKeys": ["edit"],
+        "expandedKeys": []
+      },
+      "refs": { "label": "Application menu" }
+    }
+  }
+}
