@@ -150,8 +150,8 @@ function fallbackWindowSplitterRestoreValue(
   range: WindowSplitterValueRange,
   options: WindowSplitterValueOptions | PatternOptions,
 ): number {
-  const defaultValue = finiteNumberOption(options.defaultValue)
-  if (defaultValue !== null) return defaultValue
+  const defaultValue = options.defaultValue
+  if (typeof defaultValue === 'number' && Number.isFinite(defaultValue)) return defaultValue
   if (Number.isFinite(range.max)) return Math.round((range.min + range.max) / 2)
   return range.min + range.largeStep
 }
@@ -196,10 +196,6 @@ function numericRecord(value: unknown): Record<Key, number> {
 
 function numberOption(value: unknown, fallback: number): number {
   return typeof value === 'number' && !Number.isNaN(value) ? value : fallback
-}
-
-function finiteNumberOption(value: unknown): number | null {
-  return typeof value === 'number' && Number.isFinite(value) ? value : null
 }
 
 function positiveFiniteOption(value: unknown, fallback: number): number {
