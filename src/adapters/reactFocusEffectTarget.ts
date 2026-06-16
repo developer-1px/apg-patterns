@@ -13,15 +13,10 @@ export function resolveFocusEffectTarget(target: FocusEffectTarget, data: Patter
 
 export function containsActiveElement(target: FocusEffectTarget, data: PatternData, keyToElementId: (key: Key) => string, rootRole: string): boolean {
   const targetElement = resolveFocusEffectTarget(target, data, keyToElementId)
-  const root = targetElement ? closestRole(targetElement, rootRole) : null
-  return Boolean(root && document.activeElement && root.contains(document.activeElement))
-}
-
-function closestRole(element: HTMLElement, role: string): HTMLElement | null {
-  let current: HTMLElement | null = element
-  while (current) {
-    if (current.getAttribute('role') === role) return current
-    current = current.parentElement
+  if (!targetElement) return false
+  let root: HTMLElement | null = targetElement
+  while (root && root.getAttribute('role') !== rootRole) {
+    root = root.parentElement
   }
-  return null
+  return Boolean(root && document.activeElement && root.contains(document.activeElement))
 }
