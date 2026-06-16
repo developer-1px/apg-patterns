@@ -8,8 +8,6 @@ type TreeDataItem = PatternItem & {
 }
 
 type DivProps = ComponentPropsWithoutRef<'div'>
-type ButtonProps = ComponentPropsWithoutRef<'button'>
-type AnchorProps = ComponentPropsWithoutRef<'a'>
 type SpanProps = ComponentPropsWithoutRef<'span'>
 
 export interface TreeviewProps<TItem extends TreeDataItem = TreeDataItem> {
@@ -62,7 +60,7 @@ function renderTreeItem<TItem extends TreeDataItem>({
           key: `${item.key}-toggle`,
           'aria-label': `${item.state.expanded ? 'Collapse' : 'Expand'} ${item.label}`,
           ...item.toggleButtonProps,
-        } as ButtonProps,
+        } as ComponentPropsWithoutRef<'button'>,
         item.state.expanded ? '-' : '+',
       ),
     )
@@ -71,7 +69,7 @@ function renderTreeItem<TItem extends TreeDataItem>({
   const icon = renderIcon?.(item, dataItem)
   if (icon !== undefined && icon !== null) children.push(createElement('span', { key: `${item.key}-icon`, 'aria-hidden': true } as SpanProps, icon))
 
-  children.push(createElement('span', { key: `${item.key}-label` } as SpanProps, renderLabel?.(item, dataItem) ?? (dataItem.href ? createElement('a', { href: dataItem.href } as AnchorProps, item.label) : item.label)))
+  children.push(createElement('span', { key: `${item.key}-label` } as SpanProps, renderLabel?.(item, dataItem) ?? (dataItem.href ? createElement('a', { href: dataItem.href } as ComponentPropsWithoutRef<'a'>, item.label) : item.label)))
 
   const style: CSSProperties | undefined = item.level > 1 ? { paddingInlineStart: `${(item.level - 1) * indent}px` } : undefined
   return createElement('div', { key: item.key, ...item.treeitemProps, style } as DivProps & { key: Key }, children)

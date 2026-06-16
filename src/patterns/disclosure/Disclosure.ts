@@ -8,7 +8,6 @@ type DisclosureDataItem = PatternItem & {
 }
 
 type DivProps = ComponentPropsWithoutRef<'div'>
-type ButtonProps = ComponentPropsWithoutRef<'button'>
 
 export interface DisclosureProps<TItem extends DisclosureDataItem = DisclosureDataItem> {
   data: PatternData<TItem>
@@ -35,7 +34,7 @@ export function Disclosure<TItem extends DisclosureDataItem = DisclosureDataItem
     disclosure.items.map((item) => {
       const panelItem = item.panelKey ? data.items[item.panelKey] : undefined
       return createElement('div', { key: item.key } as DivProps & { key: Key }, [
-        createElement('button', { key: `${item.key}-trigger`, ...item.triggerProps } as ButtonProps, renderTrigger?.(item, data.items[item.key]) ?? item.label),
+        createElement('button', { key: `${item.key}-trigger`, ...item.triggerProps } as ComponentPropsWithoutRef<'button'>, renderTrigger?.(item, data.items[item.key]) ?? item.label),
         item.expanded && item.panelProps
           ? createElement('div', { key: `${item.key}-panel`, ...item.panelProps } as DivProps, renderPanel?.(item, panelItem) ?? panelItem?.content ?? panelItem?.label)
           : null,

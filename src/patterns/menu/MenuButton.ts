@@ -4,7 +4,6 @@ import type { ReactMenuButtonItem } from './menuButtonItem'
 import { useMenuButtonPattern } from './useMenuButtonPattern'
 
 type DivProps = ComponentPropsWithoutRef<'div'>
-type ButtonProps = ComponentPropsWithoutRef<'button'>
 
 export interface MenuButtonProps<TItem extends PatternItem = PatternItem> {
   data: PatternData<TItem>
@@ -19,7 +18,7 @@ export function MenuButton<TItem extends PatternItem = PatternItem>({ data, onEv
   const menu = useMenuButtonPattern(data, onEvent, options)
 
   return createElement('div', { className } as DivProps, [
-    createElement('button', { key: 'trigger', ...menu.triggerProps } as ButtonProps, renderTrigger?.() ?? (menu.triggerKey ? data.items[menu.triggerKey]?.label : undefined)),
+    createElement('button', { key: 'trigger', ...menu.triggerProps } as ComponentPropsWithoutRef<'button'>, renderTrigger?.() ?? (menu.triggerKey ? data.items[menu.triggerKey]?.label : undefined)),
     menu.expanded
       ? createElement(
           'div',

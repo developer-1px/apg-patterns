@@ -9,8 +9,6 @@ type AlertDialogDataItem = PatternItem & {
 
 type DivProps = ComponentPropsWithoutRef<'div'>
 type ButtonProps = ComponentPropsWithoutRef<'button'>
-type HeadingProps = ComponentPropsWithoutRef<'h2'>
-type ParagraphProps = ComponentPropsWithoutRef<'p'>
 
 export interface AlertDialogProps<TItem extends AlertDialogDataItem = AlertDialogDataItem> {
   data: PatternData<TItem>
@@ -47,10 +45,10 @@ export function AlertDialog<TItem extends AlertDialogDataItem = AlertDialogDataI
     alertDialog.open
       ? createElement('div', { key: 'overlay', ...alertDialog.overlayProps } as DivProps, [
           createElement('div', { key: 'dialog', ...alertDialog.dialogProps } as DivProps, [
-            createElement('h2', { key: 'title', ...alertDialog.titleProps } as HeadingProps, renderTitle?.(titleItem) ?? titleItem?.label),
+            createElement('h2', { key: 'title', ...alertDialog.titleProps } as ComponentPropsWithoutRef<'h2'>, renderTitle?.(titleItem) ?? titleItem?.label),
             createElement(
               'p',
-              { key: 'description', ...alertDialog.descriptionProps } as ParagraphProps,
+              { key: 'description', ...alertDialog.descriptionProps } as ComponentPropsWithoutRef<'p'>,
               renderDescription?.(descriptionItem) ?? descriptionItem?.content ?? descriptionItem?.label,
             ),
             createElement('button', { key: 'confirm', ...alertDialog.confirmProps } as ButtonProps, renderConfirm?.(data.items.confirm) ?? data.items.confirm?.label ?? 'Confirm'),

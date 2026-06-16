@@ -7,7 +7,6 @@ type TabsDataItem = PatternItem & {
 }
 
 type DivProps = ComponentPropsWithoutRef<'div'>
-type ButtonProps = ComponentPropsWithoutRef<'button'>
 
 export interface TabsProps<TItem extends TabsDataItem = TabsDataItem> {
   data: PatternData<TItem>
@@ -26,7 +25,7 @@ export function Tabs<TItem extends TabsDataItem = TabsDataItem>({ data, onEvent,
     createElement(
       'div',
       { key: 'tablist', ...tabs.getTablistProps() } as DivProps,
-      tabs.tabs.map((key) => createElement('button', { key, ...tabs.getTabProps(key) } as ButtonProps & { key: Key }, renderTab?.(key, data.items[key]) ?? data.items[key]?.label ?? key)),
+      tabs.tabs.map((key) => createElement('button', { key, ...tabs.getTabProps(key) } as ComponentPropsWithoutRef<'button'> & { key: Key }, renderTab?.(key, data.items[key]) ?? data.items[key]?.label ?? key)),
     ),
     panelKey
       ? createElement(

@@ -3,8 +3,6 @@ import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from
 import type { ReactToolbarRenderItem } from './toolbarRenderItem'
 import { useToolbarPattern } from './useToolbarPattern'
 
-type DivProps = ComponentPropsWithoutRef<'div'>
-
 export interface ToolbarProps<TItem extends PatternItem = PatternItem> {
   data: PatternData<TItem>
   onEvent: (event: PatternEvent) => void
@@ -18,7 +16,7 @@ export function Toolbar<TItem extends PatternItem = PatternItem>({ data, onEvent
 
   return createElement(
     'div',
-    { ...toolbar.rootProps, className } as DivProps,
+    { ...toolbar.rootProps, className } as ComponentPropsWithoutRef<'div'>,
     toolbar.renderItems.map((item) =>
       createElement('button', { key: item.key, type: 'button', ...item.itemProps } as ComponentPropsWithoutRef<'button'> & { key: Key }, renderItem?.(item, data.items[item.key]) ?? item.label),
     ),

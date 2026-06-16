@@ -7,9 +7,6 @@ type FeedDataItem = PatternItem & {
   content?: string
 }
 
-type DivProps = ComponentPropsWithoutRef<'div'>
-type ArticleProps = ComponentPropsWithoutRef<'article'>
-
 export interface FeedProps<TItem extends FeedDataItem = FeedDataItem> {
   data: PatternData<TItem>
   onEvent: (event: PatternEvent) => void
@@ -23,11 +20,11 @@ export function Feed<TItem extends FeedDataItem = FeedDataItem>({ data, onEvent,
 
   return createElement(
     'div',
-    { ...feed.feedProps, className } as DivProps,
+    { ...feed.feedProps, className } as ComponentPropsWithoutRef<'div'>,
     feed.articles.map((article) =>
       createElement(
         'article',
-        { key: article.key, ...article.articleProps } as ArticleProps & { key: Key },
+        { key: article.key, ...article.articleProps } as ComponentPropsWithoutRef<'article'> & { key: Key },
         renderArticle?.(article, data.items[article.key]) ?? data.items[article.key]?.content ?? article.label,
       ),
     ),

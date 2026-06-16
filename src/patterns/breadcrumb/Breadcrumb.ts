@@ -8,10 +8,6 @@ type BreadcrumbDataItem = PatternItem & {
 }
 
 type BreadcrumbData<TItem extends BreadcrumbDataItem> = PatternData<TItem>
-type AnchorProps = ComponentPropsWithoutRef<'a'>
-type ListItemProps = ComponentPropsWithoutRef<'li'>
-type ListProps = ComponentPropsWithoutRef<'ol'>
-type NavProps = ComponentPropsWithoutRef<'nav'>
 
 export interface BreadcrumbProps<TItem extends BreadcrumbDataItem = BreadcrumbDataItem> {
   data: BreadcrumbData<TItem>
@@ -32,13 +28,13 @@ export function Breadcrumb<TItem extends BreadcrumbDataItem = BreadcrumbDataItem
 
   return createElement(
     'nav',
-    { ...breadcrumb.rootProps, className } as NavProps,
+    { ...breadcrumb.rootProps, className } as ComponentPropsWithoutRef<'nav'>,
     createElement(
       'ol',
-      breadcrumb.listProps as ListProps,
+      breadcrumb.listProps as ComponentPropsWithoutRef<'ol'>,
       breadcrumb.items.map((item) =>
-        createElement('li', { key: item.key } as ListItemProps & { key: Key },
-          createElement('a', item.crumbProps as AnchorProps, renderCrumb?.(item, data.items[item.key]) ?? item.label),
+        createElement('li', { key: item.key } as ComponentPropsWithoutRef<'li'> & { key: Key },
+          createElement('a', item.crumbProps as ComponentPropsWithoutRef<'a'>, renderCrumb?.(item, data.items[item.key]) ?? item.label),
         ),
       ),
     ),

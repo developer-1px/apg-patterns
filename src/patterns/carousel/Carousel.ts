@@ -16,7 +16,6 @@ type CarouselDataState = PatternState & {
 
 type DivProps = ComponentPropsWithoutRef<'div'>
 type ButtonProps = ComponentPropsWithoutRef<'button'>
-type ImgProps = ComponentPropsWithoutRef<'img'>
 
 export interface CarouselProps<TItem extends CarouselDataItem = CarouselDataItem> {
   data: PatternData<TItem, CarouselDataState>
@@ -35,7 +34,7 @@ export function Carousel<TItem extends CarouselDataItem = CarouselDataItem>({ da
     ...carousel.slides.map((slide) => {
       const dataItem = data.items[slide.key]
       return createElement('div', { key: slide.key, ...slide.slideProps } as DivProps & { key: Key }, renderSlide?.(slide, dataItem) ?? [
-        slide.imageUrl ? createElement('img', { key: 'image', src: slide.imageUrl, alt: slide.imageAlt } as ImgProps) : null,
+        slide.imageUrl ? createElement('img', { key: 'image', src: slide.imageUrl, alt: slide.imageAlt } as ComponentPropsWithoutRef<'img'>) : null,
         createElement('strong', { key: 'title' }, slide.title),
         slide.caption ? createElement('span', { key: 'caption' }, slide.caption) : null,
       ])

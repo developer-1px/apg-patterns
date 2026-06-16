@@ -7,7 +7,6 @@ type TooltipDataItem = PatternItem & {
 }
 
 type DivProps = ComponentPropsWithoutRef<'div'>
-type ButtonProps = ComponentPropsWithoutRef<'button'>
 
 export interface TooltipProps<TItem extends TooltipDataItem = TooltipDataItem> {
   data: PatternData<TItem>
@@ -31,7 +30,7 @@ export function Tooltip<TItem extends TooltipDataItem = TooltipDataItem>({
   const tooltipItem = tooltip.tooltipKey ? data.items[tooltip.tooltipKey] : undefined
 
   return createElement('div', { className } as DivProps, [
-    createElement('button', { key: 'trigger', ...tooltip.triggerProps } as ButtonProps, renderTrigger?.(triggerItem) ?? tooltip.triggerLabel),
+    createElement('button', { key: 'trigger', ...tooltip.triggerProps } as ComponentPropsWithoutRef<'button'>, renderTrigger?.(triggerItem) ?? tooltip.triggerLabel),
     tooltip.state.open
       ? createElement('div', { key: 'tooltip', ...tooltip.tooltipProps } as DivProps, renderTooltip?.(tooltipItem) ?? tooltipItem?.content ?? tooltip.tooltipLabel)
       : null,

@@ -6,9 +6,6 @@ type AlertDataItem = PatternItem & {
   message?: unknown
 }
 
-type DivProps = ComponentPropsWithoutRef<'div'>
-type ButtonProps = ComponentPropsWithoutRef<'button'>
-
 export interface AlertProps<TItem extends AlertDataItem = AlertDataItem> {
   data: PatternData<TItem>
   onEvent: (event: PatternEvent) => void
@@ -38,9 +35,9 @@ export function Alert<TItem extends AlertDataItem = AlertDataItem>({
 
   if (dismissible && data.items.dismiss) {
     children.push(
-      createElement('button', { key: `${alert.key}-dismiss`, ...alert.dismissProps } as ButtonProps, renderDismiss?.() ?? data.items.dismiss.label ?? 'Dismiss'),
+      createElement('button', { key: `${alert.key}-dismiss`, ...alert.dismissProps } as ComponentPropsWithoutRef<'button'>, renderDismiss?.() ?? data.items.dismiss.label ?? 'Dismiss'),
     )
   }
 
-  return createElement('div', { ...alert.rootProps, className } as DivProps, children)
+  return createElement('div', { ...alert.rootProps, className } as ComponentPropsWithoutRef<'div'>, children)
 }

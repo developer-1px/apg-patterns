@@ -5,7 +5,6 @@ import type { ComboboxData } from './comboboxRuntimeState'
 import { useComboboxPattern } from './useComboboxPattern'
 
 type DivProps = ComponentPropsWithoutRef<'div'>
-type InputProps = ComponentPropsWithoutRef<'input'>
 
 export interface ComboboxProps<TItem extends PatternItem = PatternItem> {
   data: ComboboxData & { items: Record<Key, TItem> }
@@ -19,7 +18,7 @@ export function Combobox<TItem extends PatternItem = PatternItem>({ data, onEven
   const combobox = useComboboxPattern(data, onEvent, options)
 
   return createElement('div', { className } as DivProps, [
-    createElement('input', { key: 'input', ...combobox.inputProps, ref: combobox.setInputRef } as InputProps),
+    createElement('input', { key: 'input', ...combobox.inputProps, ref: combobox.setInputRef } as ComponentPropsWithoutRef<'input'>),
     combobox.open
       ? createElement(
           'div',

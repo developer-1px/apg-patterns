@@ -8,8 +8,6 @@ type DialogDataItem = PatternItem & {
 
 type DivProps = ComponentPropsWithoutRef<'div'>
 type ButtonProps = ComponentPropsWithoutRef<'button'>
-type HeadingProps = ComponentPropsWithoutRef<'h2'>
-type ParagraphProps = ComponentPropsWithoutRef<'p'>
 
 export interface DialogProps<TItem extends DialogDataItem = DialogDataItem> {
   data: PatternData<TItem>
@@ -43,10 +41,10 @@ export function Dialog<TItem extends DialogDataItem = DialogDataItem>({
     dialog.open
       ? createElement('div', { key: 'overlay', ...dialog.overlayProps } as DivProps, [
           createElement('div', { key: 'dialog', ...dialog.dialogProps } as DivProps, [
-            createElement('h2', { key: 'title', ...dialog.titleProps } as HeadingProps, renderTitle?.(titleItem) ?? titleItem?.label),
+            createElement('h2', { key: 'title', ...dialog.titleProps } as ComponentPropsWithoutRef<'h2'>, renderTitle?.(titleItem) ?? titleItem?.label),
             createElement(
               'p',
-              { key: 'description', ...dialog.descriptionProps } as ParagraphProps,
+              { key: 'description', ...dialog.descriptionProps } as ComponentPropsWithoutRef<'p'>,
               renderDescription?.(descriptionItem) ?? descriptionItem?.content ?? descriptionItem?.label,
             ),
             renderBody ? createElement('div', { key: 'body' } as DivProps, renderBody()) : null,

@@ -7,9 +7,6 @@ type LinkDataItem = PatternItem & {
   variant?: string
 }
 
-type AnchorProps = ComponentPropsWithoutRef<'a'>
-type SpanProps = ComponentPropsWithoutRef<'span'>
-
 export interface LinkProps<TItem extends LinkDataItem = LinkDataItem> {
   data: PatternData<TItem>
   onEvent?: (event: PatternEvent) => void
@@ -23,7 +20,7 @@ export function Link<TItem extends LinkDataItem = LinkDataItem>({ data, onEvent 
   if (!link.key) return null
 
   if (link.variant === 'spanRole') {
-    return createElement('span', { ...link.linkProps, className, 'data-href': link.href } as SpanProps, children ?? link.label)
+    return createElement('span', { ...link.linkProps, className, 'data-href': link.href } as ComponentPropsWithoutRef<'span'>, children ?? link.label)
   }
 
   return createElement(
@@ -36,7 +33,7 @@ export function Link<TItem extends LinkDataItem = LinkDataItem>({ data, onEvent 
         event.preventDefault()
         link.linkProps.onClick?.(event)
       },
-    } as AnchorProps,
+    } as ComponentPropsWithoutRef<'a'>,
     children ?? link.label,
   )
 }

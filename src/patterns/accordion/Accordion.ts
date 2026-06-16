@@ -8,8 +8,6 @@ type AccordionDataItem = PatternItem & {
 }
 
 type DivProps = ComponentPropsWithoutRef<'div'>
-type ButtonProps = ComponentPropsWithoutRef<'button'>
-type HeadingProps = ComponentPropsWithoutRef<'h3'>
 
 export interface AccordionProps<TItem extends AccordionDataItem = AccordionDataItem> {
   data: PatternData<TItem>
@@ -36,8 +34,8 @@ export function Accordion<TItem extends AccordionDataItem = AccordionDataItem>({
     accordion.renderItems.map((item) => {
       const panelItem = item.panelKey ? data.items[item.panelKey] : undefined
       return createElement('div', { key: item.key } as DivProps & { key: Key }, [
-        createElement('h3', { key: `${item.key}-heading` } as HeadingProps, [
-          createElement('button', { key: `${item.key}-button`, ...item.headerProps } as ButtonProps, renderHeader?.(item, data.items[item.key]) ?? item.label),
+        createElement('h3', { key: `${item.key}-heading` } as ComponentPropsWithoutRef<'h3'>, [
+          createElement('button', { key: `${item.key}-button`, ...item.headerProps } as ComponentPropsWithoutRef<'button'>, renderHeader?.(item, data.items[item.key]) ?? item.label),
         ]),
         item.state.expanded && item.panelProps
           ? createElement('div', { key: `${item.key}-panel`, ...item.panelProps } as DivProps, renderPanel?.(item, panelItem) ?? panelItem?.content ?? panelItem?.label ?? null)
