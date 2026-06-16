@@ -1,7 +1,6 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
-import type { ReactFeedArticle } from './feedArticle'
-import { useFeedPattern } from './useFeedPattern'
+import { useFeedPattern, type ReactFeedArticle } from './useFeedPattern'
 
 type FeedDataItem = PatternItem & {
   content?: string

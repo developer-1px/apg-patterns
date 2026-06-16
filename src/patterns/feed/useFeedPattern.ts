@@ -1,11 +1,16 @@
-import { createPatternRuntime } from '../../kernel/patternRuntime'
+import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
-import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
 import { feedDefinition } from './definition'
-import { createFeedArticle, type ReactFeedArticle } from './feedArticle'
 import { usePatternElementId } from '../../adapters/reactDomIds'
-export type { ReactFeedArticle } from './feedArticle'
+
+export interface ReactFeedArticle {
+  key: Key
+  label: string
+  state: Pick<ReactRenderItemState, 'active'>
+  articleProps: ReactPatternProps
+}
 
 export interface ReactFeedRuntime {
   feedProps: ReactPatternProps
@@ -40,5 +45,15 @@ export function useFeedPattern(data: PatternData, onEvent: (event: PatternEvent)
       return { forKey: runtime.keyToElementId }
     },
     keyToElementId: runtime.keyToElementId,
+  }
+}
+
+function createFeedArticle(runtime: PatternRuntime, key: Key): ReactFeedArticle {
+  const state = runtime.getItemState(key, 'article')
+  return {
+    key,
+    label: runtime.data.items[key]?.label ?? key,
+    state: { active: Boolean(state.active) },
+    articleProps: reactProps(runtime.getItemProps('article', key)),
   }
 }
