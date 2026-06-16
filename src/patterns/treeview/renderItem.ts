@@ -1,7 +1,6 @@
 import type { Key, PatternData } from '../../schema'
 import type { SlotProps } from '../../kernel/patternRuntime'
 import type { TreeviewRenderState } from './renderState'
-import { getTreeItemState } from './renderState'
 import { resolveTreeviewVisibleKeys } from './typeahead'
 
 export interface TreeviewRenderItem {
@@ -17,7 +16,7 @@ export function createTreeviewRenderItems(
   data: PatternData,
   getTreeItemProps: (key: Key) => SlotProps,
   getIndicatorProps: (key: Key) => SlotProps,
-  resolveState: (key: Key) => TreeviewRenderState = (key) => getTreeItemState(data, key),
+  resolveState: (key: Key) => TreeviewRenderState,
 ): readonly TreeviewRenderItem[] {
   return resolveTreeviewVisibleKeys(data).map((key) => ({
     key,
