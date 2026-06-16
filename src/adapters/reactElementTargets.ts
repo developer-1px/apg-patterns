@@ -1,8 +1,6 @@
 import type { ElementTarget, Key, PatternData } from '../schema'
 import { resolveKeyToken } from '../kernel/patternKernel'
 
-type ReactFocusTarget = HTMLElement | null | { readonly current: HTMLElement | null } | (() => HTMLElement | null)
-
 export const FOCUSABLE_SELECTOR = [
   'a[href]',
   'button:not([disabled])',
@@ -12,7 +10,14 @@ export const FOCUSABLE_SELECTOR = [
   '[tabindex]:not([tabindex="-1"])',
 ].join(',')
 
-export function resolveReactFocusTarget(target: ReactFocusTarget | undefined): HTMLElement | null {
+export function resolveReactFocusTarget(
+  target:
+    | HTMLElement
+    | null
+    | { readonly current: HTMLElement | null }
+    | (() => HTMLElement | null)
+    | undefined,
+): HTMLElement | null {
   if (!target) return null
   if (typeof target === 'function') return target()
   if (typeof target === 'object' && 'current' in target) return target.current
