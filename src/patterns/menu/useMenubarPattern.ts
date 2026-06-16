@@ -41,7 +41,10 @@ export function useMenubarPattern(data: PatternData, onEvent: (event: PatternEve
   return {
     get rootProps() {
       const props = reactProps(runtime.getPartProps('menubar'))
-      return createMenubarRootProps(props, typeahead)
+      return {
+        ...props,
+        onKeyDown: (event: KeyboardEvent<HTMLElement>) => handleMenubarKey(event, props.onKeyDown as ((event: KeyboardEvent<HTMLElement>) => void) | undefined, typeahead),
+      }
     },
     get rootItems() {
       return rootKeys.map((key) => createMenubarItem({ runtime, data, key, rootKeys, onEvent }))
@@ -112,8 +115,10 @@ function handleMenubarSubmenuKey(
     input.onEvent({ type: 'focus', key: input.ownerKey, meta: { reason: 'keyboard' } })
   }
   const openSibling = (direction: 'next' | 'previous') => {
-    const target = siblingKey(input.rootKeys, input.ownerKey, direction)
-    if (!target) return
+    if (input.rootKeys.length === 0) return
+    const ownerIndex = input.rootKeys.indexOf(input.ownerKey)
+    if (ownerIndex === -1) return
+    const target = input.rootKeys[(ownerIndex + (direction === 'next' ? 1 : -1) + input.rootKeys.length) % input.rootKeys.length]
     const targetChildren = getEnabledMenubarKeys(input.data.relations?.childrenByKey?.[target] ?? [], input.data)
     closeOwner()
     input.onEvent({ type: 'focus', key: target, meta: { reason: 'keyboard' } })
@@ -172,20 +177,6 @@ function stepKey(keys: readonly Key[], activeKey: Key | null | undefined, delta:
   const index = activeKey ? keys.indexOf(activeKey) : -1
   if (index === -1) return keys[delta === 1 ? 0 : keys.length - 1]
   return keys[(index + delta + keys.length) % keys.length]
-}
-
-function siblingKey(keys: readonly Key[], key: Key, direction: 'next' | 'previous') {
-  if (keys.length === 0) return undefined
-  const index = keys.indexOf(key)
-  if (index === -1) return undefined
-  return keys[(index + (direction === 'next' ? 1 : -1) + keys.length) % keys.length]
-}
-
-function createMenubarRootProps(props: ReactPatternProps, typeahead: (char: string) => void): ReactPatternProps {
-  return {
-    ...props,
-    onKeyDown: (event: KeyboardEvent<HTMLElement>) => handleMenubarKey(event, props.onKeyDown as ((event: KeyboardEvent<HTMLElement>) => void) | undefined, typeahead),
-  }
 }
 
 function handleMenubarKey(event: KeyboardEvent<HTMLElement>, baseKeyDown: ((event: KeyboardEvent<HTMLElement>) => void) | undefined, typeahead: (char: string) => void) {
