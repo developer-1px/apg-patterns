@@ -1,6 +1,6 @@
 import { createElement, type ComponentPropsWithoutRef, type CSSProperties, type ReactNode } from 'react'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
-import type { ReactTreeviewRenderItem } from './reactTypes'
+import type { ReactTreeviewRenderItem } from './adaptTreeviewRuntime'
 import { useTreeviewPattern } from './useTreeviewPattern'
 
 type TreeDataItem = PatternItem & {
