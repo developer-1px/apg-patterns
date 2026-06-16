@@ -62,7 +62,13 @@ export function useControlledDialogPattern(
   return {
     open: config.open,
     get overlayProps() {
-      return createControlledDialogOverlayProps({ runtime, close })
+      const props = reactProps(runtime.getPartProps('overlay'))
+      return {
+        ...props,
+        onMouseDown: (event: MouseEvent<HTMLElement>) => {
+          if (event.target === event.currentTarget) close('pointer')
+        },
+      }
     },
     get dialogProps() {
       return createControlledDialogProps({ runtime, open: config.open, keyToElementId, dialogKey, close })
@@ -85,22 +91,6 @@ export function useControlledDialogPattern(
       return { forKey: keyToElementId }
     },
     keyToElementId,
-  }
-}
-
-function createControlledDialogOverlayProps({
-  runtime,
-  close,
-}: {
-  runtime: PatternRuntime
-  close(reason: 'pointer'): void
-}): ReactPatternProps {
-  const props = reactProps(runtime.getPartProps('overlay'))
-  return {
-    ...props,
-    onMouseDown: (event: MouseEvent<HTMLElement>) => {
-      if (event.target === event.currentTarget) close('pointer')
-    },
   }
 }
 
