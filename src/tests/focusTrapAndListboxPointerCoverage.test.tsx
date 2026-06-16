@@ -1,11 +1,10 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import { registerKernelBuiltins } from '../kernel/kernelBuiltins'
 import type { PatternData, PatternDefinition, PatternEvent } from '../schema'
-import type { PatternRuntime } from '../kernel/patternRuntime'
 import { handlePatternTrapFocus } from '../adapters/reactPatternTrapFocus'
-import { handleListboxMultiClick } from '../patterns/listbox/handleListboxMultiClick'
+import { useListboxPattern } from '../patterns/listbox/useListboxPattern'
 
 registerKernelBuiltins()
 
@@ -77,43 +76,56 @@ function FocusTrapHost() {
 
 function ListboxPointerHost() {
   const [result, setResult] = useState('')
-  const [events, setEvents] = useState<PatternEvent[]>([])
-  const makeRuntime = (selectionMode: 'single' | 'multiple', disabledKeys: string[] = []): PatternRuntime => ({
-    definition: {} as PatternDefinition,
-    data: { items: {}, relations: {}, state: { selectedKeys: ['a'], activeKey: 'a', anchorKey: 'a', disabledKeys } },
-    options: { selectionMode },
-    visibleKeys: ['a', 'b', 'c'],
-    getRootProps: () => ({}),
-    getItemProps: () => ({}),
-    getPartProps: () => ({}),
-    getRootKeyboardHandler: () => () => undefined,
-    resolveKeyboardBinding: () => null,
-    getItemState: () => ({}),
-    keyToElementId: (key) => key,
-    emit: (event) => setEvents((current) => [...current, event]),
-  })
-  const run = (label: string, runtime: PatternRuntime, key: string, eventInit: { shiftKey?: boolean; ctrlKey?: boolean; metaKey?: boolean } = {}) => {
+  const [events, setEvents] = useState('')
+  const emittedEvents = useRef<PatternEvent[]>([])
+  const listboxData = {
+    items: { a: { label: 'Alpha' }, b: { label: 'Beta' }, c: { label: 'Gamma' }, hidden: { label: 'Hidden' } },
+    relations: { rootKeys: ['a', 'b', 'c'] },
+    state: { selectedKeys: ['a'], activeKey: 'a', anchorKey: 'a' },
+  } satisfies PatternData
+  const captureEvent = (event: PatternEvent) => emittedEvents.current.push(event)
+  const singleListbox = useListboxPattern(listboxData, captureEvent, { selectionMode: 'single' })
+  const multiListbox = useListboxPattern(listboxData, captureEvent, { selectionMode: 'multiple' })
+  const disabledListbox = useListboxPattern(
+    { ...listboxData, state: { ...listboxData.state, disabledKeys: ['b'] } },
+    captureEvent,
+    { selectionMode: 'multiple' },
+  )
+  const shiftMissingListbox = useListboxPattern(
+    { ...listboxData, state: { ...listboxData.state, anchorKey: 'hidden' } },
+    captureEvent,
+    { selectionMode: 'multiple' },
+  )
+  const run = (label: string, item: (typeof singleListbox.renderItems)[number] | undefined, eventInit: { shiftKey?: boolean; ctrlKey?: boolean; metaKey?: boolean } = {}) => {
+    emittedEvents.current = []
     let prevented = false
     let stopped = false
-    const handled = handleListboxMultiClick(runtime, key, {
+    item?.optionProps.onClick?.({
       ...eventInit,
       preventDefault: () => { prevented = true },
       stopPropagation: () => { stopped = true },
-    } as Parameters<typeof handleListboxMultiClick>[2])
-    setResult(`${label}:${handled}:${prevented}:${stopped}`)
+    } as never)
+    setResult(`${label}:${prevented}:${stopped}`)
+    setEvents(emittedEvents.current.map(formatListboxEvent).join('|'))
   }
 
   return (
     <div>
-      <button type="button" onClick={() => run('single', makeRuntime('single'), 'b')}>Single click path</button>
-      <button type="button" onClick={() => run('disabled', makeRuntime('multiple', ['b']), 'b')}>Disabled click path</button>
-      <button type="button" onClick={() => run('plain', makeRuntime('multiple'), 'c')}>Plain multi click path</button>
-      <button type="button" onClick={() => run('meta', makeRuntime('multiple'), 'b', { metaKey: true })}>Meta click path</button>
-      <button type="button" onClick={() => run('shift-miss', makeRuntime('multiple'), 'missing', { shiftKey: true })}>Shift missing range</button>
+      <button type="button" onClick={() => run('single', singleListbox.renderItems.find((item) => item.key === 'b'))}>Single click path</button>
+      <button type="button" onClick={() => run('disabled', disabledListbox.renderItems.find((item) => item.key === 'b'))}>Disabled click path</button>
+      <button type="button" onClick={() => run('plain', multiListbox.renderItems.find((item) => item.key === 'c'))}>Plain multi click path</button>
+      <button type="button" onClick={() => run('meta', multiListbox.renderItems.find((item) => item.key === 'b'), { metaKey: true })}>Meta click path</button>
+      <button type="button" onClick={() => run('shift-miss', shiftMissingListbox.renderItems.find((item) => item.key === 'c'), { shiftKey: true })}>Shift missing range</button>
       <output data-testid="listbox-click-result">{result}</output>
-      <output data-testid="listbox-click-events">{events.map((event) => event.type === 'select' ? event.keys.join(',') : event.type).join('|')}</output>
+      <output data-testid="listbox-click-events">{events}</output>
     </div>
   )
+}
+
+function formatListboxEvent(event: PatternEvent): string {
+  if (event.type === 'select') return event.keys.join(',')
+  if ('key' in event) return `${event.type}:${event.key ?? ''}`
+  return event.type
 }
 
 describe('focus trap and listbox pointer edge coverage', () => {
@@ -140,21 +152,23 @@ describe('focus trap and listbox pointer edge coverage', () => {
     render(<ListboxPointerHost />)
 
     fireEvent.click(screen.getByRole('button', { name: 'Single click path' }))
-    expect(screen.getByTestId('listbox-click-result').textContent).toBe('single:false:false:false')
+    expect(screen.getByTestId('listbox-click-result').textContent).toBe('single:false:false')
+    expect(screen.getByTestId('listbox-click-events').textContent).toBe('focus:b|b')
 
     fireEvent.click(screen.getByRole('button', { name: 'Disabled click path' }))
-    expect(screen.getByTestId('listbox-click-result').textContent).toBe('disabled:true:false:false')
+    expect(screen.getByTestId('listbox-click-result').textContent).toBe('disabled:false:false')
+    expect(screen.getByTestId('listbox-click-events').textContent).toBe('')
 
     fireEvent.click(screen.getByRole('button', { name: 'Plain multi click path' }))
-    expect(screen.getByTestId('listbox-click-result').textContent).toBe('plain:true:true:true')
+    expect(screen.getByTestId('listbox-click-result').textContent).toBe('plain:true:true')
     expect(screen.getByTestId('listbox-click-events').textContent).toBe('c')
 
     fireEvent.click(screen.getByRole('button', { name: 'Meta click path' }))
-    expect(screen.getByTestId('listbox-click-result').textContent).toBe('meta:true:true:true')
-    expect(screen.getByTestId('listbox-click-events').textContent).toBe('c|a,b')
+    expect(screen.getByTestId('listbox-click-result').textContent).toBe('meta:true:true')
+    expect(screen.getByTestId('listbox-click-events').textContent).toBe('a,b')
 
     fireEvent.click(screen.getByRole('button', { name: 'Shift missing range' }))
-    expect(screen.getByTestId('listbox-click-result').textContent).toBe('shift-miss:true:true:true')
-    expect(screen.getByTestId('listbox-click-events').textContent).toBe('c|a,b')
+    expect(screen.getByTestId('listbox-click-result').textContent).toBe('shift-miss:true:true')
+    expect(screen.getByTestId('listbox-click-events').textContent).toBe('')
   })
 })
