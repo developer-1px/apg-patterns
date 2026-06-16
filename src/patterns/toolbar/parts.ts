@@ -1,3 +1,11 @@
+const toolbarRovingFocus = {
+  tabIndex: {
+    when: { kind: 'always' },
+    active: 0,
+    inactive: -1,
+  },
+} as const
+
 export const toolbarParts = {
   toolbar: {
     role: 'toolbar',
@@ -12,13 +20,7 @@ export const toolbarParts = {
       { attribute: 'aria-pressed', from: 'state.pressedByKey' },
       { attribute: 'aria-disabled', from: 'state.disabledKeys' },
     ],
-    focus: {
-      tabIndex: {
-        when: { kind: 'always' },
-        active: 0,
-        inactive: -1,
-      },
-    },
+    focus: toolbarRovingFocus,
     state: [
       { name: 'active', from: 'state.activeKey' },
       { name: 'pressed', from: 'state.pressedByKey' },
@@ -31,13 +33,7 @@ export const toolbarParts = {
   },
   control: {
     role: 'group',
-    focus: {
-      tabIndex: {
-        when: { kind: 'always' },
-        active: 0,
-        inactive: -1,
-      },
-    },
+    focus: toolbarRovingFocus,
     state: [
       { name: 'active', from: 'state.activeKey' },
       { name: 'disabled', from: 'state.disabledKeys' },
