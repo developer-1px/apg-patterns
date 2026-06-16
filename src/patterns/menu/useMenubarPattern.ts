@@ -180,47 +180,32 @@ function handleMenubarSubmenuKey(
     }
   }
 
-  if (event.key === 'Escape') {
-    event.preventDefault()
-    event.stopPropagation()
-    closeOwner()
-    focusOwner()
-    return
-  }
-  if (event.key === 'ArrowDown') {
-    event.preventDefault()
-    event.stopPropagation()
-    focusChild(stepKey(children, activeKey, 1))
-    return
-  }
-  if (event.key === 'ArrowUp') {
-    event.preventDefault()
-    event.stopPropagation()
-    focusChild(stepKey(children, activeKey, -1))
-    return
-  }
-  if (event.key === 'Home') {
-    event.preventDefault()
-    event.stopPropagation()
-    focusChild(children[0])
-    return
-  }
-  if (event.key === 'End') {
-    event.preventDefault()
-    event.stopPropagation()
-    focusChild(children[children.length - 1])
-    return
-  }
-  if (event.key === 'ArrowRight') {
-    event.preventDefault()
-    event.stopPropagation()
-    openSibling('next')
-    return
-  }
-  if (event.key === 'ArrowLeft') {
-    event.preventDefault()
-    event.stopPropagation()
-    openSibling('previous')
+  switch (event.key) {
+    case 'Escape':
+      event.preventDefault()
+      event.stopPropagation()
+      closeOwner()
+      focusOwner()
+      return
+    case 'ArrowDown':
+    case 'ArrowUp':
+    case 'Home':
+    case 'End': {
+      event.preventDefault()
+      event.stopPropagation()
+      const target = event.key === 'ArrowDown'
+        ? stepKey(children, activeKey, 1)
+        : event.key === 'ArrowUp'
+          ? stepKey(children, activeKey, -1)
+          : children[event.key === 'Home' ? 0 : children.length - 1]
+      focusChild(target)
+      return
+    }
+    case 'ArrowRight':
+    case 'ArrowLeft':
+      event.preventDefault()
+      event.stopPropagation()
+      openSibling(event.key === 'ArrowRight' ? 'next' : 'previous')
   }
 }
 
