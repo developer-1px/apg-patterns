@@ -1,8 +1,7 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
 import type { Key, PatternEvent, PatternItem, PatternOptions } from '../../schema'
-import type { ReactGridCell } from './gridCell'
 import type { GridData } from './gridRuntimeState'
-import { useGridPattern } from './useGridPattern'
+import { useGridPattern, type ReactGridCell } from './useGridPattern'
 
 type DivProps = ComponentPropsWithoutRef<'div'>
 
