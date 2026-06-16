@@ -119,9 +119,9 @@ export function createMenuButtonPatternData(
   options: MenuButtonCommandSurfaceDataOptions = {},
 ): PatternData {
   const menuKey = options.menuKey ?? `${trigger.key}-menu`
-  assertUniqueKeys([trigger.key, menuKey, ...menuItems.map((item) => item.key)])
-
   const itemKeys = menuItems.map((item) => item.key)
+  assertUniqueKeys([trigger.key, menuKey, ...itemKeys])
+
   const disabledKeys = commandDisabledKeys(menuItems, options.disabledKeys)
   const checkedByKey = {
     ...options.checkedByKey,
