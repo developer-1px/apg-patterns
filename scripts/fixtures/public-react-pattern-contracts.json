@@ -157,5 +157,485 @@
         "disabledKeys": ["paste"]
       }
     }
+  },
+  "alert": {
+    "component": "Alert",
+    "options": { "elementIdPrefix": "alert-" },
+    "data": {
+      "items": {
+        "alert": { "label": "Status", "message": "Saved" },
+        "dismiss": { "label": "Dismiss" }
+      },
+      "relations": { "rootKeys": ["alert"] },
+      "state": {
+        "activeKey": "alert",
+        "expandedKeys": ["alert"]
+      }
+    }
+  },
+  "alertDialog": {
+    "component": "AlertDialog",
+    "options": { "elementIdPrefix": "ad-" },
+    "data": {
+      "items": {
+        "trigger": { "label": "Delete item", "kind": "dialog" },
+        "warningDialog": { "label": "Delete dialog" },
+        "title": { "label": "Delete item?" },
+        "description": { "label": "This cannot be undone." },
+        "confirm": { "label": "Delete" },
+        "cancel": { "label": "Cancel" }
+      },
+      "relations": {
+        "rootKeys": ["trigger"],
+        "controlsByKey": {
+          "trigger": ["warningDialog"],
+          "warningDialog": ["description"]
+        },
+        "ownerByKey": { "warningDialog": "title" }
+      },
+      "state": {
+        "activeKey": "trigger",
+        "expandedKeys": ["trigger"]
+      },
+      "refs": { "initialFocusKey": "cancel" }
+    }
+  },
+  "accordion": {
+    "component": "Accordion",
+    "options": { "elementIdPrefix": "acc-" },
+    "data": {
+      "items": {
+        "section": { "label": "Section" },
+        "panel": { "label": "Panel", "content": "Panel content" }
+      },
+      "relations": {
+        "rootKeys": ["section"],
+        "controlsByKey": { "section": ["panel"] },
+        "ownerByKey": { "panel": "section" }
+      },
+      "state": {
+        "activeKey": "section",
+        "expandedKeys": ["section"]
+      },
+      "refs": { "label": "Sections" }
+    }
+  },
+  "disclosure": {
+    "component": "Disclosure",
+    "options": { "elementIdPrefix": "disc-" },
+    "data": {
+      "items": {
+        "details": { "label": "Details" },
+        "detailsPanel": { "label": "Details panel", "content": "More detail" }
+      },
+      "relations": {
+        "rootKeys": ["details"],
+        "controlsByKey": { "details": ["detailsPanel"] },
+        "ownerByKey": { "detailsPanel": "details" }
+      },
+      "state": {
+        "activeKey": "details",
+        "expandedKeys": ["details"]
+      }
+    }
+  },
+  "button": {
+    "component": "Button",
+    "options": { "elementIdPrefix": "btn-" },
+    "data": {
+      "items": { "submit": { "label": "Submit" } },
+      "relations": { "rootKeys": ["submit"] },
+      "state": {
+        "activeKey": "submit",
+        "pressedByKey": { "submit": true }
+      }
+    }
+  },
+  "checkbox": {
+    "component": "Checkbox",
+    "options": { "elementIdPrefix": "chk-" },
+    "data": {
+      "items": { "agree": { "label": "Agree" } },
+      "relations": { "rootKeys": ["agree"] },
+      "state": {
+        "activeKey": "agree",
+        "checkedByKey": { "agree": "mixed" }
+      }
+    }
+  },
+  "switch": {
+    "component": "Switch",
+    "options": { "elementIdPrefix": "sw-" },
+    "data": {
+      "items": { "power": { "label": "Power" } },
+      "relations": { "rootKeys": ["power"] },
+      "state": {
+        "activeKey": "power",
+        "checkedByKey": { "power": true }
+      }
+    }
+  },
+  "radioGroup": {
+    "component": "RadioGroup",
+    "options": { "elementIdPrefix": "radio-" },
+    "data": {
+      "items": {
+        "compact": { "label": "Compact" },
+        "comfortable": { "label": "Comfortable" }
+      },
+      "relations": { "rootKeys": ["compact", "comfortable"] },
+      "state": {
+        "activeKey": "comfortable",
+        "selectedKeys": ["comfortable"]
+      },
+      "refs": { "label": "Density" }
+    }
+  },
+  "toolbar": {
+    "component": "Toolbar",
+    "options": { "elementIdPrefix": "tool-" },
+    "data": {
+      "items": {
+        "bold": { "label": "Bold", "kind": "toggleButton" },
+        "italic": { "label": "Italic", "kind": "toggleButton" }
+      },
+      "relations": { "rootKeys": ["bold", "italic"] },
+      "state": {
+        "activeKey": "bold",
+        "pressedByKey": { "bold": true, "italic": false }
+      },
+      "refs": { "label": "Formatting" }
+    }
+  },
+  "slider": {
+    "component": "Slider",
+    "options": {
+      "elementIdPrefix": "sld-",
+      "min": 0,
+      "max": 10
+    },
+    "data": {
+      "items": {
+        "volume": {
+          "label": "Volume",
+          "valuemin": 0,
+          "valuemax": 10,
+          "valuetext": "4 of 10"
+        }
+      },
+      "relations": { "rootKeys": ["volume"] },
+      "state": {
+        "activeKey": "volume",
+        "valueByKey": { "volume": 4 }
+      }
+    }
+  },
+  "spinbutton": {
+    "component": "Spinbutton",
+    "options": {
+      "elementIdPrefix": "spin-",
+      "min": 0,
+      "max": 20
+    },
+    "data": {
+      "items": {
+        "quantity": {
+          "label": "Quantity",
+          "valuemin": 0,
+          "valuemax": 20
+        }
+      },
+      "relations": { "rootKeys": ["quantity"] },
+      "state": {
+        "activeKey": "quantity",
+        "valueByKey": { "quantity": 2 }
+      }
+    }
+  },
+  "windowSplitter": {
+    "component": "WindowSplitter",
+    "options": {
+      "elementIdPrefix": "split-",
+      "min": 0,
+      "max": 100
+    },
+    "data": {
+      "items": {
+        "splitter": { "label": "Resize panel" },
+        "panel": { "label": "Resizable panel", "content": "Panel content" }
+      },
+      "relations": {
+        "rootKeys": ["splitter"],
+        "controlsByKey": { "splitter": ["panel"] }
+      },
+      "state": {
+        "activeKey": "splitter",
+        "valueByKey": { "splitter": 60 }
+      }
+    }
+  },
+  "table": {
+    "component": "Table",
+    "options": { "elementIdPrefix": "tbl-" },
+    "data": {
+      "items": {
+        "row": { "label": "Row" },
+        "name": { "label": "Name", "kind": "columnheader" },
+        "value": { "label": "Value", "kind": "cell" }
+      },
+      "relations": {
+        "rowKeys": ["row"],
+        "columnKeys": ["name", "value"],
+        "cells": [
+          { "rowKey": "row", "columnKey": "name", "cellKey": "name" },
+          { "rowKey": "row", "columnKey": "value", "cellKey": "value" }
+        ]
+      },
+      "state": {
+        "rowIndexByKey": { "row": 1, "name": 1, "value": 1 },
+        "columnIndexByKey": { "name": 1, "value": 2 },
+        "rowCount": 1,
+        "colCount": 2
+      },
+      "refs": { "label": "Metrics" }
+    }
+  },
+  "grid": {
+    "component": "Grid",
+    "options": {
+      "elementIdPrefix": "grd-",
+      "selectionMode": "multiple"
+    },
+    "data": {
+      "items": {
+        "row": { "label": "Row" },
+        "name": { "label": "Name", "kind": "columnheader" },
+        "value": { "label": "Value", "kind": "gridcell" }
+      },
+      "relations": {
+        "rowKeys": ["row"],
+        "columnKeys": ["name", "value"],
+        "cells": [
+          { "rowKey": "row", "columnKey": "name", "cellKey": "name" },
+          { "rowKey": "row", "columnKey": "value", "cellKey": "value" }
+        ]
+      },
+      "state": {
+        "activeKey": "name",
+        "selectedKeys": ["name"],
+        "rowIndexByKey": { "row": 1, "name": 1, "value": 1 },
+        "columnIndexByKey": { "name": 1, "value": 2 },
+        "rowCount": 1,
+        "colCount": 2
+      },
+      "refs": { "label": "Editable grid" }
+    }
+  },
+  "treegrid": {
+    "component": "Treegrid",
+    "options": { "elementIdPrefix": "tg-" },
+    "data": {
+      "items": {
+        "parent": { "label": "Parent" },
+        "child": { "label": "Child" },
+        "name": { "label": "Name" },
+        "status": { "label": "Status" },
+        "parentName": { "label": "Parent name" },
+        "parentStatus": { "label": "Ready" },
+        "childName": { "label": "Child name" },
+        "childStatus": { "label": "Queued" }
+      },
+      "relations": {
+        "rootKeys": ["parent"],
+        "childrenByKey": { "parent": ["child"] },
+        "rowKeys": ["parent", "child"],
+        "columnKeys": ["name", "status"],
+        "cells": [
+          { "rowKey": "parent", "columnKey": "name", "cellKey": "parentName" },
+          { "rowKey": "parent", "columnKey": "status", "cellKey": "parentStatus" },
+          { "rowKey": "child", "columnKey": "name", "cellKey": "childName" },
+          { "rowKey": "child", "columnKey": "status", "cellKey": "childStatus" }
+        ]
+      },
+      "state": {
+        "activeKey": "parentName",
+        "expandedKeys": ["parent"],
+        "rowIndexByKey": {
+          "parent": 1,
+          "child": 2,
+          "parentName": 1,
+          "parentStatus": 1,
+          "childName": 2,
+          "childStatus": 2
+        },
+        "columnIndexByKey": {
+          "parentName": 1,
+          "parentStatus": 2,
+          "childName": 1,
+          "childStatus": 2
+        },
+        "levelByKey": { "parent": 1, "child": 2 },
+        "rowCount": 2,
+        "colCount": 2
+      },
+      "refs": { "label": "Resources" }
+    }
+  },
+  "menu": {
+    "component": "Menu",
+    "options": {
+      "elementIdPrefix": "menu-",
+      "open": true,
+      "dismissOnInteractOutside": false
+    },
+    "data": {
+      "items": {
+        "menu": { "label": "Actions" },
+        "copy": { "label": "Copy" },
+        "delete": { "label": "Delete" }
+      },
+      "relations": {
+        "rootKeys": ["menu"],
+        "childrenByKey": { "menu": ["copy", "delete"] },
+        "ownerByKey": { "menu": "menu" }
+      },
+      "state": { "activeKey": "copy" },
+      "refs": { "label": "Actions" }
+    }
+  },
+  "menubar": {
+    "component": "Menubar",
+    "options": { "elementIdPrefix": "menubar-" },
+    "data": {
+      "items": {
+        "file": { "label": "File" },
+        "edit": { "label": "Edit" },
+        "new": { "label": "New" },
+        "open": { "label": "Open" }
+      },
+      "relations": {
+        "rootKeys": ["file", "edit"],
+        "childrenByKey": { "file": ["new", "open"] }
+      },
+      "state": {
+        "activeKey": "file",
+        "expandedKeys": ["file"]
+      },
+      "refs": { "label": "Application menu" }
+    }
+  },
+  "link": {
+    "component": "Link",
+    "options": { "elementIdPrefix": "lnk-" },
+    "data": {
+      "items": { "docs": { "label": "Docs", "href": "/docs" } },
+      "relations": { "rootKeys": ["docs"] },
+      "state": { "activeKey": "docs" }
+    }
+  },
+  "breadcrumb": {
+    "component": "Breadcrumb",
+    "options": { "elementIdPrefix": "bc-" },
+    "data": {
+      "items": {
+        "home": { "label": "Home", "href": "/" },
+        "docs": { "label": "Docs", "href": "/docs" }
+      },
+      "relations": { "rootKeys": ["home", "docs"] },
+      "refs": { "label": "Breadcrumb" }
+    }
+  },
+  "meter": {
+    "component": "Meter",
+    "options": {
+      "elementIdPrefix": "meter-",
+      "min": 0,
+      "max": 100
+    },
+    "data": {
+      "items": { "usage": { "label": "Usage" } },
+      "relations": { "rootKeys": ["usage"] },
+      "state": { "valueByKey": { "usage": 70 } }
+    }
+  },
+  "carousel": {
+    "component": "Carousel",
+    "options": { "elementIdPrefix": "car-" },
+    "data": {
+      "items": {
+        "prev": { "label": "Previous" },
+        "next": { "label": "Next" },
+        "slide1": {
+          "label": "Slide 1",
+          "title": "First slide",
+          "caption": "Intro"
+        },
+        "slide2": {
+          "label": "Slide 2",
+          "title": "Second slide"
+        }
+      },
+      "relations": { "rootKeys": ["slide1", "slide2"] },
+      "state": {
+        "activeKey": "slide1",
+        "showDots": true
+      },
+      "refs": { "label": "Featured" }
+    }
+  },
+  "feed": {
+    "component": "Feed",
+    "options": { "elementIdPrefix": "feed-" },
+    "data": {
+      "items": {
+        "first": { "label": "First article", "content": "Hello" },
+        "second": { "label": "Second article", "content": "World" }
+      },
+      "relations": { "rootKeys": ["first", "second"] },
+      "state": {
+        "activeKey": "first",
+        "posInSetByKey": { "first": 1, "second": 2 },
+        "setSizeByKey": { "first": 2, "second": 2 }
+      },
+      "refs": { "label": "Updates" }
+    }
+  },
+  "landmarks": {
+    "component": "Landmarks",
+    "options": { "elementIdPrefix": "land-" },
+    "data": {
+      "items": {
+        "main": {
+          "label": "Main content",
+          "kind": "main",
+          "content": "Main"
+        },
+        "nav": {
+          "label": "Primary navigation",
+          "kind": "navigation",
+          "content": "Nav"
+        }
+      },
+      "relations": { "rootKeys": ["main", "nav"] }
+    }
+  },
+  "tooltip": {
+    "component": "Tooltip",
+    "options": { "elementIdPrefix": "tip-" },
+    "data": {
+      "items": {
+        "help": { "label": "Help" },
+        "tip": { "label": "Helpful tip", "content": "More information" }
+      },
+      "relations": {
+        "rootKeys": ["help"],
+        "controlsByKey": { "help": ["tip"] },
+        "ownerByKey": { "tip": "help" }
+      },
+      "state": {
+        "activeKey": "help",
+        "expandedKeys": ["help"]
+      }
+    }
   }
 }

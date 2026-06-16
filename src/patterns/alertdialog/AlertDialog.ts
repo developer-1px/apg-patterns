@@ -1,5 +1,6 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
 import type { PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
+import { getAlertDialogRuntimeKeys } from './alertDialogRuntimeKeys'
 import { useAlertDialogPattern } from './useAlertDialogPattern'
 
 type AlertDialogDataItem = PatternItem & {
@@ -33,18 +34,23 @@ export function AlertDialog<TItem extends AlertDialogDataItem = AlertDialogDataI
   renderCancel,
 }: AlertDialogProps<TItem>) {
   const alertDialog = useAlertDialogPattern(data, onEvent, options)
-  const titleItem = data.items.title
-  const descriptionItem = data.items.description
+  const keys = getAlertDialogRuntimeKeys(data)
+  const titleItem = keys.titleKey ? data.items[keys.titleKey] : undefined
+  const descriptionItem = keys.descriptionKey ? data.items[keys.descriptionKey] : undefined
 
   return createElement('div', { className } as DivProps, [
-    createElement('button', { key: 'trigger', ...alertDialog.triggerProps } as ButtonProps, data.items.trigger?.label ?? alertDialog.labelOf('trigger')),
+    createElement(
+      'button',
+      { key: 'trigger', ...alertDialog.triggerProps } as ButtonProps,
+      keys.triggerKey ? data.items[keys.triggerKey]?.label ?? alertDialog.labelOf(keys.triggerKey) : data.items.trigger?.label ?? alertDialog.labelOf('trigger'),
+    ),
     alertDialog.open
       ? createElement('div', { key: 'overlay', ...alertDialog.overlayProps } as DivProps, [
           createElement('div', { key: 'dialog', ...alertDialog.dialogProps } as DivProps, [
-            createElement('h2', { key: 'title', id: alertDialog.ids.forKey('title') } as HeadingProps, renderTitle?.(titleItem) ?? titleItem?.label),
+            createElement('h2', { key: 'title', ...alertDialog.titleProps } as HeadingProps, renderTitle?.(titleItem) ?? titleItem?.label),
             createElement(
               'p',
-              { key: 'description', id: alertDialog.ids.forKey('description') } as ParagraphProps,
+              { key: 'description', ...alertDialog.descriptionProps } as ParagraphProps,
               renderDescription?.(descriptionItem) ?? descriptionItem?.content ?? descriptionItem?.label,
             ),
             createElement('button', { key: 'confirm', ...alertDialog.confirmProps } as ButtonProps, renderConfirm?.(data.items.confirm) ?? data.items.confirm?.label ?? 'Confirm'),

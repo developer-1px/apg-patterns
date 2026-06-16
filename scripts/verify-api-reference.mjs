@@ -661,6 +661,118 @@ function assertPublicReactPatternFixtures(coreRuntime, reactRuntime) {
     'role="menuitem" id="mb-copy" tabindex="0"',
     'role="menuitem" id="mb-paste" aria-disabled="true" tabindex="-1"',
   ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'alert', fixture.alert, [
+    'role="alert" id="alert-alert" aria-label="Status"',
+    'role="button" id="alert-dismiss" aria-label="Dismiss"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'alertDialog', fixture.alertDialog, [
+    'role="button" id="ad-trigger" aria-expanded="true" aria-controls="ad-warningDialog" aria-haspopup="dialog"',
+    'role="alertdialog" id="ad-warningDialog" aria-modal="true" aria-labelledby="ad-title" aria-describedby="ad-description"',
+    'id="ad-title"',
+    'id="ad-description"',
+    'role="button" id="ad-confirm"',
+    'role="button" id="ad-cancel"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'accordion', fixture.accordion, [
+    'role="group" aria-label="Sections"',
+    'role="button" id="acc-section" aria-expanded="true" aria-controls="acc-panel" tabindex="0"',
+    'role="region" id="acc-panel" aria-labelledby="acc-section"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'disclosure', fixture.disclosure, [
+    'role="button" id="disc-details" aria-expanded="true" aria-controls="disc-detailsPanel" aria-label="Details"',
+    'role="region" id="disc-detailsPanel" aria-labelledby="disc-details"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'button', fixture.button, [
+    'id="btn-submit" aria-label="Submit" aria-pressed="true" tabindex="0" type="button"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'checkbox', fixture.checkbox, [
+    'role="checkbox" id="chk-agree" aria-label="Agree" aria-checked="mixed" tabindex="0"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'switch', fixture.switch, [
+    'role="switch" id="sw-power" aria-label="Power" aria-checked="true" tabindex="0"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'radioGroup', fixture.radioGroup, [
+    'role="radiogroup" aria-label="Density"',
+    'role="radio" id="radio-compact" aria-checked="false" tabindex="-1"',
+    'role="radio" id="radio-comfortable" aria-checked="true" tabindex="0"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'toolbar', fixture.toolbar, [
+    'role="toolbar" aria-label="Formatting" aria-orientation="horizontal"',
+    'role="button" id="tool-bold" aria-pressed="true" tabindex="0"',
+    'role="button" id="tool-italic" aria-pressed="false" tabindex="-1"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'slider', fixture.slider, [
+    'role="slider" id="sld-volume" aria-label="Volume" aria-valuemin="0" aria-valuemax="10" aria-valuenow="4" aria-valuetext="4 of 10"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'spinbutton', fixture.spinbutton, [
+    'aria-label="Decrement Quantity"',
+    'role="spinbutton" id="spin-quantity" aria-label="Quantity" aria-valuemin="0" aria-valuemax="20" aria-valuenow="2"',
+    'aria-label="Increment Quantity"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'windowSplitter', fixture.windowSplitter, [
+    'id="split-panel"',
+    'role="separator" id="split-splitter" aria-label="Resize panel" aria-controls="split-panel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="60"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'table', fixture.table, [
+    'role="table" aria-label="Metrics" aria-rowcount="1" aria-colcount="2"',
+    'role="row" id="tbl-row" aria-rowindex="1"',
+    'role="columnheader" id="tbl-name" aria-rowindex="1" aria-colindex="1"',
+    'role="cell" id="tbl-value" aria-rowindex="1" aria-colindex="2"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'grid', fixture.grid, [
+    'role="grid" aria-label="Editable grid" aria-rowcount="1" aria-colcount="2" aria-multiselectable="true"',
+    'role="columnheader" id="grd-name" aria-rowindex="1" aria-colindex="1" aria-selected="true" tabindex="0"',
+    'role="gridcell" id="grd-value" aria-rowindex="1" aria-colindex="2" aria-selected="false" tabindex="-1"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'treegrid', fixture.treegrid, [
+    'role="treegrid" aria-label="Resources" aria-rowcount="2" aria-colcount="2"',
+    'role="row" id="tg-parent" aria-rowindex="1" aria-level="1" aria-expanded="true"',
+    'role="gridcell" id="tg-parentName" aria-rowindex="1" aria-colindex="1"',
+    'role="row" id="tg-child" aria-rowindex="2" aria-level="2"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'menu', fixture.menu, [
+    'role="menu" id="menu-menu" aria-labelledby="menu-menu" tabindex="-1"',
+    'role="menuitem" id="menu-copy" tabindex="0"',
+    'role="menuitem" id="menu-delete" tabindex="-1"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'menubar', fixture.menubar, [
+    'role="menubar" aria-label="Application menu" aria-orientation="horizontal"',
+    'role="menuitem" id="menubar-file" aria-haspopup="menu" aria-expanded="true" tabindex="0"',
+    'role="menu"',
+    'role="menuitem" id="menubar-new"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'link', fixture.link, [
+    'role="link" id="lnk-docs" aria-label="Docs" tabindex="0" href="/docs"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'breadcrumb', fixture.breadcrumb, [
+    'role="navigation" aria-label="Breadcrumb"',
+    'role="list"',
+    'role="link" id="bc-home" href="/"',
+    'role="link" id="bc-docs" href="/docs"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'meter', fixture.meter, [
+    'role="meter" id="meter-usage" aria-label="Usage" aria-valuemin="0" aria-valuemax="100" aria-valuenow="70"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'carousel', fixture.carousel, [
+    'role="region" aria-roledescription="carousel" aria-label="Featured"',
+    'role="button" id="car-prev" aria-label="Previous"',
+    'role="group" id="car-slide1" aria-roledescription="slide"',
+    'role="group" id="car-slide2" aria-roledescription="slide" aria-hidden="true"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'feed', fixture.feed, [
+    'role="feed" aria-label="Updates"',
+    'role="article" id="feed-first" aria-posinset="1" aria-setsize="2" tabindex="0"',
+    'role="article" id="feed-second" aria-posinset="2" aria-setsize="2" tabindex="-1"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'landmarks', fixture.landmarks, [
+    'role="document"',
+    'role="main" id="land-main"',
+    'role="navigation" id="land-nav" aria-label="Primary navigation"',
+  ])
+  assertReactPatternMarkupContract(coreRuntime, reactRuntime, 'tooltip', fixture.tooltip, [
+    'role="button" id="tip-help" aria-describedby="tip-tip" aria-label="Help"',
+    'role="tooltip" id="tip-tip" aria-labelledby="tip-help"',
+  ])
 }
 
 function assertReactPatternMarkupContract(coreRuntime, reactRuntime, label, fixture, expectedMarkupParts) {

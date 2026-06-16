@@ -6,6 +6,7 @@ import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapter
 import { alertDialogDefinition } from './definition'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
+import { getAlertDialogRuntimeKeys } from './alertDialogRuntimeKeys'
 
 registerKernelBuiltins()
 
@@ -29,29 +30,30 @@ export function useAlertDialogPattern(data: PatternData, onEvent: (event: Patter
   const runtimeOptions = options ?? {}
   const keyToElementId = usePatternElementId(runtimeOptions, 'alertdialog-')
   const runtime = createPatternRuntime({ definition: alertDialogDefinition, data, options: runtimeOptions, onEvent, keyToElementId })
+  const keys = getAlertDialogRuntimeKeys(data)
 
   usePatternEffects({ definition: alertDialogDefinition, data: runtime.data, keyToElementId })
 
   return {
-    open: data.state?.expandedKeys?.includes('trigger') ?? false,
+    open: keys.triggerKey ? data.state?.expandedKeys?.includes(keys.triggerKey) ?? false : false,
     get triggerProps() {
-      return reactProps(runtime.getPartProps('trigger', 'trigger'))
+      return keys.triggerKey ? reactProps(runtime.getPartProps('trigger', keys.triggerKey)) : {}
     },
     overlayProps: alertDialogOverlayProps,
     get dialogProps() {
-      return createAlertDialogDialogProps({ runtime, data, onEvent, keyToElementId })
+      return keys.dialogKey ? createAlertDialogDialogProps({ runtime, data, onEvent, keyToElementId, dialogKey: keys.dialogKey }) : {}
     },
     get titleProps() {
-      return reactProps(runtime.getPartProps('title', 'title'))
+      return keys.titleKey ? reactProps(runtime.getPartProps('title', keys.titleKey)) : {}
     },
     get descriptionProps() {
-      return reactProps(runtime.getPartProps('description', 'description'))
+      return keys.descriptionKey ? reactProps(runtime.getPartProps('description', keys.descriptionKey)) : {}
     },
     get confirmProps() {
-      return createAlertDialogActionProps({ runtime, part: 'confirm', onEvent })
+      return keys.confirmKey ? createAlertDialogActionProps({ runtime, part: 'confirm', key: keys.confirmKey, onEvent }) : {}
     },
     get cancelProps() {
-      return createAlertDialogActionProps({ runtime, part: 'cancel', onEvent })
+      return keys.cancelKey ? createAlertDialogActionProps({ runtime, part: 'cancel', key: keys.cancelKey, onEvent }) : {}
     },
     labelOf: (key) => data.items[key]?.label ?? key,
     get ids() {
@@ -73,15 +75,17 @@ function createAlertDialogDialogProps({
   data,
   onEvent,
   keyToElementId,
+  dialogKey,
 }: {
   runtime: ReturnType<typeof createPatternRuntime>
   data: PatternData
   onEvent: (event: PatternEvent) => void
   keyToElementId: (key: Key) => string
+  dialogKey: Key
 }): ReactPatternProps {
   const rootKeyDown = runtime.getRootKeyboardHandler()
   return reactProps({
-    ...runtime.getPartProps('dialog', 'dialog'),
+    ...runtime.getPartProps('dialog', dialogKey),
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
       if (event.key === 'Escape') onEvent({ type: 'activate', key: 'cancel' })
       rootKeyDown(reactKeyInput(event))
@@ -93,18 +97,20 @@ function createAlertDialogDialogProps({
 function createAlertDialogActionProps({
   runtime,
   part,
+  key,
   onEvent,
 }: {
   runtime: ReturnType<typeof createPatternRuntime>
   part: 'confirm' | 'cancel'
+  key: Key
   onEvent: (event: PatternEvent) => void
 }): ReactPatternProps {
-  const props = reactProps(runtime.getPartProps(part, part))
+  const props = reactProps(runtime.getPartProps(part, key))
   return {
     ...props,
     onClick: (event: MouseEvent<HTMLElement>) => {
       props.onClick?.(event)
-      onEvent({ type: 'activate', key: part })
+      onEvent({ type: 'activate', key })
     },
   }
 }
