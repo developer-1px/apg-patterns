@@ -58,7 +58,7 @@ function applyStateAction(data: PatternData, event: PatternEvent, action: StateA
   return { ...data, state: { ...state, [action.field]: [...set] } }
 }
 
-export function resolveTransitionValue(value: TransitionValue, event: PatternEvent, data: PatternData): unknown {
+function resolveTransitionValue(value: TransitionValue, event: PatternEvent, data: PatternData): unknown {
   if ('literal' in value) return value.literal
   if (value.from === '$activeKey') return data.state?.activeKey ?? null
   if (value.from === '$event.key') return 'key' in event ? event.key : null
