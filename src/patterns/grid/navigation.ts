@@ -3,8 +3,6 @@ import { createCellRows } from '../../internal/cellRelations'
 import { defineNavigationTarget, defineVisibleOrder } from '../../kernel/patternKernel'
 import type { Key, PatternData } from '../../schema'
 
-type GridAction = 'left' | 'right' | 'up' | 'down' | 'rowStart' | 'rowEnd' | 'gridStart' | 'gridEnd'
-type GridPageAction = 'pageUp' | 'pageDown'
 const PAGE_SIZE = 5
 
 export const gridRows = (data: PatternData): readonly (readonly Key[])[] => {
@@ -37,11 +35,11 @@ defineNavigationTarget('gridCell', (target, ctx) => {
   ) {
     throw new Error(`Unsupported grid action: ${String(action)}`)
   }
-  return moveApgGrid(gridRows(ctx.data), ctx.activeKey, action as GridAction)
+  return moveApgGrid(gridRows(ctx.data), ctx.activeKey, action)
 })
 
 defineNavigationTarget('gridPage', (target, ctx) => {
-  const action = target.action as GridPageAction
+  const action = target.action
   if (action !== 'pageUp' && action !== 'pageDown') {
     throw new Error(`Unsupported grid page action: ${String(action)}`)
   }
