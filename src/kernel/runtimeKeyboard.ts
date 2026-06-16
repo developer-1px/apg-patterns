@@ -11,7 +11,7 @@ interface RuntimeKeyboardInput {
   activeKey: Key
 }
 
-export interface RuntimeKeyboardBindingResult {
+interface RuntimeKeyboardBindingResult {
   events: readonly PatternEvent[]
   preventDefault: boolean
 }
