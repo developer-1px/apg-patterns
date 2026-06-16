@@ -10,11 +10,19 @@ import {
 } from '../../schema'
 import { treeviewDefinition } from './definition'
 import { createPatternRuntime, type PatternRuntime, type SlotProps } from '../../kernel/patternRuntime'
-import { createTreeviewRenderItems, type TreeviewRenderItem } from './renderItem'
 import { toTreeviewRenderState, type TreeviewRenderState } from './renderState'
-import { resolveTypeaheadTarget } from './typeahead'
+import { resolveTreeviewVisibleKeys, resolveTypeaheadTarget } from './typeahead'
 import { createElementId } from '../../kernel/domIds'
 import { withNonEnumerableMeta } from '../../kernel/domEventBindings'
+
+export interface TreeviewRenderItem {
+  key: Key
+  state: TreeviewRenderState
+  slotProps: {
+    treeitem: SlotProps
+    indicator?: SlotProps
+  }
+}
 
 export interface TreeviewRuntime {
   definition: typeof treeviewDefinition
@@ -97,6 +105,19 @@ export function createTreeviewRuntime(input: CreateTreeviewRuntimeInput): Treevi
     keyToElementId,
     emit,
   }
+}
+
+function createTreeviewRenderItems(
+  data: PatternData,
+  getTreeItemProps: (key: Key) => SlotProps,
+  getIndicatorProps: (key: Key) => SlotProps,
+  resolveState: (key: Key) => TreeviewRenderState,
+): readonly TreeviewRenderItem[] {
+  return resolveTreeviewVisibleKeys(data).map((key) => ({
+    key,
+    state: resolveState(key),
+    slotProps: { treeitem: getTreeItemProps(key), indicator: getIndicatorProps(key) },
+  }))
 }
 
 function createTreeProps({
