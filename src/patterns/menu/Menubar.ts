@@ -1,8 +1,7 @@
-import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
-import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
+import { createElement, type ReactNode } from 'react'
+import { renderItemCollection } from '../../adapters/reactPresetElements'
+import type { PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import { useMenubarPattern, type ReactMenubarItem } from './useMenubarPattern'
-
-type DivProps = ComponentPropsWithoutRef<'div'>
 
 export interface MenubarProps<TItem extends PatternItem = PatternItem> {
   data: PatternData<TItem>
@@ -17,20 +16,21 @@ export function Menubar<TItem extends PatternItem = PatternItem>({ data, onEvent
 
   return createElement(
     'div',
-    { ...menubar.rootProps, className } as DivProps,
+    { ...menubar.rootProps, className },
     menubar.rootItems.map((item) =>
-      createElement('div', { key: item.key } as DivProps & { key: Key }, [
-        createElement('div', { key: `${item.key}-item`, ...item.itemProps } as DivProps, renderItem?.(item, data.items[item.key]) ?? item.label),
+      createElement(
+        'div',
+        { key: item.key },
+        createElement('div', item.itemProps, renderItem?.(item, data.items[item.key]) ?? item.label),
         item.expanded && item.hasChildren
-          ? createElement(
-              'div',
-              { key: `${item.key}-menu`, role: 'menu' } as DivProps,
-              menubar.itemsFor(item.key).map((child) =>
-                createElement('div', { key: child.key, ...child.itemProps } as DivProps & { key: Key }, renderItem?.(child, data.items[child.key]) ?? child.label),
-              ),
-            )
+          ? renderItemCollection({
+              rootProps: { role: 'menu' },
+              items: menubar.itemsFor(item.key), dataItems: data.items,
+              getItemProps: (child) => child.itemProps,
+              children: (child, dataItem) => renderItem?.(child, dataItem) ?? child.label,
+            })
           : null,
-      ]),
+      ),
     ),
   )
 }

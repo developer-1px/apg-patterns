@@ -1,8 +1,7 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
+import { renderItemCollection } from '../../adapters/reactPresetElements'
 import type { Key, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import { useComboboxPattern, type ComboboxData, type ReactComboboxOption } from './useComboboxPattern'
-
-type DivProps = ComponentPropsWithoutRef<'div'>
 
 export interface ComboboxProps<TItem extends PatternItem = PatternItem> {
   data: ComboboxData & { items: Record<Key, TItem> }
@@ -15,16 +14,16 @@ export interface ComboboxProps<TItem extends PatternItem = PatternItem> {
 export function Combobox<TItem extends PatternItem = PatternItem>({ data, onEvent, options, className, renderOption }: ComboboxProps<TItem>) {
   const combobox = useComboboxPattern(data, onEvent, options)
 
-  return createElement('div', { className } as DivProps, [
-    createElement('input', { key: 'input', ...combobox.inputProps, ref: combobox.setInputRef } as ComponentPropsWithoutRef<'input'>),
+  return createElement(
+    'div',
+    { className },
+    createElement('input', { ...combobox.inputProps, ref: combobox.setInputRef } as ComponentPropsWithoutRef<'input'>),
     combobox.open
-      ? createElement(
-          'div',
-          { key: 'listbox', ...combobox.listboxProps } as DivProps,
-          combobox.options.map((option) =>
-            createElement('div', { key: option.key, ...option.optionProps } as DivProps & { key: Key }, renderOption?.(option, data.items[option.key]) ?? option.label),
-          ),
-        )
+      ? renderItemCollection({
+          rootProps: combobox.listboxProps, items: combobox.options, dataItems: data.items,
+          getItemProps: (option) => option.optionProps,
+          children: (option, dataItem) => renderOption?.(option, dataItem) ?? option.label,
+        })
       : null,
-  ])
+  )
 }

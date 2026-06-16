@@ -1,8 +1,8 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
-import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
+import { renderItemCollection } from '../../adapters/reactPresetElements'
+import type { PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import { useMenuButtonPattern, type ReactMenuButtonRuntime } from './useMenuButtonPattern'
 
-type DivProps = ComponentPropsWithoutRef<'div'>
 type ReactMenuButtonItem = ReactMenuButtonRuntime['items'][number]
 
 export interface MenuButtonProps<TItem extends PatternItem = PatternItem> {
@@ -17,16 +17,16 @@ export interface MenuButtonProps<TItem extends PatternItem = PatternItem> {
 export function MenuButton<TItem extends PatternItem = PatternItem>({ data, onEvent, options, className, renderTrigger, renderItem }: MenuButtonProps<TItem>) {
   const menu = useMenuButtonPattern(data, onEvent, options)
 
-  return createElement('div', { className } as DivProps, [
-    createElement('button', { key: 'trigger', ...menu.triggerProps } as ComponentPropsWithoutRef<'button'>, renderTrigger?.() ?? (menu.triggerKey ? data.items[menu.triggerKey]?.label : undefined)),
+  return createElement(
+    'div',
+    { className },
+    createElement('button', menu.triggerProps as ComponentPropsWithoutRef<'button'>, renderTrigger?.() ?? (menu.triggerKey ? data.items[menu.triggerKey]?.label : undefined)),
     menu.expanded
-      ? createElement(
-          'div',
-          { key: 'menu', ...menu.menuProps } as DivProps,
-          menu.items.map((item) =>
-            createElement('div', { key: item.key, ...item.itemProps } as DivProps & { key: Key }, renderItem?.(item, data.items[item.key]) ?? item.label),
-          ),
-        )
+      ? renderItemCollection({
+          rootProps: menu.menuProps, items: menu.items, dataItems: data.items,
+          getItemProps: (item) => item.itemProps,
+          children: (item, dataItem) => renderItem?.(item, dataItem) ?? item.label,
+        })
       : null,
-  ])
+  )
 }
