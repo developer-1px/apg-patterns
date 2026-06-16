@@ -1,9 +1,9 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
-import type { ReactMenuButtonItem } from './menuButtonItem'
-import { useMenuButtonPattern } from './useMenuButtonPattern'
+import { useMenuButtonPattern, type ReactMenuButtonRuntime } from './useMenuButtonPattern'
 
 type DivProps = ComponentPropsWithoutRef<'div'>
+type ReactMenuButtonItem = ReactMenuButtonRuntime['items'][number]
 
 export interface MenuButtonProps<TItem extends PatternItem = PatternItem> {
   data: PatternData<TItem>

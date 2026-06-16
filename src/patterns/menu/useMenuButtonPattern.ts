@@ -1,17 +1,24 @@
-import { useLayoutEffect, type KeyboardEvent } from 'react'
+import { useLayoutEffect, type KeyboardEvent, type MouseEvent } from 'react'
 import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
 import { withDefaultReason } from '../../kernel/domEventBindings'
 import type { Key, PatternData, PatternEvent, PatternEventReason, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
-import { createReactKeyboardHandler, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { createReactKeyboardHandler, reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
 import { menuButtonDefinition } from './definition'
-import { createMenuButtonItem, type ReactMenuButtonItem } from './menuButtonItem'
+import { withMenuItemRoleProps } from './menuItemRole'
 import { resolveMenuButtonKey } from './menuButtonKeyboard'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 
 export interface ReactMenuButtonTriggerState {
   disabled: boolean
   expanded: boolean
+}
+
+interface ReactMenuButtonItem {
+  key: Key
+  label: string
+  state: Pick<ReactRenderItemState, 'active' | 'disabled'>
+  itemProps: ReactPatternProps
 }
 
 export interface ReactMenuButtonRuntime {
@@ -145,6 +152,45 @@ export function useMenuButtonPattern(data: PatternData, onEvent: (event: Pattern
       return { forKey: runtime.keyToElementId }
     },
     keyToElementId: runtime.keyToElementId,
+  }
+}
+
+function createMenuButtonItem({
+  runtime,
+  data,
+  key,
+  onEvent,
+  closeAndFocusTrigger,
+}: {
+  runtime: PatternRuntime
+  data: PatternData
+  key: Key
+  onEvent: (event: PatternEvent) => void
+  closeAndFocusTrigger(reason?: PatternEventReason): void
+}): ReactMenuButtonItem {
+  const itemProps = withMenuItemRoleProps(reactProps(runtime.getPartProps('menuitem', key)), data, key)
+  const state = runtime.getItemState(key, 'menuitem')
+  return {
+    key,
+    label: data.items[key]?.label ?? key,
+    state: {
+      active: Boolean(state.active),
+      disabled: Boolean(state.disabled),
+    },
+    itemProps: {
+      ...itemProps,
+      id: runtime.keyToElementId(key),
+      onFocus: () => onEvent(withDefaultReason({ type: 'focus', key }, 'focus')),
+      onClick: (event: MouseEvent<HTMLElement>) => {
+        if (state.disabled) {
+          event.preventDefault()
+          event.stopPropagation()
+          return
+        }
+        itemProps.onClick?.(event)
+        closeAndFocusTrigger('pointer')
+      },
+    },
   }
 }
 

@@ -1,14 +1,19 @@
-import { useLayoutEffect, useRef, type HTMLAttributes, type InputHTMLAttributes, type KeyboardEvent } from 'react'
+import { useLayoutEffect, useRef, type HTMLAttributes, type InputHTMLAttributes, type KeyboardEvent, type MouseEvent } from 'react'
 import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
 import { withDefaultReason } from '../../kernel/domEventBindings'
-import type { Key, PatternEvent, PatternOptions } from '../../schema'
-import { createComboboxOption, type ReactComboboxOption } from './comboboxOption'
+import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
+import { reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
 import { getComboboxRuntimeState, type ComboboxData, type ComboboxVariant } from './comboboxRuntimeState'
 import { comboboxDefinition } from './definition'
 import { comboboxRootKey } from './navigation'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 
-export type { ReactComboboxOption } from './comboboxOption'
+export interface ReactComboboxOption {
+  key: Key
+  label: string
+  state: Pick<ReactRenderItemState, 'active' | 'selected'>
+  optionProps: ReactPatternProps
+}
 
 export interface ReactComboboxRuntime {
   inputProps: InputHTMLAttributes<HTMLInputElement>
@@ -96,6 +101,45 @@ function handleSelectOnlyTypeahead(key: string, onEvent: (event: PatternEvent) =
   if (!/^[\w]$/.test(key)) return false
   onEvent(withDefaultReason({ type: 'typeahead', query: key.toLowerCase() }, 'keyboard'))
   return true
+}
+
+function createComboboxOption({
+  runtime,
+  data,
+  key,
+  open,
+  editable,
+  onEvent,
+}: {
+  runtime: PatternRuntime
+  data: PatternData
+  key: Key
+  open: boolean
+  editable: boolean
+  onEvent: (event: PatternEvent) => void
+}): ReactComboboxOption {
+  const optionProps = reactProps(runtime.getPartProps('option', key))
+  const state = runtime.getItemState(key, 'option')
+  const active = Boolean(state.active)
+  const selected = Boolean(state.selected)
+  return {
+    key,
+    label: data.items[key]?.label ?? key,
+    state: {
+      active,
+      selected,
+    },
+    optionProps: {
+      ...optionProps,
+      'aria-selected': open ? active : selected,
+      onMouseDown: (event: MouseEvent<HTMLElement>) => {
+        event.preventDefault()
+        onEvent(withDefaultReason({ type: 'select', keys: [key], anchorKey: key, extentKey: key }, 'pointer'))
+        onEvent(withDefaultReason({ type: 'expand', key: comboboxRootKey, expanded: false }, 'pointer'))
+        if (editable) onEvent(withDefaultReason({ type: 'commitValue', key, value: data.items[key]?.label ?? '' }, 'pointer'))
+      },
+    },
+  }
 }
 
 function useComboboxInlineCompletionInputRef({
