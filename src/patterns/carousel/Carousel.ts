@@ -54,13 +54,9 @@ function renderCarouselSlide<TItem extends CarouselDataItem>({
   dataItem: TItem
   renderSlide?: (slide: ReactCarouselSlide, dataItem: TItem) => ReactNode
 }) {
-  return createElement('div', { key: slide.key, ...slide.slideProps } as DivProps & { key: Key }, renderSlide?.(slide, dataItem) ?? renderDefaultSlide(slide))
-}
-
-function renderDefaultSlide(slide: ReactCarouselSlide) {
-  return [
+  return createElement('div', { key: slide.key, ...slide.slideProps } as DivProps & { key: Key }, renderSlide?.(slide, dataItem) ?? [
     slide.imageUrl ? createElement('img', { key: 'image', src: slide.imageUrl, alt: slide.imageAlt } as ImgProps) : null,
     createElement('strong', { key: 'title' }, slide.title),
     slide.caption ? createElement('span', { key: 'caption' }, slide.caption) : null,
-  ]
+  ])
 }
