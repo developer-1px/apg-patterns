@@ -91,7 +91,7 @@ function createListboxRootProps(runtime: PatternRuntime, typeahead: ApgTypeahead
     ...props,
     onKeyDown: (event) => {
       if (handleListboxMultiKeyDown(runtime, event)) return
-      const query = typeahead.feed(event as Parameters<typeof typeahead.feed>[0])
+      const query = typeahead.feed(event)
       const match = query && runtime.options.typeaheadEnabled !== false
         ? findApgTypeaheadMatch(
             runtime.visibleKeys.map((key) => ({
