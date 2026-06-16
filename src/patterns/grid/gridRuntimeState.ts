@@ -1,7 +1,7 @@
 import type { Key, PatternData, PatternItem, PatternOptions, PatternState } from '../../schema'
 
-type GridValue = string | number | boolean | null
-type GridSort = 'ascending' | 'descending' | 'other'
+export type GridValue = string | number | boolean | null
+export type GridSort = 'ascending' | 'descending' | 'other'
 
 interface GridState extends PatternState {
   multiselectable?: boolean

@@ -1,8 +1,6 @@
 import type { Key, PatternData, PatternEvent } from '../../schema'
 import { withDefaultReason } from '../../kernel/domEventBindings'
-
-type GridValue = string | number | boolean | null
-type GridSort = 'ascending' | 'descending' | 'other'
+import type { GridSort, GridValue } from './gridRuntimeState'
 
 export function createGridRuntimeEventHandler({
   data,

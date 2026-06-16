@@ -1,5 +1,6 @@
 import type { InputHTMLAttributes } from 'react'
 import type { Key, PatternEvent } from '../../schema'
+import type { GridValue } from './gridRuntimeState'
 
 export type ReactGridEditInputProps = InputHTMLAttributes<HTMLInputElement> & { 'data-edit': string }
 
@@ -11,7 +12,7 @@ export function createGridEditInputProps({
   onEvent,
 }: {
   key: Key
-  editDraftByKey: Record<string, string | number | boolean | null>
+  editDraftByKey: Record<string, GridValue>
   commitEdit(): void
   cancelEdit(): void
   onEvent(event: PatternEvent): void

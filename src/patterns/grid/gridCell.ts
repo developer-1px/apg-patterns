@@ -2,6 +2,7 @@ import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { Key, PatternData, PatternEvent } from '../../schema'
 import { reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
 import { createGridEditInputProps, type ReactGridEditInputProps } from './gridEditInputProps'
+import type { GridSort, GridValue } from './gridRuntimeState'
 
 export interface ReactGridCell {
   key: Key
@@ -22,9 +23,9 @@ export function createGridCell(input: {
   key: Key
   editableKeys: readonly string[]
   editingKey: string | null
-  editDraftByKey: Record<string, string | number | boolean | null>
-  valueByKey: Readonly<Record<Key, string | number | boolean | null>>
-  sortByKey: Readonly<Record<Key, 'ascending' | 'descending' | 'other'>>
+  editDraftByKey: Record<string, GridValue>
+  valueByKey: Readonly<Record<Key, GridValue>>
+  sortByKey: Readonly<Record<Key, GridSort>>
   commitEdit(): void
   cancelEdit(): void
   onEvent(event: PatternEvent): void
