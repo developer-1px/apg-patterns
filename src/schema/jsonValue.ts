@@ -23,14 +23,6 @@ function isJsonValue(value: unknown): value is JsonValue {
   return Object.values(value).every(isJsonValue)
 }
 
-function addJsonValueIssue(ctx: z.RefinementCtx, path: (string | number)[]) {
-  ctx.addIssue({
-    code: 'custom',
-    path,
-    message: 'value must be JSON-serializable',
-  })
-}
-
 export function validateJsonExtensionFields(
   value: Record<string, unknown>,
   knownKeys: readonly string[],
@@ -39,7 +31,13 @@ export function validateJsonExtensionFields(
   const known = new Set(knownKeys)
   for (const [key, fieldValue] of Object.entries(value)) {
     if (known.has(key)) continue
-    if (!isJsonValue(fieldValue)) addJsonValueIssue(ctx, [key])
+    if (!isJsonValue(fieldValue)) {
+      ctx.addIssue({
+        code: 'custom',
+        path: [key],
+        message: 'value must be JSON-serializable',
+      })
+    }
   }
 }
 
