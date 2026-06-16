@@ -34,10 +34,7 @@ export function useReactPatternRuntime(input: CreatePatternRuntimeInput): Patter
   })
   const runtime = createPatternRuntime({ ...input, onEvent, keyToElementId })
   usePatternEffects({ definition: runtime.definition, data: runtime.data, keyToElementId: runtime.keyToElementId })
-  return withKeyboardFocusVisibleProps(runtime, keyboardFocusKeyRef.current)
-}
-
-function withKeyboardFocusVisibleProps(runtime: PatternRuntime, keyboardFocusKey: Key | null): PatternRuntime {
+  const keyboardFocusKey = keyboardFocusKeyRef.current
   if (!keyboardFocusKey) return runtime
   const addFocusVisible = (props: Record<string, unknown>, key?: Key) => {
     if (key !== keyboardFocusKey) return props
