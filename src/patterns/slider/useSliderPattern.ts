@@ -1,17 +1,11 @@
 import { createPatternRuntime } from '../../kernel/patternRuntime'
-import { PatternDataSchema, PatternOptionsSchema, type Key, type PatternData, type PatternEvent, type PatternItem, type PatternOptions } from '../../schema'
+import { PatternDataSchema, PatternOptionsSchema, type Key, type PatternEvent, type PatternOptions } from '../../schema'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { sliderDefinition } from './definition'
 import { createSliderRenderItem, type ReactSliderRenderItem } from './sliderRenderItem'
-import { getSliderRuntimeState, isMultiThumbSlider } from './sliderRuntimeState'
+import { getSliderRuntimeState, isMultiThumbSlider, type SliderPatternData } from './sliderRuntimeState'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 export type { ReactSliderRenderItem } from './sliderRenderItem'
-
-type SliderPatternData = PatternData<PatternItem & {
-  valuemin?: number
-  valuemax?: number
-  valuetext?: string
-}>
 
 export interface ReactSliderRuntime {
   rootProps: ReactPatternProps

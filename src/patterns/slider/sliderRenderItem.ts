@@ -1,15 +1,10 @@
 import type { KeyboardEvent, PointerEvent } from 'react'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternData, PatternItem } from '../../schema'
+import type { Key } from '../../schema'
 import { dispatchReactKeyboardBinding, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { withDefaultReason } from '../../kernel/domEventBindings'
 import { valueFromSliderPointer } from './sliderPointerValue'
-
-type SliderPatternData = PatternData<PatternItem & {
-  valuemin?: number
-  valuemax?: number
-  valuetext?: string
-}>
+import type { SliderPatternData } from './sliderRuntimeState'
 
 export interface ReactSliderRenderItem {
   key: Key

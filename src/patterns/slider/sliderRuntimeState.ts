@@ -1,9 +1,10 @@
 import type { Key, PatternData, PatternItem } from '../../schema'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 
-type SliderPatternData = PatternData<PatternItem & {
+export type SliderPatternData = PatternData<PatternItem & {
   valuemin?: number
   valuemax?: number
+  valuetext?: string
 }>
 
 export function getSliderRuntimeState(runtime: PatternRuntime<SliderPatternData>): {
