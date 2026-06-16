@@ -1,7 +1,6 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
-import type { ReactMenubarItem } from './menubarItem'
-import { useMenubarPattern } from './useMenubarPattern'
+import { useMenubarPattern, type ReactMenubarItem } from './useMenubarPattern'
 
 type DivProps = ComponentPropsWithoutRef<'div'>
 

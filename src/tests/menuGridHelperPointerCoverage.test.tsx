@@ -1,11 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import { resolveAriaSource, type PatternData, type PatternEvent } from '../index'
 import { createGridEditActions, createGridRuntimeEventHandler } from '../patterns/grid/gridRuntimeEvents'
-import { createMenubarItem } from '../patterns/menu/menubarItem'
 import { registerMenuAriaSources } from '../patterns/menu/menuAriaSources'
 import { resolveMenuButtonKey } from '../patterns/menu/menuButtonKeyboard'
+import { useMenubarPattern } from '../patterns/menu/useMenubarPattern'
 
 registerMenuAriaSources()
 
@@ -14,6 +14,7 @@ const menuData = {
     file: { label: 'File' },
     edit: { label: 'Edit' },
     help: {},
+    new: { label: 'New' },
   },
   relations: { rootKeys: ['file', 'edit', 'help'], childrenByKey: { file: ['new'] } },
   state: { expandedKeys: ['file'] },
@@ -21,6 +22,8 @@ const menuData = {
 
 function MenuGridHelperHost() {
   const [result, setResult] = useState('')
+  const menubarEventsRef = useRef<PatternEvent[]>([])
+  const menubar = useMenubarPattern(menuData, (event) => menubarEventsRef.current.push(event))
 
   return (
     <div>
@@ -55,22 +58,17 @@ function MenuGridHelperHost() {
       <button
         type="button"
         onClick={() => {
-          const events: PatternEvent[] = []
-          const runtime = {
-            getPartProps: () => ({ role: 'menuitem', onKeyDown: () => events.push({ type: 'activate', key: 'fallback' }) }),
-            keyToElementId: (key: string) => `menubar-${key}`,
-          }
-          const noRootKeys = createMenubarItem({ runtime: runtime as never, data: menuData, key: 'file', rootKeys: [], onEvent: (event) => events.push(event) })
-          const missingKey = createMenubarItem({ runtime: runtime as never, data: menuData, key: 'missing', rootKeys: ['file'], onEvent: (event) => events.push(event) })
-          const fallback = createMenubarItem({ runtime: runtime as never, data: menuData, key: 'edit', rootKeys: ['file', 'edit'], onEvent: (event) => events.push(event) })
+          menubarEventsRef.current = []
+          const file = menubar.rootItems.find((item) => item.key === 'file')
+          const edit = menubar.rootItems.find((item) => item.key === 'edit')
           const eventBase = {
             preventDefault: () => undefined,
             stopPropagation: () => undefined,
           }
-          noRootKeys.itemProps.onKeyDown?.({ ...eventBase, key: 'ArrowRight' } as never)
-          missingKey.itemProps.onKeyDown?.({ ...eventBase, key: 'ArrowLeft' } as never)
-          fallback.itemProps.onKeyDown?.({ ...eventBase, key: 'Escape' } as never)
-          setResult(events.map((event) => `${event.type}:${'key' in event ? event.key ?? '' : ''}`).join('|'))
+          file?.itemProps.onKeyDown?.({ ...eventBase, key: 'ArrowDown' } as never)
+          file?.itemProps.onKeyDown?.({ ...eventBase, key: 'ArrowRight' } as never)
+          edit?.itemProps.onKeyDown?.({ ...eventBase, key: 'ArrowLeft' } as never)
+          setResult(menubarEventsRef.current.map((event) => `${event.type}:${'key' in event ? event.key ?? '' : ''}`).join('|'))
         }}
       >
         Run menubar item helpers
@@ -113,7 +111,7 @@ describe('menu and grid helper coverage from pointer input', () => {
     expect(screen.getByText('undefined|undefined|undefined|undefined|undefined')).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Run menubar item helpers' }))
-    expect(screen.getByText((content) => content.includes('activate:fallback'))).toBeTruthy()
+    expect(screen.getByText('expand:file|focus:new|focus:edit|focus:file')).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Run grid helpers' }))
     expect(screen.getByText('editStart:value|editEnd:|editEnd:')).toBeTruthy()
