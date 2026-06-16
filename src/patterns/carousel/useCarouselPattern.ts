@@ -95,12 +95,13 @@ function createCarouselSlides({
 }): readonly ReactCarouselSlide[] {
   return slideKeys.map((key, index) => {
     const item = data.items[key]
+    const label = item?.label ?? key
     return {
       key,
-      title: String(item?.title ?? data.items[key]?.label ?? key),
+      title: String(item?.title ?? label),
       caption: String(item?.caption ?? ''),
       imageUrl: typeof item?.imageUrl === 'string' ? item.imageUrl : null,
-      imageAlt: String(item?.imageAlt ?? item?.caption ?? item?.title ?? data.items[key]?.label ?? key),
+      imageAlt: String(item?.imageAlt ?? item?.caption ?? item?.title ?? label),
       active: key === activeKey,
       index,
       slideProps: reactProps(runtime.getPartProps('slide', key)),
