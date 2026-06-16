@@ -72,9 +72,7 @@ export function useComboboxPattern(data: ComboboxData, onEvent: (event: PatternE
     inputProps: createComboboxInputProps({ rootProps, editable, displayValue, listboxId, open, variant, label, onEvent }),
     listboxProps: runtime.getPartProps('listbox') as HTMLAttributes<HTMLElement>,
     get options() {
-      return Object.keys(data.items)
-        .filter((key) => key !== comboboxRootKey)
-        .map((key) => createComboboxOption({ runtime, data, key, open, editable, onEvent }))
+      return runtime.visibleKeys.map((key) => createComboboxOption({ runtime, data, key, open, editable, onEvent }))
     },
     open,
     editable,
