@@ -60,9 +60,14 @@ export function resolvePartEventBindings(
 
 export function withDefaultReason(event: PatternEvent, reason: PatternEventReason): PatternEvent {
   if (event.meta?.reason) return event
+  return withNonEnumerableMeta({ ...event, meta: { ...event.meta, reason } } as PatternEvent)
+}
+
+export function withNonEnumerableMeta(event: PatternEvent): PatternEvent {
+  if (!event.meta) return event
   const next = { ...event } as PatternEvent
   Object.defineProperty(next, 'meta', {
-    value: { ...event.meta, reason },
+    value: event.meta,
     enumerable: false,
     configurable: true,
   })

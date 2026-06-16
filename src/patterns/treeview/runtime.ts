@@ -15,6 +15,7 @@ import { createTreeviewRenderItems, type TreeviewRenderItem } from './renderItem
 import { toTreeviewRenderState, type TreeviewRenderState } from './renderState'
 import { resolveTypeaheadTarget } from './typeahead'
 import { createElementId } from '../../kernel/domIds'
+import { withNonEnumerableMeta } from '../../kernel/domEventBindings'
 
 export interface TreeviewRuntime {
   definition: typeof treeviewDefinition
@@ -87,17 +88,6 @@ export function createTreeviewRuntime(input: CreateTreeviewRuntimeInput): Treevi
     keyToElementId,
     emit,
   }
-}
-
-function withNonEnumerableMeta(event: PatternEvent): PatternEvent {
-  if (!event.meta) return event
-  const next = { ...event } as PatternEvent
-  Object.defineProperty(next, 'meta', {
-    value: event.meta,
-    enumerable: false,
-    configurable: true,
-  })
-  return next
 }
 
 function createTreeProps({
