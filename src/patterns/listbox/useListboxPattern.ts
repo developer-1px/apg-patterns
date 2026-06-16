@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { createApgTypeaheadBuffer } from '../../internal/keyboard'
+import { createApgTypeaheadBuffer, type ApgTypeaheadBuffer } from '../../internal/keyboard'
 import { findApgTypeaheadMatch } from '../../internal/collectionNavigation'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import { withDefaultReason } from '../../kernel/domEventBindings'
@@ -99,7 +99,7 @@ function getItemState(runtime: PatternRuntime, key: Key, part: string): ReactRen
   }
 }
 
-function createListboxRootProps(runtime: PatternRuntime, typeahead: ReturnType<typeof createApgTypeaheadBuffer>): ReactPatternProps {
+function createListboxRootProps(runtime: PatternRuntime, typeahead: ApgTypeaheadBuffer): ReactPatternProps {
   const props = reactProps(runtime.getPartProps('listbox'))
   const baseKeyDown = props.onKeyDown
   return {
