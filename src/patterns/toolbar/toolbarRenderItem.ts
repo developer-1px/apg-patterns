@@ -19,6 +19,8 @@ export function createToolbarRenderItem(runtime: PatternRuntime, key: Key): Reac
     : 'button'
   const part = kind === 'button' || kind === 'toggleButton' ? 'item' : 'control'
   const state = runtime.getItemState(key, part)
+  const itemProps = reactProps(runtime.getPartProps(part, key))
+  const { role: _role, ...controlProps } = itemProps
   return {
     key,
     label: runtime.data.items[key]?.label ?? key,
@@ -29,13 +31,6 @@ export function createToolbarRenderItem(runtime: PatternRuntime, key: Key): Reac
       pressed: Boolean(state.pressed),
       disabled: Boolean(state.disabled),
     },
-    itemProps: part === 'control'
-      ? createToolbarControlProps(runtime, key)
-      : reactProps(runtime.getPartProps('item', key)),
+    itemProps: part === 'control' ? controlProps : itemProps,
   }
-}
-
-function createToolbarControlProps(runtime: PatternRuntime, key: Key): ReactPatternProps {
-  const { role: _role, ...props } = reactProps(runtime.getPartProps('control', key))
-  return props
 }
