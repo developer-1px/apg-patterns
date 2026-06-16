@@ -1,4 +1,4 @@
-import { moveApgGrid } from '../../internal/collectionNavigation'
+import { findApgGridLocation, moveApgGrid } from '../../internal/collectionNavigation'
 import { createCellRows } from '../../internal/cellRelations'
 import { defineNavigationTarget, defineVisibleOrder } from '../../kernel/patternKernel'
 import type { Key, PatternData } from '../../schema'
@@ -44,14 +44,7 @@ defineNavigationTarget('gridPage', (target, ctx) => {
     throw new Error(`Unsupported grid page action: ${String(action)}`)
   }
   const rows = gridRows(ctx.data)
-  let location: { rowIndex: number; columnIndex: number } | null = null
-  for (let r = 0; r < rows.length; r += 1) {
-    const c = rows[r]!.indexOf(ctx.activeKey)
-    if (c >= 0) {
-      location = { rowIndex: r, columnIndex: c }
-      break
-    }
-  }
+  const location = findApgGridLocation(rows, ctx.activeKey)
   if (!location) return null
   const delta = action === 'pageDown' ? PAGE_SIZE : -PAGE_SIZE
   const targetRowIndex = Math.max(0, Math.min(rows.length - 1, location.rowIndex + delta))

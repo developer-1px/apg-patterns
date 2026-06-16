@@ -15,7 +15,7 @@ type ApgGridNavigationAction =
   | 'gridStart'
   | 'gridEnd'
 
-interface ApgGridLocation {
+export interface ApgGridLocation {
   rowIndex: number
   columnIndex: number
 }
@@ -158,7 +158,7 @@ function isGridAvailable<T>(item: T, options: ApgGridNavigationOptions<T>): bool
   return options.isAvailable?.(item) ?? true
 }
 
-function findApgGridLocation<T>(
+export function findApgGridLocation<T>(
   rows: readonly (readonly T[])[],
   current: T,
 ): ApgGridLocation | null {

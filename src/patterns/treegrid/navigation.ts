@@ -1,4 +1,4 @@
-import { moveApgGrid } from '../../internal/collectionNavigation'
+import { findApgGridLocation, moveApgGrid } from '../../internal/collectionNavigation'
 import {
   defineNavigationTarget,
   defineVisibleOrder,
@@ -26,23 +26,14 @@ defineNavigationTarget('treegridPage', (target, ctx) => {
   const direction = target.direction ?? 'down'
   const rows = visibleCells(ctx.data)
   if (!ctx.activeKey) return null
-  let rowIndex = -1
-  let colIndex = -1
-  for (let r = 0; r < rows.length; r += 1) {
-    const c = rows[r]!.indexOf(ctx.activeKey)
-    if (c !== -1) {
-      rowIndex = r
-      colIndex = c
-      break
-    }
-  }
-  if (rowIndex === -1) return null
+  const location = findApgGridLocation(rows, ctx.activeKey)
+  if (!location) return null
   const nextRowIndex = direction === 'down'
-    ? Math.min(rows.length - 1, rowIndex + PAGE_STEP)
-    : Math.max(0, rowIndex - PAGE_STEP)
-  if (nextRowIndex === rowIndex) return null
+    ? Math.min(rows.length - 1, location.rowIndex + PAGE_STEP)
+    : Math.max(0, location.rowIndex - PAGE_STEP)
+  if (nextRowIndex === location.rowIndex) return null
   const row = rows[nextRowIndex] ?? []
-  return row[Math.min(colIndex, row.length - 1)] ?? null
+  return row[Math.min(location.columnIndex, row.length - 1)] ?? null
 })
 
 defineNavigationTarget('treegridParentRowFirstCell', (_target, ctx) => {
