@@ -288,12 +288,22 @@ const reactOnlyExports = reactExports.filter((name) => !coreExports.includes(nam
 const reactOnlyRuntimeExports = reactRuntimeExports.filter((name) => !coreRuntimeExports.includes(name))
 const rootSurfaceBuckets = assertClassifiedPublicExports('root/core declaration exports', coreExports, classifyRootCoreExport)
 const reactSurfaceBuckets = assertClassifiedPublicExports('./react-only declaration exports', reactOnlyExports, classifyReactOnlyExport)
+const rootSurfaceManifest = publicSurfaceManifest(coreExports, classifyRootCoreExport)
+const reactSurfaceManifest = publicSurfaceManifest(reactOnlyExports, classifyReactOnlyExport)
 assertInterfaceStabilityDocumentsBuckets(rootSurfaceBuckets, reactSurfaceBuckets)
 const nextApiReference = shouldWrite
   ? replaceExportBlock(
     replaceExportBlock(
       replaceExportBlock(
-        replaceExportBlock(apiReference, 'root-core', coreExports),
+        replaceExportBlock(
+          replaceExportBlock(
+            replaceExportBlock(apiReference, 'root-core-surface', rootSurfaceManifest),
+            'react-only-surface',
+            reactSurfaceManifest,
+          ),
+          'root-core',
+          coreExports,
+        ),
         'root-core-runtime',
         rootRuntimeExports,
       ),
@@ -314,6 +324,8 @@ assertContains("import { createPatternRuntime } from '@interactive-os/aria'")
 assertContains("import { createPatternRuntime } from '@interactive-os/aria/core'")
 assertContains("import { Button, useButtonPattern } from '@interactive-os/aria/react'")
 assertContains("import type { PatternData, PatternEvent } from '@interactive-os/aria'")
+assertExportBlock('root-core-surface', rootSurfaceManifest)
+assertExportBlock('react-only-surface', reactSurfaceManifest)
 assertExportBlock('root-core', coreExports)
 assertExportBlock('root-core-runtime', rootRuntimeExports)
 assertExportBlock('react-only', reactOnlyExports)
@@ -416,6 +428,10 @@ function assertClassifiedPublicExports(label, exports, classify) {
   }
 
   return buckets
+}
+
+function publicSurfaceManifest(exports, classify) {
+  return exports.map((name) => `${name} | ${classify(name) ?? 'unclassified'}`)
 }
 
 function classifyRootCoreExport(name) {
