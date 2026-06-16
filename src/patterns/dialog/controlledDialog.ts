@@ -2,6 +2,8 @@ import { useLayoutEffect, useRef, type KeyboardEvent } from 'react'
 import { FOCUSABLE_SELECTOR } from '../../adapters/reactElementTargets'
 import type { Key, PatternData, PatternEvent, PatternEventReason } from '../../schema'
 
+const fallbackDialogKey: Key = 'dialog'
+
 export type ReactDialogFocusTarget =
   | HTMLElement
   | null
@@ -68,7 +70,7 @@ export function handleControlledDialogKeyDown({
     return
   }
 
-  if (open && event.key === 'Tab') trapDialogFocus(event, keyToElementId(dialogKey ?? fallbackDialogKey()))
+  if (open && event.key === 'Tab') trapDialogFocus(event, keyToElementId(dialogKey ?? fallbackDialogKey))
 }
 
 export function emitControlledDialogClose({
@@ -80,13 +82,9 @@ export function emitControlledDialogClose({
   reason: PatternEventReason
   key?: Key | null
 }) {
-  const dialogKey = key ?? fallbackDialogKey()
+  const dialogKey = key ?? fallbackDialogKey
   config.onEvent?.({ type: 'dismiss', key: dialogKey, meta: { reason } })
   config.onOpenChange(false, { reason, key: dialogKey })
-}
-
-export function dialogKey(): Key {
-  return fallbackDialogKey()
 }
 
 function focusInitialDialogTarget({
@@ -100,15 +98,11 @@ function focusInitialDialogTarget({
   dialogKey?: Key | null
   initialFocusKey?: Key
 }) {
-  const root = document.getElementById(keyToElementId(dialogKey ?? fallbackDialogKey()))
+  const root = document.getElementById(keyToElementId(dialogKey ?? fallbackDialogKey))
   const targetKey = initialFocusKey ?? data.refs?.initialFocusKey
   const target = targetKey ? document.getElementById(keyToElementId(targetKey)) : root?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR)
   const focusTarget = target ?? root
   focusTarget?.focus({ preventScroll: true })
-}
-
-function fallbackDialogKey(): Key {
-  return 'dialog'
 }
 
 function trapDialogFocus(event: KeyboardEvent<HTMLElement>, dialogElementId: string) {
