@@ -10,7 +10,7 @@ import {
 } from '../../schema'
 import { treeviewDefinition } from './definition'
 import { treeviewDefaultOptions } from './defaultOptions'
-import { createPatternRuntime, type CreatePatternRuntimeInput, type PatternRuntime, type SlotProps } from '../../kernel/patternRuntime'
+import { createPatternRuntime, type PatternRuntime, type SlotProps } from '../../kernel/patternRuntime'
 import { createTreeviewRenderItems, type TreeviewRenderItem } from './renderItem'
 import { toTreeviewRenderState, type TreeviewRenderState } from './renderState'
 import { resolveTypeaheadTarget } from './typeahead'
@@ -53,7 +53,7 @@ export function createTreeviewRuntime(input: CreateTreeviewRuntimeInput): Treevi
     options,
     keyToElementId,
     onEvent: emit,
-  } satisfies CreatePatternRuntimeInput)
+  })
 
   const getTreeProps = (): SlotProps => createTreeProps({ runtime, data, options, typeahead, emit })
 

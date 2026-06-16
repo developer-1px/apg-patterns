@@ -1,6 +1,5 @@
 import {
   createPatternRuntime,
-  type CreatePatternRuntimeInput,
   type PatternRuntime,
   type SlotProps,
 } from '../../kernel/patternRuntime'
@@ -44,7 +43,7 @@ export function createTabsRuntime(input: CreateTabsRuntimeInput): TabsRuntime {
     options,
     keyToElementId: (key) => createElementId(options.elementIdPrefix ?? 'tab-', key),
     onEvent: emit,
-  } satisfies CreatePatternRuntimeInput) as PatternRuntime
+  })
 
   const selectedKey = data.state?.selectedKeys?.[0] ?? data.state?.activeKey ?? runtime.visibleKeys[0] ?? null
   const selectedPanelKey = selectedKey ? data.relations?.controlsByKey?.[selectedKey]?.[0] ?? null : null
