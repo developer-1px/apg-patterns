@@ -1,5 +1,5 @@
 import { createElement, type ComponentPropsWithoutRef, type ReactNode } from 'react'
-import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
+import type { PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import { useTablePattern, type ReactTableCell } from './useTablePattern'
 
 type DivProps = ComponentPropsWithoutRef<'div'>
@@ -21,9 +21,9 @@ export function Table<TItem extends PatternItem = PatternItem>({ data, onEvent =
     table.rows.map((row) =>
       createElement(
         'div',
-        { key: row.key, ...row.rowProps } as DivProps & { key: Key },
+        { key: row.key, ...row.rowProps },
         row.cells.map((cell) =>
-          createElement('div', { key: cell.key, ...cell.cellProps } as DivProps & { key: Key }, renderCell?.(cell, data.items[cell.key]) ?? cell.label),
+          createElement('div', { key: cell.key, ...cell.cellProps }, renderCell?.(cell, data.items[cell.key]) ?? cell.label),
         ),
       ),
     ),

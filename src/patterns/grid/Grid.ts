@@ -22,9 +22,9 @@ export function Grid<TItem extends PatternItem = PatternItem>({ data, onEvent, o
     grid.rows.map((row) =>
       createElement(
         'div',
-        { key: row.key, ...row.rowProps } as DivProps & { key: Key },
+        { key: row.key, ...row.rowProps },
         row.cells.map((cell) =>
-          createElement('div', { key: cell.key, ...cell.cellProps } as DivProps & { key: Key }, renderCell?.(cell, data.items[cell.key]) ?? (cell.editing ? createElement('input', cell.editInputProps as ComponentPropsWithoutRef<'input'>) : cell.value)),
+          createElement('div', { key: cell.key, ...cell.cellProps }, renderCell?.(cell, data.items[cell.key]) ?? (cell.editing ? createElement('input', cell.editInputProps) : cell.value)),
         ),
       ),
     ),

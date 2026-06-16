@@ -1,5 +1,5 @@
 import { createElement, type ComponentPropsWithoutRef, type CSSProperties, type ReactNode } from 'react'
-import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
+import type { PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
 import type { ReactTreeviewRenderItem } from './adaptTreeviewRuntime'
 import { useTreeviewPattern } from './useTreeviewPattern'
 
@@ -59,17 +59,17 @@ function renderTreeItem<TItem extends TreeDataItem>({
           key: `${item.key}-toggle`,
           'aria-label': `${item.state.expanded ? 'Collapse' : 'Expand'} ${item.label}`,
           ...item.toggleButtonProps,
-        } as ComponentPropsWithoutRef<'button'>,
+        },
         item.state.expanded ? '-' : '+',
       ),
     )
   }
 
   const icon = renderIcon?.(item, dataItem)
-  if (icon !== undefined && icon !== null) children.push(createElement('span', { key: `${item.key}-icon`, 'aria-hidden': true } as ComponentPropsWithoutRef<'span'>, icon))
+  if (icon !== undefined && icon !== null) children.push(createElement('span', { key: `${item.key}-icon`, 'aria-hidden': true }, icon))
 
-  children.push(createElement('span', { key: `${item.key}-label` } as ComponentPropsWithoutRef<'span'>, renderLabel?.(item, dataItem) ?? (dataItem.href ? createElement('a', { href: dataItem.href } as ComponentPropsWithoutRef<'a'>, item.label) : item.label)))
+  children.push(createElement('span', { key: `${item.key}-label` }, renderLabel?.(item, dataItem) ?? (dataItem.href ? createElement('a', { href: dataItem.href }, item.label) : item.label)))
 
   const style: CSSProperties | undefined = item.level > 1 ? { paddingInlineStart: `${(item.level - 1) * indent}px` } : undefined
-  return createElement('div', { key: item.key, ...item.treeitemProps, style } as DivProps & { key: Key }, children)
+  return createElement('div', { key: item.key, ...item.treeitemProps, style }, children)
 }
