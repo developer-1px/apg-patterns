@@ -61,9 +61,7 @@ export function createPatternRuntime<TData extends PatternData = PatternData>(in
     parentByKey,
   })
 
-  const emit = (event: PatternEvent) => {
-    onEvent(event)
-  }
+  const emit = onEvent
 
   const resolveKeyboardBinding = (input: KeyInput, activeKey: Key) => resolveRuntimeKeyboardBinding({ definition, data, options, parentByKey, input, activeKey })
 

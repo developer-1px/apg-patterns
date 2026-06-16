@@ -102,7 +102,7 @@ function reduceSelectRowEvent(definition: PatternDefinition, data: PatternData):
   const activeKey = data.state?.activeKey
   const position = findCellPosition(rows, activeKey)
   if (!position) return data
-  const keys = [...(rows[position.row] ?? [])]
+  const keys = rows[position.row] ?? []
   return keys.length > 0 ? withSelection(data, keys, keys[0]!, keys[keys.length - 1]!) : data
 }
 
