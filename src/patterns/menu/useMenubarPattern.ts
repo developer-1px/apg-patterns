@@ -97,7 +97,7 @@ function handleMenubarSubmenuKey(
     keyToElementId(key: Key): string
   },
 ) {
-  const children = enabledMenuItemKeys(input.data, input.data.relations?.childrenByKey?.[input.ownerKey] ?? [])
+  const children = getEnabledMenubarKeys(input.data.relations?.childrenByKey?.[input.ownerKey] ?? [], input.data)
   const activeKey = children.includes(input.data.state?.activeKey ?? '') ? input.data.state?.activeKey : undefined
   const focusChild = (key: Key | undefined) => {
     if (key) input.onEvent({ type: 'focus', key, meta: { reason: 'keyboard' } })
@@ -114,7 +114,7 @@ function handleMenubarSubmenuKey(
   const openSibling = (direction: 'next' | 'previous') => {
     const target = siblingKey(input.rootKeys, input.ownerKey, direction)
     if (!target) return
-    const targetChildren = enabledMenuItemKeys(input.data, input.data.relations?.childrenByKey?.[target] ?? [])
+    const targetChildren = getEnabledMenubarKeys(input.data.relations?.childrenByKey?.[target] ?? [], input.data)
     closeOwner()
     input.onEvent({ type: 'focus', key: target, meta: { reason: 'keyboard' } })
     if (targetChildren.length > 0) {
@@ -165,11 +165,6 @@ function handleMenubarSubmenuKey(
     event.stopPropagation()
     openSibling('previous')
   }
-}
-
-function enabledMenuItemKeys(data: PatternData, keys: readonly Key[]): readonly Key[] {
-  const disabled = new Set(data.state?.disabledKeys ?? [])
-  return keys.filter((key) => !disabled.has(key))
 }
 
 function stepKey(keys: readonly Key[], activeKey: Key | null | undefined, delta: 1 | -1) {
