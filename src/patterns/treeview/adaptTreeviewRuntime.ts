@@ -31,10 +31,19 @@ export function adaptTreeviewRuntime(runtime: TreeviewRuntime): ReactTreeviewRun
       return createTreeviewRenderItems(runtime, getTreeItemProps, getIndicatorProps)
     },
     get state() {
-      return getTreeviewReactState(runtime)
+      return {
+        activeKey: runtime.data.state?.activeKey ?? null,
+        selectedKeys: runtime.data.state?.selectedKeys ?? [],
+        disabledKeys: runtime.data.state?.disabledKeys ?? [],
+        expandedKeys: runtime.data.state?.expandedKeys ?? [],
+      }
     },
     get actions() {
-      return createTreeviewReactActions(runtime)
+      return {
+        focus: (key: Key) => runtime.emit({ type: 'focus', key }),
+        select: (key: Key) => runtime.emit({ type: 'select', keys: [key], anchorKey: key, extentKey: key }),
+        toggle: (key: Key) => runtime.emit({ type: 'expand', key, expanded: !(runtime.data.state?.expandedKeys ?? []).includes(key) }),
+      }
     },
     get ids() {
       return { forKey: runtime.keyToElementId }
@@ -61,21 +70,4 @@ function adaptTreeviewIndicatorProps(props: SlotProps): ReactPatternProps {
       onClick?.(event)
     },
   } as ReactPatternProps
-}
-
-function getTreeviewReactState(runtime: TreeviewRuntime): ReactTreeviewRuntime['state'] {
-  return {
-    activeKey: runtime.data.state?.activeKey ?? null,
-    selectedKeys: runtime.data.state?.selectedKeys ?? [],
-    disabledKeys: runtime.data.state?.disabledKeys ?? [],
-    expandedKeys: runtime.data.state?.expandedKeys ?? [],
-  }
-}
-
-function createTreeviewReactActions(runtime: TreeviewRuntime): ReactTreeviewRuntime['actions'] {
-  return {
-    focus: (key: Key) => runtime.emit({ type: 'focus', key }),
-    select: (key: Key) => runtime.emit({ type: 'select', keys: [key], anchorKey: key, extentKey: key }),
-    toggle: (key: Key) => runtime.emit({ type: 'expand', key, expanded: !(runtime.data.state?.expandedKeys ?? []).includes(key) }),
-  }
 }
