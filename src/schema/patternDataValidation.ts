@@ -49,8 +49,6 @@ interface PatternRefsRefs {
   pointerByKey?: Record<string, unknown>
 }
 
-type IssuePath = (string | number)[]
-
 /**
  * Cross-field referential integrity checks for PatternData.
  * Every relations/state/refs key must exist in items.
@@ -66,7 +64,7 @@ export const validatePatternDataRefs = (
   validateRefsRefs(value.refs, keys, ctx)
 }
 
-function addUnknownKeyIssue(ctx: z.RefinementCtx, path: IssuePath, key: string) {
+function addUnknownKeyIssue(ctx: z.RefinementCtx, path: (string | number)[], key: string) {
   ctx.addIssue({
     code: 'custom',
     path,
