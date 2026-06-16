@@ -73,7 +73,7 @@ export function useMenuPattern(data: PatternData, onEvent: (event: PatternEvent)
     menuElementRef.current = element
   }
   const closeMenu = (reason: PatternEventReason, closeOptions?: { emitDismiss?: boolean; restoreFocus?: boolean }) => {
-    const dismissEvent = createDismissEvent(menuKey, reason)
+    const dismissEvent: MenuDismissEvent = { type: 'dismiss', ...(menuKey ? { key: menuKey } : {}), meta: { reason } }
     if (closeOptions?.emitDismiss !== false) onEvent(dismissEvent)
     onClose?.(dismissEvent)
     if (closeOptions?.restoreFocus === false) return
@@ -200,7 +200,8 @@ function createMenuItem({
 
 function createMenuRuntimeData(data: PatternData, open: boolean, enabledItemKeys: readonly Key[], initialActiveKey: Key | null | undefined): PatternData {
   if (!open) return data
-  const activeKey = activeEnabledKey(data, enabledItemKeys) ?? initialEnabledKey(enabledItemKeys, initialActiveKey)
+  const initialKey = initialActiveKey && enabledItemKeys.includes(initialActiveKey) ? initialActiveKey : enabledItemKeys[0] ?? null
+  const activeKey = activeEnabledKey(data, enabledItemKeys) ?? initialKey
   if (!activeKey) return data
   const lastEventReason = data.state?.lastEventReason ?? 'open'
   if (data.state?.activeKey === activeKey && data.state?.lastEventReason === lastEventReason) return data
@@ -210,15 +211,6 @@ function createMenuRuntimeData(data: PatternData, open: boolean, enabledItemKeys
 function activeEnabledKey(data: PatternData, enabledItemKeys: readonly Key[]): Key | null {
   const activeKey = data.state?.activeKey
   return activeKey && enabledItemKeys.includes(activeKey) ? activeKey : null
-}
-
-function initialEnabledKey(enabledItemKeys: readonly Key[], initialActiveKey: Key | null | undefined): Key | null {
-  if (initialActiveKey && enabledItemKeys.includes(initialActiveKey)) return initialActiveKey
-  return enabledItemKeys[0] ?? null
-}
-
-function createDismissEvent(menuKey: Key | null, reason: PatternEventReason): MenuDismissEvent {
-  return { type: 'dismiss', ...(menuKey ? { key: menuKey } : {}), meta: { reason } }
 }
 
 function resolveRestoreFocusTarget(target: RestoreFocusTarget | undefined): HTMLElement | null {
