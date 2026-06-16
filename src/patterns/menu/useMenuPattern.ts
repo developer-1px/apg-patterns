@@ -260,7 +260,10 @@ function useMenuOutsideDismiss({
     if (!ownerDocument) return
     let dismissed = false
     const dismissIfOutside = (event: Event) => {
-      if (dismissed || isEventTargetInside(event.target, menuElementRef.current)) return
+      const target = event.target
+      const element = menuElementRef.current
+      const insideMenu = Boolean(target && element && typeof Node !== 'undefined' && target instanceof Node && element.contains(target))
+      if (dismissed || insideMenu) return
       dismissed = true
       closeMenu('pointer', { emitDismiss: true, restoreFocus: false })
     }
@@ -271,9 +274,4 @@ function useMenuOutsideDismiss({
       ownerDocument.removeEventListener('contextmenu', dismissIfOutside, true)
     }
   }, [closeMenu, enabled, menuElementRef, open])
-}
-
-function isEventTargetInside(target: EventTarget | null, element: HTMLElement | null): boolean {
-  if (!target || !element || typeof Node === 'undefined' || !(target instanceof Node)) return false
-  return element.contains(target)
 }
