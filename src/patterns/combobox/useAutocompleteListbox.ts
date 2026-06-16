@@ -1,7 +1,7 @@
 import { type HTMLAttributes, type KeyboardEvent, useMemo } from 'react'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
-import type { ReactListboxRenderItem, ReactListboxRuntime } from '../../adapters/reactTypes'
+import type { ReactListboxRenderItem } from '../../adapters/reactTypes'
 import { createElementId, createElementIdPrefix } from '../../kernel/domIds'
 import { useListboxPattern } from '../listbox/useListboxPattern'
 
@@ -66,7 +66,13 @@ export function useAutocompleteListbox<TElement extends HTMLElement = HTMLElemen
     })
 
   return {
-    actions: createAutocompleteListboxActions({ onEvent, ownerKey, listbox }),
+    actions: {
+      close: () => onEvent({ type: 'expand', key: ownerKey, expanded: false, meta: { reason: 'external' } }),
+      dismiss: () => onEvent({ type: 'dismiss', key: ownerKey, meta: { reason: 'external' } }),
+      focus: listbox.actions.focus,
+      open: () => onEvent({ type: 'expand', key: ownerKey, expanded: true, meta: { reason: 'external' } }),
+      select: listbox.actions.select,
+    },
     activeDescendantId,
     dispatchOwnerKeyDown,
     ownerProps: createAutocompleteOwnerProps({
@@ -184,24 +190,6 @@ function createAutocompletePopupProps(
   return {
     ...popupProps,
     id: popupId,
-  }
-}
-
-function createAutocompleteListboxActions({
-  listbox,
-  onEvent,
-  ownerKey,
-}: {
-  listbox: ReactListboxRuntime
-  onEvent: (event: PatternEvent) => void
-  ownerKey: Key
-}): AutocompleteListboxActions {
-  return {
-    close: () => onEvent({ type: 'expand', key: ownerKey, expanded: false, meta: { reason: 'external' } }),
-    dismiss: () => onEvent({ type: 'dismiss', key: ownerKey, meta: { reason: 'external' } }),
-    focus: listbox.actions.focus,
-    open: () => onEvent({ type: 'expand', key: ownerKey, expanded: true, meta: { reason: 'external' } }),
-    select: listbox.actions.select,
   }
 }
 
