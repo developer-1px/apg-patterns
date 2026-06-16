@@ -1,7 +1,6 @@
 import { createElement, type ComponentPropsWithoutRef, type PointerEvent, type ReactNode } from 'react'
 import type { Key, PatternData, PatternEvent, PatternItem, PatternOptions } from '../../schema'
-import type { ReactSliderRenderItem } from './sliderRenderItem'
-import { useSliderPattern } from './useSliderPattern'
+import { useSliderPattern, type ReactSliderRenderItem } from './useSliderPattern'
 
 type SliderDataItem = PatternItem & {
   valuemin?: number
