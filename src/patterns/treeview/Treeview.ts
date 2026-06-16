@@ -50,26 +50,25 @@ function renderTreeItem<TItem extends TreeDataItem>({
   renderLabel?: (item: ReactTreeviewRenderItem, dataItem: TItem) => ReactNode
   renderIcon?: (item: ReactTreeviewRenderItem, dataItem: TItem) => ReactNode
 }) {
-  const children: ReactNode[] = []
-  if (item.kind === 'branch') {
-    children.push(
-      createElement(
-        'button',
-        {
-          key: `${item.key}-toggle`,
-          'aria-label': `${item.state.expanded ? 'Collapse' : 'Expand'} ${item.label}`,
-          ...item.toggleButtonProps,
-        },
-        item.state.expanded ? '-' : '+',
-      ),
-    )
-  }
-
   const icon = renderIcon?.(item, dataItem)
-  if (icon !== undefined && icon !== null) children.push(createElement('span', { key: `${item.key}-icon`, 'aria-hidden': true }, icon))
-
-  children.push(createElement('span', { key: `${item.key}-label` }, renderLabel?.(item, dataItem) ?? (dataItem.href ? createElement('a', { href: dataItem.href }, item.label) : item.label)))
+  const label = renderLabel?.(item, dataItem) ?? (dataItem.href ? createElement('a', { href: dataItem.href }, item.label) : item.label)
 
   const style: CSSProperties | undefined = item.level > 1 ? { paddingInlineStart: `${(item.level - 1) * indent}px` } : undefined
-  return createElement('div', { key: item.key, ...item.treeitemProps, style }, children)
+  return createElement(
+    'div',
+    { key: item.key, ...item.treeitemProps, style },
+    item.kind === 'branch'
+      ? createElement(
+          'button',
+          {
+            key: `${item.key}-toggle`,
+            'aria-label': `${item.state.expanded ? 'Collapse' : 'Expand'} ${item.label}`,
+            ...item.toggleButtonProps,
+          },
+          item.state.expanded ? '-' : '+',
+        )
+      : null,
+    icon !== undefined && icon !== null ? createElement('span', { key: `${item.key}-icon`, 'aria-hidden': true }, icon) : null,
+    createElement('span', { key: `${item.key}-label` }, label),
+  )
 }
