@@ -29,13 +29,9 @@ function resolveOptionalElementTarget(target: Exclude<ElementTarget, { kind: 'fi
   try {
     return resolveElementTarget(target, data, keyToElementId)
   } catch (error) {
-    if (isUnresolvedKeyTokenError(error)) return null
+    if (error instanceof Error && error.message.startsWith('Cannot resolve key token:')) return null
     throw error
   }
-}
-
-function isUnresolvedKeyTokenError(error: unknown): boolean {
-  return error instanceof Error && error.message.startsWith('Cannot resolve key token:')
 }
 
 function resolveElementTargetKey(target: Extract<ElementTarget, { kind: 'key' }> | Extract<ElementTarget, { kind: 'controlledBy' }>, data: PatternData): Key | null {
