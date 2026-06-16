@@ -107,8 +107,12 @@ function handleMenubarSubmenuKey(
   }
   const closeOwner = () => input.onEvent({ type: 'expand', key: input.ownerKey, expanded: false, meta: { reason: 'keyboard' } })
   const focusOwner = () => {
+    const owner = document.getElementById(input.keyToElementId(input.ownerKey))
+    if (owner && document.activeElement !== owner) {
+      owner.focus({ preventScroll: true })
+      return
+    }
     input.onEvent({ type: 'focus', key: input.ownerKey, meta: { reason: 'keyboard' } })
-    document.getElementById(input.keyToElementId(input.ownerKey))?.focus({ preventScroll: true })
   }
   const openSibling = (direction: 'next' | 'previous') => {
     const target = siblingKey(input.rootKeys, input.ownerKey, direction)

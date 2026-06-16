@@ -231,9 +231,11 @@ server-rendered markup:
 contracts through the public `../react` facade:
 
 - `useTreeviewPattern`, `useTabsPattern`, `useComboboxPattern`,
-  `useDialogPattern`, `useListboxPattern`, and `useMenuButtonPattern` must
-  preserve representative keyboard, focus, pointer, open, close, select,
-  activate, and navigation event payloads.
+  `useDialogPattern`, `useListboxPattern`, `useMenuButtonPattern`,
+  `useGridPattern`, `useTreegridPattern`, `useMenubarPattern`, and
+  `useMenuPattern` must preserve representative keyboard, focus, pointer,
+  open, close, select, activate, navigation, sort, edit, and dismiss event
+  payloads.
 - Event payloads and `meta.reason` are checked separately so enumerable versus
   non-enumerable metadata remains an implementation detail, while the public
   event meaning stays fixed.
