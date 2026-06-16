@@ -1,6 +1,7 @@
 import type { MouseEvent } from 'react'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternData, PatternEvent } from '../../schema'
+import { withDefaultReason } from '../../kernel/domEventBindings'
+import type { Key, PatternData, PatternEvent, PatternEventReason } from '../../schema'
 import { reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
 import { withMenuItemRoleProps } from './menuItemRole'
 
@@ -22,7 +23,7 @@ export function createMenuButtonItem({
   data: PatternData
   key: Key
   onEvent: (event: PatternEvent) => void
-  closeAndFocusTrigger(): void
+  closeAndFocusTrigger(reason?: PatternEventReason): void
 }): ReactMenuButtonItem {
   const itemProps = withMenuItemRoleProps(reactProps(runtime.getPartProps('menuitem', key)), data, key)
   const state = runtime.getItemState(key, 'menuitem')
@@ -36,7 +37,7 @@ export function createMenuButtonItem({
     itemProps: {
       ...itemProps,
       id: runtime.keyToElementId(key),
-      onFocus: () => onEvent({ type: 'focus', key }),
+      onFocus: () => onEvent(withDefaultReason({ type: 'focus', key }, 'focus')),
       onClick: (event: MouseEvent<HTMLElement>) => {
         if (state.disabled) {
           event.preventDefault()
@@ -44,7 +45,7 @@ export function createMenuButtonItem({
           return
         }
         itemProps.onClick?.(event)
-        closeAndFocusTrigger()
+        closeAndFocusTrigger('pointer')
       },
     },
   }

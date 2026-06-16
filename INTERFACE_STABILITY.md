@@ -236,9 +236,10 @@ server-rendered markup:
 contracts through the public `../react` facade:
 
 - `useTreeviewPattern`, `useTabsPattern`, `useComboboxPattern`,
-  `useDialogPattern`, `useListboxPattern`, `useMenuButtonPattern`,
-  `useGridPattern`, `useTreegridPattern`, `useMenubarPattern`, and
-  `useMenuPattern`, `useButtonPattern`, `useCheckboxPattern`,
+  `useDialogPattern`, `useAlertDialogPattern`, `useListboxPattern`,
+  `useMenuButtonPattern`, `useGridPattern`, `useTreegridPattern`,
+  `useMenubarPattern`, `useMenuPattern`, `useButtonPattern`,
+  `useCheckboxPattern`, `useBreadcrumbPattern`,
   `useSwitchPattern`, `useLinkPattern`, `useAccordionPattern`,
   `useDisclosurePattern`, `useRadioGroupPattern`, `useToolbarPattern`,
   `useSliderPattern`, `useSpinbuttonPattern`, `useWindowSplitterPattern`,

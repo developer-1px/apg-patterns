@@ -1,5 +1,6 @@
 import type { MouseEvent } from 'react'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
+import { withDefaultReason } from '../../kernel/domEventBindings'
 import type { Key, PatternData, PatternEvent } from '../../schema'
 import { reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
 import { comboboxRootKey } from './navigation'
@@ -42,9 +43,9 @@ export function createComboboxOption({
       'aria-selected': open ? active : selected,
       onMouseDown: (event: MouseEvent<HTMLElement>) => {
         event.preventDefault()
-        onEvent({ type: 'select', keys: [key], anchorKey: key, extentKey: key })
-        onEvent({ type: 'expand', key: comboboxRootKey, expanded: false })
-        if (editable) onEvent({ type: 'commitValue', key, value: data.items[key]?.label ?? '' })
+        onEvent(withDefaultReason({ type: 'select', keys: [key], anchorKey: key, extentKey: key }, 'pointer'))
+        onEvent(withDefaultReason({ type: 'expand', key: comboboxRootKey, expanded: false }, 'pointer'))
+        if (editable) onEvent(withDefaultReason({ type: 'commitValue', key, value: data.items[key]?.label ?? '' }, 'pointer'))
       },
     },
   }

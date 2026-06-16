@@ -1,5 +1,6 @@
 import type { KeyboardEvent } from 'react'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { withDefaultReason } from '../../kernel/domEventBindings'
 import type { MenuButtonPropsInput } from './menuButtonPropsInput'
 
 export function createMenuButtonTriggerProps({
@@ -34,7 +35,7 @@ export function createMenuButtonTriggerProps({
       }
       if (expanded && event.key === 'Escape') {
         event.preventDefault()
-        onEvent({ type: 'expand', key: triggerKey, expanded: false })
+        onEvent(withDefaultReason({ type: 'expand', key: triggerKey, expanded: false }, 'keyboard'))
         return
       }
       props.onKeyDown?.(event)

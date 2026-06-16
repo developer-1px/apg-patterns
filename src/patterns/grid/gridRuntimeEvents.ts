@@ -1,4 +1,5 @@
 import type { Key, PatternData, PatternEvent } from '../../schema'
+import { withDefaultReason } from '../../kernel/domEventBindings'
 
 type GridValue = string | number | boolean | null
 type GridSort = 'ascending' | 'descending' | 'other'
@@ -23,16 +24,16 @@ export function createGridRuntimeEventHandler({
       const key = event.key
       if (data.items[key]?.kind === 'columnheader' && isSortableColumnHeader(data, sortByKey, key)) {
         const current = sortByKey[key]
-        onEvent({ type: 'sort', key, sort: current === 'ascending' ? 'descending' : 'ascending' })
+        onEvent(withDefaultReason({ type: 'sort', key, sort: current === 'ascending' ? 'descending' : 'ascending' }, event.meta?.reason ?? 'external'))
         return
       }
       if (editableKeys.includes(key)) {
-        onEvent({ type: 'editStart', key, value: String(valueByKey[key] ?? data.items[key]?.label ?? '') })
+        onEvent(withDefaultReason({ type: 'editStart', key, value: String(valueByKey[key] ?? data.items[key]?.label ?? '') }, event.meta?.reason ?? 'external'))
         return
       }
     }
     if (event.type === 'dismiss') {
-      onEvent({ type: 'editEnd', key: editingKey ?? undefined })
+      onEvent(withDefaultReason({ type: 'editEnd', key: editingKey ?? undefined }, event.meta?.reason ?? 'external'))
       return
     }
     onEvent(event)
@@ -58,11 +59,11 @@ export function createGridEditActions({
   return {
     commitEdit() {
       if (!editingKey) return
-      onEvent({ type: 'value', key: editingKey, value: String(editDraftByKey[editingKey] ?? '') })
-      onEvent({ type: 'editEnd', key: editingKey })
+      onEvent(withDefaultReason({ type: 'value', key: editingKey, value: String(editDraftByKey[editingKey] ?? '') }, 'external'))
+      onEvent(withDefaultReason({ type: 'editEnd', key: editingKey }, 'external'))
     },
     cancelEdit() {
-      onEvent({ type: 'editEnd', key: editingKey ?? undefined })
+      onEvent(withDefaultReason({ type: 'editEnd', key: editingKey ?? undefined }, 'external'))
     },
   }
 }

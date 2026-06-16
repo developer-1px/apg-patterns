@@ -1,7 +1,8 @@
 import { useLayoutEffect } from 'react'
 import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
 import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
-import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
+import { withDefaultReason } from '../../kernel/domEventBindings'
+import type { Key, PatternData, PatternEvent, PatternEventReason, PatternOptions } from '../../schema'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { menuButtonDefinition } from './definition'
@@ -47,16 +48,16 @@ export function useMenuButtonPattern(data: PatternData, onEvent: (event: Pattern
   usePatternEffects({ definition: menuButtonDefinition, data: runtime.data, keyToElementId: runtime.keyToElementId })
   useMenuButtonActiveDescendantFocus({ data, expanded, focusStrategy, menuKey, runtime })
 
-  const closeAndFocusTrigger = () => {
+  const closeAndFocusTrigger = (reason: PatternEventReason = 'external') => {
     if (!triggerKey) return
-    onEvent({ type: 'expand', key: triggerKey, expanded: false })
+    onEvent(withDefaultReason({ type: 'expand', key: triggerKey, expanded: false }, reason))
     document.getElementById(runtime.keyToElementId(triggerKey))?.focus({ preventScroll: true })
   }
-  const activateActiveItem = () => {
+  const activateActiveItem = (reason: PatternEventReason = 'external') => {
     const activeKey = data.state?.activeKey
     if (!activeKey || !itemKeys.includes(activeKey) || data.state?.disabledKeys?.includes(activeKey)) return
-    onEvent({ type: 'activate', key: activeKey })
-    closeAndFocusTrigger()
+    onEvent(withDefaultReason({ type: 'activate', key: activeKey }, reason))
+    closeAndFocusTrigger(reason)
   }
 
   return {

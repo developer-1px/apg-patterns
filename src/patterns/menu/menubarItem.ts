@@ -1,5 +1,6 @@
 import type { KeyboardEvent } from 'react'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
+import { withDefaultReason } from '../../kernel/domEventBindings'
 import type { Key, PatternData, PatternEvent } from '../../schema'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 import { getMenubarChildEntryKey, getMenubarSiblingKey } from './menubarNavigation'
@@ -47,7 +48,7 @@ export function createMenubarItem({
         if ((event.key === 'ArrowDown' || event.key === 'ArrowUp') && children.length > 0) {
           event.preventDefault()
           event.stopPropagation()
-          onEvent({ type: 'expand', key, expanded: true })
+          onEvent(withDefaultReason({ type: 'expand', key, expanded: true }, 'keyboard'))
           const target = getMenubarChildEntryKey(children, event.key === 'ArrowDown' ? 'first' : 'last', data)
           if (target) onEvent({ type: 'focus', key: target, meta: { reason: 'keyboard' } })
           return

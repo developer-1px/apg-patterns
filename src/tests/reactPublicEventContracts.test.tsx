@@ -2,6 +2,8 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import {
   useAccordionPattern,
+  useAlertDialogPattern,
+  useBreadcrumbPattern,
   useButtonPattern,
   useCarouselPattern,
   useCheckboxPattern,
@@ -64,17 +66,32 @@ describe('React public event contracts', () => {
 
   it('keeps combobox input and open keyboard events on the public hook surface', () => {
     const events: PatternEvent[] = []
-    render(<ComboboxContractHost onEvent={(event) => events.push(event)} />)
+    const { unmount } = render(<ComboboxContractHost onEvent={(event) => events.push(event)} />)
 
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'alp' } })
     fireEvent.keyDown(screen.getByRole('combobox'), { key: 'ArrowDown' })
 
     expect(eventPayload(events[0])).toEqual({ type: 'inputValue', key: 'combobox', value: 'alp', inline: false })
+    expect(eventReason(events[0])).toBe('keyboard')
     expect(events.slice(1).map(eventPayload)).toEqual([
       { type: 'expand', key: 'combobox', expanded: true },
       { type: 'navigate', direction: 'first' },
     ])
     expect(events.slice(1).map(eventReason)).toEqual(['keyboard', 'keyboard'])
+
+    unmount()
+
+    const pointerEvents: PatternEvent[] = []
+    render(<ComboboxContractHost data={comboboxOpenData} onEvent={(event) => pointerEvents.push(event)} />)
+
+    fireEvent.mouseDown(screen.getByRole('option', { name: 'Alpha' }))
+
+    expect(pointerEvents.map(eventPayload)).toEqual([
+      { type: 'select', keys: ['alpha'], anchorKey: 'alpha', extentKey: 'alpha' },
+      { type: 'expand', key: 'combobox', expanded: false },
+      { type: 'commitValue', key: 'alpha', value: 'Alpha' },
+    ])
+    expect(pointerEvents.map(eventReason)).toEqual(['pointer', 'pointer', 'pointer'])
   })
 
   it('keeps dialog Escape and overlay close events on the public hook surface', () => {
@@ -90,6 +107,32 @@ describe('React public event contracts', () => {
     expect(eventReason(events[1])).toBe('pointer')
   })
 
+  it('keeps alert dialog activation and close events on the public hook surface', () => {
+    const keyboardEvents: PatternEvent[] = []
+    const { unmount } = render(<AlertDialogContractHost onEvent={(event) => keyboardEvents.push(event)} />)
+
+    fireEvent.keyDown(screen.getByRole('alertdialog'), { key: 'Escape' })
+
+    expect(keyboardEvents.map(eventPayload)).toEqual([
+      { type: 'activate', key: 'cancel' },
+      { type: 'expand', key: 'trigger', expanded: false },
+    ])
+    expect(keyboardEvents.map(eventReason)).toEqual(['keyboard', 'keyboard'])
+
+    unmount()
+
+    const pointerEvents: PatternEvent[] = []
+    render(<AlertDialogContractHost onEvent={(event) => pointerEvents.push(event)} />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Delete' }))
+
+    expect(pointerEvents.map(eventPayload)).toEqual([
+      { type: 'activate', key: 'confirm' },
+      { type: 'expand', key: 'trigger', expanded: false },
+    ])
+    expect(pointerEvents.map(eventReason)).toEqual(['pointer', 'pointer'])
+  })
+
   it('keeps listbox keyboard navigation and multi-select pointer events on the public hook surface', () => {
     const events: PatternEvent[] = []
     render(<ListboxContractHost onEvent={(event) => events.push(event)} />)
@@ -100,6 +143,7 @@ describe('React public event contracts', () => {
     expect(eventPayload(events[0])).toEqual({ type: 'navigate', direction: 'next' })
     expect(eventReason(events[0])).toBe('keyboard')
     expect(eventPayload(events[1])).toEqual({ type: 'select', keys: ['two'], anchorKey: 'two', extentKey: 'two' })
+    expect(eventReason(events[1])).toBe('pointer')
   })
 
   it('keeps menu button open and activation events on the public hook surface', () => {
@@ -123,6 +167,7 @@ describe('React public event contracts', () => {
       { type: 'activate', key: 'copy' },
       { type: 'expand', key: 'trigger', expanded: false },
     ])
+    expect(activationEvents.map(eventReason)).toEqual(['keyboard', 'keyboard'])
   })
 
   it('keeps grid navigation, sorting, and edit events on the public hook surface', () => {
@@ -138,7 +183,7 @@ describe('React public event contracts', () => {
       { type: 'selectColumn' },
       { type: 'sort', key: 'name', sort: 'descending' },
     ])
-    expect(navigationEvents.slice(0, 2).map(eventReason)).toEqual(['keyboard', 'keyboard'])
+    expect(navigationEvents.map(eventReason)).toEqual(['keyboard', 'keyboard', 'keyboard'])
 
     unmount()
 
@@ -150,6 +195,7 @@ describe('React public event contracts', () => {
     expect(editEvents.map(eventPayload)).toEqual([
       { type: 'editStart', key: 'alpha-value', value: 'Draft' },
     ])
+    expect(editEvents.map(eventReason)).toEqual(['keyboard'])
   })
 
   it('keeps treegrid collapse and row selection events on the public hook surface', () => {
@@ -178,7 +224,7 @@ describe('React public event contracts', () => {
       { type: 'expand', key: 'file', expanded: true },
       { type: 'focus', key: 'new' },
     ])
-    expect(rootEvents.map(eventReason)).toEqual(['keyboard', undefined, 'keyboard'])
+    expect(rootEvents.map(eventReason)).toEqual(['keyboard', 'keyboard', 'keyboard'])
 
     const submenuEvents: PatternEvent[] = []
     render(<MenubarContractHost data={menubarOpenData} onEvent={(event) => submenuEvents.push(event)} />)
@@ -236,6 +282,18 @@ describe('React public event contracts', () => {
       { type: 'activate', key: 'docs' },
     ])
     expect(events.map(eventReason)).toEqual(['keyboard', 'keyboard', 'keyboard', 'keyboard', 'pointer'])
+  })
+
+  it('keeps breadcrumb pointer activation on the public hook surface', () => {
+    const events: PatternEvent[] = []
+    render(<BreadcrumbContractHost onEvent={(event) => events.push(event)} />)
+
+    fireEvent.click(screen.getByRole('link', { name: 'API' }))
+
+    expect(events.map(eventPayload)).toEqual([
+      { type: 'activate', key: 'api' },
+    ])
+    expect(events.map(eventReason)).toEqual(['pointer'])
   })
 
   it('keeps accordion and disclosure expand events on the public hook surface', () => {
@@ -409,8 +467,8 @@ function TabsContractHost({ onEvent }: { onEvent: (event: PatternEvent) => void 
   )
 }
 
-function ComboboxContractHost({ onEvent }: { onEvent: (event: PatternEvent) => void }) {
-  const combobox = useComboboxPattern(comboboxData, onEvent)
+function ComboboxContractHost({ data = comboboxData, onEvent }: { data?: PatternData; onEvent: (event: PatternEvent) => void }) {
+  const combobox = useComboboxPattern(data, onEvent)
 
   return (
     <div>
@@ -440,6 +498,24 @@ function DialogContractHost({ onEvent }: { onEvent: (event: PatternEvent) => voi
           </div>
         </div>
       ) : null}
+    </div>
+  )
+}
+
+function AlertDialogContractHost({ onEvent }: { onEvent: (event: PatternEvent) => void }) {
+  const alertDialog = useAlertDialogPattern(alertDialogData, onEvent)
+
+  return (
+    <div>
+      <button type="button" {...alertDialog.triggerProps}>{alertDialog.labelOf('trigger')}</button>
+      <div data-testid="alertdialog-overlay" {...alertDialog.overlayProps}>
+        <div {...alertDialog.dialogProps}>
+          <h2 {...alertDialog.titleProps}>{alertDialog.labelOf('title')}</h2>
+          <p {...alertDialog.descriptionProps}>{alertDialog.labelOf('description')}</p>
+          <button type="button" {...alertDialog.confirmProps}>{alertDialog.labelOf('confirm')}</button>
+          <button type="button" {...alertDialog.cancelProps}>{alertDialog.labelOf('cancel')}</button>
+        </div>
+      </div>
     </div>
   )
 }
@@ -537,6 +613,22 @@ function SimpleControlsContractHost({ onEvent }: { onEvent: (event: PatternEvent
       {switchRuntime.renderItems.map((item) => <div key={item.key} {...item.switchProps}>{item.label}</div>)}
       <a href={link.href} {...link.linkProps}>{link.label}</a>
     </div>
+  )
+}
+
+function BreadcrumbContractHost({ onEvent }: { onEvent: (event: PatternEvent) => void }) {
+  const breadcrumb = useBreadcrumbPattern(breadcrumbData, onEvent)
+
+  return (
+    <nav {...breadcrumb.rootProps}>
+      <ol {...breadcrumb.listProps}>
+        {breadcrumb.items.map((item) => (
+          <li key={item.key}>
+            <a {...item.crumbProps}>{item.label}</a>
+          </li>
+        ))}
+      </ol>
+    </nav>
   )
 }
 
@@ -750,6 +842,15 @@ const comboboxData = {
   refs: { label: 'Search options' },
 } satisfies PatternData
 
+const comboboxOpenData = {
+  ...comboboxData,
+  state: {
+    ...comboboxData.state,
+    activeKey: 'alpha',
+    expandedKeys: ['combobox'],
+  },
+} satisfies PatternData
+
 const dialogData = {
   items: {
     trigger: { label: 'Open dialog', kind: 'dialog' },
@@ -771,6 +872,30 @@ const dialogData = {
     activeKey: 'trigger',
     expandedKeys: ['trigger'],
   },
+} satisfies PatternData
+
+const alertDialogData = {
+  items: {
+    trigger: { label: 'Delete item', kind: 'dialog' },
+    warningDialog: { label: 'Delete warning' },
+    title: { label: 'Delete item?' },
+    description: { label: 'This cannot be undone.' },
+    confirm: { label: 'Delete' },
+    cancel: { label: 'Cancel' },
+  },
+  relations: {
+    rootKeys: ['trigger'],
+    controlsByKey: {
+      trigger: ['warningDialog'],
+      warningDialog: ['description'],
+    },
+    ownerByKey: { warningDialog: 'title' },
+  },
+  state: {
+    activeKey: 'trigger',
+    expandedKeys: ['trigger'],
+  },
+  refs: { initialFocusKey: 'cancel' },
 } satisfies PatternData
 
 const listboxData = {
@@ -1041,6 +1166,20 @@ const linkData = {
   state: {
     activeKey: 'docs',
   },
+} satisfies PatternData
+
+const breadcrumbData = {
+  items: {
+    home: { label: 'Home', href: '#home' },
+    api: { label: 'API', href: '#api' },
+  },
+  relations: {
+    rootKeys: ['home', 'api'],
+  },
+  state: {
+    currentByKey: { api: 'page' },
+  },
+  refs: { label: 'Breadcrumb' },
 } satisfies PatternData
 
 const accordionData = {

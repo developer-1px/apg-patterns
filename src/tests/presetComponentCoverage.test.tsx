@@ -370,8 +370,8 @@ describe('preset React components', () => {
 
     expect(events).toEqual([
       { type: 'expand', key: 'trigger', expanded: false },
-      { type: 'expand', key: 'trigger', expanded: false },
       { type: 'activate', key: 'confirm' },
+      { type: 'expand', key: 'trigger', expanded: false },
     ])
   })
 

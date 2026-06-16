@@ -1,5 +1,6 @@
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { withDefaultReason } from '../../kernel/domEventBindings'
 import type { Key } from '../../schema'
 import { rangeBetween } from './listboxMultiSelectionRange'
 
@@ -15,7 +16,7 @@ export function handleListboxMultiClick(runtime: PatternRuntime, key: Key, event
 
   if (event.shiftKey && anchorKey) {
     const range = rangeBetween(visibleKeys, anchorKey, key)
-    if (range) runtime.emit({ type: 'select', keys: range, anchorKey, extentKey: key })
+    if (range) runtime.emit(withDefaultReason({ type: 'select', keys: range, anchorKey, extentKey: key }, 'pointer'))
     return true
   }
 
@@ -23,10 +24,10 @@ export function handleListboxMultiClick(runtime: PatternRuntime, key: Key, event
     const next = new Set(selectedKeys)
     if (next.has(key)) next.delete(key)
     else next.add(key)
-    runtime.emit({ type: 'select', keys: [...next], anchorKey: key, extentKey: key })
+    runtime.emit(withDefaultReason({ type: 'select', keys: [...next], anchorKey: key, extentKey: key }, 'pointer'))
     return true
   }
 
-  runtime.emit({ type: 'select', keys: [key], anchorKey: key, extentKey: key })
+  runtime.emit(withDefaultReason({ type: 'select', keys: [key], anchorKey: key, extentKey: key }, 'pointer'))
   return true
 }

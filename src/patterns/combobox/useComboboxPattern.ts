@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef, type HTMLAttributes, type InputHTMLAttributes, type KeyboardEvent } from 'react'
 import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
+import { withDefaultReason } from '../../kernel/domEventBindings'
 import type { Key, PatternEvent, PatternOptions } from '../../schema'
 import { createComboboxOption, type ReactComboboxOption } from './comboboxOption'
 import { getComboboxRuntimeState, type ComboboxData, type ComboboxVariant } from './comboboxRuntimeState'
@@ -76,7 +77,7 @@ function createComboboxInputProps({
     placeholder: editable ? `Search ${label.toLowerCase()}` : `Select ${label.toLowerCase()}`,
     'aria-controls': listboxId,
     onChange: (event) => {
-      if (editable) onEvent({ type: 'inputValue', key: comboboxRootKey, value: event.currentTarget.value, inline: variant === 'listWithInlineAutocomplete' })
+      if (editable) onEvent(withDefaultReason({ type: 'inputValue', key: comboboxRootKey, value: event.currentTarget.value, inline: variant === 'listWithInlineAutocomplete' }, 'keyboard'))
     },
     onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => {
       if (variant === 'selectOnly' && event.key.length === 1 && handleSelectOnlyTypeahead(event.key, onEvent)) {
@@ -86,14 +87,14 @@ function createComboboxInputProps({
       rootProps.onKeyDown?.(event)
     },
     onClick: () => {
-      if (!open) onEvent({ type: 'expand', key: comboboxRootKey, expanded: true })
+      if (!open) onEvent(withDefaultReason({ type: 'expand', key: comboboxRootKey, expanded: true }, 'pointer'))
     },
   }
 }
 
 function handleSelectOnlyTypeahead(key: string, onEvent: (event: PatternEvent) => void): boolean {
   if (!/^[\w]$/.test(key)) return false
-  onEvent({ type: 'typeahead', query: key.toLowerCase() })
+  onEvent(withDefaultReason({ type: 'typeahead', query: key.toLowerCase() }, 'keyboard'))
   return true
 }
 

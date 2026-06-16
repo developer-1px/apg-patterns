@@ -2,6 +2,7 @@ import { useLayoutEffect, useMemo, useRef, type KeyboardEvent, type MouseEvent }
 import { createPatternRuntime, type PatternRuntime } from '../../kernel/patternRuntime'
 import { registerKernelBuiltins } from '../../kernel/kernelBuiltins'
 import { reactProps, type ReactPatternProps, type ReactRenderItemState } from '../../adapters/reactBaseTypes'
+import { withDefaultReason } from '../../kernel/domEventBindings'
 import { usePatternEffects } from '../../adapters/reactPatternEffects'
 import { usePatternElementId } from '../../adapters/reactDomIds'
 import type { Key, PatternData, PatternEvent, PatternEventReason, PatternOptions } from '../../schema'
@@ -189,7 +190,7 @@ function createMenuItem({
       ...itemProps,
       id: runtime.keyToElementId(key),
       onFocus: () => {
-        if (!disabled) onEvent({ type: 'focus', key })
+        if (!disabled) onEvent(withDefaultReason({ type: 'focus', key }, 'focus'))
       },
       onClick: (event: MouseEvent<HTMLElement>) => {
         if (disabled) return

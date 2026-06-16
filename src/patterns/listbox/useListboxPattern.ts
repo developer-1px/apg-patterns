@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import { createApgTypeaheadBuffer } from '../../internal/keyboard'
 import { findApgTypeaheadMatch } from '../../internal/collectionNavigation'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
+import { withDefaultReason } from '../../kernel/domEventBindings'
 import { listboxDefinition } from './definition'
 import type { Key, PatternData, PatternEvent, PatternOptions } from '../../schema'
 import { useReactPatternRuntime } from '../../adapters/reactPatternEffects'
@@ -43,8 +44,8 @@ export function useListboxPattern(data: PatternData, onEvent: (event: PatternEve
     },
     get actions() {
       return {
-        focus: (key: Key) => runtime.emit({ type: 'focus', key }),
-        select: (key: Key) => runtime.emit({ type: 'select', keys: [key], anchorKey: key, extentKey: key }),
+        focus: (key: Key) => runtime.emit(withDefaultReason({ type: 'focus', key }, 'external')),
+        select: (key: Key) => runtime.emit(withDefaultReason({ type: 'select', keys: [key], anchorKey: key, extentKey: key }, 'external')),
       }
     },
     get ids() {

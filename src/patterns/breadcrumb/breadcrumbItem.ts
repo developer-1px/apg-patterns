@@ -1,5 +1,6 @@
 import type { MouseEvent } from 'react'
 import type { PatternRuntime } from '../../kernel/patternRuntime'
+import { withDefaultReason } from '../../kernel/domEventBindings'
 import type { Key, PatternData, PatternEvent, PatternItem } from '../../schema'
 import { reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
 
@@ -38,7 +39,7 @@ export function createBreadcrumbItems({
         'aria-current': current || undefined,
         onClick: (event: MouseEvent<HTMLElement>) => {
           event.preventDefault()
-          onEvent({ type: 'activate', key })
+          onEvent(withDefaultReason({ type: 'activate', key }, 'pointer'))
         },
       }),
     }

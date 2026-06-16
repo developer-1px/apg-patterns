@@ -1,5 +1,6 @@
 import type { PatternRuntime } from '../../kernel/patternRuntime'
 import type { ReactPatternProps } from '../../adapters/reactBaseTypes'
+import { withDefaultReason } from '../../kernel/domEventBindings'
 import { rangeBetween, stepKey } from './listboxMultiSelectionRange'
 
 export function handleListboxMultiKeyDown(runtime: PatternRuntime, event: Parameters<NonNullable<ReactPatternProps['onKeyDown']>>[0]): boolean {
@@ -12,12 +13,12 @@ export function handleListboxMultiKeyDown(runtime: PatternRuntime, event: Parame
   if ((event.ctrlKey || event.metaKey) && (event.key === 'a' || event.key === 'A')) {
     event.preventDefault()
     const allSelected = visibleKeys.length > 0 && visibleKeys.every((key) => selectedKeys.includes(key))
-    runtime.emit({
+    runtime.emit(withDefaultReason({
       type: 'select',
       keys: allSelected ? [] : [...visibleKeys],
       anchorKey: visibleKeys[0] ?? null,
       extentKey: visibleKeys[visibleKeys.length - 1] ?? null,
-    })
+    }, 'keyboard'))
     return true
   }
 
@@ -29,7 +30,7 @@ export function handleListboxMultiKeyDown(runtime: PatternRuntime, event: Parame
     if (!nextKey) return true
     const anchor = anchorKey ?? active
     const range = rangeBetween(visibleKeys, anchor, nextKey)
-    if (range) runtime.emit({ type: 'select', keys: range, anchorKey: anchor, extentKey: nextKey })
+    if (range) runtime.emit(withDefaultReason({ type: 'select', keys: range, anchorKey: anchor, extentKey: nextKey }, 'keyboard'))
     return true
   }
 
@@ -40,7 +41,7 @@ export function handleListboxMultiKeyDown(runtime: PatternRuntime, event: Parame
     const target = visibleKeys[event.key === 'Home' ? 0 : visibleKeys.length - 1]
     if (!target) return true
     const range = rangeBetween(visibleKeys, active, target)
-    if (range) runtime.emit({ type: 'select', keys: range, anchorKey: active, extentKey: target })
+    if (range) runtime.emit(withDefaultReason({ type: 'select', keys: range, anchorKey: active, extentKey: target }, 'keyboard'))
     return true
   }
 

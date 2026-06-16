@@ -1,6 +1,6 @@
 import type { KeyboardEvent } from 'react'
 import { reactKeyInput, reactProps, type ReactPatternProps } from '../../adapters/reactBaseTypes'
-import type { Key } from '../../schema'
+import type { Key, PatternEventReason } from '../../schema'
 import { resolveMenuButtonKey } from './menuButtonKeyboard'
 import type { MenuButtonPropsInput } from './menuButtonPropsInput'
 
@@ -17,8 +17,8 @@ export function createMenuButtonMenuProps({
 }: MenuButtonPropsInput & {
   menuKey: Key | null
   focusStrategy: 'rovingTabIndex' | 'ariaActiveDescendant'
-  closeAndFocusTrigger: () => void
-  activateActiveItem: () => void
+  closeAndFocusTrigger: (reason?: PatternEventReason) => void
+  activateActiveItem: (reason?: PatternEventReason) => void
 }): ReactPatternProps {
   if (!menuKey || !triggerKey) return {}
   const props = reactProps(runtime.getPartProps('menu', menuKey))
@@ -29,7 +29,7 @@ export function createMenuButtonMenuProps({
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
       if (event.key === 'Escape') {
         event.preventDefault()
-        closeAndFocusTrigger()
+        closeAndFocusTrigger('keyboard')
         return
       }
       if (event.key === 'Tab') {
@@ -38,7 +38,7 @@ export function createMenuButtonMenuProps({
       }
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault()
-        activateActiveItem()
+        activateActiveItem('keyboard')
         return
       }
       const nextKey = resolveMenuButtonKey(event.key, itemKeys, data.state?.activeKey, data)
